@@ -4,8 +4,8 @@ Proyecto XE
 en Windows, Linux, MacOS, Android y HTML5.
 
 Caracteristicas:
-    1. Portabilidad
-    2. Ligero
+    1. Portabilidad sobre varias plataformas.
+    2. Ligero.
     3. Alto Rendimiento.
 
 Funcionalidades Bajo Nivel:
