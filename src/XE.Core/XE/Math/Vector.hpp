@@ -6,8 +6,53 @@
 
 namespace XE::Math {
     template<typename T, int N>
-    struct Vector {
-        T Data[N];
+    struct VectorBase;
+
+    template<typename T>
+    struct VectorBase<T, 2> {
+        union {
+            T Data[2];
+            struct {T X, Y; };
+        };
+
+        VectorBase(T X, T Y) {
+            this->X = X;
+            this->Y = Y;
+        }
+    };
+
+    template<typename T>
+    struct VectorBase<T, 3> {
+        union {
+            T Data[3];
+            struct {T X, Y, Z; };
+        };
+
+        VectorBase(T X, T Y, T Z) {
+            this->X = X;
+            this->Y = Y;
+            this->Z = Z;
+        }
+    };
+    
+    template<typename T>
+    struct VectorBase<T, 4> {
+        union {
+            T Data[4];
+            struct {T X, Y, Z, W; };
+        };
+
+        VectorBase(T X, T Y, T Z, T W) {
+            this->X = X;
+            this->Y = Y;
+            this->Z = Z;
+            this->W = W;
+        }
+    };
+
+    template<typename T, int N>
+    struct Vector : VectorBase<T, N> {
+        VectorBase<T, N>::VectorBase;
 
         explicit Vector();
 

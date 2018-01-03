@@ -6,5 +6,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 cmake_minimum_required(VERSION 3.10)
 
+include_directories("src/XE.Core")
 add_subdirectory("src/XE.Core")
+
 add_subdirectory("src/XE.Test")
