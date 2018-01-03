@@ -9,4 +9,5 @@ cmake_minimum_required(VERSION 3.10)
 include_directories("src/XE.Core")
 add_subdirectory("src/XE.Core")
 
+include_directories("dep/Catch2/single_include")
 add_subdirectory("src/XE.Test")

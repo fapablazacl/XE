@@ -1,7 +1,2 @@
-
-#include <XE/Math/Vector.hpp>
-
-int main() {
-
-    return 0;
-}
+#define CATCH_CONFIG_MAIN
+#include <catch.hpp>
