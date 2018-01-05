@@ -15,9 +15,9 @@ namespace XE::Math {
             struct {T X, Y; };
         };
 
-        VectorBase(T X, T Y) {
-            this->X = X;
-            this->Y = Y;
+        VectorBase(T x, T y) {
+            X = x;
+            Y = y;
         }
     };
 
@@ -28,10 +28,10 @@ namespace XE::Math {
             struct {T X, Y, Z; };
         };
 
-        VectorBase(T X, T Y, T Z) {
-            this->X = X;
-            this->Y = Y;
-            this->Z = Z;
+        VectorBase(T x, T y, T z) {
+            X = x;
+            Y = y;
+            Z = z;
         }
     };
     
@@ -42,14 +42,17 @@ namespace XE::Math {
             struct {T X, Y, Z, W; };
         };
 
-        VectorBase(T X, T Y, T Z, T W) {
-            this->X = X;
-            this->Y = Y;
-            this->Z = Z;
-            this->W = W;
+        VectorBase(T x, T y, T z, T w) {
+            X = x;
+            Y = y;
+            Z = z;
+            W = w;
         }
     };
 
+    /**
+     * @brief N-Dimensional Vector structure.
+     */
     template<typename T, int N>
     struct Vector : VectorBase<T, N> {
         VectorBase<T, N>::VectorBase;
@@ -59,6 +62,30 @@ namespace XE::Math {
         explicit Vector(T value);
 
         explicit Vector(const T *values);
+
+        Vector<T, N> operator+ () const;
+
+        Vector<T, N> operator- () const;
+
+        Vector<T, N> operator+ (const Vector<T, N>& rhs) const;
+
+        Vector<T, N> operator- (const Vector<T, N>& rhs) const;
+
+        Vector<T, N> operator* (const Vector<T, N>& rhs) const;
+
+        Vector<T, N> operator/ (const Vector<T, N>& rhs) const;
+
+        Vector<T, N>& operator+= (const Vector<T, N>& rhs);
+
+        Vector<T, N>& operator-= (const Vector<T, N>& rhs);
+
+        Vector<T, N>& operator*= (const Vector<T, N>& rhs);
+
+        Vector<T, N>& operator/= (const Vector<T, N>& rhs);
+
+        bool operator== (const Vector<T, N>& rhs) const;
+
+        bool operator!= (const Vector<T, N>& rhs) const;
     };
 
     typedef Vector<std::int32_t, 2> Vector2i;

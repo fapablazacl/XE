@@ -3,6 +3,7 @@
 #include <cassert>
 
 namespace XE::Math {
+
     template<typename T, int N>
     Vector<T, N>::Vector() {
 
@@ -22,6 +23,66 @@ namespace XE::Math {
         for (int i=0; i<N; i++) {
             Data[i] = values[i];
         }
+    }
+
+    template<typename T, int N>
+    Vector<T, N> Vector<T, N>::operator+ () const {
+        return *this;
+    }
+
+    template<typename T, int N>
+    Vector<T, N> Vector<T, N>::operator- () const {
+        return Vector<T, N>();
+    }
+
+    template<typename T, int N>
+    Vector<T, N> Vector<T, N>::operator+ (const Vector<T, N>& rhs) const {
+        return Vector<T, N>();
+    }
+
+    template<typename T, int N>
+    Vector<T, N> Vector<T, N>::operator- (const Vector<T, N>& rhs) const {
+        return Vector<T, N>();
+    }
+
+    template<typename T, int N>
+    Vector<T, N> Vector<T, N>::operator* (const Vector<T, N>& rhs) const {
+        return Vector<T, N>();
+    }
+
+    template<typename T, int N>
+    Vector<T, N> Vector<T, N>::operator/ (const Vector<T, N>& rhs) const {
+        return Vector<T, N>();
+    }
+
+    template<typename T, int N>
+    Vector<T, N>& Vector<T, N>::operator+= (const Vector<T, N>& rhs) {
+        return *this;
+    }
+
+    template<typename T, int N>
+    Vector<T, N>& Vector<T, N>::operator-= (const Vector<T, N>& rhs) {
+        return *this;
+    }
+
+    template<typename T, int N>
+    Vector<T, N>& Vector<T, N>::operator*= (const Vector<T, N>& rhs) {
+        return *this;
+    }
+
+    template<typename T, int N>
+    Vector<T, N>& Vector<T, N>::operator/= (const Vector<T, N>& rhs) {
+        return *this;
+    }
+
+    template<typename T, int N>
+    bool Vector<T, N>::operator== (const Vector<T, N>& rhs) const {
+        return false;
+    }
+
+    template<typename T, int N>
+    bool Vector<T, N>::operator!= (const Vector<T, N>& rhs) const {
+        return true;
     }
 
     template<> struct Vector<std::int32_t, 2>;
