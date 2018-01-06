@@ -3,11 +3,8 @@
 #include <cassert>
 
 namespace XE::Math {
-
     template<typename T, int N>
-    Vector<T, N>::Vector() {
-
-    }
+    Vector<T, N>::Vector() {}
 
     template<typename T, int N>
     Vector<T, N>::Vector(T value) {
@@ -32,56 +29,154 @@ namespace XE::Math {
 
     template<typename T, int N>
     Vector<T, N> Vector<T, N>::operator- () const {
-        return Vector<T, N>();
+        Vector<T, N> result;
+
+        for (int i=0; i<N; i++) {
+            result.Data[i] = -Data[i];
+        }
+
+        return result;
     }
 
     template<typename T, int N>
     Vector<T, N> Vector<T, N>::operator+ (const Vector<T, N>& rhs) const {
-        return Vector<T, N>();
+        Vector<T, N> result;
+
+        for (int i=0; i<N; i++) {
+            result.Data[i] = Data[i] + rhs.Data[i];
+        }
+
+        return result;
     }
 
     template<typename T, int N>
     Vector<T, N> Vector<T, N>::operator- (const Vector<T, N>& rhs) const {
-        return Vector<T, N>();
+        Vector<T, N> result;
+
+        for (int i=0; i<N; i++) {
+            result.Data[i] = Data[i] - rhs.Data[i];
+        }
+
+        return result;
     }
 
     template<typename T, int N>
     Vector<T, N> Vector<T, N>::operator* (const Vector<T, N>& rhs) const {
-        return Vector<T, N>();
+        Vector<T, N> result;
+
+        for (int i=0; i<N; i++) {
+            result.Data[i] = Data[i] * rhs.Data[i];
+        }
+
+        return result;
     }
 
     template<typename T, int N>
     Vector<T, N> Vector<T, N>::operator/ (const Vector<T, N>& rhs) const {
-        return Vector<T, N>();
+        Vector<T, N> result;
+
+        for (int i=0; i<N; i++) {
+            result.Data[i] = Data[i] / rhs.Data[i];
+        }
+
+        return result;
+    }
+
+    template<typename T, int N>
+    Vector<T, N> Vector<T, N>::operator* (const T rhs) const {
+        Vector<T, N> result;
+
+        for (int i=0; i<N; i++) {
+            result.Data[i] = Data[i] * rhs;
+        }
+
+        return result;
+    }
+
+    template<typename T, int N>
+    Vector<T, N> Vector<T, N>::operator/ (const T rhs) const {
+        Vector<T, N> result;
+
+        for (int i=0; i<N; i++) {
+            result.Data[i] = Data[i] / rhs;
+        }
+
+        return result;
     }
 
     template<typename T, int N>
     Vector<T, N>& Vector<T, N>::operator+= (const Vector<T, N>& rhs) {
+        for (int i=0; i<N; i++) {
+            Data[i] += rhs.Data[i];
+        }
+
         return *this;
     }
 
     template<typename T, int N>
     Vector<T, N>& Vector<T, N>::operator-= (const Vector<T, N>& rhs) {
+        for (int i=0; i<N; i++) {
+            Data[i] -= rhs.Data[i];
+        }
+        
         return *this;
     }
 
     template<typename T, int N>
     Vector<T, N>& Vector<T, N>::operator*= (const Vector<T, N>& rhs) {
+        for (int i=0; i<N; i++) {
+            Data[i] *= rhs.Data[i];
+        }
+        
         return *this;
     }
 
     template<typename T, int N>
     Vector<T, N>& Vector<T, N>::operator/= (const Vector<T, N>& rhs) {
+        for (int i=0; i<N; i++) {
+            Data[i] /= rhs.Data[i];
+        }
+        
+        return *this;
+    }
+
+    template<typename T, int N>
+    Vector<T, N>& Vector<T, N>::operator*= (const T rhs) {
+        for (int i=0; i<N; i++) {
+            Data[i] *= rhs;
+        }
+        
+        return *this;
+    }
+
+    template<typename T, int N>
+    Vector<T, N>& Vector<T, N>::operator/= (const T rhs) {
+        for (int i=0; i<N; i++) {
+            Data[i] /= rhs;
+        }
+        
         return *this;
     }
 
     template<typename T, int N>
     bool Vector<T, N>::operator== (const Vector<T, N>& rhs) const {
-        return false;
+        for (int i=0; i<N; i++) {
+            if  (Data[i] != rhs.Data[i]) {
+                return false;
+            }
+        }
+        
+        return true;
     }
 
     template<typename T, int N>
     bool Vector<T, N>::operator!= (const Vector<T, N>& rhs) const {
+        for (int i=0; i<N; i++) {
+            if  (Data[i] == rhs.Data[i]) {
+                return false;
+            }
+        }
+        
         return true;
     }
 

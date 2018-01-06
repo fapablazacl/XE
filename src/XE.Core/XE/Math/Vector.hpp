@@ -55,6 +55,8 @@ namespace XE::Math {
      */
     template<typename T, int N>
     struct Vector : VectorBase<T, N> {
+        static_assert(N >= 2 && N <=4);
+
         VectorBase<T, N>::VectorBase;
 
         explicit Vector();
@@ -75,6 +77,10 @@ namespace XE::Math {
 
         Vector<T, N> operator/ (const Vector<T, N>& rhs) const;
 
+        Vector<T, N> operator* (const T rhs) const;
+
+        Vector<T, N> operator/ (const T rhs) const;
+
         Vector<T, N>& operator+= (const Vector<T, N>& rhs);
 
         Vector<T, N>& operator-= (const Vector<T, N>& rhs);
@@ -83,9 +89,17 @@ namespace XE::Math {
 
         Vector<T, N>& operator/= (const Vector<T, N>& rhs);
 
+        Vector<T, N>& operator*= (const T rhs);
+
+        Vector<T, N>& operator/= (const T rhs);
+
         bool operator== (const Vector<T, N>& rhs) const;
 
         bool operator!= (const Vector<T, N>& rhs) const;
+
+        inline friend Vector<T, N> operator* (const T s, const Vector<T, N>& v) {
+            return v * s;
+        }
     };
 
     typedef Vector<std::int32_t, 2> Vector2i;
