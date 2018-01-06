@@ -8,7 +8,7 @@ namespace XE::Math {
         Vector<T, C> result;
 
         for (int col=0; col<C; col++) {
-            result.Data[col] = Element[row][col];
+            result.Data[col] = this->Element[row][col];
         }
 
         return result;
@@ -19,7 +19,7 @@ namespace XE::Math {
         Vector<T, R> result;
 
         for (int row=0; row<R; row++) {
-            result.Data[row] = Element[row][col];
+            result.Data[row] = this->Element[row][col];
         }
 
         return result;
@@ -41,7 +41,7 @@ namespace XE::Math {
                     continue;
                 }
 
-                result.Element[ii][jj] = Element[i][j]; 
+                result.Element[ii][jj] = this->Element[i][j]; 
                 ++jj;
             }
             
@@ -57,20 +57,20 @@ namespace XE::Math {
         static_assert(R == C);
         static_assert(R >= 2);
 
-        constexpr if (R == 2 && C == 2) {
-            return M22 * M11 - M12 * M21;
+        if constexpr (R == 2 && C == 2) {
+            return this->M22 * this->M11 - this->M12 * this->M21;
         } else {
             T factor = T(1);
             T result = T(0);
             
             const int row = 0;
                 
-            for (int column=0; column<Count; column++) {
+            for (int column=0; column<C; column++) {
                 factor = (column + 1)%2 ? T(-1) : T(1);
 
                 const T subDet = SubMatrix(row, column).Determinant();
 
-                result += factor * Element[row][column] * subDet;
+                result += factor * this->Element[row][column] * subDet;
             }
                 
             return result;
@@ -83,7 +83,7 @@ namespace XE::Math {
 
         for (int i=0; i<R; i++) {
             for (int j=0; j<C; j++) {
-                result.Element[j][i] = Element[i][j];
+                result.Element[j][i] = this->Element[i][j];
             }
         }
 
@@ -105,7 +105,7 @@ namespace XE::Math {
         Matrix<T, R, C> result;
 
         for (int i=0; i<R*C; i++) {
-            result.Data[i] = Data[i] + rhs.Data[i];
+            result.Data[i] = this->Data[i] + rhs.Data[i];
         }
 
         return result;
@@ -116,7 +116,7 @@ namespace XE::Math {
         Matrix<T, R, C> result;
 
         for (int i=0; i<R*C; i++) {
-            result.Data[i] = Data[i] - rhs.Data[i];
+            result.Data[i] = this->Data[i] - rhs.Data[i];
         }
 
         return result;
@@ -145,7 +145,7 @@ namespace XE::Math {
         Matrix<T, R, C> result;
 
         for (int i=0; i<R*C; i++) {
-            result.Data[i] = Data[i] * s;
+            result.Data[i] = this->Data[i] * s;
         }
 
         return result;
@@ -156,7 +156,7 @@ namespace XE::Math {
         Matrix<T, R, C> result;
 
         for (int i=0; i<R*C; i++) {
-            result.Data[i] = Data[i] / s;
+            result.Data[i] = this->Data[i] / s;
         }
 
         return result;
@@ -165,7 +165,7 @@ namespace XE::Math {
     template<typename T, int R, int C>
     Matrix<T, R, C>& Matrix<T, R, C>::operator+= (const Matrix<T, R, C>& rhs) {
         for (int i=0; i<R*C; i++) {
-            Data[i] += rhs.Data[i];
+            this->Data[i] += rhs.Data[i];
         }
 
         return *this;
@@ -174,7 +174,7 @@ namespace XE::Math {
     template<typename T, int R, int C>
     Matrix<T, R, C>& Matrix<T, R, C>::operator-= (const Matrix<T, R, C>& rhs) {
         for (int i=0; i<R*C; i++) {
-            Data[i] -= rhs.Data[i];
+            this->Data[i] -= rhs.Data[i];
         }
 
         return *this;

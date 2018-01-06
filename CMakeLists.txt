@@ -10,8 +10,8 @@ set(XE_VERSION_MAJOR 0)
 set(XE_VERSION_MINOR 0)
 set(XE_VERSION "${XE_VERSION_MAJOR}.${XE_VERSION_MINOR}")
 
-add_definitions(-DXE_VERSION_MAJOR ${XE_VERSION_MAJOR})
-add_definitions(-DXE_VERSION_MINOR ${XE_VERSION_MINOR})
+add_definitions(-DXE_VERSION_MAJOR=${XE_VERSION_MAJOR})
+add_definitions(-DXE_VERSION_MINOR=${XE_VERSION_MINOR})
 
 include_directories("src/XE.Core")
 add_subdirectory("src/XE.Core")

@@ -8,7 +8,7 @@ namespace XE::Math {
 
     template<typename T, int N>
     Vector<T, N>::Vector(T value) {
-        for (T &element : Data) {
+        for (T &element : this->Data) {
             element = value;
         }
     }
@@ -18,7 +18,7 @@ namespace XE::Math {
         assert(values);
 
         for (int i=0; i<N; i++) {
-            Data[i] = values[i];
+            this->Data[i] = values[i];
         }
     }
 
@@ -32,7 +32,7 @@ namespace XE::Math {
         Vector<T, N> result;
 
         for (int i=0; i<N; i++) {
-            result.Data[i] = -Data[i];
+            result.Data[i] = -this->Data[i];
         }
 
         return result;
@@ -43,7 +43,7 @@ namespace XE::Math {
         Vector<T, N> result;
 
         for (int i=0; i<N; i++) {
-            result.Data[i] = Data[i] + rhs.Data[i];
+            result.Data[i] = this->Data[i] + rhs.Data[i];
         }
 
         return result;
@@ -54,7 +54,7 @@ namespace XE::Math {
         Vector<T, N> result;
 
         for (int i=0; i<N; i++) {
-            result.Data[i] = Data[i] - rhs.Data[i];
+            result.Data[i] = this->Data[i] - rhs.Data[i];
         }
 
         return result;
@@ -65,7 +65,7 @@ namespace XE::Math {
         Vector<T, N> result;
 
         for (int i=0; i<N; i++) {
-            result.Data[i] = Data[i] * rhs.Data[i];
+            result.Data[i] = this->Data[i] * rhs.Data[i];
         }
 
         return result;
@@ -76,7 +76,7 @@ namespace XE::Math {
         Vector<T, N> result;
 
         for (int i=0; i<N; i++) {
-            result.Data[i] = Data[i] / rhs.Data[i];
+            result.Data[i] = this->Data[i] / rhs.Data[i];
         }
 
         return result;
@@ -87,7 +87,7 @@ namespace XE::Math {
         Vector<T, N> result;
 
         for (int i=0; i<N; i++) {
-            result.Data[i] = Data[i] * rhs;
+            result.Data[i] = this->Data[i] * rhs;
         }
 
         return result;
@@ -98,7 +98,7 @@ namespace XE::Math {
         Vector<T, N> result;
 
         for (int i=0; i<N; i++) {
-            result.Data[i] = Data[i] / rhs;
+            result.Data[i] = this->Data[i] / rhs;
         }
 
         return result;
@@ -107,7 +107,7 @@ namespace XE::Math {
     template<typename T, int N>
     Vector<T, N>& Vector<T, N>::operator+= (const Vector<T, N>& rhs) {
         for (int i=0; i<N; i++) {
-            Data[i] += rhs.Data[i];
+            this->Data[i] += rhs.Data[i];
         }
 
         return *this;
@@ -116,7 +116,7 @@ namespace XE::Math {
     template<typename T, int N>
     Vector<T, N>& Vector<T, N>::operator-= (const Vector<T, N>& rhs) {
         for (int i=0; i<N; i++) {
-            Data[i] -= rhs.Data[i];
+            this->Data[i] -= rhs.Data[i];
         }
         
         return *this;
@@ -125,7 +125,7 @@ namespace XE::Math {
     template<typename T, int N>
     Vector<T, N>& Vector<T, N>::operator*= (const Vector<T, N>& rhs) {
         for (int i=0; i<N; i++) {
-            Data[i] *= rhs.Data[i];
+            this->Data[i] *= rhs.Data[i];
         }
         
         return *this;
@@ -134,7 +134,7 @@ namespace XE::Math {
     template<typename T, int N>
     Vector<T, N>& Vector<T, N>::operator/= (const Vector<T, N>& rhs) {
         for (int i=0; i<N; i++) {
-            Data[i] /= rhs.Data[i];
+            this->Data[i] /= rhs.Data[i];
         }
         
         return *this;
@@ -143,7 +143,7 @@ namespace XE::Math {
     template<typename T, int N>
     Vector<T, N>& Vector<T, N>::operator*= (const T rhs) {
         for (int i=0; i<N; i++) {
-            Data[i] *= rhs;
+            this->Data[i] *= rhs;
         }
         
         return *this;
@@ -152,7 +152,7 @@ namespace XE::Math {
     template<typename T, int N>
     Vector<T, N>& Vector<T, N>::operator/= (const T rhs) {
         for (int i=0; i<N; i++) {
-            Data[i] /= rhs;
+            this->Data[i] /= rhs;
         }
         
         return *this;
@@ -161,7 +161,7 @@ namespace XE::Math {
     template<typename T, int N>
     bool Vector<T, N>::operator== (const Vector<T, N>& rhs) const {
         for (int i=0; i<N; i++) {
-            if  (Data[i] != rhs.Data[i]) {
+            if (this->Data[i] != rhs.Data[i]) {
                 return false;
             }
         }
@@ -172,7 +172,7 @@ namespace XE::Math {
     template<typename T, int N>
     bool Vector<T, N>::operator!= (const Vector<T, N>& rhs) const {
         for (int i=0; i<N; i++) {
-            if  (Data[i] == rhs.Data[i]) {
+            if (this->Data[i] == rhs.Data[i]) {
                 return false;
             }
         }

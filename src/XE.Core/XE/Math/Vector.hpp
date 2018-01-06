@@ -55,10 +55,10 @@ namespace XE::Math {
      * @brief N-Dimensional Vector structure.
      */
     template<typename T, int N>
-    struct Vector : VectorBase<T, N> {
+    struct Vector : public VectorBase<T, N> {
         static_assert(N >= 2 && N <=4);
 
-        VectorBase<T, N>::VectorBase;
+        using VectorBase<T, N>::VectorBase;
 
         explicit Vector();
 
