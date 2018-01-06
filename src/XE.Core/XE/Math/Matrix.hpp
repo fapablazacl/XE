@@ -108,9 +108,9 @@ namespace XE::Math {
 
         Matrix<T, R, C> operator/ (const Matrix<T, R, C>& rhs) const;
 
-        Matrix<T, R, C> operator* (const T *s) const;
+        Matrix<T, R, C> operator* (const T s) const;
 
-        Matrix<T, R, C> operator/ (const T *s) const;
+        Matrix<T, R, C> operator/ (const T s) const;
 
         Matrix<T, R, C>& operator+= (const Matrix<T, R, C>& rhs);
 

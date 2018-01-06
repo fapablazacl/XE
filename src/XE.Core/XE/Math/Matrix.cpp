@@ -141,6 +141,28 @@ namespace XE::Math {
     }
     
     template<typename T, int R, int C>
+    Matrix<T, R, C> Matrix<T, R, C>::operator* (const T s) const {
+        Matrix<T, R, C> result;
+
+        for (int i=0; i<R*C; i++) {
+            result.Data[i] = Data[i] * s;
+        }
+
+        return result;
+    }
+
+    template<typename T, int R, int C>
+    Matrix<T, R, C> Matrix<T, R, C>::operator/ (const T s) const {
+        Matrix<T, R, C> result;
+
+        for (int i=0; i<R*C; i++) {
+            result.Data[i] = Data[i] / s;
+        }
+
+        return result;
+    }
+
+    template<typename T, int R, int C>
     Matrix<T, R, C>& Matrix<T, R, C>::operator+= (const Matrix<T, R, C>& rhs) {
         for (int i=0; i<R*C; i++) {
             Data[i] += rhs.Data[i];
@@ -160,11 +182,15 @@ namespace XE::Math {
     
     template<typename T, int R, int C>
     Matrix<T, R, C>& Matrix<T, R, C>::operator*= (const Matrix<T, R, C>& rhs) {
+        *this = *this * rhs;
+
         return *this;
     }
 
     template<typename T, int R, int C>
     Matrix<T, R, C>& Matrix<T, R, C>::operator/= (const Matrix<T, R, C>& rhs) {
+        *this = *this / rhs;
+
         return *this;
     }
     
