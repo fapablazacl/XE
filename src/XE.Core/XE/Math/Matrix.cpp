@@ -1,7 +1,30 @@
 
 #include "Matrix.hpp"
+#include "Vector.hpp"
 
 namespace XE::Math {
+    template<typename T, int R, int C>
+    Vector<T, C> Matrix<T, R, C>::RowVector(const int row) const {
+        Vector<T, C> result;
+
+        for (int col=0; col<C; col++) {
+            result.Data[col] = Element[row][col];
+        }
+
+        return result;
+    }
+
+    template<typename T, int R, int C>
+    Vector<T, R> Matrix<T, R, C>::ColumnVector(const int col) const {
+        Vector<T, R> result;
+
+        for (int row=0; row<R; row++) {
+            result.Data[row] = Element[row][col];
+        }
+
+        return result;
+    }
+
     template<typename T, int R, int C>
     Matrix<T, R - 1, C - 1> Matrix<T, R, C>::SubMatrix(const int row, const int column) const {
         Matrix<T, R - 1, C - 1> result;
@@ -55,6 +78,29 @@ namespace XE::Math {
     }
 
     template<typename T, int R, int C>
+    Matrix<T, C, R> Matrix<T, R, C>::Transpose() const {
+        Matrix<T, C, R> result;
+
+        for (int i=0; i<R; i++) {
+            for (int j=0; j<C; j++) {
+                result.Element[j][i] = Element[i][j];
+            }
+        }
+
+        return result;
+    }
+
+    template<typename T, int R, int C>
+    Matrix<T, R, C> Matrix<T, R, C>::Inverse() const {
+        return Matrix<T, R, C>();
+    }
+
+    template<typename T, int R, int C>
+    Matrix<T, R, C> Matrix<T, R, C>::Inverse(const T determinant) const {
+        return Matrix<T, R, C>();
+    }
+
+    template<typename T, int R, int C>
     Matrix<T, R, C> Matrix<T, R, C>::operator+ (const Matrix<T, R, C>& rhs) const {
         Matrix<T, R, C> result;
 
@@ -80,13 +126,9 @@ namespace XE::Math {
     Matrix<T, R, C> Matrix<T, R, C>::operator* (const Matrix<T, R, C>& rhs) const {
         Matrix<T, R, C> result;
 
-        const int N = R;
-
         for (int i=0; i<R; i++) {
             for (int j=0; j<C; j++) {
-                T element = T(0);
-
-                result.Element[i][j] = element;
+                result.Element[i][j] = Dot(RowVector(i), rhs.ColumnVector(j));
             }
         }
 
@@ -95,7 +137,7 @@ namespace XE::Math {
 
     template<typename T, int R, int C>
     Matrix<T, R, C> Matrix<T, R, C>::operator/ (const Matrix<T, R, C>& rhs) const {
-        return Matrix<T, R, C>();
+        return *this * rhs.Inverse(rhs);
     }
     
     template<typename T, int R, int C>

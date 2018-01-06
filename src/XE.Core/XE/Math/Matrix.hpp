@@ -77,13 +77,26 @@ namespace XE::Math {
         }
     };
 
+    template<typename T, int N>
+    struct Vector;
+
     template<typename T, int R, int C>
     struct Matrix : public MatrixBase<T, R, C> {
         static_assert(R == C);
 
         using MatrixBase<T, R, C>::MatrixBase;
 
+        Vector<T, C> RowVector(const int row) const;
+
+        Vector<T, R> ColumnVector(const int column) const;
+
         Matrix<T, R - 1, C - 1> SubMatrix(const int row, const int column) const;
+
+        Matrix<T, C, R> Transpose() const;
+
+        Matrix<T, R, C> Inverse() const;
+
+        Matrix<T, R, C> Inverse(const T determinant) const;
 
         T Determinant() const;
 
@@ -95,6 +108,10 @@ namespace XE::Math {
 
         Matrix<T, R, C> operator/ (const Matrix<T, R, C>& rhs) const;
 
+        Matrix<T, R, C> operator* (const T *s) const;
+
+        Matrix<T, R, C> operator/ (const T *s) const;
+
         Matrix<T, R, C>& operator+= (const Matrix<T, R, C>& rhs);
 
         Matrix<T, R, C>& operator-= (const Matrix<T, R, C>& rhs);
@@ -102,6 +119,10 @@ namespace XE::Math {
         Matrix<T, R, C>& operator*= (const Matrix<T, R, C>& rhs);
 
         Matrix<T, R, C>& operator/= (const Matrix<T, R, C>& rhs);
+
+        inline friend Matrix<T, R, C> operator* (const T s, const Matrix<T, R, C> &m) {
+            return m * s;
+        }
     };
 
     typedef Matrix<float, 2, 2> Matrix2f;

@@ -2,6 +2,7 @@
 #ifndef __XE_MATH_VECTOR_HPP__
 #define __XE_MATH_VECTOR_HPP__
 
+#include <cmath>
 #include <cstdint>
 
 namespace XE::Math {
@@ -101,6 +102,36 @@ namespace XE::Math {
             return v * s;
         }
     };
+
+    template<typename T, int N>
+    T Dot(const Vector<T, N> &v1, const Vector<T, N> &v2) {
+        T sum = T(0);
+
+        for (int i=0; i<N; i++) {
+            sum += v1.Data[i]*v2.Data[i];
+        }
+
+        return sum;
+    }
+
+    template<typename T>
+    Vector<T, 3> Cross(const Vector<T, 3> &v1, const Vector<T, 3> &v2) {
+        return {
+            v1.Y*v2.Z - v1.Z*v2.Y,
+            v1.Z*v2.X - v1.X*v2.Z,
+            v1.X*v2.Y - v1.Y*v2.X
+        };
+    }
+
+    template<typename T>
+    T Cross(const Vector<T, 2> &v1, const Vector<T, 2> &v2) {
+        return v1.X*v2.Y - v1.Y*v2.X;
+    }
+
+    template<typename T, int N>
+    T Abs(const Vector<T, N> &v1) {
+        return static_cast<T>(std::sqrt(Dot(v1, v1)));
+    }
 
     typedef Vector<std::int32_t, 2> Vector2i;
     typedef Vector<std::int32_t, 3> Vector3i;
