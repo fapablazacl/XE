@@ -136,8 +136,13 @@ namespace XE::Math {
     }
 
     template<typename T, int N>
-    T Abs(const Vector<T, N> &v1) {
-        return static_cast<T>(std::sqrt(Dot(v1, v1)));
+    T Abs(const Vector<T, N> &v) {
+        return static_cast<T>(std::sqrt(Dot(v, v)));
+    }
+
+    template<typename T, int N>
+    T Normalize(const Vector<T, N> &v) {
+        return v / Abs(v);
     }
 
     extern template struct Vector<std::int32_t, 2>;

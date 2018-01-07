@@ -13,6 +13,8 @@ set (src_xe_math
     "XE/Math/Vector.cpp"
 	"XE/Math/Matrix.hpp"
     "XE/Math/Matrix.cpp"
+	"XE/Math/Quaternion.hpp"
+	"XE/Math/Quaternion.cpp"
 )
 
 source_group("\\XE" FILES ${src_xe})
