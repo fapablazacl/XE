@@ -199,12 +199,12 @@ namespace XE::Math {
         
         bool operator!= (const Quaternion<T> &rhs) const {
             for (int i=0; i<4; i++) {
-                if (this->Data[i] != rhs.Data[i]) {
-                    return true;
+                if (this->Data[i] == rhs.Data[i]) {
+                    return false;
                 }
             }
 
-            return false;
+            return true;
         }
 
         static Quaternion<T> Zero() {
@@ -222,16 +222,16 @@ namespace XE::Math {
         }
         
         static Quaternion<T> Rotation(const Vector<T, 3> &v1, const Vector<T, 3> &v2) {
-            auto v = cross(v1, v2);
-            auto w = std::sqrt(dot(v1, v1) * dot(v2, v2)) + dot(v1, v2);
+            auto v = Cross(v1, v2);
+            auto w = std::sqrt(Dot(v1, v1) * Dot(v2, v2)) + Dot(v1, v2);
             
-            return normalize(Quaternion<T>(v, w));
+            return Normalize(Quaternion<T>(v, w));
         }
     };
 
     template<typename T>
     Quaternion<T> Inverse(const Quaternion<T> &q) {
-        return conj(q) * norm_pow2(q);
+        return conj(q) * Abs_2(q);
     }
 
     template<typename T>
@@ -251,13 +251,13 @@ namespace XE::Math {
     }
 
     template<typename T>
-    T Abs2(const Quaternion<T> &q) {
+    T Abs_2(const Quaternion<T> &q) {
         return Dot(q, q);
     }
 
     template<typename T>
     T Abs(const Quaternion<T> &q) {
-        return static_cast<T>(std::sqrt(Abs2(q)));
+        return static_cast<T>(std::sqrt(Abs_2(q)));
     }
 
     template<typename T>
