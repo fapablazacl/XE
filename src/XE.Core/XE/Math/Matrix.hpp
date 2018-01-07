@@ -86,20 +86,6 @@ namespace XE::Math {
 
         using MatrixBase<T, R, C>::MatrixBase;
 
-        Vector<T, C> RowVector(const int row) const;
-
-        Vector<T, R> ColumnVector(const int column) const;
-
-        Matrix<T, R - 1, C - 1> SubMatrix(const int row, const int column) const;
-
-        Matrix<T, C, R> Transpose() const;
-
-        Matrix<T, R, C> Inverse() const;
-
-        Matrix<T, R, C> Inverse(const T determinant) const;
-
-        T Determinant() const;
-
         Matrix<T, R, C> operator+ (const Matrix<T, R, C>& rhs) const;
 
         Matrix<T, R, C> operator- (const Matrix<T, R, C>& rhs) const;
@@ -118,8 +104,6 @@ namespace XE::Math {
 
         Matrix<T, R, C>& operator*= (const Matrix<T, R, C>& rhs);
 
-        Matrix<T, R, C>& operator/= (const Matrix<T, R, C>& rhs);
-
         inline friend Matrix<T, R, C> operator* (const T s, const Matrix<T, R, C> &m) {
             return m * s;
         }
@@ -128,6 +112,190 @@ namespace XE::Math {
     typedef Matrix<float, 2, 2> Matrix2f;
     typedef Matrix<float, 3, 3> Matrix3f;
     typedef Matrix<float, 4, 4> Matrix4f;
+    
+    template<typename T, int R, int C>
+    Vector<T, C> RowVector(const Matrix<T, R, C> &m, const int row) {
+        Vector<T, C> result;
+        
+        for (int col=0; col<C; col++) {
+            result.Data[col] = m.Element[row][col];
+        }
+        
+        return result;
+    }
+    
+    template<typename T, int R, int C>
+    Vector<T, R> ColumnVector(const Matrix<T, R, C> &m, const int col) {
+        Vector<T, R> result;
+        
+        for (int row=0; row<R; row++) {
+            result.Data[row] = m.Element[row][col];
+        }
+        
+        return result;
+    }
+    
+    template<typename T, int R, int C>
+    Matrix<T, R - 1, C - 1> SubMatrix(const Matrix<T, R, C> &m, const int row, const int column) {
+        Matrix<T, R - 1, C - 1> result;
+        
+        int ii = 0, jj = 0;
+        
+        for (int i=0; i<R; ++i) {
+            if (i == row) {
+                continue;
+            }
+            
+            for (int j=0; j<C; ++j) {
+                if (j == column) {
+                    continue;
+                }
+                
+                result.Element[ii][jj] = m.Element[i][j];
+                ++jj;
+            }
+            
+            ++ii;
+            jj = 0;
+        }
+        
+        return result;
+    }
+    
+    template<typename T, int R, int C>
+    T Abs(const Matrix<T, R, C> &m) {
+        static_assert(R == C);
+        static_assert(R >= 2);
+        
+        if constexpr (R == 2 && C == 2) {
+            return m.M22 * m.M11 - m.M12 * m.M21;
+        } else {
+            T factor = T(1);
+            T result = T(0);
+            
+            const int row = 0;
+            
+            for (int column=0; column<C; column++) {
+                factor = (column + 1)%2 ? T(-1) : T(1);
+                
+                const T subDet = Abs(SubMatrix(m, row, column));
+                
+                result += factor * m.Element[row][column] * subDet;
+            }
+            
+            return result;
+        }
+    }
+    
+    template<typename T, int R, int C>
+    Matrix<T, C, R> Transpose(const Matrix<T, R, C> &m) {
+        Matrix<T, C, R> result;
+        
+        for (int i=0; i<R; i++) {
+            for (int j=0; j<C; j++) {
+                result.Element[j][i] = m.Element[i][j];
+            }
+        }
+        
+        return result;
+    }
+    
+    template<typename T, int R, int C>
+    Matrix<T, R, C> Inverse(const Matrix<T, R, C> &m) {
+        return Matrix<T, R, C>();
+    }
+    
+    template<typename T, int R, int C>
+    Matrix<T, R, C> Inverse(const Matrix<T, R, C> &m, const T abs) {
+        return Matrix<T, R, C>();
+    }
+    
+    template<typename T, int R, int C>
+    Matrix<T, R, C> Matrix<T, R, C>::operator+ (const Matrix<T, R, C>& rhs) const {
+        Matrix<T, R, C> result;
+        
+        for (int i=0; i<R*C; i++) {
+            result.Data[i] = this->Data[i] + rhs.Data[i];
+        }
+        
+        return result;
+    }
+    
+    template<typename T, int R, int C>
+    Matrix<T, R, C> Matrix<T, R, C>::operator- (const Matrix<T, R, C>& rhs) const {
+        Matrix<T, R, C> result;
+        
+        for (int i=0; i<R*C; i++) {
+            result.Data[i] = this->Data[i] - rhs.Data[i];
+        }
+        
+        return result;
+    }
+    
+    template<typename T, int R, int C>
+    Matrix<T, R, C> Matrix<T, R, C>::operator* (const Matrix<T, R, C>& rhs) const {
+        Matrix<T, R, C> result;
+        
+        for (int i=0; i<R; i++) {
+            for (int j=0; j<C; j++) {
+                result.Element[i][j] = Dot(RowVector(*this, i), ColumnVector(rhs, j));
+            }
+        }
+        
+        return result;
+    }
+    
+    template<typename T, int R, int C>
+    Matrix<T, R, C> Matrix<T, R, C>::operator/ (const Matrix<T, R, C>& rhs) const {
+        return *this * rhs.Inverse(rhs);
+    }
+    
+    template<typename T, int R, int C>
+    Matrix<T, R, C> Matrix<T, R, C>::operator* (const T s) const {
+        Matrix<T, R, C> result;
+        
+        for (int i=0; i<R*C; i++) {
+            result.Data[i] = this->Data[i] * s;
+        }
+        
+        return result;
+    }
+    
+    template<typename T, int R, int C>
+    Matrix<T, R, C> Matrix<T, R, C>::operator/ (const T s) const {
+        Matrix<T, R, C> result;
+        
+        for (int i=0; i<R*C; i++) {
+            result.Data[i] = this->Data[i] / s;
+        }
+        
+        return result;
+    }
+    
+    template<typename T, int R, int C>
+    Matrix<T, R, C>& Matrix<T, R, C>::operator+= (const Matrix<T, R, C>& rhs) {
+        for (int i=0; i<R*C; i++) {
+            this->Data[i] += rhs.Data[i];
+        }
+        
+        return *this;
+    }
+    
+    template<typename T, int R, int C>
+    Matrix<T, R, C>& Matrix<T, R, C>::operator-= (const Matrix<T, R, C>& rhs) {
+        for (int i=0; i<R*C; i++) {
+            this->Data[i] -= rhs.Data[i];
+        }
+        
+        return *this;
+    }
+    
+    template<typename T, int R, int C>
+    Matrix<T, R, C>& Matrix<T, R, C>::operator*= (const Matrix<T, R, C>& rhs) {
+        *this = *this * rhs;
+        
+        return *this;
+    }
 }
 
 #endif

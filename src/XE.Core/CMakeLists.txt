@@ -4,6 +4,8 @@ set (target "XE.Core")
 set (src_xe
     "XE/Stream.hpp"
     "XE/Stream.cpp"
+    "XE/Buffer.hpp"
+    "XE/Buffer.cpp"
 )
 
 set (src_xe_math
