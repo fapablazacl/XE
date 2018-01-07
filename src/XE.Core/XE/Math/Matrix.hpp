@@ -19,6 +19,8 @@ namespace XE::Math {
             };
         };
 
+        MatrixBase() {}
+
         MatrixBase(
             const T m11, const T m12,
             const T m21, const T m22
@@ -39,6 +41,8 @@ namespace XE::Math {
                 T M31, M32, M33;
             };
         };
+
+        MatrixBase() {}
 
         MatrixBase(
             const T m11, const T m12, const T m13,
@@ -64,6 +68,8 @@ namespace XE::Math {
             };
         };
 
+        MatrixBase() {}
+
         MatrixBase(
             const T m11, const T m12, const T m13, const T m14,
             const T m21, const T m22, const T m23, const T m24,
@@ -85,6 +91,8 @@ namespace XE::Math {
         static_assert(R == C);
 
         using MatrixBase<T, R, C>::MatrixBase;
+
+        Matrix() {}
 
         Matrix<T, R, C> operator+ (const Matrix<T, R, C>& rhs) const;
 
@@ -108,8 +116,10 @@ namespace XE::Math {
             return m * s;
         }
     };
+    
+    extern template struct Matrix<float, 3, 3>;
+    extern template struct Matrix<float, 4, 4>;
 
-    typedef Matrix<float, 2, 2> Matrix2f;
     typedef Matrix<float, 3, 3> Matrix3f;
     typedef Matrix<float, 4, 4> Matrix4f;
     
@@ -247,7 +257,7 @@ namespace XE::Math {
     
     template<typename T, int R, int C>
     Matrix<T, R, C> Matrix<T, R, C>::operator/ (const Matrix<T, R, C>& rhs) const {
-        return *this * rhs.Inverse(rhs);
+        return *this * Inverse(rhs);
     }
     
     template<typename T, int R, int C>

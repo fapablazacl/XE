@@ -4,6 +4,7 @@
 
 #include <cmath>
 #include <cstdint>
+#include <cassert>
 
 namespace XE::Math {
     template<typename T, int N>
@@ -15,6 +16,8 @@ namespace XE::Math {
             T Data[2];
             struct {T X, Y; };
         };
+
+        VectorBase() {}
 
         VectorBase(T x, T y) {
             X = x;
@@ -29,6 +32,8 @@ namespace XE::Math {
             struct {T X, Y, Z; };
         };
 
+        VectorBase() {}
+
         VectorBase(T x, T y, T z) {
             X = x;
             Y = y;
@@ -42,6 +47,8 @@ namespace XE::Math {
             T Data[4];
             struct {T X, Y, Z, W; };
         };
+
+        VectorBase() {}
 
         VectorBase(T x, T y, T z, T w) {
             X = x;
@@ -133,6 +140,18 @@ namespace XE::Math {
         return static_cast<T>(std::sqrt(Dot(v1, v1)));
     }
 
+    extern template struct Vector<std::int32_t, 2>;
+    extern template struct Vector<std::int32_t, 3>;
+    extern template struct Vector<std::int32_t, 4>;
+
+    extern template struct Vector<float, 2>;
+    extern template struct Vector<float, 3>;
+    extern template struct Vector<float, 4>;
+
+    extern template struct Vector<double, 2>;
+    extern template struct Vector<double, 3>;
+    extern template struct Vector<double, 4>;
+
     typedef Vector<std::int32_t, 2> Vector2i;
     typedef Vector<std::int32_t, 3> Vector3i;
     typedef Vector<std::int32_t, 4> Vector4i;
@@ -144,6 +163,183 @@ namespace XE::Math {
     typedef Vector<double, 2> Vector2d;
     typedef Vector<double, 3> Vector3d;
     typedef Vector<double, 4> Vector4d;
+
+    template<typename T, int N>
+    Vector<T, N>::Vector() {}
+
+    template<typename T, int N>
+    Vector<T, N>::Vector(T value) {
+        for (T &element : this->Data) {
+            element = value;
+        }
+    }
+
+    template<typename T, int N>
+    Vector<T, N>::Vector(const T *values) {
+        assert(values);
+
+        for (int i=0; i<N; i++) {
+            this->Data[i] = values[i];
+        }
+    }
+
+    template<typename T, int N>
+    Vector<T, N> Vector<T, N>::operator+ () const {
+        return *this;
+    }
+
+    template<typename T, int N>
+    Vector<T, N> Vector<T, N>::operator- () const {
+        Vector<T, N> result;
+
+        for (int i=0; i<N; i++) {
+            result.Data[i] = -this->Data[i];
+        }
+
+        return result;
+    }
+
+    template<typename T, int N>
+    Vector<T, N> Vector<T, N>::operator+ (const Vector<T, N>& rhs) const {
+        Vector<T, N> result;
+
+        for (int i=0; i<N; i++) {
+            result.Data[i] = this->Data[i] + rhs.Data[i];
+        }
+
+        return result;
+    }
+
+    template<typename T, int N>
+    Vector<T, N> Vector<T, N>::operator- (const Vector<T, N>& rhs) const {
+        Vector<T, N> result;
+
+        for (int i=0; i<N; i++) {
+            result.Data[i] = this->Data[i] - rhs.Data[i];
+        }
+
+        return result;
+    }
+
+    template<typename T, int N>
+    Vector<T, N> Vector<T, N>::operator* (const Vector<T, N>& rhs) const {
+        Vector<T, N> result;
+
+        for (int i=0; i<N; i++) {
+            result.Data[i] = this->Data[i] * rhs.Data[i];
+        }
+
+        return result;
+    }
+
+    template<typename T, int N>
+    Vector<T, N> Vector<T, N>::operator/ (const Vector<T, N>& rhs) const {
+        Vector<T, N> result;
+
+        for (int i=0; i<N; i++) {
+            result.Data[i] = this->Data[i] / rhs.Data[i];
+        }
+
+        return result;
+    }
+
+    template<typename T, int N>
+    Vector<T, N> Vector<T, N>::operator* (const T rhs) const {
+        Vector<T, N> result;
+
+        for (int i=0; i<N; i++) {
+            result.Data[i] = this->Data[i] * rhs;
+        }
+
+        return result;
+    }
+
+    template<typename T, int N>
+    Vector<T, N> Vector<T, N>::operator/ (const T rhs) const {
+        Vector<T, N> result;
+
+        for (int i=0; i<N; i++) {
+            result.Data[i] = this->Data[i] / rhs;
+        }
+
+        return result;
+    }
+
+    template<typename T, int N>
+    Vector<T, N>& Vector<T, N>::operator+= (const Vector<T, N>& rhs) {
+        for (int i=0; i<N; i++) {
+            this->Data[i] += rhs.Data[i];
+        }
+
+        return *this;
+    }
+
+    template<typename T, int N>
+    Vector<T, N>& Vector<T, N>::operator-= (const Vector<T, N>& rhs) {
+        for (int i=0; i<N; i++) {
+            this->Data[i] -= rhs.Data[i];
+        }
+        
+        return *this;
+    }
+
+    template<typename T, int N>
+    Vector<T, N>& Vector<T, N>::operator*= (const Vector<T, N>& rhs) {
+        for (int i=0; i<N; i++) {
+            this->Data[i] *= rhs.Data[i];
+        }
+        
+        return *this;
+    }
+
+    template<typename T, int N>
+    Vector<T, N>& Vector<T, N>::operator/= (const Vector<T, N>& rhs) {
+        for (int i=0; i<N; i++) {
+            this->Data[i] /= rhs.Data[i];
+        }
+        
+        return *this;
+    }
+
+    template<typename T, int N>
+    Vector<T, N>& Vector<T, N>::operator*= (const T rhs) {
+        for (int i=0; i<N; i++) {
+            this->Data[i] *= rhs;
+        }
+        
+        return *this;
+    }
+
+    template<typename T, int N>
+    Vector<T, N>& Vector<T, N>::operator/= (const T rhs) {
+        for (int i=0; i<N; i++) {
+            this->Data[i] /= rhs;
+        }
+        
+        return *this;
+    }
+
+    template<typename T, int N>
+    bool Vector<T, N>::operator== (const Vector<T, N>& rhs) const {
+        for (int i=0; i<N; i++) {
+            if (this->Data[i] != rhs.Data[i]) {
+                return false;
+            }
+        }
+        
+        return true;
+    }
+
+    template<typename T, int N>
+    bool Vector<T, N>::operator!= (const Vector<T, N>& rhs) const {
+        for (int i=0; i<N; i++) {
+            if (this->Data[i] == rhs.Data[i]) {
+                return false;
+            }
+        }
+        
+        return true;
+    }
 }
 
 #endif
