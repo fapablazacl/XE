@@ -218,7 +218,7 @@ namespace XE::Math {
         static Quaternion<T> Rotation(const T radians, const Vector<T, 3> &axis) {
             auto q = Quaternion<T>(axis, std::cos(radians / T(2)));
             
-            return normalize(q);
+            return Normalize(q);
         }
         
         static Quaternion<T> Rotation(const Vector<T, 3> &v1, const Vector<T, 3> &v2) {

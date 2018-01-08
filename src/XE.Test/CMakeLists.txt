@@ -2,7 +2,9 @@
 set (target "XE.Test")
 
 set (src "Main.cpp")
-set (src_xe_math "XE/Math/Vector.Test.cpp")
+set (src_xe_math 
+    "XE/Math/Vector.Test.cpp"
+)
 
 source_group("\\" FILES ${src})
 source_group("\\XE\\Math" FILES ${src_xe_math})

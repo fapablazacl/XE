@@ -26,4 +26,14 @@ TEST_CASE("XE::Math::Vector<T, N>") {
         REQUIRE(v1.Z == 3.0f);
         REQUIRE(v1.W == 4.0f);
     }
+
+    SECTION("Normalize function should return a 1-length vector") {
+        XE::Math::Vector4f v1 = {1.0f, 1.0f, 1.0f, 1.0f};
+        XE::Math::Vector4f normalized = XE::Math::Normalize(v1);
+        
+        REQUIRE(v1.X == 1.0f);
+        REQUIRE(v1.Y == 2.0f);
+        REQUIRE(v1.Z == 3.0f);
+        REQUIRE(v1.W == 4.0f);
+    }
 }

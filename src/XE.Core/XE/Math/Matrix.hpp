@@ -3,10 +3,16 @@
 #define __XE_MATH_MATRIX_HPP__
 
 #include <cstdint>
+#include "Vector.hpp"
 
 namespace XE::Math {
     template<typename T, int R, int C>
-    struct MatrixBase;
+    struct MatrixBase {
+        union {
+            T Data[R*C];
+            T Element[R][C];
+        };
+    };
 
     template<typename T>
     struct MatrixBase<T, 2, 2> {
@@ -124,6 +130,66 @@ namespace XE::Math {
             return this->Element[i][j];
         }
 
+        Vector<T, C> GetRowVector(const int row) const {
+            Vector<T, C> result;
+            
+            for (int col=0; col<C; col++) {
+                result.Data[col] = this->Element[row][col];
+            }
+            
+            return result;
+        }
+        
+        Vector<T, R> GetColumnVector(const int col) const {
+            Vector<T, R> result;
+            
+            for (int row=0; row<R; row++) {
+                result.Data[row] = this->Element[row][col];
+            }
+            
+            return result;
+        }
+        
+        void SetRowVector(const int row, const Vector<T, C> &v) {
+            for (int col=0; col<C; col++) {
+                this->Element[row][col] = v[col];
+            }
+        }
+
+        void SetColumnVector(const int col, const Vector<T, R> &v) {
+            for (int row=0; row<R; row++) {
+                this->Element[row][col] = v[col];
+            }
+        }
+
+        auto SubMatrix(const int row, const int column) {
+            if constexpr (C > 2 && R > 2) {
+                Matrix<T, R - 1, C - 1> result;
+                
+                int ii = 0, jj = 0;
+                
+                for (int i=0; i<R; ++i) {
+                    if (i == row) {
+                        continue;
+                    }
+                    
+                    for (int j=0; j<C; ++j) {
+                        if (j == column) {
+                            continue;
+                        }
+                        
+                        result(ii, jj) = (*this)(i, j);
+                        ++jj;
+                    }
+                    
+                    ++ii;
+                    jj = 0;
+                }
+                
+                return result;
+            }
+        }
+
         /**
          * @brief Build a matrix initialized with zeros.
          */
@@ -140,16 +206,16 @@ namespace XE::Math {
         /**
          * @brief Build a identity matrix. Must be square.
          */
-        static M Identity() {
-            static_assert(R == C);
-
-            auto result = Matrix<T, R, C>::Zero();
-            
-            for (int i=0; i<R; ++i) {
-                result.Data[i] = T(1);
+        static auto Identity() {
+            if constexpr (R == C) {
+                auto result = Matrix<T, R, C>::Zero();
+                
+                for (int i=0; i<R; ++i) {
+                    result.Data[i] = T(1);
+                }
+                
+                return result;
             }
-            
-            return result;
         }
         
         static Matrix<T, R, C> Scale(const Vector<T, R> &scale) {
@@ -165,53 +231,65 @@ namespace XE::Math {
         static Matrix<T, R, C> Translate(const Vector<T, R> &displace) {
             auto result = Matrix<T, R, C>::Zero();
             
-            result.setColumn(C - 1, displace);
+            result.SetColumnVector(C - 1, displace);
             
             return result;
         }
-        
+
         static Matrix<T, R, C> Translate(const Vector<T, R - 1> &displace) {
-            return Matrix<T, R, C>::Translate(Vector<T, R>(displace, T(1)));
+            auto result = Matrix<T, R, C>::Zero();
+            
+            Vector<T, R> d;
+
+            for (int i=0; i<R - 1; i++) {
+                d[i] = displace[i];
+            }
+
+            d[R - 1] = T(1);
+
+            result.SetColumnVector(C - 1, d);
+            
+            return result;
         }
 
         static Matrix<T, R, C> RotateX(const T radians) {
-            auto result = M::makeIdentity();
+            auto result = Matrix<T, R, C>::Identity();
             
             T Cos = std::cos(radians);
             T Sin = std::sin(radians);
             
-            result.get(1, 1) = Cos;
-            result.get(2, 2) = Cos;
-            result.get(2, 1) = -Sin;
-            result.get(1, 2) = Sin;
+            result(1, 1) = Cos;
+            result(2, 2) = Cos;
+            result(2, 1) = -Sin;
+            result(1, 2) = Sin;
             
             return result;
         }
         
-        static M RotateY(const T radians) {
-            auto result = M::makeIdentity();
+        static Matrix<T, R, C> RotateY(const T radians) {
+            auto result = Matrix<T, R, C>::Identity();
             
             T Cos = std::cos(radians);
             T Sin = std::sin(radians);
             
-            result.get(0, 0) = Cos;
-            result.get(2, 2) = Cos;
-            result.get(2, 0) = -Sin;
-            result.get(0, 2) = Sin;
+            result(0, 0) = Cos;
+            result(2, 2) = Cos;
+            result(2, 0) = -Sin;
+            result(0, 2) = Sin;
             
             return result;
         }
         
-        static M RotateZ(const T radians) {
-            auto result = M::makeIdentity();
+        static Matrix<T, R, C> RotateZ(const T radians) {
+            auto result = Matrix<T, R, C>::Identity();
             
             T Cos = std::cos(radians);
             T Sin = std::sin(radians);
             
-            result.get(0, 0) = Cos;
-            result.get(1, 1) = Cos;
-            result.get(1, 0) = Sin;
-            result.get(0, 1) = -Sin;
+            result(0, 0) = Cos;
+            result(1, 1) = Cos;
+            result(1, 0) = Sin;
+            result(0, 1) = -Sin;
             
             return result;
         }
@@ -219,168 +297,126 @@ namespace XE::Math {
         /**
          * @brief Build a arbitrary rotation matrix 
          */
-        static Matrix<T, R, C> Rotate(T radians, const Vector<T, 3> &Axis) {
-            assert(!std::isnan(radians));
-            assert(!std::isinf(radians));
-            assert(!Axis.isZero());
+        static auto Rotate(T radians, const Vector<T, 3> &Axis) {
+            if constexpr ( (C>=3 && C<=4) && (R>=3 && R<=4) ) {
+                assert(!std::isnan(radians));
+                assert(!std::isinf(radians));
 
-            T Cos = std::cos(radians);
-            T Sin = std::sin(radians);
+                T Cos = std::cos(radians);
+                T Sin = std::sin(radians);
+                
+                Vector<T, 3> U = Axis;
+                Vector<T, 3> V = Normalize(Axis);
+                
+                //auto MatS = Matrix<T, 3, 3>::makeZero();
+                auto MatUut = Matrix<T, 3, 3>::Zero();
+                auto MatId = Matrix<T, 3, 3>::Identity();
+                
+                //Iniciar S
+                Matrix<T, 3, 3> MatS = {
+                    T(0), -V.Z, V.Y,
+                    V.Z , T(0), -V.X,
+                    -V.Y, V.X , T(0),
+                };
+                
+                //auto matU = Matrix<T, 1, 3>{V};
+                //auto matU_Ut = transpose(matU) * matU;
+                
+                //Iniciar u*ut
+                MatUut(0, 0) = V.X * V.X;
+                MatUut(1, 0) = V.Y * V.X;
+                MatUut(2, 0) = V.Z * V.X;
             
-            auto U = Axis;
-            auto V = normalize(Axis);
-            
-            //auto MatS = Matrix<T, 3, 3>::makeZero();
-            auto MatUut = Matrix<T, 3, 3>::makeZero();
-            auto MatId = Matrix<T, 3, 3>::makeIdentity();
-            
-            //Iniciar S
-            Matrix<T, 3, 3> MatS = {
-                T(0), -V.z, V.y,
-                V.z , T(0), -V.x, 
-                -V.y, V.x , T(0), 
-            };
-            
-            //auto matU = Matrix<T, 1, 3>{V};
-            //auto matU_Ut = transpose(matU) * matU;
-            
-            //Iniciar u*ut
-            MatUut.get(0, 0) = V.x * V.x;
-            MatUut.get(1, 0) = V.y * V.x;
-            MatUut.get(2, 0) = V.z * V.x;
-        
-            MatUut.get(0, 1) = V.x * V.y;
-            MatUut.get(1, 1) = V.y * V.y;
-            MatUut.get(2, 1) = V.z * V.y;
-            
-            MatUut.get(0, 2) = V.x * V.z;
-            MatUut.get(1, 2) = V.y * V.z;
-            MatUut.get(2, 2) = V.z * V.z;
-            
-            auto tempResult = MatUut + Cos * (MatId - MatUut) + Sin * MatS;
-            
-            auto result = M::makeIdentity();
-            
-            for (int i=0; i<3; ++i) {
-                for (int j=0; j<3; ++j) {
-                    result(i, j) = tempResult(i, j);
+                MatUut(0, 1) = V.X * V.Y;
+                MatUut(1, 1) = V.Y * V.Y;
+                MatUut(2, 1) = V.Z * V.Y;
+                
+                MatUut(0, 2) = V.X * V.Z;
+                MatUut(1, 2) = V.Y * V.Z;
+                MatUut(2, 2) = V.Z * V.Z;
+                
+                auto tempResult = MatUut + Cos * (MatId - MatUut) + Sin * MatS;
+                
+                auto result = Matrix<T, C, R>::Identity();
+                
+                for (int i=0; i<3; ++i) {
+                    for (int j=0; j<3; ++j) {
+                        result(i, j) = tempResult(i, j);
+                    }
                 }
+                
+                return result;
             }
-            
-            return result;
         }
         
-        static Matrix<T, 4, 4> Lookat(const Vector<T, 3> &Eye, const Vector<T, 3> &At, const Vector<T, 3> &Up) {
-            const auto forward = normalize(At - Eye);
-            const auto side = normalize(cross(forward, Up));
-            const auto up = cross(side, forward);
+        static auto Lookat(const Vector<T, 3> &Eye, const Vector<T, 3> &At, const Vector<T, 3> &Up) {
+            if constexpr (C==4 && R==4) {
+                const auto forward = Normalize(At - Eye);
+                const auto side = Normalize(Cross(forward, Up));
+                const auto up = Cross(side, forward);
+                
+                auto result = Matrix<T, 4, 4>::Identity();
+                
+                result(0, 0) = side.X;
+                result(0, 1) = side.Y;
+                result(0, 2) = side.Z;
             
-            auto result = Matrix<T, 4, 4>::makeIdentity();
+                result(1, 0) = up.X;
+                result(1, 1) = up.Y;
+                result(1, 2) = up.Z;
             
-            result.get(0, 0) = side.x;
-            result.get(0, 1) = side.y;
-            result.get(0, 2) = side.z;
-        
-            result.get(1, 0) = up.x;
-            result.get(1, 1) = up.y;
-            result.get(1, 2) = up.z;
-        
-            result.get(2, 0) = -forward.x;
-            result.get(2, 1) = -forward.y;
-            result.get(2, 2) = -forward.z;
-            
-            result *= Matrix<T, 4, 4>::makeTranslate(-Eye);
-            
-            return result;
+                result(2, 0) = -forward.X;
+                result(2, 1) = -forward.Y;
+                result(2, 2) = -forward.Z;
+                
+                result *= Matrix<T, 4, 4>::Translate(-Eye);
+                
+                return result;
+            }
         }
         
-        static Matrix<T, 4, 4> Perspective(T fov_radians, T aspect, T znear, T zfar) {
-            const T f = T(1) / std::tan(fov_radians / T(2));
-            const T zdiff = znear - zfar;
-            
-            auto result = Matrix<T, 4, 4>::makeIdentity();
-            
-            result.get(0, 0) = f / aspect;
-            result.get(1, 1) = f;
-            result.get(2, 2) = (zfar + znear) / zdiff;
-            result.get(3, 2) = T(-1);
-            result.get(2, 3) = (T(2)*znear * zfar) / zdiff;
-            
-            return result;
+        static auto Perspective(T fov_radians, T aspect, T znear, T zfar) {
+            if constexpr (C==4 && R==4) {
+                const T f = T(1) / std::tan(fov_radians / T(2));
+                const T zdiff = znear - zfar;
+
+                auto result = Matrix<T, 4, 4>::Identity();
+                
+                result(0, 0) = f / aspect;
+                result(1, 1) = f;
+                result(2, 2) = (zfar + znear) / zdiff;
+                result(3, 2) = T(-1);
+                result(2, 3) = (T(2)*znear * zfar) / zdiff;
+                
+                return result;
+            }
         }
         
-        static Matrix<T, 4, 4> Ortho(const Vector<T, 3> &pmin,  const Vector<T, 3> &pmax) {
-            
-            auto diff = pmax - pmin;
-            auto result = Matrix<T, 4, 4>::makeIdentity();
-            
-            result.get(0, 0) = T(2) / diff.x;
-            result.get(1, 1) = T(2) / diff.y;
-            result.get(2, 2) = T(-2) / diff.z;
-            result.get(3, 3) = T(1);
-            
-            result.get(0, 3) = -(pmax.x + pmin.x ) / diff.x;
-            result.get(1, 3) = -(pmax.y + pmin.y ) / diff.y;
-            result.get(2, 3) = -(pmax.z + pmin.z ) / diff.z;
-            
-            return result;
+        static auto Ortho(const Vector<T, 3> &pmin,  const Vector<T, 3> &pmax) {
+            if constexpr (C==4 && R==4) {
+                auto diff = pmax - pmin;
+                auto result = Matrix<T, 4, 4>::Identity();
+                
+                result(0, 0) = T(2) / diff.X;
+                result(1, 1) = T(2) / diff.Y;
+                result(2, 2) = T(-2) / diff.Z;
+                result(3, 3) = T(1);
+                
+                result(0, 3) = -(pmax.X + pmin.X ) / diff.X;
+                result(1, 3) = -(pmax.Y + pmin.Y ) / diff.Y;
+                result(2, 3) = -(pmax.Z + pmin.Z ) / diff.Z;
+                
+                return result;
+            }
         }
     };
     
+    extern template struct Matrix<float, 2, 2>;
     extern template struct Matrix<float, 3, 3>;
     extern template struct Matrix<float, 4, 4>;
 
     typedef Matrix<float, 3, 3> Matrix3f;
     typedef Matrix<float, 4, 4> Matrix4f;
-    
-    template<typename T, int R, int C>
-    Vector<T, C> RowVector(const Matrix<T, R, C> &m, const int row) {
-        Vector<T, C> result;
-        
-        for (int col=0; col<C; col++) {
-            result.Data[col] = m.Element[row][col];
-        }
-        
-        return result;
-    }
-    
-    template<typename T, int R, int C>
-    Vector<T, R> ColumnVector(const Matrix<T, R, C> &m, const int col) {
-        Vector<T, R> result;
-        
-        for (int row=0; row<R; row++) {
-            result.Data[row] = m.Element[row][col];
-        }
-        
-        return result;
-    }
-    
-    template<typename T, int R, int C>
-    Matrix<T, R - 1, C - 1> SubMatrix(const Matrix<T, R, C> &m, const int row, const int column) {
-        Matrix<T, R - 1, C - 1> result;
-        
-        int ii = 0, jj = 0;
-        
-        for (int i=0; i<R; ++i) {
-            if (i == row) {
-                continue;
-            }
-            
-            for (int j=0; j<C; ++j) {
-                if (j == column) {
-                    continue;
-                }
-                
-                result.Element[ii][jj] = m.Element[i][j];
-                ++jj;
-            }
-            
-            ++ii;
-            jj = 0;
-        }
-        
-        return result;
-    }
     
     template<typename T, int R, int C>
     T Abs(const Matrix<T, R, C> &m) {
@@ -458,7 +494,7 @@ namespace XE::Math {
         
         for (int i=0; i<R; i++) {
             for (int j=0; j<C; j++) {
-                result.Element[i][j] = Dot(RowVector(*this, i), ColumnVector(rhs, j));
+                result.Element[i][j] = Dot(this->GetRowVector(i), rhs.GetColumnVector(j));
             }
         }
         

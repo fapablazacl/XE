@@ -8,7 +8,9 @@
 
 namespace XE::Math {
     template<typename T, int N>
-    struct VectorBase;
+    struct VectorBase {
+        T Data[N];
+    };
 
     template<typename T>
     struct VectorBase<T, 2> {
@@ -63,8 +65,6 @@ namespace XE::Math {
      */
     template<typename T, int N>
     struct Vector : public VectorBase<T, N> {
-        static_assert(N >= 2 && N <=4);
-
         using VectorBase<T, N>::VectorBase;
 
         explicit Vector();
@@ -104,6 +104,14 @@ namespace XE::Math {
         bool operator== (const Vector<T, N>& rhs) const;
 
         bool operator!= (const Vector<T, N>& rhs) const;
+
+        T& operator[] (const int index) {
+            return this->Data[index];
+        }
+
+        const T operator[] (const int index) const {
+            return this->Data[index];
+        }
 
         inline friend Vector<T, N> operator* (const T s, const Vector<T, N>& v) {
             return v * s;
@@ -146,7 +154,7 @@ namespace XE::Math {
     }
 
     template<typename T, int N>
-    T Normalize(const Vector<T, N> &v) {
+    Vector<T, N> Normalize(const Vector<T, N> &v) {
         return v / Abs(v);
     }
 
