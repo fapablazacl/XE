@@ -9,10 +9,10 @@
 #include "Vector.hpp"
 
 namespace XE::Math {
-    template<typename Type>
+    template<typename T>
     struct Rotation {
-        Type angle;
-        Vector<Type, 3> axis;
+        T angle;
+        Vector<T, 3> axis;
     };
 
     template<typename T>

@@ -5,6 +5,7 @@
 #include <cmath>
 #include <cstdint>
 #include <cassert>
+#include <algorithm>
 
 namespace XE::Math {
     template<typename T, int N>
@@ -156,6 +157,28 @@ namespace XE::Math {
     template<typename T, int N>
     Vector<T, N> Normalize(const Vector<T, N> &v) {
         return v / Abs(v);
+    }
+
+    template<typename T, int N>
+    Vector<T, N> Maximize(const Vector<T, N> &v1, const Vector<T, N> &v2) {
+        Vector<T, N> result;
+
+        for (int i=0; i<N; i++) {
+            result[i] = std::max(v1[i], v2[i]);
+        }
+
+        return result;
+    }
+
+    template<typename T, int N>
+    Vector<T, N> Minimize(const Vector<T, N> &v1, const Vector<T, N> &v2) {
+        Vector<T, N> result;
+
+        for (int i=0; i<N; i++) {
+            result[i] = std::min(v1[i], v2[i]);
+        }
+
+        return result;
     }
 
     extern template struct Vector<std::int32_t, 2>;
