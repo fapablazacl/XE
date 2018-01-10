@@ -23,7 +23,7 @@ namespace XE::Math {
         }
         
         /**
-         * @brief Initializes a Sphere from the given center and radius
+         * @brief Initializes a Sphere from the given radius and center
          */
         Sphere(T radius, const Vector<T, 3> &center) {
             Center = center;
@@ -65,10 +65,8 @@ namespace XE::Math {
         if (disc == T(0)) {
             return -B / T(2);
         } else if (disc > T(0)) {
-            // Existen dos puntos de interseccion 
             T rootDisc = std::sqrt(disc);
 
-            // Determinar el primer punto de interseccion
             T t1 = ( -B - rootDisc ) / T(2);
             T t2 = ( -B + rootDisc ) / T(2);
         

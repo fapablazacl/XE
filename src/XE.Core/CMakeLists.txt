@@ -27,6 +27,8 @@ set (src_xe_math
 	"XE/Math/Rect.cpp"
 	"XE/Math/Sphere.hpp"
 	"XE/Math/Sphere.cpp"
+	"XE/Math/Triangle.hpp"
+	"XE/Math/Triangle.cpp"
 )
 
 set (src_xe_graphics
