@@ -23,7 +23,7 @@ namespace XE::Math {
         }
         
         Vector<T, 3> ComputeNormalUnnormalized() const {
-            return Cross((p2 - p1), p3 - p1);
+            return Cross((P2 - P1), P3 - P1);
         }
     };
 

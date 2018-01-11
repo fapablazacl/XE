@@ -29,6 +29,8 @@ set (src_xe_math
 	"XE/Math/Sphere.cpp"
 	"XE/Math/Triangle.hpp"
 	"XE/Math/Triangle.cpp"
+    "XE/Math/Ellipsoid.hpp"
+    "XE/Math/Ellipsoid.cpp"
 )
 
 set (src_xe_graphics

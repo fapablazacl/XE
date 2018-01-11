@@ -113,22 +113,23 @@ namespace XE::Math {
             }
         }
 
-        bool IntersectImpl(const Boundary<T, N>& other) const {   
+        bool Intersect(const Boundary<T, N>& other) const {
             assert(IsValid());
 
+            return IntersectImpl(other) || IntersectImpl(*this);
+        }
+        
+    private:
+        bool IntersectImpl(const Boundary<T, N>& other) const {
+            assert(IsValid());
+            
             for(int i=0; i<Boundary<T, N>::PointCount; ++i) {
                 if (this->IsInside(other.GetEdge(i))) {
                     return true;
                 }
             }
-    
+            
             return false;
-        }
-
-        bool Intersect(const Boundary<T, N>& other) const {
-            assert(IsValid());
-
-            return IntersectImpl(other) || IntersectImpl(*this);
         }
     };
 }
