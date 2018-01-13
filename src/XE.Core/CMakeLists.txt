@@ -43,7 +43,9 @@ set (src_xe_graphics
 	"XE/Graphics/Texture.cpp" 
 	"XE/Graphics/Texture.hpp" 
 	"XE/Graphics/PixelFormat.cpp" 
-	"XE/Graphics/PixelFormat.hpp" 
+	"XE/Graphics/PixelFormat.hpp"
+    "XE/Graphics/Attribute.cpp"
+    "XE/Graphics/Attribute.hpp"
 )
 
 source_group("\\XE" FILES ${src_xe})
