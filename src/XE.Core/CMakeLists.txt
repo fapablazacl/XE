@@ -6,6 +6,8 @@ set (src_xe
     "XE/Stream.cpp"
     "XE/Buffer.hpp"
     "XE/Buffer.cpp"
+    "XE/DataType.hpp"
+    "XE/DataType.cpp"
 )
 
 set (src_xe_math
