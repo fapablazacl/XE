@@ -18,3 +18,5 @@ add_subdirectory("src/XE.Core")
 
 include_directories("dep/Catch2/single_include")
 add_subdirectory("src/XE.Test")
+
+add_subdirectory("src/XE.Graphics.D3D11.TestApp")

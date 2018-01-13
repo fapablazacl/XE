@@ -4,18 +4,19 @@
 
 #include <vector>
 #include <XE/Buffer.hpp>
-
-#include "Structure.hpp"
+#include <XE/Structure.hpp>
 
 namespace XE::Graphics {
-    struct SubsetFormat {
-        std::vector<SubsetAttrib> Attribs;
+    struct SubsetAttribute : public Attribute {
+        int BufferIndex;
     };
-    
+
+    typedef Structure<SubsetAttribute> SubsetStructure;
+
     class Subset {
     public:
         virtual ~Subset() {}
-        virtual const SubsetFormat* GetFormat() = 0;
+        virtual const SubsetStructure* GetStructure() = 0;
         virtual int GetBufferCount() const = 0;
         virtual Buffer* GetBuffer(const int index) = 0;
         virtual Buffer* GetIndexBuffer() = 0;

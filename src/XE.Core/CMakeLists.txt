@@ -8,6 +8,8 @@ set (src_xe
     "XE/Buffer.cpp"
     "XE/DataType.hpp"
     "XE/DataType.cpp"
+    "XE/Structure.cpp"
+    "XE/Structure.hpp"
 )
 
 set (src_xe_math
@@ -44,8 +46,6 @@ set (src_xe_graphics
 	"XE/Graphics/Texture.hpp" 
 	"XE/Graphics/PixelFormat.cpp" 
 	"XE/Graphics/PixelFormat.hpp"
-    "XE/Graphics/Attribute.cpp"
-    "XE/Graphics/Attribute.hpp"
 )
 
 source_group("\\XE" FILES ${src_xe})
