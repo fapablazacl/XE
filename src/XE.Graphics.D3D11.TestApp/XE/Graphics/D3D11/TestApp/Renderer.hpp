@@ -6,8 +6,53 @@
 #include <d3d11.h>
 #include <dxgi.h>
 #include <atlbase.h>
+#include <cassert>
 
-namespace XE::Graphics::D3D11::TestApp {
+namespace XE::Graphics::D3D11::TestApp {    
+    /**
+     * @brief A pointer that handles COM objects automatically
+     */
+    template<class T>
+    class COMPtr {
+        // static_assert(std::is_base_of<IUnknown, T>)
+
+    public:
+        COMPtr() {}
+
+        COMPtr(T* object) : m_obj(object) {}
+
+        ~COMPtr() {
+            if (m_obj) {
+                m_obj->Release();
+            }
+        }
+
+        T** operator& () {
+            return &m_obj;
+        }
+
+        T* operator->() {
+            assert(m_obj);
+            return m_obj;
+        }
+
+        const T* operator->() const {
+            assert(m_obj);
+            return m_obj;
+        }
+
+        operator T*() {
+            return m_obj;
+        }
+        
+        operator const T*() const {
+            return m_obj;
+        }
+
+    private:
+        T* m_obj = nullptr;
+    };
+
     class Renderer {
     public:
         Renderer();

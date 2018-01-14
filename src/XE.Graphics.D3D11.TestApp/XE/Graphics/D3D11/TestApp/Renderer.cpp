@@ -2,6 +2,7 @@
 #include "Renderer.hpp"
 
 #include <array>
+#include <cassert>
 
 namespace XE::Graphics::D3D11::TestApp {
     class ComResultChecker {
@@ -90,7 +91,7 @@ namespace XE::Graphics::D3D11::TestApp {
         for (auto driverType : g_driverTypes) {
             resultChecker = D3D11CreateDeviceAndSwapChain(
                 nullptr, driverType, NULL, creationFlags, 
-                g_featureLevels.data(), g_featureLevels.size(),
+                g_featureLevels.data(), static_cast<UINT>(g_featureLevels.size()),
                 D3D11_SDK_VERSION, &swapChainDesc, &m_swapChain, &m_device, &m_featureLevel, &m_context
             );
 
