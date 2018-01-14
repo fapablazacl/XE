@@ -1,9 +1,14 @@
 
 set (target "XE.Graphics.D3D11.TestApp")
+set (source_base "XE/Graphics/D3D11/TestApp")
 set (sources_xe_graphics_d3d11_testapp
-	"XE/Graphics/D3D11/TestApp/TestApp.cpp"
-	"XE/Graphics/D3D11/TestApp/Renderer.hpp"
-	"XE/Graphics/D3D11/TestApp/Renderer.cpp"
+	"${source_base}/TestApp.cpp"
+	"${source_base}/Renderer.hpp"
+	"${source_base}/Renderer.cpp"
+	"${source_base}/Mesh.hpp"
+	"${source_base}/Mesh.cpp"
+	"${source_base}/Color.vs"
+	"${source_base}/Color.ps"
 ) 
 
 source_group("\\XE\\Graphics\\D3D11\\TestApp" FILES ${sources_xe_graphics_d3d11_testapp})
