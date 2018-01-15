@@ -59,17 +59,46 @@ namespace XE::Graphics::D3D11::TestApp {
         vertexData.SysMemPitch = 0;
         vertexData.SysMemSlicePitch = 0;
 
+        if (FAILED(device->CreateBuffer(&vertexBufferDesc, &vertexData, &vertexBuffer))) {
+            return false;
+        }
+
         //setup index data
         D3D11_BUFFER_DESC indexBufferDesc = {};
-        
-        D3D11_SUBRESOURCE_DATA indexData;
+        indexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
+        indexBufferDesc.ByteWidth = sizeof(int) * 3;
+        indexBufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
+
+        D3D11_SUBRESOURCE_DATA indexData = {};
+        indexData.pSysMem = indices;
+        indexData.SysMemPitch = 0;
+        indexData.SysMemSlicePitch = 0;
+
+        if (FAILED(device->CreateBuffer(&indexBufferDesc, &indexData, &indexBuffer))) {
+            return false;
+        }
+
+        return true;
     }
 
     void Mesh::ShutdownBuffers() {
+        if (indexBuffer) {
+            indexBuffer->Release();
+            indexBuffer = nullptr;
+        }
 
+        if (vertexBuffer) {
+            vertexBuffer->Release();
+            vertexBuffer = nullptr;
+        }
     }
 
     void Mesh::RenderBuffers(ID3D11DeviceContext *context) {
+        const unsigned int stride = sizeof(VertexType);
+        const unsigned int offset = 0;
 
+        context->IASetVertexBuffers(0, 1, &vertexBuffer, &stride, &offset);
+        context->IASetIndexBuffer(indexBuffer, DXGI_FORMAT_R32_UINT, 0);
+        context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     }
 }
