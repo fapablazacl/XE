@@ -1,6 +1,7 @@
 
 #include "Shader.hpp"
 
+#include <iostream>
 #include <d3dcompiler.h>
 
 namespace XE::Graphics::D3D11::TestApp {
@@ -39,7 +40,7 @@ namespace XE::Graphics::D3D11::TestApp {
         // Compile Vertex Shader
         if (FAILED(D3DCompileFromFile(vertexShaderFile, nullptr, nullptr, "ColorVertexShader", "vs_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0, &vertexShaderBlob, &errorMessage))) {
             if (errorMessage) {
-                this->OutputShaderErrorMessage(errorMessage, hWnd, vertexShaderFile);
+                this->DisplayShaderErrorMessage(errorMessage, hWnd, vertexShaderFile);
                 errorMessage->Release();
             } else {
                 ::MessageBoxW(hWnd, vertexShaderFile, L"Missing Shader File", MB_OK | MB_ICONERROR);
@@ -55,7 +56,7 @@ namespace XE::Graphics::D3D11::TestApp {
         // Compile Pixel Shader
         if (FAILED(D3DCompileFromFile(pixelShaderFile, nullptr, nullptr, "ColorPixelShader", "vs_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0, &pixelShaderBlob, &errorMessage))) {
             if (errorMessage) {
-                this->OutputShaderErrorMessage(errorMessage, hWnd, pixelShaderFile);
+                this->DisplayShaderErrorMessage(errorMessage, hWnd, pixelShaderFile);
                 errorMessage->Release();
             } else {
                 ::MessageBoxW(hWnd, pixelShaderFile, L"Missing Shader File", MB_OK | MB_ICONERROR);
@@ -68,7 +69,6 @@ namespace XE::Graphics::D3D11::TestApp {
             return false;
         }
         
-
         // create the InputLayout class (that specifies the 
         D3D11_INPUT_ELEMENT_DESC positionInputElement;
         D3D11_INPUT_ELEMENT_DESC colorInputElement;
@@ -145,15 +145,43 @@ namespace XE::Graphics::D3D11::TestApp {
         }
     }
 
-    void Shader::OutputShaderErrorMessage(ID3D10Blob *blob, HWND hWnd, LPCWSTR msg) {
+    void Shader::DisplayShaderErrorMessage(ID3D10Blob *errorMessage, HWND hWnd, LPCWSTR msg) {
+        auto errorStr = static_cast<char*>(errorMessage->GetBufferPointer());
+        auto errorStrSize = errorMessage->GetBufferSize();
+
+        std::cout << errorStr << std::endl;
     }
 
     bool Shader::SetShaderParameters(ID3D11DeviceContext *context, const XE::Math::Matrix4f &world, const XE::Math::Matrix4f &view, const XE::Math::Matrix4f &projection) {
-        return false;
+        D3D11_MAPPED_SUBRESOURCE mappedResource;
+
+        const XE::Math::Matrix4f worldT = XE::Math::Transpose(world);
+        const XE::Math::Matrix4f viewT = XE::Math::Transpose(view);
+        const XE::Math::Matrix4f projectionT = XE::Math::Transpose(projection);
+
+        if (FAILED(context->Map(matrixBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource))) {
+            return false;
+        }
+
+        auto dataPtr = (MatrixBufferType*)mappedResource.pData;
+        dataPtr->world = worldT;
+        dataPtr->view = viewT;
+        dataPtr->projection = projectionT;
+
+        context->Unmap(matrixBuffer, 0);
+
+        context->VSSetConstantBuffers(0, 1, &matrixBuffer);
+
+        return true;
     }
 
     void Shader::RenderShader(ID3D11DeviceContext *context, int indexCount) {
+        context->IASetInputLayout(layout);
 
+        context->VSSetShader(vertexShader, nullptr, 0);
+        context->PSSetShader(pixelShader, nullptr, 0);
+
+        context->DrawIndexed(indexCount, 0, 0);
     }
 }
 
