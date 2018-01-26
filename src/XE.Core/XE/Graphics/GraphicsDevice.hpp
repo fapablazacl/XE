@@ -95,7 +95,7 @@ namespace XE::Graphics {
         
         virtual TextureCubeMap* CreateTextureCubeMap(const PixelFormat format, const XE::Math::Vector2i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void **sourceData) = 0;
         
-        virtual Program* CreateProgram(const std::vector<std::tuple<ShaderType, std::string>> &shaderSources) = 0;
+        virtual Program* CreateProgram(const std::vector<std::tuple<ShaderType, std::string>> &sources) = 0;
         
         virtual void SetProgram(const Program *program) = 0;
         
@@ -107,7 +107,7 @@ namespace XE::Graphics {
         
         virtual void Draw(const std::vector<DrawEnvelope> &envelopes) = 0;
         
-        virtual void BeginFrame(const ClearFlags flags) = 0;
+        virtual void BeginFrame(const ClearFlags flags, const XE::Math::Vector4f &color, const float depth, const int stencil) = 0;
         
         virtual void EndFrame() = 0;
         
