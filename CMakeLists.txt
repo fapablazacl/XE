@@ -20,3 +20,6 @@ include_directories("dep/Catch2/single_include")
 add_subdirectory("src/XE.Test")
 
 add_subdirectory("src/XE.Graphics.D3D11.TestApp")
+
+add_subdirectory("src/XE.OpenGLCore")
+include_directories("src/XE.OpenGLCore")

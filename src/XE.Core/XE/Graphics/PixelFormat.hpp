@@ -8,7 +8,6 @@ namespace XE::Graphics {
         R8G8B8,
         R8G8B8A8,
     };
-
 }
 
 #endif

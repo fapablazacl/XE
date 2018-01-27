@@ -3,8 +3,10 @@
 #define __XE_GRAPHICS_GRAPHICSDEVICE_HPP__
 
 #include <vector>
+#include <memory>
 #include <XE/DataType.hpp>
 #include <XE/Math/Vector.hpp>
+#include <XE/DataLayout.hpp>
 
 namespace XE::Graphics {
     /**
@@ -58,9 +60,8 @@ namespace XE::Graphics {
         IndexBuffer
     };
     
-    class InputManager;
     class Buffer;
-    class Subset;
+    class MeshSubset;
     
     struct SubsetFormat;
     
@@ -71,7 +72,7 @@ namespace XE::Graphics {
     
     enum class PixelFormat;
     
-    struct Structure;
+    struct Pack;
 
     class Program;
     
@@ -79,39 +80,31 @@ namespace XE::Graphics {
     
     class GraphicsDevice {
     public:
-        virtual ~GraphicsDevice() {}
+        virtual ~GraphicsDevice();
         
-        virtual InputManager* GetInputManager() = 0;
+        virtual std::unique_ptr<MeshSubset> CreateMeshSubset(const SubsetFormat *format, std::vector<Buffer*> buffers, const DataType indexType=DataType::Unknown, Buffer *indexBuffer=nullptr) = 0;
         
-        virtual Subset* CreateSubset(const SubsetFormat *format, std::vector<Buffer*> buffers, const DataType indexType=DataType::Unknown, Buffer *indexBuffer=nullptr) = 0;
+        virtual std::unique_ptr<Buffer> CreateBuffer(const BufferType bufferType, const int size, const void *data=nullptr) = 0;
         
-        virtual Buffer* CreateBuffer(const BufferType bufferType, const int size, const void *data=nullptr) = 0;
+        virtual std::unique_ptr<Texture2D> CreateTexture2D(const PixelFormat format, const XE::Math::Vector2i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void *sourceData) = 0;
         
-        virtual Texture2D* CreateTexture2D(const PixelFormat format, const XE::Math::Vector2i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void *sourceData) = 0;
+        virtual std::unique_ptr<Texture3D> CreateTexture3D(const PixelFormat format, const XE::Math::Vector3i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void *sourceData) = 0;
         
-        virtual Texture3D* CreateTexture3D(const PixelFormat format, const XE::Math::Vector3i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void *sourceData) = 0;
+        virtual std::unique_ptr<Texture2DArray> CreateTexture2DArray(const PixelFormat format, const XE::Math::Vector2i &size, const int count, const PixelFormat sourceFormat, const DataType sourceDataType, const void **sourceData) = 0;
         
-        virtual Texture2DArray* CreateTexture2DArray(const PixelFormat format, const XE::Math::Vector2i &size, const int count, const PixelFormat sourceFormat, const DataType sourceDataType, const void **sourceData) = 0;
+        virtual std::unique_ptr<TextureCubeMap> CreateTextureCubeMap(const PixelFormat format, const XE::Math::Vector2i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void **sourceData) = 0;
         
-        virtual TextureCubeMap* CreateTextureCubeMap(const PixelFormat format, const XE::Math::Vector2i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void **sourceData) = 0;
-        
-        virtual Program* CreateProgram(const std::vector<std::tuple<ShaderType, std::string>> &sources) = 0;
+        virtual std::unique_ptr<Program> CreateProgram(const std::vector<std::tuple<ShaderType, std::string>> &sources) = 0;
         
         virtual void SetProgram(const Program *program) = 0;
         
         virtual const Program* GetProgram() const = 0;
         
-        virtual void SetSubset(const Subset *subset) = 0;
-        
-        virtual const Subset* GetSubset() const = 0;
-        
-        virtual void Draw(const std::vector<DrawEnvelope> &envelopes) = 0;
+        virtual void Draw(const MeshSubset *subset, const std::vector<DrawEnvelope> &envelopes) = 0;
         
         virtual void BeginFrame(const ClearFlags flags, const XE::Math::Vector4f &color, const float depth, const int stencil) = 0;
         
         virtual void EndFrame() = 0;
-        
-        virtual void ApplyUniform(const Structure* structure, const void *uniform) = 0;
     };
 }
 

@@ -8,8 +8,8 @@ set (src_xe
     "XE/Buffer.cpp"
     "XE/DataType.hpp"
     "XE/DataType.cpp"
-    "XE/Structure.cpp"
-    "XE/Structure.hpp"
+    "XE/DataLayout.cpp"
+    "XE/DataLayout.hpp"
 )
 
 set (src_xe_math
@@ -40,8 +40,8 @@ set (src_xe_math
 set (src_xe_graphics
 	"XE/Graphics/GraphicsDevice.cpp"
 	"XE/Graphics/GraphicsDevice.hpp" 
-	"XE/Graphics/Subset.cpp" 
-	"XE/Graphics/Subset.hpp" 
+	"XE/Graphics/MeshSubset.cpp" 
+	"XE/Graphics/MeshSubset.hpp" 
 	"XE/Graphics/Texture.cpp" 
 	"XE/Graphics/Texture.hpp" 
 	"XE/Graphics/Texture2D.cpp" 
@@ -54,6 +54,16 @@ set (src_xe_graphics
 	"XE/Graphics/TextureCubeMap.hpp" 
 	"XE/Graphics/PixelFormat.cpp" 
 	"XE/Graphics/PixelFormat.hpp"
+	"XE/Graphics/Shader.cpp" 
+	"XE/Graphics/Shader.hpp"
+	"XE/Graphics/Program.cpp" 
+	"XE/Graphics/Program.hpp"
+	"XE/Graphics/Vertex.cpp"
+	"XE/Graphics/Vertex.hpp"
+	"XE/Graphics/VertexFormat.cpp"
+	"XE/Graphics/VertexFormat.hpp"
+	"XE/Graphics/UniformLayout.cpp"
+	"XE/Graphics/UniformLayout.hpp"
 )
 
 source_group("\\XE" FILES ${src_xe})

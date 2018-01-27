@@ -5,7 +5,7 @@
 #include <cstdint>
 
 namespace XE {
-    enum class DataType {
+    enum class DataType : std::int16_t {
         Unknown,
         UInt8,
         UInt16,
@@ -19,7 +19,7 @@ namespace XE {
         Float32,
         Float64
     };
-    
+
     extern int ComputeByteSize(const DataType dataType);
 }
 
