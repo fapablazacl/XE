@@ -64,6 +64,12 @@ set (src_xe_graphics
 	"XE/Graphics/VertexFormat.hpp"
 	"XE/Graphics/UniformLayout.cpp"
 	"XE/Graphics/UniformLayout.hpp"
+	"XE/Graphics/ImageImpl.hpp"
+	"XE/Graphics/ImageImpl.cpp"
+	"XE/Graphics/Image.hpp"
+	"XE/Graphics/Image.cpp"
+	"XE/Graphics/ImageLoader.hpp"
+	"XE/Graphics/ImageLoader.cpp"
 )
 
 source_group("\\XE" FILES ${src_xe})

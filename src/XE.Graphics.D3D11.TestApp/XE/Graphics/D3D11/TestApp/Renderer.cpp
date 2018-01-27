@@ -36,7 +36,7 @@ namespace XE::Graphics::D3D11::TestApp {
         }
 
     private:
-        HRESULT m_hr = NULL;
+        HRESULT m_hr = 0;
     };
 
     // tipos de controladores disponibles
@@ -86,11 +86,11 @@ namespace XE::Graphics::D3D11::TestApp {
 
         // crear el dispositivo
         unsigned creationFlags = D3D11_CREATE_DEVICE_DEBUG;
-        ComResultChecker resultChecker = NULL;
+        ComResultChecker resultChecker = 0;
 
         for (auto driverType : g_driverTypes) {
             resultChecker = D3D11CreateDeviceAndSwapChain(
-                nullptr, driverType, NULL, creationFlags, 
+                nullptr, driverType, 0, creationFlags, 
                 g_featureLevels.data(), static_cast<UINT>(g_featureLevels.size()),
                 D3D11_SDK_VERSION, &swapChainDesc, &m_swapChain, &m_device, &m_featureLevel, &m_context
             );

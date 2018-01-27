@@ -5,7 +5,6 @@
 #include <Windows.h>
 #include <d3d11.h>
 #include <dxgi.h>
-#include <atlbase.h>
 #include <cassert>
 
 namespace XE::Graphics::D3D11::TestApp {    
