@@ -27,6 +27,9 @@ set (sources_xe_graphics_glcore
 	
 	"${source_base}/MeshSubsetGL.hpp"
 	"${source_base}/MeshSubsetGL.cpp"
+
+	"${source_base}/Conversion.hpp"
+	"${source_base}/Conversion.cpp"
 ) 
 
 source_group("\\XE\\Graphics\\GL" FILES ${sources_xe_graphics_glcore})

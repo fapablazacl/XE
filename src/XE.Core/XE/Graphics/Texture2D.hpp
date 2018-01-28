@@ -7,6 +7,9 @@
 namespace XE::Graphics {
     class Texture2D : public Texture {
     public:
+        virtual TextureType GetType() const override;
+
+    public:
         virtual ~Texture2D();
         
         virtual XE:: Math::Vector2i GetSize() const = 0;
