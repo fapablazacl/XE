@@ -72,8 +72,8 @@ set (src_xe_graphics
 	"XE/Graphics/ImageLoader.cpp"
 )
 
-source_group("\\XE" FILES ${src_xe})
-source_group("\\XE\\Math" FILES ${src_xe_math})
-source_group("\\XE\\Graphics" FILES ${src_xe_graphics})
+source_group ("\\XE" FILES ${src_xe})
+source_group ("\\XE\\Math" FILES ${src_xe_math})
+source_group ("\\XE\\Graphics" FILES ${src_xe_graphics})
 
-add_library(${target} ${src_xe} ${src_xe_math} ${src_xe_graphics})
+add_library (${target} ${src_xe} ${src_xe_math} ${src_xe_graphics})

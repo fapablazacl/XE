@@ -1,6 +1,6 @@
 
 #ifndef __XE_GRAPHICS_TEXTURE2DARRAY_HPP__
-#define __XE_GRAPHICS_TEXTURE3DARRAY_HPP__
+#define __XE_GRAPHICS_TEXTURE2DARRAY_HPP__
 
 #include <XE/Graphics/Texture.hpp>
 

@@ -1,25 +1,38 @@
 project (XE)
 
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS OFF)
+option (XE_PLUGIN_DIRECT3D11 "Add Direct3D 11 support" OFF)
+option (XE_PLUGIN_OPENGLCORE "Add OpenGL Core support" ON)
 
-cmake_minimum_required(VERSION 3.10)
+set (CMAKE_CXX_STANDARD 17)
+set (CMAKE_CXX_STANDARD_REQUIRED ON)
+set (CMAKE_CXX_EXTENSIONS OFF)
 
-set(XE_VERSION_MAJOR 0)
-set(XE_VERSION_MINOR 0)
-set(XE_VERSION "${XE_VERSION_MAJOR}.${XE_VERSION_MINOR}")
+cmake_minimum_required (VERSION 3.10)
 
-add_definitions(-DXE_VERSION_MAJOR=${XE_VERSION_MAJOR})
-add_definitions(-DXE_VERSION_MINOR=${XE_VERSION_MINOR})
+set (XE_VERSION_MAJOR 0)
+set (XE_VERSION_MINOR 0)
+set (XE_VERSION_REVISION 0)
+set (XE_VERSION "${XE_VERSION_MAJOR}.${XE_VERSION_MINOR}.${XE_VERSION_REVISION}")
 
-include_directories("src/XE.Core")
-add_subdirectory("src/XE.Core")
+add_definitions (-DXE_VERSION_MAJOR=${XE_VERSION_MAJOR})
+add_definitions (-DXE_VERSION_MINOR=${XE_VERSION_MINOR})
+add_definitions (-DXE_VERSION_REVISION=${XE_VERSION_REVISION})
 
-include_directories("dep/Catch2/single_include")
-add_subdirectory("src/XE.Test")
+include_directories ("src/XE.Core")
+add_subdirectory ("src/XE.Core")
 
-add_subdirectory("src/XE.Graphics.D3D11.TestApp")
+include_directories ("dep/Catch2/single_include")
+add_subdirectory ("src/XE.Test")
 
-add_subdirectory("src/XE.OpenGLCore")
-include_directories("src/XE.OpenGLCore")
+if (XE_PLUGIN_DIRECT3D11)
+    add_subdirectory ("src/XE.Graphics.D3D11.TestApp")
+    include_directories ("src/XE.Graphics.D3D11.TestApp")
+endif ()
+
+if (XE_PLUGIN_OPENGLCORE)
+    add_subdirectory ("src/glad-gl4")
+    include_directories ("src/glad-gl4")
+
+    add_subdirectory ("src/XE.OpenGLCore")
+    include_directories ("src/XE.OpenGLCore")
+endif ()
