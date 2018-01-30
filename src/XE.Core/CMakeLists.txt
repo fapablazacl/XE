@@ -70,6 +70,8 @@ set (src_xe_graphics
 	"XE/Graphics/Image.cpp"
 	"XE/Graphics/ImageLoader.hpp"
 	"XE/Graphics/ImageLoader.cpp"
+	"XE/Graphics/Material.hpp"
+	"XE/Graphics/Material.cpp"
 )
 
 source_group ("\\XE" FILES ${src_xe})
