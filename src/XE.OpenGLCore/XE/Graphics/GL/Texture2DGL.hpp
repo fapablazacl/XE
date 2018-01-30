@@ -5,10 +5,6 @@
 #include <XE/Graphics/Texture2D.hpp>
 #include <glad/glad.h>
 
-namespace XE::Graphics {
-    enum class DataType;
-}
-
 namespace XE::Graphics::GL {
     class Texture2DGL : public Texture2D {
     public:
@@ -25,9 +21,9 @@ namespace XE::Graphics::GL {
             return m_size;
         }
         
-        virtual void SetData(const void *surfaceData, const int mipLevel, const PixelFormat surfaceFormat, const XE::Math::Recti &area) override;
-        
-        virtual void GetData(void *surfaceData, const int mipLevel, const PixelFormat surfaceFormat, const XE::Math::Recti &area) const override;
+        virtual void SetData(const std::byte *surfaceData, const int mipLevel, const PixelFormat surfaceFormat, const DataType surfaceDataType, const XE::Math::Recti &area) override;
+
+        virtual void GetData(std::byte *surfaceData, const int mipLevel, const PixelFormat surfaceFormat, const DataType surfaceDataType) const override;
 
     public:
         GLuint GetID() const {
