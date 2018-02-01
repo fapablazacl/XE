@@ -74,8 +74,18 @@ set (src_xe_graphics
 	"XE/Graphics/Material.cpp"
 )
 
+set (src_xe_input
+    "XE/Input/InputManager.hpp"
+	"XE/Input/InputManager.cpp"
+	"XE/Input/InputCode.hpp"
+	"XE/Input/InputCode.cpp"
+	"XE/Input/InputState.hpp"
+	"XE/Input/InputState.cpp"
+)
+
 source_group ("\\XE" FILES ${src_xe})
 source_group ("\\XE\\Math" FILES ${src_xe_math})
 source_group ("\\XE\\Graphics" FILES ${src_xe_graphics})
+source_group ("\\XE\\Input" FILES ${src_xe_input})
 
-add_library (${target} ${src_xe} ${src_xe_math} ${src_xe_graphics})
+add_library (${target} ${src_xe} ${src_xe_math} ${src_xe_graphics} ${src_xe_input})

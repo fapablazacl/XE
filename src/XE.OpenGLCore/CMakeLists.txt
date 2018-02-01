@@ -28,6 +28,9 @@ set (sources_xe_graphics_glcore
 	"${source_base}/MeshSubsetGL.hpp"
 	"${source_base}/MeshSubsetGL.cpp"
 
+	"${source_base}/TextureGLBase.hpp"
+	"${source_base}/TextureGLBase.cpp"
+
 	"${source_base}/Conversion.hpp"
 	"${source_base}/Conversion.cpp"
 ) 

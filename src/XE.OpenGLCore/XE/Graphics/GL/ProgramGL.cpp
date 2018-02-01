@@ -4,11 +4,11 @@
 
 namespace XE::Graphics::GL {
     ProgramGL::ProgramGL(const std::vector<std::tuple<ShaderType, std::string>> &sources) {
-        for (auto &sourceTuple : sources) {
+        for (const auto &sourceTuple : sources) {
             const ShaderType type = std::get<0>(sourceTuple);
-            const std::string &source = std::get<1>(sourceTuple);
+            const std::string &code = std::get<1>(sourceTuple);
 
-            m_shaders.emplace_back(new ShaderGL(type, source));
+            m_shaders.emplace_back(new ShaderGL(type, code));
         }
     }
 

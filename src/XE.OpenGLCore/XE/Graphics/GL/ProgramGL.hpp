@@ -6,6 +6,7 @@
 #include <vector>
 #include <string>
 #include <memory>
+#include <tuple>
 #include <glad/glad.h>
 
 namespace XE::Graphics {
