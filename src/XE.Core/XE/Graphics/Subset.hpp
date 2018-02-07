@@ -1,12 +1,15 @@
 
-#ifndef __XE_GRAPHICS_MESHSUBSET_HPP__
-#define __XE_GRAPHICS_MESHSUBSET_HPP__
+#ifndef __XE_GRAPHICS_SUBSET_HPP__
+#define __XE_GRAPHICS_SUBSET_HPP__
+
+namespace XE {
+    class Buffer;
+}
 
 namespace XE::Graphics {
-    class Buffer;
-    class MeshSubset {
+    class Subset {
     public:
-        virtual ~MeshSubset();
+        virtual ~Subset();
 
         virtual int GetBufferCount() const = 0;
         virtual Buffer* GetBuffer(const int index) = 0;

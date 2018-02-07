@@ -61,9 +61,9 @@ namespace XE::Graphics {
     };
     
     class Buffer;
-    class MeshSubset;
+    class Subset;
     
-    struct SubsetFormat;
+    class VertexFormat;
     
     class Texture2D;
     class Texture3D;
@@ -82,7 +82,7 @@ namespace XE::Graphics {
     public:
         virtual ~GraphicsDevice();
         
-        virtual std::unique_ptr<MeshSubset> CreateMeshSubset(const SubsetFormat *format, std::vector<Buffer*> buffers, const DataType indexType=DataType::Unknown, Buffer *indexBuffer=nullptr) = 0;
+        virtual std::unique_ptr<Subset> CreateSubset(const VertexFormat *format, std::vector<Buffer*> buffers, const DataType indexType=DataType::Unknown, Buffer *indexBuffer=nullptr) = 0;
         
         virtual std::unique_ptr<Buffer> CreateBuffer(const BufferType bufferType, const int size, const void *data=nullptr) = 0;
         
@@ -100,7 +100,7 @@ namespace XE::Graphics {
         
         virtual const Program* GetProgram() const = 0;
         
-        virtual void Draw(const MeshSubset *subset, const std::vector<DrawEnvelope> &envelopes) = 0;
+        virtual void Draw(const Subset *subset, const std::vector<DrawEnvelope> &envelopes) = 0;
         
         virtual void BeginFrame(const ClearFlags flags, const XE::Math::Vector4f &color, const float depth, const int stencil) = 0;
         

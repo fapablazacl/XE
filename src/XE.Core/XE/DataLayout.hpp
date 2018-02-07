@@ -2,17 +2,10 @@
 #ifndef __XE_DATALAYOUT_HPP__
 #define __XE_DATALAYOUT_HPP__
 
-#include <string>
 #include <vector>
-#include <XE/DataType.hpp>
 
 namespace XE {
-    struct DataAttribute {
-        DataType Type;
-        std::int16_t Dimension;
-        std::int16_t Count;
-        char Name[16];
-    };
+    struct DataAttribute;
 
     /**
      * @brief Description for packed data structures

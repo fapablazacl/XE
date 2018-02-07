@@ -6,21 +6,26 @@
 #include <XE/Math/Vector.hpp>
 
 namespace XE::Input {
-    enum class InputState;
-    enum class InputCode;
+    class KeyboardStatus;
+    class MouseStatus;
+    class ControllerStatus;
 
     /**
-     * @brief Handles all the different input events 
+     * @brief Provides low-level device status scanning capabilities
+     *
+     * @todo Add API for connected device detection
      */
     class InputManager {
     public:
         virtual ~InputManager();
 
-        virtual InputState GetState(const InputCode code) const = 0;
+        virtual KeyboardStatus GetKeyboardStatus() const = 0;
 
-        virtual XE::Math::Vector2i GetMousePosition() = 0;
+        virtual MouseStatus GetMouseStatus() const = 0;
 
-        virtual void Poll() = 0;
+        virtual int GetControllerCount() const = 0;
+        
+        virtual ControllerStatus GetControllerStatus(const int index) const = 0;
     };
 }
 

@@ -10,6 +10,8 @@ set (src_xe
     "XE/DataType.cpp"
     "XE/DataLayout.cpp"
     "XE/DataLayout.hpp"
+	"XE/DataAttribute.cpp"
+    "XE/DataAttribute.hpp"
 )
 
 set (src_xe_math
@@ -40,8 +42,8 @@ set (src_xe_math
 set (src_xe_graphics
 	"XE/Graphics/GraphicsDevice.cpp"
 	"XE/Graphics/GraphicsDevice.hpp" 
-	"XE/Graphics/MeshSubset.cpp" 
-	"XE/Graphics/MeshSubset.hpp" 
+	"XE/Graphics/Subset.cpp" 
+	"XE/Graphics/Subset.hpp" 
 	"XE/Graphics/Texture.cpp" 
 	"XE/Graphics/Texture.hpp" 
 	"XE/Graphics/Texture2D.cpp" 
@@ -77,15 +79,19 @@ set (src_xe_graphics
 set (src_xe_input
     "XE/Input/InputManager.hpp"
 	"XE/Input/InputManager.cpp"
-	"XE/Input/InputCode.hpp"
-	"XE/Input/InputCode.cpp"
-	"XE/Input/InputState.hpp"
-	"XE/Input/InputState.cpp"
+	"XE/Input/DeviceStatus.hpp"
+	"XE/Input/DeviceStatus.cpp"
+)
+
+set (src_xe_ui
+    "XE/UI/Frame.hpp"
+	"XE/UI/Frame.cpp"
 )
 
 source_group ("\\XE" FILES ${src_xe})
 source_group ("\\XE\\Math" FILES ${src_xe_math})
 source_group ("\\XE\\Graphics" FILES ${src_xe_graphics})
 source_group ("\\XE\\Input" FILES ${src_xe_input})
+source_group ("\\XE\\UI" FILES ${src_xe_ui})
 
-add_library (${target} ${src_xe} ${src_xe_math} ${src_xe_graphics} ${src_xe_input})
+add_library (${target} ${src_xe} ${src_xe_math} ${src_xe_graphics} ${src_xe_input} ${src_xe_ui})
