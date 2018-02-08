@@ -6,7 +6,14 @@
 #include <memory>
 #include <XE/DataType.hpp>
 #include <XE/Math/Vector.hpp>
-#include <XE/DataLayout.hpp>
+
+namespace XE {
+    class Buffer;
+}
+
+namespace XE::Input {
+    class InputManager;
+}
 
 namespace XE::Graphics {
     /**
@@ -60,10 +67,9 @@ namespace XE::Graphics {
         IndexBuffer
     };
     
-    class Buffer;
     class Subset;
     
-    class VertexFormat;
+    struct VertexLayout;
     
     class Texture2D;
     class Texture3D;
@@ -72,8 +78,6 @@ namespace XE::Graphics {
     
     enum class PixelFormat;
     
-    struct Pack;
-
     class Program;
     
     enum class ShaderType;
@@ -82,7 +86,9 @@ namespace XE::Graphics {
     public:
         virtual ~GraphicsDevice();
         
-        virtual std::unique_ptr<Subset> CreateSubset(const VertexFormat *format, std::vector<Buffer*> buffers, const DataType indexType=DataType::Unknown, Buffer *indexBuffer=nullptr) = 0;
+        virtual XE::Input::InputManager* GetInputManager() = 0;
+
+        virtual std::unique_ptr<Subset> CreateSubset(const VertexLayout &format, std::vector<std::unique_ptr<Buffer>> buffers, const DataType indexType, std::unique_ptr<Buffer> indexBuffer) = 0;
         
         virtual std::unique_ptr<Buffer> CreateBuffer(const BufferType bufferType, const int size, const void *data=nullptr) = 0;
         

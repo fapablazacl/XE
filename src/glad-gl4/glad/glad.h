@@ -8,4 +8,13 @@
   #include "glad_release.h"
 #endif
 
+// because Windows.h defines a max and a min macro, we undefine them
+#if defined(max)
+#undef max
+#endif
+
+#if defined(min)
+#undef min
+#endif
+
 #endif

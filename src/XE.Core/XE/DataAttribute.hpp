@@ -8,7 +8,6 @@ namespace XE {
     struct DataAttribute {
         DataType Type;
         std::int16_t Dimension;
-        std::int16_t Count;
         char Name[16];
     };
 }

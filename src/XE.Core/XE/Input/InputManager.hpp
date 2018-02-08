@@ -2,9 +2,6 @@
 #ifndef __XE_INPUT_INPUTMANAGER_HPP__
 #define __XE_INPUT_INPUTMANAGER_HPP__
 
-#include <map>
-#include <XE/Math/Vector.hpp>
-
 namespace XE::Input {
     class KeyboardStatus;
     class MouseStatus;
@@ -19,13 +16,13 @@ namespace XE::Input {
     public:
         virtual ~InputManager();
 
-        virtual KeyboardStatus GetKeyboardStatus() const = 0;
+        virtual KeyboardStatus GetKeyboardStatus() = 0;
 
-        virtual MouseStatus GetMouseStatus() const = 0;
+        virtual MouseStatus GetMouseStatus() = 0;
 
-        virtual int GetControllerCount() const = 0;
+        virtual int GetControllerCount() = 0;
         
-        virtual ControllerStatus GetControllerStatus(const int index) const = 0;
+        virtual ControllerStatus GetControllerStatus(const int index) = 0;
     };
 }
 
