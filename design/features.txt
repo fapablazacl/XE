@@ -12,7 +12,6 @@ Supported Platforms / Toolchains:
 	- Web / emscripten
 
 - Test-Driven development 
-- Support for Windows, Linux, Web and Android
 
 Features:
 
@@ -22,12 +21,11 @@ Core
 	- Buffer Abstraction
 	
 	- Stream Abstration
-		- Memory Stream.
-		- Memory Reference Stream.
+		- Memory Stream
 		- Buffer Stream
-		- File Stream.
+		- File Stream
 		
-	- Archive Abstraction
+	- Archive Abstraction (PENDING)
 		- Folder Archive
 		- Zipped Archive
 		
@@ -103,11 +101,9 @@ Input
 Graphics
 	- Images
 	- Textures
-	- 
 	- Modern Device Interface
 		- Custom Vertex Attributes
-		- Programmable Pipeline (Language depends on backend renderer)
-		
+		- Programmable Graphics Pipeline (Language depends on backend renderer)
 	- Legacy Device Interface
 		
 Audio
@@ -115,7 +111,7 @@ Audio
 		- Volume Control
 		- Pitch Control 
 		
-	- Listener Model 3D 
+	- Listener (3D)
 		- Volume Control
 		- Pitch Control
 		
@@ -124,8 +120,11 @@ Audio
 	- Extensible interface for loading Audio Samples 
 	- Extensible inteface for sound effects
 
+	
+High-Level Layer
+	
 Scene Graph 
 	- Scene - Based rendering 
 	- Extensible Scene Node Object Interface
-	
+
 	
