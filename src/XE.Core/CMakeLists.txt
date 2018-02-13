@@ -42,6 +42,8 @@ set (src_xe_math
 set (src_xe_graphics
 	"XE/Graphics/GraphicsDevice.cpp"
 	"XE/Graphics/GraphicsDevice.hpp" 
+	"XE/Graphics/BufferDescriptor.cpp" 
+	"XE/Graphics/BufferDescriptor.hpp" 
 	"XE/Graphics/Subset.cpp" 
 	"XE/Graphics/Subset.hpp" 
 	"XE/Graphics/Texture.cpp" 
@@ -64,6 +66,8 @@ set (src_xe_graphics
 	"XE/Graphics/Vertex.hpp"
 	"XE/Graphics/VertexLayout.cpp"
 	"XE/Graphics/VertexLayout.hpp"
+	"XE/Graphics/VertexFormat.cpp"
+	"XE/Graphics/VertexFormat.hpp"
 	"XE/Graphics/UniformLayout.cpp"
 	"XE/Graphics/UniformLayout.hpp"
 	"XE/Graphics/ImageImpl.hpp"

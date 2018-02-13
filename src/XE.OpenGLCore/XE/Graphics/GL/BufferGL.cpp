@@ -1,18 +1,21 @@
 
 #include "BufferGL.hpp"
-
+#include "Conversion.hpp"
 #include <cstdint>
 
 namespace XE::Graphics::GL {
-    BufferGL::BufferGL(const GLenum target, const GLenum usage, const int size, const void *data) {
+    BufferGL::BufferGL(const BufferType type, const BufferUsage usage, const BufferAccess access, const int size, const void *data) {
+        const GLenum targetGL = ConvertToGL(type);
+        const GLenum usageGL = ConvertToGL(usage, access);
+
         ::glGenBuffers(1, &m_id);
-        ::glBindBuffer(target, m_id);
-        ::glBufferData(target, size, data, usage);
-        ::glBindBuffer(target, 0);
+        ::glBindBuffer(targetGL, m_id);
+        ::glBufferData(targetGL, size, data, usageGL);
+        ::glBindBuffer(targetGL, 0);
 
         m_size = size;
-        m_target = target;
-        m_usage = usage;
+        m_target = targetGL;
+        m_usage = usageGL;
     }
 
     BufferGL::~BufferGL() {

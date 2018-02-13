@@ -5,10 +5,16 @@
 #include <XE/Buffer.hpp>
 #include <glad/glad.h>
 
+namespace XE::Graphics {
+    enum class BufferUsage;
+    enum class BufferAccess;
+    enum class BufferType;
+}
+
 namespace XE::Graphics::GL {
     class BufferGL : public Buffer {
     public:
-        BufferGL(const GLenum target, const GLenum usage, const int size, const void *data);
+        BufferGL(const BufferType type, const BufferUsage usage, const BufferAccess access, const int size, const void *data);
 
         virtual ~BufferGL();
 

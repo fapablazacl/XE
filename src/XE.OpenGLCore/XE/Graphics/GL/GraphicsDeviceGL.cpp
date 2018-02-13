@@ -23,8 +23,8 @@ namespace XE::Graphics::GL {
         return std::unique_ptr<Subset>();
     }
         
-    std::unique_ptr<Buffer> GraphicsDeviceGL::CreateBuffer(const BufferType bufferType, const int size, const void *data) {
-        return std::make_unique<BufferGL>(bufferType, size, data);
+    std::unique_ptr<Buffer> GraphicsDeviceGL::CreateBuffer(const BufferType bufferType, const BufferUsage bufferUsage, const BufferAccess bufferAccess, const int size, const void *data) {
+        return std::make_unique<BufferGL>(bufferType, bufferUsage, bufferAccess, size, data);
     }
         
     std::unique_ptr<Texture2D> GraphicsDeviceGL::CreateTexture2D(const PixelFormat format, const XE::Math::Vector2i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void *sourceData) {

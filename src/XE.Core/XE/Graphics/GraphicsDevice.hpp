@@ -38,59 +38,43 @@ namespace XE::Graphics {
         }
     }
     
-    enum class PrimitiveType {
-        Unknown,
-        PointList,
-        LineList,
-        LineStrip,
-        TriangleStrip,
-        TriangleList,
-        TriangleFan
-    };
-    
-    /**
-     * @brief Interpretation information for geometry buffers
-     */
-    struct DrawEnvelope {
-        //! The primitive used for render
-        PrimitiveType Primitive;
-        
-        //! The count of vertices
-        int VertexCount;
-        
-        //! The start offset used for vertex counting
-        int VertexStart = 0;
-    };
-    
-    enum class BufferType {
-        VertexBuffer,
-        IndexBuffer
-    };
-    
-    class Subset;
-    
+    enum class PixelFormat;
+    enum class ShaderType;
+
+    struct BufferDescriptor;
+    struct SubsetEnvelope;
     struct VertexLayout;
     
+    class Subset;
     class Texture2D;
     class Texture3D;
     class Texture2DArray;
     class TextureCubeMap;
-    
-    enum class PixelFormat;
-    
     class Program;
+    class Material;
     
-    enum class ShaderType;
-    
+    struct ProgramSource {
+        ShaderType Type;
+        std::string Text;
+    };
+
+    struct ProgramDescriptor {
+        ProgramSource *Sources;
+        int Count;
+    };
+
+    /**
+     * @brief Graphics API abstraction
+     */
     class GraphicsDevice {
     public:
         virtual ~GraphicsDevice();
-        
+
         virtual XE::Input::InputManager* GetInputManager() = 0;
 
         virtual std::unique_ptr<Subset> CreateSubset(const VertexLayout &format, std::vector<std::unique_ptr<Buffer>> buffers, const DataType indexType, std::unique_ptr<Buffer> indexBuffer) = 0;
         
-        virtual std::unique_ptr<Buffer> CreateBuffer(const BufferType bufferType, const int size, const void *data=nullptr) = 0;
+        virtual std::unique_ptr<Buffer> CreateBuffer(const BufferDescriptor descriptor) = 0;
         
         virtual std::unique_ptr<Texture2D> CreateTexture2D(const PixelFormat format, const XE::Math::Vector2i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void *sourceData) = 0;
         
@@ -100,13 +84,13 @@ namespace XE::Graphics {
         
         virtual std::unique_ptr<TextureCubeMap> CreateTextureCubeMap(const PixelFormat format, const XE::Math::Vector2i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void **sourceData) = 0;
         
-        virtual std::unique_ptr<Program> CreateProgram(const std::vector<std::tuple<ShaderType, std::string>> &sources) = 0;
+        virtual std::unique_ptr<Program> CreateProgram(const ProgramDescriptor &descriptor) = 0;
         
-        virtual void SetProgram(const Program *program) = 0;
+        virtual void SetMaterial(const Material *material) = 0;
         
-        virtual const Program* GetProgram() const = 0;
-        
-        virtual void Draw(const Subset *subset, const std::vector<DrawEnvelope> &envelopes) = 0;
+        virtual const Material* GetMaterial() const = 0;
+
+        virtual void Draw(const Subset *subset, const SubsetEnvelope *envelopes, const int envelopeCount) = 0;
         
         virtual void BeginFrame(const ClearFlags flags, const XE::Math::Vector4f &color, const float depth, const int stencil) = 0;
         

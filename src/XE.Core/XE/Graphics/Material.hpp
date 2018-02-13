@@ -6,6 +6,7 @@
 #include <array>
 
 namespace XE::Graphics {
+    class Program;
     class Texture;
 
     enum class TextureFilter {

@@ -16,7 +16,7 @@ namespace XE {
     };
 
     /**
-     * @brief Streaming abstraction class
+     * @brief Streaming for binary data
      */
     class Stream {
     public:

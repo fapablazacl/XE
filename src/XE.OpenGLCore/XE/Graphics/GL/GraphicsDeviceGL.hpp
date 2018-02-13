@@ -15,7 +15,7 @@ namespace XE::Graphics::GL {
 
         virtual std::unique_ptr<Subset> CreateSubset(const VertexLayout &format, std::vector<std::unique_ptr<Buffer>> buffers, const DataType indexType, std::unique_ptr<Buffer> indexBuffer) override;
         
-        virtual std::unique_ptr<Buffer> CreateBuffer(const BufferType bufferType, const int size, const void *data=nullptr) override;
+        virtual std::unique_ptr<Buffer> CreateBuffer(const BufferType bufferType, const BufferUsage bufferUsage, const BufferAccess bufferAccess, const int size, const void *data) override;
         
         virtual std::unique_ptr<Texture2D> CreateTexture2D(const PixelFormat format, const XE::Math::Vector2i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void *sourceData) override;
         
@@ -30,8 +30,6 @@ namespace XE::Graphics::GL {
         virtual void SetProgram(const Program *program) override;
         
         virtual const Program* GetProgram() const override;
-        
-        virtual void Draw(const Subset *subset, const std::vector<DrawEnvelope> &envelopes) override;
         
         virtual void BeginFrame(const ClearFlags flags, const XE::Math::Vector4f &color, const float depth, const int stencil) override;
         
