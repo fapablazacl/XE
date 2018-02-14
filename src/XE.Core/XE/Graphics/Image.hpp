@@ -8,7 +8,7 @@
 
 namespace XE::Graphics {
     /**
-     * @brief A Abstract Image class that's used for an abstraction around image classes from another libraries.
+     * @brief Abstract image class with basic image manipulation.
      */
     class Image {
     public:

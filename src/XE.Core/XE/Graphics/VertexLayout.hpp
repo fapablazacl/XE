@@ -7,6 +7,7 @@ namespace XE::Graphics {
      * @brief The Vertex Layout specifies how the information stored in a Vertex is structured in memory.
      */
     class VertexLayout {
+
     };
 }
 

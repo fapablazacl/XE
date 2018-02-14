@@ -63,8 +63,6 @@ namespace XE::Graphics {
 
         virtual int GetAttributeSize() const = 0;
 
-    public:
-
     protected:
         std::array<MaterialLayer, 8> m_layers;
         MaterialRenderState m_renderState;

@@ -17,7 +17,6 @@ namespace XE::Graphics {
         
         virtual void GetData(void *surfaceData, const int mipLevel, const int arrayIndex, const PixelFormat surfaceFormat, const XE::Math::Recti &area) const = 0;
     };
-    
 }
 
 #endif

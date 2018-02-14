@@ -74,7 +74,7 @@ namespace XE::Graphics {
 
         virtual std::unique_ptr<Subset> CreateSubset(const VertexLayout &format, std::vector<std::unique_ptr<Buffer>> buffers, const DataType indexType, std::unique_ptr<Buffer> indexBuffer) = 0;
         
-        virtual std::unique_ptr<Buffer> CreateBuffer(const BufferDescriptor descriptor) = 0;
+        virtual std::unique_ptr<Buffer> CreateBuffer(const BufferDescriptor &bufferDescriptor) = 0;
         
         virtual std::unique_ptr<Texture2D> CreateTexture2D(const PixelFormat format, const XE::Math::Vector2i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void *sourceData) = 0;
         
@@ -84,7 +84,7 @@ namespace XE::Graphics {
         
         virtual std::unique_ptr<TextureCubeMap> CreateTextureCubeMap(const PixelFormat format, const XE::Math::Vector2i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void **sourceData) = 0;
         
-        virtual std::unique_ptr<Program> CreateProgram(const ProgramDescriptor &descriptor) = 0;
+        virtual std::unique_ptr<Program> CreateProgram(const ProgramDescriptor &programDescriptor) = 0;
         
         virtual void SetMaterial(const Material *material) = 0;
         

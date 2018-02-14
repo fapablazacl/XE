@@ -5,13 +5,11 @@
 #include <XE/Math/Vector.hpp>
 
 namespace XE::Graphics {
-    /**
-     *
-     */
+    template<typename CoordAttrib, typename ... Attribs>
     struct Vertex {
-        XE::Math::Vector<float, 3> Position;
-        XE::Math::Vector<float, 3> Normal;
-        XE::Math::Vector<float, 3> TexCoord;
+        XE::Math::Vector3f Position;
+        XE::Math::Vector3f Normal;
+        XE::Math::Vector2f TexCoord;
     };
 }
 
