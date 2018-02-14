@@ -1,10 +1,36 @@
 
 ## What is XE?
 
-XE will be a platform for building high-performance, cross-platform multimedia applications,
-based on a layered module architecture. 
+XE will be a framework, written in C++17 for building high-performance, cross-platform multimedia applications.
 
-The first layer (called XE.Core) is currently on development and offers:
+## Preliminary Supported Platforms
 
-* Mathematical functions and structures.
-* Low-level abstractions to Memory, Streams, Archives, Graphics, Audio and Input handling.
+* Windows 7+
+* Linux (X Window System and Wayland)
+* HTML5 
+* Android
+
+## Supported Compilers
+* Visual C++
+* GCC
+* clang 
+
+## Planned Features
+
+Features for a Low Level library:
+* Math Support Library
+    - Linear Algebra (Vector, Matrix and Quaterion operations)
+    - Geometry (Triangle, Plane, Box, Sphere and Ellipsoid operations)
+* Resource Management
+* User Interface    
+* Graphics 
+* Audio
+* Input
+
+Features for a set of High Level libraries:
+* Entity Component System
+* Message Bus System
+* Scene Graph
+* Shader Abstraction Layer
+* Font Rendering Engine
+* Asset/Resource Loaders
