@@ -20,12 +20,12 @@ namespace XE::Graphics {
     };
 
     struct MaterialLayer {
-        const Texture* Texture = nullptr;
-        TextureFilter MinFilter = TextureFilter::Nearest;
-        TextureFilter MagFilter = TextureFilter::Nearest;
-        TextureWrap WrapS = TextureWrap::Repeat;
-        TextureWrap WrapT = TextureWrap::Repeat;
-        TextureWrap WrapR = TextureWrap::Repeat;
+        const Texture* texture = nullptr;
+        TextureFilter minFilter = TextureFilter::Nearest;
+        TextureFilter magFilter = TextureFilter::Nearest;
+        TextureWrap wrapS = TextureWrap::Repeat;
+        TextureWrap wrapT = TextureWrap::Repeat;
+        TextureWrap wrapR = TextureWrap::Repeat;
     };
 
     enum class PolygonMode {
@@ -35,10 +35,10 @@ namespace XE::Graphics {
     };
 
     struct MaterialRenderState {
-        bool DepthTest = true;
-        bool StencilTest = false;
+        bool depthTest = true;
+        bool stencilTest = false;
 
-        PolygonMode PolygonMode = PolygonMode::Triangle;
+        PolygonMode polygonMode = PolygonMode::Triangle;
     };
 
     class Material {

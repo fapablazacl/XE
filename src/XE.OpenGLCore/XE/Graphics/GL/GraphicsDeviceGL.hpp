@@ -13,9 +13,9 @@ namespace XE::Graphics::GL {
         
         virtual XE::Input::InputManager* GetInputManager() override;
 
-        virtual std::unique_ptr<Subset> CreateSubset(const VertexLayout &format, std::vector<std::unique_ptr<Buffer>> buffers, const DataType indexType, std::unique_ptr<Buffer> indexBuffer) override;
+        virtual std::unique_ptr<Subset> CreateSubset(const SubsetDescriptor& desc) override;
         
-        virtual std::unique_ptr<Buffer> CreateBuffer(const BufferType bufferType, const BufferUsage bufferUsage, const BufferAccess bufferAccess, const int size, const void *data) override;
+        virtual std::unique_ptr<Buffer> CreateBuffer(const BufferDescriptor &bufferDescriptor) override;
         
         virtual std::unique_ptr<Texture2D> CreateTexture2D(const PixelFormat format, const XE::Math::Vector2i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void *sourceData) override;
         
@@ -25,14 +25,12 @@ namespace XE::Graphics::GL {
         
         virtual std::unique_ptr<TextureCubeMap> CreateTextureCubeMap(const PixelFormat format, const XE::Math::Vector2i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void **sourceData) override;
         
-        virtual std::unique_ptr<Program> CreateProgram(const std::vector<std::tuple<ShaderType, std::string>> &sources) override;
-        
-        virtual void SetProgram(const Program *program) override;
-        
-        virtual const Program* GetProgram() const override;
+        virtual std::unique_ptr<Program> CreateProgram(const ProgramDescriptor &programDescriptor) override;
         
         virtual void BeginFrame(const ClearFlags flags, const XE::Math::Vector4f &color, const float depth, const int stencil) override;
         
+        virtual void Draw(const Subset *subset, const SubsetEnvelope *envelopes, const int envelopeCount) override;
+
         virtual void EndFrame() override;
     };
 }

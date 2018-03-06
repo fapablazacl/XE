@@ -215,13 +215,13 @@ namespace XE::Math {
             return Quaternion<T>({T(0), T(0), T(0)}, T(1));
         }
         
-        static Quaternion<T> Rotation(const T radians, const Vector<T, 3> &axis) {
+        static Quaternion<T> Rotate(const T radians, const Vector<T, 3> &axis) {
             auto q = Quaternion<T>(axis, std::cos(radians / T(2)));
             
             return Normalize(q);
         }
         
-        static Quaternion<T> Rotation(const Vector<T, 3> &v1, const Vector<T, 3> &v2) {
+        static Quaternion<T> Rotate(const Vector<T, 3> &v1, const Vector<T, 3> &v2) {
             auto v = Cross(v1, v2);
             auto w = std::sqrt(Dot(v1, v1) * Dot(v2, v2)) + Dot(v1, v2);
             

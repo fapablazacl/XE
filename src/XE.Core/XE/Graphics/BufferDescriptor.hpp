@@ -19,11 +19,11 @@ namespace XE::Graphics {
     };
 
     struct BufferDescriptor {
-        BufferType Type;
-        BufferUsage Usage;
-        BufferAccess Access;
-        int Size;
-        const std::byte *Data;
+        BufferType type;
+        BufferUsage usage;
+        BufferAccess access;
+        int size;
+        const std::byte *data;
     };
 }
 
