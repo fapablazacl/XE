@@ -5,20 +5,26 @@
 
 #include <vulkan/vulkan.h>
 
-namespace vulkan {
+namespace XE::Graphics::Vulkan::TestApp {
     // struct to 'parse' the vulkan version specification
     struct Version {
         std::uint32_t major:10;
         std::uint32_t minor:10;
         std::uint32_t patch:12;
         
-        explicit Version(std::uint32_t value) {
-            std::memcpy(this, &value, sizeof(value));
-        }
-        
+        Version() {}
+
         friend std::ostream& operator<< (std::ostream &os, Version version) {
             os << version.major << "." << version.minor << "." << version.patch;
             return os;
+        }
+
+        static Version Parse(const std::uint32_t value) {
+            Version version;
+
+            std::memcpy(&version, &value, sizeof(value));
+
+            return version;
         }
     };
 
@@ -76,7 +82,7 @@ namespace vulkan {
 }
 
 // import operator<< 
-using namespace vulkan; 
+using namespace XE::Graphics::Vulkan::TestApp; 
 
 class Test01App {
 public:
@@ -128,7 +134,7 @@ protected:
             
             ::vkGetPhysicalDeviceProperties(device, &deviceProperties);
             
-            std::cout << "  API version: "          << vulkan::Version(deviceProperties.apiVersion) << std::endl;
+            std::cout << "  API version: "          << Version::Parse(deviceProperties.apiVersion) << std::endl;
             std::cout << "  Driver version: "       << deviceProperties.driverVersion << std::endl;
             std::cout << "  Vendor ID: "            << deviceProperties.vendorID << std::endl;
             std::cout << "  Device ID: "            << deviceProperties.deviceID << std::endl;
