@@ -1,5 +1,5 @@
 
-set (target "XE.OpenGLCore")
+set (target "XE.Graphics.OpenGL")
 set (source_base "XE/Graphics/GL")
 set (sources_xe_graphics_glcore
 	"${source_base}/GraphicsDeviceGL.hpp"
