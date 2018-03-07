@@ -6,14 +6,11 @@
 #include <string>
 #include <XE/Math/Vector.hpp>
 
-namespace XE::Input {
-    class InputManager;
-}
-
 namespace XE::UI {
     struct WidgetProperties {
         std::string Caption;
         XE::Math::Vector2i Position;
+        XE::Math::Vector2i Size;
     };
 
     class Widget {
@@ -31,7 +28,7 @@ namespace XE::UI {
      */
     class Frame : public Widget {
     public:
-        virtual XE::Input::InputManager* GetInputManager() = 0;
+
     };
 }
 

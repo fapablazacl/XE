@@ -90,6 +90,8 @@ set (src_xe_input
 set (src_xe_ui
     "XE/UI/Frame.hpp"
 	"XE/UI/Frame.cpp"
+	"XE/UI/WindowSystem.hpp"
+	"XE/UI/WindowSystem.cpp"
 )
 
 source_group ("\\XE" FILES ${src_xe})

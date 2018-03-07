@@ -1,7 +1,7 @@
 project (XE)
 
 option (XE_PLUGIN_DIRECT3D11 "Include Direct3D 11 support" OFF)
-option (XE_PLUGIN_OPENGLCORE "Include OpenGL Core support" ON)
+option (XE_PLUGIN_OPENGLCORE "Include OpenGL Core support" OFF)
 
 set (CMAKE_CXX_STANDARD 17)
 set (CMAKE_CXX_STANDARD_REQUIRED ON)
