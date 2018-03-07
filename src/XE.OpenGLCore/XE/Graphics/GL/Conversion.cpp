@@ -3,9 +3,7 @@
 
 #include <XE/DataType.hpp>
 #include <XE/Graphics/PixelFormat.hpp>
-#include <XE/Graphics/BufferAccess.hpp>
-#include <XE/Graphics/BufferUsage.hpp>
-#include <XE/Graphics/BufferType.hpp>
+#include <XE/Graphics/BufferDescriptor.hpp>
 
 namespace XE::Graphics::GL {
     GLenum ConvertToGL(const DataType type) {

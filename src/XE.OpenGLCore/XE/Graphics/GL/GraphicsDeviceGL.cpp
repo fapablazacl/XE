@@ -19,12 +19,13 @@ namespace XE::Graphics::GL {
         return nullptr;
     }
 
-    std::unique_ptr<Subset> GraphicsDeviceGL::CreateSubset(const VertexLayout &format, std::vector<std::unique_ptr<Buffer>> buffers, const DataType indexType, std::unique_ptr<Buffer> indexBuffer) {
+    std::unique_ptr<Subset> GraphicsDeviceGL::CreateSubset(const SubsetDescriptor& desc) {
         return std::unique_ptr<Subset>();
     }
         
-    std::unique_ptr<Buffer> GraphicsDeviceGL::CreateBuffer(const BufferType bufferType, const BufferUsage bufferUsage, const BufferAccess bufferAccess, const int size, const void *data) {
-        return std::make_unique<BufferGL>(bufferType, bufferUsage, bufferAccess, size, data);
+    std::unique_ptr<Buffer> GraphicsDeviceGL::CreateBuffer(const BufferDescriptor &desc) {
+        //return std::make_unique<BufferGL>(bufferType, bufferUsage, bufferAccess, size, data);
+        return std::unique_ptr<Buffer>();
     }
         
     std::unique_ptr<Texture2D> GraphicsDeviceGL::CreateTexture2D(const PixelFormat format, const XE::Math::Vector2i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void *sourceData) {
@@ -43,18 +44,12 @@ namespace XE::Graphics::GL {
         return std::unique_ptr<TextureCubeMap>();
     }
         
-    std::unique_ptr<Program> GraphicsDeviceGL::CreateProgram(const std::vector<std::tuple<ShaderType, std::string>> &sources) {
-        return std::make_unique<ProgramGL>(sources);
+    std::unique_ptr<Program> GraphicsDeviceGL::CreateProgram(const ProgramDescriptor &programDescriptor) {
+        //return std::make_unique<ProgramGL>(sources);
+        return std::unique_ptr<Program>();
     }
-        
-    void GraphicsDeviceGL::SetProgram(const Program *program) {
-    }
-        
-    const Program* GraphicsDeviceGL::GetProgram() const {
-        return nullptr;
-    }
-        
-    void GraphicsDeviceGL::Draw(const Subset *subset, const std::vector<DrawEnvelope> &envelopes) {
+    
+    void GraphicsDeviceGL::Draw(const Subset *subset, const SubsetEnvelope *envelopes, const int envelopeCount) {
     }
         
     void GraphicsDeviceGL::BeginFrame(const ClearFlags flags, const XE::Math::Vector4f &color, const float depth, const int stencil) {

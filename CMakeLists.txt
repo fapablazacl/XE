@@ -1,7 +1,8 @@
 project (XE)
 
-option (XE_PLUGIN_DIRECT3D11 "Include Direct3D 11 support" OFF)
-option (XE_PLUGIN_OPENGLCORE "Include OpenGL Core support" OFF)
+option (XE_PLUGIN_DIRECT3D11    "Include Direct3D 11 support" OFF)
+option (XE_PLUGIN_OPENGLCORE    "Include OpenGL Core support" OFF)
+option (XE_PLUGIN_VULKAN        "Include OpenGL Core support" OFF)
 
 set (CMAKE_CXX_STANDARD 17)
 set (CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -37,6 +38,11 @@ if (XE_PLUGIN_OPENGLCORE)
 
     add_subdirectory ("src/XE.OpenGLCore")
     include_directories ("src/XE.OpenGLCore")
+endif ()
+
+if (XE_PLUGIN_VULKAN)
+    add_subdirectory ("src/XE.Graphics.Vk.TestApp")
+    include_directories ("src/XE.Graphics.Vk.TestApp")
 endif ()
 
 add_subdirectory("src/XE.Sandbox")

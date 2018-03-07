@@ -54,14 +54,16 @@ namespace XE::Graphics {
     class Material;
     
     struct ProgramSource {
-        ShaderType Type;
-        std::string Text;
+        ShaderType type;
+        std::string text;
     };
 
     struct ProgramDescriptor {
-        ProgramSource *Sources;
-        int Count;
+        ProgramSource *sources;
+        int count;
     };
+
+    struct SubsetDescriptor;
 
     /**
      * @brief Graphics API abstraction
@@ -72,7 +74,7 @@ namespace XE::Graphics {
 
         virtual XE::Input::InputManager* GetInputManager() = 0;
 
-        virtual std::unique_ptr<Subset> CreateSubset(const VertexLayout &format, std::vector<std::unique_ptr<Buffer>> buffers, const DataType indexType, std::unique_ptr<Buffer> indexBuffer) = 0;
+        virtual std::unique_ptr<Subset> CreateSubset(const SubsetDescriptor& desc) = 0;
         
         virtual std::unique_ptr<Buffer> CreateBuffer(const BufferDescriptor &bufferDescriptor) = 0;
         
