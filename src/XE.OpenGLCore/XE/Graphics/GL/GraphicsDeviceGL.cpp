@@ -57,4 +57,12 @@ namespace XE::Graphics::GL {
         
     void GraphicsDeviceGL::EndFrame() {
     }
+
+    void GraphicsDeviceGL::SetMaterial(const Material *material) {
+
+    }
+
+    const Material* GraphicsDeviceGL::GetMaterial() const {
+        return nullptr;
+    }
 }

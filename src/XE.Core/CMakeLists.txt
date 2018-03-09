@@ -12,6 +12,10 @@ set (src_xe
     "XE/DataLayout.hpp"
 	"XE/DataAttribute.cpp"
     "XE/DataAttribute.hpp"
+
+	# these will be future C++20 Modules!
+	"XE.hpp"
+	"XE/Graphics.hpp"
 )
 
 set (src_xe_math

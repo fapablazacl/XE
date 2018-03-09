@@ -59,8 +59,7 @@ namespace XE::Graphics {
     };
 
     struct ProgramDescriptor {
-        ProgramSource *sources;
-        int count;
+        std::vector<ProgramSource> sources;
     };
 
     struct SubsetDescriptor;
