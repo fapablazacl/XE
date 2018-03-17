@@ -8,22 +8,37 @@
 #include <XE/Graphics/GL/GraphicsDeviceGL.hpp>
 
 namespace XE::Graphics {
+    /**
+     * @brief Describes a Vertex Attribute for use in the vertex shader
+     */
     struct VertexAttribute {
+        //! Attribute Name in the vertex shader
         std::string name;
+
+        //! Basic data type
         DataType type;
+
+        //! Attribute dimension (1, 2, 3 or 4)
         int size;
     };
 
+    /**
+     * @brief Describes the structure a Vertex conforms to.
+     */
     struct VertexFormat {
+        //! Attributes, in order
         std::vector<VertexAttribute> attributes;
     };
 
+    /**
+     * @brief 
+     */
     struct SubsetDescriptor {
         VertexFormat vertexFormat;
-        std::vector<BufferDescriptor> bufferDescriptors;
+        std::vector<BufferDescriptor> bufferAttribMapping;
     };
 }
-
+hbg
 int main(int argc, char **argv) {
     // auto screen = new XE::Graphics::Screen::New();
 
@@ -103,6 +118,8 @@ void main() {
     XE::Graphics::SubsetDescriptor subsetDescriptor;
 
     // graphicsDevice->CreateSubset()
+
+    delete graphicsDevice;
 
     return 0;
 }
