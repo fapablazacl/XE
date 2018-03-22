@@ -39,4 +39,4 @@ source_group ("\\XE\\Graphics\\GL" FILES ${sources_xe_graphics_glcore})
 
 add_library (${target} ${sources_xe_graphics_glcore})
 
-target_link_libraries (${target} glad-gl4)
+target_link_libraries (${target} glad-gl4 XE.Core)

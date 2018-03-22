@@ -14,4 +14,10 @@ set (target glad-gl4)
 
 source_group(\\glad FILES ${sources})
 
+if (UNIX)
+	set (OS_LIBRARIES dl)
+endif ()
+
 add_library(${target} ${sources})
+
+target_link_libraries(${target} ${OS_LIBRARIES})
