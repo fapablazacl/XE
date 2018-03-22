@@ -30,17 +30,20 @@ TEST_CASE("XE::Math::Vector<3, float>") {
         REQUIRE(v1 == v2);
         REQUIRE(v1 != v3);
         REQUIRE(v2 != v3);
+
+        REQUIRE(v2 == v1);
+        REQUIRE(v3 != v1);
+        REQUIRE(v3 != v2);
     }
 
     SECTION("operator+ should add component-wise") {
         const Vector3f v1 = {1.0f, -2.0f, 3.0f};
         const Vector3f v2 = {-2.0f, -1.0f, -2.0f};
 
+        REQUIRE((v2 + v1) == Vector3f{-1.0f, -3.0f, 1.0f});
         REQUIRE((v1 + v2) == Vector3f{-1.0f, -3.0f, 1.0f});
-
         REQUIRE(v1 == +v1);
         REQUIRE(v2 == +v2);
-
         REQUIRE((Vector3f{0.0f} += v1) == v1);
         REQUIRE((Vector3f{0.0f} += v2) == v2);
     }
@@ -49,6 +52,7 @@ TEST_CASE("XE::Math::Vector<3, float>") {
         const Vector3f v1 = {1.0f, -2.0f, 3.0f};
         const Vector3f v2 = {-2.0f, -1.0f, -2.0f};
 
+        REQUIRE((v2 - v1) == Vector3f{-3.0f, 1.0f, -5.0f});
         REQUIRE((v1 - v2) == Vector3f{3.0f, -1.0f, 5.0f});
         REQUIRE((v1 - v1) == Vector3f{0.0f});
         REQUIRE((v2 - v2) == Vector3f{0.0f});
@@ -65,6 +69,8 @@ TEST_CASE("XE::Math::Vector<3, float>") {
         const Vector3f v2 = {-2.0f, -1.0f, -2.0f};
 
         REQUIRE((v1 * v2) == Vector3f{-2.0f, 2.0f, -6.0f});
+        REQUIRE((v2 * v1) == Vector3f{-2.0f, 2.0f, -6.0f});
+
         REQUIRE((v1 * 1.0f) == v1);
         REQUIRE((v1 * -1.0f) == -v1);
         REQUIRE((v1 * 2.0f) == Vector3f{2.0f, -4.0f, 6.0f});
@@ -105,22 +111,16 @@ TEST_CASE("XE::Math::Vector<3, float>") {
         REQUIRE(Dot(Vector3f{0.0f}, v1) == 0.0f);
         REQUIRE(Dot(Vector3f{0.0f}, v2) == 0.0f);
 
-        REQUIRE(Dot(v1, v2) == 146.0f);
-    }
-
-    SECTION("Dot Product should perform correctly") {
-        const Vector3f v1 = {2.0f, 8.0f, 32.0f};
-        const Vector3f v2 = {1.0f, 2.0f, 4.0f};
-
-        REQUIRE(Dot(Vector3f{1.0f, 1.0f, 1.0f}, v1) == 42.0f);
-        REQUIRE(Dot(Vector3f{1.0f, 1.0f, 1.0f}, v2) == 7.0f);
-        REQUIRE(Dot(Vector3f{0.0f}, v1) == 0.0f);
-        REQUIRE(Dot(Vector3f{0.0f}, v2) == 0.0f);
+        REQUIRE(Dot(v1, Vector3f{1.0f, 1.0f, 1.0f}) == 42.0f);
+        REQUIRE(Dot(v2, Vector3f{1.0f, 1.0f, 1.0f}) == 7.0f);
+        REQUIRE(Dot(v1, Vector3f{0.0f}) == 0.0f);
+        REQUIRE(Dot(v2, Vector3f{0.0f}) == 0.0f);
 
         REQUIRE(Dot(v1, v2) == 146.0f);
+        REQUIRE(Dot(v2, v1) == 146.0f);
     }
 
-    SECTION("Cross Product should perform correctly") {
+    SECTION("3-Cross Product should perform correctly for unit vectors") {
         const Vector3f v1 = {1.0f, 0.0f, 0.0f};
         const Vector3f v2 = {0.0f, 1.0f, 0.0f};
         const Vector3f v3 = {0.0f, 0.0f, 1.0f};
