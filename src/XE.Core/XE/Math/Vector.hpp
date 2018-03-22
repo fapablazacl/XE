@@ -74,6 +74,8 @@ namespace XE::Math {
 
         explicit Vector(const T *values);
 
+        Vector(const Vector<T, N> &other);
+
         Vector<T, N> operator+ () const;
 
         Vector<T, N> operator- () const;
@@ -222,6 +224,11 @@ namespace XE::Math {
         for (int i=0; i<N; i++) {
             this->Data[i] = values[i];
         }
+    }
+
+    template<typename T, int N>
+    Vector<T, N>::Vector(const Vector<T, N> &other) {
+        *this = other;
     }
 
     template<typename T, int N>

@@ -38,7 +38,7 @@ namespace XE::Graphics {
         std::vector<BufferDescriptor> bufferAttribMapping;
     };
 }
-hbg
+
 int main(int argc, char **argv) {
     // auto screen = new XE::Graphics::Screen::New();
 
