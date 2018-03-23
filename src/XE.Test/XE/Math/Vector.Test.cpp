@@ -1,12 +1,44 @@
 
 #include <catch.hpp>
 #include <XE/Math/Vector.hpp>
+#include <sstream>
 
 using namespace XE;
 using namespace XE::Math;
 
+namespace XE {
+    /**
+     * @brief Constructs a string representation of an N-dimensional vector for user feedback, or debugging purposes.
+     */
+    template<typename T, int N>
+    std::string ToString(const Vector<T, N> &v) {
+        std::stringstream ss;
+        ss << "[";
+
+        for (int i=0; i<N; i++) {
+            ss << v[i];
+
+            if (i < N - 1) {
+                ss << ", ";
+            }
+        }
+
+        ss << "]";
+        return ss.str();
+    }
+}
+
+namespace Catch {
+    template<>
+    struct StringMaker<XE::Math::Vector3f> {
+        static std::string convert(XE::Math::Vector3f const& value) {
+            return XE::ToString(value);
+        }
+    };
+}
+
 TEST_CASE("XE::Math::Vector<3, float>") {
-    SECTION("constructor for 3 components should set the parameters correctly") {
+    SECTION("constructor should setup the vector components correctly") {
         const Vector3f v = {1.0f, 2.0f, 3.0f};
 
         REQUIRE(v.X == 1.0f);
@@ -22,7 +54,7 @@ TEST_CASE("XE::Math::Vector<3, float>") {
         REQUIRE(v[2] == 3.0f);
     }
 
-    SECTION("Comparison operators should operate correctly") {
+    SECTION("Comparison operators should check vector components for equality and inequality") {
         const Vector3f v1 = {1.0f, 2.0f, 3.0f};
         const Vector3f v2 = {1.0f, 2.0f, 3.0f};
         const Vector3f v3 = {-1.0f, -2.0f, -3.0f};
@@ -36,9 +68,10 @@ TEST_CASE("XE::Math::Vector<3, float>") {
         REQUIRE(v3 != v2);
     }
 
-    SECTION("operator+ should add component-wise") {
+    SECTION("operator+ should add component-wise.") {
         const Vector3f v1 = {1.0f, -2.0f, 3.0f};
         const Vector3f v2 = {-2.0f, -1.0f, -2.0f};
+        const Vector3f v3 = {0.0f, 1.0f, -1.0f};
 
         REQUIRE((v2 + v1) == Vector3f{-1.0f, -3.0f, 1.0f});
         REQUIRE((v1 + v2) == Vector3f{-1.0f, -3.0f, 1.0f});
@@ -48,7 +81,7 @@ TEST_CASE("XE::Math::Vector<3, float>") {
         REQUIRE((Vector3f{0.0f} += v2) == v2);
     }
 
-    SECTION("operator- should subtract component-wise") {
+    SECTION("operator- should subtract component-wise the vector") {
         const Vector3f v1 = {1.0f, -2.0f, 3.0f};
         const Vector3f v2 = {-2.0f, -1.0f, -2.0f};
 
@@ -120,7 +153,7 @@ TEST_CASE("XE::Math::Vector<3, float>") {
         REQUIRE(Dot(v2, v1) == 146.0f);
     }
 
-    SECTION("3-Cross Product should perform correctly for unit vectors") {
+    SECTION("Three-Dimensional Cross Product should perform correctly for unit vectors") {
         const Vector3f v1 = {1.0f, 0.0f, 0.0f};
         const Vector3f v2 = {0.0f, 1.0f, 0.0f};
         const Vector3f v3 = {0.0f, 0.0f, 1.0f};
