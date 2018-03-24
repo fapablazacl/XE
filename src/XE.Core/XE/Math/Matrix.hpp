@@ -134,6 +134,8 @@ namespace XE::Math {
 
         bool operator!= (const Matrix<T, R, C> &other) const;
 
+        Matrix<T, R, C> operator+ () const;
+
         Matrix<T, R, C> operator+ (const Matrix<T, R, C>& rhs) const;
 
         Matrix<T, R, C> operator- () const;
@@ -562,6 +564,11 @@ namespace XE::Math {
         }
         
         return result;
+    }
+
+    template<typename T, int R, int C>
+    Matrix<T, R, C> Matrix<T, R, C>::operator+ () const {
+        return *this;
     }
 
     template<typename T, int R, int C>

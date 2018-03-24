@@ -228,101 +228,162 @@ TEST_CASE("Math::Matrix<3, float>") {
         });
     }
 
-    /*
-    const Matrix4f matA = {
-        {1.0f, 2.0f, 1.0f, 0.0f}, 
-        {2.0f, 1.0f, -3.0f, -1.0f}, 
-        {-3.0f, 2.0f, 1.0f, 0.0f}, 
-        {2.0f, -1.0f, 0.0f, -1.0f}
-    };
+    SECTION("Determinant should compute the matrix determinant correctly") {
+        const Matrix4f matA = {
+            {1.0f, 2.0f, 1.0f, 0.0f}, 
+            {2.0f, 1.0f, -3.0f, -1.0f}, 
+            {-3.0f, 2.0f, 1.0f, 0.0f}, 
+            {2.0f, -1.0f, 0.0f, -1.0f}
+        };
+
+        // matrix determinant
+        REQUIRE(Abs(Matrix4f::Zero()) == 0.0f);
+        REQUIRE(Abs(Matrix4f::Identity()) == 1.0f);
+        REQUIRE(Abs(matA) == -32.0f);
+    }
+
+    SECTION("Arithmetic operators should behave according to their corresponding mathematical definitions") {
+        const Matrix4f matA = {
+            {1.0f, 2.0f, 1.0f, 0.0f}, 
+            {2.0f, 1.0f, -3.0f, -1.0f}, 
+            {-3.0f, 2.0f, 1.0f, 0.0f}, 
+            {2.0f, -1.0f, 0.0f, -1.0f}
+        };
     
-    const Matrix4f matB = {
-        {-3.0f, 1.0f, 5.0f, 1.0f},
-        {1.0f, 2.0f, -1.0f, 1.0f},
-        {1.0f, 2.0f, 1.0f, -2.0f},
-        {1.0f, -1.0f, -3.0f, -1.0f}
-    };
+        const Matrix4f matNegA = {
+            {-1.0f, -2.0f, -1.0f, -0.0f}, 
+            {-2.0f, -1.0f, 3.0f, 1.0f}, 
+            {3.0f, -2.0f, -1.0f, -0.0f}, 
+            {-2.0f, 1.0f, -0.0f, 1.0f}
+        };
+
+        const Matrix4f matB = {
+            {-3.0f, 1.0f, 5.0f, 1.0f},
+            {1.0f, 2.0f, -1.0f, 1.0f},
+            {1.0f, 2.0f, 1.0f, -2.0f},
+            {1.0f, -1.0f, -3.0f, -1.0f}
+        };
+
+        const Matrix4f matAddResult = {
+            {-2.0f,  3.0f,  6.0f,  1.0f},
+            { 3.0f,  3.0f, -4.0f,  0.0f},
+            {-2.0f,  4.0f,  2.0f, -2.0f},
+            { 3.0f, -2.0f, -3.0f, -2.0f}
+        };
     
-    const auto subIdentity = Matrix3f::Identity();
-    const auto identity = Matrix4f::Identity();
-    const auto zero = Matrix3f::Zero();
+        const Matrix4f matSubResult = {
+            { 4.0f,  1.0f, -4.0f, -1.0f},
+            { 1.0f, -1.0f, -2.0f, -2.0f},
+            {-4.0f,  0.0f,  0.0f,  2.0f},
+            { 1.0f,  0.0f,  3.0f,  0.0f}
+        };
     
-    const Matrix4f matAddResult = {
-        {-2.0f,  3.0f,  6.0f,  1.0f},
-        { 3.0f,  3.0f, -4.0f,  0.0f},
-        {-2.0f,  4.0f,  2.0f, -2.0f},
-        { 3.0f, -2.0f, -3.0f, -2.0f}
-    };
+        const Matrix4f matMulResult = {
+            {  0.0f,  7.0f,  4.0f,   1.0f},
+            { -9.0f, -1.0f,  9.0f,  10.0f},
+            { 12.0f,  3.0f, -16.0f, -3.0f},
+            { -8.0f,  1.0f,  14.0f,  2.0f}
+        };
     
-    const Matrix4f matSubResult = {
-        { 4.0f,  1.0f, -4.0f, -1.0f},
-        { 1.0f, -1.0f, -2.0f, -2.0f},
-        {-4.0f,  0.0f,  0.0f,  2.0f},
-        { 1.0f,  0.0f,  3.0f,  0.0f}
-    };
+        const Matrix4f matDivResult = {
+            {-1.0f, 2.0f, 0.f,  0.0f},
+            { 2.0f, 0.0f, 3.0f, -1.0f},
+            {-3.0f, 1.0f, 1.0f,  0.0f},
+            { 2.0f, 1.0f, 0.0f,  1.0f}
+        };
     
-    const Matrix4f matMulResult = {
-        {  0.0f,  7.0f,  4.0f,   1.0f},
-        { -9.0f, -1.0f,  9.0f,  10.0f},
-        { 12.0f,  3.0f, -16.0f, -3.0f},
-        { -8.0f,  1.0f,  14.0f,  2.0f}
-    };
-    
-    const Matrix4f matDivResult = {
-        {-1.0f, 2.0f, 0.f,  0.0f},
-        { 2.0f, 0.0f, 3.0f, -1.0f},
-        {-3.0f, 1.0f, 1.0f,  0.0f},
-        { 2.0f, 1.0f, 0.0f,  1.0f}
-    };
-    
-    const Matrix4f invMatA = {
-        {0.25000f,  0.000f, -0.25000f,  0.000},
-        {0.28125f,  0.125f,  0.09375f, -0.125},
-        {0.18750f, -0.250f,  0.06250f,  0.250},
-        {0.21875f, -0.125f, -0.59375f, -0.875}
-    };
+        // addition
+        REQUIRE(matA == +matA);
+        REQUIRE(matB == +matB);
+
+        REQUIRE(matA + Matrix4f::Zero() == matA);
+        REQUIRE(matB + Matrix4f::Zero() == matB);
+
+        REQUIRE(matAddResult == matA + matB);
+        REQUIRE(matAddResult == matB + matA);
+
+        REQUIRE(matAddResult == ((+matA) += matB));
+        REQUIRE(matAddResult == ((+matB) += matA));
+
+        // subtraction
+        REQUIRE(matNegA == -matA);
+        REQUIRE(matA - Matrix4f::Zero() == matA);
+        REQUIRE(matB - Matrix4f::Zero() == matB);
+
+        REQUIRE(Matrix4f::Zero() - matA == -matA);
+        REQUIRE(Matrix4f::Zero() - matB == -matB);
+
+        REQUIRE(matA - matB == matSubResult);
+        REQUIRE(matB - matA == -matSubResult);
  
-    const float detA = -32.0f;
-    
-    Matrix4f aux;
-    
-    
-    // matrix scale
-    REQUIRE(matA * -1.0f == -matA);
-    REQUIRE(matA * -1.0f == -1.0f * matA);
-    REQUIRE(matA * 1.0f == matA);
-        
-    // matrix adition 
-    REQUIRE(matAddResult == matA + matB);
-    REQUIRE(matSubResult == matA - matB);
-        
-    aux = matA; aux += matB;
-    REQUIRE(matAddResult == aux);
-        
-    aux = matA; aux -= matB;
-    REQUIRE(matSubResult == aux);
-    
-    // submatrix
-    REQUIRE(subIdentity == identity.SubMatrix(0, 0));
-        
-    // matrix determinant
-    REQUIRE( Abs(identity) == 1.0f );
-    REQUIRE( Abs(matA) == detA );
-        
-    //matrix multiply
-    REQUIRE(matMulResult == matA * matB);
-    REQUIRE(matMulResult == ((aux = matA) *= matB));
-    
-	REQUIRE(identity == identity * identity);
+        REQUIRE(matSubResult == ((+matA) -= matB));
+        REQUIRE(-matSubResult == ((+matB) -= matA));
 
-	REQUIRE(matA == matA * identity);
-	REQUIRE(matA == identity * matA);
+        // scalar multiplication
+        REQUIRE(matA * -1.0f == -matA);
+        REQUIRE(matA * -1.0f == -1.0f * matA);
+        REQUIRE(matA * 1.0f == matA);
+        REQUIRE(matA * 1.0f == 1.0f * matA);
 
-    //inverse matrix
-    aux = Inverse(matA);
+        // matrix multiplication
+        REQUIRE(Matrix4f::Zero() == Matrix4f::Zero() * Matrix4f::Zero());
+        REQUIRE(Matrix4f::Zero() == Matrix4f::Identity() * Matrix4f::Zero());
+	    REQUIRE(Matrix4f::Identity() == Matrix4f::Identity() * Matrix4f::Identity());
+        
+	    REQUIRE(matA == matA * Matrix4f::Identity());
+	    REQUIRE(matA == Matrix4f::Identity() * matA);
 
-	REQUIRE(invMatA == aux);
+        REQUIRE(matMulResult == matA * matB);
+        REQUIRE(matMulResult == ((+matA) *= matB));
+    }
 
+    SECTION("Transpose should swap matrix rows and columns") {
+        auto mi = Matrix4f::Identity();
+        auto m0 = Matrix4f::Zero();
+
+        REQUIRE(mi == Transpose(mi));
+        REQUIRE(m0 == Transpose(m0));
+
+        const Matrix4f m = {
+            {1.0f, 2.0f, 3.0f, 4.0f}, 
+            {5.0f, 6.0f, 7.0f, 8.0f}, 
+            {9.0f, 10.0f, 11.0f, 12.0f},
+            {13.0f, 14.0f, 15.0f, 16.0f}
+        };
+
+        REQUIRE(Transpose(m) == Matrix4f{
+            {1.0f, 5.0f, 9.0f, 13.0f}, 
+            {2.0f, 6.0f, 10.0f,14.0f}, 
+            {3.0f, 7.0f, 11.0f, 15.0f},
+            {4.0f, 8.0f, 12.0f, 16.0f}
+        });
+    }
+
+    SECTION("Inverse should swap matrix rows and columns") {        
+        const Matrix4f invMatA = {
+            {0.25000f,  0.000f, -0.25000f,  0.000},
+            {0.28125f,  0.125f,  0.09375f, -0.125},
+            {0.18750f, -0.250f,  0.06250f,  0.250},
+            {0.21875f, -0.125f, -0.59375f, -0.875}
+        };
+
+        const Matrix4f matA = {
+            {1.0f, 2.0f, 1.0f, 0.0f}, 
+            {2.0f, 1.0f, -3.0f, -1.0f}, 
+            {-3.0f, 2.0f, 1.0f, 0.0f}, 
+            {2.0f, -1.0f, 0.0f, -1.0f}
+        };
+
+        auto mi = Matrix4f::Identity();
+        auto m0 = Matrix4f::Zero();
+        auto detMatA = -32.0f;
+
+        REQUIRE(mi == Inverse(mi));
+        REQUIRE(invMatA == Inverse(matA, detMatA));
+        REQUIRE(invMatA == Inverse(matA));
+    }
+
+    /*
 	// vector transformation
 	Matrix4f translation = Matrix4f::Translate({1.0f, 1.0f, 1.0f, 1.0f});
 	Vector3f position1 = {0.0f, -1.0f, 0.0f};
