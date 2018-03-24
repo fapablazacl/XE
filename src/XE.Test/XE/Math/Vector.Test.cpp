@@ -8,7 +8,8 @@ using namespace XE::Math;
 
 namespace XE {
     /**
-     * @brief Constructs a string representation of an N-dimensional vector for user feedback, or debugging purposes.
+     * @brief Constructs a string representation of an N-dimensional vector for user feedback, 
+     * or debugging purposes.
      */
     template<typename T, int N>
     std::string ToString(const Vector<T, N> &v) {
@@ -170,5 +171,55 @@ TEST_CASE("XE::Math::Vector<3, float>") {
         REQUIRE(Cross(v1, v1) == Vector3f{0.0f});
         REQUIRE(Cross(v2, v2) == Vector3f{0.0f});
         REQUIRE(Cross(v3, v3) == Vector3f{0.0f});
+    }
+    
+    SECTION("Minimize function should return the minimun values between two vectors") {
+        const Vector3f v1 = {1.0f, -2.0f, -1.3f};
+        const Vector3f v2 = {1.3f, -1.6f, 0.0f};
+        const Vector3f v3 = {-0.3f, 2.0f, 2.0f};
+
+        REQUIRE(Minimize(v1, v1) == v1);
+        REQUIRE(Minimize(v2, v2) == v2);
+        REQUIRE(Minimize(v3, v3) == v3);
+
+        REQUIRE(Minimize(v1, v2) == Vector3f{1.0f, -2.0f, -1.3f});
+        REQUIRE(Minimize(v1, v3) == Vector3f{-0.3f, -2.0f, -1.3f});
+        REQUIRE(Minimize(v2, v3) == Vector3f{-0.3f, -1.6f, 0.0f});
+
+        REQUIRE(Minimize(v2, v1) == Vector3f{1.0f, -2.0f, -1.3f});
+        REQUIRE(Minimize(v3, v1) == Vector3f{-0.3f, -2.0f, -1.3f});
+        REQUIRE(Minimize(v3, v2) == Vector3f{-0.3f, -1.6f, 0.0f});
+
+        REQUIRE(Minimize(v1, Minimize(v2, v3)) == Vector3f{-0.3f, -2.0f, -1.3f});
+        REQUIRE(Minimize(v1, Minimize(v3, v2)) == Vector3f{-0.3f, -2.0f, -1.3f});
+        REQUIRE(Minimize(v2, Minimize(v1, v3)) == Vector3f{-0.3f, -2.0f, -1.3f});
+        REQUIRE(Minimize(v2, Minimize(v3, v1)) == Vector3f{-0.3f, -2.0f, -1.3f});
+        REQUIRE(Minimize(v3, Minimize(v2, v1)) == Vector3f{-0.3f, -2.0f, -1.3f});
+        REQUIRE(Minimize(v3, Minimize(v1, v2)) == Vector3f{-0.3f, -2.0f, -1.3f});
+    }
+
+    SECTION("Maximize function should return the minimun values between two vectors") {
+        const Vector3f v1 = {1.0f, -2.0f, -1.3f};
+        const Vector3f v2 = {1.3f, -1.6f, 0.0f};
+        const Vector3f v3 = {-0.3f, 2.0f, 2.0f};
+
+        REQUIRE(Maximize(v1, v1) == v1);
+        REQUIRE(Maximize(v2, v2) == v2);
+        REQUIRE(Maximize(v3, v3) == v3);
+
+        REQUIRE(Maximize(v1, v2) == Vector3f{1.3f, -1.6f, 0.0f});
+        REQUIRE(Maximize(v1, v3) == Vector3f{1.0f, 2.0f, 2.0f});
+        REQUIRE(Maximize(v2, v3) == Vector3f{1.3f, 2.0f, 2.0f});
+
+        REQUIRE(Maximize(v2, v1) == Vector3f{1.3f, -1.6f, 0.0f});
+        REQUIRE(Maximize(v3, v1) == Vector3f{1.0f, 2.0f, 2.0f});
+        REQUIRE(Maximize(v3, v2) == Vector3f{1.3f, 2.0f, 2.0f});
+
+        REQUIRE(Maximize(v1, Maximize(v2, v3)) == Vector3f{1.3f, 2.0f, 2.0f});
+        REQUIRE(Maximize(v1, Maximize(v3, v2)) == Vector3f{1.3f, 2.0f, 2.0f});
+        REQUIRE(Maximize(v2, Maximize(v1, v3)) == Vector3f{1.3f, 2.0f, 2.0f});
+        REQUIRE(Maximize(v2, Maximize(v3, v1)) == Vector3f{1.3f, 2.0f, 2.0f});
+        REQUIRE(Maximize(v3, Maximize(v2, v1)) == Vector3f{1.3f, 2.0f, 2.0f});
+        REQUIRE(Maximize(v3, Maximize(v1, v2)) == Vector3f{1.3f, 2.0f, 2.0f});
     }
 }
