@@ -498,7 +498,21 @@ namespace XE::Math {
             }
         }
     }
-    
+
+    template<typename T, int R, int C>
+    Matrix<T, R, C> Adjoint(const Matrix<T, R, C> &matrix) {
+        Matrix<T, R, C> result;
+        
+        for(int i=0; i<R; ++i) {
+            for(int j=0; j<C; ++j) {
+                T factor = ((i+j)%2 == 1) ? T(1) : T(-1);
+                result(i, j) = factor * Abs(matrix.SubMatrix(i, j));
+            }
+        }
+        
+        return result;
+    }
+
     template<typename T, int R, int C>
     Matrix<T, C, R> Transpose(const Matrix<T, R, C> &m) {
         Matrix<T, C, R> result;
@@ -514,12 +528,12 @@ namespace XE::Math {
     
     template<typename T, int R, int C>
     Matrix<T, R, C> Inverse(const Matrix<T, R, C> &m) {
-        return Matrix<T, R, C>();
+        return Transpose(Adjoint(m)) / Abs(m);
     }
     
     template<typename T, int R, int C>
     Matrix<T, R, C> Inverse(const Matrix<T, R, C> &m, const T abs) {
-        return Matrix<T, R, C>();
+        return Transpose(Adjoint(m)) / abs;
     }
     
     template<typename T, int R, int C>
