@@ -112,6 +112,73 @@ TEST_CASE("Math::Matrix<3, float>") {
         REQUIRE(m2 != m1);
     }
 
+    SECTION("GetColumnVector should extract a certain column from the Matrix as a Vector") {
+        const Matrix4f m = {
+            {1.0f, 2.0f, 3.0f, 4.0f}, 
+            {5.0f, 6.0f, 7.0f, 8.0f}, 
+            {9.0f, 10.0f, 11.0f, 12.0f},
+            {13.0f, 14.0f, 15.0f, 16.0f}
+        };
+
+        REQUIRE(m.GetColumnVector(0) == Vector4f{1.0f, 5.0f, 9.0f, 13.0f});
+        REQUIRE(m.GetColumnVector(1) == Vector4f{2.0f, 6.0f, 10.0f, 14.0f});
+        REQUIRE(m.GetColumnVector(2) == Vector4f{3.0f, 7.0f, 11.0f, 15.0f});
+        REQUIRE(m.GetColumnVector(3) == Vector4f{4.0f, 8.0f, 12.0f, 16.0f});
+    }
+    
+    SECTION("GetRowVector should extract a certain row from the Matrix as a Vector") {
+        const Matrix4f m = {
+            {1.0f, 2.0f, 3.0f, 4.0f}, 
+            {5.0f, 6.0f, 7.0f, 8.0f}, 
+            {9.0f, 10.0f, 11.0f, 12.0f},
+            {13.0f, 14.0f, 15.0f, 16.0f}
+        };
+
+        REQUIRE(m.GetRowVector(0) == Vector4f{1.0f, 2.0f, 3.0f, 4.0f});
+        REQUIRE(m.GetRowVector(1) == Vector4f{5.0f, 6.0f, 7.0f, 8.0f});
+        REQUIRE(m.GetRowVector(2) == Vector4f{9.0f, 10.0f, 11.0f, 12.0f});
+        REQUIRE(m.GetRowVector(3) == Vector4f{13.0f, 14.0f, 15.0f, 16.0f});
+    }
+
+    SECTION("SubMatrix should extract a smaller matrix from another by discarding an entire row and column") {
+        const Matrix4f m = {
+            {1.0f, 2.0f, 3.0f, 4.0f}, 
+            {5.0f, 6.0f, 7.0f, 8.0f}, 
+            {9.0f, 10.0f, 11.0f, 12.0f},
+            {13.0f, 14.0f, 15.0f, 16.0f}
+        };
+
+        REQUIRE(m.SubMatrix(0, 0) == Matrix3f{
+            {6.0f, 7.0f, 8.0f},
+            {10.0f, 11.0f, 12.0f},
+            {14.0f, 15.0f, 16.0f}
+        });
+
+        REQUIRE(m.SubMatrix(0, 1) == Matrix3f{
+            {5.0f, 7.0f, 8.0f},
+            {9.0f, 11.0f, 12.0f},
+            {13.0f, 15.0f, 16.0f}
+        });
+
+        REQUIRE(m.SubMatrix(1, 0) == Matrix3f{
+            {2.0f, 3.0f, 4.0f},
+            {10.0f, 11.0f, 12.0f},
+            {14.0f, 15.0f, 16.0f}
+        });
+
+        REQUIRE(m.SubMatrix(3, 3) == Matrix3f{
+            {1.0f, 2.0f, 3.0f},
+            {5.0f, 6.0f, 7.0f},
+            {9.0f, 10.0f, 11.0f}
+        });
+
+        REQUIRE(m.SubMatrix(3, 0) == Matrix3f{
+            {2.0f, 3.0f, 4.0f},
+            {6.0f, 7.0f, 8.0f},
+            {10.0f, 11.0f, 12.0f},
+        });
+    }
+
     /*
     const Matrix4f matA = {
         {1.0f, 2.0f, 1.0f, 0.0f}, 

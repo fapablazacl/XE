@@ -177,6 +177,9 @@ namespace XE::Math {
         }
 
         Vector<T, C> GetRowVector(const int row) const {
+            assert(row >= 0);
+            assert(row < R);
+
             Vector<T, C> result;
             
             for (int col=0; col<C; col++) {
@@ -187,6 +190,9 @@ namespace XE::Math {
         }
         
         Vector<T, R> GetColumnVector(const int col) const {
+            assert(col >= 0);
+            assert(col < C);
+
             Vector<T, R> result;
             
             for (int row=0; row<R; row++) {
@@ -210,6 +216,12 @@ namespace XE::Math {
 
         auto SubMatrix(const int row, const int column) const {
             if constexpr (C > 2 && R > 2) {
+                assert(row >= 0);
+                assert(row < R);
+
+                assert(column >= 0);
+                assert(column < C);
+
                 Matrix<T, R - 1, C - 1> result;
                 
                 int ii = 0, jj = 0;
