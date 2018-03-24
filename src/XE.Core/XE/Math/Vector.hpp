@@ -147,18 +147,18 @@ namespace XE::Math {
     }
 
     template<typename T, int N>
-    T Abs(const Vector<T, N> &v) {
+    T Magnitude(const Vector<T, N> &v) {
         return static_cast<T>(std::sqrt(Dot(v, v)));
     }
 
     template<typename T, int N>
-    T Abs_2(const Vector<T, N> &v) {
+    T Magnitude2(const Vector<T, N> &v) {
         return Dot(v, v);
     }
 
     template<typename T, int N>
     Vector<T, N> Normalize(const Vector<T, N> &v) {
-        return v / Abs(v);
+        return v / Magnitude(v);
     }
 
     template<typename T, int N>

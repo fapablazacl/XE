@@ -222,4 +222,24 @@ TEST_CASE("XE::Math::Vector<3, float>") {
         REQUIRE(Maximize(v3, Maximize(v2, v1)) == Vector3f{1.3f, 2.0f, 2.0f});
         REQUIRE(Maximize(v3, Maximize(v1, v2)) == Vector3f{1.3f, 2.0f, 2.0f});
     }
+
+    SECTION("Magnitude2 function should return an squared vector length") {
+        const Vector3f v1 = {1.0f, -2.0f, -1.6f};
+        const Vector3f v2 = {1.3f, -1.6f, 0.0f};
+        const Vector3f v3 = {-0.3f, 2.0f, 2.0f};
+
+        REQUIRE(Magnitude2(v1) == 1.0f + 4.0f + 1.6f*1.6f);
+        REQUIRE(Magnitude2(v2) == 1.3f*1.3f + 1.6f*1.6f);
+        REQUIRE(Magnitude2(v3) == 0.3f*0.3f + 4.0f + 4.0f);
+    }
+
+    SECTION("Magnitude function should return the vector length") {
+        const Vector3f v1 = {0.0f, 0.0f, 0.0f};
+        const Vector3f v2 = {4.0f, 2.0f, 4.0f};
+        const Vector3f v3 = {1.0f, 1.0f, 1.0f};
+
+        REQUIRE(Magnitude(v1) == 0.0f);
+        REQUIRE(Magnitude(v2) == 6.0f);
+        REQUIRE(Magnitude(v3) == std::sqrt(3.0f));
+    }
 }
