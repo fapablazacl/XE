@@ -269,7 +269,7 @@ namespace XE::Math {
                 auto result = Matrix<T, R, C>::Zero();
                 
                 for (int i=0; i<R; ++i) {
-                    result.Data[i] = T(1);
+                    result(i, i) = T(1);
                 }
                 
                 return result;
@@ -638,6 +638,23 @@ namespace XE::Math {
         *this = *this * rhs;
         
         return *this;
+    }
+}
+
+
+namespace std {
+    template<typename T, int R, int C>
+    std::ostream& operator<< (std::ostream &os, const XE::Math::Matrix<T, R, C>& m) {
+        os << std::endl;
+
+        for (int i=0; i<R; ++i) {
+            os << m.GetRowVector(i);
+            os << std::endl;
+        }
+
+        os << std::endl;
+
+        return os;
     }
 }
 

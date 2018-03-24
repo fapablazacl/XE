@@ -6,34 +6,15 @@
 using namespace XE;
 using namespace XE::Math;
 
-namespace XE {
-    /**
-     * @brief Constructs a string representation of an N-dimensional vector for user feedback, 
-     * or debugging purposes.
-     */
-    template<typename T, int N>
-    std::string ToString(const Vector<T, N> &v) {
-        std::stringstream ss;
-        ss << "[";
-
-        for (int i=0; i<N; i++) {
-            ss << v[i];
-
-            if (i < N - 1) {
-                ss << ", ";
-            }
-        }
-
-        ss << "]";
-        return ss.str();
-    }
-}
-
 namespace Catch {
     template<>
     struct StringMaker<XE::Math::Vector3f> {
         static std::string convert(XE::Math::Vector3f const& value) {
-            return XE::ToString(value);
+            std::stringstream ss;
+
+            ss << value;
+
+            return ss.str();
         }
     };
 }

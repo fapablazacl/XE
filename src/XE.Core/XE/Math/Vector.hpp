@@ -6,6 +6,8 @@
 #include <cstdint>
 #include <cassert>
 #include <algorithm>
+#include <ostream>
+#include <string>
 
 namespace XE::Math {
     template<typename T, int N>
@@ -387,6 +389,28 @@ namespace XE::Math {
         }
         
         return true;
+    }
+}
+
+namespace std {
+    /**
+     * @brief Send a string-representation of the supplied row vector
+     */
+    template<typename T, int N>
+    std::ostream& operator<< (std::ostream &os, const XE::Math::Vector<T, N> &v) {
+        os << "[";
+
+        for (int i=0; i<N; i++) {
+            os << v[i];
+
+            if (i < N - 1) {
+                os << ", ";
+            }
+        }
+
+        os << "]";
+
+        return os;
     }
 }
 

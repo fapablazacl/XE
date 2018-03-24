@@ -2,25 +2,34 @@
 #include <catch.hpp>
 #include <XE/Math/Matrix.hpp>
 
-namespace XE {
-    template<typename T, int R, int C>
-    std::string ToString(const XE::Math::Matrix<T, R, C> &m) {
-        return "ToString(const XE::Math::Matrix<T, R, C> &m)";
-    }
-}
-
 namespace Catch {
+    template<>
+    struct StringMaker<XE::Math::Matrix2f> {
+        static std::string convert(XE::Math::Matrix2f const& value) {
+            std::stringstream ss;
+            ss << value;
+
+            return ss.str();
+        }
+    };
+
     template<>
     struct StringMaker<XE::Math::Matrix3f> {
         static std::string convert(XE::Math::Matrix3f const& value) {
-            return XE::ToString(value);
+            std::stringstream ss;
+            ss << value;
+
+            return ss.str();
         }
     };
 
     template<>
     struct StringMaker<XE::Math::Matrix4f> {
         static std::string convert(XE::Math::Matrix4f const& value) {
-            return XE::ToString(value);
+            std::stringstream ss;
+            ss << value;
+
+            return ss.str();
         }
     };
 }
@@ -179,6 +188,46 @@ TEST_CASE("Math::Matrix<3, float>") {
         });
     }
 
+    SECTION("Zero static function should create a valid zero matrix") {
+        REQUIRE(Matrix4f::Zero() == Matrix4f{
+            {0.0f, 0.0f, 0.0f, 0.0f},
+            {0.0f, 0.0f, 0.0f, 0.0f},
+            {0.0f, 0.0f, 0.0f, 0.0f},
+            {0.0f, 0.0f, 0.0f, 0.0f}
+        });
+
+        REQUIRE(Matrix3f::Zero() == Matrix3f{
+            {0.0f, 0.0f, 0.0f},
+            {0.0f, 0.0f, 0.0f},
+            {0.0f, 0.0f, 0.0f}
+        });
+
+        REQUIRE(Matrix2f::Zero() == Matrix2f{
+            {0.0f, 0.0f},
+            {0.0f, 0.0f}
+        });
+    }
+
+    SECTION("Identity static function should create a valid identity matrix") {
+        REQUIRE(Matrix4f::Identity() == Matrix4f{
+            {1.0f, 0.0f, 0.0f, 0.0f},
+            {0.0f, 1.0f, 0.0f, 0.0f},
+            {0.0f, 0.0f, 1.0f, 0.0f},
+            {0.0f, 0.0f, 0.0f, 1.0f}
+        });
+
+        REQUIRE(Matrix3f::Identity() == Matrix3f{
+            {1.0f, 0.0f, 0.0f},
+            {0.0f, 1.0f, 0.0f},
+            {0.0f, 0.0f, 1.0f}
+        });
+
+        REQUIRE(Matrix2f::Identity() == Matrix2f{
+            {1.0f, 0.0f},
+            {0.0f, 1.0f}
+        });
+    }
+
     /*
     const Matrix4f matA = {
         {1.0f, 2.0f, 1.0f, 0.0f}, 
@@ -237,42 +286,6 @@ TEST_CASE("Math::Matrix<3, float>") {
     
     Matrix4f aux;
     
-    // matrix element retrieval by function paramenters
-    REQUIRE(matA(0, 0) == 1.0f);
-    REQUIRE(matA(0, 1) == 2.0f);
-    REQUIRE(matA(0, 2) == 1.0f);
-    REQUIRE(matA(0, 3) == 0.0f);
-        
-    REQUIRE(matA(1, 0) == 2.0f);
-    REQUIRE(matA(1, 1) == 1.0f);
-    REQUIRE(matA(1, 2) == -3.0f);
-    REQUIRE(matA(1, 3) == -1.0f);
-        
-    REQUIRE(matA(2, 0) == -3.0f);
-    REQUIRE(matA(2, 1) == 2.0f);
-    REQUIRE(matA(2, 2) == 1.0f);
-    REQUIRE(matA(2, 3) == 0.0f);
-        
-    REQUIRE(matA(3, 0) == 2.0f);
-    REQUIRE(matA(3, 1) == -1.0f);
-    REQUIRE(matA(3, 2) == 0.0f);
-    REQUIRE(matA(3, 3) == -1.0f);
-        
-    // matrix element retrieval by template paramenters
-    // matrix row vectors
-    REQUIRE(matA.GetRowVector(0) == Vector4f(1.0f, 2.0f, 1.0f, 0.0f));
-    REQUIRE(matA.GetRowVector(1) == Vector4f(2.0f, 1.0f, -3.0f, -1.0f));
-    REQUIRE(matA.GetRowVector(2) == Vector4f(-3.0f, 2.0f, 1.0f, 0.0f));
-    REQUIRE(matA.GetRowVector(3) == Vector4f(2.0f, -1.0f, 0.0f, -1.0f));
-        
-    // matrix column vectors
-    REQUIRE(matA.GetColumnVector(0) == Vector4f(1.0f, 2.0f, -3.0f, 2.0f));
-    REQUIRE(matA.GetColumnVector(1) == Vector4f(2.0f, 1.0f, 2.0f, -1.0f));
-    REQUIRE(matA.GetColumnVector(2) == Vector4f(1.0f, -3.0f, 1.0f, 0.0f));
-    REQUIRE(matA.GetColumnVector(3) == Vector4f(0.0f, -1.0f, 0.0f, -1.0f));
-        
-    // matrix direct comparison
-    REQUIRE(matA != matB);
     
     // matrix scale
     REQUIRE(matA * -1.0f == -matA);
