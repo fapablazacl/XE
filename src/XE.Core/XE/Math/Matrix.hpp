@@ -34,6 +34,14 @@ namespace XE::Math {
             M11 = m11; M12 = m12;
             M21 = m21; M22 = m22;
         }
+
+        MatrixBase(
+            const Vector<T, 2> &row1,
+            const Vector<T, 2> &row2
+        ) {
+            M11 = row1.X; M12 = row1.Y;
+            M21 = row2.X; M22 = row2.Y;
+        }
     };
 
     template<typename T>
@@ -58,6 +66,16 @@ namespace XE::Math {
             M11 = m11; M12 = m12; M13 = m13;
             M21 = m21; M22 = m22; M23 = m23;
             M31 = m31; M32 = m32; M33 = m33;
+        }
+
+        MatrixBase(
+            const Vector<T, 3> &row1,
+            const Vector<T, 3> &row2,
+            const Vector<T, 3> &row3
+        ) {
+            M11 = row1.X; M12 = row1.Y; M13 = row1.Z;
+            M21 = row2.X; M22 = row2.Y; M23 = row2.Z;
+            M31 = row3.X; M32 = row3.Y; M33 = row3.Z;
         }
     };
     
@@ -87,6 +105,18 @@ namespace XE::Math {
             M31 = m31; M32 = m32; M33 = m33; M34 = m34;
             M41 = m41; M42 = m42; M43 = m43; M44 = m44;
         }
+
+        MatrixBase(
+            const Vector<T, 4> &row1,
+            const Vector<T, 4> &row2,
+            const Vector<T, 4> &row3,
+            const Vector<T, 4> &row4
+        ) {
+            M11 = row1.X; M12 = row1.Y; M13 = row1.Z; M14 = row1.W;
+            M21 = row2.X; M22 = row2.Y; M23 = row2.Z; M24 = row2.W;
+            M31 = row3.X; M32 = row3.Y; M33 = row3.Z; M34 = row3.W;
+            M41 = row4.X; M42 = row4.Y; M43 = row4.Z; M44 = row4.W;
+        }
     };
 
     template<typename T, int N>
@@ -100,7 +130,13 @@ namespace XE::Math {
 
         Matrix() {}
 
+        bool operator== (const Matrix<T, R, C> &other) const;
+
+        bool operator!= (const Matrix<T, R, C> &other) const;
+
         Matrix<T, R, C> operator+ (const Matrix<T, R, C>& rhs) const;
+
+        Matrix<T, R, C> operator- () const;
 
         Matrix<T, R, C> operator- (const Matrix<T, R, C>& rhs) const;
 
@@ -162,7 +198,7 @@ namespace XE::Math {
             }
         }
 
-        auto SubMatrix(const int row, const int column) {
+        auto SubMatrix(const int row, const int column) const {
             if constexpr (C > 2 && R > 2) {
                 Matrix<T, R - 1, C - 1> result;
                 
@@ -411,35 +447,31 @@ namespace XE::Math {
         }
     };
     
-    extern template struct Matrix<float, 2, 2>;
-    extern template struct Matrix<float, 3, 3>;
-    extern template struct Matrix<float, 4, 4>;
-
+    typedef Matrix<float, 2, 2> Matrix2f;
     typedef Matrix<float, 3, 3> Matrix3f;
     typedef Matrix<float, 4, 4> Matrix4f;
     
     template<typename T, int R, int C>
-    T Abs(const Matrix<T, R, C> &m) {
-        static_assert(R == C);
-        static_assert(R >= 2);
-        
-        if constexpr (R == 2 && C == 2) {
-            return m.M22 * m.M11 - m.M12 * m.M21;
-        } else {
-            T factor = T(1);
-            T result = T(0);
+    auto Abs(const Matrix<T, R, C> &m) {
+        if constexpr (R >= 2) {
+            if constexpr (R == 2 && C == 2) {
+                return m.M22 * m.M11 - m.M12 * m.M21;
+            } else {
+                T factor = T(1);
+                T result = T(0);
             
-            const int row = 0;
+                const int row = 0;
             
-            for (int column=0; column<C; column++) {
-                factor = (column + 1)%2 ? T(-1) : T(1);
+                for (int column=0; column<C; column++) {
+                    factor = (column + 1)%2 ? T(-1) : T(1); 
                 
-                const T subDet = Abs(SubMatrix(m, row, column));
+                    const T subDet = Abs(m.SubMatrix(row, column));
                 
-                result += factor * m.Element[row][column] * subDet;
+                    result += factor * m.Element[row][column] * subDet;
+                }
+            
+                return result;
             }
-            
-            return result;
         }
     }
     
@@ -467,6 +499,28 @@ namespace XE::Math {
     }
     
     template<typename T, int R, int C>
+    bool Matrix<T, R, C>::operator== (const Matrix<T, R, C> &other) const {
+        for (int i=0; i<R*C; i++) {
+            if (this->Data[i] != other.Data[i]) {
+                return false;
+            }
+        }
+        
+        return true;
+    }
+
+    template<typename T, int R, int C>
+    bool Matrix<T, R, C>::operator!= (const Matrix<T, R, C> &other) const {
+        for (int i=0; i<R*C; i++) {
+            if (this->Data[i] == other.Data[i]) {
+                return false;
+            }
+        }
+        
+        return true;
+    }
+
+    template<typename T, int R, int C>
     Matrix<T, R, C> Matrix<T, R, C>::operator+ (const Matrix<T, R, C>& rhs) const {
         Matrix<T, R, C> result;
         
@@ -477,6 +531,17 @@ namespace XE::Math {
         return result;
     }
     
+    template<typename T, int R, int C>
+    Matrix<T, R, C> Matrix<T, R, C>::operator- () const {
+        Matrix<T, R, C> result;
+        
+        for (int i=0; i<R*C; i++) {
+            result.Data[i] = -this->Data[i];
+        }
+        
+        return result;
+    }
+
     template<typename T, int R, int C>
     Matrix<T, R, C> Matrix<T, R, C>::operator- (const Matrix<T, R, C>& rhs) const {
         Matrix<T, R, C> result;
