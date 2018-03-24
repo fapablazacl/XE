@@ -28,7 +28,91 @@ namespace Catch {
 using namespace XE;
 using namespace Math;
 
-TEST_CASE("Math::Vector<3, float>") {
+TEST_CASE("Math::Matrix<3, float>") {
+    SECTION("constructor should setup the matrix components correctly") {
+        SECTION("for two-dimensional matrices") {      
+            const Matrix2f m = {
+                {1.0f, 2.0f}, 
+                {3.0f, 4.0f}
+            };
+
+            REQUIRE(m.M11 == 1.0f); REQUIRE(m.M12 == 2.0f);
+            REQUIRE(m.M21 == 3.0f); REQUIRE(m.M22 == 4.0f);
+
+            REQUIRE(m.Element[0][0] == 1.0f); REQUIRE(m.Element[0][1] == 2.0f);
+            REQUIRE(m.Element[1][0] == 3.0f); REQUIRE(m.Element[1][1] == 4.0f);
+
+            REQUIRE(m(0, 0) == 1.0f); REQUIRE(m(0, 1) == 2.0f);
+            REQUIRE(m(1, 0) == 3.0f); REQUIRE(m(1, 1) == 4.0f);
+        }
+
+        SECTION("for three-dimensional matrices") {      
+            const Matrix3f m = {
+                {1.0f, 2.0f, 3.0f}, 
+                {4.0f, 5.0f, 6.0f}, 
+                {7.0f, 8.0f, 9.0f}
+            };
+
+            REQUIRE(m.M11 == 1.0f); REQUIRE(m.M12 == 2.0f); REQUIRE(m.M13 == 3.0f);
+            REQUIRE(m.M21 == 4.0f); REQUIRE(m.M22 == 5.0f); REQUIRE(m.M23 == 6.0f);
+            REQUIRE(m.M31 == 7.0f); REQUIRE(m.M32 == 8.0f); REQUIRE(m.M33 == 9.0f);
+
+            REQUIRE(m.Element[0][0] == 1.0f); REQUIRE(m.Element[0][1] == 2.0f); REQUIRE(m.Element[0][2] == 3.0f);
+            REQUIRE(m.Element[1][0] == 4.0f); REQUIRE(m.Element[1][1] == 5.0f); REQUIRE(m.Element[1][2] == 6.0f);
+            REQUIRE(m.Element[2][0] == 7.0f); REQUIRE(m.Element[2][1] == 8.0f); REQUIRE(m.Element[2][2] == 9.0f);
+
+            REQUIRE(m(0, 0) == 1.0f); REQUIRE(m(0, 1) == 2.0f); REQUIRE(m(0, 2) == 3.0f);
+            REQUIRE(m(1, 0) == 4.0f); REQUIRE(m(1, 1) == 5.0f); REQUIRE(m(1, 2) == 6.0f);
+            REQUIRE(m(2, 0) == 7.0f); REQUIRE(m(2, 1) == 8.0f); REQUIRE(m(2, 2) == 9.0f);
+        }
+
+        SECTION("for four-dimensional matrices") {
+            const Matrix4f m = {
+                {1.0f, 2.0f, 3.0f, 4.0f}, 
+                {5.0f, 6.0f, 7.0f, 8.0f}, 
+                {9.0f, 10.0f, 11.0f, 12.0f},
+                {13.0f, 14.0f, 15.0f, 16.0f}
+            };
+
+            REQUIRE(m.M11 == 1.0f); REQUIRE(m.M12 == 2.0f); REQUIRE(m.M13 == 3.0f); REQUIRE(m.M14 == 4.0f);
+            REQUIRE(m.M21 == 5.0f); REQUIRE(m.M22 == 6.0f); REQUIRE(m.M23 == 7.0f); REQUIRE(m.M24 == 8.0f);
+            REQUIRE(m.M31 == 9.0f); REQUIRE(m.M32 == 10.0f); REQUIRE(m.M33 == 11.0f); REQUIRE(m.M34 == 12.0f);
+            REQUIRE(m.M41 == 13.0f); REQUIRE(m.M42 == 14.0f); REQUIRE(m.M43 == 15.0f); REQUIRE(m.M44 == 16.0f);
+
+            REQUIRE(m.Element[0][0] == 1.0f); REQUIRE(m.Element[0][1] == 2.0f); REQUIRE(m.Element[0][2] == 3.0f); REQUIRE(m.Element[0][3] == 4.0f);
+            REQUIRE(m.Element[1][0] == 5.0f); REQUIRE(m.Element[1][1] == 6.0f); REQUIRE(m.Element[1][2] == 7.0f); REQUIRE(m.Element[1][3] == 8.0f);
+            REQUIRE(m.Element[2][0] == 9.0f); REQUIRE(m.Element[2][1] == 10.0f); REQUIRE(m.Element[2][2] == 11.0f); REQUIRE(m.Element[2][3] == 12.0f);
+            REQUIRE(m.Element[3][0] == 13.0f); REQUIRE(m.Element[3][1] == 14.0f); REQUIRE(m.Element[3][2] == 15.0f); REQUIRE(m.Element[3][3] == 16.0f);
+            
+            REQUIRE(m(0, 0) == 1.0f); REQUIRE(m(0, 1) == 2.0f); REQUIRE(m(0, 2) == 3.0f); REQUIRE(m(0, 3) == 4.0f);
+            REQUIRE(m(1, 0) == 5.0f); REQUIRE(m(1, 1) == 6.0f); REQUIRE(m(1, 2) == 7.0f); REQUIRE(m(1, 3) == 8.0f);
+            REQUIRE(m(2, 0) == 9.0f); REQUIRE(m(2, 1) == 10.0f); REQUIRE(m(2, 2) == 11.0f); REQUIRE(m(2, 3) == 12.0f);
+            REQUIRE(m(3, 0) == 13.0f); REQUIRE(m(3, 1) == 14.0f); REQUIRE(m(3, 2) == 15.0f); REQUIRE(m(3, 3) == 16.0f);
+        }
+    }
+
+    SECTION("comparison operators should check matrix components") {
+        const Matrix4f m1 = {
+            {1.0f, 2.0f, 3.0f, 4.0f}, 
+            {5.0f, 6.0f, 7.0f, 8.0f}, 
+            {9.0f, 10.0f, 11.0f, 12.0f},
+            {13.0f, 14.0f, 15.0f, 16.0f}
+        };
+
+        const Matrix4f m2 = {
+            {16.0f, 15.0f, 14.0f, 13.0f}, 
+            {12.0f, 11.0f, 10.0f, 9.0f}, 
+            {8.0f, 7.0f, 6.0f, 5.0f},
+            {4.0f, 3.0f, 2.0f, 1.0f}
+        };
+
+        REQUIRE(m1 == m1);
+        REQUIRE(m2 == m2);
+        REQUIRE(m1 != m2);
+        REQUIRE(m2 != m1);
+    }
+
+    /*
     const Matrix4f matA = {
         {1.0f, 2.0f, 1.0f, 0.0f}, 
         {2.0f, 1.0f, -3.0f, -1.0f}, 
@@ -160,7 +244,6 @@ TEST_CASE("Math::Vector<3, float>") {
 	REQUIRE(invMatA == aux);
 
 	// vector transformation
-    /*
 	Matrix4f translation = Matrix4f::Translate({1.0f, 1.0f, 1.0f, 1.0f});
 	Vector3f position1 = {0.0f, -1.0f, 0.0f};
 	Vector3f position2_1 = {1.0f,  0.0f, 1.0f};

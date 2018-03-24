@@ -159,10 +159,20 @@ namespace XE::Math {
         }
 
         T& operator() (const int i, const int j) {
+            assert(i >= 0);
+            assert(j >= 0);
+            assert(i < R);
+            assert(j < C);
+
             return this->Element[i][j];
         }
 
         T operator() (const int i, const int j) const {
+            assert(i >= 0);
+            assert(j >= 0);
+            assert(i < R);
+            assert(j < C);
+
             return this->Element[i][j];
         }
 
