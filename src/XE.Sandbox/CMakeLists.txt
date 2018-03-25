@@ -1,6 +1,10 @@
 
 set (target "XE.Sandbox")
-set (src "Main.cpp")
+set (src 
+	"Main.cpp"
+	"Assets.cpp"
+	"Assets.hpp"
+)
 
 source_group ("\\" FILES ${src})
 

@@ -2,7 +2,7 @@
 #include "Assets.hpp"
 
 namespace XE::Sandbox {
-    std::string Assets::vertexShader = R"(
+    const char* Assets::vertexShader = R"(
 #version 460
 
 in vec3 vertCoord;
@@ -16,7 +16,7 @@ void main() {
 }
     )";
 
-    std::string Assets::fragmentShader = R"(
+    const char* Assets::fragmentShader = R"(
 #version 460
 
 in vec4 fragColor;

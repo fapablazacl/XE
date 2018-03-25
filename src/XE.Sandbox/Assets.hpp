@@ -17,8 +17,8 @@ namespace XE::Sandbox {
     struct Assets {
         Assets() = delete;
 
-        static std::string vertexShader;
-        static std::string fragmentShader;
+        static const char* vertexShader;
+        static const char* fragmentShader;
 
         static std::vector<XE::Graphics::Vertex> triangleVertices;
         static std::vector<int> triangleIndices;

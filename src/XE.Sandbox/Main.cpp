@@ -7,6 +7,8 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
+#include "Assets.hpp"
+
 int main(int argc, char **argv) {
     ::glfwInit();
     ::glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
@@ -26,7 +28,32 @@ int main(int argc, char **argv) {
 
     if (!gladLoadGL()) {
         std::cout << "Failed to load OpenGL extensions" << std::endl;
+        return 1;
     }
+
+    // setup vertex shader
+    GLuint vertexShader = ::glCreateShader(GL_VERTEX_SHADER);
+
+    const char *vertexShaderSource = XE::Sandbox::Assets::vertexShader;
+    const int vertexShaderLength = (int)std::strlen(vertexShaderSource);
+
+    ::glShaderSource(vertexShader, 1, &vertexShaderSource, &vertexShaderLength);
+    ::glCompileShader(vertexShader);
+
+    // setup fragment shader
+    GLuint fragmentShader = ::glCreateShader(GL_FRAGMENT_SHADER);
+
+    const char *fragmentShaderSource = XE::Sandbox::Assets::fragmentShader;
+    const int fragmentShaderLength = (int)std::strlen(fragmentShaderSource);
+
+    ::glShaderSource(fragmentShader, 1, &fragmentShaderSource, &vertexShaderLength);
+    ::glCompileShader(fragmentShader);
+    
+    // setup shader program
+    GLuint shaderProgram = ::glCreateProgram();
+    ::glAttachShader(shaderProgram, vertexShader);
+    ::glAttachShader(shaderProgram, fragmentShader);
+    ::glLinkProgram(shaderProgram);
 
     while (!::glfwWindowShouldClose(window)) {
         ::glfwPollEvents();
