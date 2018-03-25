@@ -2,6 +2,7 @@
 #include "GraphicsDeviceGL.hpp"
 
 #include "BufferGL.hpp"
+#include "SubsetGL.hpp"
 #include "Texture2DGL.hpp"
 #include "ProgramGL.hpp"
 
@@ -11,21 +12,22 @@
 #include <XE/Graphics/TextureCubeMap.hpp>
 
 namespace XE::Graphics::GL {
-    GraphicsDeviceGL::GraphicsDeviceGL() {}
+    GraphicsDeviceGL::GraphicsDeviceGL() {
+    }
 
-    GraphicsDeviceGL::~GraphicsDeviceGL() {}
+    GraphicsDeviceGL::~GraphicsDeviceGL() {
+    }
         
     XE::Input::InputManager* GraphicsDeviceGL::GetInputManager() {
         return nullptr;
     }
 
     std::unique_ptr<Subset> GraphicsDeviceGL::CreateSubset(const SubsetDescriptor& desc) {
-        return std::unique_ptr<Subset>();
+        return std::make_unique<SubsetGL>(desc);
     }
         
     std::unique_ptr<Buffer> GraphicsDeviceGL::CreateBuffer(const BufferDescriptor &desc) {
-        //return std::make_unique<BufferGL>(bufferType, bufferUsage, bufferAccess, size, data);
-        return std::unique_ptr<Buffer>();
+        return std::make_unique<BufferGL>(desc);
     }
         
     std::unique_ptr<Texture2D> GraphicsDeviceGL::CreateTexture2D(const PixelFormat format, const XE::Math::Vector2i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void *sourceData) {
@@ -44,9 +46,8 @@ namespace XE::Graphics::GL {
         return std::unique_ptr<TextureCubeMap>();
     }
         
-    std::unique_ptr<Program> GraphicsDeviceGL::CreateProgram(const ProgramDescriptor &programDescriptor) {
-        //return std::make_unique<ProgramGL>(sources);
-        return std::unique_ptr<Program>();
+    std::unique_ptr<Program> GraphicsDeviceGL::CreateProgram(const ProgramDescriptor &desc) {
+        return std::make_unique<ProgramGL>(desc);
     }
     
     void GraphicsDeviceGL::Draw(const Subset *subset, const SubsetEnvelope *envelopes, const int envelopeCount) {
