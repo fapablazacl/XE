@@ -1,5 +1,5 @@
-
-#include "VertexLayout.hpp"
-
-namespace XE::Graphics {
-}
+//
+//#include "VertexLayout.hpp"
+//
+//namespace XE::Graphics {
+//}

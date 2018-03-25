@@ -38,6 +38,14 @@ if (XE_PLUGIN_OPENGLCORE)
 
     add_subdirectory ("src/XE.OpenGLCore")
     include_directories ("src/XE.OpenGLCore")
+
+	set (GLFW_BUILD_DOCS CACHE BOOL OFF)
+	set (GLFW_BUILD_TESTS CACHE BOOL OFF)
+	set (GLFW_BUILD_EXAMPLES CACHE BOOL OFF)
+	set (GLFW_BUILD_INSTALL CACHE BOOL OFF)
+	set (GLFW_INSTALL CACHE BOOL OFF)
+	add_subdirectory ("dep/glfw")
+	include_directories ("dep/glfw/include")
 endif ()
 
 if (XE_PLUGIN_VULKAN)

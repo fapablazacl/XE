@@ -5,7 +5,6 @@
 #include <XE/Math/Vector.hpp>
 
 namespace XE::Graphics {
-    template<typename CoordAttrib, typename ... Attribs>
     struct Vertex {
         XE::Math::Vector3f Position;
         XE::Math::Vector3f Normal;

@@ -34,12 +34,12 @@ namespace XE::Graphics {
         //! How many vertices we must use for render
         int VertexCount;
 
-        //! Wich vertex we will render from
+        //! From wich vertex we will render
         int VertexStart;
     };
 
     /**
-     * @brief Geometry Subset class
+     * @brief Geometry Subset
      *
      * This class abstracts a (possibly indexed) Geometry Subset, independent of the Vertex Layout.
      * The Vertex Layout just specifies the different attributes supported by each vertex stored in one or many
