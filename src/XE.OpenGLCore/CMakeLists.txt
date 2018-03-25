@@ -25,8 +25,8 @@ set (sources_xe_graphics_glcore
 	"${source_base}/BufferGL.hpp"
 	"${source_base}/BufferGL.cpp"
 	
-	"${source_base}/MeshSubsetGL.hpp"
-	"${source_base}/MeshSubsetGL.cpp"
+	"${source_base}/SubsetGL.hpp"
+	"${source_base}/SubsetGL.cpp"
 
 	"${source_base}/TextureGLBase.hpp"
 	"${source_base}/TextureGLBase.cpp"

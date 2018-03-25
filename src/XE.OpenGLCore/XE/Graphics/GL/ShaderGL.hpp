@@ -16,6 +16,10 @@ namespace XE::Graphics::GL {
 
         virtual std::string GetSource() const override;
 
+        GLuint GetID() const {
+            return m_id;
+        }
+
     private:
         ShaderType m_type;
         std::string m_source;

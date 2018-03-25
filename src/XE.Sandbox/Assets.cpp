@@ -3,7 +3,7 @@
 
 namespace XE::Sandbox {
     const char* Assets::vertexShader = R"(
-#version 460
+#version 430
 
 in vec3 vertCoord;
 in vec4 vertColor;
@@ -17,7 +17,7 @@ void main() {
     )";
 
     const char* Assets::fragmentShader = R"(
-#version 460
+#version 430
 
 in vec4 fragColor;
 out vec4 finalColor;

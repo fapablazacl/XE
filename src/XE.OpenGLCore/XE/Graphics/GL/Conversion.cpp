@@ -36,7 +36,7 @@ namespace XE::Graphics::GL {
         }
     }
 
-    GLenum ConvertToGL(const BufferAccess access, const BufferUsage usage) {
+    GLenum ConvertToGL(const BufferUsage usage, const BufferAccess access) {
         switch (access) {
         case BufferAccess::Dynamic:
             switch (usage) {

@@ -63,33 +63,7 @@ namespace XE::Graphics {
         std::vector<ProgramSource> sources;
     };
 
-    /**
-     * @brief Describes a Vertex Attribute for use in the vertex shader
-     */
-    struct VertexAttribute {
-        //! Attribute Name in the Vertex Shader
-        std::string name;
-
-        //! Basic data type
-        DataType type;
-
-        //! Attribute dimension (1, 2, 3 or 4)
-        int size;
-    };
-
-    /**
-     * @brief Describes a geometry subset
-     */
-    struct SubsetDescriptor {
-        //! The vertex structure
-        std::vector<VertexAttribute> attributes;
-
-        //! The buffers that have data
-        std::unique_ptr<Buffer> buffers;
-
-        //! The mapping between the buffers and the vertex attributes
-        std::map<std::string, int> bufferMapping;
-    };
+    struct SubsetDescriptor;
 
     /**
      * @brief Graphics API abstraction

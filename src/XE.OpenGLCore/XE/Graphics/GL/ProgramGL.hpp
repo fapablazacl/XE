@@ -25,6 +25,10 @@ namespace XE::Graphics::GL {
 
         virtual Shader* GetShader(const int index) override;
 
+        GLuint GetID() const {
+            return m_id;
+        }
+
     public:
         int GetUniformLoction(const std::string &name) const;
 

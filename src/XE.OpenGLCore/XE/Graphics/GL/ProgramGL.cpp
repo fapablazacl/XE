@@ -10,6 +10,26 @@ namespace XE::Graphics::GL {
 
             m_shaders.emplace_back(new ShaderGL(type, code));
         }
+
+        m_id = ::glCreateProgram();
+
+        for (auto &shader : m_shaders) {
+            ::glAttachShader(m_id, shader->GetID());
+        }
+
+        ::glLinkProgram(m_id);
+
+        GLint status;
+        ::glGetProgramiv(m_id, GL_LINK_STATUS, &status);
+
+        if (status == GL_FALSE) {
+            const GLint logsize = 4096;
+            char buffer[logsize] = {};
+                
+            ::glGetProgramInfoLog(m_id, logsize, nullptr, buffer);
+
+            throw std::runtime_error(buffer);
+        }
     }
 
     ProgramGL::~ProgramGL() {

@@ -10,4 +10,4 @@ source_group ("\\" FILES ${src})
 
 add_executable (${target} ${src})
 
-target_link_libraries (${target} XE.Core glfw glad-gl4)
+target_link_libraries (${target} XE.Core glfw glad-gl4 XE.Graphics.OpenGL)

@@ -3,6 +3,10 @@
 #define __XE_GRAPHICS_SUBSET_HPP__
 
 #include <cstddef>
+#include <map>
+#include <vector>
+#include <memory>
+#include <XE/DataType.hpp>
 
 namespace XE {
     class Buffer;
@@ -36,6 +40,34 @@ namespace XE::Graphics {
 
         //! From wich vertex we will render
         int VertexStart;
+    };
+    
+    /**
+     * @brief Describes a Vertex Attribute for use in the vertex shader
+     */
+    struct VertexAttribute {
+        //! Attribute Name in the Vertex Shader
+        std::string name;
+
+        //! Basic data type
+        DataType type;
+
+        //! Attribute dimension (1, 2, 3 or 4)
+        int size;
+    };
+
+    /**
+     * @brief Describes a geometry subset
+     */
+    struct SubsetDescriptor {
+        //! The vertex structure
+        std::vector<VertexAttribute> attributes;
+
+        //! The buffers that have data
+        std::unique_ptr<Buffer> buffers;
+
+        //! The mapping between the buffers and the vertex attributes
+        std::map<std::string, int> bufferMapping;
     };
 
     /**
