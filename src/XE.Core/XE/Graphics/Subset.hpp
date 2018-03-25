@@ -64,10 +64,16 @@ namespace XE::Graphics {
         std::vector<VertexAttribute> attributes;
 
         //! The buffers that have data
-        std::unique_ptr<Buffer> buffers;
+        std::vector<std::unique_ptr<Buffer>> buffers;
 
         //! The mapping between the buffers and the vertex attributes
         std::map<std::string, int> bufferMapping;
+
+        //! The subset geometry index buffer
+        std::unique_ptr<Buffer> indexBuffer;
+
+        //! The index buffer datatype
+        DataType indexType;
     };
 
     /**

@@ -6,13 +6,6 @@
 #include <string>
 #include <vector>
 
-namespace XE::Graphics {
-    struct Vertex {
-        XE::Math::Vector3f coord;
-        XE::Math::Vector4f color;
-    };
-}
-
 namespace XE::Sandbox {
     struct Assets {
         Assets() = delete;
@@ -20,8 +13,9 @@ namespace XE::Sandbox {
         static const char* vertexShader;
         static const char* fragmentShader;
 
-        static std::vector<XE::Graphics::Vertex> triangleVertices;
-        static std::vector<int> triangleIndices;
+        static std::vector<XE::Math::Vector3f> coordData;
+        static std::vector<XE::Math::Vector4f> colorData;
+        static std::vector<int> indexData;
     };
 }
 

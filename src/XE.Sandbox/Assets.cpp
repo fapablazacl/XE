@@ -5,8 +5,8 @@ namespace XE::Sandbox {
     const char* Assets::vertexShader = R"(
 #version 430
 
-in vec3 vertCoord;
-in vec4 vertColor;
+layout(location = 0) in vec3 vertCoord;
+layout(location = 1) in vec4 vertColor;
 
 out vec4 fragColor;
 
@@ -27,13 +27,21 @@ void main() {
 }
 )";
 
-    std::vector<XE::Graphics::Vertex> Assets::triangleVertices = {
-        {{0.0f, 0.5f, 0.0f}, {1.0f, 0.0f, 0.0f, 1.0f}},
-        {{0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f, 0.0f}},
-        {{0.5f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f, 1.0f}},
-        {{0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f, 0.0f}},
-        {{-0.5f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f, 1.0f}},
+    std::vector<XE::Math::Vector3f> Assets::coordData = {
+        { 0.0f,  0.5f, 0.0f},
+        { 0.0f,  0.0f, 0.0f},
+        { 0.5f, -0.5f, 0.0f},
+        { 0.0f,  0.0f, 0.0f},
+        {-0.5f, -0.5f, 0.0f}
     };
 
-    std::vector<int> Assets::triangleIndices = {0, 2, 4};
+    std::vector<XE::Math::Vector4f> Assets::colorData = {
+        {1.0f, 0.0f, 0.0f, 1.0f},
+        {0.0f, 0.0f, 0.0f, 0.0f},
+        {0.0f, 1.0f, 0.0f, 1.0f},
+        {0.0f, 0.0f, 0.0f, 0.0f},
+        {0.0f, 0.0f, 1.0f, 1.0f}
+    };
+
+    std::vector<int> Assets::indexData = {0, 2, 4};
 }

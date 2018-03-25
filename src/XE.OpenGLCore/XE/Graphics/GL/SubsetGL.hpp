@@ -9,7 +9,7 @@ namespace XE::Graphics::GL {
     class BufferGL;
     class SubsetGL : public Subset {
     public:
-        SubsetGL(const SubsetDescriptor &desc);
+        SubsetGL(SubsetDescriptor &desc);
 
         virtual ~SubsetGL();
         
