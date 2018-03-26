@@ -14,6 +14,7 @@ namespace XE::Graphics {
     enum class BufferType;
     enum class BufferUsage;
     enum class BufferAccess;
+    enum class PrimitiveType;
 }
 
 namespace XE::Graphics::GL {
@@ -21,6 +22,7 @@ namespace XE::Graphics::GL {
     extern GLenum ConvertToGL(const PixelFormat format);
     extern GLenum ConvertToGL(const BufferType type);
     extern GLenum ConvertToGL(const BufferUsage usage, const BufferAccess access);
+    extern GLenum ConvertToGL(const PrimitiveType type);
 }
 
 #endif 

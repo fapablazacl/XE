@@ -4,15 +4,18 @@
 #include "Conversion.hpp"
 
 namespace XE::Graphics::GL {
-    SubsetGL::SubsetGL(SubsetDescriptor &desc) {        
+    SubsetGL::SubsetGL(SubsetDescriptor& desc, 
+            std::vector<std::unique_ptr<Buffer>> buffers, 
+            const std::map<std::string, int> &bufferMapping, 
+            std::unique_ptr<Buffer> indexBuffer) {        
         // take ownership for the buffers
-        for (auto &buffer : desc.buffers) {
+        for (auto &buffer : buffers) {
             auto bufferGL = dynamic_cast<BufferGL*>(buffer.get());
             m_buffers.emplace_back(bufferGL);
             buffer.release();
         }
 
-        m_indexBuffer.reset((BufferGL*)desc.indexBuffer.release());
+        m_indexBuffer.reset((BufferGL*)indexBuffer.release());
 
         // setup the subset arrays based on the vertex format and the mapping information
         ::glGenVertexArrays(1, &m_id);
@@ -20,8 +23,8 @@ namespace XE::Graphics::GL {
 
         int attribIndex = 0;
         for (const VertexAttribute &attrib : desc.attributes) {
-            auto mappingIt = desc.bufferMapping.find(attrib.name);
-            if (mappingIt == desc.bufferMapping.end()) {
+            auto mappingIt = bufferMapping.find(attrib.name);
+            if (mappingIt == bufferMapping.end()) {
                 continue;
             }
  
@@ -52,19 +55,19 @@ namespace XE::Graphics::GL {
         return (int)m_buffers.size();
     }
 
-    Buffer* SubsetGL::GetBuffer(const int index) {
+    BufferGL* SubsetGL::GetBuffer(const int index) {
         return m_buffers[index].get();
     }
 
-    Buffer* SubsetGL::GetIndexBuffer() {
+    BufferGL* SubsetGL::GetIndexBuffer() {
         return m_indexBuffer.get();
     }
 
-    const Buffer* SubsetGL::GetBuffer(const int index) const {
+    const BufferGL* SubsetGL::GetBuffer(const int index) const {
         return m_buffers[index].get();
     }
 
-    const Buffer* SubsetGL::GetIndexBuffer() const {
+    const BufferGL* SubsetGL::GetIndexBuffer() const {
         return m_indexBuffer.get();
     }
 }

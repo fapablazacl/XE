@@ -63,15 +63,6 @@ namespace XE::Graphics {
         //! The vertex structure
         std::vector<VertexAttribute> attributes;
 
-        //! The buffers that have data
-        std::vector<std::unique_ptr<Buffer>> buffers;
-
-        //! The mapping between the buffers and the vertex attributes
-        std::map<std::string, int> bufferMapping;
-
-        //! The subset geometry index buffer
-        std::unique_ptr<Buffer> indexBuffer;
-
         //! The index buffer datatype
         DataType indexType;
     };
@@ -111,6 +102,11 @@ namespace XE::Graphics {
          * @brief Get a constant pointer to a buffer allocated in GPU memory. This buffer stores indexation data
          */
         virtual const Buffer* GetIndexBuffer() const = 0;
+
+        /**
+         * @brief Get the current description structure that leads to the creation of the subset
+         */
+        virtual SubsetDescriptor GetDescriptor() const = 0;
     };
 }
 

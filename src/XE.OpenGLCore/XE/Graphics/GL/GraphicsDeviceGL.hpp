@@ -4,6 +4,9 @@
 
 #include <XE/Graphics/GraphicsDevice.hpp>
 
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
+
 namespace XE::Graphics::GL {
     class GraphicsDeviceGL : public GraphicsDevice {
     public:
@@ -13,7 +16,11 @@ namespace XE::Graphics::GL {
         
         virtual XE::Input::InputManager* GetInputManager() override;
 
-        virtual std::unique_ptr<Subset> CreateSubset(const SubsetDescriptor& desc) override;
+        virtual std::unique_ptr<Subset> CreateSubset(
+            SubsetDescriptor& desc, 
+            std::vector<std::unique_ptr<Buffer>> buffers, 
+            const std::map<std::string, int> &bufferMapping, 
+            std::unique_ptr<Buffer> indexBuffer) override;
         
         virtual std::unique_ptr<Buffer> CreateBuffer(const BufferDescriptor &bufferDescriptor) override;
         
@@ -36,6 +43,9 @@ namespace XE::Graphics::GL {
         virtual void Draw(const Subset *subset, const SubsetEnvelope *envelopes, const int envelopeCount) override;
 
         virtual void EndFrame() override;
+
+    private:
+        GLFWwindow *m_window = nullptr;
     };
 }
 

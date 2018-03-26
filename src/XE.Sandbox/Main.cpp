@@ -37,39 +37,53 @@ int main(int argc, char **argv) {
         }
 
         // setup vertex shader
-        const std::vector<std::tuple<XE::Graphics::ShaderType, std::string>> sources = {
-            {XE::Graphics::ShaderType::Vertex, std::string{XE::Sandbox::Assets::vertexShader}},
-            {XE::Graphics::ShaderType::Fragment, std::string{XE::Sandbox::Assets::fragmentShader}}
+        const XE::Graphics::ProgramDescriptor programDescriptor = {
+            {
+                {XE::Graphics::ShaderType::Vertex, std::string{XE::Sandbox::Assets::vertexShader}},
+                {XE::Graphics::ShaderType::Fragment, std::string{XE::Sandbox::Assets::fragmentShader}}
+            }
         };
 
-        XE::Graphics::GL::ProgramGL program{sources};
+        XE::Graphics::GL::ProgramGL program{programDescriptor};
 
         ::glUseProgram(program.GetID());
 
         // create the vertex buffer
-        std::unique_ptr<XE::Buffer> coordBuffer = std::make_unique<XE::Graphics::GL::BufferGL> (
+        XE::Graphics::BufferDescriptor coordBufferDescriptor = {
             XE::Graphics::BufferType::Vertex, 
             XE::Graphics::BufferUsage::Copy, 
             XE::Graphics::BufferAccess::Static, 
             (int)XE::Sandbox::Assets::coordData.size() * (int)sizeof(XE::Math::Vector3f), 
-            XE::Sandbox::Assets::coordData.data()
+            (const std::byte*) XE::Sandbox::Assets::coordData.data()
+        };
+
+        std::unique_ptr<XE::Buffer> coordBuffer = std::make_unique<XE::Graphics::GL::BufferGL> (
+            coordBufferDescriptor
         );
 
-        std::unique_ptr<XE::Buffer> colorBuffer = std::make_unique<XE::Graphics::GL::BufferGL> (
+        XE::Graphics::BufferDescriptor colorBufferDescriptor = {
             XE::Graphics::BufferType::Vertex, 
             XE::Graphics::BufferUsage::Copy, 
             XE::Graphics::BufferAccess::Static, 
             (int)XE::Sandbox::Assets::colorData.size() * (int)sizeof(XE::Math::Vector4f), 
-            XE::Sandbox::Assets::colorData.data()
+            (const std::byte*) XE::Sandbox::Assets::colorData.data()
+        };
+
+        std::unique_ptr<XE::Buffer> colorBuffer = std::make_unique<XE::Graphics::GL::BufferGL> (
+            colorBufferDescriptor
         );
 
         // create the index buffer
-        std::unique_ptr<XE::Buffer> indexBuffer = std::make_unique<XE::Graphics::GL::BufferGL> (
+        XE::Graphics::BufferDescriptor indexBufferDescriptor = {
             XE::Graphics::BufferType::Index, 
             XE::Graphics::BufferUsage::Copy, 
             XE::Graphics::BufferAccess::Static, 
             (int)XE::Sandbox::Assets::indexData.size() * (int)sizeof(int), 
-            XE::Sandbox::Assets::indexData.data()
+            (const std::byte*) XE::Sandbox::Assets::indexData.data()
+        };
+
+        std::unique_ptr<XE::Buffer> indexBuffer = std::make_unique<XE::Graphics::GL::BufferGL> (
+            indexBufferDescriptor
         );
 
         // create the geometry subset
@@ -79,18 +93,18 @@ int main(int argc, char **argv) {
             {"vertCoord", XE::DataType::Float32, 3}, 
             {"vertColor", XE::DataType::Float32, 4}
         };
-        
-        subsetDescriptor.buffers.push_back(std::move(coordBuffer));
-        subsetDescriptor.buffers.push_back(std::move(colorBuffer));
 
-        subsetDescriptor.bufferMapping = {
+        subsetDescriptor.indexType = XE::DataType::UInt32;
+
+        std::vector<std::unique_ptr<XE::Buffer>> buffers;
+        buffers.push_back(std::move(coordBuffer));
+        buffers.push_back(std::move(colorBuffer));
+
+        std::map<std::string, int> bufferMapping = {
             {"vertCoord", 0}, {"vertColor", 1}
         };
 
-        subsetDescriptor.indexBuffer = std::move(indexBuffer);
-        subsetDescriptor.indexType = XE::DataType::UInt32;
-
-        XE::Graphics::GL::SubsetGL subset {subsetDescriptor};
+        XE::Graphics::GL::SubsetGL subset {subsetDescriptor, std::move(buffers), bufferMapping, std::move(indexBuffer)};
         
         while (!::glfwWindowShouldClose(window)) {
             ::glfwPollEvents();

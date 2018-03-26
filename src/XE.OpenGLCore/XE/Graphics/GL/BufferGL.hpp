@@ -3,6 +3,7 @@
 #define __XE_GRAPHICS_GL_BUFFERGL_HPP__
 
 #include <XE/Buffer.hpp>
+#include <XE/Graphics/BufferDescriptor.hpp>
 #include <glad/glad.h>
 
 namespace XE::Graphics {
@@ -14,7 +15,7 @@ namespace XE::Graphics {
 namespace XE::Graphics::GL {
     class BufferGL : public Buffer {
     public:
-        BufferGL(const BufferType type, const BufferUsage usage, const BufferAccess access, const int size, const void *data);
+        BufferGL(const BufferDescriptor &desc);
 
         virtual ~BufferGL();
 

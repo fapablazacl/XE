@@ -5,23 +5,32 @@
 #include <XE/Graphics/Subset.hpp>
 #include <glad/glad.h>
 
+#include "BufferGL.hpp"
+
 namespace XE::Graphics::GL {
-    class BufferGL;
     class SubsetGL : public Subset {
     public:
-        SubsetGL(SubsetDescriptor &desc);
+        SubsetGL(
+            SubsetDescriptor& desc, 
+            std::vector<std::unique_ptr<Buffer>> buffers, 
+            const std::map<std::string, int> &bufferMapping, 
+            std::unique_ptr<Buffer> indexBuffer);
 
         virtual ~SubsetGL();
         
         virtual int GetBufferCount() const override;
 
-        virtual Buffer* GetBuffer(const int index) override;
+        virtual BufferGL* GetBuffer(const int index) override;
 
-        virtual Buffer* GetIndexBuffer() override;
+        virtual BufferGL* GetIndexBuffer() override;
 
-        virtual const Buffer* GetBuffer(const int index) const override;
+        virtual const BufferGL* GetBuffer(const int index) const override;
 
-        virtual const Buffer* GetIndexBuffer() const override;
+        virtual const BufferGL* GetIndexBuffer() const override;
+
+        virtual SubsetDescriptor GetDescriptor() const override {
+            return m_descriptor;
+        }
 
     public:
         GLuint GetID() const {
@@ -32,6 +41,8 @@ namespace XE::Graphics::GL {
         GLuint m_id;
         std::vector<std::unique_ptr<BufferGL>> m_buffers;
         std::unique_ptr<BufferGL> m_indexBuffer;
+
+        SubsetDescriptor m_descriptor;
     };
 }
 

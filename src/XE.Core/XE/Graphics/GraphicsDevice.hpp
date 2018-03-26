@@ -53,17 +53,9 @@ namespace XE::Graphics {
     class TextureCubeMap;
     class Program;
     class Material;
-    
-    struct ProgramSource {
-        ShaderType type;
-        std::string text;
-    };
-
-    struct ProgramDescriptor {
-        std::vector<ProgramSource> sources;
-    };
 
     struct SubsetDescriptor;
+    struct ProgramDescriptor;
 
     /**
      * @brief Graphics API abstraction
@@ -74,7 +66,17 @@ namespace XE::Graphics {
 
         virtual XE::Input::InputManager* GetInputManager() = 0;
 
-        virtual std::unique_ptr<Subset> CreateSubset(const SubsetDescriptor& desc) = 0;
+        /**
+         * @brief Create a geometry subset composed of many geometry and indexation buffers
+         * @param buffers The buffers that have data
+         * @param bufferMapping The mapping between the buffers and the vertex attributes
+         * @param indexBuffer The subset geometry index buffer
+         */
+        virtual std::unique_ptr<Subset> CreateSubset(
+            SubsetDescriptor& desc, 
+            std::vector<std::unique_ptr<Buffer>> buffers, 
+            const std::map<std::string, int> &bufferMapping, 
+            std::unique_ptr<Buffer> indexBuffer) = 0;
         
         virtual std::unique_ptr<Buffer> CreateBuffer(const BufferDescriptor &bufferDescriptor) = 0;
         

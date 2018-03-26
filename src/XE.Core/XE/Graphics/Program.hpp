@@ -2,13 +2,25 @@
 #ifndef __XE_GRAPHICS_PROGRAM_HPP__
 #define __XE_GRAPHICS_PROGRAM_HPP__
 
+#include <string>
+#include <vector>
+
 namespace XE::Graphics {
+    enum class ShaderType;
+
     enum ShaderLang {
         GLSL,
         HLSL
     };
+    
+    struct ProgramSource {
+        ShaderType type;
+        std::string text;
+    };
 
-    struct Structure;
+    struct ProgramDescriptor {
+        std::vector<ProgramSource> sources;
+    };
 
     class Shader;
     class Program {

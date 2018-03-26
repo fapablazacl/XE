@@ -4,6 +4,7 @@
 #include <XE/DataType.hpp>
 #include <XE/Graphics/PixelFormat.hpp>
 #include <XE/Graphics/BufferDescriptor.hpp>
+#include <XE/Graphics/Subset.hpp>
 
 namespace XE::Graphics::GL {
     GLenum ConvertToGL(const DataType type) {
@@ -61,6 +62,21 @@ namespace XE::Graphics::GL {
             case BufferUsage::Write: return GL_STREAM_DRAW;
             default: return 0;
             }
+
+        default:
+            return 0;
+        }
+    }
+
+    GLenum ConvertToGL(const PrimitiveType type) {
+        switch (type) {
+            case PrimitiveType::PointList: return GL_POINTS;
+            case PrimitiveType::LineList: return GL_LINES;
+            case PrimitiveType::LineStrip: return GL_LINE_STRIP;
+            case PrimitiveType::TriangleStrip: return GL_TRIANGLE_STRIP;
+            case PrimitiveType::TriangleList: return GL_TRIANGLES;
+            case PrimitiveType::TriangleFan: return GL_TRIANGLE_FAN;
+            default: return 0;
         }
     }
 }

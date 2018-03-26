@@ -3,12 +3,9 @@
 #include "ShaderGL.hpp"
 
 namespace XE::Graphics::GL {
-    ProgramGL::ProgramGL(const std::vector<std::tuple<ShaderType, std::string>> &sources) {
-        for (const auto &sourceTuple : sources) {
-            const ShaderType type = std::get<0>(sourceTuple);
-            const std::string &code = std::get<1>(sourceTuple);
-
-            m_shaders.emplace_back(new ShaderGL(type, code));
+    ProgramGL::ProgramGL(const ProgramDescriptor &desc) {
+        for (const auto &source: desc.sources) {
+            m_shaders.emplace_back(new ShaderGL(source.type, source.text));
         }
 
         m_id = ::glCreateProgram();

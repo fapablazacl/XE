@@ -4,16 +4,16 @@
 #include <cstdint>
 
 namespace XE::Graphics::GL {
-    BufferGL::BufferGL(const BufferType type, const BufferUsage usage, const BufferAccess access, const int size, const void *data) {
-        const GLenum targetGL = ConvertToGL(type);
-        const GLenum usageGL = ConvertToGL(usage, access);
+    BufferGL::BufferGL(const BufferDescriptor &desc) {
+        const GLenum targetGL = ConvertToGL(desc.type);
+        const GLenum usageGL = ConvertToGL(desc.usage, desc.access);
 
         ::glGenBuffers(1, &m_id);
         ::glBindBuffer(targetGL, m_id);
-        ::glBufferData(targetGL, size, data, usageGL);
+        ::glBufferData(targetGL, desc.size, desc.data, usageGL);
         ::glBindBuffer(targetGL, 0);
 
-        m_size = size;
+        m_size = desc.size;
         m_target = targetGL;
         m_usage = usageGL;
     }

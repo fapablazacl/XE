@@ -11,13 +11,14 @@
 
 namespace XE::Graphics {
     enum class ShaderType;
+    struct ProgramDescriptor;
 }
 
 namespace XE::Graphics::GL {
     class ShaderGL;
     class ProgramGL : public Program {
     public:
-        ProgramGL(const std::vector<std::tuple<ShaderType, std::string>> &sources);
+        ProgramGL(const ProgramDescriptor &desc);
 
         virtual ~ProgramGL();
 
