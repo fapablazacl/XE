@@ -35,11 +35,11 @@ namespace XE::Graphics {
         //! Geometric Primitive Shape basis for rendering
         PrimitiveType Primitive;
 
-        //! How many vertices we must use for render
-        int VertexCount;
-
         //! From wich vertex we will render
         int VertexStart;
+        
+        //! How many vertices we must use for render
+        int VertexCount;
     };
     
     /**

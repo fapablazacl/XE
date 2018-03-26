@@ -43,6 +43,8 @@ namespace XE::Graphics::GL {
         }
         
         ::glBindVertexArray(0);
+
+        m_descriptor = desc;
     }
 
     SubsetGL::~SubsetGL() {

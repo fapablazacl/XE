@@ -94,6 +94,10 @@ namespace XE::Graphics {
         
         virtual const Material* GetMaterial() const = 0;
 
+        virtual void SetProgram(const Program *program) = 0;
+
+        virtual const Program* GetProgram() const = 0;
+
         virtual void Draw(const Subset *subset, const SubsetEnvelope *envelopes, const int envelopeCount) = 0;
         
         virtual void BeginFrame(const ClearFlags flags, const XE::Math::Vector4f &color, const float depth, const int stencil) = 0;

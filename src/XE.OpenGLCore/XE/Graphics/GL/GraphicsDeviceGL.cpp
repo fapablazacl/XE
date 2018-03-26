@@ -128,6 +128,16 @@ namespace XE::Graphics::GL {
 
     }
 
+    void GraphicsDeviceGL::SetProgram(const Program *program) {
+        auto programGL = static_cast<const ProgramGL *>(program);
+
+        ::glUseProgram(programGL->GetID());
+    }
+    
+    const Program* GraphicsDeviceGL::GetProgram() const {
+        return nullptr;
+    }
+
     const Material* GraphicsDeviceGL::GetMaterial() const {
         return nullptr;
     }

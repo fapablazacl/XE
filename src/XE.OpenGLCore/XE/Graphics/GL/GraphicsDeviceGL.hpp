@@ -38,6 +38,10 @@ namespace XE::Graphics::GL {
 
         virtual const Material* GetMaterial() const override;
 
+        virtual void SetProgram(const Program *program) override;
+
+        virtual const Program* GetProgram() const override;
+
         virtual void BeginFrame(const ClearFlags flags, const XE::Math::Vector4f &color, const float depth, const int stencil) override;
         
         virtual void Draw(const Subset *subset, const SubsetEnvelope *envelopes, const int envelopeCount) override;
