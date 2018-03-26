@@ -2,6 +2,7 @@
 #ifndef __XE_GRAPHICS_TEXTURE3D_HPP__
 #define __XE_GRAPHICS_TEXTURE3D_HPP__
 
+#include <XE/Predef.hpp>
 #include <XE/Graphics/Texture.hpp>
 
 namespace XE::Graphics {

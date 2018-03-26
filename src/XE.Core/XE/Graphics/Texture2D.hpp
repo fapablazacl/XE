@@ -4,6 +4,7 @@
 
 #include <cstdint>
 #include <cstddef>
+#include <XE/Predef.hpp>
 #include <XE/Graphics/Texture.hpp>
 
 namespace XE {

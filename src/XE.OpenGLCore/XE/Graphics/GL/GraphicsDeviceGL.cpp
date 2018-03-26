@@ -16,7 +16,7 @@ namespace XE::Graphics::GL {
     GraphicsDeviceGL::GraphicsDeviceGL() {
         ::glfwInit();
         ::glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-        ::glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+        ::glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
         ::glfwWindowHint(GLFW_OPENGL_CORE_PROFILE, 1);
         ::glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, 1);
         ::glfwWindowHint(GLFW_DEPTH_BITS, 24);

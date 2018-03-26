@@ -2,6 +2,7 @@
 #ifndef __XE_BUFFER_HPP__
 #define __XE_BUFFER_HPP__
 
+#include <XE/Predef.hpp>
 #include <cstddef>
 
 namespace XE {

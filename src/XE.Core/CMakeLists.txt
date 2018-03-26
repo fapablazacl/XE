@@ -2,6 +2,7 @@
 set (target "XE.Core")
 
 set (src_xe
+	"XE/Predef.hpp"
     "XE/Stream.hpp"
     "XE/Stream.cpp"
     "XE/Buffer.hpp"

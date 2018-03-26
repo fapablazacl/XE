@@ -4,6 +4,7 @@
 
 #include <cstddef>
 #include <array>
+#include <XE/Predef.hpp>
 
 namespace XE::Graphics {
     class Program;

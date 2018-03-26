@@ -3,6 +3,7 @@
 #define __XE_GRAPHICS_IMAGE_HPP__
 
 #include <cstddef>
+#include <XE/Predef.hpp>
 #include <XE/Math/Vector.hpp>
 #include <XE/Graphics/PixelFormat.hpp>
 

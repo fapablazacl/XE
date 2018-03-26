@@ -2,6 +2,7 @@
 #ifndef __XE_GRAPHICS_TEXTURECUBEMAP_HPP__
 #define __XE_GRAPHICS_TEXTURECUBEMAP_HPP__
 
+#include <XE/Predef.hpp>
 #include <XE/Graphics/Texture.hpp>
 
 namespace XE::Graphics {

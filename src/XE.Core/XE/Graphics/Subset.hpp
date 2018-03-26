@@ -6,6 +6,8 @@
 #include <map>
 #include <vector>
 #include <memory>
+#include <string>
+#include <XE/Predef.hpp>
 #include <XE/DataType.hpp>
 
 namespace XE {
