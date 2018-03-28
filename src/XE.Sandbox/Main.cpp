@@ -5,6 +5,9 @@
 #include <map>
 #include <XE.hpp>
 #include <XE/Graphics.hpp>
+#include <XE/Input/InputManager.hpp>
+#include <XE/Input/DeviceStatus.hpp>
+#include <XE/Input/InputCode.hpp>
 #include <XE/Graphics/GL/GraphicsDeviceGL.hpp>
 #include <XE/Graphics/GL/ProgramGL.hpp>
 #include <XE/Graphics/GL/BufferGL.hpp>
@@ -15,6 +18,7 @@
 int main(int argc, char **argv) {
     try {
         auto graphicsDevice = std::make_unique<XE::Graphics::GL::GraphicsDeviceGL>();
+        auto inputManager = graphicsDevice->GetInputManager();
 
         // setup vertex shader
         const XE::Graphics::ProgramDescriptor programDescriptor = {
@@ -79,6 +83,14 @@ int main(int argc, char **argv) {
         auto subset = graphicsDevice->CreateSubset(subsetDescriptor, std::move(buffers), bufferMapping, std::move(indexBuffer));
 
         while (true) {
+            inputManager->Poll();
+            
+            const XE::Input::KeyboardStatus keyboardStatus = inputManager->GetKeyboardStatus();
+
+            if (keyboardStatus.GetState(XE::Input::KeyCode::KeyEsc) == XE::Input::BinaryState::Press) {
+                break;
+            }
+
             graphicsDevice->BeginFrame(XE::Graphics::ClearFlags::All, {0.2f, 0.2f, 0.2f, 1.0f}, 0.0f, 0);
             graphicsDevice->SetProgram(program.get());
 

@@ -7,6 +7,10 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
+namespace XE::Input {
+    class InputManager;
+}
+
 namespace XE::Graphics::GL {
     class GraphicsDeviceGL : public GraphicsDevice {
     public:
@@ -50,6 +54,7 @@ namespace XE::Graphics::GL {
 
     private:
         GLFWwindow *m_window = nullptr;
+        std::unique_ptr<XE::Input::InputManager> m_inputManager;
     };
 }
 

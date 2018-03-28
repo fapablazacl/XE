@@ -6,6 +6,7 @@
 #include "SubsetGL.hpp"
 #include "Texture2DGL.hpp"
 #include "ProgramGL.hpp"
+#include "InputManagerGLFW.hpp"
 
 #include <XE/Graphics/Subset.hpp>
 #include <XE/Graphics/Texture3D.hpp>
@@ -33,6 +34,8 @@ namespace XE::Graphics::GL {
         if (!gladLoadGL()) {
             throw std::runtime_error("Failed to load OpenGL extensions");
         }
+
+        m_inputManager.reset(new InputManagerGLFW(m_window));
     }
 
     GraphicsDeviceGL::~GraphicsDeviceGL() {
@@ -46,7 +49,7 @@ namespace XE::Graphics::GL {
     }
         
     XE::Input::InputManager* GraphicsDeviceGL::GetInputManager() {
-        return nullptr;
+        return m_inputManager.get();
     }
 
     std::unique_ptr<Subset> GraphicsDeviceGL::CreateSubset(

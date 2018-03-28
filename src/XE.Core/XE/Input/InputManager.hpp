@@ -16,6 +16,11 @@ namespace XE::Input {
     public:
         virtual ~InputManager();
 
+        /**
+         * @brief Scans the status of all recognized input devices.
+         */
+        virtual void Poll() = 0;
+
         virtual KeyboardStatus GetKeyboardStatus() = 0;
 
         virtual MouseStatus GetMouseStatus() = 0;

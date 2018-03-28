@@ -12,4 +12,6 @@ namespace std {
 #include <cstddef>
 #endif
 
+#define XE_API
+
 #endif
