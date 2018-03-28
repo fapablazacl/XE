@@ -12,9 +12,11 @@
 #include <XE/Graphics/Texture3D.hpp>
 #include <XE/Graphics/Texture2DArray.hpp>
 #include <XE/Graphics/TextureCubeMap.hpp>
+#include <iostream>
 
 namespace XE::Graphics::GL {
     GraphicsDeviceGL::GraphicsDeviceGL() {
+        std::cout << "[GL] Initializing GLFW ..." << std::endl;
         ::glfwInit();
         ::glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
         ::glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
@@ -27,13 +29,18 @@ namespace XE::Graphics::GL {
         ::glfwWindowHint(GLFW_BLUE_BITS, 8);
         ::glfwWindowHint(GLFW_ALPHA_BITS, 0);
 
+        std::cout << "[GL] Creating Window/Context ..." << std::endl;
         m_window = ::glfwCreateWindow(1200, 800, "Test", nullptr, nullptr);
 
+        std::cout << "[GL] Making Context current ..." << std::endl;
         ::glfwMakeContextCurrent(m_window);
 
+        std::cout << "[GL] Loading OpenGL Extensions ..." << std::endl;
         if (!gladLoadGL()) {
             throw std::runtime_error("Failed to load OpenGL extensions");
         }
+
+        std::cout << "[GL] Creating the GLFW-based input manager ..." << std::endl;
 
         m_inputManager.reset(new InputManagerGLFW(m_window));
     }

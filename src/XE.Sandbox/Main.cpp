@@ -17,9 +17,11 @@
 
 int main(int argc, char **argv) {
     try {
+        std::cout << "Initializing Engine ..." << std::endl;
         auto graphicsDevice = std::make_unique<XE::Graphics::GL::GraphicsDeviceGL>();
         auto inputManager = graphicsDevice->GetInputManager();
 
+        std::cout << "Loading assets ..." << std::endl;
         // setup vertex shader
         const XE::Graphics::ProgramDescriptor programDescriptor = {
             {
@@ -82,6 +84,7 @@ int main(int argc, char **argv) {
 
         auto subset = graphicsDevice->CreateSubset(subsetDescriptor, std::move(buffers), bufferMapping, std::move(indexBuffer));
 
+        std::cout << "Entering main loop" << std::endl;
         while (true) {
             inputManager->Poll();
             
