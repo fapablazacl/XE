@@ -2,7 +2,7 @@ project (XE)
 
 option (XE_PLUGIN_DIRECT3D11    "Include Direct3D 11 support" OFF)
 option (XE_PLUGIN_OPENGLCORE    "Include OpenGL Core support" OFF)
-option (XE_PLUGIN_VULKAN        "Include OpenGL Core support" OFF)
+option (XE_PLUGIN_VULKAN        "Include Vulkan support" OFF)
 
 set (CMAKE_CXX_STANDARD 17)
 set (CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -31,7 +31,7 @@ if (XE_PLUGIN_DIRECT3D11)
 endif ()
 
 if (XE_PLUGIN_OPENGLCORE)
-	include_directories ("src/khronos")
+    include_directories ("src/khronos")
 
     add_subdirectory ("src/glad-gl4")
     include_directories ("src/glad-gl4")
