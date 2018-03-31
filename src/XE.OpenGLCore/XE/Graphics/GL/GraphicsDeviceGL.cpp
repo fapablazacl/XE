@@ -8,6 +8,7 @@
 #include "ProgramGL.hpp"
 #include "InputManagerGLFW.hpp"
 
+#include <XE/Graphics/Uniform.hpp>
 #include <XE/Graphics/Subset.hpp>
 #include <XE/Graphics/Texture3D.hpp>
 #include <XE/Graphics/Texture2DArray.hpp>
@@ -139,13 +140,139 @@ namespace XE::Graphics::GL {
     }
 
     void GraphicsDeviceGL::SetProgram(const Program *program) {
-        auto programGL = static_cast<const ProgramGL *>(program);
+        m_program = static_cast<const ProgramGL *>(program);
 
-        ::glUseProgram(programGL->GetID());
+        if (m_program) {
+            ::glUseProgram(m_program->GetID());
+        } else {
+            ::glUseProgram(0);
+        }
     }
     
     const Program* GraphicsDeviceGL::GetProgram() const {
-        return nullptr;
+        return m_program;
+    }
+
+    void GraphicsDeviceGL::ApplyUniform(const UniformMatrix *uniformMatrix, const int count, const std::byte *data) {
+        assert(m_program);
+        assert(uniformMatrix);
+        assert(count > 0);
+        assert(data);
+
+        int offset = 0;
+
+        for (int i=0; i<count; i++) {
+            const UniformMatrix *current = &uniformMatrix[i];
+            const GLint location = m_program->GetUniformLoction(current->Name);
+
+            switch (current->Type) {
+            case DataType::Float32: 
+                switch (current->Rows) {
+                case 2:
+                    switch (current->Columns) {
+                    case 2: ::glUniformMatrix2fv(location, current->Count, GL_FALSE, (const GLfloat*)&data[offset]); break;
+                    case 3: ::glUniformMatrix2x3fv(location, current->Count, GL_FALSE, (const GLfloat*)&data[offset]); break;
+                    case 4: ::glUniformMatrix2x4fv(location, current->Count, GL_FALSE, (const GLfloat*)&data[offset]); break;
+                    }
+                    break;
+
+                case 3:
+                    switch (current->Columns) {
+                    case 2: ::glUniformMatrix3x2fv(location, current->Count, GL_FALSE, (const GLfloat*)&data[offset]); break;
+                    case 3: ::glUniformMatrix3fv(location, current->Count, GL_FALSE, (const GLfloat*)&data[offset]); break;
+                    case 4: ::glUniformMatrix3x4fv(location, current->Count, GL_FALSE, (const GLfloat*)&data[offset]); break;
+                    }
+                    break;
+
+                case 4:
+                    switch (current->Columns) {
+                    case 2: ::glUniformMatrix4x2fv(location, current->Count, GL_FALSE, (const GLfloat*)&data[offset]); break;
+                    case 3: ::glUniformMatrix4x3fv(location, current->Count, GL_FALSE, (const GLfloat*)&data[offset]); break;
+                    case 4: ::glUniformMatrix4fv(location, current->Count, GL_FALSE, (const GLfloat*)&data[offset]); break;
+                    }
+                    break;
+                }
+                break;
+
+            case DataType::Float64: 
+                switch (current->Rows) {
+                case 2:
+                    switch (current->Columns) {
+                    case 2: ::glUniformMatrix2dv(location, current->Count, GL_FALSE, (const GLdouble*)&data[offset]); break;
+                    case 3: ::glUniformMatrix2x3dv(location, current->Count, GL_FALSE, (const GLdouble*)&data[offset]); break;
+                    case 4: ::glUniformMatrix2x4dv(location, current->Count, GL_FALSE, (const GLdouble*)&data[offset]); break;
+                    }
+                    break;
+
+                case 3:
+                    switch (current->Columns) {
+                    case 2: ::glUniformMatrix3x2dv(location, current->Count, GL_FALSE, (const GLdouble*)&data[offset]); break;
+                    case 3: ::glUniformMatrix3dv(location, current->Count, GL_FALSE, (const GLdouble*)&data[offset]); break;
+                    case 4: ::glUniformMatrix3x4dv(location, current->Count, GL_FALSE, (const GLdouble*)&data[offset]); break;
+                    }
+                    break;
+
+                case 4:
+                    switch (current->Columns) {
+                    case 2: ::glUniformMatrix4x2dv(location, current->Count, GL_FALSE, (const GLdouble*)&data[offset]); break;
+                    case 3: ::glUniformMatrix4x3dv(location, current->Count, GL_FALSE, (const GLdouble*)&data[offset]); break;
+                    case 4: ::glUniformMatrix4dv(location, current->Count, GL_FALSE, (const GLdouble*)&data[offset]); break;
+                    }
+                    break;
+                }
+                break;
+            }
+
+            offset += XE::ComputeByteSize(current->Type) * current->Rows * current->Columns * current->Count;
+        }
+    }
+
+    void GraphicsDeviceGL::ApplyUniform(const Uniform *uniform, const int count, const std::byte *data) {
+        assert(m_program);
+        assert(uniform);
+        assert(count > 0);
+        assert(data);
+
+        int offset = 0;
+
+        for (int i=0; i<count; i++) {
+            const Uniform *current = &uniform[i];
+            const GLint location = m_program->GetUniformLoction(current->Name);
+
+            switch (current->Type) {
+            case DataType::Int32:
+                switch (current->Size) {
+                    case 1: glUniform1iv(location, current->Count, (const GLint*)&data[offset]); break;
+                    case 2: glUniform2iv(location, current->Count, (const GLint*)&data[offset]); break;
+                    case 3: glUniform3iv(location, current->Count, (const GLint*)&data[offset]); break;
+                    case 4: glUniform4iv(location, current->Count, (const GLint*)&data[offset]); break;
+                }
+                break;
+            
+            case DataType::Float32:
+                switch (current->Size) {
+                    case 1: glUniform1fv(location, current->Count, (const GLfloat*)&data[offset]); break;
+                    case 2: glUniform2fv(location, current->Count, (const GLfloat*)&data[offset]); break;
+                    case 3: glUniform3fv(location, current->Count, (const GLfloat*)&data[offset]); break;
+                    case 4: glUniform4fv(location, current->Count, (const GLfloat*)&data[offset]); break;
+                }
+                break;
+
+            case DataType::UInt32:
+                switch (current->Size) {
+                    case 1: glUniform1uiv(location, current->Count, (const GLuint*)&data[offset]); break;
+                    case 2: glUniform2uiv(location, current->Count, (const GLuint*)&data[offset]); break;
+                    case 3: glUniform3uiv(location, current->Count, (const GLuint*)&data[offset]); break;
+                    case 4: glUniform4uiv(location, current->Count, (const GLuint*)&data[offset]); break;
+                }
+                break;
+
+            default:
+                assert(false);
+            }
+
+            offset += XE::ComputeByteSize(current->Type) * current->Size * current->Count;
+        }
     }
 
     const Material* GraphicsDeviceGL::GetMaterial() const {

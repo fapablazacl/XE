@@ -5,9 +5,11 @@
 #include <map>
 #include <XE.hpp>
 #include <XE/Graphics.hpp>
+#include <XE/Math/Matrix.hpp>
 #include <XE/Input/InputManager.hpp>
 #include <XE/Input/DeviceStatus.hpp>
 #include <XE/Input/InputCode.hpp>
+#include <XE/Graphics/Uniform.hpp>
 #include <XE/Graphics/GL/GraphicsDeviceGL.hpp>
 #include <XE/Graphics/GL/ProgramGL.hpp>
 #include <XE/Graphics/GL/BufferGL.hpp>
@@ -96,6 +98,17 @@ int main(int argc, char **argv) {
 
             graphicsDevice->BeginFrame(XE::Graphics::ClearFlags::All, {0.2f, 0.2f, 0.2f, 1.0f}, 0.0f, 0);
             graphicsDevice->SetProgram(program.get());
+
+            XE::Math::Matrix4f mvp = XE::Math::Matrix4f::Identity();
+
+            XE::Graphics::UniformMatrix uniformMatrix;
+            uniformMatrix.Columns = 4;
+            uniformMatrix.Rows = 4;
+            uniformMatrix.Count = 1;
+            uniformMatrix.Name = "m_mvp";
+            uniformMatrix.Type = XE::DataType::Float32;
+
+            graphicsDevice->ApplyUniform(&uniformMatrix, 1, (const std::byte*)&mvp.Data[0]);
 
             XE::Graphics::SubsetEnvelope envelope = {
                 nullptr, XE::Graphics::PrimitiveType::TriangleList, 0, 3

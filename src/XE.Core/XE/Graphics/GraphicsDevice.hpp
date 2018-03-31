@@ -45,6 +45,8 @@ namespace XE::Graphics {
     struct BufferDescriptor;
     struct SubsetEnvelope;
     struct VertexLayout;
+    struct Uniform;
+    struct UniformMatrix;
     
     class Subset;
     class Texture2D;
@@ -97,6 +99,10 @@ namespace XE::Graphics {
         virtual void SetProgram(const Program *program) = 0;
 
         virtual const Program* GetProgram() const = 0;
+
+        virtual void ApplyUniform(const UniformMatrix *uniformMatrix, const int count, const std::byte *data) = 0;
+
+        virtual void ApplyUniform(const Uniform *uniform, const int count, const std::byte *data) = 0;
 
         virtual void Draw(const Subset *subset, const SubsetEnvelope *envelopes, const int envelopeCount) = 0;
         

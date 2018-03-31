@@ -12,6 +12,8 @@ namespace XE::Input {
 }
 
 namespace XE::Graphics::GL {
+    class ProgramGL;
+
     class GraphicsDeviceGL : public GraphicsDevice {
     public:
         GraphicsDeviceGL();
@@ -46,6 +48,10 @@ namespace XE::Graphics::GL {
 
         virtual const Program* GetProgram() const override;
 
+        virtual void ApplyUniform(const UniformMatrix *uniformMatrix, const int count, const std::byte *data) override;
+
+        virtual void ApplyUniform(const Uniform *uniform, const int count, const std::byte *data) override;
+
         virtual void BeginFrame(const ClearFlags flags, const XE::Math::Vector4f &color, const float depth, const int stencil) override;
         
         virtual void Draw(const Subset *subset, const SubsetEnvelope *envelopes, const int envelopeCount) override;
@@ -55,6 +61,7 @@ namespace XE::Graphics::GL {
     private:
         GLFWwindow *m_window = nullptr;
         std::unique_ptr<XE::Input::InputManager> m_inputManager;
+        const ProgramGL *m_program = nullptr;
     };
 }
 

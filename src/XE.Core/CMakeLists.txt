@@ -3,6 +3,8 @@ set (target "XE.Core")
 
 set (src_xe
 	"XE/Predef.hpp"
+	"XE/Event.hpp"
+    "XE/EventImpl.hpp"
     "XE/Stream.hpp"
     "XE/Stream.cpp"
     "XE/Buffer.hpp"
@@ -14,7 +16,7 @@ set (src_xe
 	"XE/DataAttribute.cpp"
     "XE/DataAttribute.hpp"
 
-	# these will be future C++20 Modules!
+	# these will be future C++20 Modules
 	"XE.hpp"
 	"XE/Graphics.hpp"
 )
@@ -73,8 +75,8 @@ set (src_xe_graphics
 	"XE/Graphics/VertexLayout.hpp"
 	"XE/Graphics/VertexFormat.cpp"
 	"XE/Graphics/VertexFormat.hpp"
-	"XE/Graphics/UniformLayout.cpp"
-	"XE/Graphics/UniformLayout.hpp"
+	"XE/Graphics/Uniform.cpp"
+	"XE/Graphics/Uniform.hpp"
 	"XE/Graphics/ImageImpl.hpp"
 	"XE/Graphics/ImageImpl.cpp"
 	"XE/Graphics/Image.hpp"
@@ -105,4 +107,10 @@ source_group ("\\XE\\Graphics" FILES ${src_xe_graphics})
 source_group ("\\XE\\Input" FILES ${src_xe_input})
 source_group ("\\XE\\UI" FILES ${src_xe_ui})
 
-add_library (${target} ${src_xe} ${src_xe_math} ${src_xe_graphics} ${src_xe_input} ${src_xe_ui})
+add_library (${target} 
+	${src_xe} 
+	${src_xe_math} 
+	${src_xe_graphics} 
+	${src_xe_input} 
+	${src_xe_ui}
+)

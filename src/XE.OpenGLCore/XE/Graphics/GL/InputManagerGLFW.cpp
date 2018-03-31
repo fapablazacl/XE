@@ -19,13 +19,14 @@ namespace XE::Graphics::GL {
     };
 
     static int s_keys[] = {
-        GLFW_KEY_SPACE, GLFW_KEY_APOSTROPHE ,GLFW_KEY_COMMA, GLFW_KEY_MINUS
-        ,GLFW_KEY_PERIOD,GLFW_KEY_SLASH,GLFW_KEY_0,GLFW_KEY_1,GLFW_KEY_2,GLFW_KEY_3
+        GLFW_KEY_SPACE, GLFW_KEY_APOSTROPHE, GLFW_KEY_COMMA, GLFW_KEY_MINUS
+        ,GLFW_KEY_PERIOD, GLFW_KEY_SLASH
+        ,GLFW_KEY_0, GLFW_KEY_1, GLFW_KEY_2, GLFW_KEY_3
         ,GLFW_KEY_4,GLFW_KEY_5,GLFW_KEY_6,GLFW_KEY_7,GLFW_KEY_8,GLFW_KEY_9
         ,GLFW_KEY_SEMICOLON,GLFW_KEY_EQUAL,GLFW_KEY_A,GLFW_KEY_B,GLFW_KEY_C
-        ,GLFW_KEY_D,GLFW_KEY_E,GLFW_KEY_F,GLFW_KEY_G,GLFW_KEY_H,GLFW_KEY_I
-        ,GLFW_KEY_J,GLFW_KEY_K,GLFW_KEY_L,GLFW_KEY_M,GLFW_KEY_N,GLFW_KEY_O
-        ,GLFW_KEY_P,GLFW_KEY_Q,GLFW_KEY_R,GLFW_KEY_S,GLFW_KEY_T,GLFW_KEY_U                  
+        ,GLFW_KEY_D, GLFW_KEY_E, GLFW_KEY_F, GLFW_KEY_G, GLFW_KEY_H, GLFW_KEY_I
+        ,GLFW_KEY_J, GLFW_KEY_K, GLFW_KEY_L, GLFW_KEY_M, GLFW_KEY_N, GLFW_KEY_O
+        ,GLFW_KEY_P, GLFW_KEY_Q, GLFW_KEY_R, GLFW_KEY_S, GLFW_KEY_T, GLFW_KEY_U                  
         ,GLFW_KEY_V                  ,GLFW_KEY_W                  ,GLFW_KEY_X                  
         ,GLFW_KEY_Y                  ,GLFW_KEY_Z                  ,GLFW_KEY_LEFT_BRACKET       
         ,GLFW_KEY_BACKSLASH          ,GLFW_KEY_RIGHT_BRACKET      ,GLFW_KEY_GRAVE_ACCENT       
@@ -88,16 +89,19 @@ namespace XE::Graphics::GL {
 
     XE::Input::MouseStatus InputManagerGLFW::GetMouseStatus() {
         // TODO: Add implementation code
+        assert(false);
         return {};
     }
 
     int InputManagerGLFW::GetControllerCount() {
         // TODO: Add implementation code
+        assert(false);
         return 0;
     }
         
     XE::Input::ControllerStatus InputManagerGLFW::GetControllerStatus(const int index) {
         // TODO: Add implementation code
+        assert(false);
         assert(index == 0);
         return {};
     }
