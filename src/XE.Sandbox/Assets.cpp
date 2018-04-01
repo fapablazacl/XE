@@ -23,7 +23,7 @@ void main() {
     )";
 
     const char* Assets::fragmentShader = R"(
-#version 430
+#version 420
 
 in vec4 fragColor;
 out vec4 finalColor;
@@ -34,20 +34,18 @@ void main() {
 )";
 
     std::vector<XE::Math::Vector3f> Assets::coordData = {
-        { 0.0f,  0.5f, 0.0f},
-        { 0.0f,  0.0f, 0.0f},
-        { 0.5f, -0.5f, 0.0f},
-        { 0.0f,  0.0f, 0.0f},
-        {-0.5f, -0.5f, 0.0f}
+        {-0.5f,  0.5f, 0.0f},
+        {0.5f,  0.5f, 0.0f},
+        {-0.5f,  -0.5f, 0.0f},
+        {0.5f,  -0.5f, 0.0f},
     };
 
     std::vector<XE::Math::Vector4f> Assets::colorData = {
-        {1.0f, 0.0f, 0.0f, 1.0f},
-        {0.0f, 0.0f, 0.0f, 0.0f},
-        {0.0f, 1.0f, 0.0f, 1.0f},
-        {0.0f, 0.0f, 0.0f, 0.0f},
+        {0.0f, 0.0f, 1.0f, 1.0f},
+        {0.25f, 0.25f, 0.5f, 1.0f},
+        {0.1f, 0.25f, 0.65f, 1.0f},
         {0.0f, 0.0f, 1.0f, 1.0f}
     };
 
-    std::vector<int> Assets::indexData = {0, 2, 4};
+    std::vector<int> Assets::indexData = {0, 1, 2, 3};
 }

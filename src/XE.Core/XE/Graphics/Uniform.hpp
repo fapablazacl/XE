@@ -3,6 +3,7 @@
 #define __XE_GRAPHICS_UNIFORM_HPP__
 
 #include <vector>
+#include <string>
 #include <XE/DataType.hpp>
 
 namespace XE::Graphics {

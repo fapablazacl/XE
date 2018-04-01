@@ -132,7 +132,7 @@ int main(int argc, char **argv) {
             graphicsDevice->ApplyUniform(matrixLayout, 3, (const std::byte*)&matrices);
 
             XE::Graphics::SubsetEnvelope envelope = {
-                nullptr, XE::Graphics::PrimitiveType::TriangleList, 0, 3
+                nullptr, XE::Graphics::PrimitiveType::TriangleStrip, 0, 4
             };
 
             graphicsDevice->Draw(subset.get(), &envelope, 1);
