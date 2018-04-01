@@ -15,8 +15,6 @@ namespace XE::Graphics::GL {
 
         ::glBindTexture(GL_TEXTURE_2D, m_id);
         ::glTexImage2D(GL_TEXTURE_2D, 0, internalFormatGL, m_size.X, m_size.Y, 0, formatGL, typeGL, sourceData);
-        ::glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-        ::glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
         ::glBindTexture(GL_TEXTURE_2D, 0);
     }
 

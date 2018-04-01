@@ -9,7 +9,6 @@
 #include <XE/Input/InputManager.hpp>
 #include <XE/Input/DeviceStatus.hpp>
 #include <XE/Input/InputCode.hpp>
-#include <XE/Graphics/Uniform.hpp>
 #include <XE/Graphics/GL/GraphicsDeviceGL.hpp>
 #include <XE/Graphics/GL/ProgramGL.hpp>
 #include <XE/Graphics/GL/BufferGL.hpp>
@@ -90,6 +89,8 @@ int main(int argc, char **argv) {
 
         float angle = 0.0f;
 
+        XE::Graphics::Material material;
+
         while (true) {
             inputManager->Poll();
             
@@ -127,6 +128,7 @@ int main(int argc, char **argv) {
                 XE::Math::Matrix4f::Identity(),
             };
 
+            graphicsDevice->SetMaterial(&material);
             graphicsDevice->ApplyUniform(matrixLayout, 3, (const std::byte*)&matrices);
 
             XE::Graphics::SubsetEnvelope envelope = {

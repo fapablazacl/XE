@@ -18,7 +18,9 @@ namespace XE::Graphics {
     enum class DepthFunc;
     enum class PolygonMode;
     enum class FrontFaceOrder;
-    enum class BlendParam ;
+    enum class BlendParam;
+    enum class TextureFilter;
+    enum class TextureWrap;
 }
 
 namespace XE::Graphics::GL {
@@ -31,6 +33,8 @@ namespace XE::Graphics::GL {
     extern GLenum ConvertToGL(const PolygonMode mode);
     extern GLenum ConvertToGL(const FrontFaceOrder order);
     extern GLenum ConvertToGL(const BlendParam param);
+    extern GLenum ConvertToGL(const TextureFilter filter);
+    extern GLenum ConvertToGL(const TextureWrap wrap);
 }
 
 #endif 

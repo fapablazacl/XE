@@ -7,5 +7,7 @@
 #include <XE/Graphics/BufferDescriptor.hpp>
 #include <XE/Graphics/Program.hpp>
 #include <XE/Graphics/Shader.hpp>
+#include <XE/Graphics/Uniform.hpp>
+#include <XE/Graphics/Material.hpp>
 
 #endif

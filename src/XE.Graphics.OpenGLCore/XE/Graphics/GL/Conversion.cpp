@@ -131,4 +131,20 @@ namespace XE::Graphics::GL {
         default:    return 0;
         }
     }
+
+    GLenum ConvertToGL(const TextureFilter filter) {
+        switch (filter) {
+        case TextureFilter::Linear: return GL_LINEAR;
+        case TextureFilter::Nearest: return GL_NEAREST;
+        default: return 0;
+        }
+    }
+
+    GLenum ConvertToGL(const TextureWrap wrap) {
+        switch (wrap) {
+        case TextureWrap::Clamp: return GL_CLAMP_TO_BORDER;
+        case TextureWrap::Repeat: return GL_REPEAT;
+        default: return 0;
+        }
+    }
 }

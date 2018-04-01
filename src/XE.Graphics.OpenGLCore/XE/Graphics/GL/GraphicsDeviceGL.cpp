@@ -108,7 +108,7 @@ namespace XE::Graphics::GL {
                 ::glDrawArrays(primitiveGL, env.VertexStart, env.VertexCount);
             }
         } else {
-            GLenum indexTypeGL = ConvertToGL(descriptor.indexType);
+            const GLenum indexTypeGL = ConvertToGL(descriptor.indexType);
 
             for (int i=0; i<envelopeCount; i++) {
                 const SubsetEnvelope &env = envelopes[i];
@@ -158,42 +158,42 @@ namespace XE::Graphics::GL {
 
         // depth buffer configuration
         if (rs.depthTest) {
-            glEnable(GL_DEPTH_TEST);
+            ::glEnable(GL_DEPTH_TEST);
         } else {
-            glDisable(GL_DEPTH_TEST);
+            ::glDisable(GL_DEPTH_TEST);
         }
 
         const GLenum depthFuncGL = ConvertToGL(rs.depthFunc);
-        glDepthFunc(depthFuncGL);
+        ::glDepthFunc(depthFuncGL);
 
         // polygon mode
         const GLenum fillModeGL = ConvertToGL(rs.polygonMode);
-        glPolygonMode(GL_FRONT_AND_BACK, fillModeGL);
+        ::glPolygonMode(GL_FRONT_AND_BACK, fillModeGL);
 
         // front face definition
         const GLenum faceGL = ConvertToGL(rs.frontFace);
-        glFrontFace(faceGL);
+        ::glFrontFace(faceGL);
 
         // back face culling
         if (rs.cullBackFace) {
-            glEnable(GL_CULL_FACE);
+            ::glEnable(GL_CULL_FACE);
         } else {
-            glDisable(GL_CULL_FACE);
+            ::glDisable(GL_CULL_FACE);
         }
 
         // point and line sizing
-        glPointSize(rs.pointSize);
-        glLineWidth(rs.lineWidth);
+        ::glPointSize(rs.pointSize);
+        ::glLineWidth(rs.lineWidth);
 
         // blending
         if (rs.blendEnable) {
-            glEnable(GL_BLEND);
+            ::glEnable(GL_BLEND);
 
             const GLenum sfactorGL = ConvertToGL(rs.blendSource);
             const GLenum dfactorGL = ConvertToGL(rs.blendDestination);
             ::glBlendFunc(sfactorGL, sfactorGL);
         } else {
-            glDisable(GL_BLEND);
+            ::glDisable(GL_BLEND);
         }
 
         // texture layers
@@ -206,9 +206,15 @@ namespace XE::Graphics::GL {
 
             // FIXME: This will cause segfaults if the real implementation isn't derived from the Texture/TextureBaseGL family
             auto textureBaseGL = reinterpret_cast<const TextureBaseGL*>(layer.texture);
-
+            auto target = textureBaseGL->GetTarget();
+            
             ::glActiveTexture(GL_TEXTURE0 + i);
-            ::glBindTexture(textureBaseGL->GetTarget(), textureBaseGL->GetID());
+            ::glBindTexture(target, textureBaseGL->GetID());
+            ::glTexParameteri(target, GL_TEXTURE_MAG_FILTER, ConvertToGL(layer.minFilter));
+            ::glTexParameteri(target, GL_TEXTURE_MIN_FILTER, ConvertToGL(layer.magFilter));
+            ::glTexParameteri(target, GL_TEXTURE_WRAP_S, ConvertToGL(layer.wrapS));
+            ::glTexParameteri(target, GL_TEXTURE_WRAP_T, ConvertToGL(layer.wrapT));
+            ::glTexParameteri(target, GL_TEXTURE_WRAP_R, ConvertToGL(layer.wrapR));
         }
     }
 
@@ -226,17 +232,17 @@ namespace XE::Graphics::GL {
 
         // depth buffer configuration
         if (rs.depthTest) {
-            glDisable(GL_DEPTH_TEST);
+            ::glDisable(GL_DEPTH_TEST);
         }
 
         // back face culling
         if (rs.cullBackFace) {
-            glDisable(GL_CULL_FACE);
+            ::glDisable(GL_CULL_FACE);
         }
 
         // blending
         if (rs.blendEnable) {
-            glDisable(GL_BLEND);
+            ::glDisable(GL_BLEND);
         }
 
         // texture layers
@@ -254,7 +260,7 @@ namespace XE::Graphics::GL {
             ::glBindTexture(textureBaseGL->GetTarget(), 0);
         }
 
-        glActiveTexture(GL_TEXTURE0);
+        ::glActiveTexture(GL_TEXTURE0);
     }
 
     void GraphicsDeviceGL::SetMaterial(const Material *material) {
@@ -376,28 +382,28 @@ namespace XE::Graphics::GL {
             switch (current->Type) {
             case DataType::Int32:
                 switch (current->Size) {
-                    case 1: glUniform1iv(location, current->Count, (const GLint*)&data[offset]); break;
-                    case 2: glUniform2iv(location, current->Count, (const GLint*)&data[offset]); break;
-                    case 3: glUniform3iv(location, current->Count, (const GLint*)&data[offset]); break;
-                    case 4: glUniform4iv(location, current->Count, (const GLint*)&data[offset]); break;
+                    case 1: ::glUniform1iv(location, current->Count, (const GLint*)&data[offset]); break;
+                    case 2: ::glUniform2iv(location, current->Count, (const GLint*)&data[offset]); break;
+                    case 3: ::glUniform3iv(location, current->Count, (const GLint*)&data[offset]); break;
+                    case 4: ::glUniform4iv(location, current->Count, (const GLint*)&data[offset]); break;
                 }
                 break;
             
             case DataType::Float32:
                 switch (current->Size) {
-                    case 1: glUniform1fv(location, current->Count, (const GLfloat*)&data[offset]); break;
-                    case 2: glUniform2fv(location, current->Count, (const GLfloat*)&data[offset]); break;
-                    case 3: glUniform3fv(location, current->Count, (const GLfloat*)&data[offset]); break;
-                    case 4: glUniform4fv(location, current->Count, (const GLfloat*)&data[offset]); break;
+                    case 1: ::glUniform1fv(location, current->Count, (const GLfloat*)&data[offset]); break;
+                    case 2: ::glUniform2fv(location, current->Count, (const GLfloat*)&data[offset]); break;
+                    case 3: ::glUniform3fv(location, current->Count, (const GLfloat*)&data[offset]); break;
+                    case 4: ::glUniform4fv(location, current->Count, (const GLfloat*)&data[offset]); break;
                 }
                 break;
 
             case DataType::UInt32:
                 switch (current->Size) {
-                    case 1: glUniform1uiv(location, current->Count, (const GLuint*)&data[offset]); break;
-                    case 2: glUniform2uiv(location, current->Count, (const GLuint*)&data[offset]); break;
-                    case 3: glUniform3uiv(location, current->Count, (const GLuint*)&data[offset]); break;
-                    case 4: glUniform4uiv(location, current->Count, (const GLuint*)&data[offset]); break;
+                    case 1: ::glUniform1uiv(location, current->Count, (const GLuint*)&data[offset]); break;
+                    case 2: ::glUniform2uiv(location, current->Count, (const GLuint*)&data[offset]); break;
+                    case 3: ::glUniform3uiv(location, current->Count, (const GLuint*)&data[offset]); break;
+                    case 4: ::glUniform4uiv(location, current->Count, (const GLuint*)&data[offset]); break;
                 }
                 break;
 

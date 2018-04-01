@@ -100,7 +100,7 @@ namespace XE::Graphics {
         ~Material();
 
         std::array<MaterialLayer, 8> layers;
-        int layerCount = 1;
+        int layerCount = 0;
         MaterialRenderState renderState;
     };
 }
