@@ -142,13 +142,7 @@ namespace XE::Graphics::GL {
         ::glfwSwapBuffers(m_window);
     }
 
-    void GraphicsDeviceGL::SetMaterial(const Material *material) {
-        if (m_material == material) {
-            return;
-        }
-
-        m_material = material;
-
+    void GraphicsDeviceGL::PreRenderMaterial(const Material *material) {
         const auto &rs = material->renderState;
 
         // clip distances
@@ -203,8 +197,51 @@ namespace XE::Graphics::GL {
         }
 
         // texture layers
-        for (int i=0; i<m_material->layerCount; i++) {
-            const auto &layer = m_material->layers[i];
+        for (int i=0; i<material->layerCount; i++) {
+            const auto &layer = material->layers[i];
+
+            if (!layer.texture) {
+                continue;
+            }
+
+            // FIXME: This will cause segfaults if the real implementation isn't derived from the Texture/TextureBaseGL family
+            auto textureBaseGL = reinterpret_cast<const TextureBaseGL*>(layer.texture);
+
+            ::glActiveTexture(GL_TEXTURE0 + i);
+            ::glBindTexture(textureBaseGL->GetTarget(), textureBaseGL->GetID());
+        }
+    }
+
+    void GraphicsDeviceGL::PostRenderMaterial(const Material *material) {
+        const auto &rs = material->renderState;
+
+        // clip distances
+        for (int i=0; i<rs.clipDistanceCount; i++) {
+            const GLenum clipDistanceGL = GL_CLIP_DISTANCE0 + i;
+
+            if (rs.clipDistances[i]) {
+                ::glDisable(clipDistanceGL);
+            }
+        }
+
+        // depth buffer configuration
+        if (rs.depthTest) {
+            glDisable(GL_DEPTH_TEST);
+        }
+
+        // back face culling
+        if (rs.cullBackFace) {
+            glDisable(GL_CULL_FACE);
+        }
+
+        // blending
+        if (rs.blendEnable) {
+            glDisable(GL_BLEND);
+        }
+
+        // texture layers
+        for (int i=0; i<material->layerCount; i++) {
+            const auto &layer = material->layers[i];
 
             if (!layer.texture) {
                 continue;
@@ -214,8 +251,24 @@ namespace XE::Graphics::GL {
             auto textureBaseGL = reinterpret_cast<const TextureBaseGL*>(layer.texture);
 
             ::glActiveTexture(GL_TEXTURE0 + i);
-            ::glBindTexture(textureBaseGL->GetTarget(), textureBaseGL->GetID());
+            ::glBindTexture(textureBaseGL->GetTarget(), 0);
         }
+
+        glActiveTexture(GL_TEXTURE0);
+    }
+
+    void GraphicsDeviceGL::SetMaterial(const Material *material) {
+        if (m_material == material) {
+            return;
+        }
+
+        if (m_material) {
+            this->PostRenderMaterial(m_material);
+        }
+
+        this->PreRenderMaterial(material);
+
+        m_material = material;
     }
 
     void GraphicsDeviceGL::SetProgram(const Program *program) {

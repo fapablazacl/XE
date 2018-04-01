@@ -59,6 +59,11 @@ namespace XE::Graphics::GL {
         virtual void EndFrame() override;
 
     private:
+        void PreRenderMaterial(const Material *material);
+
+        void PostRenderMaterial(const Material *material);
+
+    private:
         GLFWwindow *m_window = nullptr;
         std::unique_ptr<XE::Input::InputManager> m_inputManager;
         const ProgramGL *m_program = nullptr;
