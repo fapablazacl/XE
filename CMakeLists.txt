@@ -44,8 +44,8 @@ if (XE_PLUGIN_OPENGLCORE)
 	add_subdirectory ("dep/glfw")
 	include_directories ("dep/glfw/include")
 
-    add_subdirectory ("src/XE.OpenGLCore")
-    include_directories ("src/XE.OpenGLCore")
+    add_subdirectory ("src/XE.Graphics.OpenGLCore")
+    include_directories ("src/XE.Graphics.OpenGLCore")
 endif ()
 
 if (XE_PLUGIN_VULKAN)
