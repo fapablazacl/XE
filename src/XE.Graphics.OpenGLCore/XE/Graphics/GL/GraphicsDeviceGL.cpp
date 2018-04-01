@@ -5,6 +5,7 @@
 #include "BufferGL.hpp"
 #include "SubsetGL.hpp"
 #include "Texture2DGL.hpp"
+#include "Texture2DArrayGL.hpp"
 #include "Texture3DGL.hpp"
 #include "ProgramGL.hpp"
 #include "InputManagerGLFW.hpp"
@@ -82,8 +83,8 @@ namespace XE::Graphics::GL {
         return std::make_unique<Texture3DGL>(format, size, sourceFormat, sourceDataType, sourceData);
     }
 
-    std::unique_ptr<Texture2DArray> GraphicsDeviceGL::CreateTexture2DArray(const PixelFormat format, const XE::Math::Vector2i &size, const int count, const PixelFormat sourceFormat, const DataType sourceDataType, const void **sourceData) {
-        return std::unique_ptr<Texture2DArray>();
+    std::unique_ptr<Texture2DArray> GraphicsDeviceGL::CreateTexture2DArray(const PixelFormat format, const XE::Math::Vector2i &size, const int count) {
+        return std::make_unique<Texture2DArrayGL>(format, size, count);
     }
         
     std::unique_ptr<TextureCubeMap> GraphicsDeviceGL::CreateTextureCubeMap(const PixelFormat format, const XE::Math::Vector2i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void **sourceData) {
