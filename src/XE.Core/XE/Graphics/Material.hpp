@@ -7,7 +7,6 @@
 #include <XE/Predef.hpp>
 
 namespace XE::Graphics {
-    class Program;
     class Texture;
 
     enum class TextureFilter {
@@ -29,44 +28,80 @@ namespace XE::Graphics {
         TextureWrap wrapR = TextureWrap::Repeat;
     };
 
+    /**
+     * @brirf Fill mode for polygon
+     */
     enum class PolygonMode {
         Point,
         Line,
-        Triangle
+        Fill
     };
 
+    enum class DepthFunc {
+        Never,
+        Less,
+        Equal,
+        LesserEqual,
+        Greater,
+        NotEqual,
+        GreaterEqual,
+        Always
+    };
+
+    enum class FrontFaceOrder {
+        Clockwise,
+        CounterClockwise
+    };
+
+    enum class BlendParam {
+        Zero, 
+        One, 
+        SourceColor,
+        OneMinusSourceColor,
+        DestinationColor,
+        OneMinusDestinationColor,
+        SourceAlpha,
+        OneMinusSourceAlpha,
+        DestinationAlpha,
+        OneMinusDestinationAlpha,
+        ConstantColor,
+        OneMinusConstantColor,
+        ConstantAlpha,
+        OneMinusConstantAlpha
+    };
+
+    /**
+     * @brief Graphics Device current render states
+     */
     struct MaterialRenderState {
-        bool depthTest = true;
+        bool depthTest = false;
         bool stencilTest = false;
+        bool cullBackFace = false;
+        bool blendEnable = false;
 
-        PolygonMode polygonMode = PolygonMode::Triangle;
+        BlendParam blendSource;
+        BlendParam blendDestination;
+
+        float pointSize = 1.0f;
+        float lineWidth = 1.0f;
+        DepthFunc depthFunc = DepthFunc::LesserEqual;
+        FrontFaceOrder frontFace = FrontFaceOrder::Clockwise;
+        PolygonMode polygonMode = PolygonMode::Fill;
+        std::array<bool, 8> clipDistances;
+        int clipDistanceCount = 0;
     };
 
+    /**
+     * @brief Describes the genric visual appearance of all the objects. For other properties, use uniforms.
+     * @note Very unstable interface.
+     */
     class Material {
     public:
-        virtual ~Material();
+        ~Material();
 
-        MaterialLayer GetLayer(const int index) const {
-            return m_layers[index];
-        }
-
-        void SetLayer(const int index, const MaterialLayer& layer) {
-            m_layers[index] = layer;
-        }
-
-        int GetLayerCount() const {
-            return 8;
-        }
-
-        void SetRenderState(const MaterialRenderState &renderState);
-
-        virtual std::byte* GetAttributePtr() const = 0;
-
-        virtual int GetAttributeSize() const = 0;
-
-    protected:
-        std::array<MaterialLayer, 8> m_layers;
-        MaterialRenderState m_renderState;
+        std::array<MaterialLayer, 8> layers;
+        int layerCount = 1;
+        MaterialRenderState renderState;
     };
 }
 

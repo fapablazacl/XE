@@ -3,7 +3,9 @@
 #include "Conversion.hpp"
 
 namespace XE::Graphics::GL {
-    Texture2DGL::Texture2DGL(const PixelFormat format, const XE::Math::Vector2i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void *sourceData) {
+    Texture2DGL::Texture2DGL(const PixelFormat format, const XE::Math::Vector2i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void *sourceData)
+            : TextureBaseGL(GL_TEXTURE_2D) {
+
         m_size = size;
         m_format = format;
 
@@ -11,7 +13,6 @@ namespace XE::Graphics::GL {
         const GLenum formatGL = ConvertToGL(sourceFormat);
         const GLenum typeGL = ConvertToGL(sourceDataType);
 
-        ::glGenTextures(1, &m_id);
         ::glBindTexture(GL_TEXTURE_2D, m_id);
         ::glTexImage2D(GL_TEXTURE_2D, 0, internalFormatGL, m_size.X, m_size.Y, 0, formatGL, typeGL, sourceData);
         ::glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -19,11 +20,7 @@ namespace XE::Graphics::GL {
         ::glBindTexture(GL_TEXTURE_2D, 0);
     }
 
-    Texture2DGL::~Texture2DGL() {
-        if (m_id) {
-            ::glDeleteTextures(1, &m_id);
-        }
-    }
+    Texture2DGL::~Texture2DGL() {}
 
     void Texture2DGL::SetData(const std::byte *surfaceData, const int mipLevel, const PixelFormat surfaceFormat, const DataType surfaceDataType, const XE::Math::Recti &area) {
         const XE::Math::Vector2i offset = area.MinEdge;

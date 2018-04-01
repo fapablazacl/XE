@@ -8,6 +8,7 @@
 #include "ProgramGL.hpp"
 #include "InputManagerGLFW.hpp"
 
+#include <XE/Graphics/Material.hpp>
 #include <XE/Graphics/Uniform.hpp>
 #include <XE/Graphics/Subset.hpp>
 #include <XE/Graphics/Texture3D.hpp>
@@ -142,7 +143,79 @@ namespace XE::Graphics::GL {
     }
 
     void GraphicsDeviceGL::SetMaterial(const Material *material) {
+        if (m_material == material) {
+            return;
+        }
 
+        m_material = material;
+
+        const auto &rs = material->renderState;
+
+        // clip distances
+        for (int i=0; i<rs.clipDistanceCount; i++) {
+            const GLenum clipDistanceGL = GL_CLIP_DISTANCE0 + i;
+
+            if (rs.clipDistances[i]) {
+                ::glEnable(clipDistanceGL);
+            } else {
+                ::glDisable(clipDistanceGL);
+            }
+        }
+
+        // depth buffer configuration
+        if (rs.depthTest) {
+            glEnable(GL_DEPTH_TEST);
+        } else {
+            glDisable(GL_DEPTH_TEST);
+        }
+
+        const GLenum depthFuncGL = ConvertToGL(rs.depthFunc);
+        glDepthFunc(depthFuncGL);
+
+        // polygon mode
+        const GLenum fillModeGL = ConvertToGL(rs.polygonMode);
+        glPolygonMode(GL_FRONT_AND_BACK, fillModeGL);
+
+        // front face definition
+        const GLenum faceGL = ConvertToGL(rs.frontFace);
+        glFrontFace(faceGL);
+
+        // back face culling
+        if (rs.cullBackFace) {
+            glEnable(GL_CULL_FACE);
+        } else {
+            glDisable(GL_CULL_FACE);
+        }
+
+        // point and line sizing
+        glPointSize(rs.pointSize);
+        glLineWidth(rs.lineWidth);
+
+        // blending
+        if (rs.blendEnable) {
+            glEnable(GL_BLEND);
+
+            const GLenum sfactorGL = ConvertToGL(rs.blendSource);
+            const GLenum dfactorGL = ConvertToGL(rs.blendDestination);
+            ::glBlendFunc(sfactorGL, sfactorGL);
+        } else {
+            glDisable(GL_BLEND);
+        }
+
+        // texture layers
+        for (int i=0; i<m_material->layerCount; i++) {
+            const auto &layer = m_material->layers[i];
+
+            if (!layer.texture) {
+                continue;
+            }
+
+            // FIXME: This will cause segfaults if the real implementation isn't derived from Texture/TextureBaseGL family
+            auto textureBaseGL = reinterpret_cast<const TextureBaseGL*>(layer.texture);
+
+            ::glActiveTexture(GL_TEXTURE0 + i);
+            ::glBindTexture(textureBaseGL->GetTarget(), textureBaseGL->GetID());
+        }
     }
 
     void GraphicsDeviceGL::SetProgram(const Program *program) {
@@ -160,6 +233,8 @@ namespace XE::Graphics::GL {
     }
 
     void GraphicsDeviceGL::ApplyUniform(const UniformMatrix *uniformMatrix, const int count, const std::byte *data) {
+        // TODO: Add support for matrix transposition
+
         assert(m_program);
         assert(uniformMatrix);
         assert(count > 0);
@@ -282,6 +357,6 @@ namespace XE::Graphics::GL {
     }
 
     const Material* GraphicsDeviceGL::GetMaterial() const {
-        return nullptr;
+        return m_material;
     }
 }

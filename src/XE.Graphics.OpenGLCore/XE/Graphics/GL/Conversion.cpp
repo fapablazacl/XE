@@ -5,6 +5,7 @@
 #include <XE/Graphics/PixelFormat.hpp>
 #include <XE/Graphics/BufferDescriptor.hpp>
 #include <XE/Graphics/Subset.hpp>
+#include <XE/Graphics/Material.hpp>
 
 namespace XE::Graphics::GL {
     GLenum ConvertToGL(const DataType type) {
@@ -77,6 +78,57 @@ namespace XE::Graphics::GL {
             case PrimitiveType::TriangleList: return GL_TRIANGLES;
             case PrimitiveType::TriangleFan: return GL_TRIANGLE_FAN;
             default: return 0;
+        }
+    }
+
+    GLenum ConvertToGL(const DepthFunc func) {
+        switch (func) {
+            case DepthFunc::Never:          return GL_NEVER;
+            case DepthFunc::Less:           return GL_LESS;
+            case DepthFunc::Equal:          return GL_EQUAL;
+            case DepthFunc::LesserEqual:    return GL_LEQUAL;
+            case DepthFunc::Greater:        return GL_GREATER;
+            case DepthFunc::NotEqual:       return GL_NOTEQUAL;
+            case DepthFunc::GreaterEqual:   return GL_GEQUAL;
+            case DepthFunc::Always:         return GL_ALWAYS;
+            default: return 0;
+        }
+    }
+
+    GLenum ConvertToGL(const PolygonMode mode) {
+        switch (mode) {
+            case PolygonMode::Fill: return GL_FILL;
+            case PolygonMode::Line: return GL_LINE;
+            case PolygonMode::Point: return GL_POINT;
+            default: return 0;
+        }
+    }
+
+    GLenum ConvertToGL(const FrontFaceOrder order) {
+        switch (order) {
+        case FrontFaceOrder::CounterClockwise: return GL_CCW;
+        case FrontFaceOrder::Clockwise: return GL_CW;
+        default: return 0;
+        }
+    }
+
+    GLenum ConvertToGL(const BlendParam param) {
+        switch (param) {
+        case BlendParam::Zero: return GL_ZERO;
+        case BlendParam::One: return GL_ONE;
+        case BlendParam::SourceColor: return GL_SRC_COLOR;
+        case BlendParam::OneMinusSourceColor: return GL_ONE_MINUS_SRC_COLOR;
+        case BlendParam::DestinationColor: return GL_DST_COLOR;
+        case BlendParam::OneMinusDestinationColor: return GL_ONE_MINUS_DST_COLOR;
+        case BlendParam::SourceAlpha: return GL_SRC_ALPHA;
+        case BlendParam::OneMinusSourceAlpha: return GL_ONE_MINUS_SRC_ALPHA;
+        case BlendParam::DestinationAlpha: return GL_DST_ALPHA;
+        case BlendParam::OneMinusDestinationAlpha: return GL_ONE_MINUS_DST_ALPHA;
+        case BlendParam::ConstantColor: return GL_CONSTANT_COLOR;
+        case BlendParam::OneMinusConstantColor: return GL_ONE_MINUS_CONSTANT_COLOR;
+        case BlendParam::ConstantAlpha: return GL_CONSTANT_ALPHA;
+        case BlendParam::OneMinusConstantAlpha: return GL_ONE_MINUS_CONSTANT_ALPHA;
+        default:    return 0;
         }
     }
 }

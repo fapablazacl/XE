@@ -8,6 +8,8 @@ set (sources_xe_graphics_glcore
 	"${source_base}/GraphicsDeviceGL.hpp"
 	"${source_base}/GraphicsDeviceGL.cpp"
 	
+	"${source_base}/TextureBaseGL.hpp"
+	"${source_base}/TextureBaseGL.cpp"
 	"${source_base}/Texture2DGL.hpp"
 	"${source_base}/Texture2DGL.cpp"
 	"${source_base}/Texture2DArrayGL.hpp"
@@ -30,9 +32,6 @@ set (sources_xe_graphics_glcore
 	
 	"${source_base}/SubsetGL.hpp"
 	"${source_base}/SubsetGL.cpp"
-
-	"${source_base}/TextureGLBase.hpp"
-	"${source_base}/TextureGLBase.cpp"
 
 	"${source_base}/Conversion.hpp"
 	"${source_base}/Conversion.cpp"

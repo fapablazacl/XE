@@ -62,6 +62,7 @@ namespace XE::Graphics::GL {
         GLFWwindow *m_window = nullptr;
         std::unique_ptr<XE::Input::InputManager> m_inputManager;
         const ProgramGL *m_program = nullptr;
+        const Material *m_material = nullptr;
     };
 }
 

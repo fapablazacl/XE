@@ -3,10 +3,11 @@
 #define __XE_GRAPHICS_GL_TEXTURE2DGL_HPP__
 
 #include <XE/Graphics/Texture2D.hpp>
-#include <glad/glad.h>
+
+#include "TextureBaseGL.hpp"
 
 namespace XE::Graphics::GL {
-    class Texture2DGL : public Texture2D {
+    class Texture2DGL : public Texture2D, public TextureBaseGL {
     public:
         Texture2DGL(const PixelFormat format, const XE::Math::Vector2i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void *sourceData);
 
@@ -25,19 +26,7 @@ namespace XE::Graphics::GL {
 
         virtual void GetData(std::byte *surfaceData, const int mipLevel, const PixelFormat surfaceFormat, const DataType surfaceDataType) const override;
 
-    public:
-        GLuint GetID() const {
-            return m_id;
-        }
-
-        GLenum GetTarget() const {
-            return m_target;
-        }
-
     private:
-        GLuint m_id;
-        GLenum m_target;
-
         PixelFormat m_format;
         XE::Math::Vector2i m_size;
     };

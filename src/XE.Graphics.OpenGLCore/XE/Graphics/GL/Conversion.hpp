@@ -15,6 +15,10 @@ namespace XE::Graphics {
     enum class BufferUsage;
     enum class BufferAccess;
     enum class PrimitiveType;
+    enum class DepthFunc;
+    enum class PolygonMode;
+    enum class FrontFaceOrder;
+    enum class BlendParam ;
 }
 
 namespace XE::Graphics::GL {
@@ -23,6 +27,10 @@ namespace XE::Graphics::GL {
     extern GLenum ConvertToGL(const BufferType type);
     extern GLenum ConvertToGL(const BufferUsage usage, const BufferAccess access);
     extern GLenum ConvertToGL(const PrimitiveType type);
+    extern GLenum ConvertToGL(const DepthFunc func);
+    extern GLenum ConvertToGL(const PolygonMode mode);
+    extern GLenum ConvertToGL(const FrontFaceOrder order);
+    extern GLenum ConvertToGL(const BlendParam param);
 }
 
 #endif 
