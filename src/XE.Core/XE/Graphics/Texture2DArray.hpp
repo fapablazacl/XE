@@ -13,7 +13,7 @@ namespace XE::Graphics {
     class Texture2DArray : public Texture {
 
     public:
-        virtual TextureType Texture2DArray::GetType() const override;
+        virtual TextureType GetType() const override;
 
     public:
         virtual ~Texture2DArray();
