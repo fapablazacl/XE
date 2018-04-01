@@ -73,6 +73,7 @@ namespace XE::Graphics {
          * @param buffers The buffers that have data
          * @param bufferMapping The mapping between the buffers and the vertex attributes
          * @param indexBuffer The subset geometry index buffer
+         * @todo Add support for packed vertex structures
          */
         virtual std::unique_ptr<Subset> CreateSubset(
             SubsetDescriptor& desc, 

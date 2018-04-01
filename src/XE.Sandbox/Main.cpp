@@ -119,8 +119,7 @@ int main(int argc, char **argv) {
                 },
             };
 
-            XE::Math::Matrix4f matrices[] = 
-            {
+            XE::Math::Matrix4f matrices[] = {
                 XE::Math::Matrix4f::RotateX(XE::Math::Radians(angle)) * 
                 XE::Math::Matrix4f::RotateY(XE::Math::Radians(angle)) * 
                 XE::Math::Matrix4f::RotateZ(XE::Math::Radians(angle)),
