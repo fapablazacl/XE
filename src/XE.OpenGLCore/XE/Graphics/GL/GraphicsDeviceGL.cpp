@@ -125,9 +125,15 @@ namespace XE::Graphics::GL {
     }
         
     void GraphicsDeviceGL::BeginFrame(const ClearFlags flags, const XE::Math::Vector4f &color, const float depth, const int stencil) {
-        ::glfwPollEvents();
-        ::glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
-        ::glClear(GL_COLOR_BUFFER_BIT);
+        const GLenum clearFlagsGL =
+            (flags & ClearFlags::Color   ? GL_COLOR_BUFFER_BIT   : 0) | 
+            (flags & ClearFlags::Depth   ? GL_DEPTH_BUFFER_BIT   : 0) | 
+            (flags & ClearFlags::Stencil ? GL_STENCIL_BUFFER_BIT : 0) ;
+
+        ::glClearColor(color.X, color.Y, color.Z, color.W);
+        ::glClearDepth(static_cast<GLdouble>(depth));
+        ::glClearStencil(stencil);
+        ::glClear(clearFlagsGL);
     }
         
     void GraphicsDeviceGL::EndFrame() {

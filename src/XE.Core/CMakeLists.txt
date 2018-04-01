@@ -19,9 +19,12 @@ set (src_xe
 	# these will be future C++20 Modules
 	"XE.hpp"
 	"XE/Graphics.hpp"
+	"XE/Math.hpp"
 )
 
 set (src_xe_math
+	"XE/Math/Util.hpp"
+    "XE/Math/Util.cpp"
     "XE/Math/Vector.hpp"
     "XE/Math/Vector.cpp"
 	"XE/Math/Matrix.hpp"

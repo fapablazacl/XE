@@ -5,7 +5,7 @@
 #include <map>
 #include <XE.hpp>
 #include <XE/Graphics.hpp>
-#include <XE/Math/Matrix.hpp>
+#include <XE/Math.hpp>
 #include <XE/Input/InputManager.hpp>
 #include <XE/Input/DeviceStatus.hpp>
 #include <XE/Input/InputCode.hpp>
@@ -87,6 +87,9 @@ int main(int argc, char **argv) {
         auto subset = graphicsDevice->CreateSubset(subsetDescriptor, std::move(buffers), bufferMapping, std::move(indexBuffer));
 
         std::cout << "Entering main loop" << std::endl;
+
+        float angle = 0.0f;
+
         while (true) {
             inputManager->Poll();
             
@@ -96,19 +99,36 @@ int main(int argc, char **argv) {
                 break;
             }
 
+            angle += 0.333333f;
+
             graphicsDevice->BeginFrame(XE::Graphics::ClearFlags::All, {0.2f, 0.2f, 0.2f, 1.0f}, 0.0f, 0);
             graphicsDevice->SetProgram(program.get());
 
-            XE::Math::Matrix4f mvp = XE::Math::Matrix4f::Identity();
+            XE::Graphics::UniformMatrix matrixLayout[] = {
+                {
+                    "m_model", XE::DataType::Float32, 
+                    4, 4, 1
+                }, 
+                {
+                    "m_view", XE::DataType::Float32, 
+                    4, 4, 1
+                }, 
+                {
+                    "m_proj", XE::DataType::Float32, 
+                    4, 4, 1
+                },
+            };
 
-            XE::Graphics::UniformMatrix uniformMatrix;
-            uniformMatrix.Columns = 4;
-            uniformMatrix.Rows = 4;
-            uniformMatrix.Count = 1;
-            uniformMatrix.Name = "m_mvp";
-            uniformMatrix.Type = XE::DataType::Float32;
+            XE::Math::Matrix4f matrices[] = 
+            {
+                XE::Math::Matrix4f::RotateX(XE::Math::Radians(angle)) * 
+                XE::Math::Matrix4f::RotateY(XE::Math::Radians(angle)) * 
+                XE::Math::Matrix4f::RotateZ(XE::Math::Radians(angle)),
+                XE::Math::Matrix4f::Identity(),
+                XE::Math::Matrix4f::Identity(),
+            };
 
-            graphicsDevice->ApplyUniform(&uniformMatrix, 1, (const std::byte*)&mvp.Data[0]);
+            graphicsDevice->ApplyUniform(matrixLayout, 3, (const std::byte*)&matrices);
 
             XE::Graphics::SubsetEnvelope envelope = {
                 nullptr, XE::Graphics::PrimitiveType::TriangleList, 0, 3
