@@ -18,7 +18,7 @@ namespace XE::Graphics {
     };
 
     /**
-     * @brief A variable visible to all the stages in a ShaderProgram
+     * @brief A matrix visible to all the stages in a ShaderProgram
      */
     struct UniformMatrix {
         std::string Name;

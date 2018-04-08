@@ -9,5 +9,6 @@
 #include <XE/Graphics/Shader.hpp>
 #include <XE/Graphics/Uniform.hpp>
 #include <XE/Graphics/Material.hpp>
+#include <XE/Graphics/GraphicsDevice.hpp>
 
 #endif
