@@ -14,7 +14,7 @@ int main(int argc, char **argv) {
             args.push_back(argv[i]);
         }
 
-        auto app = XE::Sandbox::Application::create(args);
+        auto app = XE::Sandbox::Application::Create(args);
 
         app->Initialize();
 

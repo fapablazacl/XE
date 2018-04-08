@@ -27,70 +27,8 @@ namespace XE::Sandbox {
             m_inputManager = m_graphicsDevice->GetInputManager();
 
             std::cout << "Loading assets ..." << std::endl;
-
-            // setup program shader
-            const XE::Graphics::ProgramDescriptor programDescriptor = {
-                {
-                    {XE::Graphics::ShaderType::Vertex, std::string{XE::Sandbox::Assets::vertexShader}},
-                    {XE::Graphics::ShaderType::Fragment, std::string{XE::Sandbox::Assets::fragmentShader}}
-                }
-            };
-
-            m_program = m_graphicsDevice->CreateProgram(programDescriptor);
-
-            // create the vertex buffer
-            XE::Graphics::BufferDescriptor coordBufferDescriptor = {
-                XE::Graphics::BufferType::Vertex, 
-                XE::Graphics::BufferUsage::Copy, 
-                XE::Graphics::BufferAccess::Static, 
-                (int)XE::Sandbox::Assets::coordData.size() * (int)sizeof(XE::Math::Vector3f), 
-                (const std::byte*) XE::Sandbox::Assets::coordData.data()
-            };
-
-            auto coordBuffer = m_graphicsDevice->CreateBuffer(coordBufferDescriptor);
-
-            XE::Graphics::BufferDescriptor colorBufferDescriptor = {
-                XE::Graphics::BufferType::Vertex, 
-                XE::Graphics::BufferUsage::Copy, 
-                XE::Graphics::BufferAccess::Static, 
-                (int)XE::Sandbox::Assets::colorData.size() * (int)sizeof(XE::Math::Vector4f), 
-                (const std::byte*) XE::Sandbox::Assets::colorData.data()
-            };
-
-            auto colorBuffer = m_graphicsDevice->CreateBuffer(colorBufferDescriptor);
-
-            // create the index buffer
-            XE::Graphics::BufferDescriptor indexBufferDescriptor = {
-                XE::Graphics::BufferType::Index, 
-                XE::Graphics::BufferUsage::Copy, 
-                XE::Graphics::BufferAccess::Static, 
-                (int)XE::Sandbox::Assets::indexData.size() * (int)sizeof(int), 
-                (const std::byte*) XE::Sandbox::Assets::indexData.data()
-            };
-
-            auto indexBuffer = m_graphicsDevice->CreateBuffer(indexBufferDescriptor);
-
-            // create the geometry subset
-            XE::Graphics::SubsetDescriptor subsetDescriptor;
-        
-            subsetDescriptor.attributes = {
-                {"vertCoord", XE::DataType::Float32, 3}, 
-                {"vertColor", XE::DataType::Float32, 4}
-            };
-
-            subsetDescriptor.indexType = XE::DataType::UInt32;
-
-            std::vector<std::unique_ptr<XE::Buffer>> buffers;
-            buffers.push_back(std::move(coordBuffer));
-            buffers.push_back(std::move(colorBuffer));
-
-            std::map<std::string, int> bufferMapping = {
-                {"vertCoord", 0}, {"vertColor", 1}
-            };
-
-            m_subset = m_graphicsDevice->CreateSubset(subsetDescriptor, std::move(buffers), bufferMapping, std::move(indexBuffer));
-
-            m_material = std::make_unique<XE::Graphics::Material>();
+            this->InitializeShaders();
+            this->InitializeGeometry();
         }
 
         virtual void Update() override {
@@ -146,6 +84,75 @@ namespace XE::Sandbox {
         }
 
     private:
+        void InitializeShaders() {
+            // setup program shader
+            const XE::Graphics::ProgramDescriptor programDescriptor = {
+                {
+                    {XE::Graphics::ShaderType::Vertex, std::string{XE::Sandbox::Assets::vertexShader}},
+                    {XE::Graphics::ShaderType::Fragment, std::string{XE::Sandbox::Assets::fragmentShader}}
+                }
+            };
+
+            m_program = m_graphicsDevice->CreateProgram(programDescriptor);
+        }
+
+        void InitializeGeometry() {
+            // create the vertex buffer
+            XE::Graphics::BufferDescriptor coordBufferDescriptor = {
+                XE::Graphics::BufferType::Vertex, 
+                XE::Graphics::BufferUsage::Copy, 
+                XE::Graphics::BufferAccess::Static, 
+                (int)XE::Sandbox::Assets::coordData.size() * (int)sizeof(XE::Math::Vector3f), 
+                (const std::byte*) XE::Sandbox::Assets::coordData.data()
+            };
+
+            auto coordBuffer = m_graphicsDevice->CreateBuffer(coordBufferDescriptor);
+
+            XE::Graphics::BufferDescriptor colorBufferDescriptor = {
+                XE::Graphics::BufferType::Vertex, 
+                XE::Graphics::BufferUsage::Copy, 
+                XE::Graphics::BufferAccess::Static, 
+                (int)XE::Sandbox::Assets::colorData.size() * (int)sizeof(XE::Math::Vector4f), 
+                (const std::byte*) XE::Sandbox::Assets::colorData.data()
+            };
+
+            auto colorBuffer = m_graphicsDevice->CreateBuffer(colorBufferDescriptor);
+
+            // create the index buffer
+            XE::Graphics::BufferDescriptor indexBufferDescriptor = {
+                XE::Graphics::BufferType::Index, 
+                XE::Graphics::BufferUsage::Copy, 
+                XE::Graphics::BufferAccess::Static, 
+                (int)XE::Sandbox::Assets::indexData.size() * (int)sizeof(int), 
+                (const std::byte*) XE::Sandbox::Assets::indexData.data()
+            };
+
+            auto indexBuffer = m_graphicsDevice->CreateBuffer(indexBufferDescriptor);
+
+            // create the geometry subset
+            XE::Graphics::SubsetDescriptor subsetDescriptor;
+        
+            subsetDescriptor.attributes = {
+                {"vertCoord", XE::DataType::Float32, 3}, 
+                {"vertColor", XE::DataType::Float32, 4}
+            };
+
+            subsetDescriptor.indexType = XE::DataType::UInt32;
+
+            std::vector<std::unique_ptr<XE::Buffer>> buffers;
+            buffers.push_back(std::move(coordBuffer));
+            buffers.push_back(std::move(colorBuffer));
+
+            std::map<std::string, int> bufferMapping = {
+                {"vertCoord", 0}, {"vertColor", 1}
+            };
+
+            m_subset = m_graphicsDevice->CreateSubset(subsetDescriptor, std::move(buffers), bufferMapping, std::move(indexBuffer));
+
+            m_material = std::make_unique<XE::Graphics::Material>();
+        }
+
+    private:
         std::unique_ptr<XE::Graphics::Program> m_program;
         std::unique_ptr<XE::Graphics::GraphicsDevice> m_graphicsDevice;
         std::unique_ptr<XE::Graphics::Subset> m_subset;
@@ -157,7 +164,7 @@ namespace XE::Sandbox {
         float m_angle = 0.0f;
     };
 
-    std::unique_ptr<Application> Application::create(const std::vector<std::string> &args) {
+    std::unique_ptr<Application> Application::Create(const std::vector<std::string> &args) {
         return std::make_unique<SandboxApp>(args);
     }
 }
