@@ -13,9 +13,10 @@ out vec4 fragColor;
 uniform mat4 m_model;
 uniform mat4 m_view;
 uniform mat4 m_proj;
+uniform mat4 m_mvp;
 
 void main() {
-    const mat4 m_mvp = m_proj * m_view * m_model;
+    // const mat4 m_mvp = m_proj * m_view * m_model;
 
     gl_Position = m_mvp * vec4(vertCoord, 1.0);
     fragColor = vertColor;

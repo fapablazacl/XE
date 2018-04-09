@@ -31,7 +31,7 @@ namespace XE::Sandbox {
             this->InitializeGeometry();
         }
 
-        virtual void Update() override {
+        virtual void Update(const float seconds) override {
             m_inputManager->Poll();
             
             const XE::Input::KeyboardStatus keyboardStatus = m_inputManager->GetKeyboardStatus();
@@ -40,41 +40,91 @@ namespace XE::Sandbox {
                 m_shouldClose = true;
             }
 
+            // update animation
             m_angle += 0.333333f;
+
+            // update camera position
+            const bool moveForward = keyboardStatus.GetState(XE::Input::KeyCode::KeyUp) == XE::Input::BinaryState::Press;
+            const bool moveBackward = keyboardStatus.GetState(XE::Input::KeyCode::KeyDown) == XE::Input::BinaryState::Press;
+
+            const bool turnLeft = keyboardStatus.GetState(XE::Input::KeyCode::KeyLeft) == XE::Input::BinaryState::Press;
+            const bool turnRight = keyboardStatus.GetState(XE::Input::KeyCode::KeyRight) == XE::Input::BinaryState::Press;
+
+            // camera turning
+            const auto cameraDirection = XE::Math::Normalize(m_cameraLookAt - m_cameraPosition);
+            float turnSpeed = 0.0f;
+            if (turnLeft) {
+                turnSpeed = -XE::Math::Radians(0.25f);
+            } else if (turnRight) {
+                turnSpeed = XE::Math::Radians(0.25f);
+            }
+
+            const auto cdt = XE::Math::Matrix4f::Rotate(turnSpeed, m_cameraUp) * XE::Math::Vector4f(cameraDirection, 0.0f);
+            
+            m_cameraLookAt = m_cameraPosition + XE::Math::Vector3f{cdt.X, cdt.Y, cdt.Z} * XE::Math::Magnitude(cameraDirection);
+
+            // camera movement
+            const auto cameraSpeed = 0.0025f;
+            const auto cameraDisplacement = cameraDirection * cameraSpeed * seconds;
+            const auto cameraSide = XE::Math::Normalize(XE::Math::Cross(cameraDirection, m_cameraUp));
+            
+            if (moveForward) {
+                m_cameraPosition += cameraDisplacement;
+                m_cameraLookAt += cameraDisplacement;
+            } else if (moveBackward) {
+                m_cameraPosition -= cameraDisplacement;
+                m_cameraLookAt -= cameraDisplacement;
+            }
+        }
+
+        /*
+        void RenderMatrices_() {
+            XE::Graphics::UniformMatrix matrixLayout[] = {
+                { "m_model", XE::DataType::Float32, 4, 4, 1 }, 
+                { "m_view",  XE::DataType::Float32, 4, 4, 1 }, 
+                { "m_proj",  XE::DataType::Float32, 4, 4, 1 },
+            };
+
+            const int matrixCount = 3;
+            
+            XE::Math::Matrix4f matrices[matrixCount] = {
+                XE::Math::Matrix4f::Identity(),
+                // XE::Math::Matrix4f::RotateY(XE::Math::Radians(m_angle)),
+
+                // XE::Math::Matrix4f::Identity(),
+                // XE::Math::Matrix4f::LookAt(m_cameraPosition, m_cameraLookAt, m_cameraUp),
+                XE::Math::Matrix4f::Translate(-m_cameraPosition),
+
+                // XE::Math::Matrix4f::Identity(),
+                XE::Math::Matrix4f::Perspective(m_cameraFov, 4.0f/3.0f, m_cameraZNear, m_cameraZFar),
+            };
+
+            m_graphicsDevice->ApplyUniform(matrixLayout, matrixCount, (const std::byte*)&matrices);
+        }
+        */
+        void RenderMatrices() {
+            const XE::Graphics::UniformMatrix matrixLayout = { "m_mvp", XE::DataType::Float32, 4, 4, 1 };
+
+            const XE::Math::Matrix4f modelViewProj = XE::Math::Transpose (
+                XE::Math::Matrix4f::Perspective(m_cameraFov, m_cameraAspect, m_cameraZNear, m_cameraZFar) * 
+                XE::Math::Matrix4f::LookAt(m_cameraPosition, m_cameraLookAt, m_cameraUp) * 
+                XE::Math::Matrix4f::RotateY(XE::Math::Radians(m_angle)) 
+            );
+
+            m_graphicsDevice->ApplyUniform(&matrixLayout, 1, (const std::byte*)&modelViewProj);
         }
 
         virtual void Render() override {
             m_graphicsDevice->BeginFrame(XE::Graphics::ClearFlags::All, {0.2f, 0.2f, 0.2f, 1.0f}, 0.0f, 0);
             m_graphicsDevice->SetProgram(m_program.get());
 
-            XE::Graphics::UniformMatrix matrixLayout[] = {
-                {
-                    "m_model", XE::DataType::Float32, 
-                    4, 4, 1
-                }, 
-                {
-                    "m_view", XE::DataType::Float32, 
-                    4, 4, 1
-                }, 
-                {
-                    "m_proj", XE::DataType::Float32, 
-                    4, 4, 1
-                },
-            };
-
-            XE::Math::Matrix4f matrices[] = {
-                XE::Math::Matrix4f::RotateY(XE::Math::Radians(m_angle)),
-                XE::Math::Matrix4f::Identity(),
-                XE::Math::Matrix4f::Identity(),
-            };
+            this->RenderMatrices();
 
             m_graphicsDevice->SetMaterial(m_material.get());
-            m_graphicsDevice->ApplyUniform(matrixLayout, 3, (const std::byte*)&matrices);
 
             XE::Graphics::SubsetEnvelope envelope = {
                 nullptr, XE::Graphics::PrimitiveType::TriangleStrip, 0, 3
             };
-
             m_graphicsDevice->Draw(m_subset.get(), &envelope, 1);
             m_graphicsDevice->EndFrame();
         }
@@ -162,6 +212,15 @@ namespace XE::Sandbox {
         bool m_shouldClose = false;
 
         float m_angle = 0.0f;
+
+        XE::Math::Vector3f m_cameraPosition = {0.0f, 0.0f, 5.0f};
+        XE::Math::Vector3f m_cameraLookAt = {0.0f, 0.0f, 0.0f};
+        XE::Math::Vector3f m_cameraUp = {0.0f, 1.0f, 0.0f};
+
+        float m_cameraFov = XE::Math::Radians(60.0f);
+        float m_cameraAspect = 640.0f / 480.0f;
+        float m_cameraZNear = 0.1f;
+        float m_cameraZFar = 1000.0f;
     };
 
     std::unique_ptr<Application> Application::Create(const std::vector<std::string> &args) {

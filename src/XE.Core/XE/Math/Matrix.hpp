@@ -156,6 +156,8 @@ namespace XE::Math {
 
         Matrix<T, R, C>& operator*= (const Matrix<T, R, C>& rhs);
 
+        Vector<T, R> operator* (const Vector<T, R> &v) const;
+
         inline friend Matrix<T, R, C> operator* (const T s, const Matrix<T, R, C> &m) {
             return m * s;
         }
@@ -204,16 +206,20 @@ namespace XE::Math {
             return result;
         }
         
-        void SetRowVector(const int row, const Vector<T, C> &v) {
+        Matrix<T, R, C>& SetRowVector(const int row, const Vector<T, C> &v) {
             for (int col=0; col<C; col++) {
                 this->Element[row][col] = v[col];
             }
+
+            return *this;
         }
 
-        void SetColumnVector(const int col, const Vector<T, R> &v) {
+        Matrix<T, R, C>& SetColumnVector(const int col, const Vector<T, R> &v) {
             for (int row=0; row<R; row++) {
-                this->Element[row][col] = v[col];
+                this->Element[row][col] = v[row];
             }
+
+            return *this;
         }
 
         auto SubMatrix(const int row, const int column) const {
@@ -279,7 +285,7 @@ namespace XE::Math {
         }
         
         static Matrix<T, R, C> Scale(const Vector<T, R> &scale) {
-            auto result = Matrix<T, R, C>::Zero();
+            auto result = Matrix<T, R, C>::Identity();
             
             for (int i=0; i<R; ++i) {
                 result(i, i) = scale[i];
@@ -289,7 +295,7 @@ namespace XE::Math {
         }
         
         static Matrix<T, R, C> Translate(const Vector<T, R> &displace) {
-            auto result = Matrix<T, R, C>::Zero();
+            auto result = Matrix<T, R, C>::Identity();
             
             result.SetColumnVector(C - 1, displace);
             
@@ -297,7 +303,7 @@ namespace XE::Math {
         }
 
         static Matrix<T, R, C> Translate(const Vector<T, R - 1> &displace) {
-            auto result = Matrix<T, R, C>::Zero();
+            auto result = Matrix<T, R, C>::Identity();
             
             Vector<T, R> d;
 
@@ -409,7 +415,7 @@ namespace XE::Math {
             }
         }
         
-        static auto Lookat(const Vector<T, 3> &Eye, const Vector<T, 3> &At, const Vector<T, 3> &Up) {
+        static auto LookAt(const Vector<T, 3> &Eye, const Vector<T, 3> &At, const Vector<T, 3> &Up) {
             if constexpr (C==4 && R==4) {
                 const auto forward = Normalize(At - Eye);
                 const auto side = Normalize(Cross(forward, Up));
@@ -660,8 +666,18 @@ namespace XE::Math {
         
         return *this;
     }
-}
 
+    template<typename T, int R, int C>
+    Vector<T, R> Matrix<T, R, C>::operator* (const Vector<T, R> &v) const {
+        Vector<T, R> result;
+
+        for (int col=0; col<C; col++) {
+            result[col] = XE::Math::Dot(this->GetColumnVector(col), v);
+        }
+
+        return result;
+    }
+}
 
 namespace std {
     template<typename T, int R, int C>

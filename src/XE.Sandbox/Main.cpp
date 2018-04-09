@@ -19,7 +19,7 @@ int main(int argc, char **argv) {
         app->Initialize();
 
         while (!app->ShouldClose()) {
-            app->Update();
+            app->Update(1000.0f / 60.0f);
             app->Render();
         }
     } catch (const std::exception &exp) {

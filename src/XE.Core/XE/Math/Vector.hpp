@@ -44,6 +44,18 @@ namespace XE::Math {
             Y = y;
             Z = z;
         }
+
+        VectorBase(const VectorBase<T, 2> &v, T z) {
+            X = v.x;
+            Y = v.y;
+            Z = z;
+        }
+
+        VectorBase(T x, const VectorBase<T, 2> &v) {
+            X = x;
+            Y = v.x;
+            Z = v.y;
+        }
     };
     
     template<typename T>
@@ -60,6 +72,41 @@ namespace XE::Math {
             Y = y;
             Z = z;
             W = w;
+        }
+
+        VectorBase(const VectorBase<T, 3> &v, T w) {
+            X = v.X;
+            Y = v.Y;
+            Z = v.Z;
+            W = w;
+        }
+
+        VectorBase(T x, const VectorBase<T, 3> &v) {
+            X = x
+            Y = v.X;
+            Z = v.T;
+            W = v.W;
+        }
+
+        VectorBase(const VectorBase<T, 2> &v, T z, T w) {
+            X = v.X;
+            Y = v.Y;
+            Z = z;
+            W = w;
+        }
+
+        VectorBase(T x, const VectorBase<T, 2> &v, T w) {
+            X = x;
+            Y = v.X;
+            Z = v.Y;
+            W = w;
+        }
+
+        VectorBase(T x, T y, const VectorBase<T, 2> &v) {
+            X = x;
+            Y = y;
+            Z = v.X;
+            W = v.Y;
         }
     };
 

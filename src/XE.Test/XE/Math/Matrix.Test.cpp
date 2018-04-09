@@ -135,6 +135,56 @@ TEST_CASE("Math::Matrix<3, float>") {
         REQUIRE(m.GetColumnVector(3) == Vector4f{4.0f, 8.0f, 12.0f, 16.0f});
     }
     
+    SECTION("SetColumnVector should change correctly a certain column in the Matrix") {
+        REQUIRE(Matrix4f{
+            {1.0f, 2.0f, 3.0f, 4.0f}, 
+            {5.0f, 6.0f, 7.0f, 8.0f}, 
+            {9.0f, 10.0f, 11.0f, 12.0f},
+            {13.0f, 14.0f, 15.0f, 16.0f}
+        }.SetColumnVector(0, Vector4f{4.0f, 3.0f, 2.0f, 1.0f}) == Matrix4f{
+            {4.0f, 2.0f, 3.0f, 4.0f}, 
+            {3.0f, 6.0f, 7.0f, 8.0f}, 
+            {2.0f, 10.0f, 11.0f, 12.0f},
+            {1.0f, 14.0f, 15.0f, 16.0f}
+        });
+
+        REQUIRE(Matrix4f{
+            {1.0f, 2.0f, 3.0f, 4.0f}, 
+            {5.0f, 6.0f, 7.0f, 8.0f}, 
+            {9.0f, 10.0f, 11.0f, 12.0f},
+            {13.0f, 14.0f, 15.0f, 16.0f}
+        }.SetColumnVector(1, Vector4f{4.0f, 3.0f, 2.0f, 1.0f}) == Matrix4f{
+            {1.0f, 4.0f, 3.0f, 4.0f}, 
+            {5.0f, 3.0f, 7.0f, 8.0f}, 
+            {9.0f, 2.0f, 11.0f, 12.0f},
+            {13.0f, 1.0f, 15.0f, 16.0f}
+        });
+
+        REQUIRE(Matrix4f{
+            {1.0f, 2.0f, 3.0f, 4.0f}, 
+            {5.0f, 6.0f, 7.0f, 8.0f}, 
+            {9.0f, 10.0f, 11.0f, 12.0f},
+            {13.0f, 14.0f, 15.0f, 16.0f}
+        }.SetColumnVector(2, Vector4f{4.0f, 3.0f, 2.0f, 1.0f}) == Matrix4f{
+            {1.0f, 2.0f, 4.0f, 4.0f}, 
+            {5.0f, 6.0f, 3.0f, 8.0f}, 
+            {9.0f, 10.0f, 2.0f, 12.0f},
+            {13.0f, 14.0f, 1.0f, 16.0f}
+        });
+        
+        REQUIRE(Matrix4f{
+            {1.0f, 2.0f, 3.0f, 4.0f}, 
+            {5.0f, 6.0f, 7.0f, 8.0f}, 
+            {9.0f, 10.0f, 11.0f, 12.0f},
+            {13.0f, 14.0f, 15.0f, 16.0f}
+        }.SetColumnVector(3, Vector4f{4.0f, 3.0f, 2.0f, 1.0f}) == Matrix4f{
+            {1.0f, 2.0f, 3.0f, 4.0f}, 
+            {5.0f, 6.0f, 7.0f, 3.0f}, 
+            {9.0f, 10.0f, 11.0f, 2.0f},
+            {13.0f, 14.0f, 15.0f, 1.0f}
+        });
+    }
+
     SECTION("GetRowVector should extract a certain row from the Matrix as a Vector") {
         const Matrix4f m = {
             {1.0f, 2.0f, 3.0f, 4.0f}, 
@@ -375,7 +425,6 @@ TEST_CASE("Math::Matrix<3, float>") {
         };
 
         auto mi = Matrix4f::Identity();
-        auto m0 = Matrix4f::Zero();
         auto detMatA = -32.0f;
 
         REQUIRE(mi == Inverse(mi));

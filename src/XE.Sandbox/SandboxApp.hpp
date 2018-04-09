@@ -12,7 +12,7 @@ namespace XE::Sandbox {
         virtual ~Application() {}
 
         virtual void Initialize() = 0;
-        virtual void Update() = 0;
+        virtual void Update(const float seconds) = 0;
         virtual void Render() = 0;
 
         virtual bool ShouldClose() const = 0;
