@@ -32,6 +32,9 @@ namespace XE::Sandbox {
         }
 
         virtual void Update(const float seconds) override {
+            const XE::Math::Vector2i windowSize = m_graphicsDevice->GetWindow()->GetSize();
+            m_graphicsDevice->SetViewport({{0, 0}, windowSize});
+
             m_inputManager->Poll();
             
             const XE::Input::KeyboardStatus keyboardStatus = m_inputManager->GetKeyboardStatus();

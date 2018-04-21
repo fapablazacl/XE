@@ -60,14 +60,34 @@ namespace XE::Graphics {
     struct SubsetDescriptor;
     struct ProgramDescriptor;
 
+    struct Viewport {
+        XE::Math::Vector2i position;
+        XE::Math::Vector2i size;
+    };
+
+    /**
+     * @brief The 'Window' that is beign used as the render target for the graphics device contents
+     */
+    class XE_API Window {
+    public:
+        virtual ~Window() {}
+
+        /**
+         * @brief Get the current size of the Window, in Pixels, where the X and Y fields correspond to the Width and Height of the Window, respectively
+         */
+        virtual XE::Math::Vector2i GetSize() const = 0;
+    };
+
     /**
      * @brief Graphics API abstraction
      */
-    class GraphicsDevice {
+    class XE_API GraphicsDevice {
     public:
         virtual ~GraphicsDevice();
 
         virtual XE::Input::InputManager* GetInputManager() = 0;
+
+        virtual Window* GetWindow() const = 0;
 
         /**
          * @brief Create a geometry subset composed of many geometry and indexation buffers
@@ -94,6 +114,10 @@ namespace XE::Graphics {
         
         virtual std::unique_ptr<Program> CreateProgram(const ProgramDescriptor &programDescriptor) = 0;
         
+        virtual void SetViewport(const Viewport &viewport) = 0;
+
+        virtual Viewport GetViewport() const = 0;
+
         virtual void SetMaterial(const Material *material) = 0;
         
         virtual const Material* GetMaterial() const = 0;

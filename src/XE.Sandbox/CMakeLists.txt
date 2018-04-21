@@ -4,6 +4,8 @@ set (src
 	"Main.cpp"
 	"Assets.cpp"
 	"Assets.hpp"
+	"SandboxApp.cpp"
+	"SandboxApp.hpp"
 )
 
 source_group ("\\" FILES ${src})

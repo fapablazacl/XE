@@ -20,6 +20,8 @@ namespace XE::Graphics::GL {
 
         virtual ~GraphicsDeviceGL();
         
+        virtual Window* GetWindow() const override;
+
         virtual XE::Input::InputManager* GetInputManager() override;
 
         virtual std::unique_ptr<Subset> CreateSubset(
@@ -58,16 +60,23 @@ namespace XE::Graphics::GL {
 
         virtual void EndFrame() override;
 
+        virtual void SetViewport(const Viewport &viewport) override;
+
+        virtual Viewport GetViewport() const override;
+
     private:
         void PreRenderMaterial(const Material *material);
 
         void PostRenderMaterial(const Material *material);
 
     private:
-        GLFWwindow *m_window = nullptr;
+        GLFWwindow *m_windowGLFW = nullptr;
+        std::unique_ptr<Window> m_window;
         std::unique_ptr<XE::Input::InputManager> m_inputManager;
         const ProgramGL *m_program = nullptr;
         const Material *m_material = nullptr;
+
+        Viewport m_viewport;
     };
 }
 

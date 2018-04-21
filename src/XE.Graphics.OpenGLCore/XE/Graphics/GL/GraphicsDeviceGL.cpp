@@ -9,6 +9,7 @@
 #include "Texture3DGL.hpp"
 #include "ProgramGL.hpp"
 #include "InputManagerGLFW.hpp"
+#include "WindowGLFW.hpp"
 
 #include <XE/Graphics/Material.hpp>
 #include <XE/Graphics/Uniform.hpp>
@@ -34,10 +35,10 @@ namespace XE::Graphics::GL {
         ::glfwWindowHint(GLFW_ALPHA_BITS, 0);
 
         std::cout << "[GL] Creating Window/Context ..." << std::endl;
-        m_window = ::glfwCreateWindow(1200, 800, "Test", nullptr, nullptr);
+        m_windowGLFW = ::glfwCreateWindow(1200, 800, "Test", nullptr, nullptr);
 
         std::cout << "[GL] Making Context current ..." << std::endl;
-        ::glfwMakeContextCurrent(m_window);
+        ::glfwMakeContextCurrent(m_windowGLFW);
 
         std::cout << "[GL] Loading OpenGL Extensions ..." << std::endl;
         if (!gladLoadGL()) {
@@ -46,19 +47,24 @@ namespace XE::Graphics::GL {
 
         std::cout << "[GL] Creating the GLFW-based input manager ..." << std::endl;
 
-        m_inputManager.reset(new InputManagerGLFW(m_window));
+        m_window.reset(new WindowGLFW(m_windowGLFW));
+        m_inputManager.reset(new InputManagerGLFW(m_windowGLFW));
     }
 
     GraphicsDeviceGL::~GraphicsDeviceGL() {
-        if (m_window) {
+        if (m_windowGLFW) {
             ::glfwMakeContextCurrent(nullptr);
-            ::glfwDestroyWindow(m_window);
+            ::glfwDestroyWindow(m_windowGLFW);
             ::glfwTerminate();
 
-            m_window = nullptr;
+            m_windowGLFW = nullptr;
         }
     }
-        
+    
+    Window* GraphicsDeviceGL::GetWindow() const {
+        return m_window.get();
+    }
+
     XE::Input::InputManager* GraphicsDeviceGL::GetInputManager() {
         return m_inputManager.get();
     }
@@ -141,7 +147,7 @@ namespace XE::Graphics::GL {
         
     void GraphicsDeviceGL::EndFrame() {
         ::glFlush();
-        ::glfwSwapBuffers(m_window);
+        ::glfwSwapBuffers(m_windowGLFW);
     }
 
     void GraphicsDeviceGL::PreRenderMaterial(const Material *material) {
@@ -415,6 +421,22 @@ namespace XE::Graphics::GL {
 
             offset += XE::ComputeByteSize(current->Type) * current->Size * current->Count;
         }
+    }
+
+    void GraphicsDeviceGL::SetViewport(const Viewport &viewport) {
+        GLint x = static_cast<GLint>(viewport.position.X);
+        GLint y = static_cast<GLint>(viewport.position.Y);
+
+        GLint w = static_cast<GLint>(viewport.size.X);
+        GLint h = static_cast<GLint>(viewport.size.Y);
+
+        ::glViewport(x, y, w, h);
+
+        m_viewport = viewport;
+    }
+
+    Viewport GraphicsDeviceGL::GetViewport() const {
+        return m_viewport;
     }
 
     const Material* GraphicsDeviceGL::GetMaterial() const {

@@ -27,7 +27,7 @@ namespace XE::Graphics::GL {
         void FillKeyboardStatus();
 
     private:
-        GLFWwindow *m_window;
+        GLFWwindow *m_windowGLFW;
         XE::Input::KeyboardStatus m_keyboardStatus;
     };
 }

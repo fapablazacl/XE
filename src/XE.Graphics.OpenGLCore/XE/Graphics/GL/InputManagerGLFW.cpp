@@ -56,8 +56,8 @@ namespace XE::Graphics::GL {
         ,GLFW_KEY_RIGHT_ALT          ,GLFW_KEY_RIGHT_SUPER         ,GLFW_KEY_MENU               
     };
 
-    InputManagerGLFW::InputManagerGLFW(GLFWwindow *window) : m_window(window) {
-        assert(m_window);
+    InputManagerGLFW::InputManagerGLFW(GLFWwindow *window) : m_windowGLFW(window) {
+        assert(m_windowGLFW);
     }
 
     void InputManagerGLFW::Poll() {
@@ -73,7 +73,7 @@ namespace XE::Graphics::GL {
             if (keyMappingIt == s_keyMapping.end()) {
                 continue;
             }
-            auto state = ::glfwGetKey(m_window, key);
+            auto state = ::glfwGetKey(m_windowGLFW, key);
             auto stateMappingIt = s_stateMappings.find(state);
 
             if (stateMappingIt == s_stateMappings.end()) {
