@@ -144,6 +144,13 @@ namespace XE::Sandbox {
 
             this->RenderMatrices();
 
+            XE::Graphics::Uniform textureUniform = {
+                "texture0", XE::DataType::Int32, 1, 1
+            };
+            int textureUnit = 0;
+
+            m_graphicsDevice->ApplyUniform(&textureUniform, 1, reinterpret_cast<std::byte*>(&textureUnit));
+
             m_graphicsDevice->SetMaterial(m_material.get());
 
             XE::Graphics::SubsetEnvelope envelope = {
@@ -247,7 +254,11 @@ namespace XE::Sandbox {
 
             m_subset = m_graphicsDevice->CreateSubset(subsetDescriptor, std::move(buffers), bufferMapping, std::move(indexBuffer));
 
+            m_texture = this->CreateColorTexture(256, 256, {1.0f, 0.0f, 0.0f, 1.0f});
+
             m_material = std::make_unique<XE::Graphics::Material>();
+            m_material->layers[0].texture = m_texture.get();
+            m_material->layerCount = 1;
         }
 
     private:
@@ -255,6 +266,7 @@ namespace XE::Sandbox {
         std::unique_ptr<XE::Graphics::GraphicsDevice> m_graphicsDevice;
         std::unique_ptr<XE::Graphics::Subset> m_subset;
         std::unique_ptr<XE::Graphics::Material> m_material;
+        std::unique_ptr<XE::Graphics::Texture2D> m_texture;
         XE::Input::InputManager *m_inputManager = nullptr;
 
         bool m_shouldClose = false;
