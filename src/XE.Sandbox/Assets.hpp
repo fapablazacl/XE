@@ -15,6 +15,8 @@ namespace XE::Sandbox {
 
         static std::vector<XE::Math::Vector3f> coordData;
         static std::vector<XE::Math::Vector4f> colorData;
+        static std::vector<XE::Math::Vector3f> normalData;
+        static std::vector<XE::Math::Vector2f> texCoordData;
         static std::vector<int> indexData;
     };
 }

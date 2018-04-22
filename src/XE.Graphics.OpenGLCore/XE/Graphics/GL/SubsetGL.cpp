@@ -7,7 +7,7 @@ namespace XE::Graphics::GL {
     SubsetGL::SubsetGL(SubsetDescriptor& desc, 
             std::vector<std::unique_ptr<Buffer>> buffers, 
             const std::map<std::string, int> &bufferMapping, 
-            std::unique_ptr<Buffer> indexBuffer) {        
+            std::unique_ptr<Buffer> indexBuffer) {
         // take ownership for the buffers
         for (auto &buffer : buffers) {
             auto bufferGL = dynamic_cast<BufferGL*>(buffer.get());
