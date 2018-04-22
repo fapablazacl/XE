@@ -42,7 +42,7 @@ uniform sampler2D texture0;
 out vec4 finalColor;
 
 void main() {
-    finalColor = fragColor * texture2D(texture0, fragTexCoord);
+    finalColor = fragColor/* * texture2D(texture0, fragTexCoord)*/;
 }
 )";
 

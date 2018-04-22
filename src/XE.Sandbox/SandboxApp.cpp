@@ -117,6 +117,27 @@ namespace XE::Sandbox {
             m_graphicsDevice->ApplyUniform(&matrixLayout, 1, (const std::byte*)&modelViewProj);
         }
 
+        std::unique_ptr<XE::Graphics::Texture2D> CreateColorTexture(const int width, const int height, const XE::Math::Vector4f &color) {
+            const auto format = XE::Graphics::PixelFormat::R8G8B8A8;
+            const auto size = XE::Math::Vector2i{width, height};
+
+            const auto sourceFormat = XE::Graphics::PixelFormat::R8G8B8A8;
+            const auto sourceDataType = XE::DataType::UInt8;
+
+            std::vector<XE::Math::Vector<std::uint8_t, 4>> pixels;
+
+            pixels.resize(width * height);
+
+            for (auto &pixel : pixels) {
+                pixel.X = static_cast<std::uint8_t>(255.0f * color.X);
+                pixel.Y = static_cast<std::uint8_t>(255.0f * color.Y);
+                pixel.Z = static_cast<std::uint8_t>(255.0f * color.Z);
+                pixel.W = static_cast<std::uint8_t>(255.0f * color.W);
+            }
+
+            return m_graphicsDevice->CreateTexture2D(format, size, sourceFormat, sourceDataType, pixels.data());
+        }
+
         virtual void Render() override {
             m_graphicsDevice->BeginFrame(XE::Graphics::ClearFlags::All, {0.2f, 0.2f, 0.2f, 1.0f}, 0.0f, 0);
             m_graphicsDevice->SetProgram(m_program.get());
@@ -126,7 +147,7 @@ namespace XE::Sandbox {
             m_graphicsDevice->SetMaterial(m_material.get());
 
             XE::Graphics::SubsetEnvelope envelope = {
-                nullptr, XE::Graphics::PrimitiveType::TriangleStrip, 0, 3
+                nullptr, XE::Graphics::PrimitiveType::TriangleStrip, 0, 4
             };
             m_graphicsDevice->Draw(m_subset.get(), &envelope, 1);
             m_graphicsDevice->EndFrame();
@@ -171,6 +192,26 @@ namespace XE::Sandbox {
 
             auto colorBuffer = m_graphicsDevice->CreateBuffer(colorBufferDescriptor);
 
+            XE::Graphics::BufferDescriptor normalBufferDescriptor = {
+                XE::Graphics::BufferType::Vertex, 
+                XE::Graphics::BufferUsage::Copy, 
+                XE::Graphics::BufferAccess::Static, 
+                (int)XE::Sandbox::Assets::normalData.size() * (int)sizeof(XE::Math::Vector3f), 
+                (const std::byte*) XE::Sandbox::Assets::normalData.data()
+            };
+
+            auto normalBuffer = m_graphicsDevice->CreateBuffer(normalBufferDescriptor);
+
+            XE::Graphics::BufferDescriptor texCoordBufferDescriptor = {
+                XE::Graphics::BufferType::Vertex, 
+                XE::Graphics::BufferUsage::Copy, 
+                XE::Graphics::BufferAccess::Static, 
+                (int)XE::Sandbox::Assets::texCoordData.size() * (int)sizeof(XE::Math::Vector3f), 
+                (const std::byte*) XE::Sandbox::Assets::texCoordData.data()
+            };
+
+            auto texCoordBuffer = m_graphicsDevice->CreateBuffer(texCoordBufferDescriptor);
+
             // create the index buffer
             XE::Graphics::BufferDescriptor indexBufferDescriptor = {
                 XE::Graphics::BufferType::Index, 
@@ -187,7 +228,9 @@ namespace XE::Sandbox {
         
             subsetDescriptor.attributes = {
                 {"vertCoord", XE::DataType::Float32, 3}, 
-                {"vertColor", XE::DataType::Float32, 4}
+                {"vertColor", XE::DataType::Float32, 4},
+                {"vertNormal", XE::DataType::Float32, 3},
+                {"vertTexCoord", XE::DataType::Float32, 2}
             };
 
             subsetDescriptor.indexType = XE::DataType::UInt32;
@@ -195,9 +238,11 @@ namespace XE::Sandbox {
             std::vector<std::unique_ptr<XE::Buffer>> buffers;
             buffers.push_back(std::move(coordBuffer));
             buffers.push_back(std::move(colorBuffer));
+            buffers.push_back(std::move(normalBuffer));
+            buffers.push_back(std::move(texCoordBuffer));
 
             std::map<std::string, int> bufferMapping = {
-                {"vertCoord", 0}, {"vertColor", 1}
+                {"vertCoord", 0}, {"vertColor", 1}, {"vertNormal", 2}, {"vertTexCoord", 3}
             };
 
             m_subset = m_graphicsDevice->CreateSubset(subsetDescriptor, std::move(buffers), bufferMapping, std::move(indexBuffer));

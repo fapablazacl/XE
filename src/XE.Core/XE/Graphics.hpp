@@ -9,6 +9,10 @@
 #include <XE/Graphics/Shader.hpp>
 #include <XE/Graphics/Uniform.hpp>
 #include <XE/Graphics/Material.hpp>
+#include <XE/Graphics/PixelFormat.hpp>
 #include <XE/Graphics/GraphicsDevice.hpp>
+#include <XE/Graphics/Texture2D.hpp>
+#include <XE/Graphics/Texture2DArray.hpp>
+#include <XE/Graphics/Texture3D.hpp>
 
 #endif
