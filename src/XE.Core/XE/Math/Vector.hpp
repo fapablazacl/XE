@@ -82,7 +82,7 @@ namespace XE::Math {
         }
 
         VectorBase(T x, const VectorBase<T, 3> &v) {
-            X = x
+            X = x;
             Y = v.X;
             Z = v.T;
             W = v.W;
