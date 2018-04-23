@@ -10,6 +10,7 @@
 #include "ProgramGL.hpp"
 #include "InputManagerGLFW.hpp"
 #include "WindowGLFW.hpp"
+#include "Util.hpp"
 
 #include <XE/Graphics/Material.hpp>
 #include <XE/Graphics/Uniform.hpp>
@@ -20,13 +21,23 @@
 #include <iostream>
 
 namespace XE::Graphics::GL {
+/*#if defined(GLAD_DEBUG)
+    void gladPostCallback(const char *name, void *funcptr, int len_args, ...) {
+        if (std::string(name) != "glGetError") {
+            GLenum error = glGetError();
+            assert(error == GL_NO_ERROR);
+        }
+    }
+#endif
+*/
+
     GraphicsDeviceGL::GraphicsDeviceGL() {
         std::cout << "[GL] Initializing GLFW ..." << std::endl;
         ::glfwInit();
         ::glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
         ::glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
         ::glfwWindowHint(GLFW_OPENGL_CORE_PROFILE, 1);
-        ::glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, 1);
+        // ::glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, 1);
         ::glfwWindowHint(GLFW_DEPTH_BITS, 24);
         ::glfwWindowHint(GLFW_DOUBLEBUFFER, 1);
         ::glfwWindowHint(GLFW_RED_BITS, 8);
@@ -45,10 +56,18 @@ namespace XE::Graphics::GL {
             throw std::runtime_error("Failed to load OpenGL extensions");
         }
 
+/*
+#if defined(GLAD_DEBUG)
+    // glad_set_pre_callback(gladPreCallback);
+    // glad_set_post_callback(gladPostCallback);
+#endif
+*/
         std::cout << "[GL] Creating the GLFW-based input manager ..." << std::endl;
 
         m_window.reset(new WindowGLFW(m_windowGLFW));
         m_inputManager.reset(new InputManagerGLFW(m_windowGLFW));
+
+        XE_GRAPHICS_GL_CHECK_ERROR();
     }
 
     GraphicsDeviceGL::~GraphicsDeviceGL() {
@@ -131,6 +150,7 @@ namespace XE::Graphics::GL {
         }
 
         ::glBindVertexArray(0);
+        XE_GRAPHICS_GL_CHECK_ERROR();
     }
         
     void GraphicsDeviceGL::BeginFrame(const ClearFlags flags, const XE::Math::Vector4f &color, const float depth, const int stencil) {
@@ -143,11 +163,15 @@ namespace XE::Graphics::GL {
         ::glClearDepth(static_cast<GLdouble>(depth));
         ::glClearStencil(stencil);
         ::glClear(clearFlagsGL);
+
+        XE_GRAPHICS_GL_CHECK_ERROR();
     }
         
     void GraphicsDeviceGL::EndFrame() {
         ::glFlush();
         ::glfwSwapBuffers(m_windowGLFW);
+
+        XE_GRAPHICS_GL_CHECK_ERROR();
     }
 
     void GraphicsDeviceGL::PreRenderMaterial(const Material *material) {
@@ -213,9 +237,11 @@ namespace XE::Graphics::GL {
             }
 
             // FIXME: This will cause segfaults if the real implementation isn't derived from the Texture/TextureBaseGL family
-            auto textureBaseGL = reinterpret_cast<const TextureBaseGL*>(layer.texture);
+            auto textureBaseGL = dynamic_cast<const TextureBaseGL*>(layer.texture);
             auto target = textureBaseGL->GetTarget();
             
+            std::cout << target << ", " << textureBaseGL->GetID() << std::endl;
+
             ::glActiveTexture(GL_TEXTURE0 + i);
             ::glBindTexture(target, textureBaseGL->GetID());
             ::glTexParameteri(target, GL_TEXTURE_MAG_FILTER, ConvertToGL(layer.minFilter));
@@ -224,6 +250,8 @@ namespace XE::Graphics::GL {
             ::glTexParameteri(target, GL_TEXTURE_WRAP_T, ConvertToGL(layer.wrapT));
             ::glTexParameteri(target, GL_TEXTURE_WRAP_R, ConvertToGL(layer.wrapR));
         }
+
+        XE_GRAPHICS_GL_CHECK_ERROR();
     }
 
     void GraphicsDeviceGL::PostRenderMaterial(const Material *material) {
@@ -269,6 +297,8 @@ namespace XE::Graphics::GL {
         }
 
         ::glActiveTexture(GL_TEXTURE0);
+
+        XE_GRAPHICS_GL_CHECK_ERROR();
     }
 
     void GraphicsDeviceGL::SetMaterial(const Material *material) {
@@ -283,16 +313,20 @@ namespace XE::Graphics::GL {
         this->PreRenderMaterial(material);
 
         m_material = material;
+
+        XE_GRAPHICS_GL_CHECK_ERROR();
     }
 
     void GraphicsDeviceGL::SetProgram(const Program *program) {
-        m_program = static_cast<const ProgramGL *>(program);
+        m_program = static_cast<const ProgramGL*>(program);
 
         if (m_program) {
             ::glUseProgram(m_program->GetID());
         } else {
             ::glUseProgram(0);
         }
+
+        XE_GRAPHICS_GL_CHECK_ERROR();
     }
     
     const Program* GraphicsDeviceGL::GetProgram() const {
@@ -373,6 +407,8 @@ namespace XE::Graphics::GL {
 
             offset += XE::ComputeByteSize(current->Type) * current->Rows * current->Columns * current->Count;
         }
+
+        XE_GRAPHICS_GL_CHECK_ERROR();
     }
 
     void GraphicsDeviceGL::ApplyUniform(const Uniform *uniform, const int count, const std::byte *data) {
@@ -387,13 +423,17 @@ namespace XE::Graphics::GL {
             const Uniform *current = &uniform[i];
             const GLint location = m_program->GetUniformLoction(current->Name);
 
+            assert(location >= 0);
+
             switch (current->Type) {
             case DataType::Int32:
+                // std::cout << current->Name << ": " << location << ", " << *((const GLint*)&data[offset]) << std::endl;
                 switch (current->Size) {
                     case 1: ::glUniform1iv(location, current->Count, (const GLint*)&data[offset]); break;
                     case 2: ::glUniform2iv(location, current->Count, (const GLint*)&data[offset]); break;
                     case 3: ::glUniform3iv(location, current->Count, (const GLint*)&data[offset]); break;
                     case 4: ::glUniform4iv(location, current->Count, (const GLint*)&data[offset]); break;
+                    default: assert(false);
                 }
                 break;
             
@@ -403,6 +443,7 @@ namespace XE::Graphics::GL {
                     case 2: ::glUniform2fv(location, current->Count, (const GLfloat*)&data[offset]); break;
                     case 3: ::glUniform3fv(location, current->Count, (const GLfloat*)&data[offset]); break;
                     case 4: ::glUniform4fv(location, current->Count, (const GLfloat*)&data[offset]); break;
+                    default: assert(false);
                 }
                 break;
 
@@ -412,6 +453,7 @@ namespace XE::Graphics::GL {
                     case 2: ::glUniform2uiv(location, current->Count, (const GLuint*)&data[offset]); break;
                     case 3: ::glUniform3uiv(location, current->Count, (const GLuint*)&data[offset]); break;
                     case 4: ::glUniform4uiv(location, current->Count, (const GLuint*)&data[offset]); break;
+                    default: assert(false);
                 }
                 break;
 
@@ -421,6 +463,8 @@ namespace XE::Graphics::GL {
 
             offset += XE::ComputeByteSize(current->Type) * current->Size * current->Count;
         }
+
+        XE_GRAPHICS_GL_CHECK_ERROR();
     }
 
     void GraphicsDeviceGL::SetViewport(const Viewport &viewport) {
@@ -433,6 +477,8 @@ namespace XE::Graphics::GL {
         ::glViewport(x, y, w, h);
 
         m_viewport = viewport;
+
+        XE_GRAPHICS_GL_CHECK_ERROR();
     }
 
     Viewport GraphicsDeviceGL::GetViewport() const {

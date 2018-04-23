@@ -38,6 +38,9 @@ set (sources_xe_graphics_glcore
 
 	"${source_base}/Conversion.hpp"
 	"${source_base}/Conversion.cpp"
+
+	"${source_base}/Util.hpp"
+	"${source_base}/Util.cpp"
 ) 
 
 source_group ("\\XE\\Graphics\\GL" FILES ${sources_xe_graphics_glcore})

@@ -1,6 +1,7 @@
 
 #include "Texture2DGL.hpp"
 #include "Conversion.hpp"
+#include "Util.hpp"
 
 namespace XE::Graphics::GL {
     Texture2DGL::Texture2DGL(const PixelFormat format, const XE::Math::Vector2i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void *sourceData)
@@ -16,6 +17,8 @@ namespace XE::Graphics::GL {
         ::glBindTexture(GL_TEXTURE_2D, m_id);
         ::glTexImage2D(GL_TEXTURE_2D, 0, internalFormatGL, m_size.X, m_size.Y, 0, formatGL, typeGL, sourceData);
         ::glBindTexture(GL_TEXTURE_2D, 0);
+
+        XE_GRAPHICS_GL_CHECK_ERROR();
     }
 
     Texture2DGL::~Texture2DGL() {}
@@ -29,6 +32,8 @@ namespace XE::Graphics::GL {
         ::glBindTexture(GL_TEXTURE_2D, m_id);
         ::glTexSubImage2D(GL_TEXTURE_2D, mipLevel, offset.X, offset.Y, size.X, size.Y, formatGL, dataTypeGL, surfaceData);
         ::glBindTexture(GL_TEXTURE_2D, 0);
+
+        XE_GRAPHICS_GL_CHECK_ERROR();
     }
     
     void Texture2DGL::GetData(std::byte *surfaceData, const int mipLevel, const PixelFormat surfaceFormat, const DataType surfaceDataType) const {
@@ -38,5 +43,7 @@ namespace XE::Graphics::GL {
         ::glBindTexture(GL_TEXTURE_2D, m_id);
         ::glGetTexImage(GL_TEXTURE_2D, mipLevel, formatGL, dataTypeGL, surfaceData);
         ::glBindTexture(GL_TEXTURE_2D, 0);
+
+        XE_GRAPHICS_GL_CHECK_ERROR();
     }
 }
