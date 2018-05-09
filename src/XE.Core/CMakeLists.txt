@@ -104,11 +104,17 @@ set (src_xe_ui
 	"XE/UI/WindowSystem.cpp"
 )
 
+set (src_xe_util
+	"XE/Util/Timer.hpp"
+	"XE/Util/Timer.cpp"
+)
+
 source_group ("\\XE" FILES ${src_xe})
 source_group ("\\XE\\Math" FILES ${src_xe_math})
 source_group ("\\XE\\Graphics" FILES ${src_xe_graphics})
 source_group ("\\XE\\Input" FILES ${src_xe_input})
 source_group ("\\XE\\UI" FILES ${src_xe_ui})
+source_group ("\\XE\\Util" FILES ${src_xe_util})
 
 add_library (${target} 
 	${src_xe} 
@@ -116,4 +122,5 @@ add_library (${target}
 	${src_xe_graphics} 
 	${src_xe_input} 
 	${src_xe_ui}
+	${src_xe_util}
 )

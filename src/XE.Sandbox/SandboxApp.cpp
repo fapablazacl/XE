@@ -43,8 +43,8 @@ namespace XE::Sandbox {
                 m_shouldClose = true;
             }
 
-            // update animation
-            m_angle += 0.333333f;
+            // update animation (rotation angle)
+            m_angle += 60.0f * seconds;
 
             // update camera position
             const bool moveForward = keyboardStatus.GetState(XE::Input::KeyCode::KeyUp) == XE::Input::BinaryState::Press;
@@ -57,9 +57,9 @@ namespace XE::Sandbox {
             const auto cameraDirection = XE::Math::Normalize(m_cameraLookAt - m_cameraPosition);
             float turnSpeed = 0.0f;
             if (turnLeft) {
-                turnSpeed = -XE::Math::Radians(0.25f);
+                turnSpeed = -XE::Math::Radians(1.25f * seconds);
             } else if (turnRight) {
-                turnSpeed = XE::Math::Radians(0.25f);
+                turnSpeed = XE::Math::Radians(1.25f * seconds);
             }
 
             const auto cdt = XE::Math::Matrix4f::Rotate(turnSpeed, m_cameraUp) * XE::Math::Vector4f(cameraDirection, 0.0f);
@@ -67,7 +67,7 @@ namespace XE::Sandbox {
             m_cameraLookAt = m_cameraPosition + XE::Math::Vector3f{cdt.X, cdt.Y, cdt.Z} * XE::Math::Magnitude(cameraDirection);
 
             // camera movement
-            const auto cameraSpeed = 0.0025f;
+            const auto cameraSpeed = 0.025f * seconds;
             const auto cameraDisplacement = cameraDirection * cameraSpeed * seconds;
             const auto cameraSide = XE::Math::Normalize(XE::Math::Cross(cameraDirection, m_cameraUp));
             
