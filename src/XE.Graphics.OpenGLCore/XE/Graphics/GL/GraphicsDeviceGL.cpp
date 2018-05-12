@@ -31,12 +31,26 @@ namespace XE::Graphics::GL {
 #endif
 */
 
+    void errorCallback(int error, const char *description) {
+        std::cout << error << ":" << description << std::endl;
+    }
+
     GraphicsDeviceGL::GraphicsDeviceGL() {
         std::cout << "[GL] Initializing GLFW ..." << std::endl;
         ::glfwInit();
+
+        ::glfwSetErrorCallback(errorCallback);
+
+#if defined(__APPLE__)
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
+        glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+        glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+#else
         ::glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
         ::glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
         ::glfwWindowHint(GLFW_OPENGL_CORE_PROFILE, 1);
+#endif
         // ::glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, 1);
         ::glfwWindowHint(GLFW_DEPTH_BITS, 24);
         ::glfwWindowHint(GLFW_DOUBLEBUFFER, 1);
@@ -47,6 +61,12 @@ namespace XE::Graphics::GL {
 
         std::cout << "[GL] Creating Window/Context ..." << std::endl;
         m_windowGLFW = ::glfwCreateWindow(1200, 800, "Test", nullptr, nullptr);
+
+        if (!m_windowGLFW) {
+            const char description[256] = {};
+            int error = ::glfwGetError((const char **)&description);
+            throw std::runtime_error(description);
+        }
 
         std::cout << "[GL] Making Context current ..." << std::endl;
         ::glfwMakeContextCurrent(m_windowGLFW);
