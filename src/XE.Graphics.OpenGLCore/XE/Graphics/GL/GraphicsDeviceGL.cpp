@@ -309,7 +309,7 @@ namespace XE::Graphics::GL {
                 continue;
             }
 
-            // FIXME: This will cause segfaults if the real implementation isn't derived from Texture/TextureBaseGL family
+            // FIXME: This will cause segfaults if the real implementation isn't derived from the Texture/TextureBaseGL family
             auto textureBaseGL = reinterpret_cast<const TextureBaseGL*>(layer.texture);
 
             ::glActiveTexture(GL_TEXTURE0 + i);
