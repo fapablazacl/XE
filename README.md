@@ -1,10 +1,8 @@
 
 ## What is XE?
-
 XE will be a framework, written in C++17 for building high-performance, cross-platform multimedia applications.
 
 ## Preliminary Supported Platforms
-
 * Windows 7+
 * Linux (X Window System and Wayland)
 * HTML5 
@@ -16,7 +14,6 @@ XE will be a framework, written in C++17 for building high-performance, cross-pl
 * clang 
 
 ## Planned Features
-
 Features for a Low Level library:
 * Math Support Library
     - Linear Algebra (Vector, Matrix and Quaterion operations)
@@ -28,9 +25,9 @@ Features for a Low Level library:
 * Input
 
 Features for a set of High Level libraries:
-* Entity Component System
-* Message Bus System
-* Scene Graph
-* Shader Abstraction Layer
+* Entity Component System / Message Bus System
+* Scene Graph / Scene Graph Renderers
+* Hardware-acceletared Ray-Tracing redering
+* Shader Abstraction Layer / Material Graph System
 * Font Rendering Engine
 * Asset/Resource Loaders

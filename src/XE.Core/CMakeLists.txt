@@ -3,18 +3,14 @@ set (target "XE.Core")
 
 set (src_xe
 	"XE/Predef.hpp"
-	"XE/Event.hpp"
-    "XE/EventImpl.hpp"
     "XE/Stream.hpp"
     "XE/Stream.cpp"
     "XE/Buffer.hpp"
     "XE/Buffer.cpp"
     "XE/DataType.hpp"
     "XE/DataType.cpp"
-    "XE/DataLayout.cpp"
-    "XE/DataLayout.hpp"
-	"XE/DataAttribute.cpp"
-    "XE/DataAttribute.hpp"
+	"XE/Core.hpp"
+    "XE/Core.cpp"
 
 	# these will be future C++20 Modules
 	"XE.hpp"

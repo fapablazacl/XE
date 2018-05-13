@@ -127,6 +127,7 @@ namespace XE::Sandbox {
 
             pixels.resize(width * height);
 
+            // TODO: Factor into the vector class
             for (auto &pixel : pixels) {
                 pixel.X = static_cast<std::uint8_t>(255.0f * color.X);
                 pixel.Y = static_cast<std::uint8_t>(255.0f * color.Y);
