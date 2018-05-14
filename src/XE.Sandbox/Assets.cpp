@@ -3,7 +3,7 @@
 
 namespace XE::Sandbox {
     const char* Assets::vertexShader = R"(
-#version 420
+#version 410 core
 
 layout(location = 0) in vec3 vertCoord;
 layout(location = 1) in vec4 vertColor;
@@ -31,7 +31,7 @@ void main() {
     )";
 
     const char* Assets::fragmentShader = R"(
-#version 420
+#version 410 core
 
 in vec4 fragColor;
 in vec3 fragNormal;
@@ -42,7 +42,7 @@ uniform sampler2D texture0;
 out vec4 finalColor;
 
 void main() {
-    finalColor = fragColor * texture2D(texture0, fragTexCoord);
+    finalColor = fragColor * texture(texture0, fragTexCoord);
 }
 )";
 

@@ -7,7 +7,6 @@
 #include <XE/Math.hpp>
 #include <XE/Input/InputManager.hpp>
 #include <XE/Input/DeviceStatus.hpp>
-#include <XE/Input/InputCode.hpp>
 #include <XE/Graphics/GL/GraphicsDeviceGL.hpp>
 #include <XE/Graphics/GL/ProgramGL.hpp>
 #include <XE/Graphics/GL/BufferGL.hpp>
@@ -128,6 +127,7 @@ namespace XE::Sandbox {
 
             pixels.resize(width * height);
 
+            // TODO: Factor into the vector class
             for (auto &pixel : pixels) {
                 pixel.X = static_cast<std::uint8_t>(255.0f * color.X);
                 pixel.Y = static_cast<std::uint8_t>(255.0f * color.Y);
