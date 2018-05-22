@@ -168,6 +168,28 @@ namespace XE::Math {
         inline friend Vector<T, N> operator* (const T s, const Vector<T, N>& v) {
             return v * s;
         }
+
+        template<typename T2>
+        operator Vector<T2, N>() const {
+            Vector<T2, N> result;
+
+            for (int i=0; i<N; i++) {
+                result.Data[i] = static_cast<T2>(this->Data[i]);
+            }
+
+            return result;
+        }
+
+        template<typename T2>
+        Vector<T2, N> Cast() const {
+            Vector<T2, N> result;
+
+            for (int i=0; i<N; i++) {
+                result.Data[i] = static_cast<T2>(this->Data[i]);
+            }
+
+            return result;
+        }
     };
 
     template<typename T, int N>

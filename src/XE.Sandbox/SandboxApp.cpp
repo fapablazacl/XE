@@ -127,12 +127,8 @@ namespace XE::Sandbox {
 
             pixels.resize(width * height);
 
-            // TODO: Factor into the vector class
             for (auto &pixel : pixels) {
-                pixel.X = static_cast<std::uint8_t>(255.0f * color.X);
-                pixel.Y = static_cast<std::uint8_t>(255.0f * color.Y);
-                pixel.Z = static_cast<std::uint8_t>(255.0f * color.Z);
-                pixel.W = static_cast<std::uint8_t>(255.0f * color.W);
+                pixel = (color * XE::Math::Vector4f{255.0f}).Cast<std::uint8_t>();
             }
 
             return m_graphicsDevice->CreateTexture2D(format, size, sourceFormat, sourceDataType, pixels.data());
