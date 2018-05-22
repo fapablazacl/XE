@@ -2,7 +2,6 @@
 #include "Timer.hpp"
 
 #if defined(_WINDOWS)
-
 #include <Windows.h>
 
 namespace XE::Util {
@@ -51,6 +50,18 @@ namespace XE::Util {
     }
 }
 
-#else 
+#elif defined(__linux__)
+#include <time.h>
+
+namespace XE::Util {
+    int Timer::GetTick() {
+        timespec ts;
+        clock_gettime(CLOCK_MONOTONIC, &ts);
+
+        return 1000 * ts.tv_sec + ts.tv_nsec / 1000000;
+    }
+}
+
+#else
 #error "Unsupported platform"
 #endif

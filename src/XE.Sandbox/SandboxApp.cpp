@@ -262,8 +262,8 @@ namespace XE::Sandbox {
         }
 
     private:
-        std::unique_ptr<XE::Graphics::Program> m_program;
         std::unique_ptr<XE::Graphics::GraphicsDevice> m_graphicsDevice;
+        std::unique_ptr<XE::Graphics::Program> m_program;
         std::unique_ptr<XE::Graphics::Subset> m_subset;
         std::unique_ptr<XE::Graphics::Material> m_material;
         std::unique_ptr<XE::Graphics::Texture2D> m_texture;
