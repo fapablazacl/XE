@@ -10,8 +10,7 @@ shallow_clone: true                 # default is "false"
 image: Visual Studio 2017
 
 install:
-  mkdir build
-  cd build 
-  cmake ../ -G "NMake Makefiles"
-  nmake
-  
+  - mkdir build
+  - cd build 
+  - cmake ../ -G "NMake Makefiles"
+  - nmake
