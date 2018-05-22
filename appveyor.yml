@@ -5,7 +5,7 @@ branches:
     - master
 
 # fetch repository as zip archive
-shallow_clone: true                 # default is "false"
+shallow_clone: false                 # default is "false"
 
 image: Visual Studio 2017
 
