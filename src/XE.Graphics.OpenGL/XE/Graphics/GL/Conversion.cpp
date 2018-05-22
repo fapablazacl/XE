@@ -106,45 +106,45 @@ namespace XE::Graphics::GL {
 
     GLenum ConvertToGL(const FrontFaceOrder order) {
         switch (order) {
-        case FrontFaceOrder::CounterClockwise: return GL_CCW;
-        case FrontFaceOrder::Clockwise: return GL_CW;
-        default: return 0;
+            case FrontFaceOrder::CounterClockwise: return GL_CCW;
+            case FrontFaceOrder::Clockwise: return GL_CW;
+            default: return 0;
         }
     }
 
     GLenum ConvertToGL(const BlendParam param) {
         switch (param) {
-        case BlendParam::Zero: return GL_ZERO;
-        case BlendParam::One: return GL_ONE;
-        case BlendParam::SourceColor: return GL_SRC_COLOR;
-        case BlendParam::OneMinusSourceColor: return GL_ONE_MINUS_SRC_COLOR;
-        case BlendParam::DestinationColor: return GL_DST_COLOR;
-        case BlendParam::OneMinusDestinationColor: return GL_ONE_MINUS_DST_COLOR;
-        case BlendParam::SourceAlpha: return GL_SRC_ALPHA;
-        case BlendParam::OneMinusSourceAlpha: return GL_ONE_MINUS_SRC_ALPHA;
-        case BlendParam::DestinationAlpha: return GL_DST_ALPHA;
-        case BlendParam::OneMinusDestinationAlpha: return GL_ONE_MINUS_DST_ALPHA;
-        case BlendParam::ConstantColor: return GL_CONSTANT_COLOR;
-        case BlendParam::OneMinusConstantColor: return GL_ONE_MINUS_CONSTANT_COLOR;
-        case BlendParam::ConstantAlpha: return GL_CONSTANT_ALPHA;
-        case BlendParam::OneMinusConstantAlpha: return GL_ONE_MINUS_CONSTANT_ALPHA;
-        default:    return 0;
+            case BlendParam::Zero: return GL_ZERO;
+            case BlendParam::One: return GL_ONE;
+            case BlendParam::SourceColor: return GL_SRC_COLOR;
+            case BlendParam::OneMinusSourceColor: return GL_ONE_MINUS_SRC_COLOR;
+            case BlendParam::DestinationColor: return GL_DST_COLOR;
+            case BlendParam::OneMinusDestinationColor: return GL_ONE_MINUS_DST_COLOR;
+            case BlendParam::SourceAlpha: return GL_SRC_ALPHA;
+            case BlendParam::OneMinusSourceAlpha: return GL_ONE_MINUS_SRC_ALPHA;
+            case BlendParam::DestinationAlpha: return GL_DST_ALPHA;
+            case BlendParam::OneMinusDestinationAlpha: return GL_ONE_MINUS_DST_ALPHA;
+            case BlendParam::ConstantColor: return GL_CONSTANT_COLOR;
+            case BlendParam::OneMinusConstantColor: return GL_ONE_MINUS_CONSTANT_COLOR;
+            case BlendParam::ConstantAlpha: return GL_CONSTANT_ALPHA;
+            case BlendParam::OneMinusConstantAlpha: return GL_ONE_MINUS_CONSTANT_ALPHA;
+            default:    return 0;
         }
     }
 
     GLenum ConvertToGL(const TextureFilter filter) {
         switch (filter) {
-        case TextureFilter::Linear: return GL_LINEAR;
-        case TextureFilter::Nearest: return GL_NEAREST;
-        default: return 0;
+            case TextureFilter::Linear: return GL_LINEAR;
+            case TextureFilter::Nearest: return GL_NEAREST;
+            default: return 0;
         }
     }
 
     GLenum ConvertToGL(const TextureWrap wrap) {
         switch (wrap) {
-        case TextureWrap::Clamp: return GL_CLAMP_TO_BORDER;
-        case TextureWrap::Repeat: return GL_REPEAT;
-        default: return 0;
+            case TextureWrap::Clamp: return GL_CLAMP_TO_BORDER;
+            case TextureWrap::Repeat: return GL_REPEAT;
+            default: return 0;
         }
     }
 }
