@@ -15,5 +15,5 @@ install:
   - call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars64.bat"
   - mkdir build
   - cd build 
-  - cmake ../ -G "NMake Makefiles"
+  - cmake ../ -G "NMake Makefiles" -DXE_PLUGIN_OPENGLCORE=1
   - nmake
