@@ -24,4 +24,4 @@ build_script:
   - cd ..
 
 test_script:
-  - build/src/XE.Test/XE.Test
+  - call "build/src/XE.Test/XE.Test.exe"
