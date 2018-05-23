@@ -4,20 +4,22 @@ branches:
   only:
     - master
 
-
-# 
-# fetch repository as zip archive
-shallow_clone: false                 # default is "false"
+clone_depth: 5
+shallow_clone: false
 
 image: Visual Studio 2017
 
-install:
+init:
   - git submodule init
   - git submodule update
-
-build:
   - call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars64.bat"
+
+build_script:
   - mkdir build
   - cd build 
   - cmake ../ -G "NMake Makefiles" -DXE_PLUGIN_OPENGLCORE=1
   - nmake
+  - cd ..
+
+test_script:
+  - build/src/XE.Test/XE.Test
