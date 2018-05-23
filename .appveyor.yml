@@ -4,6 +4,8 @@ branches:
   only:
     - master
 
+
+# 
 # fetch repository as zip archive
 shallow_clone: false                 # default is "false"
 
@@ -12,6 +14,8 @@ image: Visual Studio 2017
 install:
   - git submodule init
   - git submodule update
+
+build:
   - call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars64.bat"
   - mkdir build
   - cd build 
