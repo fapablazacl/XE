@@ -40,6 +40,9 @@ namespace XE::Graphics::PNG {
     ImageLoaderPNG::~ImageLoaderPNG() {}
 
     std::unique_ptr<Image> ImageLoaderPNG::Load(Stream *inputStream) {
+        // TODO: Add support for another pixel formats
+        // TODO: Enhance stream buffering code
+
         const std::uint32_t bufferLength = 512;
 
         std::uint32_t readed;
