@@ -10,7 +10,7 @@ namespace XE::Graphics::PNG {
 
     class ImagePNG : public Image {
     public:
-        explicit ImagePNG(const std::byte *pointer, const PixelFormat format, const XE::Math::Vector2i size) {
+        ImagePNG(const std::byte *pointer, const PixelFormat format, const XE::Math::Vector2i size) {
             this->pointer = pointer;
             this->format = format;
             this->size = size;
@@ -57,10 +57,18 @@ namespace XE::Graphics::PNG {
         unsigned int width = 0;
         unsigned int height = 0;
 
-        LodePNGState state;
+        LodePNGState state = {};
 
         unsigned int error = lodepng_decode(&pixels, &width, &height, &state, imageBuffer.data(), imageBuffer.size());
 
-        return {};
+        if (error) {
+            return {};
+        }
+
+        return std::make_unique<ImagePNG> (
+            (const std::byte*)pixels, 
+            PixelFormat::R8G8B8A8, 
+            XE::Math::Vector2i(int(width), int(height))
+        );
     }
 }
