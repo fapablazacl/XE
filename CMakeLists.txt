@@ -1,5 +1,6 @@
 project (XE)
 
+option (XE_PLUGIN_PNG           "Include PNG image support via LodePNG" OFF)
 option (XE_PLUGIN_DIRECT3D11    "Include Direct3D 11 support" OFF)
 option (XE_PLUGIN_OPENGLCORE    "Include OpenGL Core support" OFF)
 option (XE_PLUGIN_VULKAN        "Include Vulkan support" OFF)
@@ -25,6 +26,22 @@ add_definitions (-DXE_VERSION_REVISION=${XE_VERSION_REVISION})
 
 include_directories ("src/XE.Core")
 add_subdirectory ("src/XE.Core")
+
+# include LodePNG image
+if (XE_PLUGIN_PNG)
+    include_directories("dep/lodepng")
+    set (lodepng_target "lodepng")
+    set (lodepng_sources 
+        "dep/lodepng/lodepng.h"
+        "dep/lodepng/lodepng.cpp"
+        "dep/lodepng/lodepng_util.h"
+        "dep/lodepng/lodepng_util.cpp"
+    )
+
+    add_library(${lodepng_target} ${lodepng_sources})
+
+    add_subdirectory("src/XE.Graphics.PNG")
+endif ()
 
 include_directories ("dep/Catch2/single_include")
 add_subdirectory ("src/XE.Test")

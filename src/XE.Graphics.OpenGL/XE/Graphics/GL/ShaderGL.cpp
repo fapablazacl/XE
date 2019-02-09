@@ -4,7 +4,7 @@
 #include <stdexcept>
 
 namespace XE::Graphics::GL {
-    static GLenum g_shaderTypesGL[] = {
+    static GLenum s_shaderTypesGL[] = {
         GL_VERTEX_SHADER,
         GL_FRAGMENT_SHADER,
         GL_GEOMETRY_SHADER
@@ -13,7 +13,7 @@ namespace XE::Graphics::GL {
     ShaderGL::ShaderGL(const ShaderType type, const std::string &source) {
         m_type = type;
         m_source = source;
-        m_typeGL = g_shaderTypesGL[int(type)];
+        m_typeGL = s_shaderTypesGL[int(type)];
 
         m_id = ::glCreateShader(m_typeGL);
 

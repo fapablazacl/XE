@@ -2,3 +2,4 @@ x64/*
 build/*
 .vscode/*
 .DS_Store
+.build/*
