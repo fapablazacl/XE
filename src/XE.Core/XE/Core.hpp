@@ -11,7 +11,7 @@ namespace XE {
     };
 
     /**
-     * @brief The main coordinator for the rest of the subsystems
+     * @brief The Core Root class
      */ 
     class XE_API Core {
     public:
