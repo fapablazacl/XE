@@ -27,11 +27,11 @@ namespace XE {
     FileStream::~FileStream() {}
 
     int FileStream::Read(void *buffer, const int size, const int count) {
-        return std::fread(buffer, size, count, m_fileHandle);
+        return (int) std::fread(buffer, size, count, m_fileHandle);
     }
 
     int FileStream::Write(const void *buffer, const int size, const int count) {
-        return std::fwrite(buffer, size, count, m_fileHandle);
+        return (int) std::fwrite(buffer, size, count, m_fileHandle);
     }
 
     bool FileStream::Seek(const int offset, const StreamOffset position) {
@@ -46,12 +46,12 @@ namespace XE {
 
             case StreamOffset::Set:
                 std::fseek(m_fileHandle, offset, SEEK_SET);
-                break;            
+                break;
         }
     }
 
     int FileStream::Tell() const {
-        return std::ftell(m_fileHandle);
+        return (int) std::ftell(m_fileHandle);
     }
 
     StreamFlags FileStream::GetFlags() const {

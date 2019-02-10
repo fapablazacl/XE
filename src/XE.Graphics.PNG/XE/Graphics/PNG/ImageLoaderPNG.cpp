@@ -1,6 +1,7 @@
 
 #include "ImageLoaderPNG.hpp"
 
+#include <iostream>
 #include <vector>
 #include <lodepng.h>
 #include <XE/Stream.hpp>
@@ -50,7 +51,7 @@ namespace XE::Graphics::PNG {
     
         std::vector<std::uint8_t> imageBuffer;
 
-        while ( (readed = inputStream->Read(buffer, bufferLength, 1)) > 0) {
+        while ( (readed = inputStream->Read(buffer, 1, bufferLength)) > 0) {
             for (int i=0; i<int(readed); i++) {
                 imageBuffer.push_back(buffer[i]);
             }
@@ -62,9 +63,13 @@ namespace XE::Graphics::PNG {
 
         LodePNGState state = {};
 
+        std::cout << "[INFO] ImageLoaderPNG::Load: PNG File has " << imageBuffer.size() << " byte(s)."  << std::endl;
+
         unsigned int error = lodepng_decode(&pixels, &width, &height, &state, imageBuffer.data(), imageBuffer.size());
 
         if (error) {
+            std::cout << "ImageLoaderPNG::Load: Error at loading texture from XE::Stream (error:" << lodepng_error_text(error) << ")" << std::endl;
+            assert(false);
             return {};
         }
 

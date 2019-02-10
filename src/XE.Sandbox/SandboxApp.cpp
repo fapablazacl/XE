@@ -8,6 +8,7 @@
 #include <XE/FileStream.hpp>
 #include <XE/Input/InputManager.hpp>
 #include <XE/Input/DeviceStatus.hpp>
+#include <XE/Graphics/Image.hpp>
 #include <XE/Graphics/GL/GraphicsDeviceGL.hpp>
 #include <XE/Graphics/GL/ProgramGL.hpp>
 #include <XE/Graphics/GL/BufferGL.hpp>
@@ -112,9 +113,19 @@ namespace XE::Sandbox {
         }
 
         std::unique_ptr<XE::Graphics::Texture2D> CreateFileTexture(const std::string &filePath) {
+            std::cout << "SandboxApp::CreateFileTexture: Loading texture from file " << filePath << " ..." << std::endl;
+
             XE::FileStream stream {filePath, XE::StreamFlags::Readable};
 
-            return {};
+            auto imagePtr = m_imageLoaderPNG.Load(&stream);
+
+            return m_graphicsDevice->CreateTexture2D (
+                XE::Graphics::PixelFormat::R8G8B8A8, 
+                imagePtr->GetSize(), 
+                imagePtr->GetFormat(),
+                XE::DataType::UInt8,
+                imagePtr->GetPointer()
+            );
         }
 
         virtual void Render() override {
@@ -233,7 +244,8 @@ namespace XE::Sandbox {
 
             m_subset = m_graphicsDevice->CreateSubset(subsetDescriptor, std::move(buffers), bufferMapping, std::move(indexBuffer));
 
-            m_texture = this->CreateColorTexture(256, 256, {1.0f, 0.0f, 0.0f, 1.0f});
+            // m_texture = this->CreateColorTexture(256, 256, {1.0f, 0.0f, 0.0f, 1.0f});
+            m_texture = this->CreateFileTexture("media/materials/Tiles_Azulejos_004_SD/Tiles_Azulejos_004_COLOR.png");
 
             m_material = std::make_unique<XE::Graphics::Material>();
             m_material->layers[0].texture = m_texture.get();
@@ -247,9 +259,8 @@ namespace XE::Sandbox {
         std::unique_ptr<XE::Graphics::Material> m_material;
         std::unique_ptr<XE::Graphics::Texture2D> m_texture;
 
-
-
         XE::Input::InputManager *m_inputManager = nullptr;
+        XE::Graphics::PNG::ImageLoaderPNG m_imageLoaderPNG;
 
         bool m_shouldClose = false;
 

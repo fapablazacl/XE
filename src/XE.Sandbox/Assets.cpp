@@ -47,10 +47,10 @@ void main() {
 )";
 
     std::vector<XE::Math::Vector3f> Assets::coordData = {
-        {-0.5f,  0.5f, 0.0f},
-        { 0.5f,  0.5f, 0.0f},
-        {-0.5f, -0.5f, 0.0f},
-        { 0.5f, -0.5f, 0.0f}
+        {-1.5f,  1.5f, 0.0f},
+        { 1.5f,  1.5f, 0.0f},
+        {-1.5f, -1.5f, 0.0f},
+        { 1.5f, -1.5f, 0.0f}
     };
 
     std::vector<XE::Math::Vector4f> Assets::colorData = {
