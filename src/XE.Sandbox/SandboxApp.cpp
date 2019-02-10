@@ -11,6 +11,7 @@
 #include <XE/Graphics/GL/ProgramGL.hpp>
 #include <XE/Graphics/GL/BufferGL.hpp>
 #include <XE/Graphics/GL/SubsetGL.hpp>
+#include <XE/Graphics/PNG/ImageLoaderPNG.hpp>
 
 #include <iostream>
 
@@ -79,31 +80,6 @@ namespace XE::Sandbox {
             }
         }
 
-        /*
-        void RenderMatrices_() {
-            XE::Graphics::UniformMatrix matrixLayout[] = {
-                { "m_model", XE::DataType::Float32, 4, 4, 1 }, 
-                { "m_view",  XE::DataType::Float32, 4, 4, 1 }, 
-                { "m_proj",  XE::DataType::Float32, 4, 4, 1 },
-            };
-
-            const int matrixCount = 3;
-            
-            XE::Math::Matrix4f matrices[matrixCount] = {
-                XE::Math::Matrix4f::Identity(),
-                // XE::Math::Matrix4f::RotateY(XE::Math::Radians(m_angle)),
-
-                // XE::Math::Matrix4f::Identity(),
-                // XE::Math::Matrix4f::LookAt(m_cameraPosition, m_cameraLookAt, m_cameraUp),
-                XE::Math::Matrix4f::Translate(-m_cameraPosition),
-
-                // XE::Math::Matrix4f::Identity(),
-                XE::Math::Matrix4f::Perspective(m_cameraFov, 4.0f/3.0f, m_cameraZNear, m_cameraZFar),
-            };
-
-            m_graphicsDevice->ApplyUniform(matrixLayout, matrixCount, (const std::byte*)&matrices);
-        }
-        */
         void RenderMatrices() {
             const XE::Graphics::UniformMatrix matrixLayout = { "m_mvp", XE::DataType::Float32, 4, 4, 1 };
 
@@ -132,6 +108,11 @@ namespace XE::Sandbox {
             }
 
             return m_graphicsDevice->CreateTexture2D(format, size, sourceFormat, sourceDataType, pixels.data());
+        }
+
+        std::unique_ptr<XE::Graphics::Texture2D> CreateFileTexture(const std::string &filePath) {
+
+            return {};
         }
 
         virtual void Render() override {

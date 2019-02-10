@@ -4,7 +4,9 @@ set (target "XE.Core")
 set (src_xe
 	"XE/Predef.hpp"
     "XE/Stream.hpp"
-    "XE/Stream.cpp"
+	"XE/Stream.cpp"
+	"XE/FileStream.hpp"
+    "XE/FileStream.cpp"
     "XE/Buffer.hpp"
     "XE/Buffer.cpp"
     "XE/DataType.hpp"

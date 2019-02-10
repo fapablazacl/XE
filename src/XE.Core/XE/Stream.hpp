@@ -30,7 +30,7 @@ namespace XE {
 
         virtual int Tell() const = 0;
 
-        virtual StreamFlags GetFlags() = 0;
+        virtual StreamFlags GetFlags() const = 0;
     };
 }
 
