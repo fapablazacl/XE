@@ -40,6 +40,7 @@ if (XE_PLUGIN_PNG)
 
     add_library(${lodepng_target} ${lodepng_sources})
 
+    include_directories("src/XE.Graphics.PNG")
     add_subdirectory("src/XE.Graphics.PNG")
 endif ()
 

@@ -5,6 +5,7 @@
 #include <XE.hpp>
 #include <XE/Graphics.hpp>
 #include <XE/Math.hpp>
+#include <XE/FileStream.hpp>
 #include <XE/Input/InputManager.hpp>
 #include <XE/Input/DeviceStatus.hpp>
 #include <XE/Graphics/GL/GraphicsDeviceGL.hpp>
@@ -111,6 +112,7 @@ namespace XE::Sandbox {
         }
 
         std::unique_ptr<XE::Graphics::Texture2D> CreateFileTexture(const std::string &filePath) {
+            XE::FileStream stream {filePath, XE::StreamFlags::Readable};
 
             return {};
         }
@@ -244,6 +246,9 @@ namespace XE::Sandbox {
         std::unique_ptr<XE::Graphics::Subset> m_subset;
         std::unique_ptr<XE::Graphics::Material> m_material;
         std::unique_ptr<XE::Graphics::Texture2D> m_texture;
+
+
+
         XE::Input::InputManager *m_inputManager = nullptr;
 
         bool m_shouldClose = false;
