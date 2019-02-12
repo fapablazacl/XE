@@ -13,5 +13,6 @@
 #include <XE/Graphics/Texture2D.hpp>
 #include <XE/Graphics/Texture2DArray.hpp>
 #include <XE/Graphics/Texture3D.hpp>
+#include <XE/Graphics/Image.hpp>
 
 #endif

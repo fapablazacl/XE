@@ -5,16 +5,9 @@
 #include <XE.hpp>
 #include <XE/Graphics.hpp>
 #include <XE/Math.hpp>
-#include <XE/Stream.hpp>
-#include <XE/StreamSource.hpp>
-#include <XE/Input/InputManager.hpp>
-#include <XE/Input/DeviceStatus.hpp>
-#include <XE/Graphics/Image.hpp>
-#include <XE/Graphics/GL/GraphicsDeviceGL.hpp>
-#include <XE/Graphics/GL/ProgramGL.hpp>
-#include <XE/Graphics/GL/BufferGL.hpp>
-#include <XE/Graphics/GL/SubsetGL.hpp>
-#include <XE/Graphics/PNG/ImageLoaderPNG.hpp>
+#include <XE/Input.hpp>
+#include <XE/Graphics/GL.hpp>
+#include <XE/Graphics/PNG.hpp>
 
 #include <iostream>
 

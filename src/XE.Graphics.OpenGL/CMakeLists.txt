@@ -2,6 +2,8 @@
 set (target "XE.Graphics.OpenGL")
 set (source_base "XE/Graphics/GL")
 set (sources_xe_graphics_glcore
+	"XE/Graphics/GL.hpp"
+
 	"${source_base}/InputManagerGLFW.hpp"
 	"${source_base}/InputManagerGLFW.cpp"
 

@@ -22,6 +22,7 @@ set (src_xe
 	"XE.hpp"
 	"XE/Graphics.hpp"
 	"XE/Math.hpp"
+	"XE/Input.hpp"
 )
 
 set (src_xe_math
