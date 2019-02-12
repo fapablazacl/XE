@@ -1,6 +1,5 @@
 
 #include "StreamSource.hpp"
-
 #include "FileStream.hpp"
 #include <experimental/filesystem>
 
