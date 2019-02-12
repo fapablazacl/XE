@@ -12,7 +12,9 @@ set (src_xe
     "XE/DataType.hpp"
     "XE/DataType.cpp"
 	"XE/Core.hpp"
-    "XE/Core.cpp"
+	"XE/Core.cpp"
+	"XE/StreamSource.hpp"
+    "XE/StreamSource.cpp"
 
 	# these will be future C++20 Modules
 	"XE.hpp"
@@ -122,3 +124,5 @@ add_library (${target}
 	${src_xe_ui}
 	${src_xe_util}
 )
+
+target_link_libraries(${target} stdc++fs)

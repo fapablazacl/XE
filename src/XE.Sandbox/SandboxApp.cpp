@@ -5,7 +5,8 @@
 #include <XE.hpp>
 #include <XE/Graphics.hpp>
 #include <XE/Math.hpp>
-#include <XE/FileStream.hpp>
+#include <XE/Stream.hpp>
+#include <XE/StreamSource.hpp>
 #include <XE/Input/InputManager.hpp>
 #include <XE/Input/DeviceStatus.hpp>
 #include <XE/Graphics/Image.hpp>
@@ -29,6 +30,7 @@ namespace XE::Sandbox {
             m_inputManager = m_graphicsDevice->GetInputManager();
 
             std::cout << "Loading assets ..." << std::endl;
+            m_streamSource = XE::StreamSource::Create();
             this->InitializeShaders();
             this->InitializeGeometry();
         }
@@ -114,10 +116,9 @@ namespace XE::Sandbox {
 
         std::unique_ptr<XE::Graphics::Texture2D> CreateFileTexture(const std::string &filePath) {
             std::cout << "SandboxApp::CreateFileTexture: Loading texture from file " << filePath << " ..." << std::endl;
+            auto stream = m_streamSource->Open(filePath);
 
-            XE::FileStream stream {filePath, XE::StreamFlags::Readable};
-
-            auto imagePtr = m_imageLoaderPNG.Load(&stream);
+            auto imagePtr = m_imageLoaderPNG.Load(stream.get());
 
             return m_graphicsDevice->CreateTexture2D (
                 XE::Graphics::PixelFormat::R8G8B8A8, 
@@ -259,9 +260,11 @@ namespace XE::Sandbox {
         std::unique_ptr<XE::Graphics::Material> m_material;
         std::unique_ptr<XE::Graphics::Texture2D> m_texture;
 
+        std::unique_ptr<XE::StreamSource> m_streamSource;
+
         XE::Input::InputManager *m_inputManager = nullptr;
         XE::Graphics::PNG::ImageLoaderPNG m_imageLoaderPNG;
-
+        
         bool m_shouldClose = false;
 
         float m_angle = 0.0f;

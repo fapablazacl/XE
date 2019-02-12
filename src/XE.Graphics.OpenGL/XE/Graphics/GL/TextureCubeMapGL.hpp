@@ -7,6 +7,7 @@
 #include "TextureBaseGL.hpp"
 
 namespace XE::Graphics::GL {
+    /*
     class TextureCubeMapGL : public TextureCubeMap, public TextureBaseGL {
     public:
         TextureCubeMapGL(const PixelFormat format, const XE::Math::Vector3i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void *sourceData);
@@ -28,6 +29,7 @@ namespace XE::Graphics::GL {
         PixelFormat m_format;
         XE::Math::Vector3i m_size;
     };
+    */
 }
 
 #endif
