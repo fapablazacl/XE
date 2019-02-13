@@ -3,7 +3,7 @@
 
 #include <stdexcept>
 
-namespace XE::Graphics::GL {
+namespace XE {
     static GLenum s_shaderTypesGL[] = {
         GL_VERTEX_SHADER,
         GL_FRAGMENT_SHADER,

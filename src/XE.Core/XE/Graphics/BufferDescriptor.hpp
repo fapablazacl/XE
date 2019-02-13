@@ -5,7 +5,7 @@
 #include <XE/Predef.hpp>
 #include <cstddef>
 
-namespace XE::Graphics {
+namespace XE {
     enum class BufferAccess {
         Static, Dynamic, Stream
     };

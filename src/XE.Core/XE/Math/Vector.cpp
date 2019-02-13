@@ -1,7 +1,7 @@
 
 #include "Vector.hpp"
 
-namespace XE::Math {
+namespace XE {
     template struct Vector<std::int32_t, 2>;
     template struct Vector<std::int32_t, 3>;
     template struct Vector<std::int32_t, 4>;

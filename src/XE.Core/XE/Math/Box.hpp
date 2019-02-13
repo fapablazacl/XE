@@ -4,7 +4,7 @@
 
 #include "Boundary.hpp"
 
-namespace XE::Math {
+namespace XE {
     typedef Boundary<float, 3> Boxf;
     typedef Boundary<int, 3> Boxi;
 }

@@ -3,6 +3,7 @@
 #define __XE_STREAMSOURCE_HPP__
 
 #include <memory>
+#include <string>
 
 namespace XE {
     class Stream;
@@ -10,11 +11,11 @@ namespace XE {
     public:
         virtual ~StreamSource();
 
-        virtual std::unique_ptr<Stream> Open(const std::string &path) = 0;
+        virtual std::unique_ptr<Stream> open(const std::string &path) = 0;
 
     public:
-        static std::unique_ptr<StreamSource> Create();
-        static std::unique_ptr<StreamSource> Create(const std::string &directory);
+        static std::unique_ptr<StreamSource> create();
+        static std::unique_ptr<StreamSource> create(const std::string &directory);
     };
 }
 

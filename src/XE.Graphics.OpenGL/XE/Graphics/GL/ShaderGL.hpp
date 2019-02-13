@@ -5,7 +5,7 @@
 #include <XE/Graphics/Shader.hpp>
 #include <glad/glad.h>
 
-namespace XE::Graphics::GL {
+namespace XE {
     class ShaderGL : public Shader {
     public:
         ShaderGL(const ShaderType type, const std::string &source);

@@ -1,6 +1,6 @@
 
 #include "WindowSystem.hpp"
 
-namespace XE::UI {
+namespace XE {
     WindowSystem::~WindowSystem() {}
 }

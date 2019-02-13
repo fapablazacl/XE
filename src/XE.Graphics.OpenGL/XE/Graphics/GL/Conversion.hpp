@@ -9,7 +9,7 @@ namespace XE {
     enum class DataType : std::int16_t;
 }
 
-namespace XE::Graphics {
+namespace XE {
     enum class PixelFormat;
     enum class BufferType;
     enum class BufferUsage;
@@ -23,7 +23,7 @@ namespace XE::Graphics {
     enum class TextureWrap;
 }
 
-namespace XE::Graphics::GL {
+namespace XE {
     extern GLenum ConvertToGL(const DataType type);
     extern GLenum ConvertToGL(const PixelFormat format);
     extern GLenum ConvertToGL(const BufferType type);

@@ -6,29 +6,29 @@
 #include <XE/Input/DeviceStatus.hpp>
 #include <GLFW/glfw3.h>
 
-namespace XE::Graphics::GL {
-    class InputManagerGLFW : public XE::Input::InputManager {
+namespace XE {
+    class InputManagerGLFW : public InputManager {
     public:
         explicit InputManagerGLFW(GLFWwindow *window);
 
         virtual void Poll() override;
 
-        virtual XE::Input::KeyboardStatus GetKeyboardStatus() override {
+        virtual KeyboardStatus GetKeyboardStatus() override {
             return m_keyboardStatus;
         }
 
-        virtual XE::Input::MouseStatus GetMouseStatus() override;
+        virtual MouseStatus GetMouseStatus() override;
 
         virtual int GetControllerCount() override;
         
-        virtual XE::Input::ControllerStatus GetControllerStatus(const int index) override;
+        virtual ControllerStatus GetControllerStatus(const int index) override;
 
     private:
         void FillKeyboardStatus();
 
     private:
         GLFWwindow *m_windowGLFW;
-        XE::Input::KeyboardStatus m_keyboardStatus;
+        KeyboardStatus m_keyboardStatus;
     };
 }
 

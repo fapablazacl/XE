@@ -5,7 +5,7 @@
 #include <cstdint>
 #include "Vector.hpp"
 
-namespace XE::Math {
+namespace XE {
     template<typename T, int R, int C>
     struct MatrixBase {
         union {
@@ -672,7 +672,7 @@ namespace XE::Math {
         Vector<T, R> result;
 
         for (int col=0; col<C; col++) {
-            result[col] = XE::Math::Dot(this->GetColumnVector(col), v);
+            result[col] = XE::Dot(this->GetColumnVector(col), v);
         }
 
         return result;
@@ -681,7 +681,7 @@ namespace XE::Math {
 
 namespace std {
     template<typename T, int R, int C>
-    std::ostream& operator<< (std::ostream &os, const XE::Math::Matrix<T, R, C>& m) {
+    std::ostream& operator<< (std::ostream &os, const XE::Matrix<T, R, C>& m) {
         os << std::endl;
 
         for (int i=0; i<R; ++i) {

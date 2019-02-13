@@ -2,7 +2,7 @@
 #include "ProgramGL.hpp"
 #include "ShaderGL.hpp"
 
-namespace XE::Graphics::GL {
+namespace XE {
     ProgramGL::ProgramGL(const ProgramDescriptor &desc) {
         for (const auto &source: desc.sources) {
             m_shaders.emplace_back(new ShaderGL(source.type, source.text));

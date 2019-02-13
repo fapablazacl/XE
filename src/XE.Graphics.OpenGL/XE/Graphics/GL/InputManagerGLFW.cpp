@@ -2,20 +2,20 @@
 #include "InputManagerGLFW.hpp"
 #include <map>
 
-namespace XE::Graphics::GL {
-    static std::map<int, XE::Input::KeyCode> s_keyMapping = {
-        {GLFW_KEY_ESCAPE    , XE::Input::KeyCode::KeyEsc},
-        {GLFW_KEY_LEFT      , XE::Input::KeyCode::KeyLeft},
-        {GLFW_KEY_RIGHT     , XE::Input::KeyCode::KeyRight},
-        {GLFW_KEY_UP        , XE::Input::KeyCode::KeyUp},
-        {GLFW_KEY_DOWN      , XE::Input::KeyCode::KeyDown},
-        {GLFW_KEY_ENTER     , XE::Input::KeyCode::KeyEnter}, 
-        {GLFW_KEY_SPACE     , XE::Input::KeyCode::KeySpace}
+namespace XE {
+    static std::map<int, KeyCode> s_keyMapping = {
+        {GLFW_KEY_ESCAPE    , KeyCode::KeyEsc},
+        {GLFW_KEY_LEFT      , KeyCode::KeyLeft},
+        {GLFW_KEY_RIGHT     , KeyCode::KeyRight},
+        {GLFW_KEY_UP        , KeyCode::KeyUp},
+        {GLFW_KEY_DOWN      , KeyCode::KeyDown},
+        {GLFW_KEY_ENTER     , KeyCode::KeyEnter}, 
+        {GLFW_KEY_SPACE     , KeyCode::KeySpace}
     };
 
-    static std::map<int, XE::Input::BinaryState> s_stateMappings = {
-        {GLFW_PRESS     , XE::Input::BinaryState::Press},
-        {GLFW_RELEASE   , XE::Input::BinaryState::Release}
+    static std::map<int, BinaryState> s_stateMappings = {
+        {GLFW_PRESS     , BinaryState::Press},
+        {GLFW_RELEASE   , BinaryState::Release}
     };
 
     static int s_keys[] = {
@@ -80,14 +80,14 @@ namespace XE::Graphics::GL {
                 continue;
             }
 
-            XE::Input::KeyCode keyCode = keyMappingIt->second;
-            XE::Input::BinaryState stateCode = stateMappingIt->second;
+            KeyCode keyCode = keyMappingIt->second;
+            BinaryState stateCode = stateMappingIt->second;
             
             m_keyboardStatus.SetState(keyCode, stateCode);
         }
     }
 
-    XE::Input::MouseStatus InputManagerGLFW::GetMouseStatus() {
+    MouseStatus InputManagerGLFW::GetMouseStatus() {
         // TODO: Add implementation code
         assert(false);
         return {};
@@ -99,7 +99,7 @@ namespace XE::Graphics::GL {
         return 0;
     }
         
-    XE::Input::ControllerStatus InputManagerGLFW::GetControllerStatus(const int index) {
+    ControllerStatus InputManagerGLFW::GetControllerStatus(const int index) {
         // TODO: Add implementation code
         assert(false);
         assert(index == 0);

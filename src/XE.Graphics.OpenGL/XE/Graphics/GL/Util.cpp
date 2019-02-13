@@ -5,7 +5,7 @@
 #include <iostream>
 #include <glad/glad.h>
 
-namespace XE::Graphics::GL {
+namespace XE {
     void __checkErrorImpl(const char *file, const int line) {
         GLenum errorGL = ::glGetError();
 

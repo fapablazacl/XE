@@ -48,6 +48,8 @@ namespace XE {
                 std::fseek(m_fileHandle, offset, SEEK_SET);
                 break;
         }
+
+        return true;
     }
 
     int FileStream::Tell() const {

@@ -4,7 +4,7 @@
 
 #include <string>
 
-namespace XE::Graphics {
+namespace XE {
     enum class ShaderType {
         Vertex,
         Fragment,

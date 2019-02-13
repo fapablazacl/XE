@@ -1,6 +1,6 @@
 
 #include "Program.hpp"
 
-namespace XE::Graphics {
+namespace XE {
     Program::~Program() {}
 }

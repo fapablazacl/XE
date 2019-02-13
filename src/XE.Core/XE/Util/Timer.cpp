@@ -4,7 +4,7 @@
 #if defined(_WINDOWS)
 #include <Windows.h>
 
-namespace XE::Util {
+namespace XE {
     int Timer::GetTick() {
         const DWORD dwTickCount = ::GetTickCount();
         return dwTickCount;

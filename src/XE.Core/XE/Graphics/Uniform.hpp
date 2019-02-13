@@ -6,7 +6,7 @@
 #include <string>
 #include <XE/DataType.hpp>
 
-namespace XE::Graphics {
+namespace XE {
     /**
      * @brief A variable visible to all the stages in a ShaderProgram
      */

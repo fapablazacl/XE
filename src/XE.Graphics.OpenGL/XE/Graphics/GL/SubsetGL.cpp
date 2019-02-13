@@ -3,7 +3,7 @@
 #include "BufferGL.hpp"
 #include "Conversion.hpp"
 
-namespace XE::Graphics::GL {
+namespace XE {
     SubsetGL::SubsetGL(SubsetDescriptor& desc, 
             std::vector<std::unique_ptr<Buffer>> buffers, 
             const std::map<std::string, int> &bufferMapping, 

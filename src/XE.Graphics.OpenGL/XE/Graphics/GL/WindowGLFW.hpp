@@ -5,12 +5,12 @@
 #include <GLFW/glfw3.h>
 #include <XE/Graphics/GraphicsDevice.hpp>
 
-namespace XE::Graphics::GL {
+namespace XE {
     class WindowGLFW : public Window {
     public:
         explicit WindowGLFW(GLFWwindow *window);
 
-        virtual XE::Math::Vector2i GetSize() const override;
+        virtual XE::Vector2i GetSize() const override;
 
     private:
         GLFWwindow *m_windowGLFW;

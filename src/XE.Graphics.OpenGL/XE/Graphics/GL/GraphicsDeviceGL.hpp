@@ -11,7 +11,7 @@ namespace XE::Input {
     class InputManager;
 }
 
-namespace XE::Graphics::GL {
+namespace XE {
     class ProgramGL;
 
     class GraphicsDeviceGL : public GraphicsDevice {
@@ -22,7 +22,7 @@ namespace XE::Graphics::GL {
         
         virtual Window* GetWindow() const override;
 
-        virtual XE::Input::InputManager* GetInputManager() override;
+        virtual InputManager* GetInputManager() override;
 
         virtual std::unique_ptr<Subset> CreateSubset(
             SubsetDescriptor& desc, 
@@ -32,13 +32,13 @@ namespace XE::Graphics::GL {
         
         virtual std::unique_ptr<Buffer> CreateBuffer(const BufferDescriptor &bufferDescriptor) override;
         
-        virtual std::unique_ptr<Texture2D> CreateTexture2D(const PixelFormat format, const XE::Math::Vector2i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void *sourceData) override;
+        virtual std::unique_ptr<Texture2D> CreateTexture2D(const PixelFormat format, const XE::Vector2i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void *sourceData) override;
         
-        virtual std::unique_ptr<Texture3D> CreateTexture3D(const PixelFormat format, const XE::Math::Vector3i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void *sourceData) override;
+        virtual std::unique_ptr<Texture3D> CreateTexture3D(const PixelFormat format, const XE::Vector3i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void *sourceData) override;
         
-        virtual std::unique_ptr<Texture2DArray> CreateTexture2DArray(const PixelFormat format, const XE::Math::Vector2i &size, const int count) override;
+        virtual std::unique_ptr<Texture2DArray> CreateTexture2DArray(const PixelFormat format, const XE::Vector2i &size, const int count) override;
         
-        virtual std::unique_ptr<TextureCubeMap> CreateTextureCubeMap(const PixelFormat format, const XE::Math::Vector2i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void **sourceData) override;
+        virtual std::unique_ptr<TextureCubeMap> CreateTextureCubeMap(const PixelFormat format, const XE::Vector2i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void **sourceData) override;
         
         virtual std::unique_ptr<Program> CreateProgram(const ProgramDescriptor &programDescriptor) override;
         
@@ -54,7 +54,7 @@ namespace XE::Graphics::GL {
 
         virtual void ApplyUniform(const Uniform *uniform, const int count, const std::byte *data) override;
 
-        virtual void BeginFrame(const ClearFlags flags, const XE::Math::Vector4f &color, const float depth, const int stencil) override;
+        virtual void BeginFrame(const ClearFlags flags, const XE::Vector4f &color, const float depth, const int stencil) override;
         
         virtual void Draw(const Subset *subset, const SubsetEnvelope *envelopes, const int envelopeCount) override;
 
@@ -72,7 +72,7 @@ namespace XE::Graphics::GL {
     private:
         GLFWwindow *m_windowGLFW = nullptr;
         std::unique_ptr<Window> m_window;
-        std::unique_ptr<XE::Input::InputManager> m_inputManager;
+        std::unique_ptr<InputManager> m_inputManager;
         const ProgramGL *m_program = nullptr;
         const Material *m_material = nullptr;
 

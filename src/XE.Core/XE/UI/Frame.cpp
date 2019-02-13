@@ -1,6 +1,6 @@
 
 #include "Frame.hpp"
 
-namespace XE::UI {
+namespace XE {
     Frame::~Frame() {}
 }

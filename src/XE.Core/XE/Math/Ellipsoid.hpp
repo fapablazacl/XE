@@ -6,7 +6,7 @@
 
 #include <limits>
 
-namespace XE::Math {
+namespace XE {
     /**
      * @brief Ellipsoid in the 3-space
      */

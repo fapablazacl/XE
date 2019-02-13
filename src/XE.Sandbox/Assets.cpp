@@ -46,28 +46,28 @@ void main() {
 }
 )";
 
-    std::vector<XE::Math::Vector3f> Assets::coordData = {
+    std::vector<XE::Vector3f> Assets::coordData = {
         {-1.5f,  1.5f, 0.0f},
         { 1.5f,  1.5f, 0.0f},
         {-1.5f, -1.5f, 0.0f},
         { 1.5f, -1.5f, 0.0f}
     };
 
-    std::vector<XE::Math::Vector4f> Assets::colorData = {
+    std::vector<XE::Vector4f> Assets::colorData = {
         {1.0f, 1.0f, 1.0f, 1.0f},
         {1.0f, 1.0f, 1.0f, 1.0f},
         {1.0f, 1.0f, 1.0f, 1.0f},
         {1.0f, 1.0f, 1.0f, 1.0f}
     };
 
-    std::vector<XE::Math::Vector3f> Assets::normalData = {
+    std::vector<XE::Vector3f> Assets::normalData = {
         {0.0f, 0.0f, 1.0f},
         {0.0f, 0.0f, 1.0f},
         {0.0f, 0.0f, 1.0f},
         {0.0f, 0.0f, 1.0f}
     };
 
-    std::vector<XE::Math::Vector2f> Assets::texCoordData = {
+    std::vector<XE::Vector2f> Assets::texCoordData = {
         {0.0f, 1.0f},
         {1.0f, 1.0f},
         {0.0f, 0.0f},

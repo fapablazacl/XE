@@ -4,11 +4,11 @@
 
 #include <XE/Math/Vector.hpp>
 
-namespace XE::Graphics {
+namespace XE {
     struct Vertex {
-        XE::Math::Vector3f Position;
-        XE::Math::Vector3f Normal;
-        XE::Math::Vector2f TexCoord;
+        XE::Vector3f Position;
+        XE::Vector3f Normal;
+        XE::Vector2f TexCoord;
     };
 }
 

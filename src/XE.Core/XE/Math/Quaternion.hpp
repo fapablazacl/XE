@@ -8,7 +8,7 @@
 
 #include "Vector.hpp"
 
-namespace XE::Math {
+namespace XE {
     template<typename T>
     struct Rotation {
         T angle;

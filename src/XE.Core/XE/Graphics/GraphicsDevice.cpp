@@ -1,6 +1,6 @@
 
 #include "GraphicsDevice.hpp"
 
-namespace XE::Graphics {
+namespace XE {
     GraphicsDevice::~GraphicsDevice() {}
 }

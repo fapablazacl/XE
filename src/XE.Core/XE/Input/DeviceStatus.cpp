@@ -1,7 +1,7 @@
 
 #include "DeviceStatus.hpp"
 
-namespace XE::Input {
+namespace XE {
     BinaryState KeyboardStatus::GetState(KeyCode code) const {
         return m_keys[static_cast<int>(code)];
     }
@@ -11,11 +11,11 @@ namespace XE::Input {
     }
 
 
-    XE::Math::Vector2i MouseStatus::GetPosition() const {
+    XE::Vector2i MouseStatus::GetPosition() const {
         return m_position;
     }
 
-    void MouseStatus::SetPosition(const XE::Math::Vector2i &position) {
+    void MouseStatus::SetPosition(const XE::Vector2i &position) {
         m_position = position;
     }
 
@@ -36,11 +36,11 @@ namespace XE::Input {
         m_buttons[static_cast<int>(button)] = state;
     }
 
-    XE::Math::Vector2f ControllerStatus::GetState(const ControllerJoystick joystick) const {
+    XE::Vector2f ControllerStatus::GetState(const ControllerJoystick joystick) const {
         return m_joysticks[static_cast<int>(joystick)];
     }
 
-    void ControllerStatus::SetState(const ControllerJoystick joystick, const XE::Math::Vector2f &state) {
+    void ControllerStatus::SetState(const ControllerJoystick joystick, const XE::Vector2f &state) {
         m_joysticks[static_cast<int>(joystick)] = state;
     }
 }

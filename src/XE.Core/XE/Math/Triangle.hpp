@@ -5,7 +5,7 @@
 #include <array>
 #include "Vector.hpp"
 
-namespace XE::Math {
+namespace XE {
     template<typename T>
     struct Triangle {
         Vector<T, 3> P1;

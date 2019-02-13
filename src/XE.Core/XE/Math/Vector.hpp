@@ -9,7 +9,7 @@
 #include <ostream>
 #include <string>
 
-namespace XE::Math {
+namespace XE {
     template<typename T, int N>
     struct VectorBase {
         T Data[N];
@@ -466,7 +466,7 @@ namespace std {
      * @brief Send a string-representation of the supplied row vector
      */
     template<typename T, int N>
-    std::ostream& operator<< (std::ostream &os, const XE::Math::Vector<T, N> &v) {
+    std::ostream& operator<< (std::ostream &os, const XE::Vector<T, N> &v) {
         os << "[";
 
         for (int i=0; i<N; i++) {

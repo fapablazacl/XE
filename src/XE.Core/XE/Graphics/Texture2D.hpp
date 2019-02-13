@@ -9,9 +9,7 @@
 
 namespace XE {
     enum class DataType : std::int16_t;
-}
 
-namespace XE::Graphics {
     class Texture2D : public Texture {
     public:
         virtual TextureType GetType() const override;
@@ -19,9 +17,9 @@ namespace XE::Graphics {
     public:
         virtual ~Texture2D();
         
-        virtual XE:: Math::Vector2i GetSize() const = 0;
+        virtual Vector2i GetSize() const = 0;
         
-        virtual void SetData(const std::byte *surfaceData, const int mipLevel, const PixelFormat surfaceFormat, const DataType surfaceDataType, const XE::Math::Recti &area) = 0;
+        virtual void SetData(const std::byte *surfaceData, const int mipLevel, const PixelFormat surfaceFormat, const DataType surfaceDataType, const XE::Recti &area) = 0;
 
         virtual void GetData(std::byte *surfaceData, const int mipLevel, const PixelFormat surfaceFormat, const DataType surfaceDataType) const = 0;
     };

@@ -7,11 +7,11 @@
 #include <XE/Stream.hpp>
 #include <XE/Graphics/Image.hpp>
 
-namespace XE::Graphics::PNG {
+namespace XE {
 
     class ImagePNG : public Image {
     public:
-        ImagePNG(const std::byte *pointer, const PixelFormat format, const XE::Math::Vector2i size) {
+        ImagePNG(const std::byte *pointer, const PixelFormat format, const XE::Vector2i size) {
             this->pointer = pointer;
             this->format = format;
             this->size = size;
@@ -27,14 +27,14 @@ namespace XE::Graphics::PNG {
             return format;
         }
 
-        virtual XE::Math::Vector2i GetSize() const override {
+        virtual XE::Vector2i GetSize() const override {
             return size;
         }
 
     private:
         const std::byte *pointer;
         PixelFormat format;
-        XE::Math::Vector2i size;
+        XE::Vector2i size;
     };
 
 
@@ -76,7 +76,7 @@ namespace XE::Graphics::PNG {
         return std::make_unique<ImagePNG> (
             (const std::byte*)pixels, 
             PixelFormat::R8G8B8A8, 
-            XE::Math::Vector2i(int(width), int(height))
+            XE::Vector2i(int(width), int(height))
         );
     }
 }

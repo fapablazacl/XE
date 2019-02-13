@@ -3,7 +3,7 @@
 #include "Conversion.hpp"
 #include <cstdint>
 
-namespace XE::Graphics::GL {
+namespace XE {
     BufferGL::BufferGL(const BufferDescriptor &desc) {
         const GLenum targetGL = ConvertToGL(desc.type);
         const GLenum usageGL = ConvertToGL(desc.usage, desc.access);

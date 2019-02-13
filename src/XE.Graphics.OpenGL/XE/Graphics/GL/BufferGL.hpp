@@ -6,13 +6,11 @@
 #include <XE/Graphics/BufferDescriptor.hpp>
 #include <glad/glad.h>
 
-namespace XE::Graphics {
+namespace XE {
     enum class BufferUsage;
     enum class BufferAccess;
     enum class BufferType;
-}
 
-namespace XE::Graphics::GL {
     class BufferGL : public Buffer {
     public:
         BufferGL(const BufferDescriptor &desc);

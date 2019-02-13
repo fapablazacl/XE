@@ -7,7 +7,7 @@
 
 #include "BufferGL.hpp"
 
-namespace XE::Graphics::GL {
+namespace XE {
     class SubsetGL : public Subset {
     public:
         SubsetGL(

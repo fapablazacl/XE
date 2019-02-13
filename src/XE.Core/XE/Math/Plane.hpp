@@ -4,7 +4,7 @@
 
 #include "Vector.hpp"
 
-namespace XE::Math {
+namespace XE {
     /**
      * @brief Plane on 3-space.
      */

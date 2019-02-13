@@ -8,7 +8,7 @@ namespace XE {
     class Stream;
 }
 
-namespace XE::Graphics {
+namespace XE {
     class Image;
 
     /**

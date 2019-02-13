@@ -4,7 +4,7 @@
 
 #include <XE/Predef.hpp>
 
-namespace XE::Util {
+namespace XE {
     class XE_API Timer {
     public:
         Timer() = delete;

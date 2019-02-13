@@ -14,7 +14,7 @@ namespace XE {
     class Buffer;
 }
 
-namespace XE::Graphics {
+namespace XE {
     /**
      * @brief Geometric Primitive Shape basis for rendering
      */

@@ -1,7 +1,7 @@
 
 #include "PixelFormat.hpp"
 
-namespace XE::Graphics {
+namespace XE {
     static int g_pixelFormatStorage[] = {
         -1, 3, 4
     };

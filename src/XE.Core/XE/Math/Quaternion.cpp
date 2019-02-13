@@ -1,6 +1,6 @@
 
 #include "Quaternion.hpp"
 
-namespace XE::Math {
+namespace XE {
 
 }

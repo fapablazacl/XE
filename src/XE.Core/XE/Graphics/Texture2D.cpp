@@ -1,7 +1,7 @@
 
 #include "Texture2D.hpp"
 
-namespace XE::Graphics {
+namespace XE {
 	Texture2D::~Texture2D() {}
 
 	TextureType Texture2D::GetType() const {

@@ -1,6 +1,6 @@
 
 #include "Subset.hpp"
 
-namespace XE::Graphics {
+namespace XE {
     Subset::~Subset() {}
 }

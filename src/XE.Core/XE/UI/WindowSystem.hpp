@@ -5,7 +5,7 @@
 #include <memory>
 #include <XE/Predef.hpp>
 
-namespace XE::UI {
+namespace XE {
     class XE_API Frame;
 
     class XE_API WindowSystem {

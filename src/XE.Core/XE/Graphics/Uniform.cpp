@@ -1,4 +1,4 @@
 
 #include "Uniform.hpp"
 
-namespace XE::Graphics {}
+namespace XE {}

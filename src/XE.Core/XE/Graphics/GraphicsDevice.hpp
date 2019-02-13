@@ -11,13 +11,8 @@
 
 namespace XE {
     class Buffer;
-}
-
-namespace XE::Input {
     class InputManager;
-}
 
-namespace XE::Graphics {
     /**
      * @brief Specify wich buffer will be used to clear
      */
@@ -61,8 +56,8 @@ namespace XE::Graphics {
     struct ProgramDescriptor;
 
     struct Viewport {
-        XE::Math::Vector2i position;
-        XE::Math::Vector2i size;
+        XE::Vector2i position;
+        XE::Vector2i size;
     };
 
     /**
@@ -75,7 +70,7 @@ namespace XE::Graphics {
         /**
          * @brief Get the current size of the Window, in Pixels, where the X and Y fields correspond to the Width and Height of the Window, respectively
          */
-        virtual XE::Math::Vector2i GetSize() const = 0;
+        virtual XE::Vector2i GetSize() const = 0;
     };
 
     /**
@@ -85,7 +80,7 @@ namespace XE::Graphics {
     public:
         virtual ~GraphicsDevice();
 
-        virtual XE::Input::InputManager* GetInputManager() = 0;
+        virtual InputManager* GetInputManager() = 0;
 
         virtual Window* GetWindow() const = 0;
 
@@ -104,13 +99,13 @@ namespace XE::Graphics {
         
         virtual std::unique_ptr<Buffer> CreateBuffer(const BufferDescriptor &bufferDescriptor) = 0;
         
-        virtual std::unique_ptr<Texture2D> CreateTexture2D(const PixelFormat format, const XE::Math::Vector2i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void *sourceData) = 0;
+        virtual std::unique_ptr<Texture2D> CreateTexture2D(const PixelFormat format, const XE::Vector2i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void *sourceData) = 0;
         
-        virtual std::unique_ptr<Texture3D> CreateTexture3D(const PixelFormat format, const XE::Math::Vector3i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void *sourceData) = 0;
+        virtual std::unique_ptr<Texture3D> CreateTexture3D(const PixelFormat format, const XE::Vector3i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void *sourceData) = 0;
         
-        virtual std::unique_ptr<Texture2DArray> CreateTexture2DArray(const PixelFormat format, const XE::Math::Vector2i &size, const int count) = 0;
+        virtual std::unique_ptr<Texture2DArray> CreateTexture2DArray(const PixelFormat format, const XE::Vector2i &size, const int count) = 0;
         
-        virtual std::unique_ptr<TextureCubeMap> CreateTextureCubeMap(const PixelFormat format, const XE::Math::Vector2i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void **sourceData) = 0;
+        virtual std::unique_ptr<TextureCubeMap> CreateTextureCubeMap(const PixelFormat format, const XE::Vector2i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void **sourceData) = 0;
         
         virtual std::unique_ptr<Program> CreateProgram(const ProgramDescriptor &programDescriptor) = 0;
         
@@ -132,7 +127,7 @@ namespace XE::Graphics {
 
         virtual void Draw(const Subset *subset, const SubsetEnvelope *envelopes, const int envelopeCount) = 0;
         
-        virtual void BeginFrame(const ClearFlags flags, const XE::Math::Vector4f &color, const float depth, const int stencil) = 0;
+        virtual void BeginFrame(const ClearFlags flags, const XE::Vector4f &color, const float depth, const int stencil) = 0;
         
         virtual void EndFrame() = 0;
     };

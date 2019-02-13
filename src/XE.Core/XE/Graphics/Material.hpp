@@ -6,7 +6,7 @@
 #include <array>
 #include <XE/Predef.hpp>
 
-namespace XE::Graphics {
+namespace XE {
     class Texture;
 
     enum class TextureFilter {

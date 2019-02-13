@@ -9,12 +9,12 @@
 #include <tuple>
 #include <glad/glad.h>
 
-namespace XE::Graphics {
+namespace XE {
     enum class ShaderType;
     struct ProgramDescriptor;
 }
 
-namespace XE::Graphics::GL {
+namespace XE {
     class ShaderGL;
     class ProgramGL : public Program {
     public:

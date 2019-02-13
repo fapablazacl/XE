@@ -2,8 +2,8 @@
 #include "Texture3DGL.hpp"
 #include "Conversion.hpp"
 
-namespace XE::Graphics::GL {
-    Texture3DGL::Texture3DGL(const PixelFormat format, const XE::Math::Vector3i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void *sourceData)
+namespace XE {
+    Texture3DGL::Texture3DGL(const PixelFormat format, const XE::Vector3i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void *sourceData)
             : TextureBaseGL(GL_TEXTURE_3D) {
 
         m_size = size;
@@ -20,9 +20,9 @@ namespace XE::Graphics::GL {
 
     Texture3DGL::~Texture3DGL() {}
 
-    void Texture3DGL::SetData(const std::byte *surfaceData, const int mipLevel, const PixelFormat surfaceFormat, const DataType surfaceDataType, const XE::Math::Boxi &volume) {
-        const XE::Math::Vector3i offset = volume.MinEdge;
-        const XE::Math::Vector3i size = volume.ComputeSize();
+    void Texture3DGL::SetData(const std::byte *surfaceData, const int mipLevel, const PixelFormat surfaceFormat, const DataType surfaceDataType, const XE::Boxi &volume) {
+        const XE::Vector3i offset = volume.MinEdge;
+        const XE::Vector3i size = volume.ComputeSize();
         const GLenum formatGL = ConvertToGL(surfaceFormat);
         const GLenum dataTypeGL = ConvertToGL(surfaceDataType);
 
@@ -31,7 +31,7 @@ namespace XE::Graphics::GL {
         ::glBindTexture(GL_TEXTURE_3D, 0);
     }
     
-    void Texture3DGL::GetData(std::byte *surfaceData, const int mipLevel, const PixelFormat surfaceFormat, const DataType surfaceDataType, const XE::Math::Boxi &volume) const {
+    void Texture3DGL::GetData(std::byte *surfaceData, const int mipLevel, const PixelFormat surfaceFormat, const DataType surfaceDataType, const XE::Boxi &volume) const {
         const GLenum formatGL = ConvertToGL(surfaceFormat);
         const GLenum dataTypeGL = ConvertToGL(surfaceDataType);
 

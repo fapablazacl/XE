@@ -4,7 +4,7 @@
 
 #include <glad/glad.h>
 
-namespace XE::Graphics::GL {
+namespace XE {
     /**
      * @brief Structural base class for textures
      */

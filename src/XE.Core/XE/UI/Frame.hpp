@@ -8,11 +8,8 @@
 #include <XE/Predef.hpp>
 #include <XE/Math/Vector.hpp>
 
-namespace XE::Input {
+namespace XE {
     class XE_API InputManager;
-}
-
-namespace XE::UI {
     /**
      * @brief 
      */
@@ -20,8 +17,8 @@ namespace XE::UI {
 
     struct FrameProperties {
         std::string Caption;
-        XE::Math::Vector2i Size;
-        XE::Math::Vector2i Position;
+        XE::Vector2i Size;
+        XE::Vector2i Position;
     };
 
     /**

@@ -4,12 +4,11 @@
 #include <sstream>
 
 using namespace XE;
-using namespace XE::Math;
 
 namespace Catch {
     template<>
-    struct StringMaker<XE::Math::Vector3f> {
-        static std::string convert(XE::Math::Vector3f const& value) {
+    struct StringMaker<XE::Vector3f> {
+        static std::string convert(XE::Vector3f const& value) {
             std::stringstream ss;
 
             ss << value;
@@ -19,7 +18,7 @@ namespace Catch {
     };
 }
 
-TEST_CASE("XE::Math::Vector<3, float>") {
+TEST_CASE("XE::Vector<3, float>") {
     SECTION("constructor should setup the vector components correctly") {
         const Vector3f v = {1.0f, 2.0f, 3.0f};
 

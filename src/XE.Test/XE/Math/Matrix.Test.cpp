@@ -4,8 +4,8 @@
 
 namespace Catch {
     template<>
-    struct StringMaker<XE::Math::Matrix2f> {
-        static std::string convert(XE::Math::Matrix2f const& value) {
+    struct StringMaker<XE::Matrix2f> {
+        static std::string convert(XE::Matrix2f const& value) {
             std::stringstream ss;
             ss << value;
 
@@ -14,8 +14,8 @@ namespace Catch {
     };
 
     template<>
-    struct StringMaker<XE::Math::Matrix3f> {
-        static std::string convert(XE::Math::Matrix3f const& value) {
+    struct StringMaker<XE::Matrix3f> {
+        static std::string convert(XE::Matrix3f const& value) {
             std::stringstream ss;
             ss << value;
 
@@ -24,8 +24,8 @@ namespace Catch {
     };
 
     template<>
-    struct StringMaker<XE::Math::Matrix4f> {
-        static std::string convert(XE::Math::Matrix4f const& value) {
+    struct StringMaker<XE::Matrix4f> {
+        static std::string convert(XE::Matrix4f const& value) {
             std::stringstream ss;
             ss << value;
 
@@ -35,7 +35,6 @@ namespace Catch {
 }
 
 using namespace XE;
-using namespace Math;
 
 TEST_CASE("Math::Matrix<3, float>") {
     SECTION("constructor should setup the matrix components correctly") {

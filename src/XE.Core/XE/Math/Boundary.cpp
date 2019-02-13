@@ -1,6 +1,6 @@
 
 #include "Boundary.hpp"
 
-namespace XE::Math {
+namespace XE {
     template struct Boundary<float, 3>;
 }

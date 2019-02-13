@@ -1,6 +1,6 @@
 
 #include "InputManager.hpp"
 
-namespace XE::Input {
+namespace XE {
     InputManager::~InputManager() {}
 }

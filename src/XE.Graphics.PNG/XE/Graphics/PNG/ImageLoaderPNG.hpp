@@ -4,7 +4,7 @@
 
 #include <XE/Graphics/ImageLoader.hpp>
 
-namespace XE::Graphics::PNG {
+namespace XE {
     class ImageLoaderPNG : public ImageLoader {
     public:
         virtual ~ImageLoaderPNG();

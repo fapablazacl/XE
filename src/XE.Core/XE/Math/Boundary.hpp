@@ -7,7 +7,7 @@
 
 #include "Vector.hpp"
 
-namespace XE::Math {
+namespace XE {
     template<typename T, int N>
     struct Boundary {
         Vector<T, N> MinEdge;

@@ -7,7 +7,7 @@
 #include <XE/Math/Vector.hpp>
 #include <XE/Graphics/PixelFormat.hpp>
 
-namespace XE::Graphics {
+namespace XE {
     /**
      * @brief Abstract image class with basic image manipulation.
      */
@@ -28,7 +28,7 @@ namespace XE::Graphics {
         /**
          * @brief Get the image dimensions as a 2D Integer Vector, in pixels.
          */
-        virtual XE::Math::Vector2i GetSize() const = 0;
+        virtual XE::Vector2i GetSize() const = 0;
     };
 }
 

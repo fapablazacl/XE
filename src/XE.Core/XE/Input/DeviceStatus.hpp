@@ -4,7 +4,7 @@
 
 #include <XE/Math/Vector.hpp>
 
-namespace XE::Input {
+namespace XE {
     enum class BinaryState {
         Press, Release
     };
@@ -37,16 +37,16 @@ namespace XE::Input {
 
     class MouseStatus {
     public:
-        XE::Math::Vector2i GetPosition() const;
+        XE::Vector2i GetPosition() const;
 
-        void SetPosition(const XE::Math::Vector2i &position);
+        void SetPosition(const XE::Vector2i &position);
 
         BinaryState GetState(const MouseButton button) const;
 
         void SetState(const MouseButton button, const BinaryState state);
 
     private:
-        XE::Math::Vector2i m_position;
+        XE::Vector2i m_position;
         BinaryState m_buttons[static_cast<int>(MouseButton::Max)];
     };
 
@@ -69,13 +69,13 @@ namespace XE::Input {
 
         void SetState(const ControllerButton button, const BinaryState state);
 
-        XE::Math::Vector2f GetState(const ControllerJoystick joystick) const;
+        XE::Vector2f GetState(const ControllerJoystick joystick) const;
 
-        void SetState(const ControllerJoystick joystick, const XE::Math::Vector2f &state);
+        void SetState(const ControllerJoystick joystick, const XE::Vector2f &state);
 
     private:
         BinaryState m_buttons[static_cast<int>(ControllerButton::Max)];
-        XE::Math::Vector2f m_joysticks[static_cast<int>(ControllerJoystick::Max)];
+        XE::Vector2f m_joysticks[static_cast<int>(ControllerJoystick::Max)];
     };
 }
 

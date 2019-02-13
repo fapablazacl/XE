@@ -20,17 +20,17 @@ std::vector<std::string> ConvertArgs(int argc, char **argv) {
 int main(int argc, char **argv) {
     try {
         std::vector<std::string> args = ConvertArgs(argc, argv);
-        auto app = XE::Sandbox::Application::Create(args);
+        auto app = XE::Application::create(args);
 
         app->Initialize();
 
-        int lastTime = XE::Util::Timer::GetTick();
+        int lastTime = XE::Timer::GetTick();
 
         while (!app->ShouldClose()) {
-            int current = XE::Util::Timer::GetTick() - lastTime;
+            int current = XE::Timer::GetTick() - lastTime;
             float seconds = static_cast<float>(current) / 1000.0f;
 
-            lastTime = XE::Util::Timer::GetTick();
+            lastTime = XE::Timer::GetTick();
 
             app->Update(seconds);
             app->Render();

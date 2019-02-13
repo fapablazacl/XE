@@ -7,7 +7,7 @@
 #include <XE/Graphics/Subset.hpp>
 #include <XE/Graphics/Material.hpp>
 
-namespace XE::Graphics::GL {
+namespace XE {
     GLenum ConvertToGL(const DataType type) {
         switch (type) {
             case DataType::UInt8: return GL_UNSIGNED_BYTE;

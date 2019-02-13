@@ -34,8 +34,8 @@ if (XE_PLUGIN_PNG)
     set (lodepng_sources 
         "dep/lodepng/lodepng.h"
         "dep/lodepng/lodepng.cpp"
-        "dep/lodepng/lodepng_util.h"
-        "dep/lodepng/lodepng_util.cpp"
+        # "dep/lodepng/lodepng_util.h"
+        # "dep/lodepng/lodepng_util.cpp"
     )
 
     add_library(${lodepng_target} ${lodepng_sources})

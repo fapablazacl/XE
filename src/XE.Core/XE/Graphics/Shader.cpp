@@ -1,6 +1,6 @@
 
 #include "Shader.hpp"
 
-namespace XE::Graphics {
+namespace XE {
     Shader::~Shader() {}
 }

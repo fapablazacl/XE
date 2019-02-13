@@ -4,14 +4,14 @@
 #include <cstdlib>
 #include <cassert>
 
-namespace XE::Graphics {
+namespace XE {
     ImageImpl::ImageImpl() {}
 
     ImageImpl::~ImageImpl() {
         this->Free();
     }
 
-    std::byte* ImageImpl::GetPointer() const {
+    const std::byte* ImageImpl::GetPointer() const {
         return pixels;
     }
 
@@ -19,11 +19,11 @@ namespace XE::Graphics {
         return format;
     }
 
-    XE::Math::Vector2i ImageImpl::GetSize() const {
+    XE::Vector2i ImageImpl::GetSize() const {
         return size;
     }
 
-    void ImageImpl::Allocate(const PixelFormat format, const XE::Math::Vector2i &size) {
+    void ImageImpl::Allocate(const PixelFormat format, const XE::Vector2i &size) {
         this->Free();
 
         const int pixelByteSize = ComputeStorage(format);

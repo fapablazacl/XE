@@ -25,7 +25,7 @@ namespace XE {
             }
         }
 
-        virtual std::unique_ptr<Stream> Open(const std::string &path) override {
+        virtual std::unique_ptr<Stream> open(const std::string &path) override {
             const fs::path finalPath = directory / fs::path(path);
 
             return std::make_unique<FileStream>(finalPath.string(), StreamFlags::Readable);
@@ -38,13 +38,13 @@ namespace XE {
 
     StreamSource::~StreamSource() {}
 
-    std::unique_ptr<StreamSource> StreamSource::Create() {
+    std::unique_ptr<StreamSource> StreamSource::create() {
         const std::string currentPath = fs::current_path().string();
 
-        return StreamSource::Create(currentPath);
+        return StreamSource::create(currentPath);
     }
 
-    std::unique_ptr<StreamSource> StreamSource::Create(const std::string &directory) {
+    std::unique_ptr<StreamSource> StreamSource::create(const std::string &directory) {
         return std::make_unique<FileStreamSource>(directory);
     }
 }

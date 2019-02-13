@@ -20,7 +20,7 @@
 #include <XE/Graphics/TextureCubeMap.hpp>
 #include <iostream>
 
-namespace XE::Graphics::GL {
+namespace XE {
 /*#if defined(GLAD_DEBUG)
     void gladPostCallback(const char *name, void *funcptr, int len_args, ...) {
         if (std::string(name) != "glGetError") {
@@ -104,7 +104,7 @@ namespace XE::Graphics::GL {
         return m_window.get();
     }
 
-    XE::Input::InputManager* GraphicsDeviceGL::GetInputManager() {
+    InputManager* GraphicsDeviceGL::GetInputManager() {
         return m_inputManager.get();
     }
 
@@ -120,19 +120,19 @@ namespace XE::Graphics::GL {
         return std::make_unique<BufferGL>(desc);
     }
         
-    std::unique_ptr<Texture2D> GraphicsDeviceGL::CreateTexture2D(const PixelFormat format, const XE::Math::Vector2i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void *sourceData) {
+    std::unique_ptr<Texture2D> GraphicsDeviceGL::CreateTexture2D(const PixelFormat format, const XE::Vector2i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void *sourceData) {
         return std::make_unique<Texture2DGL>(format, size, sourceFormat, sourceDataType, sourceData);
     }
         
-    std::unique_ptr<Texture3D> GraphicsDeviceGL::CreateTexture3D(const PixelFormat format, const XE::Math::Vector3i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void *sourceData) {
+    std::unique_ptr<Texture3D> GraphicsDeviceGL::CreateTexture3D(const PixelFormat format, const XE::Vector3i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void *sourceData) {
         return std::make_unique<Texture3DGL>(format, size, sourceFormat, sourceDataType, sourceData);
     }
 
-    std::unique_ptr<Texture2DArray> GraphicsDeviceGL::CreateTexture2DArray(const PixelFormat format, const XE::Math::Vector2i &size, const int count) {
+    std::unique_ptr<Texture2DArray> GraphicsDeviceGL::CreateTexture2DArray(const PixelFormat format, const XE::Vector2i &size, const int count) {
         return std::make_unique<Texture2DArrayGL>(format, size, count);
     }
         
-    std::unique_ptr<TextureCubeMap> GraphicsDeviceGL::CreateTextureCubeMap(const PixelFormat format, const XE::Math::Vector2i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void **sourceData) {
+    std::unique_ptr<TextureCubeMap> GraphicsDeviceGL::CreateTextureCubeMap(const PixelFormat format, const XE::Vector2i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void **sourceData) {
         return std::unique_ptr<TextureCubeMap>();
     }
         
@@ -173,7 +173,7 @@ namespace XE::Graphics::GL {
         XE_GRAPHICS_GL_CHECK_ERROR();
     }
         
-    void GraphicsDeviceGL::BeginFrame(const ClearFlags flags, const XE::Math::Vector4f &color, const float depth, const int stencil) {
+    void GraphicsDeviceGL::BeginFrame(const ClearFlags flags, const XE::Vector4f &color, const float depth, const int stencil) {
         const GLenum clearFlagsGL =
             (flags & ClearFlags::Color   ? GL_COLOR_BUFFER_BIT   : 0) | 
             (flags & ClearFlags::Depth   ? GL_DEPTH_BUFFER_BIT   : 0) | 

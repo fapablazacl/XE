@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 
-namespace XE::Graphics {
+namespace XE {
     enum class ShaderType;
 
     enum ShaderLang {

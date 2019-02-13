@@ -1,6 +1,6 @@
 
 #include "TextureCubeMap.hpp"
 
-namespace XE::Graphics {
+namespace XE {
 	TextureCubeMap::~TextureCubeMap() {}
 }

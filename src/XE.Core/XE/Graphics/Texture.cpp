@@ -1,6 +1,6 @@
 
 #include "Texture.hpp"
 
-namespace XE::Graphics {
+namespace XE {
 	Texture::~Texture() {}
 }

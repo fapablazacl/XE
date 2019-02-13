@@ -7,7 +7,7 @@
 #include <XE/Math/Box.hpp>
 #include <XE/Graphics/PixelFormat.hpp>
 
-namespace XE::Graphics {
+namespace XE {
     enum class TextureType {
         Unknown,
         Tex2D,

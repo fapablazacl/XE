@@ -128,4 +128,6 @@ add_library (${target}
 	${src_xe_util}
 )
 
-target_link_libraries(${target} stdc++fs)
+if (UNIX)
+	target_link_libraries(${target} stdc++fs)
+endif()

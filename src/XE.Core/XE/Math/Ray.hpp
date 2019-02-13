@@ -5,7 +5,7 @@
 #include <cassert>
 #include "Vector.hpp"
 
-namespace XE::Math {
+namespace XE {
     /**
      * @brief Ray with normalized direction in the 3-space
      */

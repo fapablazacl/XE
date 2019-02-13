@@ -4,7 +4,7 @@
 
 #include <cmath>
 
-namespace XE::Math {
+namespace XE {
     template<typename T>
     inline const T Pi = static_cast<T>(3.141592653589793238);
 

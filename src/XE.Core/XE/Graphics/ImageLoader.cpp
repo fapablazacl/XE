@@ -1,6 +1,6 @@
 
 #include "ImageLoader.hpp"
 
-namespace XE::Graphics {
+namespace XE {
     ImageLoader::~ImageLoader() {}
 }

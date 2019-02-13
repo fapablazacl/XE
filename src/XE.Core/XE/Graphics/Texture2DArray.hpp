@@ -9,7 +9,7 @@ namespace XE {
     enum class DataType : std::int16_t;
 }
 
-namespace XE::Graphics {
+namespace XE {
     class Texture2DArray : public Texture {
 
     public:
@@ -18,13 +18,13 @@ namespace XE::Graphics {
     public:
         virtual ~Texture2DArray();
         
-        virtual XE:: Math::Vector2i GetSize() const = 0;
+        virtual XE::Vector2i GetSize() const = 0;
         
         virtual int GetCount() const = 0;
         
-        virtual void SetData(const void *surfaceData, const int mipLevel, const int arrayIndex, const PixelFormat surfaceFormat, const DataType surfaceDataType, const XE::Math::Recti &area, int count) = 0;
+        virtual void SetData(const void *surfaceData, const int mipLevel, const int arrayIndex, const PixelFormat surfaceFormat, const DataType surfaceDataType, const XE::Recti &area, int count) = 0;
         
-        virtual void GetData(void *surfaceData, const int mipLevel, const int arrayIndex, const PixelFormat surfaceFormat, const DataType surfaceDataType, const XE::Math::Recti &area) const = 0;
+        virtual void GetData(void *surfaceData, const int mipLevel, const int arrayIndex, const PixelFormat surfaceFormat, const DataType surfaceDataType, const XE::Recti &area) const = 0;
     };
 }
 

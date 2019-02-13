@@ -2,7 +2,7 @@
 #ifndef __XE_GRAPHICS_PIXELFORMAT_HPP__
 #define __XE_GRAPHICS_PIXELFORMAT_HPP__
 
-namespace XE::Graphics {
+namespace XE {
     enum class PixelFormat {
         Unknown,
         R8G8B8,
