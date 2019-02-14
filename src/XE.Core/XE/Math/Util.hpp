@@ -17,6 +17,11 @@ namespace XE {
     inline T Degrees(const T radians) {
         return radians * static_cast<T>(180) / Pi<T>;
     }
+
+    template<typename T, typename S>
+    T Lerp(const T v1, const T v2, const S s) {
+        return v1 + (v2 - v1) * s;
+    }
 }
 
 #endif

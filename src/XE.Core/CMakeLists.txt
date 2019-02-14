@@ -98,6 +98,8 @@ set (src_xe_graphics
 	"XE/Graphics/EllipsoidGenerator.cpp"
 	"XE/Graphics/PlaneGenerator.hpp"
 	"XE/Graphics/PlaneGenerator.cpp"
+	"XE/Graphics/BoxGenerator.hpp"
+	"XE/Graphics/BoxGenerator.cpp"
 )
 
 set (src_xe_input

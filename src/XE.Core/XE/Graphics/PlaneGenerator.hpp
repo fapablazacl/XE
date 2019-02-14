@@ -15,9 +15,10 @@ namespace XE {
     // TODO: Add the following generation parameters: Reference Plane, Rotation
     // TODO: Add a method to return required rendering parameters via the SubsetEnvelope class
     // TODO: Add control parameter for the Face Vertex Ordering
+
     class PlaneGenerator : public ShapeGenerator {
     public:
-        PlaneGenerator(const int widthParts, const int depthParts, const float width, const float depth);
+        PlaneGenerator(const Vector2i &division, const Vector2f &size);
 
         virtual ~PlaneGenerator();
 
@@ -30,11 +31,8 @@ namespace XE {
         virtual std::vector<int> GenerateIndices() const override;
 
     private:
-        int widthParts;
-        int depthParts;
-
-        float width;
-        float depth;
+        Vector2i division; 
+        Vector2f size;
     };
 }
 
