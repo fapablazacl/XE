@@ -10,9 +10,6 @@ namespace XE::Sandbox {
     struct Assets {
         Assets() = delete;
 
-        static const char* vertexShader;
-        static const char* fragmentShader;
-
         static std::vector<Vector3f> coordData;
         static std::vector<Vector4f> colorData;
         static std::vector<Vector3f> normalData;

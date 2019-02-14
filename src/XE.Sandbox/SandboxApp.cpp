@@ -9,7 +9,9 @@
 #include <XE/Graphics/GL.hpp>
 #include <XE/Graphics/PNG.hpp>
 
+#include <string>
 #include <iostream>
+#include <fstream>
 
 namespace XE {
     class SandboxApp : public Application {
@@ -153,12 +155,38 @@ namespace XE {
             // setup program shader
             const ProgramDescriptor programDescriptor = {
                 {
-                    {ShaderType::Vertex, std::string{Sandbox::Assets::vertexShader}},
-                    {ShaderType::Fragment, std::string{Sandbox::Assets::fragmentShader}}
+                    {ShaderType::Vertex, this->getShaderSource("media/shaders/simple/vertex.glsl")},
+                    {ShaderType::Fragment, this->getShaderSource("media/shaders/simple/fragment.glsl")}
                 }
             };
 
             m_program = m_graphicsDevice->CreateProgram(programDescriptor);
+        }
+
+        std::string getShaderSource(const std::string &path) const {
+            std::fstream fs;
+            fs.open(path.c_str(), std::ios_base::in);
+
+            if (!fs.is_open()) {
+                throw std::runtime_error("Shared source file wasn't found");
+            }
+
+            std::string content;
+            std::string line;
+
+            while (!fs.eof()) {
+                std::getline(fs, line);
+
+                content += line;
+
+                if (!fs.eof()) {
+                     content += "\n";
+                }
+            }
+
+            std::cout << content << std::endl;
+
+            return content;
         }
 
         void InitializeGeometry() {
