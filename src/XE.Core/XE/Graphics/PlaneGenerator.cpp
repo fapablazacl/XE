@@ -1,10 +1,17 @@
 
 #include "PlaneGenerator.hpp"
+#include <cassert>
 
 namespace XE {
-    PlaneGenerator::PlaneGenerator(const Vector2i &division, const Vector2f &size) {
+    PlaneGenerator::PlaneGenerator(const Vector2i &division, const Vector2f &size, const Plane_f &plane) {
+        assert(division.X > 0);
+        assert(division.Y > 0);
+        assert(size.X > 0.0f);
+        assert(size.Y > 0.0f);
+
         this->division = division;
         this->size = size;
+        this->plane = plane;
     }
 
     PlaneGenerator::~PlaneGenerator() {}

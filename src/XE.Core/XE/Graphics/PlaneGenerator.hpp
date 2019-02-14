@@ -18,7 +18,7 @@ namespace XE {
 
     class PlaneGenerator : public ShapeGenerator {
     public:
-        PlaneGenerator(const Vector2i &division, const Vector2f &size);
+        PlaneGenerator(const Vector2i &division, const Vector2f &size, const Plane_f &plane);
 
         virtual ~PlaneGenerator();
 
@@ -33,6 +33,7 @@ namespace XE {
     private:
         Vector2i division; 
         Vector2f size;
+        Plane_f plane;
     };
 }
 

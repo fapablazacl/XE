@@ -69,6 +69,9 @@ namespace XE {
     Plane<T> Invert(const Plane<T> &other) {
         return { other.Position, -other.Normal };
     }
+
+    typedef Plane<float> Plane_f;
+    typedef Plane<double> Plane_d;
 }
 
 #endif
