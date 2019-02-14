@@ -91,6 +91,13 @@ set (src_xe_graphics
 	"XE/Graphics/ImageLoader.cpp"
 	"XE/Graphics/Material.hpp"
 	"XE/Graphics/Material.cpp"
+
+	"XE/Graphics/ShapeGenerator.hpp"
+	"XE/Graphics/ShapeGenerator.cpp"
+	"XE/Graphics/EllipsoidGenerator.hpp"
+	"XE/Graphics/EllipsoidGenerator.cpp"
+	"XE/Graphics/PlaneGenerator.hpp"
+	"XE/Graphics/PlaneGenerator.cpp"
 )
 
 set (src_xe_input
