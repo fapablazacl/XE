@@ -6,9 +6,9 @@
 
 namespace XE {
     struct Vertex {
-        XE::Vector3f Position;
-        XE::Vector3f Normal;
-        XE::Vector2f TexCoord;
+        Vector3f Position;
+        Vector3f Normal;
+        Vector2f TexCoord;
     };
 }
 

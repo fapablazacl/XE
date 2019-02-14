@@ -10,7 +10,7 @@ namespace XE {
     public:
         explicit WindowGLFW(GLFWwindow *window);
 
-        virtual XE::Vector2i GetSize() const override;
+        virtual Vector2i GetSize() const override;
 
     private:
         GLFWwindow *m_windowGLFW;

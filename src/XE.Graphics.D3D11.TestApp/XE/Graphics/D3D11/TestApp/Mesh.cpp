@@ -2,10 +2,10 @@
 #include "Mesh.hpp"
 #include <XE/Math/Vector.hpp>
 
-namespace XE::Graphics::D3D11::TestApp {
+namespace TestApp {
     struct VertexType {
-        XE::Math::Vector3f position;
-        XE::Math::Vector4f color;
+        Vector3f position;
+        Vector4f color;
     };
 
     Mesh::Mesh() {}

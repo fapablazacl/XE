@@ -4,7 +4,7 @@
 
 #include <XE/Graphics/Image.hpp>
 
-namespace XE::Graphics::FI {
+namespace XE {
     /**
      * @brief A Abstract Image class that's used for an abstraction around image classes from another libraries.
      */
@@ -16,7 +16,7 @@ namespace XE::Graphics::FI {
 
         virtual PixelFormat GetFormat() const = 0;
 
-        virtual XE::Math::Vector2i GetSize() const = 0;
+        virtual Vector2i GetSize() const = 0;
     };
 }
 

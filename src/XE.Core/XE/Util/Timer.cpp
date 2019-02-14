@@ -43,7 +43,7 @@ static uint64_t monotonicTimeNanos() {
     return data.scale(now);
 }
 
-namespace XE::Util {
+namespace XE {
     int Timer::GetTick() {
         const uint64_t nanos = monotonicTimeNanos();
         return nanos / 1000000;
@@ -53,7 +53,7 @@ namespace XE::Util {
 #elif defined(__linux__)
 #include <time.h>
 
-namespace XE::Util {
+namespace XE {
     int Timer::GetTick() {
         timespec ts;
         clock_gettime(CLOCK_MONOTONIC, &ts);

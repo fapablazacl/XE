@@ -34,7 +34,7 @@ BOOL InitWindowClass(const HINSTANCE hInstance, const LPSTR className) {
 
 //int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) {
 int main() {
-    using namespace XE::Graphics::D3D11::TestApp;
+    using namespace TestApp;
 
     const LPSTR className = TEXT("D3D11_01_Triangle");
 

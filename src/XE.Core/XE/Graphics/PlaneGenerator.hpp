@@ -21,11 +21,11 @@ namespace XE {
 
         virtual ~PlaneGenerator();
 
-        virtual std::vector<XE::Math::Vector3f> GenerateVertexCoordinates() const override;
+        virtual std::vector<Vector3f> GenerateVertexCoordinates() const override;
 
-        virtual std::vector<XE::Math::Vector3f> GenerateVertexNormals() const override;
+        virtual std::vector<Vector3f> GenerateVertexNormals() const override;
 
-        virtual std::vector<XE::Math::Vector2f> GenerateVertexTexCoords() const override;
+        virtual std::vector<Vector2f> GenerateVertexTexCoords() const override;
 
         virtual std::vector<int> GenerateIndices() const override;
 

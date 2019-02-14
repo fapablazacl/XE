@@ -4,7 +4,7 @@
 #include <iostream>
 #include <d3dcompiler.h>
 
-namespace XE::Graphics::D3D11::TestApp {
+namespace TestApp {
     Shader::Shader() {}
 
     Shader::~Shader() {
@@ -22,7 +22,7 @@ namespace XE::Graphics::D3D11::TestApp {
         this->ShutdownShader();
     }
 
-    bool Shader::Render(ID3D11DeviceContext *context, int indexCount, const XE::Math::Matrix4f &world, const XE::Math::Matrix4f &view, const XE::Math::Matrix4f &projection) {
+    bool Shader::Render(ID3D11DeviceContext *context, int indexCount, const Matrix4f &world, const Matrix4f &view, const Matrix4f &projection) {
         if (!this->SetShaderParameters(context, world, view, projection)) {
             return false;
         }
@@ -152,12 +152,12 @@ namespace XE::Graphics::D3D11::TestApp {
         std::cout << errorStr << std::endl;
     }
 
-    bool Shader::SetShaderParameters(ID3D11DeviceContext *context, const XE::Math::Matrix4f &world, const XE::Math::Matrix4f &view, const XE::Math::Matrix4f &projection) {
+    bool Shader::SetShaderParameters(ID3D11DeviceContext *context, const Matrix4f &world, const Matrix4f &view, const Matrix4f &projection) {
         D3D11_MAPPED_SUBRESOURCE mappedResource;
 
-        const XE::Math::Matrix4f worldT = XE::Math::Transpose(world);
-        const XE::Math::Matrix4f viewT = XE::Math::Transpose(view);
-        const XE::Math::Matrix4f projectionT = XE::Math::Transpose(projection);
+        const Matrix4f worldT = Transpose(world);
+        const Matrix4f viewT = Transpose(view);
+        const Matrix4f projectionT = Transpose(projection);
 
         if (FAILED(context->Map(matrixBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource))) {
             return false;

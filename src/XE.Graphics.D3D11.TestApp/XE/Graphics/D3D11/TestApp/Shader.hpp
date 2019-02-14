@@ -5,7 +5,7 @@
 #include <d3d11.h>
 #include <XE/Math/Matrix.hpp>
 
-namespace XE::Graphics::D3D11::TestApp {
+namespace TestApp {
     class Shader {
     public:
         Shader();
@@ -16,7 +16,7 @@ namespace XE::Graphics::D3D11::TestApp {
 
         void Shutdown();
 
-        bool Render(ID3D11DeviceContext *context, int indexCount, const XE::Math::Matrix4f &world, const XE::Math::Matrix4f &view, const XE::Math::Matrix4f &projection);
+        bool Render(ID3D11DeviceContext *context, int indexCount, const Matrix4f &world, const Matrix4f &view, const Matrix4f &projection);
 
     private:
         bool InitializeShader(ID3D11Device *device, HWND hWnd, LPCWSTR vertexShaderSrc, LPCWSTR pixelShaderSrc);
@@ -25,15 +25,15 @@ namespace XE::Graphics::D3D11::TestApp {
 
         void DisplayShaderErrorMessage(ID3D10Blob *blob, HWND hWnd, LPCWSTR msg);
 
-        bool SetShaderParameters(ID3D11DeviceContext *context, const XE::Math::Matrix4f &world, const XE::Math::Matrix4f &view, const XE::Math::Matrix4f &projection);
+        bool SetShaderParameters(ID3D11DeviceContext *context, const Matrix4f &world, const Matrix4f &view, const Matrix4f &projection);
 
         void RenderShader(ID3D11DeviceContext *context, int indexCount);
 
     private:
         struct MatrixBufferType {
-            XE::Math::Matrix4f world;
-            XE::Math::Matrix4f view;
-            XE::Math::Matrix4f projection;
+            Matrix4f world;
+            Matrix4f view;
+            Matrix4f projection;
         };
 
         ID3D11VertexShader *vertexShader = nullptr;

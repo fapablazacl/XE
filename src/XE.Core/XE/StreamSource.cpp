@@ -13,11 +13,11 @@ namespace XE {
 
             if (!fs::exists(this->directory)) {
                 if (this->directory.is_relative()) {
-                    const std::string msg = "XE::FileStreamSource: The directory '" + directory + "' doesn't exist.";
+                    const std::string msg = "FileStreamSource: The directory '" + directory + "' doesn't exist.";
                     throw std::runtime_error(msg);
                 } else {
                     const std::string msg = 
-                    "XE::FileStreamSource: The directory '" + directory + "' doesn't exist "
+                    "FileStreamSource: The directory '" + directory + "' doesn't exist "
                     + "(current path: " + fs::current_path().string() + ").";
 
                     throw std::runtime_error(msg);

@@ -9,7 +9,7 @@
 namespace XE {
     class Texture2DGL : public Texture2D, public TextureBaseGL {
     public:
-        Texture2DGL(const PixelFormat format, const XE::Vector2i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void *sourceData);
+        Texture2DGL(const PixelFormat format, const Vector2i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void *sourceData);
 
         virtual ~Texture2DGL();
 
@@ -18,17 +18,17 @@ namespace XE {
         }
         
     public:
-        virtual XE::Vector2i GetSize() const override {
+        virtual Vector2i GetSize() const override {
             return m_size;
         }
         
-        virtual void SetData(const std::byte *surfaceData, const int mipLevel, const PixelFormat surfaceFormat, const DataType surfaceDataType, const XE::Recti &area) override;
+        virtual void SetData(const std::byte *surfaceData, const int mipLevel, const PixelFormat surfaceFormat, const DataType surfaceDataType, const Recti &area) override;
 
         virtual void GetData(std::byte *surfaceData, const int mipLevel, const PixelFormat surfaceFormat, const DataType surfaceDataType) const override;
 
     private:
         PixelFormat m_format;
-        XE::Vector2i m_size;
+        Vector2i m_size;
     };
 }
 

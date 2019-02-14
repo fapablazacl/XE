@@ -17,11 +17,11 @@ namespace XE {
     public:
         virtual ~Texture3D();
         
-        virtual XE::Vector3i GetSize() const = 0;
+        virtual Vector3i GetSize() const = 0;
         
-        virtual void SetData(const std::byte *surfaceData, const int mipLevel, const PixelFormat surfaceFormat, const DataType surfaceDataType, const XE::Boxi &volume) = 0;
+        virtual void SetData(const std::byte *surfaceData, const int mipLevel, const PixelFormat surfaceFormat, const DataType surfaceDataType, const Boxi &volume) = 0;
         
-        virtual void GetData(std::byte *surfaceData, const int mipLevel, const PixelFormat surfaceFormat, const DataType surfaceDataType, const XE::Boxi &volume) const = 0;
+        virtual void GetData(std::byte *surfaceData, const int mipLevel, const PixelFormat surfaceFormat, const DataType surfaceDataType, const Boxi &volume) const = 0;
     };    
 }
 

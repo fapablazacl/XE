@@ -11,11 +11,11 @@ namespace XE {
     }
 
 
-    XE::Vector2i MouseStatus::GetPosition() const {
+    Vector2i MouseStatus::GetPosition() const {
         return m_position;
     }
 
-    void MouseStatus::SetPosition(const XE::Vector2i &position) {
+    void MouseStatus::SetPosition(const Vector2i &position) {
         m_position = position;
     }
 
@@ -36,11 +36,11 @@ namespace XE {
         m_buttons[static_cast<int>(button)] = state;
     }
 
-    XE::Vector2f ControllerStatus::GetState(const ControllerJoystick joystick) const {
+    Vector2f ControllerStatus::GetState(const ControllerJoystick joystick) const {
         return m_joysticks[static_cast<int>(joystick)];
     }
 
-    void ControllerStatus::SetState(const ControllerJoystick joystick, const XE::Vector2f &state) {
+    void ControllerStatus::SetState(const ControllerJoystick joystick, const Vector2f &state) {
         m_joysticks[static_cast<int>(joystick)] = state;
     }
 }

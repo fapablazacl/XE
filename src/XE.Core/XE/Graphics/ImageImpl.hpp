@@ -18,16 +18,16 @@ namespace XE {
         
         virtual PixelFormat GetFormat() const override;
 
-        virtual XE::Vector2i GetSize() const override;
+        virtual Vector2i GetSize() const override;
 
-        void Allocate(const PixelFormat format, const XE::Vector2i &size);
+        void Allocate(const PixelFormat format, const Vector2i &size);
 
         void Free();
 
     private:
         std::byte *pixels = nullptr;
         PixelFormat format = PixelFormat::Unknown;
-        XE::Vector2i size = {0, 0};
+        Vector2i size = {0, 0};
     };
 }
 

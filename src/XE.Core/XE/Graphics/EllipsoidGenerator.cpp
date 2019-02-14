@@ -2,7 +2,7 @@
 #include "EllipsoidGenerator.hpp"
 
 namespace XE {
-    EllipsoidGenerator::EllipsoidGenerator(const int slices, const int stacks, const XE::Math::Vector3f &dimensions) {
+    EllipsoidGenerator::EllipsoidGenerator(const int slices, const int stacks, const Vector3f &dimensions) {
         this->slices = slices;
         this->stacks = stacks;
         this->dimensions = dimensions;
@@ -10,15 +10,15 @@ namespace XE {
 
     EllipsoidGenerator::~EllipsoidGenerator() {}
 
-    std::vector<XE::Math::Vector3f> EllipsoidGenerator::GenerateVertexCoordinates() const {
+    std::vector<Vector3f> EllipsoidGenerator::GenerateVertexCoordinates() const {
         return {};
     }
 
-    std::vector<XE::Math::Vector3f> EllipsoidGenerator::GenerateVertexNormals() const {
+    std::vector<Vector3f> EllipsoidGenerator::GenerateVertexNormals() const {
         return {};
     }
 
-    std::vector<XE::Math::Vector2f> EllipsoidGenerator::GenerateVertexTexCoords() const {
+    std::vector<Vector2f> EllipsoidGenerator::GenerateVertexTexCoords() const {
         return {};
     }
 

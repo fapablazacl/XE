@@ -10,11 +10,11 @@ namespace XE {
     public:
         virtual ~ShapeGenerator();
 
-        virtual std::vector<XE::Math::Vector3f> GenerateVertexCoordinates() const = 0;
+        virtual std::vector<Vector3f> GenerateVertexCoordinates() const = 0;
 
-        virtual std::vector<XE::Math::Vector3f> GenerateVertexNormals() const = 0;
+        virtual std::vector<Vector3f> GenerateVertexNormals() const = 0;
 
-        virtual std::vector<XE::Math::Vector2f> GenerateVertexTexCoords() const = 0;
+        virtual std::vector<Vector2f> GenerateVertexTexCoords() const = 0;
 
         virtual std::vector<int> GenerateIndices() const = 0;
     };

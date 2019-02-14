@@ -120,19 +120,19 @@ namespace XE {
         return std::make_unique<BufferGL>(desc);
     }
         
-    std::unique_ptr<Texture2D> GraphicsDeviceGL::CreateTexture2D(const PixelFormat format, const XE::Vector2i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void *sourceData) {
+    std::unique_ptr<Texture2D> GraphicsDeviceGL::CreateTexture2D(const PixelFormat format, const Vector2i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void *sourceData) {
         return std::make_unique<Texture2DGL>(format, size, sourceFormat, sourceDataType, sourceData);
     }
         
-    std::unique_ptr<Texture3D> GraphicsDeviceGL::CreateTexture3D(const PixelFormat format, const XE::Vector3i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void *sourceData) {
+    std::unique_ptr<Texture3D> GraphicsDeviceGL::CreateTexture3D(const PixelFormat format, const Vector3i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void *sourceData) {
         return std::make_unique<Texture3DGL>(format, size, sourceFormat, sourceDataType, sourceData);
     }
 
-    std::unique_ptr<Texture2DArray> GraphicsDeviceGL::CreateTexture2DArray(const PixelFormat format, const XE::Vector2i &size, const int count) {
+    std::unique_ptr<Texture2DArray> GraphicsDeviceGL::CreateTexture2DArray(const PixelFormat format, const Vector2i &size, const int count) {
         return std::make_unique<Texture2DArrayGL>(format, size, count);
     }
         
-    std::unique_ptr<TextureCubeMap> GraphicsDeviceGL::CreateTextureCubeMap(const PixelFormat format, const XE::Vector2i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void **sourceData) {
+    std::unique_ptr<TextureCubeMap> GraphicsDeviceGL::CreateTextureCubeMap(const PixelFormat format, const Vector2i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void **sourceData) {
         return std::unique_ptr<TextureCubeMap>();
     }
         
@@ -173,7 +173,7 @@ namespace XE {
         XE_GRAPHICS_GL_CHECK_ERROR();
     }
         
-    void GraphicsDeviceGL::BeginFrame(const ClearFlags flags, const XE::Vector4f &color, const float depth, const int stencil) {
+    void GraphicsDeviceGL::BeginFrame(const ClearFlags flags, const Vector4f &color, const float depth, const int stencil) {
         const GLenum clearFlagsGL =
             (flags & ClearFlags::Color   ? GL_COLOR_BUFFER_BIT   : 0) | 
             (flags & ClearFlags::Depth   ? GL_DEPTH_BUFFER_BIT   : 0) | 
@@ -425,7 +425,7 @@ namespace XE {
                 break;
             }
 
-            offset += XE::ComputeByteSize(current->Type) * current->Rows * current->Columns * current->Count;
+            offset += ComputeByteSize(current->Type) * current->Rows * current->Columns * current->Count;
         }
 
         XE_GRAPHICS_GL_CHECK_ERROR();
@@ -481,7 +481,7 @@ namespace XE {
                 assert(false);
             }
 
-            offset += XE::ComputeByteSize(current->Type) * current->Size * current->Count;
+            offset += ComputeByteSize(current->Type) * current->Size * current->Count;
         }
 
         XE_GRAPHICS_GL_CHECK_ERROR();

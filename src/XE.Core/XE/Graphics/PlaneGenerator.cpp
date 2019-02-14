@@ -11,15 +11,15 @@ namespace XE {
 
     PlaneGenerator::~PlaneGenerator() {}
 
-    std::vector<XE::Math::Vector3f> PlaneGenerator::GenerateVertexCoordinates() const {
-        std::vector<XE::Math::Vector3f> coordinates;
+    std::vector<Vector3f> PlaneGenerator::GenerateVertexCoordinates() const {
+        std::vector<Vector3f> coordinates;
 
         for (int i=0; i<widthParts; i++) {
             for (int j=0; j<depthParts; j++) {
-                const XE::Math::Vector3f v1 = {-0.5f, 0.0f, 0.5f};
-                const XE::Math::Vector3f v2 = {0.5f, 0.0f, 0.5f};
-                const XE::Math::Vector3f v3 = {-0.5f, 0.0f, -0.5f};
-                const XE::Math::Vector3f v4 = {0.5f, 0.0f, -0.5f};
+                const Vector3f v1 = {-0.5f, 0.0f, 0.5f};
+                const Vector3f v2 = {0.5f, 0.0f, 0.5f};
+                const Vector3f v3 = {-0.5f, 0.0f, -0.5f};
+                const Vector3f v4 = {0.5f, 0.0f, -0.5f};
 
                 coordinates.push_back(v1); coordinates.push_back(v2); coordinates.push_back(v3);
                 coordinates.push_back(v2); coordinates.push_back(v4); coordinates.push_back(v3);
@@ -29,8 +29,8 @@ namespace XE {
         return coordinates;
     }
 
-    std::vector<XE::Math::Vector3f> PlaneGenerator::GenerateVertexNormals() const {
-        std::vector<XE::Math::Vector3f> normals;
+    std::vector<Vector3f> PlaneGenerator::GenerateVertexNormals() const {
+        std::vector<Vector3f> normals;
 
         for (int i=0; i<widthParts; i++) {
             for (int j=0; j<depthParts; j++) {
@@ -44,8 +44,8 @@ namespace XE {
         return normals;
     }
 
-    std::vector<XE::Math::Vector2f> PlaneGenerator::GenerateVertexTexCoords() const {
-        std::vector<XE::Math::Vector2f> texCoords;
+    std::vector<Vector2f> PlaneGenerator::GenerateVertexTexCoords() const {
+        std::vector<Vector2f> texCoords;
 
         for (int i=0; i<widthParts; i++) {
             for (int j=0; j<depthParts; j++) {

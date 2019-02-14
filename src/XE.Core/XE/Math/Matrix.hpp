@@ -672,7 +672,7 @@ namespace XE {
         Vector<T, R> result;
 
         for (int col=0; col<C; col++) {
-            result[col] = XE::Dot(this->GetColumnVector(col), v);
+            result[col] = Dot(this->GetColumnVector(col), v);
         }
 
         return result;

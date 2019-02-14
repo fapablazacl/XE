@@ -13,10 +13,10 @@ namespace XE::Sandbox {
         static const char* vertexShader;
         static const char* fragmentShader;
 
-        static std::vector<XE::Vector3f> coordData;
-        static std::vector<XE::Vector4f> colorData;
-        static std::vector<XE::Vector3f> normalData;
-        static std::vector<XE::Vector2f> texCoordData;
+        static std::vector<Vector3f> coordData;
+        static std::vector<Vector4f> colorData;
+        static std::vector<Vector3f> normalData;
+        static std::vector<Vector2f> texCoordData;
         static std::vector<int> indexData;
     };
 }

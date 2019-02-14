@@ -28,7 +28,7 @@ namespace XE {
         /**
          * @brief Get the image dimensions as a 2D Integer Vector, in pixels.
          */
-        virtual XE::Vector2i GetSize() const = 0;
+        virtual Vector2i GetSize() const = 0;
     };
 }
 

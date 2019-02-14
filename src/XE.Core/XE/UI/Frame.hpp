@@ -17,8 +17,8 @@ namespace XE {
 
     struct FrameProperties {
         std::string Caption;
-        XE::Vector2i Size;
-        XE::Vector2i Position;
+        Vector2i Size;
+        Vector2i Position;
     };
 
     /**

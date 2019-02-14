@@ -11,7 +11,7 @@ namespace XE {
 
     class ImagePNG : public Image {
     public:
-        ImagePNG(const std::byte *pointer, const PixelFormat format, const XE::Vector2i size) {
+        ImagePNG(const std::byte *pointer, const PixelFormat format, const Vector2i size) {
             this->pointer = pointer;
             this->format = format;
             this->size = size;
@@ -27,14 +27,14 @@ namespace XE {
             return format;
         }
 
-        virtual XE::Vector2i GetSize() const override {
+        virtual Vector2i GetSize() const override {
             return size;
         }
 
     private:
         const std::byte *pointer;
         PixelFormat format;
-        XE::Vector2i size;
+        Vector2i size;
     };
 
 
@@ -68,7 +68,7 @@ namespace XE {
         unsigned int error = lodepng_decode(&pixels, &width, &height, &state, imageBuffer.data(), imageBuffer.size());
 
         if (error) {
-            std::cout << "ImageLoaderPNG::Load: Error at loading texture from XE::Stream (error:" << lodepng_error_text(error) << ")" << std::endl;
+            std::cout << "ImageLoaderPNG::Load: Error at loading texture from Stream (error:" << lodepng_error_text(error) << ")" << std::endl;
             assert(false);
             return {};
         }
@@ -76,7 +76,7 @@ namespace XE {
         return std::make_unique<ImagePNG> (
             (const std::byte*)pixels, 
             PixelFormat::R8G8B8A8, 
-            XE::Vector2i(int(width), int(height))
+            Vector2i(int(width), int(height))
         );
     }
 }

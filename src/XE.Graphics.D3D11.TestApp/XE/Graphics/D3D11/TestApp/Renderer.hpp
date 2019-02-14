@@ -7,7 +7,7 @@
 #include <dxgi.h>
 #include <cassert>
 
-namespace XE::Graphics::D3D11::TestApp {    
+namespace TestApp {    
     /**
      * @brief A pointer that handles COM objects automatically
      */

@@ -5,7 +5,7 @@
 
 #include <vulkan/vulkan.h>
 
-namespace XE::Graphics::Vulkan::TestApp {
+namespace XE {
     // struct to 'parse' the vulkan version specification
     struct Version {
         std::uint32_t major:10;
@@ -82,7 +82,7 @@ namespace XE::Graphics::Vulkan::TestApp {
 }
 
 // import operator<< 
-using namespace XE::Graphics::Vulkan::TestApp; 
+using namespace XE; 
 
 class Test01App {
 public:

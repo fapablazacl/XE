@@ -10,7 +10,7 @@ namespace XE {
         m_windowGLFW = window;
     }
 
-    XE::Vector2i WindowGLFW::GetSize() const {
+    Vector2i WindowGLFW::GetSize() const {
         int width, height;
 
         ::glfwGetWindowSize(m_windowGLFW, &width, &height);

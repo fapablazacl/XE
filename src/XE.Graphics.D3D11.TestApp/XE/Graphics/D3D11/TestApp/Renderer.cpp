@@ -4,7 +4,7 @@
 #include <array>
 #include <cassert>
 
-namespace XE::Graphics::D3D11::TestApp {
+namespace TestApp {
     class ComResultChecker {
     public:
         ComResultChecker() {}

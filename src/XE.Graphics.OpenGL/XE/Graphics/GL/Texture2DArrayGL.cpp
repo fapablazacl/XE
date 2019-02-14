@@ -3,7 +3,7 @@
 #include "Conversion.hpp"
 
 namespace XE {
-    Texture2DArrayGL::Texture2DArrayGL(const PixelFormat format, const XE::Vector2i &size, const int count) 
+    Texture2DArrayGL::Texture2DArrayGL(const PixelFormat format, const Vector2i &size, const int count) 
             : TextureBaseGL(GL_TEXTURE_2D_ARRAY) {
 
         m_size = size;
@@ -19,9 +19,9 @@ namespace XE {
 
     Texture2DArrayGL::~Texture2DArrayGL() {}
 
-    void Texture2DArrayGL::SetData(const void *surfaceData, const int mipLevel, const int arrayIndex, const PixelFormat surfaceFormat, const DataType surfaceDataType, const XE::Recti &area, int count) {
-        const XE::Vector2i offset = area.MinEdge;
-        const XE::Vector2i size = area.ComputeSize();
+    void Texture2DArrayGL::SetData(const void *surfaceData, const int mipLevel, const int arrayIndex, const PixelFormat surfaceFormat, const DataType surfaceDataType, const Recti &area, int count) {
+        const Vector2i offset = area.MinEdge;
+        const Vector2i size = area.ComputeSize();
         const GLenum formatGL = ConvertToGL(surfaceFormat);
         const GLenum dataTypeGL = ConvertToGL(surfaceDataType);
 
@@ -30,7 +30,7 @@ namespace XE {
         ::glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
     }
         
-    void Texture2DArrayGL::GetData(void *surfaceData, const int mipLevel, const int arrayIndex, const PixelFormat surfaceFormat, const DataType surfaceDataType, const XE::Recti &area) const {
+    void Texture2DArrayGL::GetData(void *surfaceData, const int mipLevel, const int arrayIndex, const PixelFormat surfaceFormat, const DataType surfaceDataType, const Recti &area) const {
         const GLenum formatGL = ConvertToGL(surfaceFormat);
         const GLenum dataTypeGL = ConvertToGL(surfaceDataType);
 
