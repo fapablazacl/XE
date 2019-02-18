@@ -17,6 +17,9 @@ namespace XE {
         virtual std::vector<Vector2f> GenerateVertexTexCoords() const = 0;
 
         virtual std::vector<int> GenerateIndices() const = 0;
+
+    public:
+    
     };
 }
 

@@ -19,7 +19,7 @@ namespace XE {
     }
 
     template<typename T, typename S>
-    T Lerp(const T v1, const T v2, const S s) {
+    T lerp(const T v1, const T v2, const S s) {
         return v1 + (v2 - v1) * s;
     }
 }
