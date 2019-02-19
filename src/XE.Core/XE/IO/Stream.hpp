@@ -1,6 +1,6 @@
 
-#ifndef __XE_STREAM_HPP__
-#define __XE_STREAM_HPP__
+#ifndef __XE_IO_STREAM_HPP__
+#define __XE_IO_STREAM_HPP__
 
 namespace XE {
     enum class StreamOffset {

@@ -4,7 +4,7 @@
 #include <iostream>
 #include <vector>
 #include <lodepng.h>
-#include <XE/Stream.hpp>
+#include <XE/IO/Stream.hpp>
 #include <XE/Graphics/Image.hpp>
 
 namespace XE {

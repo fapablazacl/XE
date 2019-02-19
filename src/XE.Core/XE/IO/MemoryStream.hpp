@@ -1,21 +1,19 @@
 
-#ifndef __XE_FILESTREAM_HPP__
-#define __XE_FILESTREAM_HPP__
+#ifndef __XE_IO_MEMORYSTREAM_HPP__
+#define __XE_IO_MEMORYSTREAM_HPP__
+
+#include <cstdint>
+#include <cstddef>
 
 #include "Stream.hpp"
-#include <string>
-#include <cstdio>
 
 namespace XE {
-    /**
-     * @brief Streaming for binary data
-     */
-    class FileStream : public Stream {
+    class MemoryStream : public Stream {
     public:
-        FileStream(const std::string &fileName, const StreamFlags flags);
-
-        virtual ~FileStream();
-
+        MemoryStream(const std::uint8_t *data, const std::size_t size);
+        
+        virtual ~MemoryStream();
+        
         virtual int Read(void *buffer, const int size, const int count) override;
 
         virtual int Write(const void *buffer, const int size, const int count) override;
@@ -25,12 +23,12 @@ namespace XE {
         virtual int Tell() const override;
 
         virtual StreamFlags GetFlags() const override;
-
+        
     private:
-        std::string m_fileName;
-        StreamFlags m_flags;
-
-        FILE *m_fileHandle = nullptr;
+        const std::uint8_t *m_data;
+        const std::size_t m_size;
+        
+        int m_offset = 0;
     };
 }
 

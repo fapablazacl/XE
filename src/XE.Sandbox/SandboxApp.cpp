@@ -5,6 +5,7 @@
 #include <XE.hpp>
 #include <XE/Math.hpp>
 #include <XE/Input.hpp>
+#include <XE/IO.hpp>
 #include <XE/Graphics.hpp>
 #include <XE/Graphics/GL.hpp>
 #include <XE/Graphics/PNG.hpp>

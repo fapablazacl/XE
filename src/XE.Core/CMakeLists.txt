@@ -3,26 +3,29 @@ set (target "XE.Core")
 
 set (src_xe
 	"XE/Predef.hpp"
-    "XE/Stream.hpp"
-	"XE/Stream.cpp"
-	"XE/FileStream.hpp"
-	"XE/FileStream.cpp"
-	"XE/MemoryStream.hpp"
-    "XE/MemoryStream.cpp"
     "XE/Buffer.hpp"
     "XE/Buffer.cpp"
     "XE/DataType.hpp"
     "XE/DataType.cpp"
 	"XE/Core.hpp"
 	"XE/Core.cpp"
-	"XE/StreamSource.hpp"
-    "XE/StreamSource.cpp"
 
 	# these will be future C++20 Modules
 	"XE.hpp"
 	"XE/Graphics.hpp"
 	"XE/Math.hpp"
 	"XE/Input.hpp"
+)
+
+set (src_xe_io
+	"XE/IO/Stream.hpp"
+	"XE/IO/Stream.cpp"
+	"XE/IO/FileStream.hpp"
+	"XE/IO/FileStream.cpp"
+	"XE/IO/MemoryStream.hpp"
+	"XE/IO/MemoryStream.cpp"
+	"XE/IO/StreamSource.hpp"
+	"XE/IO/StreamSource.cpp"
 )
 
 set (src_xe_math
@@ -121,8 +124,10 @@ set (src_xe_util
 	"XE/Util/Timer.cpp"
 )
 
+
 source_group ("\\XE" FILES ${src_xe})
 source_group ("\\XE\\Math" FILES ${src_xe_math})
+source_group ("\\XE\\IO" FILES ${src_xe_io})
 source_group ("\\XE\\Graphics" FILES ${src_xe_graphics})
 source_group ("\\XE\\Input" FILES ${src_xe_input})
 source_group ("\\XE\\UI" FILES ${src_xe_ui})
@@ -131,6 +136,7 @@ source_group ("\\XE\\Util" FILES ${src_xe_util})
 add_library (${target} 
 	${src_xe} 
 	${src_xe_math} 
+	${src_xe_io} 
 	${src_xe_graphics} 
 	${src_xe_input} 
 	${src_xe_ui}
