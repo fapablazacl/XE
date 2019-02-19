@@ -4,4 +4,6 @@ set (sources "Demo.cpp")
 
 add_executable(${target} ${sources})
 
-target_link_libraries(${target} XE.Core XE.Graphics.OpenGL)
+include_directories(.)
+
+target_link_libraries(${target} XE.Core XE.Graphics.GL)

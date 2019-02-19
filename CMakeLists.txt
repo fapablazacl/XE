@@ -66,8 +66,8 @@ if (XE_PLUGIN_OPENGLCORE)
 	add_subdirectory ("dep/glfw")
 	include_directories ("dep/glfw/include")
 
-    add_subdirectory ("src/XE.Graphics.OpenGL")
-    include_directories ("src/XE.Graphics.OpenGL")
+    add_subdirectory ("src/XE.Graphics.GL")
+    include_directories ("src/XE.Graphics.GL")
 endif ()
 
 if (XE_PLUGIN_VULKAN)
@@ -76,3 +76,5 @@ if (XE_PLUGIN_VULKAN)
 endif ()
 
 add_subdirectory("src/XE.Sandbox")
+
+add_subdirectory("src/XE.Demo")

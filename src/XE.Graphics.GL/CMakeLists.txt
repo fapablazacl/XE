@@ -1,5 +1,5 @@
 
-set (target "XE.Graphics.OpenGL")
+set (target "XE.Graphics.GL")
 set (source_base "XE/Graphics/GL")
 set (sources_xe_graphics_glcore
 	"XE/Graphics/GL.hpp"
