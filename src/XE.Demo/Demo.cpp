@@ -3,9 +3,24 @@
  */
 
 #include <XE.hpp>
-#include <XE/Graphics.hpp>
+#include <XE/IO.hpp>
 #include <XE/Input.hpp>
+#include <XE/Graphics.hpp>
 #include <XE/Graphics/GL.hpp>
+
+#include <map>
+
+namespace XE {
+    class ResourceManager {
+    public:
+        std::string getString(const std::string &path) const {
+            
+        }
+        
+    private:
+        std::vector<std::unique_ptr<XE::StreamSource>> streamSources;
+    };
+}
 
 int main(int argc, char **argv) {
     auto graphicsDevice = std::make_unique<XE::GraphicsDeviceGL>();

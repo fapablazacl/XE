@@ -26,7 +26,7 @@ namespace XE {
             m_inputManager = m_graphicsDevice->GetInputManager();
 
             std::cout << "Loading assets ..." << std::endl;
-            m_streamSource = StreamSource::create();
+            m_streamSource = std::unique_ptr<FileStreamSource>();
             this->InitializeShaders();
             this->InitializeGeometry();
         }
@@ -282,7 +282,7 @@ namespace XE {
         std::unique_ptr<Material> m_material;
         std::unique_ptr<Texture2D> m_texture;
 
-        std::unique_ptr<StreamSource> m_streamSource;
+        std::unique_ptr<FileStreamSource> m_streamSource;
 
         InputManager *m_inputManager = nullptr;
         ImageLoaderPNG m_imageLoaderPNG;

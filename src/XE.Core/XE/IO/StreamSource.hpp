@@ -13,9 +13,7 @@ namespace XE {
 
         virtual std::unique_ptr<Stream> open(const std::string &path) = 0;
 
-    public:
-        static std::unique_ptr<StreamSource> create();
-        static std::unique_ptr<StreamSource> create(const std::string &directory);
+        virtual bool exists(const std::string &path) const = 0;
     };
 }
 

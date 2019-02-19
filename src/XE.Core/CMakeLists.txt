@@ -18,12 +18,14 @@ set (src_xe
 )
 
 set (src_xe_io
-	"XE/IO/Stream.hpp"
-	"XE/IO/Stream.cpp"
 	"XE/IO/FileStream.hpp"
 	"XE/IO/FileStream.cpp"
+	"XE/IO/FileStreamSource.hpp"
+	"XE/IO/FileStreamSource.cpp"
 	"XE/IO/MemoryStream.hpp"
 	"XE/IO/MemoryStream.cpp"
+	"XE/IO/Stream.hpp"
+	"XE/IO/Stream.cpp"
 	"XE/IO/StreamSource.hpp"
 	"XE/IO/StreamSource.cpp"
 )
