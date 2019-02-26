@@ -12,7 +12,7 @@ namespace XE {
      */
     template<typename T>
     struct Sphere {
-        Vector<T, 3> Center;
+        Vector<T, 3> center;
         T Radius;
 
         /**
@@ -26,7 +26,7 @@ namespace XE {
          * @brief Initializes a Sphere from the given radius and center
          */
         Sphere(T radius, const Vector<T, 3> &center) {
-            Center = center;
+            center = center;
             Radius = radius;
         }
 
@@ -34,7 +34,7 @@ namespace XE {
          * @brief Initializes a Sphere from the given center and radius
          */
         Sphere(const Vector<T, 3> &center, T radius) {
-            Center = center;
+            center = center;
             Radius = radius;
         }
     };
@@ -50,7 +50,7 @@ namespace XE {
         const Vector<T, 3> r0 = ray.Point;
         const Vector<T, 3> d = ray.Direction;
 
-        const Vector<T, 3> c = sphere.Center;
+        const Vector<T, 3> c = sphere.center;
         const T r = sphere.Radius;
         const T r_2 = r*r;
 

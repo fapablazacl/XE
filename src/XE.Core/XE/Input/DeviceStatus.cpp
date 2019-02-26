@@ -6,16 +6,16 @@ namespace XE {
         return m_keys[static_cast<int>(code)];
     }
 
-    void KeyboardStatus::SetState(const KeyCode code, const BinaryState state) {
+    void KeyboardStatus::setState(const KeyCode code, const BinaryState state) {
         m_keys[static_cast<int>(code)] = state;
     }
 
 
-    Vector2i MouseStatus::GetPosition() const {
+    Vector2i MouseStatus::getPosition() const {
         return m_position;
     }
 
-    void MouseStatus::SetPosition(const Vector2i &position) {
+    void MouseStatus::setPosition(const Vector2i &position) {
         m_position = position;
     }
 
@@ -23,7 +23,7 @@ namespace XE {
         return m_buttons[static_cast<int>(button)];
     }
 
-    void MouseStatus::SetState(const MouseButton button, const BinaryState state) {
+    void MouseStatus::setState(const MouseButton button, const BinaryState state) {
         m_buttons[static_cast<int>(button)] = state;
     }
 
@@ -32,7 +32,7 @@ namespace XE {
         return m_buttons[static_cast<int>(button)];
     }
 
-    void ControllerStatus::SetState(const ControllerButton button, const BinaryState state) {
+    void ControllerStatus::setState(const ControllerButton button, const BinaryState state) {
         m_buttons[static_cast<int>(button)] = state;
     }
 
@@ -40,7 +40,7 @@ namespace XE {
         return m_joysticks[static_cast<int>(joystick)];
     }
 
-    void ControllerStatus::SetState(const ControllerJoystick joystick, const Vector2f &state) {
+    void ControllerStatus::setState(const ControllerJoystick joystick, const Vector2f &state) {
         m_joysticks[static_cast<int>(joystick)] = state;
     }
 }

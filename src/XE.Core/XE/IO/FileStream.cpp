@@ -52,11 +52,11 @@ namespace XE {
         return true;
     }
 
-    int FileStream::Tell() const {
+    int FileStream::tell() const {
         return (int) std::ftell(m_fileHandle);
     }
 
-    StreamFlags FileStream::GetFlags() const {
+    StreamFlags FileStream::getFlags() const {
         return m_flags;
     }
 }

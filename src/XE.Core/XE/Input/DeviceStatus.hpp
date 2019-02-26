@@ -25,7 +25,7 @@ namespace XE {
     public:
         BinaryState getState(KeyCode code) const;
 
-        void SetState(const KeyCode code, const BinaryState state);
+        void setState(const KeyCode code, const BinaryState state);
 
     private:
         BinaryState m_keys[static_cast<int>(KeyCode::Max)];
@@ -37,13 +37,13 @@ namespace XE {
 
     class MouseStatus {
     public:
-        Vector2i GetPosition() const;
+        Vector2i getPosition() const;
 
-        void SetPosition(const Vector2i &position);
+        void setPosition(const Vector2i &position);
 
         BinaryState getState(const MouseButton button) const;
 
-        void SetState(const MouseButton button, const BinaryState state);
+        void setState(const MouseButton button, const BinaryState state);
 
     private:
         Vector2i m_position;
@@ -67,11 +67,11 @@ namespace XE {
     public:
         BinaryState getState(const ControllerButton button) const;
 
-        void SetState(const ControllerButton button, const BinaryState state);
+        void setState(const ControllerButton button, const BinaryState state);
 
         Vector2f getState(const ControllerJoystick joystick) const;
 
-        void SetState(const ControllerJoystick joystick, const Vector2f &state);
+        void setState(const ControllerJoystick joystick, const Vector2f &state);
 
     private:
         BinaryState m_buttons[static_cast<int>(ControllerButton::Max)];

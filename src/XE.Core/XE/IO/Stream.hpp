@@ -28,9 +28,9 @@ namespace XE {
         
         virtual bool seek(const int offset, const StreamOffset position) = 0;
 
-        virtual int Tell() const = 0;
+        virtual int tell() const = 0;
 
-        virtual StreamFlags GetFlags() const = 0;
+        virtual StreamFlags getFlags() const = 0;
     };
 }
 

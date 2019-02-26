@@ -21,8 +21,8 @@ namespace XE {
     Texture3DGL::~Texture3DGL() {}
 
     void Texture3DGL::setData(const std::byte *surfaceData, const int mipLevel, const PixelFormat surfaceFormat, const DataType surfaceDataType, const Boxi &volume) {
-        const Vector3i offset = volume.MinEdge;
-        const Vector3i size = volume.ComputeSize();
+        const Vector3i offset = volume.minEdge;
+        const Vector3i size = volume.computeSize();
         const GLenum formatGL = convertToGL(surfaceFormat);
         const GLenum dataTypeGL = convertToGL(surfaceDataType);
 

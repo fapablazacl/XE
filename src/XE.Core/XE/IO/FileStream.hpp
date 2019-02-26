@@ -22,9 +22,9 @@ namespace XE {
         
         virtual bool seek(const int offset, const StreamOffset position) override;
 
-        virtual int Tell() const override;
+        virtual int tell() const override;
 
-        virtual StreamFlags GetFlags() const override;
+        virtual StreamFlags getFlags() const override;
 
     private:
         std::string m_fileName;

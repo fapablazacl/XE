@@ -50,11 +50,11 @@ namespace XE {
         return true;
     }
     
-    int MemoryStream::Tell() const {
+    int MemoryStream::tell() const {
         return m_offset;
     }
 
-    StreamFlags MemoryStream::GetFlags() const {
+    StreamFlags MemoryStream::getFlags() const {
         return StreamFlags::Readable;
     }
 }

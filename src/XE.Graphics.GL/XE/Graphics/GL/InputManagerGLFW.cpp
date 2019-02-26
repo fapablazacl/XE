@@ -83,7 +83,7 @@ namespace XE {
             KeyCode keyCode = keyMappingIt->second;
             BinaryState stateCode = stateMappingIt->second;
             
-            m_keyboardStatus.SetState(keyCode, stateCode);
+            m_keyboardStatus.setState(keyCode, stateCode);
         }
     }
 

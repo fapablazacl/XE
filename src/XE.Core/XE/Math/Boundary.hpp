@@ -10,8 +10,8 @@
 namespace XE {
     template<typename T, int N>
     struct Boundary {
-        Vector<T, N> MinEdge;
-        Vector<T, N> MaxEdge;
+        Vector<T, N> minEdge;
+        Vector<T, N> maxEdge;
 
         template<int Base, int Exp> 
         struct Power {
@@ -28,40 +28,40 @@ namespace XE {
 
     public:
         Boundary() {
-            MinEdge = Vector<T, N>(std::numeric_limits<T>::max());
-            MaxEdge = Vector<T, N>(-std::numeric_limits<T>::max());
+            minEdge = Vector<T, N>(std::numeric_limits<T>::max());
+            maxEdge = Vector<T, N>(-std::numeric_limits<T>::max());
         }
 
         Boundary(const Vector<T, N> &value1, const Vector<T, N> &value2) {
-            Expand(value1);
-            Expand(value2);
+            expand(value1);
+            expand(value2);
         }
 
-        void Expand(const Vector<T, N> &value) {
-            MinEdge = Minimize(MinEdge, value);
-            MaxEdge = Maximize(MaxEdge, value);
+        void expand(const Vector<T, N> &value) {
+            minEdge = Minimize(minEdge, value);
+            maxEdge = Maximize(maxEdge, value);
         }
 
-        void Expand(const Boundary<T, N>& other) {
-            Expand(other.MinEdge);
-            Expand(other.MaxEdge);
+        void expand(const Boundary<T, N>& other) {
+            expand(other.minEdge);
+            expand(other.maxEdge);
         }
 
-        Vector<T, N> ComputeSize() const {
-            assert(IsValid());
+        Vector<T, N> computeSize() const {
+            assert(isValid());
 
-            return MaxEdge - MinEdge;
+            return maxEdge - minEdge;
         }
 
-        Vector<T, N> ComputeCenter() const {
-            assert(IsValid());
+        Vector<T, N> computeCenter() const {
+            assert(isValid());
 
-            return MinEdge + ((MaxEdge - MinEdge) / T(2));
+            return minEdge + ((maxEdge - minEdge) / T(2));
         }
 
-        bool IsValid() const {
+        bool isValid() const {
             for (int i=0; i<N; i++) {
-                if (MinEdge[i] > MaxEdge[i]) {
+                if (minEdge[i] > maxEdge[i]) {
                     return false;
                 }
             }
@@ -69,16 +69,16 @@ namespace XE {
             return true;
         }
 
-        bool IsInside(const Vector<T, N> &point) const {
-            assert(IsValid());
+        bool isInside(const Vector<T, N> &point) const {
+            assert(isValid());
 
             for(int i=0; i<N; ++i) { 
                 T value = point[i];
         
-                if (value < MinEdge[i]) {
+                if (value < minEdge[i]) {
                     return false;
 
-                } else if (value > MaxEdge[i]) {
+                } else if (value > maxEdge[i]) {
                     return false;
                 }
             }
@@ -86,12 +86,12 @@ namespace XE {
             return true;
         }
 
-        Vector<T, N> GetEdge(int pointIndex) const {
-            assert(IsValid());
+        Vector<T, N> getEdge(int pointIndex) const {
+            assert(isValid());
 
             // FIXME
             const int LastPoint = Boundary<T, N>::PointCount-1;
-            const Vector<T, N> *edges = &MinEdge;   
+            const Vector<T, N> *edges = &minEdge;   
 
             switch (pointIndex) {
                 case 0:         return edges[0];
@@ -113,18 +113,18 @@ namespace XE {
             }
         }
 
-        bool Intersect(const Boundary<T, N>& other) const {
-            assert(IsValid());
+        bool intersect(const Boundary<T, N>& other) const {
+            assert(isValid());
 
-            return IntersectImpl(other) || IntersectImpl(*this);
+            return intersectImpl(other) || intersectImpl(*this);
         }
         
     private:
-        bool IntersectImpl(const Boundary<T, N>& other) const {
-            assert(IsValid());
+        bool intersectImpl(const Boundary<T, N>& other) const {
+            assert(isValid());
             
             for(int i=0; i<Boundary<T, N>::PointCount; ++i) {
-                if (this->IsInside(other.GetEdge(i))) {
+                if (this->isInside(other.getEdge(i))) {
                     return true;
                 }
             }
