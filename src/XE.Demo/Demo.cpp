@@ -24,9 +24,9 @@ namespace XE {
 
 int main(int argc, char **argv) {
     auto graphicsDevice = std::make_unique<XE::GraphicsDeviceGL>();
-    auto window = graphicsDevice->GetWindow();
+    auto window = graphicsDevice->getWindow();
 
-    auto inputManager = graphicsDevice->GetInputManager();
+    auto inputManager = graphicsDevice->getInputManager();
     
     bool done = true;
 

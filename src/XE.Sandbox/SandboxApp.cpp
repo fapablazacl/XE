@@ -23,7 +23,7 @@ namespace XE {
         virtual void Initialize() override {
             std::cout << "Initializing Engine ..." << std::endl;
             m_graphicsDevice = std::make_unique<GraphicsDeviceGL>();
-            m_inputManager = m_graphicsDevice->GetInputManager();
+            m_inputManager = m_graphicsDevice->getInputManager();
 
             std::cout << "Loading assets ..." << std::endl;
             m_streamSource = std::unique_ptr<FileStreamSource>();
@@ -32,8 +32,8 @@ namespace XE {
         }
 
         virtual void Update(const float seconds) override {
-            const Vector2i windowSize = m_graphicsDevice->GetWindow()->GetSize();
-            m_graphicsDevice->SetViewport({{0, 0}, windowSize});
+            const Vector2i windowSize = m_graphicsDevice->getWindow()->getSize();
+            m_graphicsDevice->setViewport({{0, 0}, windowSize});
 
             m_inputManager->Poll();
             
@@ -89,7 +89,7 @@ namespace XE {
                 Matrix4f::RotateY(Radians(m_angle)) 
             );
 
-            m_graphicsDevice->ApplyUniform(&matrixLayout, 1, (const std::byte*)&modelViewProj);
+            m_graphicsDevice->applyUniform(&matrixLayout, 1, (const std::byte*)&modelViewProj);
         }
 
         std::unique_ptr<Texture2D> CreateColorTexture(const int width, const int height, const Vector4f &color) {
@@ -107,7 +107,7 @@ namespace XE {
                 pixel = (color * Vector4f{255.0f}).Cast<std::uint8_t>();
             }
 
-            return m_graphicsDevice->CreateTexture2D(format, size, sourceFormat, sourceDataType, pixels.data());
+            return m_graphicsDevice->createTexture2D(format, size, sourceFormat, sourceDataType, pixels.data());
         }
 
         std::unique_ptr<Texture2D> CreateFileTexture(const std::string &filePath) {
@@ -116,18 +116,18 @@ namespace XE {
 
             auto imagePtr = m_imageLoaderPNG.Load(stream.get());
 
-            return m_graphicsDevice->CreateTexture2D (
+            return m_graphicsDevice->createTexture2D (
                 PixelFormat::R8G8B8A8, 
-                imagePtr->GetSize(), 
-                imagePtr->GetFormat(),
+                imagePtr->getSize(), 
+                imagePtr->getFormat(),
                 DataType::UInt8,
-                imagePtr->GetPointer()
+                imagePtr->getPointer()
             );
         }
 
         virtual void Render() override {
             m_graphicsDevice->beginFrame(ClearFlags::All, {0.2f, 0.2f, 0.2f, 1.0f}, 0.0f, 0);
-            m_graphicsDevice->SetProgram(m_program.get());
+            m_graphicsDevice->setProgram(m_program.get());
 
             this->RenderMatrices();
 
@@ -136,14 +136,14 @@ namespace XE {
             };
             int textureUnit = 0;
 
-            m_graphicsDevice->ApplyUniform(&textureUniform, 1, reinterpret_cast<std::byte*>(&textureUnit));
+            m_graphicsDevice->applyUniform(&textureUniform, 1, reinterpret_cast<std::byte*>(&textureUnit));
 
-            m_graphicsDevice->SetMaterial(m_material.get());
+            m_graphicsDevice->setMaterial(m_material.get());
 
             SubsetEnvelope envelope = {
                 nullptr, PrimitiveType::TriangleStrip, 0, 4
             };
-            m_graphicsDevice->Draw(m_subset.get(), &envelope, 1);
+            m_graphicsDevice->draw(m_subset.get(), &envelope, 1);
             m_graphicsDevice->endFrame();
         }
 
@@ -161,7 +161,7 @@ namespace XE {
                 }
             };
 
-            m_program = m_graphicsDevice->CreateProgram(programDescriptor);
+            m_program = m_graphicsDevice->createProgram(programDescriptor);
         }
 
         std::string getShaderSource(const std::string &path) const {
@@ -200,7 +200,7 @@ namespace XE {
                 (const std::byte*) Sandbox::Assets::coordData.data()
             };
 
-            auto coordBuffer = m_graphicsDevice->CreateBuffer(coordBufferDescriptor);
+            auto coordBuffer = m_graphicsDevice->createBuffer(coordBufferDescriptor);
 
             BufferDescriptor colorBufferDescriptor = {
                 BufferType::Vertex, 
@@ -210,7 +210,7 @@ namespace XE {
                 (const std::byte*) Sandbox::Assets::colorData.data()
             };
 
-            auto colorBuffer = m_graphicsDevice->CreateBuffer(colorBufferDescriptor);
+            auto colorBuffer = m_graphicsDevice->createBuffer(colorBufferDescriptor);
 
             BufferDescriptor normalBufferDescriptor = {
                 BufferType::Vertex, 
@@ -220,7 +220,7 @@ namespace XE {
                 (const std::byte*) Sandbox::Assets::normalData.data()
             };
 
-            auto normalBuffer = m_graphicsDevice->CreateBuffer(normalBufferDescriptor);
+            auto normalBuffer = m_graphicsDevice->createBuffer(normalBufferDescriptor);
 
             BufferDescriptor texCoordBufferDescriptor = {
                 BufferType::Vertex, 
@@ -230,7 +230,7 @@ namespace XE {
                 (const std::byte*) Sandbox::Assets::texCoordData.data()
             };
 
-            auto texCoordBuffer = m_graphicsDevice->CreateBuffer(texCoordBufferDescriptor);
+            auto texCoordBuffer = m_graphicsDevice->createBuffer(texCoordBufferDescriptor);
 
             // create the index buffer
             BufferDescriptor indexBufferDescriptor = {
@@ -241,7 +241,7 @@ namespace XE {
                 (const std::byte*) Sandbox::Assets::indexData.data()
             };
 
-            auto indexBuffer = m_graphicsDevice->CreateBuffer(indexBufferDescriptor);
+            auto indexBuffer = m_graphicsDevice->createBuffer(indexBufferDescriptor);
 
             // create the geometry subset
             SubsetDescriptor subsetDescriptor;
@@ -265,7 +265,7 @@ namespace XE {
                 {"vertCoord", 0}, {"vertColor", 1}, {"vertNormal", 2}, {"vertTexCoord", 3}
             };
 
-            m_subset = m_graphicsDevice->CreateSubset(subsetDescriptor, std::move(buffers), bufferMapping, std::move(indexBuffer));
+            m_subset = m_graphicsDevice->createSubset(subsetDescriptor, std::move(buffers), bufferMapping, std::move(indexBuffer));
 
             // m_texture = this->CreateColorTexture(256, 256, {1.0f, 0.0f, 0.0f, 1.0f});
             m_texture = this->CreateFileTexture("media/materials/Tiles_Azulejos_004_SD/Tiles_Azulejos_004_COLOR.png");

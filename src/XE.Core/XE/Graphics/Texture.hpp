@@ -27,9 +27,9 @@ namespace XE {
     public:
         virtual ~Texture();
     
-        virtual PixelFormat GetFormat() const = 0;
+        virtual PixelFormat getFormat() const = 0;
         
-        virtual TextureType GetType() const = 0;
+        virtual TextureType getType() const = 0;
     };
 
 }

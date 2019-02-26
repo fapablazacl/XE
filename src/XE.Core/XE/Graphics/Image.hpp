@@ -18,17 +18,17 @@ namespace XE {
         /**
          * @brief Get a direct pointer to the image data resident in system memory.
          */
-        virtual const std::byte* GetPointer() const = 0;
+        virtual const std::byte* getPointer() const = 0;
 
         /**
          * @brief Get the image pixel format.
          */
-        virtual PixelFormat GetFormat() const = 0;
+        virtual PixelFormat getFormat() const = 0;
 
         /**
          * @brief Get the image dimensions as a 2D Integer Vector, in pixels.
          */
-        virtual Vector2i GetSize() const = 0;
+        virtual Vector2i getSize() const = 0;
     };
 }
 

@@ -19,15 +19,15 @@ namespace XE {
 
         virtual ~ImagePNG() {}
 
-        virtual const std::byte* GetPointer() const override {
+        virtual const std::byte* getPointer() const override {
             return pointer;
         }
 
-        virtual PixelFormat GetFormat() const override {
+        virtual PixelFormat getFormat() const override {
             return format;
         }
 
-        virtual Vector2i GetSize() const override {
+        virtual Vector2i getSize() const override {
             return size;
         }
 

@@ -16,7 +16,7 @@ namespace XE {
         /**
          * @brief Get the size of the buffer, in bytes.
          */
-        virtual int GetSize() const = 0;
+        virtual int getSize() const = 0;
 
         /**
          * @brief Read the buffer data into a user-defined memory region.

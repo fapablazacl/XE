@@ -100,15 +100,15 @@ namespace XE {
         }
     }
     
-    Window* GraphicsDeviceGL::GetWindow() const {
+    Window* GraphicsDeviceGL::getWindow() const {
         return m_window.get();
     }
 
-    InputManager* GraphicsDeviceGL::GetInputManager() {
+    InputManager* GraphicsDeviceGL::getInputManager() {
         return m_inputManager.get();
     }
 
-    std::unique_ptr<Subset> GraphicsDeviceGL::CreateSubset(
+    std::unique_ptr<Subset> GraphicsDeviceGL::createSubset(
             SubsetDescriptor& desc, 
             std::vector<std::unique_ptr<Buffer>> buffers, 
             const std::map<std::string, int> &bufferMapping, 
@@ -116,31 +116,31 @@ namespace XE {
         return std::make_unique<SubsetGL>(desc, std::move(buffers), bufferMapping, std::move(indexBuffer));
     }
         
-    std::unique_ptr<Buffer> GraphicsDeviceGL::CreateBuffer(const BufferDescriptor &desc) {
+    std::unique_ptr<Buffer> GraphicsDeviceGL::createBuffer(const BufferDescriptor &desc) {
         return std::make_unique<BufferGL>(desc);
     }
         
-    std::unique_ptr<Texture2D> GraphicsDeviceGL::CreateTexture2D(const PixelFormat format, const Vector2i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void *sourceData) {
+    std::unique_ptr<Texture2D> GraphicsDeviceGL::createTexture2D(const PixelFormat format, const Vector2i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void *sourceData) {
         return std::make_unique<Texture2DGL>(format, size, sourceFormat, sourceDataType, sourceData);
     }
         
-    std::unique_ptr<Texture3D> GraphicsDeviceGL::CreateTexture3D(const PixelFormat format, const Vector3i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void *sourceData) {
+    std::unique_ptr<Texture3D> GraphicsDeviceGL::createTexture3D(const PixelFormat format, const Vector3i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void *sourceData) {
         return std::make_unique<Texture3DGL>(format, size, sourceFormat, sourceDataType, sourceData);
     }
 
-    std::unique_ptr<Texture2DArray> GraphicsDeviceGL::CreateTexture2DArray(const PixelFormat format, const Vector2i &size, const int count) {
+    std::unique_ptr<Texture2DArray> GraphicsDeviceGL::createTexture2DArray(const PixelFormat format, const Vector2i &size, const int count) {
         return std::make_unique<Texture2DArrayGL>(format, size, count);
     }
         
-    std::unique_ptr<TextureCubeMap> GraphicsDeviceGL::CreateTextureCubeMap(const PixelFormat format, const Vector2i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void **sourceData) {
+    std::unique_ptr<TextureCubeMap> GraphicsDeviceGL::createTextureCubeMap(const PixelFormat format, const Vector2i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void **sourceData) {
         return std::unique_ptr<TextureCubeMap>();
     }
         
-    std::unique_ptr<Program> GraphicsDeviceGL::CreateProgram(const ProgramDescriptor &desc) {
+    std::unique_ptr<Program> GraphicsDeviceGL::createProgram(const ProgramDescriptor &desc) {
         return std::make_unique<ProgramGL>(desc);
     }
     
-    void GraphicsDeviceGL::Draw(const Subset *subset, const SubsetEnvelope *envelopes, const int envelopeCount) {
+    void GraphicsDeviceGL::draw(const Subset *subset, const SubsetEnvelope *envelopes, const int envelopeCount) {
         auto subsetGL = static_cast<const SubsetGL *>(subset);
         auto descriptor = subsetGL->GetDescriptor();
         ::glBindVertexArray(subsetGL->GetID());
@@ -194,7 +194,7 @@ namespace XE {
         XE_GRAPHICS_GL_CHECK_ERROR();
     }
 
-    void GraphicsDeviceGL::PreRenderMaterial(const Material *material) {
+    void GraphicsDeviceGL::preRenderMaterial(const Material *material) {
         const auto &rs = material->renderState;
 
         // clip distances
@@ -274,7 +274,7 @@ namespace XE {
         XE_GRAPHICS_GL_CHECK_ERROR();
     }
 
-    void GraphicsDeviceGL::PostRenderMaterial(const Material *material) {
+    void GraphicsDeviceGL::postRenderMaterial(const Material *material) {
         const auto &rs = material->renderState;
 
         // clip distances
@@ -321,23 +321,23 @@ namespace XE {
         XE_GRAPHICS_GL_CHECK_ERROR();
     }
 
-    void GraphicsDeviceGL::SetMaterial(const Material *material) {
+    void GraphicsDeviceGL::setMaterial(const Material *material) {
         if (m_material == material) {
             return;
         }
 
         if (m_material) {
-            this->PostRenderMaterial(m_material);
+            this->postRenderMaterial(m_material);
         }
 
-        this->PreRenderMaterial(material);
+        this->preRenderMaterial(material);
 
         m_material = material;
 
         XE_GRAPHICS_GL_CHECK_ERROR();
     }
 
-    void GraphicsDeviceGL::SetProgram(const Program *program) {
+    void GraphicsDeviceGL::setProgram(const Program *program) {
         m_program = static_cast<const ProgramGL*>(program);
 
         if (m_program) {
@@ -353,7 +353,7 @@ namespace XE {
         return m_program;
     }
 
-    void GraphicsDeviceGL::ApplyUniform(const UniformMatrix *uniformMatrix, const int count, const std::byte *data) {
+    void GraphicsDeviceGL::applyUniform(const UniformMatrix *uniformMatrix, const int count, const std::byte *data) {
         // TODO: Add support for matrix transposition
 
         assert(m_program);
@@ -431,7 +431,7 @@ namespace XE {
         XE_GRAPHICS_GL_CHECK_ERROR();
     }
 
-    void GraphicsDeviceGL::ApplyUniform(const Uniform *uniform, const int count, const std::byte *data) {
+    void GraphicsDeviceGL::applyUniform(const Uniform *uniform, const int count, const std::byte *data) {
         assert(m_program);
         assert(uniform);
         assert(count > 0);
@@ -487,7 +487,7 @@ namespace XE {
         XE_GRAPHICS_GL_CHECK_ERROR();
     }
 
-    void GraphicsDeviceGL::SetViewport(const Viewport &viewport) {
+    void GraphicsDeviceGL::setViewport(const Viewport &viewport) {
         GLint x = static_cast<GLint>(viewport.position.X);
         GLint y = static_cast<GLint>(viewport.position.Y);
 
@@ -501,11 +501,11 @@ namespace XE {
         XE_GRAPHICS_GL_CHECK_ERROR();
     }
 
-    Viewport GraphicsDeviceGL::GetViewport() const {
+    Viewport GraphicsDeviceGL::getViewport() const {
         return m_viewport;
     }
 
-    const Material* GraphicsDeviceGL::GetMaterial() const {
+    const Material* GraphicsDeviceGL::getMaterial() const {
         return m_material;
     }
 }

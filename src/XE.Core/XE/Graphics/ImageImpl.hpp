@@ -14,15 +14,15 @@ namespace XE {
 
         virtual ~ImageImpl();
 
-        virtual const std::byte* GetPointer() const override;
+        virtual const std::byte* getPointer() const override;
         
-        virtual PixelFormat GetFormat() const override;
+        virtual PixelFormat getFormat() const override;
 
-        virtual Vector2i GetSize() const override;
+        virtual Vector2i getSize() const override;
 
-        void Allocate(const PixelFormat format, const Vector2i &size);
+        void allocate(const PixelFormat format, const Vector2i &size);
 
-        void Free();
+        void free();
 
     private:
         std::byte *pixels = nullptr;

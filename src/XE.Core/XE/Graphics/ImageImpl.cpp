@@ -8,23 +8,23 @@ namespace XE {
     ImageImpl::ImageImpl() {}
 
     ImageImpl::~ImageImpl() {
-        this->Free();
+        this->free();
     }
 
-    const std::byte* ImageImpl::GetPointer() const {
+    const std::byte* ImageImpl::getPointer() const {
         return pixels;
     }
 
-    PixelFormat ImageImpl::GetFormat() const {
+    PixelFormat ImageImpl::getFormat() const {
         return format;
     }
 
-    Vector2i ImageImpl::GetSize() const {
+    Vector2i ImageImpl::getSize() const {
         return size;
     }
 
-    void ImageImpl::Allocate(const PixelFormat format, const Vector2i &size) {
-        this->Free();
+    void ImageImpl::allocate(const PixelFormat format, const Vector2i &size) {
+        this->free();
 
         const int pixelByteSize = ComputeStorage(format);
         const int byteSize = size.X * size.Y * pixelByteSize;
@@ -34,7 +34,7 @@ namespace XE {
         pixels = static_cast<std::byte*>(std::malloc(byteSize));
     }
 
-    void ImageImpl::Free() {
+    void ImageImpl::free() {
         if (pixels) {
             std::free(pixels);
             pixels = nullptr;

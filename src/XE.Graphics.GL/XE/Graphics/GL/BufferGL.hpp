@@ -17,7 +17,7 @@ namespace XE {
 
         virtual ~BufferGL();
 
-        virtual int GetSize() const override {
+        virtual int getSize() const override {
             return m_size;
         }
 

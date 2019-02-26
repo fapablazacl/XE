@@ -23,7 +23,7 @@ namespace XE {
 
     Texture2DGL::~Texture2DGL() {}
 
-    void Texture2DGL::SetData(const std::byte *surfaceData, const int mipLevel, const PixelFormat surfaceFormat, const DataType surfaceDataType, const Recti &area) {
+    void Texture2DGL::setData(const std::byte *surfaceData, const int mipLevel, const PixelFormat surfaceFormat, const DataType surfaceDataType, const Recti &area) {
         const Vector2i offset = area.MinEdge;
         const Vector2i size = area.ComputeSize();
         const GLenum formatGL = ConvertToGL(surfaceFormat);
@@ -36,7 +36,7 @@ namespace XE {
         XE_GRAPHICS_GL_CHECK_ERROR();
     }
     
-    void Texture2DGL::GetData(std::byte *surfaceData, const int mipLevel, const PixelFormat surfaceFormat, const DataType surfaceDataType) const {
+    void Texture2DGL::getData(std::byte *surfaceData, const int mipLevel, const PixelFormat surfaceFormat, const DataType surfaceDataType) const {
         const GLenum formatGL = ConvertToGL(surfaceFormat);
         const GLenum dataTypeGL = ConvertToGL(surfaceDataType);
 

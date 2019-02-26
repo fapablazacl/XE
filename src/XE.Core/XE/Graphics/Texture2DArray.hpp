@@ -13,18 +13,18 @@ namespace XE {
     class Texture2DArray : public Texture {
 
     public:
-        virtual TextureType GetType() const override;
+        virtual TextureType getType() const override;
 
     public:
         virtual ~Texture2DArray();
         
-        virtual Vector2i GetSize() const = 0;
+        virtual Vector2i getSize() const = 0;
         
-        virtual int GetCount() const = 0;
+        virtual int getCount() const = 0;
         
-        virtual void SetData(const void *surfaceData, const int mipLevel, const int arrayIndex, const PixelFormat surfaceFormat, const DataType surfaceDataType, const Recti &area, int count) = 0;
+        virtual void setData(const void *surfaceData, const int mipLevel, const int arrayIndex, const PixelFormat surfaceFormat, const DataType surfaceDataType, const Recti &area, int count) = 0;
         
-        virtual void GetData(void *surfaceData, const int mipLevel, const int arrayIndex, const PixelFormat surfaceFormat, const DataType surfaceDataType, const Recti &area) const = 0;
+        virtual void getData(void *surfaceData, const int mipLevel, const int arrayIndex, const PixelFormat surfaceFormat, const DataType surfaceDataType, const Recti &area) const = 0;
     };
 }
 

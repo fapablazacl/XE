@@ -4,7 +4,7 @@
 namespace XE {
 	Texture2D::~Texture2D() {}
 
-	TextureType Texture2D::GetType() const {
+	TextureType Texture2D::getType() const {
 		return TextureType::Tex2D;
 	}
 }

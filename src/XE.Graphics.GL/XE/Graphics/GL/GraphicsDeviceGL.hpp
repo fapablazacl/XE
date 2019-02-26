@@ -20,54 +20,54 @@ namespace XE {
 
         virtual ~GraphicsDeviceGL();
         
-        virtual Window* GetWindow() const override;
+        virtual Window* getWindow() const override;
 
-        virtual InputManager* GetInputManager() override;
+        virtual InputManager* getInputManager() override;
 
-        virtual std::unique_ptr<Subset> CreateSubset(
+        virtual std::unique_ptr<Subset> createSubset(
             SubsetDescriptor& desc, 
             std::vector<std::unique_ptr<Buffer>> buffers, 
             const std::map<std::string, int> &bufferMapping, 
             std::unique_ptr<Buffer> indexBuffer) override;
         
-        virtual std::unique_ptr<Buffer> CreateBuffer(const BufferDescriptor &bufferDescriptor) override;
+        virtual std::unique_ptr<Buffer> createBuffer(const BufferDescriptor &bufferDescriptor) override;
         
-        virtual std::unique_ptr<Texture2D> CreateTexture2D(const PixelFormat format, const Vector2i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void *sourceData) override;
+        virtual std::unique_ptr<Texture2D> createTexture2D(const PixelFormat format, const Vector2i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void *sourceData) override;
         
-        virtual std::unique_ptr<Texture3D> CreateTexture3D(const PixelFormat format, const Vector3i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void *sourceData) override;
+        virtual std::unique_ptr<Texture3D> createTexture3D(const PixelFormat format, const Vector3i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void *sourceData) override;
         
-        virtual std::unique_ptr<Texture2DArray> CreateTexture2DArray(const PixelFormat format, const Vector2i &size, const int count) override;
+        virtual std::unique_ptr<Texture2DArray> createTexture2DArray(const PixelFormat format, const Vector2i &size, const int count) override;
         
-        virtual std::unique_ptr<TextureCubeMap> CreateTextureCubeMap(const PixelFormat format, const Vector2i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void **sourceData) override;
+        virtual std::unique_ptr<TextureCubeMap> createTextureCubeMap(const PixelFormat format, const Vector2i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void **sourceData) override;
         
-        virtual std::unique_ptr<Program> CreateProgram(const ProgramDescriptor &programDescriptor) override;
+        virtual std::unique_ptr<Program> createProgram(const ProgramDescriptor &programDescriptor) override;
         
-        virtual void SetMaterial(const Material *material) override;
+        virtual void setMaterial(const Material *material) override;
 
-        virtual const Material* GetMaterial() const override;
+        virtual const Material* getMaterial() const override;
 
-        virtual void SetProgram(const Program *program) override;
+        virtual void setProgram(const Program *program) override;
 
         virtual const Program* getProgram() const override;
 
-        virtual void ApplyUniform(const UniformMatrix *uniformMatrix, const int count, const std::byte *data) override;
+        virtual void applyUniform(const UniformMatrix *uniformMatrix, const int count, const std::byte *data) override;
 
-        virtual void ApplyUniform(const Uniform *uniform, const int count, const std::byte *data) override;
+        virtual void applyUniform(const Uniform *uniform, const int count, const std::byte *data) override;
 
         virtual void beginFrame(const ClearFlags flags, const Vector4f &color, const float depth, const int stencil) override;
         
-        virtual void Draw(const Subset *subset, const SubsetEnvelope *envelopes, const int envelopeCount) override;
+        virtual void draw(const Subset *subset, const SubsetEnvelope *envelopes, const int envelopeCount) override;
 
         virtual void endFrame() override;
 
-        virtual void SetViewport(const Viewport &viewport) override;
+        virtual void setViewport(const Viewport &viewport) override;
 
-        virtual Viewport GetViewport() const override;
+        virtual Viewport getViewport() const override;
 
     private:
-        void PreRenderMaterial(const Material *material);
+        void preRenderMaterial(const Material *material);
 
-        void PostRenderMaterial(const Material *material);
+        void postRenderMaterial(const Material *material);
 
     private:
         GLFWwindow *m_windowGLFW = nullptr;
