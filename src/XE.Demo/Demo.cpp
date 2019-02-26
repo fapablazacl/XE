@@ -37,9 +37,9 @@ int main(int argc, char **argv) {
             done = false;
         }
 
-        graphicsDevice->BeginFrame(XE::ClearFlags::All, {0.0f, 0.0f, 1.0f, 0.0f}, 0.0f, 0);
+        graphicsDevice->beginFrame(XE::ClearFlags::All, {0.0f, 0.0f, 1.0f, 0.0f}, 0.0f, 0);
 
-        graphicsDevice->EndFrame();
+        graphicsDevice->endFrame();
     }
 
     return 0;

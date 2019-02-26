@@ -22,18 +22,18 @@ namespace XE {
 
         virtual ~ProgramGL();
 
-        virtual int GetShaderCount() const override;
+        virtual int getShaderCount() const override;
 
-        virtual Shader* GetShader(const int index) override;
+        virtual Shader* getShader(const int index) override;
 
         GLuint GetID() const {
             return m_id;
         }
 
     public:
-        int GetUniformLoction(const std::string &name) const;
+        int getUniformLoction(const std::string &name) const;
 
-        int GetAttributeLocation(const std::string &name) const;
+        int getAttributeLocation(const std::string &name) const;
 
     private:
         GLuint m_id;

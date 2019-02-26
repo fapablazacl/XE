@@ -173,7 +173,7 @@ namespace XE {
         XE_GRAPHICS_GL_CHECK_ERROR();
     }
         
-    void GraphicsDeviceGL::BeginFrame(const ClearFlags flags, const Vector4f &color, const float depth, const int stencil) {
+    void GraphicsDeviceGL::beginFrame(const ClearFlags flags, const Vector4f &color, const float depth, const int stencil) {
         const GLenum clearFlagsGL =
             (flags & ClearFlags::Color   ? GL_COLOR_BUFFER_BIT   : 0) | 
             (flags & ClearFlags::Depth   ? GL_DEPTH_BUFFER_BIT   : 0) | 
@@ -187,7 +187,7 @@ namespace XE {
         XE_GRAPHICS_GL_CHECK_ERROR();
     }
         
-    void GraphicsDeviceGL::EndFrame() {
+    void GraphicsDeviceGL::endFrame() {
         ::glFlush();
         ::glfwSwapBuffers(m_windowGLFW);
 
@@ -349,7 +349,7 @@ namespace XE {
         XE_GRAPHICS_GL_CHECK_ERROR();
     }
     
-    const Program* GraphicsDeviceGL::GetProgram() const {
+    const Program* GraphicsDeviceGL::getProgram() const {
         return m_program;
     }
 
@@ -365,7 +365,7 @@ namespace XE {
 
         for (int i=0; i<count; i++) {
             const UniformMatrix *current = &uniformMatrix[i];
-            const GLint location = m_program->GetUniformLoction(current->Name);
+            const GLint location = m_program->getUniformLoction(current->Name);
 
             switch (current->Type) {
             case DataType::Float32: 
@@ -441,7 +441,7 @@ namespace XE {
 
         for (int i=0; i<count; i++) {
             const Uniform *current = &uniform[i];
-            const GLint location = m_program->GetUniformLoction(current->Name);
+            const GLint location = m_program->getUniformLoction(current->Name);
 
             assert(location >= 0);
 

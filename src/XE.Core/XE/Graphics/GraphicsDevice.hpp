@@ -119,7 +119,7 @@ namespace XE {
 
         virtual void SetProgram(const Program *program) = 0;
 
-        virtual const Program* GetProgram() const = 0;
+        virtual const Program* getProgram() const = 0;
 
         virtual void ApplyUniform(const UniformMatrix *uniformMatrix, const int count, const std::byte *data) = 0;
 
@@ -127,9 +127,9 @@ namespace XE {
 
         virtual void Draw(const Subset *subset, const SubsetEnvelope *envelopes, const int envelopeCount) = 0;
         
-        virtual void BeginFrame(const ClearFlags flags, const Vector4f &color, const float depth, const int stencil) = 0;
+        virtual void beginFrame(const ClearFlags flags, const Vector4f &color, const float depth, const int stencil) = 0;
         
-        virtual void EndFrame() = 0;
+        virtual void endFrame() = 0;
     };
 }
 

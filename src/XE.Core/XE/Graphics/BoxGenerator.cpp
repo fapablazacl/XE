@@ -13,19 +13,19 @@ namespace XE {
 
     BoxGenerator::~BoxGenerator() {}
 
-    std::vector<Vector3f> BoxGenerator::GenerateVertexCoordinates() const {
+    std::vector<Vector3f> BoxGenerator::generateVertexCoordinates() const {
         return {};
     }
 
-    std::vector<Vector3f> BoxGenerator::GenerateVertexNormals() const {
+    std::vector<Vector3f> BoxGenerator::generateVertexNormals() const {
         return {};
     }
 
-    std::vector<Vector2f> BoxGenerator::GenerateVertexTexCoords() const {
+    std::vector<Vector2f> BoxGenerator::generateVertexTexCoords() const {
         return {};
     }
 
-    std::vector<int> BoxGenerator::GenerateIndices() const {
+    std::vector<int> BoxGenerator::generateIndices() const {
         const int slices = division.X;
         const int stacks = division.Y;
 

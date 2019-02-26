@@ -14,13 +14,13 @@ namespace XE {
 
         virtual ~EllipsoidGenerator();
 
-        virtual std::vector<Vector3f> GenerateVertexCoordinates() const override;
+        virtual std::vector<Vector3f> generateVertexCoordinates() const override;
 
-        virtual std::vector<Vector3f> GenerateVertexNormals() const override;
+        virtual std::vector<Vector3f> generateVertexNormals() const override;
 
-        virtual std::vector<Vector2f> GenerateVertexTexCoords() const override;
+        virtual std::vector<Vector2f> generateVertexTexCoords() const override;
 
-        virtual std::vector<int> GenerateIndices() const override;
+        virtual std::vector<int> generateIndices() const override;
 
     private:
         int slices = 0;

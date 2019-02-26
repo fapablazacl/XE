@@ -48,17 +48,17 @@ namespace XE {
 
         virtual void SetProgram(const Program *program) override;
 
-        virtual const Program* GetProgram() const override;
+        virtual const Program* getProgram() const override;
 
         virtual void ApplyUniform(const UniformMatrix *uniformMatrix, const int count, const std::byte *data) override;
 
         virtual void ApplyUniform(const Uniform *uniform, const int count, const std::byte *data) override;
 
-        virtual void BeginFrame(const ClearFlags flags, const Vector4f &color, const float depth, const int stencil) override;
+        virtual void beginFrame(const ClearFlags flags, const Vector4f &color, const float depth, const int stencil) override;
         
         virtual void Draw(const Subset *subset, const SubsetEnvelope *envelopes, const int envelopeCount) override;
 
-        virtual void EndFrame() override;
+        virtual void endFrame() override;
 
         virtual void SetViewport(const Viewport &viewport) override;
 

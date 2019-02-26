@@ -126,7 +126,7 @@ namespace XE {
         }
 
         virtual void Render() override {
-            m_graphicsDevice->BeginFrame(ClearFlags::All, {0.2f, 0.2f, 0.2f, 1.0f}, 0.0f, 0);
+            m_graphicsDevice->beginFrame(ClearFlags::All, {0.2f, 0.2f, 0.2f, 1.0f}, 0.0f, 0);
             m_graphicsDevice->SetProgram(m_program.get());
 
             this->RenderMatrices();
@@ -144,7 +144,7 @@ namespace XE {
                 nullptr, PrimitiveType::TriangleStrip, 0, 4
             };
             m_graphicsDevice->Draw(m_subset.get(), &envelope, 1);
-            m_graphicsDevice->EndFrame();
+            m_graphicsDevice->endFrame();
         }
 
         virtual bool ShouldClose() const override {
