@@ -9,7 +9,7 @@ namespace XE {
     public:
         virtual ~ImageLoaderPNG();
 
-        virtual std::unique_ptr<Image> Load(Stream *inputStream) override;
+        virtual std::unique_ptr<Image> load(Stream *inputStream) override;
     };
 }
 

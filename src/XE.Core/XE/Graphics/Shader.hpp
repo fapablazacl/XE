@@ -15,9 +15,9 @@ namespace XE {
     public:
         virtual ~Shader();
 
-        virtual ShaderType GetType() const = 0;
+        virtual ShaderType getType() const = 0;
 
-        virtual std::string GetSource() const = 0;
+        virtual std::string getSource() const = 0;
     };
 }
 

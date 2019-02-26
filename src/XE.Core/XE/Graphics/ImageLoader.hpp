@@ -21,7 +21,7 @@ namespace XE {
         /**
          * @brief Constructs a Image object from an input stream.
          */
-        virtual std::unique_ptr<Image> Load(Stream *inputStream) = 0;
+        virtual std::unique_ptr<Image> load(Stream *inputStream) = 0;
     };
 }
 

@@ -10,9 +10,9 @@ namespace XE {
         m_size = size;
         m_format = format;
 
-        const GLenum internalFormatGL = ConvertToGL(m_format);
-        const GLenum formatGL = ConvertToGL(sourceFormat);
-        const GLenum typeGL = ConvertToGL(sourceDataType);
+        const GLenum internalFormatGL = convertToGL(m_format);
+        const GLenum formatGL = convertToGL(sourceFormat);
+        const GLenum typeGL = convertToGL(sourceDataType);
 
         ::glBindTexture(GL_TEXTURE_2D, m_id);
         ::glTexImage2D(GL_TEXTURE_2D, 0, internalFormatGL, m_size.X, m_size.Y, 0, formatGL, typeGL, sourceData);
@@ -26,8 +26,8 @@ namespace XE {
     void Texture2DGL::setData(const std::byte *surfaceData, const int mipLevel, const PixelFormat surfaceFormat, const DataType surfaceDataType, const Recti &area) {
         const Vector2i offset = area.MinEdge;
         const Vector2i size = area.ComputeSize();
-        const GLenum formatGL = ConvertToGL(surfaceFormat);
-        const GLenum dataTypeGL = ConvertToGL(surfaceDataType);
+        const GLenum formatGL = convertToGL(surfaceFormat);
+        const GLenum dataTypeGL = convertToGL(surfaceDataType);
 
         ::glBindTexture(GL_TEXTURE_2D, m_id);
         ::glTexSubImage2D(GL_TEXTURE_2D, mipLevel, offset.X, offset.Y, size.X, size.Y, formatGL, dataTypeGL, surfaceData);
@@ -37,8 +37,8 @@ namespace XE {
     }
     
     void Texture2DGL::getData(std::byte *surfaceData, const int mipLevel, const PixelFormat surfaceFormat, const DataType surfaceDataType) const {
-        const GLenum formatGL = ConvertToGL(surfaceFormat);
-        const GLenum dataTypeGL = ConvertToGL(surfaceDataType);
+        const GLenum formatGL = convertToGL(surfaceFormat);
+        const GLenum dataTypeGL = convertToGL(surfaceDataType);
 
         ::glBindTexture(GL_TEXTURE_2D, m_id);
         ::glGetTexImage(GL_TEXTURE_2D, mipLevel, formatGL, dataTypeGL, surfaceData);

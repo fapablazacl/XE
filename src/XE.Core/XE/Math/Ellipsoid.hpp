@@ -13,14 +13,14 @@ namespace XE {
     template<typename T>
     struct Ellipsoid {
         Vector<T, 3> Center;
-        Vector<T, 3> Size;
+        Vector<T, 3> size;
         
         /**
          * @brief Initializes a Ellipsoid from the given center and radius
          */
         Ellipsoid(const Vector<T, 3> &center, const Vector<T, 3> &size) {
             Center = center;
-            Size = size;
+            size = size;
         }
     };
 }

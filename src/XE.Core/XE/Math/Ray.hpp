@@ -11,7 +11,7 @@ namespace XE {
      */
     template<typename T>
     struct Ray {
-        Vector<T, 3> Position;
+        Vector<T, 3> position;
         Vector<T, 3> Direction;
 
         /**
@@ -19,14 +19,14 @@ namespace XE {
          * direction of the ray.
          */
         Vector<T, 3> ComputePoint(const T t) const {
-            return Position + t*Direction;
+            return position + t*Direction;
         }
 
         /**
          * @brief Initializes the ray, positioned around the origin and aiming to the positive Z-axis.
          */
         Ray() {
-            Position = {T(0.0), T(0.0), T(0.0)};
+            position = {T(0.0), T(0.0), T(0.0)};
             Direction = {T(0.0), T(0.0), T(1.0)};    
         }
     };

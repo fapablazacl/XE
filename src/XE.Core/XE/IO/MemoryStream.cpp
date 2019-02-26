@@ -14,7 +14,7 @@ namespace XE {
 
     MemoryStream::~MemoryStream() {}
     
-    int MemoryStream::Read(void *bufferOut, const int size, const int count) {
+    int MemoryStream::read(void *bufferOut, const int size, const int count) {
         assert(m_data);
         assert(bufferOut);
         
@@ -24,12 +24,12 @@ namespace XE {
         return count;
     }
     
-    int Write(const void *buffer, const int size, const int count) {
+    int write(const void *buffer, const int size, const int count) {
         // TODO: Add implementation
         return 0;
     }
 
-    bool MemoryStream::Seek(const int offset, const StreamOffset position) {
+    bool MemoryStream::seek(const int offset, const StreamOffset position) {
         switch (position) {
         case StreamOffset::Current:
             m_offset += offset;

@@ -11,20 +11,20 @@ namespace XE {
     public:
         explicit InputManagerGLFW(GLFWwindow *window);
 
-        virtual void Poll() override;
+        virtual void poll() override;
 
-        virtual KeyboardStatus GetKeyboardStatus() override {
+        virtual KeyboardStatus getKeyboardStatus() override {
             return m_keyboardStatus;
         }
 
-        virtual MouseStatus GetMouseStatus() override;
+        virtual MouseStatus getMouseStatus() override;
 
-        virtual int GetControllerCount() override;
+        virtual int getControllerCount() override;
         
-        virtual ControllerStatus GetControllerStatus(const int index) override;
+        virtual ControllerStatus getControllerStatus(const int index) override;
 
     private:
-        void FillKeyboardStatus();
+        void fillKeyboardStatus();
 
     private:
         GLFWwindow *m_windowGLFW;

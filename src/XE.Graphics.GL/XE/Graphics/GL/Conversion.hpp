@@ -24,17 +24,17 @@ namespace XE {
 }
 
 namespace XE {
-    extern GLenum ConvertToGL(const DataType type);
-    extern GLenum ConvertToGL(const PixelFormat format);
-    extern GLenum ConvertToGL(const BufferType type);
-    extern GLenum ConvertToGL(const BufferUsage usage, const BufferAccess access);
-    extern GLenum ConvertToGL(const PrimitiveType type);
-    extern GLenum ConvertToGL(const DepthFunc func);
-    extern GLenum ConvertToGL(const PolygonMode mode);
-    extern GLenum ConvertToGL(const FrontFaceOrder order);
-    extern GLenum ConvertToGL(const BlendParam param);
-    extern GLenum ConvertToGL(const TextureFilter filter);
-    extern GLenum ConvertToGL(const TextureWrap wrap);
+    extern GLenum convertToGL(const DataType type);
+    extern GLenum convertToGL(const PixelFormat format);
+    extern GLenum convertToGL(const BufferType type);
+    extern GLenum convertToGL(const BufferUsage usage, const BufferAccess access);
+    extern GLenum convertToGL(const PrimitiveType type);
+    extern GLenum convertToGL(const DepthFunc func);
+    extern GLenum convertToGL(const PolygonMode mode);
+    extern GLenum convertToGL(const FrontFaceOrder order);
+    extern GLenum convertToGL(const BlendParam param);
+    extern GLenum convertToGL(const TextureFilter filter);
+    extern GLenum convertToGL(const TextureWrap wrap);
 }
 
 #endif 

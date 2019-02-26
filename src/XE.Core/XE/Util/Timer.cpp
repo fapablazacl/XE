@@ -5,7 +5,7 @@
 #include <Windows.h>
 
 namespace XE {
-    int Timer::GetTick() {
+    int Timer::getTick() {
         const DWORD dwTickCount = ::GetTickCount();
         return dwTickCount;
     }
@@ -44,7 +44,7 @@ static uint64_t monotonicTimeNanos() {
 }
 
 namespace XE {
-    int Timer::GetTick() {
+    int Timer::getTick() {
         const uint64_t nanos = monotonicTimeNanos();
         return nanos / 1000000;
     }
@@ -54,7 +54,7 @@ namespace XE {
 #include <time.h>
 
 namespace XE {
-    int Timer::GetTick() {
+    int Timer::getTick() {
         timespec ts;
         clock_gettime(CLOCK_MONOTONIC, &ts);
 

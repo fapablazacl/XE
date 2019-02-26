@@ -145,21 +145,21 @@ namespace XE {
         auto descriptor = subsetGL->GetDescriptor();
         ::glBindVertexArray(subsetGL->GetID());
 
-        auto indexBuffer = subsetGL->GetIndexBuffer();
+        auto indexBuffer = subsetGL->getIndexBuffer();
 
         if (!indexBuffer) {
             for (int i=0; i<envelopeCount; i++) {
                 const SubsetEnvelope &env = envelopes[i];
-                const GLenum primitiveGL = ConvertToGL(env.Primitive);
+                const GLenum primitiveGL = convertToGL(env.Primitive);
 
                 ::glDrawArrays(primitiveGL, env.VertexStart, env.VertexCount);
             }
         } else {
-            const GLenum indexTypeGL = ConvertToGL(descriptor.indexType);
+            const GLenum indexTypeGL = convertToGL(descriptor.indexType);
 
             for (int i=0; i<envelopeCount; i++) {
                 const SubsetEnvelope &env = envelopes[i];
-                const GLenum primitiveGL = ConvertToGL(env.Primitive);
+                const GLenum primitiveGL = convertToGL(env.Primitive);
                 
                 if (env.VertexStart == 0) {
                     ::glDrawElements(primitiveGL, env.VertexCount, indexTypeGL, nullptr);
@@ -215,15 +215,15 @@ namespace XE {
             ::glDisable(GL_DEPTH_TEST);
         }
 
-        const GLenum depthFuncGL = ConvertToGL(rs.depthFunc);
+        const GLenum depthFuncGL = convertToGL(rs.depthFunc);
         ::glDepthFunc(depthFuncGL);
 
         // polygon mode
-        const GLenum fillModeGL = ConvertToGL(rs.polygonMode);
+        const GLenum fillModeGL = convertToGL(rs.polygonMode);
         ::glPolygonMode(GL_FRONT_AND_BACK, fillModeGL);
 
         // front face definition
-        const GLenum faceGL = ConvertToGL(rs.frontFace);
+        const GLenum faceGL = convertToGL(rs.frontFace);
         ::glFrontFace(faceGL);
 
         // back face culling
@@ -241,8 +241,8 @@ namespace XE {
         if (rs.blendEnable) {
             ::glEnable(GL_BLEND);
 
-            const GLenum sfactorGL = ConvertToGL(rs.blendSource);
-            const GLenum dfactorGL = ConvertToGL(rs.blendDestination);
+            const GLenum sfactorGL = convertToGL(rs.blendSource);
+            const GLenum dfactorGL = convertToGL(rs.blendDestination);
             ::glBlendFunc(sfactorGL, sfactorGL);
         } else {
             ::glDisable(GL_BLEND);
@@ -264,11 +264,11 @@ namespace XE {
 
             ::glActiveTexture(GL_TEXTURE0 + i);
             ::glBindTexture(target, textureBaseGL->GetID());
-            ::glTexParameteri(target, GL_TEXTURE_MAG_FILTER, ConvertToGL(layer.minFilter));
-            ::glTexParameteri(target, GL_TEXTURE_MIN_FILTER, ConvertToGL(layer.magFilter));
-            ::glTexParameteri(target, GL_TEXTURE_WRAP_S, ConvertToGL(layer.wrapS));
-            ::glTexParameteri(target, GL_TEXTURE_WRAP_T, ConvertToGL(layer.wrapT));
-            ::glTexParameteri(target, GL_TEXTURE_WRAP_R, ConvertToGL(layer.wrapR));
+            ::glTexParameteri(target, GL_TEXTURE_MAG_FILTER, convertToGL(layer.minFilter));
+            ::glTexParameteri(target, GL_TEXTURE_MIN_FILTER, convertToGL(layer.magFilter));
+            ::glTexParameteri(target, GL_TEXTURE_WRAP_S, convertToGL(layer.wrapS));
+            ::glTexParameteri(target, GL_TEXTURE_WRAP_T, convertToGL(layer.wrapT));
+            ::glTexParameteri(target, GL_TEXTURE_WRAP_R, convertToGL(layer.wrapR));
         }
 
         XE_GRAPHICS_GL_CHECK_ERROR();
@@ -448,7 +448,7 @@ namespace XE {
             switch (current->Type) {
             case DataType::Int32:
                 // std::cout << current->Name << ": " << location << ", " << *((const GLint*)&data[offset]) << std::endl;
-                switch (current->Size) {
+                switch (current->size) {
                     case 1: ::glUniform1iv(location, current->Count, (const GLint*)&data[offset]); break;
                     case 2: ::glUniform2iv(location, current->Count, (const GLint*)&data[offset]); break;
                     case 3: ::glUniform3iv(location, current->Count, (const GLint*)&data[offset]); break;
@@ -458,7 +458,7 @@ namespace XE {
                 break;
             
             case DataType::Float32:
-                switch (current->Size) {
+                switch (current->size) {
                     case 1: ::glUniform1fv(location, current->Count, (const GLfloat*)&data[offset]); break;
                     case 2: ::glUniform2fv(location, current->Count, (const GLfloat*)&data[offset]); break;
                     case 3: ::glUniform3fv(location, current->Count, (const GLfloat*)&data[offset]); break;
@@ -468,7 +468,7 @@ namespace XE {
                 break;
 
             case DataType::UInt32:
-                switch (current->Size) {
+                switch (current->size) {
                     case 1: ::glUniform1uiv(location, current->Count, (const GLuint*)&data[offset]); break;
                     case 2: ::glUniform2uiv(location, current->Count, (const GLuint*)&data[offset]); break;
                     case 3: ::glUniform3uiv(location, current->Count, (const GLuint*)&data[offset]); break;
@@ -481,7 +481,7 @@ namespace XE {
                 assert(false);
             }
 
-            offset += ComputeByteSize(current->Type) * current->Size * current->Count;
+            offset += ComputeByteSize(current->Type) * current->size * current->Count;
         }
 
         XE_GRAPHICS_GL_CHECK_ERROR();

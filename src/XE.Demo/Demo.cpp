@@ -31,9 +31,9 @@ int main(int argc, char **argv) {
     bool done = true;
 
     while (done) {
-        inputManager->Poll();
-        auto keyboardStatus = inputManager->GetKeyboardStatus();
-        if (keyboardStatus.GetState(XE::KeyCode::KeyEsc) == XE::BinaryState::Press) {
+        inputManager->poll();
+        auto keyboardStatus = inputManager->getKeyboardStatus();
+        if (keyboardStatus.getState(XE::KeyCode::KeyEsc) == XE::BinaryState::Press) {
             done = false;
         }
 

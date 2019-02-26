@@ -24,13 +24,13 @@ int main(int argc, char **argv) {
 
         app->Initialize();
 
-        int lastTime = XE::Timer::GetTick();
+        int lastTime = XE::Timer::getTick();
 
         while (!app->ShouldClose()) {
-            int current = XE::Timer::GetTick() - lastTime;
+            int current = XE::Timer::getTick() - lastTime;
             float seconds = static_cast<float>(current) / 1000.0f;
 
-            lastTime = XE::Timer::GetTick();
+            lastTime = XE::Timer::getTick();
 
             app->Update(seconds);
             app->Render();

@@ -26,15 +26,15 @@ namespace XE {
 
     FileStream::~FileStream() {}
 
-    int FileStream::Read(void *buffer, const int size, const int count) {
+    int FileStream::read(void *buffer, const int size, const int count) {
         return (int) std::fread(buffer, size, count, m_fileHandle);
     }
 
-    int FileStream::Write(const void *buffer, const int size, const int count) {
+    int FileStream::write(const void *buffer, const int size, const int count) {
         return (int) std::fwrite(buffer, size, count, m_fileHandle);
     }
 
-    bool FileStream::Seek(const int offset, const StreamOffset position) {
+    bool FileStream::seek(const int offset, const StreamOffset position) {
         switch (position) {
             case StreamOffset::Current:
                 std::fseek(m_fileHandle, offset, SEEK_CUR);

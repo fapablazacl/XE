@@ -35,11 +35,11 @@ namespace XE {
             const Vector2i windowSize = m_graphicsDevice->getWindow()->getSize();
             m_graphicsDevice->setViewport({{0, 0}, windowSize});
 
-            m_inputManager->Poll();
+            m_inputManager->poll();
             
-            const KeyboardStatus keyboardStatus = m_inputManager->GetKeyboardStatus();
+            const KeyboardStatus keyboardStatus = m_inputManager->getKeyboardStatus();
 
-            if (keyboardStatus.GetState(KeyCode::KeyEsc) == BinaryState::Press) {
+            if (keyboardStatus.getState(KeyCode::KeyEsc) == BinaryState::Press) {
                 m_shouldClose = true;
             }
 
@@ -47,11 +47,11 @@ namespace XE {
             m_angle += 60.0f * seconds;
 
             // update camera position
-            const bool moveForward = keyboardStatus.GetState(KeyCode::KeyUp) == BinaryState::Press;
-            const bool moveBackward = keyboardStatus.GetState(KeyCode::KeyDown) == BinaryState::Press;
+            const bool moveForward = keyboardStatus.getState(KeyCode::KeyUp) == BinaryState::Press;
+            const bool moveBackward = keyboardStatus.getState(KeyCode::KeyDown) == BinaryState::Press;
 
-            const bool turnLeft = keyboardStatus.GetState(KeyCode::KeyLeft) == BinaryState::Press;
-            const bool turnRight = keyboardStatus.GetState(KeyCode::KeyRight) == BinaryState::Press;
+            const bool turnLeft = keyboardStatus.getState(KeyCode::KeyLeft) == BinaryState::Press;
+            const bool turnRight = keyboardStatus.getState(KeyCode::KeyRight) == BinaryState::Press;
 
             // camera turning
             const auto cameraDirection = Normalize(m_cameraLookAt - m_cameraPosition);
@@ -114,7 +114,7 @@ namespace XE {
             std::cout << "SandboxApp::CreateFileTexture: Loading texture from file " << filePath << " ..." << std::endl;
             auto stream = m_streamSource->open(filePath);
 
-            auto imagePtr = m_imageLoaderPNG.Load(stream.get());
+            auto imagePtr = m_imageLoaderPNG.load(stream.get());
 
             return m_graphicsDevice->createTexture2D (
                 PixelFormat::R8G8B8A8, 

@@ -2,7 +2,7 @@
 #include "DeviceStatus.hpp"
 
 namespace XE {
-    BinaryState KeyboardStatus::GetState(KeyCode code) const {
+    BinaryState KeyboardStatus::getState(KeyCode code) const {
         return m_keys[static_cast<int>(code)];
     }
 
@@ -19,7 +19,7 @@ namespace XE {
         m_position = position;
     }
 
-    BinaryState MouseStatus::GetState(const MouseButton button) const {
+    BinaryState MouseStatus::getState(const MouseButton button) const {
         return m_buttons[static_cast<int>(button)];
     }
 
@@ -28,7 +28,7 @@ namespace XE {
     }
 
 
-    BinaryState ControllerStatus::GetState(const ControllerButton button) const {
+    BinaryState ControllerStatus::getState(const ControllerButton button) const {
         return m_buttons[static_cast<int>(button)];
     }
 
@@ -36,7 +36,7 @@ namespace XE {
         m_buttons[static_cast<int>(button)] = state;
     }
 
-    Vector2f ControllerStatus::GetState(const ControllerJoystick joystick) const {
+    Vector2f ControllerStatus::getState(const ControllerJoystick joystick) const {
         return m_joysticks[static_cast<int>(joystick)];
     }
 

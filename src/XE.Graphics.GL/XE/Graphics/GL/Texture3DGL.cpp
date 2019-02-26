@@ -9,9 +9,9 @@ namespace XE {
         m_size = size;
         m_format = format;
 
-        const GLenum internalFormatGL = ConvertToGL(m_format);
-        const GLenum formatGL = ConvertToGL(sourceFormat);
-        const GLenum typeGL = ConvertToGL(sourceDataType);
+        const GLenum internalFormatGL = convertToGL(m_format);
+        const GLenum formatGL = convertToGL(sourceFormat);
+        const GLenum typeGL = convertToGL(sourceDataType);
 
         ::glBindTexture(GL_TEXTURE_3D, m_id);
         ::glTexImage3D(GL_TEXTURE_3D, 0, internalFormatGL, m_size.X, m_size.Y, m_size.Z, 0, formatGL, typeGL, sourceData);
@@ -23,8 +23,8 @@ namespace XE {
     void Texture3DGL::setData(const std::byte *surfaceData, const int mipLevel, const PixelFormat surfaceFormat, const DataType surfaceDataType, const Boxi &volume) {
         const Vector3i offset = volume.MinEdge;
         const Vector3i size = volume.ComputeSize();
-        const GLenum formatGL = ConvertToGL(surfaceFormat);
-        const GLenum dataTypeGL = ConvertToGL(surfaceDataType);
+        const GLenum formatGL = convertToGL(surfaceFormat);
+        const GLenum dataTypeGL = convertToGL(surfaceDataType);
 
         ::glBindTexture(GL_TEXTURE_3D, m_id);
         ::glTexSubImage3D(GL_TEXTURE_3D, mipLevel, offset.X, offset.Y, offset.Z, size.X, size.Y, size.Z, formatGL, dataTypeGL, surfaceData);
@@ -32,8 +32,8 @@ namespace XE {
     }
     
     void Texture3DGL::getData(std::byte *surfaceData, const int mipLevel, const PixelFormat surfaceFormat, const DataType surfaceDataType, const Boxi &volume) const {
-        const GLenum formatGL = ConvertToGL(surfaceFormat);
-        const GLenum dataTypeGL = ConvertToGL(surfaceDataType);
+        const GLenum formatGL = convertToGL(surfaceFormat);
+        const GLenum dataTypeGL = convertToGL(surfaceDataType);
 
         ::glBindTexture(GL_TEXTURE_3D, m_id);
         ::glGetTexImage(GL_TEXTURE_3D, mipLevel, formatGL, dataTypeGL, surfaceData);

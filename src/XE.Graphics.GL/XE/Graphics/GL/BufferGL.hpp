@@ -21,9 +21,9 @@ namespace XE {
             return m_size;
         }
 
-        virtual void Read(std::byte* destination, const int size, const int offset, const int destinationOffset) const override;
+        virtual void read(std::byte* destination, const int size, const int offset, const int destinationOffset) const override;
 
-        virtual void Write(const std::byte *source, const int size, const int offset, const int sourceOffset) override;
+        virtual void write(const std::byte *source, const int size, const int offset, const int sourceOffset) override;
 
     public:
         GLuint GetID() const {

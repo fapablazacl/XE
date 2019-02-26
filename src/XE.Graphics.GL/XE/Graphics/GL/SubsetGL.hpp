@@ -18,15 +18,15 @@ namespace XE {
 
         virtual ~SubsetGL();
         
-        virtual int GetBufferCount() const override;
+        virtual int getBufferCount() const override;
 
-        virtual BufferGL* GetBuffer(const int index) override;
+        virtual BufferGL* getBuffer(const int index) override;
 
-        virtual BufferGL* GetIndexBuffer() override;
+        virtual BufferGL* getIndexBuffer() override;
 
-        virtual const BufferGL* GetBuffer(const int index) const override;
+        virtual const BufferGL* getBuffer(const int index) const override;
 
-        virtual const BufferGL* GetIndexBuffer() const override;
+        virtual const BufferGL* getIndexBuffer() const override;
 
         virtual SubsetDescriptor GetDescriptor() const override {
             return m_descriptor;

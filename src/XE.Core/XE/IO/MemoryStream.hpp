@@ -14,11 +14,11 @@ namespace XE {
         
         virtual ~MemoryStream();
         
-        virtual int Read(void *buffer, const int size, const int count) override;
+        virtual int read(void *buffer, const int size, const int count) override;
 
-        virtual int Write(const void *buffer, const int size, const int count) override;
+        virtual int write(const void *buffer, const int size, const int count) override;
         
-        virtual bool Seek(const int offset, const StreamOffset position) override;
+        virtual bool seek(const int offset, const StreamOffset position) override;
 
         virtual int Tell() const override;
 

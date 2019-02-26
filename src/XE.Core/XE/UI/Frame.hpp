@@ -16,9 +16,9 @@ namespace XE {
     typedef void* FrameHandle;
 
     struct FrameProperties {
-        std::string Caption;
-        Vector2i Size;
-        Vector2i Position;
+        std::string caption;
+        Vector2i size;
+        Vector2i position;
     };
 
     /**
@@ -28,13 +28,13 @@ namespace XE {
     public:
         virtual ~Frame();
 
-        virtual bool GetCloseRequested() const = 0;
+        virtual bool getCloseRequested() const = 0;
 
-        virtual FrameHandle GetHandle() const = 0;
+        virtual FrameHandle getHandle() const = 0;
 
-        virtual FrameProperties GetProperties() const = 0;
+        virtual FrameProperties getProperties() const = 0;
 
-        virtual void SetProperties(const FrameProperties &properties) = 0;
+        virtual void setProperties(const FrameProperties &properties) = 0;
     };
 }
 

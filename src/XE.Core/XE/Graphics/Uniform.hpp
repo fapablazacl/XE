@@ -13,7 +13,7 @@ namespace XE {
     struct Uniform {
         std::string Name;
         DataType Type;
-        int Size;
+        int size;
         int Count;
     };
 

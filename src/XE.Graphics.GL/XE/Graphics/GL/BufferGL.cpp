@@ -5,8 +5,8 @@
 
 namespace XE {
     BufferGL::BufferGL(const BufferDescriptor &desc) {
-        const GLenum targetGL = ConvertToGL(desc.type);
-        const GLenum usageGL = ConvertToGL(desc.usage, desc.access);
+        const GLenum targetGL = convertToGL(desc.type);
+        const GLenum usageGL = convertToGL(desc.usage, desc.access);
 
         ::glGenBuffers(1, &m_id);
         ::glBindBuffer(targetGL, m_id);
@@ -24,7 +24,7 @@ namespace XE {
         }
     }
 
-    void BufferGL::Read(std::byte* destination, const int size, const int offset, const int destinationOffset) const {
+    void BufferGL::read(std::byte* destination, const int size, const int offset, const int destinationOffset) const {
         const int finalSize = size ? size : m_size;
 
         ::glBindBuffer(m_target, m_id);
@@ -32,7 +32,7 @@ namespace XE {
         ::glBindBuffer(m_target, 0);
     }
 
-    void BufferGL::Write(const std::byte *source, const int size, const int offset, const int sourceOffset) {
+    void BufferGL::write(const std::byte *source, const int size, const int offset, const int sourceOffset) {
         const int finalSize = size ? size : m_size;
 
         ::glBindBuffer(m_target, m_id);

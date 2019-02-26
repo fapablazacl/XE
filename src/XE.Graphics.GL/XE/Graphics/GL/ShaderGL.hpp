@@ -12,9 +12,9 @@ namespace XE {
 
         virtual ~ShaderGL();
 
-        virtual ShaderType GetType() const override;
+        virtual ShaderType getType() const override;
 
-        virtual std::string GetSource() const override;
+        virtual std::string getSource() const override;
 
         GLuint GetID() const {
             return m_id;

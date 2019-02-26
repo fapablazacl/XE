@@ -22,11 +22,11 @@ namespace XE {
     public:
         virtual ~Stream();
 
-        virtual int Read(void *buffer, const int size, const int count) = 0;
+        virtual int read(void *buffer, const int size, const int count) = 0;
 
-        virtual int Write(const void *buffer, const int size, const int count) = 0;
+        virtual int write(const void *buffer, const int size, const int count) = 0;
         
-        virtual bool Seek(const int offset, const StreamOffset position) = 0;
+        virtual bool seek(const int offset, const StreamOffset position) = 0;
 
         virtual int Tell() const = 0;
 

@@ -60,13 +60,13 @@ namespace XE {
         assert(m_windowGLFW);
     }
 
-    void InputManagerGLFW::Poll() {
+    void InputManagerGLFW::poll() {
         ::glfwPollEvents();
 
-        this->FillKeyboardStatus();
+        this->fillKeyboardStatus();
     }
 
-    void InputManagerGLFW::FillKeyboardStatus() {
+    void InputManagerGLFW::fillKeyboardStatus() {
         for (int key : s_keys) {
             auto keyMappingIt = s_keyMapping.find(key);
 
@@ -87,19 +87,19 @@ namespace XE {
         }
     }
 
-    MouseStatus InputManagerGLFW::GetMouseStatus() {
+    MouseStatus InputManagerGLFW::getMouseStatus() {
         // TODO: Add implementation code
         assert(false);
         return {};
     }
 
-    int InputManagerGLFW::GetControllerCount() {
+    int InputManagerGLFW::getControllerCount() {
         // TODO: Add implementation code
         assert(false);
         return 0;
     }
         
-    ControllerStatus InputManagerGLFW::GetControllerStatus(const int index) {
+    ControllerStatus InputManagerGLFW::getControllerStatus(const int index) {
         // TODO: Add implementation code
         assert(false);
         assert(index == 0);

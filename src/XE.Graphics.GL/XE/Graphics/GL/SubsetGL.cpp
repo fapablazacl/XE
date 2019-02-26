@@ -33,7 +33,7 @@ namespace XE {
 
             ::glBindBuffer(buffer->GetTarget(), buffer->GetID());
             ::glEnableVertexAttribArray(attribIndex);
-            ::glVertexAttribPointer(attribIndex, attrib.size, ConvertToGL(attrib.type), GL_FALSE, 0, 0);
+            ::glVertexAttribPointer(attribIndex, attrib.size, convertToGL(attrib.type), GL_FALSE, 0, 0);
 
             attribIndex++;
         }
@@ -53,23 +53,23 @@ namespace XE {
         }
     }
         
-    int SubsetGL::GetBufferCount() const {
+    int SubsetGL::getBufferCount() const {
         return (int)m_buffers.size();
     }
 
-    BufferGL* SubsetGL::GetBuffer(const int index) {
+    BufferGL* SubsetGL::getBuffer(const int index) {
         return m_buffers[index].get();
     }
 
-    BufferGL* SubsetGL::GetIndexBuffer() {
+    BufferGL* SubsetGL::getIndexBuffer() {
         return m_indexBuffer.get();
     }
 
-    const BufferGL* SubsetGL::GetBuffer(const int index) const {
+    const BufferGL* SubsetGL::getBuffer(const int index) const {
         return m_buffers[index].get();
     }
 
-    const BufferGL* SubsetGL::GetIndexBuffer() const {
+    const BufferGL* SubsetGL::getIndexBuffer() const {
         return m_indexBuffer.get();
     }
 }

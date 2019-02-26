@@ -9,7 +9,7 @@ namespace XE {
     public:
         Timer() = delete;
 
-        static int GetTick();
+        static int getTick();
     };
 }
 

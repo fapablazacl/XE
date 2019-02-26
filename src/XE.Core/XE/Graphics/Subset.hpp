@@ -83,27 +83,27 @@ namespace XE {
         /**
          * @brief Get the count of buffers attached to the geometric subset.
          */
-        virtual int GetBufferCount() const = 0;
+        virtual int getBufferCount() const = 0;
 
         /**
          * @brief Get a mutable pointer to a buffer allocated in GPU memory. This buffer stores geometric data
          */
-        virtual Buffer* GetBuffer(const int index) = 0;
+        virtual Buffer* getBuffer(const int index) = 0;
 
         /**
          * @brief Get a mutable pointer to a buffer allocated in GPU memory. This buffer stores indexation data
          */
-        virtual Buffer* GetIndexBuffer() = 0;
+        virtual Buffer* getIndexBuffer() = 0;
 
         /**
          * @brief Get a constant pointer to a buffer allocated in GPU memory. This buffer stores geometric data
          */
-        virtual const Buffer* GetBuffer(const int index) const = 0;
+        virtual const Buffer* getBuffer(const int index) const = 0;
 
         /**
          * @brief Get a constant pointer to a buffer allocated in GPU memory. This buffer stores indexation data
          */
-        virtual const Buffer* GetIndexBuffer() const = 0;
+        virtual const Buffer* getIndexBuffer() const = 0;
 
         /**
          * @brief Get the current description structure that leads to the creation of the subset

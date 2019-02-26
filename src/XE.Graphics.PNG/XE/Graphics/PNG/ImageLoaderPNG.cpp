@@ -40,7 +40,7 @@ namespace XE {
 
     ImageLoaderPNG::~ImageLoaderPNG() {}
 
-    std::unique_ptr<Image> ImageLoaderPNG::Load(Stream *inputStream) {
+    std::unique_ptr<Image> ImageLoaderPNG::load(Stream *inputStream) {
         // TODO: Add support for another pixel formats
         // TODO: Enhance stream buffering code
 
@@ -51,7 +51,7 @@ namespace XE {
     
         std::vector<std::uint8_t> imageBuffer;
 
-        while ( (readed = inputStream->Read(buffer, 1, bufferLength)) > 0) {
+        while ( (readed = inputStream->read(buffer, 1, bufferLength)) > 0) {
             for (int i=0; i<int(readed); i++) {
                 imageBuffer.push_back(buffer[i]);
             }
@@ -63,12 +63,12 @@ namespace XE {
 
         LodePNGState state = {};
 
-        std::cout << "[INFO] ImageLoaderPNG::Load: PNG File has " << imageBuffer.size() << " byte(s)."  << std::endl;
+        std::cout << "[INFO] ImageLoaderPNG::load: PNG File has " << imageBuffer.size() << " byte(s)."  << std::endl;
 
         unsigned int error = lodepng_decode(&pixels, &width, &height, &state, imageBuffer.data(), imageBuffer.size());
 
         if (error) {
-            std::cout << "ImageLoaderPNG::Load: Error at loading texture from Stream (error:" << lodepng_error_text(error) << ")" << std::endl;
+            std::cout << "ImageLoaderPNG::load: Error at loading texture from Stream (error:" << lodepng_error_text(error) << ")" << std::endl;
             assert(false);
             return {};
         }

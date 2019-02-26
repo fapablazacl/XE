@@ -23,7 +23,7 @@ namespace XE {
 
     class KeyboardStatus {
     public:
-        BinaryState GetState(KeyCode code) const;
+        BinaryState getState(KeyCode code) const;
 
         void SetState(const KeyCode code, const BinaryState state);
 
@@ -41,7 +41,7 @@ namespace XE {
 
         void SetPosition(const Vector2i &position);
 
-        BinaryState GetState(const MouseButton button) const;
+        BinaryState getState(const MouseButton button) const;
 
         void SetState(const MouseButton button, const BinaryState state);
 
@@ -65,11 +65,11 @@ namespace XE {
 
     class ControllerStatus {
     public:
-        BinaryState GetState(const ControllerButton button) const;
+        BinaryState getState(const ControllerButton button) const;
 
         void SetState(const ControllerButton button, const BinaryState state);
 
-        Vector2f GetState(const ControllerJoystick joystick) const;
+        Vector2f getState(const ControllerJoystick joystick) const;
 
         void SetState(const ControllerJoystick joystick, const Vector2f &state);
 

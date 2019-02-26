@@ -8,7 +8,7 @@
 #include <XE/Graphics/Material.hpp>
 
 namespace XE {
-    GLenum ConvertToGL(const DataType type) {
+    GLenum convertToGL(const DataType type) {
         switch (type) {
             case DataType::UInt8: return GL_UNSIGNED_BYTE;
             case DataType::UInt16: return GL_UNSIGNED_SHORT;
@@ -22,7 +22,7 @@ namespace XE {
         }
     }
 
-    GLenum ConvertToGL(const PixelFormat format) {
+    GLenum convertToGL(const PixelFormat format) {
         switch (format) {
             case PixelFormat::R8G8B8: return GL_RGB;
             case PixelFormat::R8G8B8A8: return GL_RGBA;
@@ -30,7 +30,7 @@ namespace XE {
         }
     }
 
-    GLenum ConvertToGL(const BufferType type) {
+    GLenum convertToGL(const BufferType type) {
         switch (type) {
         case BufferType::Vertex: return GL_ARRAY_BUFFER;
         case BufferType::Index: return GL_ELEMENT_ARRAY_BUFFER;
@@ -38,7 +38,7 @@ namespace XE {
         }
     }
 
-    GLenum ConvertToGL(const BufferUsage usage, const BufferAccess access) {
+    GLenum convertToGL(const BufferUsage usage, const BufferAccess access) {
         switch (access) {
         case BufferAccess::Dynamic:
             switch (usage) {
@@ -69,7 +69,7 @@ namespace XE {
         }
     }
 
-    GLenum ConvertToGL(const PrimitiveType type) {
+    GLenum convertToGL(const PrimitiveType type) {
         switch (type) {
             case PrimitiveType::PointList: return GL_POINTS;
             case PrimitiveType::LineList: return GL_LINES;
@@ -81,7 +81,7 @@ namespace XE {
         }
     }
 
-    GLenum ConvertToGL(const DepthFunc func) {
+    GLenum convertToGL(const DepthFunc func) {
         switch (func) {
             case DepthFunc::Never:          return GL_NEVER;
             case DepthFunc::Less:           return GL_LESS;
@@ -95,7 +95,7 @@ namespace XE {
         }
     }
 
-    GLenum ConvertToGL(const PolygonMode mode) {
+    GLenum convertToGL(const PolygonMode mode) {
         switch (mode) {
             case PolygonMode::Fill: return GL_FILL;
             case PolygonMode::Line: return GL_LINE;
@@ -104,7 +104,7 @@ namespace XE {
         }
     }
 
-    GLenum ConvertToGL(const FrontFaceOrder order) {
+    GLenum convertToGL(const FrontFaceOrder order) {
         switch (order) {
             case FrontFaceOrder::CounterClockwise: return GL_CCW;
             case FrontFaceOrder::Clockwise: return GL_CW;
@@ -112,7 +112,7 @@ namespace XE {
         }
     }
 
-    GLenum ConvertToGL(const BlendParam param) {
+    GLenum convertToGL(const BlendParam param) {
         switch (param) {
             case BlendParam::Zero: return GL_ZERO;
             case BlendParam::One: return GL_ONE;
@@ -132,7 +132,7 @@ namespace XE {
         }
     }
 
-    GLenum ConvertToGL(const TextureFilter filter) {
+    GLenum convertToGL(const TextureFilter filter) {
         switch (filter) {
             case TextureFilter::Linear: return GL_LINEAR;
             case TextureFilter::Nearest: return GL_NEAREST;
@@ -140,7 +140,7 @@ namespace XE {
         }
     }
 
-    GLenum ConvertToGL(const TextureWrap wrap) {
+    GLenum convertToGL(const TextureWrap wrap) {
         switch (wrap) {
             case TextureWrap::Clamp: return GL_CLAMP_TO_BORDER;
             case TextureWrap::Repeat: return GL_REPEAT;

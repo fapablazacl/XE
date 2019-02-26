@@ -19,15 +19,15 @@ namespace XE {
         /**
          * @brief Scans the status of all recognized input devices.
          */
-        virtual void Poll() = 0;
+        virtual void poll() = 0;
 
-        virtual KeyboardStatus GetKeyboardStatus() = 0;
+        virtual KeyboardStatus getKeyboardStatus() = 0;
 
-        virtual MouseStatus GetMouseStatus() = 0;
+        virtual MouseStatus getMouseStatus() = 0;
 
-        virtual int GetControllerCount() = 0;
+        virtual int getControllerCount() = 0;
         
-        virtual ControllerStatus GetControllerStatus(const int index) = 0;
+        virtual ControllerStatus getControllerStatus(const int index) = 0;
     };
 }
 

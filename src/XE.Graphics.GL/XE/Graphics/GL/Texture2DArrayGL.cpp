@@ -9,8 +9,8 @@ namespace XE {
         m_size = size;
         m_format = format;
 
-        const GLenum internalFormatGL = ConvertToGL(m_format);
-        const GLenum formatGL = ConvertToGL(format);
+        const GLenum internalFormatGL = convertToGL(m_format);
+        const GLenum formatGL = convertToGL(format);
 
         ::glBindTexture(GL_TEXTURE_2D_ARRAY, m_id);
         ::glTexStorage3D(GL_TEXTURE_2D_ARRAY, 1, formatGL, size.X, size.Y, count);
@@ -22,8 +22,8 @@ namespace XE {
     void Texture2DArrayGL::setData(const void *surfaceData, const int mipLevel, const int arrayIndex, const PixelFormat surfaceFormat, const DataType surfaceDataType, const Recti &area, int count) {
         const Vector2i offset = area.MinEdge;
         const Vector2i size = area.ComputeSize();
-        const GLenum formatGL = ConvertToGL(surfaceFormat);
-        const GLenum dataTypeGL = ConvertToGL(surfaceDataType);
+        const GLenum formatGL = convertToGL(surfaceFormat);
+        const GLenum dataTypeGL = convertToGL(surfaceDataType);
 
         ::glBindTexture(GL_TEXTURE_2D_ARRAY, m_id);
         ::glTexSubImage3D(GL_TEXTURE_2D_ARRAY, mipLevel, offset.X, offset.Y, arrayIndex, size.X, size.Y, count, formatGL, dataTypeGL, surfaceData);
@@ -31,8 +31,8 @@ namespace XE {
     }
         
     void Texture2DArrayGL::getData(void *surfaceData, const int mipLevel, const int arrayIndex, const PixelFormat surfaceFormat, const DataType surfaceDataType, const Recti &area) const {
-        const GLenum formatGL = ConvertToGL(surfaceFormat);
-        const GLenum dataTypeGL = ConvertToGL(surfaceDataType);
+        const GLenum formatGL = convertToGL(surfaceFormat);
+        const GLenum dataTypeGL = convertToGL(surfaceDataType);
 
         ::glBindTexture(GL_TEXTURE_2D_ARRAY, m_id);
         ::glGetTexImage(GL_TEXTURE_2D_ARRAY, mipLevel, formatGL, dataTypeGL, surfaceData);

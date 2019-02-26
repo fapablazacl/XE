@@ -10,7 +10,7 @@ namespace XE {
      */
     template<typename T>
     struct Plane {
-        Vector<T, 3> Position;
+        Vector<T, 3> position;
         Vector<T, 3> Normal;
 
         /**
@@ -67,7 +67,7 @@ namespace XE {
      */
     template<typename T>
     Plane<T> Invert(const Plane<T> &other) {
-        return { other.Position, -other.Normal };
+        return { other.position, -other.Normal };
     }
 
     typedef Plane<float> Plane_f;
