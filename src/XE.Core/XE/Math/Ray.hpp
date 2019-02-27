@@ -12,14 +12,14 @@ namespace XE {
     template<typename T>
     struct Ray {
         Vector<T, 3> position;
-        Vector<T, 3> Direction;
+        Vector<T, 3> direction;
 
         /**
          * @brief Computes the point of the ray at 't' distance from the starting point, to the 
          * direction of the ray.
          */
-        Vector<T, 3> ComputePoint(const T t) const {
-            return position + t*Direction;
+        Vector<T, 3> computePoint(const T t) const {
+            return position + t*direction;
         }
 
         /**
@@ -27,7 +27,7 @@ namespace XE {
          */
         Ray() {
             position = {T(0.0), T(0.0), T(0.0)};
-            Direction = {T(0.0), T(0.0), T(1.0)};    
+            direction = {T(0.0), T(0.0), T(1.0)};    
         }
     };
 }

@@ -19,7 +19,7 @@ namespace XE {
         static Plane<T> FromTriangle(const Vector<T, 3>& p1, const Vector<T, 3>& p2, const Vector<T, 3>& p3) {
             return {
                 (p1 + p2 + p3) / T(3),
-                Normalize(Cross(p2 - p1, p3 - p1))
+                normalize(cross(p2 - p1, p3 - p1))
             };
         }
 
@@ -52,14 +52,14 @@ namespace XE {
      * @brief Test for collisions between a Plane and a Ray
      */
     template<typename T>
-    T Test(const Plane<T> &plane, const Ray<T>& ray) {
+    T test(const Plane<T> &plane, const Ray<T>& ray) {
         auto p = plane.Point;
         auto n = plane.Normal;
         
         auto r = ray.Point;
-        auto d = ray.Direction;
+        auto d = ray.direction;
         
-        return Dot(n, p - r) / Dot(n, d);
+        return dot(n, p - r) / dot(n, d);
     }
 
     /**

@@ -18,12 +18,12 @@ namespace XE {
             P3 = p3;
         }
 
-        Vector<T, 3> ComputeNormal() const {
-            return Normalize(ComputeNormalUnnormalized());
+        Vector<T, 3> computeNormal() const {
+            return normalize(computeNormalUnnormalized());
         }
         
-        Vector<T, 3> ComputeNormalUnnormalized() const {
-            return Cross((P2 - P1), P3 - P1);
+        Vector<T, 3> computeNormalUnnormalized() const {
+            return cross((P2 - P1), P3 - P1);
         }
     };
 

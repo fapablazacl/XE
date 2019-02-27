@@ -13,29 +13,29 @@ namespace XE {
     template<typename T>
     struct Sphere {
         Vector<T, 3> center;
-        T Radius;
+        T radius;
 
         /**
          * @brief Initializes a sphere in the origin with the specified radius
          */
         explicit Sphere(T radius) {
-            Radius = radius;
+            this->radius = radius;
         }
         
         /**
          * @brief Initializes a Sphere from the given radius and center
          */
         Sphere(T radius, const Vector<T, 3> &center) {
-            center = center;
-            Radius = radius;
+            this->center = center;
+            this->radius = radius;
         }
 
         /**
          * @brief Initializes a Sphere from the given center and radius
          */
         Sphere(const Vector<T, 3> &center, T radius) {
-            center = center;
-            Radius = radius;
+            this->center = center;
+            this->radius = radius;
         }
     };
 
@@ -46,18 +46,18 @@ namespace XE {
      * @brief Test for collisions between a Sphere and a Ray
      */
     template<typename T>
-    T Test(const Sphere<T> &sphere, const Ray<T>& ray) {
-        const Vector<T, 3> r0 = ray.Point;
-        const Vector<T, 3> d = ray.Direction;
+    T test(const Sphere<T> &sphere, const Ray<T>& ray) {
+        const Vector<T, 3> r0 = ray.position;
+        const Vector<T, 3> d = ray.direction;
 
         const Vector<T, 3> c = sphere.center;
-        const T r = sphere.Radius;
+        const T r = sphere.radius;
         const T r_2 = r*r;
 
         const Vector<T, 3> r0_sub_c = r0 - c;
-        const T r0_c_2 = Abs_2(r0_sub_c);
+        const T r0_c_2 = norm2(r0_sub_c);
 
-        const T B = T(2) * Dot(d, r0_sub_c);
+        const T B = T(2) * dot(d, r0_sub_c);
         const T C = r0_c_2 - r_2;
 
         const T disc = B*B - T(4)*C;

@@ -9,16 +9,16 @@ namespace XE {
     template<typename T, int R, int C>
     struct MatrixBase {
         union {
-            T Data[R*C];
-            T Element[R][C];
+            T data[R*C];
+            T element[R][C];
         };
     };
 
     template<typename T>
     struct MatrixBase<T, 2, 2> {
         union {
-            T Data[4];
-            T Element[2][2];
+            T data[4];
+            T element[2][2];
             struct {
                 T M11, M12;
                 T M21, M22;
@@ -47,8 +47,8 @@ namespace XE {
     template<typename T>
     struct MatrixBase<T, 3, 3> {
         union {
-            T Data[9];
-            T Element[3][3];
+            T data[9];
+            T element[3][3];
             struct {
                 T M11, M12, M13;
                 T M21, M22, M23;
@@ -82,8 +82,8 @@ namespace XE {
     template<typename T>
     struct MatrixBase<T, 4, 4> {
         union {
-            T Data[16];
-            T Element[4][4];
+            T data[16];
+            T element[4][4];
             struct {
                 T M11, M12, M13, M14;
                 T M21, M22, M23, M24;
@@ -168,7 +168,7 @@ namespace XE {
             assert(i < R);
             assert(j < C);
 
-            return this->Element[i][j];
+            return this->element[i][j];
         }
 
         T operator() (const int i, const int j) const {
@@ -177,7 +177,7 @@ namespace XE {
             assert(i < R);
             assert(j < C);
 
-            return this->Element[i][j];
+            return this->element[i][j];
         }
 
         Vector<T, C> getRow(const int row) const {
@@ -187,7 +187,7 @@ namespace XE {
             Vector<T, C> result;
             
             for (int col=0; col<C; col++) {
-                result.Data[col] = this->Element[row][col];
+                result.data[col] = this->element[row][col];
             }
             
             return result;
@@ -200,7 +200,7 @@ namespace XE {
             Vector<T, R> result;
             
             for (int row=0; row<R; row++) {
-                result.Data[row] = this->Element[row][col];
+                result.data[row] = this->element[row][col];
             }
             
             return result;
@@ -208,7 +208,7 @@ namespace XE {
         
         Matrix<T, R, C>& setRow(const int row, const Vector<T, C> &v) {
             for (int col=0; col<C; col++) {
-                this->Element[row][col] = v[col];
+                this->element[row][col] = v[col];
             }
 
             return *this;
@@ -216,7 +216,7 @@ namespace XE {
 
         Matrix<T, R, C>& setColumn(const int col, const Vector<T, R> &v) {
             for (int row=0; row<R; row++) {
-                this->Element[row][col] = v[row];
+                this->element[row][col] = v[row];
             }
 
             return *this;
@@ -263,7 +263,7 @@ namespace XE {
             Matrix<T, R, C> result;
             
             for(int i=0; i<R*C; ++i) {
-                result.Data[i] = T(0);
+                result.data[i] = T(0);
             }
             
             return result;
@@ -372,7 +372,7 @@ namespace XE {
                 T Sin = std::sin(radians);
                 
                 Vector<T, 3> U = Axis;
-                Vector<T, 3> V = Normalize(Axis);
+                Vector<T, 3> V = normalize(Axis);
                 
                 //auto MatS = Matrix<T, 3, 3>::makeZero();
                 auto MatUut = Matrix<T, 3, 3>::createZero();
@@ -417,9 +417,9 @@ namespace XE {
         
         static auto createLookAt(const Vector<T, 3> &Eye, const Vector<T, 3> &At, const Vector<T, 3> &Up) {
             if constexpr (C==4 && R==4) {
-                const auto forward = Normalize(At - Eye);
-                const auto side = Normalize(Cross(forward, Up));
-                const auto up = Cross(side, forward);
+                const auto forward = normalize(At - Eye);
+                const auto side = normalize(cross(forward, Up));
+                const auto up = cross(side, forward);
                 
                 auto result = Matrix<T, 4, 4>::createIdentity();
                 
@@ -497,7 +497,7 @@ namespace XE {
                 
                     const T subDet = abs(m.getSubMatrix(row, column));
                 
-                    result += factor * m.Element[row][column] * subDet;
+                    result += factor * m.element[row][column] * subDet;
                 }
             
                 return result;
@@ -525,7 +525,7 @@ namespace XE {
         
         for (int i=0; i<R; i++) {
             for (int j=0; j<C; j++) {
-                result.Element[j][i] = m.Element[i][j];
+                result.element[j][i] = m.element[i][j];
             }
         }
         
@@ -545,7 +545,7 @@ namespace XE {
     template<typename T, int R, int C>
     bool Matrix<T, R, C>::operator== (const Matrix<T, R, C> &other) const {
         for (int i=0; i<R*C; i++) {
-            if (this->Data[i] != other.Data[i]) {
+            if (this->data[i] != other.data[i]) {
                 return false;
             }
         }
@@ -556,7 +556,7 @@ namespace XE {
     template<typename T, int R, int C>
     bool Matrix<T, R, C>::operator!= (const Matrix<T, R, C> &other) const {
         for (int i=0; i<R*C; i++) {
-            if (this->Data[i] == other.Data[i]) {
+            if (this->data[i] == other.data[i]) {
                 return false;
             }
         }
@@ -569,7 +569,7 @@ namespace XE {
         Matrix<T, R, C> result;
         
         for (int i=0; i<R*C; i++) {
-            result.Data[i] = this->Data[i] + rhs.Data[i];
+            result.data[i] = this->data[i] + rhs.data[i];
         }
         
         return result;
@@ -580,7 +580,7 @@ namespace XE {
         Matrix<T, R, C> result;
         
         for (int i=0; i<R*C; i++) {
-            result.Data[i] = -this->Data[i];
+            result.data[i] = -this->data[i];
         }
         
         return result;
@@ -596,7 +596,7 @@ namespace XE {
         Matrix<T, R, C> result;
         
         for (int i=0; i<R*C; i++) {
-            result.Data[i] = this->Data[i] - rhs.Data[i];
+            result.data[i] = this->data[i] - rhs.data[i];
         }
         
         return result;
@@ -608,7 +608,7 @@ namespace XE {
         
         for (int i=0; i<R; i++) {
             for (int j=0; j<C; j++) {
-                result.Element[i][j] = Dot(this->getRow(i), rhs.getColumn(j));
+                result.element[i][j] = dot(this->getRow(i), rhs.getColumn(j));
             }
         }
         
@@ -625,7 +625,7 @@ namespace XE {
         Matrix<T, R, C> result;
         
         for (int i=0; i<R*C; i++) {
-            result.Data[i] = this->Data[i] * s;
+            result.data[i] = this->data[i] * s;
         }
         
         return result;
@@ -636,7 +636,7 @@ namespace XE {
         Matrix<T, R, C> result;
         
         for (int i=0; i<R*C; i++) {
-            result.Data[i] = this->Data[i] / s;
+            result.data[i] = this->data[i] / s;
         }
         
         return result;
@@ -645,7 +645,7 @@ namespace XE {
     template<typename T, int R, int C>
     Matrix<T, R, C>& Matrix<T, R, C>::operator+= (const Matrix<T, R, C>& rhs) {
         for (int i=0; i<R*C; i++) {
-            this->Data[i] += rhs.Data[i];
+            this->data[i] += rhs.data[i];
         }
         
         return *this;
@@ -654,7 +654,7 @@ namespace XE {
     template<typename T, int R, int C>
     Matrix<T, R, C>& Matrix<T, R, C>::operator-= (const Matrix<T, R, C>& rhs) {
         for (int i=0; i<R*C; i++) {
-            this->Data[i] -= rhs.Data[i];
+            this->data[i] -= rhs.data[i];
         }
         
         return *this;
@@ -672,7 +672,7 @@ namespace XE {
         Vector<T, R> result;
 
         for (int col=0; col<C; col++) {
-            result[col] = Dot(this->getColumn(col), v);
+            result[col] = dot(this->getColumn(col), v);
         }
 
         return result;

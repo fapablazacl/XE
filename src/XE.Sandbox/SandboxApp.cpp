@@ -54,22 +54,22 @@ namespace XE {
             const bool turnRight = keyboardStatus.getState(KeyCode::KeyRight) == BinaryState::Press;
 
             // camera turning
-            const auto cameraDirection = Normalize(m_cameraLookAt - m_cameraPosition);
+            const auto cameraDirection = normalize(m_cameraLookAt - m_cameraPosition);
             float turnSpeed = 0.0f;
             if (turnLeft) {
-                turnSpeed = -Radians(1.25f * seconds);
+                turnSpeed = -radians(1.25f * seconds);
             } else if (turnRight) {
-                turnSpeed = Radians(1.25f * seconds);
+                turnSpeed = radians(1.25f * seconds);
             }
 
             const auto cdt = Matrix4f::createRotation(turnSpeed, m_cameraUp) * Vector4f(cameraDirection, 0.0f);
             
-            m_cameraLookAt = m_cameraPosition + Vector3f{cdt.X, cdt.Y, cdt.Z} * Magnitude(cameraDirection);
+            m_cameraLookAt = m_cameraPosition + Vector3f{cdt.X, cdt.Y, cdt.Z} * norm(cameraDirection);
 
             // camera movement
             const auto cameraSpeed = 0.025f * seconds;
             const auto cameraDisplacement = cameraDirection * cameraSpeed * seconds;
-            const auto cameraSide = Normalize(Cross(cameraDirection, m_cameraUp));
+            const auto cameraSide = normalize(cross(cameraDirection, m_cameraUp));
             
             if (moveForward) {
                 m_cameraPosition += cameraDisplacement;
@@ -86,7 +86,7 @@ namespace XE {
             const Matrix4f modelViewProj = transpose (
                 Matrix4f::createPerspective(m_cameraFov, m_cameraAspect, m_cameraZNear, m_cameraZFar) * 
                 Matrix4f::createLookAt(m_cameraPosition, m_cameraLookAt, m_cameraUp) * 
-                Matrix4f::createRotationY(Radians(m_angle)) 
+                Matrix4f::createRotationY(radians(m_angle)) 
             );
 
             m_graphicsDevice->applyUniform(&matrixLayout, 1, (const std::byte*)&modelViewProj);
@@ -104,7 +104,7 @@ namespace XE {
             pixels.resize(width * height);
 
             for (auto &pixel : pixels) {
-                pixel = (color * Vector4f{255.0f}).Cast<std::uint8_t>();
+                pixel = (color * Vector4f{255.0f}).cast<std::uint8_t>();
             }
 
             return m_graphicsDevice->createTexture2D(format, size, sourceFormat, sourceDataType, pixels.data());
@@ -295,7 +295,7 @@ namespace XE {
         Vector3f m_cameraLookAt = {0.0f, 0.0f, 0.0f};
         Vector3f m_cameraUp = {0.0f, 1.0f, 0.0f};
 
-        float m_cameraFov = Radians(60.0f);
+        float m_cameraFov = radians(60.0f);
         float m_cameraAspect = 640.0f / 480.0f;
         float m_cameraZNear = 0.1f;
         float m_cameraZFar = 1000.0f;

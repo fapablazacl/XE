@@ -6,16 +6,16 @@
 
 namespace XE {
     template<typename T>
-    inline const T Pi = static_cast<T>(3.141592653589793238);
+    inline const T pi = static_cast<T>(3.141592653589793238);
 
     template<typename T>
-    inline T Radians(const T degrees) {
-        return degrees * Pi<T> / static_cast<T>(180);
+    inline T radians(const T degrees) {
+        return degrees * pi<T> / static_cast<T>(180);
     }
 
     template<typename T>
-    inline T Degrees(const T radians) {
-        return radians * static_cast<T>(180) / Pi<T>;
+    inline T degrees(const T radians) {
+        return radians * static_cast<T>(180) / pi<T>;
     }
 
     template<typename T, typename S>

@@ -38,8 +38,8 @@ namespace XE {
         }
 
         void expand(const Vector<T, N> &value) {
-            minEdge = Minimize(minEdge, value);
-            maxEdge = Maximize(maxEdge, value);
+            minEdge = minimize(minEdge, value);
+            maxEdge = maximize(maxEdge, value);
         }
 
         void expand(const Boundary<T, N>& other) {

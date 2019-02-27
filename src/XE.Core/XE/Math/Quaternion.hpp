@@ -23,7 +23,7 @@ namespace XE {
                 T W;
             };
 
-            T Data[4];
+            T data[4];
         };
 
         Quaternion() {}
@@ -32,7 +32,7 @@ namespace XE {
             assert(values);
 
             for (int i=0; i<4; i++) {
-                Data[i] = values[i];
+                data[i] = values[i];
             }
         }
         
@@ -78,7 +78,7 @@ namespace XE {
             Quaternion<T> result;
 
             for (int i=0; i<4; i++) {
-                result.Data[i] = this->Data[i] + rhs.Data[i];
+                result.data[i] = this->data[i] + rhs.data[i];
             }
 
             return result;
@@ -88,7 +88,7 @@ namespace XE {
             Quaternion<T> result;
 
             for (int i=0; i<4; i++) {
-                result.Data[i] = this->Data[i] + rhs.Data[i];
+                result.data[i] = this->data[i] + rhs.data[i];
             }
 
             return result;
@@ -98,7 +98,7 @@ namespace XE {
             Quaternion<T> result;
 
             for (int i=0; i<4; i++) {
-                result.Data[i] = -this->Data[i];
+                result.data[i] = -this->data[i];
             }
 
             return result;
@@ -110,8 +110,8 @@ namespace XE {
         
         Quaternion<T> operator* (const Quaternion<T> &rhs) const {
             return {
-                Cross(V, rhs.V) + rhs.v*W + V*rhs.W,
-                W*rhs.W - Dot(V, rhs.V)
+                cross(V, rhs.V) + rhs.v*W + V*rhs.W,
+                W*rhs.W - dot(V, rhs.V)
             };
         }
         
@@ -123,7 +123,7 @@ namespace XE {
             Quaternion<T> result;
 
             for (int i=0; i<4; i++) {
-                result.Data[i] = this->Data[i] / s;
+                result.data[i] = this->data[i] / s;
             }
 
             return result;
@@ -133,7 +133,7 @@ namespace XE {
             Quaternion<T> result;
 
             for (int i=0; i<4; i++) {
-                result.Data[i] = this->Data[i] / s;
+                result.data[i] = this->data[i] / s;
             }
 
             return result;
@@ -145,7 +145,7 @@ namespace XE {
         
         Quaternion<T>& operator+= (const Quaternion<T> &rhs) {
             for (int i=0; i<4; i++) {
-                this->Data[i] += rhs.Data[i];
+                this->data[i] += rhs.data[i];
             }
 
             return *this;
@@ -153,7 +153,7 @@ namespace XE {
 
         Quaternion<T>& operator-= (const Quaternion<T> &rhs) {
             for (int i=0; i<4; i++) {
-                this->Data[i] -= rhs.Data[i];
+                this->data[i] -= rhs.data[i];
             }
 
             return *this;
@@ -173,7 +173,7 @@ namespace XE {
 
         Quaternion<T>& operator*= (const T s) {
             for (int i=0; i<4; i++) {
-                this->Data[i] *= s;
+                this->data[i] *= s;
             }
 
             return *this;
@@ -181,7 +181,7 @@ namespace XE {
 
         Quaternion<T>& operator/= (const T s) {
             for (int i=0; i<4; i++) {
-                this->Data[i] /= s;
+                this->data[i] /= s;
             }
 
             return *this;
@@ -189,7 +189,7 @@ namespace XE {
 
         bool operator== (const Quaternion<T> &rhs) const {
             for (int i=0; i<4; i++) {
-                if (this->Data[i] != rhs.Data[i]) {
+                if (this->data[i] != rhs.data[i]) {
                     return false;
                 }
             }
@@ -199,7 +199,7 @@ namespace XE {
         
         bool operator!= (const Quaternion<T> &rhs) const {
             for (int i=0; i<4; i++) {
-                if (this->Data[i] == rhs.Data[i]) {
+                if (this->data[i] == rhs.data[i]) {
                     return false;
                 }
             }
@@ -207,31 +207,31 @@ namespace XE {
             return true;
         }
 
-        static Quaternion<T> Zero() {
+        static Quaternion<T> createZero() {
             return Quaternion<T>({T(0), T(0), T(0)}, T(0));
         }
         
-        static Quaternion<T> Identity() {
+        static Quaternion<T> createIdentity() {
             return Quaternion<T>({T(0), T(0), T(0)}, T(1));
         }
         
         static Quaternion<T> Rotate(const T radians, const Vector<T, 3> &axis) {
             auto q = Quaternion<T>(axis, std::cos(radians / T(2)));
             
-            return Normalize(q);
+            return normalize(q);
         }
         
         static Quaternion<T> Rotate(const Vector<T, 3> &v1, const Vector<T, 3> &v2) {
-            auto v = Cross(v1, v2);
-            auto w = std::sqrt(Dot(v1, v1) * Dot(v2, v2)) + Dot(v1, v2);
+            auto v = cross(v1, v2);
+            auto w = std::sqrt(dot(v1, v1) * dot(v2, v2)) + dot(v1, v2);
             
-            return Normalize(Quaternion<T>(v, w));
+            return normalize(Quaternion<T>(v, w));
         }
     };
 
     template<typename T>
     Quaternion<T> Inverse(const Quaternion<T> &q) {
-        return conj(q) * Abs_2(q);
+        return conj(q) * norm2(q);
     }
 
     template<typename T>
@@ -240,33 +240,33 @@ namespace XE {
     }
 
     template<typename T>
-    T Dot(const Quaternion<T> &q1, const Quaternion<T> &q2) {
+    T dot(const Quaternion<T> &q1, const Quaternion<T> &q2) {
         T sum = T(0);
 
         for (int i=0; i<4; i++) {
-            sum += q1.Data[i]*q2.Data[i];
+            sum += q1.data[i]*q2.data[i];
         }
 
         return sum;
     }
 
     template<typename T>
-    T Abs_2(const Quaternion<T> &q) {
-        return Dot(q, q);
+    T norm2(const Quaternion<T> &q) {
+        return dot(q, q);
     }
 
     template<typename T>
-    T Abs(const Quaternion<T> &q) {
-        return static_cast<T>(std::sqrt(Abs_2(q)));
+    T abs(const Quaternion<T> &q) {
+        return static_cast<T>(std::sqrt(norm2(q)));
     }
 
     template<typename T>
-    Quaternion<T> Normalize(const Quaternion<T> &q) {
-        return q / Abs(q);
+    Quaternion<T> normalize(const Quaternion<T> &q) {
+        return q / abs(q);
     }
 
     template<typename T>
-    Vector<T, 3> Transform(const Quaternion<T> &q, const Vector<T, 3> &v) {
+    Vector<T, 3> transform(const Quaternion<T> &q, const Vector<T, 3> &v) {
         return (q * Quaternion<T>(v) * Inverse(q)).V;
     }
 }
