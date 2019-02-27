@@ -1,5 +1,7 @@
 
 #include <catch.hpp>
+
+#include <XE/Math/Util.hpp>
 #include <XE/Math/Matrix.hpp>
 
 namespace Catch {
@@ -72,6 +74,10 @@ TEST_CASE("Math::Matrix<3, float>") {
             REQUIRE(m(0, 0) == 1.0f); REQUIRE(m(0, 1) == 2.0f); REQUIRE(m(0, 2) == 3.0f);
             REQUIRE(m(1, 0) == 4.0f); REQUIRE(m(1, 1) == 5.0f); REQUIRE(m(1, 2) == 6.0f);
             REQUIRE(m(2, 0) == 7.0f); REQUIRE(m(2, 1) == 8.0f); REQUIRE(m(2, 2) == 9.0f);
+
+            REQUIRE(m.data[0] == 1.0f); REQUIRE(m.data[1] == 2.0f); REQUIRE(m.data[2] == 3.0f);
+            REQUIRE(m.data[3] == 4.0f); REQUIRE(m.data[4] == 5.0f); REQUIRE(m.data[5] == 6.0f);
+            REQUIRE(m.data[6] == 7.0f); REQUIRE(m.data[7] == 8.0f); REQUIRE(m.data[8] == 9.0f);
         }
 
         SECTION("for four-dimensional matrices") {
@@ -96,6 +102,40 @@ TEST_CASE("Math::Matrix<3, float>") {
             REQUIRE(m(1, 0) == 5.0f); REQUIRE(m(1, 1) == 6.0f); REQUIRE(m(1, 2) == 7.0f); REQUIRE(m(1, 3) == 8.0f);
             REQUIRE(m(2, 0) == 9.0f); REQUIRE(m(2, 1) == 10.0f); REQUIRE(m(2, 2) == 11.0f); REQUIRE(m(2, 3) == 12.0f);
             REQUIRE(m(3, 0) == 13.0f); REQUIRE(m(3, 1) == 14.0f); REQUIRE(m(3, 2) == 15.0f); REQUIRE(m(3, 3) == 16.0f);
+
+            REQUIRE(m.data[0] == 1.0f); REQUIRE(m.data[1] == 2.0f); REQUIRE(m.data[2] == 3.0f); REQUIRE(m.data[3] == 4.0f);
+            REQUIRE(m.data[4] == 5.0f); REQUIRE(m.data[5] == 6.0f); REQUIRE(m.data[6] == 7.0f); REQUIRE(m.data[7] == 8.0f);
+            REQUIRE(m.data[8] == 9.0f); REQUIRE(m.data[9] == 10.0f); REQUIRE(m.data[10] == 11.0f); REQUIRE(m.data[11] == 12.0f);
+            REQUIRE(m.data[12] == 13.0f); REQUIRE(m.data[13] == 14.0f); REQUIRE(m.data[14] == 15.0f); REQUIRE(m.data[15] == 16.0f);
+        }
+
+        SECTION("for four-dimensional matrices (single vector constructor)") {
+            const Matrix4f m = {
+                1.0f, 2.0f, 3.0f, 4.0f, 
+                5.0f, 6.0f, 7.0f, 8.0f, 
+                9.0f, 10.0f, 11.0f, 12.0f,
+                13.0f, 14.0f, 15.0f, 16.0f
+            };
+
+            REQUIRE(m.M11 == 1.0f); REQUIRE(m.M12 == 2.0f); REQUIRE(m.M13 == 3.0f); REQUIRE(m.M14 == 4.0f);
+            REQUIRE(m.M21 == 5.0f); REQUIRE(m.M22 == 6.0f); REQUIRE(m.M23 == 7.0f); REQUIRE(m.M24 == 8.0f);
+            REQUIRE(m.M31 == 9.0f); REQUIRE(m.M32 == 10.0f); REQUIRE(m.M33 == 11.0f); REQUIRE(m.M34 == 12.0f);
+            REQUIRE(m.M41 == 13.0f); REQUIRE(m.M42 == 14.0f); REQUIRE(m.M43 == 15.0f); REQUIRE(m.M44 == 16.0f);
+
+            REQUIRE(m.element[0][0] == 1.0f); REQUIRE(m.element[0][1] == 2.0f); REQUIRE(m.element[0][2] == 3.0f); REQUIRE(m.element[0][3] == 4.0f);
+            REQUIRE(m.element[1][0] == 5.0f); REQUIRE(m.element[1][1] == 6.0f); REQUIRE(m.element[1][2] == 7.0f); REQUIRE(m.element[1][3] == 8.0f);
+            REQUIRE(m.element[2][0] == 9.0f); REQUIRE(m.element[2][1] == 10.0f); REQUIRE(m.element[2][2] == 11.0f); REQUIRE(m.element[2][3] == 12.0f);
+            REQUIRE(m.element[3][0] == 13.0f); REQUIRE(m.element[3][1] == 14.0f); REQUIRE(m.element[3][2] == 15.0f); REQUIRE(m.element[3][3] == 16.0f);
+            
+            REQUIRE(m(0, 0) == 1.0f); REQUIRE(m(0, 1) == 2.0f); REQUIRE(m(0, 2) == 3.0f); REQUIRE(m(0, 3) == 4.0f);
+            REQUIRE(m(1, 0) == 5.0f); REQUIRE(m(1, 1) == 6.0f); REQUIRE(m(1, 2) == 7.0f); REQUIRE(m(1, 3) == 8.0f);
+            REQUIRE(m(2, 0) == 9.0f); REQUIRE(m(2, 1) == 10.0f); REQUIRE(m(2, 2) == 11.0f); REQUIRE(m(2, 3) == 12.0f);
+            REQUIRE(m(3, 0) == 13.0f); REQUIRE(m(3, 1) == 14.0f); REQUIRE(m(3, 2) == 15.0f); REQUIRE(m(3, 3) == 16.0f);
+
+            REQUIRE(m.data[0] == 1.0f); REQUIRE(m.data[1] == 2.0f); REQUIRE(m.data[2] == 3.0f); REQUIRE(m.data[3] == 4.0f);
+            REQUIRE(m.data[4] == 5.0f); REQUIRE(m.data[5] == 6.0f); REQUIRE(m.data[6] == 7.0f); REQUIRE(m.data[7] == 8.0f);
+            REQUIRE(m.data[8] == 9.0f); REQUIRE(m.data[9] == 10.0f); REQUIRE(m.data[10] == 11.0f); REQUIRE(m.data[11] == 12.0f);
+            REQUIRE(m.data[12] == 13.0f); REQUIRE(m.data[13] == 14.0f); REQUIRE(m.data[14] == 15.0f); REQUIRE(m.data[15] == 16.0f);
         }
     }
 
@@ -277,6 +317,66 @@ TEST_CASE("Math::Matrix<3, float>") {
         });
     }
 
+    SECTION("createScaling static function should create a valid scaling matrix") {
+        REQUIRE(Matrix4f::createScaling({1.0f, 2.0f, 3.0f, 4.0f}) == Matrix4f{
+            {1.0f, 0.0f, 0.0f, 0.0f},
+            {0.0f, 2.0f, 0.0f, 0.0f},
+            {0.0f, 0.0f, 3.0f, 0.0f},
+            {0.0f, 0.0f, 0.0f, 4.0f}
+        });
+
+        REQUIRE(Matrix3f::createScaling({1.0f, 2.0f, 3.0f}) == Matrix3f{
+            {1.0f, 0.0f, 0.0f},
+            {0.0f, 2.0f, 0.0f},
+            {0.0f, 0.0f, 3.0f},
+        });
+
+        REQUIRE(Matrix2f::createScaling({1.0f, 2.0f}) == Matrix2f{
+            {1.0f, 0.0f},
+            {0.0f, 2.0f},
+        });
+    }
+    
+    SECTION("createTranslation static function should create a valid scaling function") {
+        const auto m = Matrix4f::createTranslation({2.0f, 3.0f, 4.0f, 1.0f});
+
+        REQUIRE(m.getRow(0) == Vector4f{1.0f, 0.0f, 0.0f, 0.0f});
+        REQUIRE(m.getRow(1) == Vector4f{0.0f, 1.0f, 0.0f, 0.0f});
+        REQUIRE(m.getRow(2) == Vector4f{0.0f, 0.0f, 1.0f, 0.0f});
+        REQUIRE(m.getRow(3) == Vector4f{2.0f, 3.0f, 4.0f, 1.0f});
+    }
+        
+    SECTION("createRotationX static function should create a valid scaling function") {
+        // TODO: Add missing test case
+
+        /*
+        REQUIRE(m.getRow(0) == Vector4f{1.0f, 0.0f, 0.0f, 0.0f});
+        REQUIRE(m.getRow(1) == Vector4f{0.0f, 1.0f, 0.0f, 0.0f});
+        REQUIRE(m.getRow(2) == Vector4f{0.0f, 0.0f, 1.0f, 0.0f});
+        REQUIRE(m.getRow(3) == Vector4f{2.0f, 3.0f, 4.0f, 1.0f});
+        */
+    }
+
+    SECTION("createRotation with fixed axis should match the corresponding createRotation(X, Y Z) static methods") {
+        // NOTE: this test assumes that createRotationX, createRotationY, createRotationZ are correct
+        
+        REQUIRE(Matrix4f::createRotation(0.0f, {1.0f, 0.0f, 0.0f}) == Matrix4f::createRotationX(0.0f));
+        REQUIRE(Matrix4f::createRotation(-pi<float>, {1.0f, 0.0f, 0.0f}) == Matrix4f::createRotationX(-pi<float>));
+
+        REQUIRE(Matrix4f::createRotation(0.0f, {0.0f, 1.0f, 0.0f}) == Matrix4f::createRotationY(0.0f));
+        REQUIRE(Matrix4f::createRotation(-pi<float>, {0.0f, 1.0f, 0.0f}) == Matrix4f::createRotationY(-pi<float>));
+
+        REQUIRE(Matrix4f::createRotation(0.0f, {0.0f, 0.0f, 1.0f}) == Matrix4f::createRotationZ(0.0f));
+        REQUIRE(Matrix4f::createRotation(-pi<float>, {0.0f, 0.0f, 1.0f}) == Matrix4f::createRotationZ(-pi<float>));
+
+        /*
+        REQUIRE(m.getRow(0) == Vector4f{1.0f, 0.0f, 0.0f, 0.0f});
+        REQUIRE(m.getRow(1) == Vector4f{0.0f, 1.0f, 0.0f, 0.0f});
+        REQUIRE(m.getRow(2) == Vector4f{0.0f, 0.0f, 1.0f, 0.0f});
+        REQUIRE(m.getRow(3) == Vector4f{2.0f, 3.0f, 4.0f, 1.0f});
+        */
+    }
+
     SECTION("Determinant should compute the matrix determinant correctly") {
         const Matrix4f matA = {
             {1.0f, 2.0f, 1.0f, 0.0f}, 
@@ -433,7 +533,7 @@ TEST_CASE("Math::Matrix<3, float>") {
 
     /*
 	// vector transformation
-	Matrix4f translation = Matrix4f::createTranslate({1.0f, 1.0f, 1.0f, 1.0f});
+	Matrix4f translation = Matrix4f::createTranslation({1.0f, 1.0f, 1.0f, 1.0f});
 	Vector3f position1 = {0.0f, -1.0f, 0.0f};
 	Vector3f position2_1 = {1.0f,  0.0f, 1.0f};
 	Vector3f position2_2 = transform<float, 4>(translation, position1);

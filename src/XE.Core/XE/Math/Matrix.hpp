@@ -124,11 +124,14 @@ namespace XE {
 
     template<typename T, int R, int C>
     struct Matrix : public MatrixBase<T, R, C> {
-        static_assert(R == C);
-
         using MatrixBase<T, R, C>::MatrixBase;
 
         Matrix() {}
+
+        Matrix(const Vector<T, R*C> &v) {
+            constexpr int totalBytes = R * C * sizeof(T);
+            std::memcpy(this->data, v.data, totalBytes);
+        }
 
         bool operator== (const Matrix<T, R, C> &other) const;
 
@@ -142,7 +145,8 @@ namespace XE {
 
         Matrix<T, R, C> operator- (const Matrix<T, R, C>& rhs) const;
 
-        Matrix<T, R, C> operator* (const Matrix<T, R, C>& rhs) const;
+        template<int R2, int C2>
+        Matrix<T, R, C2> operator* (const Matrix<T, R2, C2>& rhs) const;
 
         Matrix<T, R, C> operator/ (const Matrix<T, R, C>& rhs) const;
 
@@ -284,7 +288,7 @@ namespace XE {
             }
         }
         
-        static Matrix<T, R, C> createScale(const Vector<T, R> &scale) {
+        static Matrix<T, R, C> createScaling(const Vector<T, R> &scale) {
             auto result = Matrix<T, R, C>::createIdentity();
             
             for (int i=0; i<R; ++i) {
@@ -294,15 +298,15 @@ namespace XE {
             return result;
         }
         
-        static Matrix<T, R, C> createTranslate(const Vector<T, R> &displace) {
+        static Matrix<T, R, C> createTranslation(const Vector<T, R> &displace) {
             auto result = Matrix<T, R, C>::createIdentity();
             
-            result.setColumn(C - 1, displace);
+            result.setRow(C - 1, displace);
             
             return result;
         }
 
-        static Matrix<T, R, C> createTranslate(const Vector<T, R - 1> &displace) {
+        static Matrix<T, R, C> createTranslation(const Vector<T, R - 1> &displace) {
             auto result = Matrix<T, R, C>::createIdentity();
             
             Vector<T, R> d;
@@ -313,7 +317,7 @@ namespace XE {
 
             d[R - 1] = T(1);
 
-            result.setColumn(C - 1, d);
+            result.setRow(C - 1, d);
             
             return result;
         }
@@ -321,13 +325,13 @@ namespace XE {
         static Matrix<T, R, C> createRotationX(const T radians) {
             auto result = Matrix<T, R, C>::createIdentity();
             
-            T Cos = std::cos(radians);
-            T Sin = std::sin(radians);
+            const T cos = std::cos(radians);
+            const T sin = std::sin(radians);
             
-            result(1, 1) = Cos;
-            result(2, 2) = Cos;
-            result(2, 1) = -Sin;
-            result(1, 2) = Sin;
+            result(1, 1) = cos;
+            result(2, 2) = cos;
+            result(1, 2) = -sin;
+            result(2, 1) = sin;
             
             return result;
         }
@@ -335,13 +339,13 @@ namespace XE {
         static Matrix<T, R, C> createRotationY(const T radians) {
             auto result = Matrix<T, R, C>::createIdentity();
             
-            T Cos = std::cos(radians);
-            T Sin = std::sin(radians);
+            const T Cos = std::cos(radians);
+            const T Sin = std::sin(radians);
             
             result(0, 0) = Cos;
             result(2, 2) = Cos;
-            result(2, 0) = -Sin;
-            result(0, 2) = Sin;
+            result(0, 2) = -Sin;
+            result(2, 0) = Sin;
             
             return result;
         }
@@ -349,13 +353,13 @@ namespace XE {
         static Matrix<T, R, C> createRotationZ(const T radians) {
             auto result = Matrix<T, R, C>::createIdentity();
             
-            T Cos = std::cos(radians);
-            T Sin = std::sin(radians);
+            const T Cos = std::cos(radians);
+            const T Sin = std::sin(radians);
             
             result(0, 0) = Cos;
             result(1, 1) = Cos;
-            result(1, 0) = Sin;
-            result(0, 1) = -Sin;
+            result(0, 1) = Sin;
+            result(1, 0) = -Sin;
             
             return result;
         }
@@ -363,48 +367,30 @@ namespace XE {
         /**
          * @brief Build a arbitrary rotation matrix 
          */
-        static auto createRotation(const T radians, const Vector<T, 3> &Axis) {
+        static auto createRotation(const T rads, const Vector<T, 3> &axis) {
             if constexpr ( (C>=3 && C<=4) && (R>=3 && R<=4) ) {
-                assert(!std::isnan(radians));
-                assert(!std::isinf(radians));
+                const auto I = Matrix<T, 3, 3>::createIdentity();
 
-                T Cos = std::cos(radians);
-                T Sin = std::sin(radians);
+                assert(!std::isnan(rads));
+                assert(!std::isinf(rads));
+
+                const T cos = std::cos(rads);
+                const T sin = std::sin(rads);
                 
-                Vector<T, 3> U = Axis;
-                Vector<T, 3> V = normalize(Axis);
+                Vector<T, 3> U = axis;
+                Vector<T, 3> V = normalize(axis);
                 
-                //auto MatS = Matrix<T, 3, 3>::makeZero();
-                auto MatUut = Matrix<T, 3, 3>::createZero();
-                auto MatId = Matrix<T, 3, 3>::createIdentity();
-                
-                //Iniciar S
-                Matrix<T, 3, 3> MatS = {
+                const Matrix<T, 3, 3> matS = {
                     T(0), -V.Z, V.Y,
                     V.Z , T(0), -V.X,
                     -V.Y, V.X , T(0),
                 };
                 
-                //auto matU = Matrix<T, 1, 3>{V};
-                //auto matU_Ut = transpose(matU) * matU;
-                
-                //Iniciar u*ut
-                MatUut(0, 0) = V.X * V.X;
-                MatUut(1, 0) = V.Y * V.X;
-                MatUut(2, 0) = V.Z * V.X;
-            
-                MatUut(0, 1) = V.X * V.Y;
-                MatUut(1, 1) = V.Y * V.Y;
-                MatUut(2, 1) = V.Z * V.Y;
-                
-                MatUut(0, 2) = V.X * V.Z;
-                MatUut(1, 2) = V.Y * V.Z;
-                MatUut(2, 2) = V.Z * V.Z;
-                
-                auto tempResult = MatUut + Cos * (MatId - MatUut) + Sin * MatS;
+                const auto matUUT = Matrix<T, 3, 1>{V} * Matrix<T, 1, 3>{V};
+                const auto tempResult = matUUT + cos * (I - matUUT) + sin * matS;
                 
                 auto result = Matrix<T, C, R>::createIdentity();
-                
+
                 for (int i=0; i<3; ++i) {
                     for (int j=0; j<3; ++j) {
                         result(i, j) = tempResult(i, j);
@@ -435,7 +421,7 @@ namespace XE {
                 result(2, 1) = -forward.Y;
                 result(2, 2) = -forward.Z;
                 
-                result *= Matrix<T, 4, 4>::createTranslate(-Eye);
+                result *= Matrix<T, 4, 4>::createTranslation(-Eye);
                 
                 return result;
             }
@@ -603,18 +589,26 @@ namespace XE {
     }
     
     template<typename T, int R, int C>
-    Matrix<T, R, C> Matrix<T, R, C>::operator* (const Matrix<T, R, C>& rhs) const {
-        Matrix<T, R, C> result;
+    template<int R2, int C2>
+    Matrix<T, R, C2> Matrix<T, R, C>::operator* (const Matrix<T, R2, C2>& rhs) const {
+        static_assert(R == C2);
+        static_assert(C == R2);
+        
+        Matrix<T, R, C2> result;
         
         for (int i=0; i<R; i++) {
-            for (int j=0; j<C; j++) {
-                result.element[i][j] = dot(this->getRow(i), rhs.getColumn(j));
+            for (int j=0; j<C2; j++) {
+                const auto rowI = this->getRow(i);
+                const auto colJ = rhs.getColumn(j);
+                const auto mIJ = dot(rowI, colJ);;
+
+                result.element[i][j] = mIJ;
             }
         }
         
         return result;
     }
-    
+
     template<typename T, int R, int C>
     Matrix<T, R, C> Matrix<T, R, C>::operator/ (const Matrix<T, R, C>& rhs) const {
         return *this * inverse(rhs);
