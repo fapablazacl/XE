@@ -62,7 +62,7 @@ namespace XE {
                 turnSpeed = Radians(1.25f * seconds);
             }
 
-            const auto cdt = Matrix4f::Rotate(turnSpeed, m_cameraUp) * Vector4f(cameraDirection, 0.0f);
+            const auto cdt = Matrix4f::createRotation(turnSpeed, m_cameraUp) * Vector4f(cameraDirection, 0.0f);
             
             m_cameraLookAt = m_cameraPosition + Vector3f{cdt.X, cdt.Y, cdt.Z} * Magnitude(cameraDirection);
 
@@ -83,10 +83,10 @@ namespace XE {
         void RenderMatrices() {
             const UniformMatrix matrixLayout = { "m_mvp", DataType::Float32, 4, 4, 1 };
 
-            const Matrix4f modelViewProj = Transpose (
-                Matrix4f::Perspective(m_cameraFov, m_cameraAspect, m_cameraZNear, m_cameraZFar) * 
-                Matrix4f::LookAt(m_cameraPosition, m_cameraLookAt, m_cameraUp) * 
-                Matrix4f::RotateY(Radians(m_angle)) 
+            const Matrix4f modelViewProj = transpose (
+                Matrix4f::createPerspective(m_cameraFov, m_cameraAspect, m_cameraZNear, m_cameraZFar) * 
+                Matrix4f::createLookAt(m_cameraPosition, m_cameraLookAt, m_cameraUp) * 
+                Matrix4f::createRotationY(Radians(m_angle)) 
             );
 
             m_graphicsDevice->applyUniform(&matrixLayout, 1, (const std::byte*)&modelViewProj);

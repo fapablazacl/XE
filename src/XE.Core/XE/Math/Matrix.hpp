@@ -180,7 +180,7 @@ namespace XE {
             return this->Element[i][j];
         }
 
-        Vector<T, C> GetRowVector(const int row) const {
+        Vector<T, C> getRow(const int row) const {
             assert(row >= 0);
             assert(row < R);
 
@@ -193,7 +193,7 @@ namespace XE {
             return result;
         }
         
-        Vector<T, R> GetColumnVector(const int col) const {
+        Vector<T, R> getColumn(const int col) const {
             assert(col >= 0);
             assert(col < C);
 
@@ -206,7 +206,7 @@ namespace XE {
             return result;
         }
         
-        Matrix<T, R, C>& SetRowVector(const int row, const Vector<T, C> &v) {
+        Matrix<T, R, C>& setRow(const int row, const Vector<T, C> &v) {
             for (int col=0; col<C; col++) {
                 this->Element[row][col] = v[col];
             }
@@ -214,7 +214,7 @@ namespace XE {
             return *this;
         }
 
-        Matrix<T, R, C>& SetColumnVector(const int col, const Vector<T, R> &v) {
+        Matrix<T, R, C>& setColumn(const int col, const Vector<T, R> &v) {
             for (int row=0; row<R; row++) {
                 this->Element[row][col] = v[row];
             }
@@ -222,7 +222,7 @@ namespace XE {
             return *this;
         }
 
-        auto SubMatrix(const int row, const int column) const {
+        auto getSubMatrix(const int row, const int column) const {
             if constexpr (C > 2 && R > 2) {
                 assert(row >= 0);
                 assert(row < R);
@@ -259,7 +259,7 @@ namespace XE {
         /**
          * @brief Build a matrix initialized with zeros.
          */
-        static Matrix<T, R, C> Zero() {
+        static Matrix<T, R, C> createZero() {
             Matrix<T, R, C> result;
             
             for(int i=0; i<R*C; ++i) {
@@ -272,9 +272,9 @@ namespace XE {
         /**
          * @brief Build a identity matrix. Must be square.
          */
-        static auto Identity() {
+        static auto createIdentity() {
             if constexpr (R == C) {
-                auto result = Matrix<T, R, C>::Zero();
+                auto result = Matrix<T, R, C>::createZero();
                 
                 for (int i=0; i<R; ++i) {
                     result(i, i) = T(1);
@@ -284,8 +284,8 @@ namespace XE {
             }
         }
         
-        static Matrix<T, R, C> Scale(const Vector<T, R> &scale) {
-            auto result = Matrix<T, R, C>::Identity();
+        static Matrix<T, R, C> createScale(const Vector<T, R> &scale) {
+            auto result = Matrix<T, R, C>::createIdentity();
             
             for (int i=0; i<R; ++i) {
                 result(i, i) = scale[i];
@@ -294,16 +294,16 @@ namespace XE {
             return result;
         }
         
-        static Matrix<T, R, C> Translate(const Vector<T, R> &displace) {
-            auto result = Matrix<T, R, C>::Identity();
+        static Matrix<T, R, C> createTranslate(const Vector<T, R> &displace) {
+            auto result = Matrix<T, R, C>::createIdentity();
             
-            result.SetColumnVector(C - 1, displace);
+            result.setColumn(C - 1, displace);
             
             return result;
         }
 
-        static Matrix<T, R, C> Translate(const Vector<T, R - 1> &displace) {
-            auto result = Matrix<T, R, C>::Identity();
+        static Matrix<T, R, C> createTranslate(const Vector<T, R - 1> &displace) {
+            auto result = Matrix<T, R, C>::createIdentity();
             
             Vector<T, R> d;
 
@@ -313,13 +313,13 @@ namespace XE {
 
             d[R - 1] = T(1);
 
-            result.SetColumnVector(C - 1, d);
+            result.setColumn(C - 1, d);
             
             return result;
         }
 
-        static Matrix<T, R, C> RotateX(const T radians) {
-            auto result = Matrix<T, R, C>::Identity();
+        static Matrix<T, R, C> createRotationX(const T radians) {
+            auto result = Matrix<T, R, C>::createIdentity();
             
             T Cos = std::cos(radians);
             T Sin = std::sin(radians);
@@ -332,8 +332,8 @@ namespace XE {
             return result;
         }
         
-        static Matrix<T, R, C> RotateY(const T radians) {
-            auto result = Matrix<T, R, C>::Identity();
+        static Matrix<T, R, C> createRotationY(const T radians) {
+            auto result = Matrix<T, R, C>::createIdentity();
             
             T Cos = std::cos(radians);
             T Sin = std::sin(radians);
@@ -346,8 +346,8 @@ namespace XE {
             return result;
         }
         
-        static Matrix<T, R, C> RotateZ(const T radians) {
-            auto result = Matrix<T, R, C>::Identity();
+        static Matrix<T, R, C> createRotationZ(const T radians) {
+            auto result = Matrix<T, R, C>::createIdentity();
             
             T Cos = std::cos(radians);
             T Sin = std::sin(radians);
@@ -363,7 +363,7 @@ namespace XE {
         /**
          * @brief Build a arbitrary rotation matrix 
          */
-        static auto Rotate(T radians, const Vector<T, 3> &Axis) {
+        static auto createRotation(const T radians, const Vector<T, 3> &Axis) {
             if constexpr ( (C>=3 && C<=4) && (R>=3 && R<=4) ) {
                 assert(!std::isnan(radians));
                 assert(!std::isinf(radians));
@@ -375,8 +375,8 @@ namespace XE {
                 Vector<T, 3> V = Normalize(Axis);
                 
                 //auto MatS = Matrix<T, 3, 3>::makeZero();
-                auto MatUut = Matrix<T, 3, 3>::Zero();
-                auto MatId = Matrix<T, 3, 3>::Identity();
+                auto MatUut = Matrix<T, 3, 3>::createZero();
+                auto MatId = Matrix<T, 3, 3>::createIdentity();
                 
                 //Iniciar S
                 Matrix<T, 3, 3> MatS = {
@@ -403,7 +403,7 @@ namespace XE {
                 
                 auto tempResult = MatUut + Cos * (MatId - MatUut) + Sin * MatS;
                 
-                auto result = Matrix<T, C, R>::Identity();
+                auto result = Matrix<T, C, R>::createIdentity();
                 
                 for (int i=0; i<3; ++i) {
                     for (int j=0; j<3; ++j) {
@@ -415,13 +415,13 @@ namespace XE {
             }
         }
         
-        static auto LookAt(const Vector<T, 3> &Eye, const Vector<T, 3> &At, const Vector<T, 3> &Up) {
+        static auto createLookAt(const Vector<T, 3> &Eye, const Vector<T, 3> &At, const Vector<T, 3> &Up) {
             if constexpr (C==4 && R==4) {
                 const auto forward = Normalize(At - Eye);
                 const auto side = Normalize(Cross(forward, Up));
                 const auto up = Cross(side, forward);
                 
-                auto result = Matrix<T, 4, 4>::Identity();
+                auto result = Matrix<T, 4, 4>::createIdentity();
                 
                 result(0, 0) = side.X;
                 result(0, 1) = side.Y;
@@ -435,18 +435,18 @@ namespace XE {
                 result(2, 1) = -forward.Y;
                 result(2, 2) = -forward.Z;
                 
-                result *= Matrix<T, 4, 4>::Translate(-Eye);
+                result *= Matrix<T, 4, 4>::createTranslate(-Eye);
                 
                 return result;
             }
         }
         
-        static auto Perspective(T fov_radians, T aspect, T znear, T zfar) {
+        static auto createPerspective(const T fov_radians, const T aspect, const T znear, const T zfar) {
             if constexpr (C==4 && R==4) {
                 const T f = T(1) / std::tan(fov_radians / T(2));
                 const T zdiff = znear - zfar;
 
-                auto result = Matrix<T, 4, 4>::Identity();
+                auto result = Matrix<T, 4, 4>::createIdentity();
                 
                 result(0, 0) = f / aspect;
                 result(1, 1) = f;
@@ -458,10 +458,10 @@ namespace XE {
             }
         }
         
-        static auto Ortho(const Vector<T, 3> &pmin,  const Vector<T, 3> &pmax) {
+        static auto createOrthographic(const Vector<T, 3> &pmin,  const Vector<T, 3> &pmax) {
             if constexpr (C==4 && R==4) {
                 auto diff = pmax - pmin;
-                auto result = Matrix<T, 4, 4>::Identity();
+                auto result = Matrix<T, 4, 4>::createIdentity();
                 
                 result(0, 0) = T(2) / diff.X;
                 result(1, 1) = T(2) / diff.Y;
@@ -482,7 +482,7 @@ namespace XE {
     typedef Matrix<float, 4, 4> Matrix4f;
     
     template<typename T, int R, int C>
-    auto Abs(const Matrix<T, R, C> &m) {
+    auto abs(const Matrix<T, R, C> &m) {
         if constexpr (R >= 2) {
             if constexpr (R == 2 && C == 2) {
                 return m.M22 * m.M11 - m.M12 * m.M21;
@@ -495,7 +495,7 @@ namespace XE {
                 for (int column=0; column<C; column++) {
                     factor = (column + 1)%2 ? T(-1) : T(1); 
                 
-                    const T subDet = Abs(m.SubMatrix(row, column));
+                    const T subDet = abs(m.getSubMatrix(row, column));
                 
                     result += factor * m.Element[row][column] * subDet;
                 }
@@ -506,13 +506,13 @@ namespace XE {
     }
 
     template<typename T, int R, int C>
-    Matrix<T, R, C> Adjoint(const Matrix<T, R, C> &matrix) {
+    Matrix<T, R, C> adjoint(const Matrix<T, R, C> &matrix) {
         Matrix<T, R, C> result;
         
         for(int i=0; i<R; ++i) {
             for(int j=0; j<C; ++j) {
                 T factor = ((i+j)%2 == 1) ? T(1) : T(-1);
-                result(i, j) = factor * Abs(matrix.SubMatrix(i, j));
+                result(i, j) = factor * abs(matrix.getSubMatrix(i, j));
             }
         }
         
@@ -520,7 +520,7 @@ namespace XE {
     }
 
     template<typename T, int R, int C>
-    Matrix<T, C, R> Transpose(const Matrix<T, R, C> &m) {
+    Matrix<T, C, R> transpose(const Matrix<T, R, C> &m) {
         Matrix<T, C, R> result;
         
         for (int i=0; i<R; i++) {
@@ -533,13 +533,13 @@ namespace XE {
     }
     
     template<typename T, int R, int C>
-    Matrix<T, R, C> Inverse(const Matrix<T, R, C> &m) {
-        return Transpose(Adjoint(m)) / Abs(m);
+    Matrix<T, R, C> inverse(const Matrix<T, R, C> &m) {
+        return transpose(adjoint(m)) / abs(m);
     }
     
     template<typename T, int R, int C>
-    Matrix<T, R, C> Inverse(const Matrix<T, R, C> &m, const T abs) {
-        return Transpose(Adjoint(m)) / abs;
+    Matrix<T, R, C> inverse(const Matrix<T, R, C> &m, const T abs) {
+        return transpose(adjoint(m)) / abs;
     }
     
     template<typename T, int R, int C>
@@ -608,7 +608,7 @@ namespace XE {
         
         for (int i=0; i<R; i++) {
             for (int j=0; j<C; j++) {
-                result.Element[i][j] = Dot(this->GetRowVector(i), rhs.GetColumnVector(j));
+                result.Element[i][j] = Dot(this->getRow(i), rhs.getColumn(j));
             }
         }
         
@@ -617,7 +617,7 @@ namespace XE {
     
     template<typename T, int R, int C>
     Matrix<T, R, C> Matrix<T, R, C>::operator/ (const Matrix<T, R, C>& rhs) const {
-        return *this * Inverse(rhs);
+        return *this * inverse(rhs);
     }
     
     template<typename T, int R, int C>
@@ -672,7 +672,7 @@ namespace XE {
         Vector<T, R> result;
 
         for (int col=0; col<C; col++) {
-            result[col] = Dot(this->GetColumnVector(col), v);
+            result[col] = Dot(this->getColumn(col), v);
         }
 
         return result;
@@ -685,7 +685,7 @@ namespace std {
         os << std::endl;
 
         for (int i=0; i<R; ++i) {
-            os << m.GetRowVector(i);
+            os << m.getRow(i);
             os << std::endl;
         }
 
