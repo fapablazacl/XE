@@ -4,6 +4,8 @@
 #include <XE/Math/Util.hpp>
 #include <XE/Math/Matrix.hpp>
 
+#include <iostream>
+
 namespace Catch {
     template<>
     struct StringMaker<XE::Matrix2f> {
@@ -277,6 +279,18 @@ TEST_CASE("Math::Matrix<3, float>") {
         });
     }
 
+    SECTION("Matrix-Vector multiply operation should transform the vector by the right") {
+        const Matrix3f m = {
+            {1.0f, -1.0f, 1.0f},
+            {-1.0f, 1.0f, -1.0f},
+            {1.0f, 0.0f, 1.0f}
+        };
+
+        REQUIRE(m * Vector3f{0.0f, 0.0f, 0.0f} == Vector3f{0.0f, 0.0f, 0.0f});
+        REQUIRE(m * Vector3f{1.0f, 1.0f, 1.0f} == Vector3f{1.0f, -1.0f, 2.0f});
+        REQUIRE(m * Vector3f{-1.0f, -1.0f, -1.0f} == Vector3f{-1.0f, 1.0f, -2.0f});
+    }
+
     SECTION("createZero static function should create a valid zero matrix") {
         REQUIRE(Matrix4f::createZero() == Matrix4f{
             {0.0f, 0.0f, 0.0f, 0.0f},
@@ -295,6 +309,13 @@ TEST_CASE("Math::Matrix<3, float>") {
             {0.0f, 0.0f},
             {0.0f, 0.0f}
         });
+
+        const auto mzero = Matrix4f::createZero();
+
+        REQUIRE(mzero * Vector4f{0.0f, 0.0f, 0.0f, 0.0f} == Vector4f{0.0f, 0.0f, 0.0f, 0.0f});
+        REQUIRE(mzero * Vector4f{1.0f, 0.0f, 0.0f, 0.0f} == Vector4f{0.0f, 0.0f, 0.0f, 0.0f});
+        REQUIRE(mzero * Vector4f{0.0f, 1.0f, 0.0f, 0.0f} == Vector4f{0.0f, 0.0f, 0.0f, 0.0f});
+        REQUIRE(mzero * Vector4f{0.0f, 0.0f, 1.0f, 0.0f} == Vector4f{0.0f, 0.0f, 0.0f, 0.0f});
     }
 
     SECTION("createIdentity static function should create a valid identity matrix") {
@@ -315,6 +336,13 @@ TEST_CASE("Math::Matrix<3, float>") {
             {1.0f, 0.0f},
             {0.0f, 1.0f}
         });
+
+        const auto mid = Matrix4f::createIdentity();
+        REQUIRE(mid * Vector4f{0.0f, 0.0f, 0.0f, 0.0f} == Vector4f{0.0f, 0.0f, 0.0f, 0.0f});
+        REQUIRE(mid * Vector4f{1.0f, 0.0f, 0.0f, 0.0f} == Vector4f{1.0f, 0.0f, 0.0f, 0.0f});
+        REQUIRE(mid * Vector4f{0.0f, 1.0f, 0.0f, 0.0f} == Vector4f{0.0f, 1.0f, 0.0f, 0.0f});
+        REQUIRE(mid * Vector4f{0.0f, 0.0f, 1.0f, 0.0f} == Vector4f{0.0f, 0.0f, 1.0f, 0.0f});
+        REQUIRE(mid * Vector4f{1.0f, 2.0f, -3.0f, 4.0f} == Vector4f{1.0f, 2.0f, -3.0f, 4.0f});
     }
 
     SECTION("createScaling static function should create a valid scaling matrix") {
@@ -335,46 +363,147 @@ TEST_CASE("Math::Matrix<3, float>") {
             {1.0f, 0.0f},
             {0.0f, 2.0f},
         });
+
+        const auto m_s1 = Matrix4f::createScaling({1.0f, 2.0f, 3.0f, 1.0f});
+        REQUIRE(m_s1 * Vector4f{0.0f, 0.0f, 0.0f, 0.0f} == Vector4f{0.0f, 0.0f, 0.0f, 0.0f});
+        REQUIRE(m_s1 * Vector4f{1.0f, 0.0f, 0.0f, 0.0f} == Vector4f{1.0f, 0.0f, 0.0f, 0.0f});
+        REQUIRE(m_s1 * Vector4f{0.0f, 1.0f, 0.0f, 0.0f} == Vector4f{0.0f, 2.0f, 0.0f, 0.0f});
+        REQUIRE(m_s1 * Vector4f{0.0f, 0.0f, 1.0f, 0.0f} == Vector4f{0.0f, 0.0f, 3.0f, 0.0f});
+        REQUIRE(m_s1 * Vector4f{1.0f, 2.0f, -3.0f, 4.0f} == Vector4f{1.0f, 4.0f, -9.0f, 4.0f});
     }
     
-    SECTION("createTranslation static function should create a valid scaling function") {
-        const auto m = Matrix4f::createTranslation({2.0f, 3.0f, 4.0f, 1.0f});
+    SECTION("createTranslation static function should create a valid translate matrix") {
+        const auto m1 = Matrix4f::createTranslation({2.0f, 3.0f, 4.0f, 0.0f});
+        REQUIRE(m1.getRow(0) == Vector4f{1.0f, 0.0f, 0.0f, 0.0f});
+        REQUIRE(m1.getRow(1) == Vector4f{0.0f, 1.0f, 0.0f, 0.0f});
+        REQUIRE(m1.getRow(2) == Vector4f{0.0f, 0.0f, 1.0f, 0.0f});
+        REQUIRE(m1.getRow(3) == Vector4f{2.0f, 3.0f, 4.0f, 0.0f});
 
-        REQUIRE(m.getRow(0) == Vector4f{1.0f, 0.0f, 0.0f, 0.0f});
-        REQUIRE(m.getRow(1) == Vector4f{0.0f, 1.0f, 0.0f, 0.0f});
-        REQUIRE(m.getRow(2) == Vector4f{0.0f, 0.0f, 1.0f, 0.0f});
-        REQUIRE(m.getRow(3) == Vector4f{2.0f, 3.0f, 4.0f, 1.0f});
+        const auto m2 = Matrix4f::createTranslation({2.0f, 3.0f, 4.0f, 1.0f});
+        REQUIRE(m2.getRow(0) == Vector4f{1.0f, 0.0f, 0.0f, 0.0f});
+        REQUIRE(m2.getRow(1) == Vector4f{0.0f, 1.0f, 0.0f, 0.0f});
+        REQUIRE(m2.getRow(2) == Vector4f{0.0f, 0.0f, 1.0f, 0.0f});
+        REQUIRE(m2.getRow(3) == Vector4f{2.0f, 3.0f, 4.0f, 1.0f});
+
+        const auto m3 = Matrix4f::createTranslation({2.0f, -3.0f, 4.0f});
+        REQUIRE(m3.getRow(0) == Vector4f{1.0f, 0.0f, 0.0f, 0.0f});
+        REQUIRE(m3.getRow(1) == Vector4f{0.0f, 1.0f, 0.0f, 0.0f});
+        REQUIRE(m3.getRow(2) == Vector4f{0.0f, 0.0f, 1.0f, 0.0f});
+        REQUIRE(m3.getRow(3) == Vector4f{2.0f, -3.0f, 4.0f, 1.0f});
+
+        REQUIRE(m1 * Vector4f{0.0f, 0.0f, 0.0f, 0.0f} == Vector4f{2.0f, 3.0f, 4.0f, 0.0f});
+        REQUIRE(m1 * Vector4f{2.0f, -2.0f, 1.0f, 1.0f} == Vector4f{4.0f, 1.0f, 5.0f, 1.0f});
+        REQUIRE(m1 * Vector4f{1.0f, 0.0f, 1.0f, 1.0f} == Vector4f{3.0f, 3.0f, 5.0f, 1.0f});
+
+        REQUIRE(m3 * Vector4f{1.0f, 1.0f, 1.0f, 1.0f} == Vector4f{3.0f, -2.0f, 5.0f, 1.0f});
     }
         
-    SECTION("createRotationX static function should create a valid scaling function") {
-        // TODO: Add missing test case
+    SECTION("createRotationX static function should create a well-constructed rotation matrix") {
+        Matrix4f m;
+        float sin, cos;
 
-        /*
+        m = Matrix4f::createRotationX(0.0f);
+        sin = std::sin(0.0f);
+        cos = std::cos(0.0f);
         REQUIRE(m.getRow(0) == Vector4f{1.0f, 0.0f, 0.0f, 0.0f});
         REQUIRE(m.getRow(1) == Vector4f{0.0f, 1.0f, 0.0f, 0.0f});
         REQUIRE(m.getRow(2) == Vector4f{0.0f, 0.0f, 1.0f, 0.0f});
-        REQUIRE(m.getRow(3) == Vector4f{2.0f, 3.0f, 4.0f, 1.0f});
-        */
+        REQUIRE(m.getRow(3) == Vector4f{0.0f, 0.0f, 0.0f, 1.0f});
+
+        m = Matrix4f::createRotationX(pi<float>);
+        sin = std::sin(pi<float>);
+        cos = std::cos(pi<float>);
+        REQUIRE(m.getRow(0) == Vector4f{1.0f, 0.0f, 0.0f, 0.0f});
+        REQUIRE(m.getRow(1) == Vector4f{0.0f, cos, -sin, 0.0f});
+        REQUIRE(m.getRow(2) == Vector4f{0.0f, sin, cos, 0.0f});
+        REQUIRE(m.getRow(3) == Vector4f{0.0f, 0.0f, 0.0f, 1.0f});
+
+        m = Matrix4f::createRotationX(2.0f * pi<float>);
+        sin = std::sin(2.0f * pi<float>);
+        cos = std::cos(2.0f * pi<float>);
+        REQUIRE(m.getRow(0) == Vector4f{1.0f, 0.0f, 0.0f, 0.0f});
+        REQUIRE(m.getRow(1) == Vector4f{0.0f, cos, -sin, 0.0f});
+        REQUIRE(m.getRow(2) == Vector4f{0.0f, sin, cos, 0.0f});
+        REQUIRE(m.getRow(3) == Vector4f{0.0f, 0.0f, 0.0f, 1.0f});
+    }
+
+    SECTION("createRotationY static function should create a well-constructed rotation matrix") {
+        Matrix4f m;
+        float sin, cos;
+
+        m = Matrix4f::createRotationY(0.0f);
+        sin = std::sin(0.0f);
+        cos = std::cos(0.0f);
+        REQUIRE(m.getRow(0) == Vector4f{1.0f, 0.0f, 0.0f, 0.0f});
+        REQUIRE(m.getRow(1) == Vector4f{0.0f, 1.0f, 0.0f, 0.0f});
+        REQUIRE(m.getRow(2) == Vector4f{0.0f, 0.0f, 1.0f, 0.0f});
+        REQUIRE(m.getRow(3) == Vector4f{0.0f, 0.0f, 0.0f, 1.0f});
+
+        m = Matrix4f::createRotationY(pi<float>);
+        sin = std::sin(pi<float>);
+        cos = std::cos(pi<float>);
+        REQUIRE(m.getRow(0) == Vector4f{cos,  0.0f, -sin,  0.0f});
+        REQUIRE(m.getRow(1) == Vector4f{0.0f, 1.0f,  0.0f, 0.0f});
+        REQUIRE(m.getRow(2) == Vector4f{sin,  0.0f,  cos,  0.0f});
+        REQUIRE(m.getRow(3) == Vector4f{0.0f, 0.0f,  0.0f, 1.0f});
+
+        m = Matrix4f::createRotationY(2.0f * pi<float>);
+        sin = std::sin(2.0f * pi<float>);
+        cos = std::cos(2.0f * pi<float>);
+        REQUIRE(m.getRow(0) == Vector4f{cos,  0.0f, -sin,  0.0f});
+        REQUIRE(m.getRow(1) == Vector4f{0.0f, 1.0f,  0.0f, 0.0f});
+        REQUIRE(m.getRow(2) == Vector4f{sin,  0.0f,  cos,  0.0f});
+        REQUIRE(m.getRow(3) == Vector4f{0.0f, 0.0f,  0.0f, 1.0f});
+    }
+
+    SECTION("createRotationZ static function should create a well-constructed rotation matrix") {
+        Matrix4f m;
+        float sin, cos;
+
+        m = Matrix4f::createRotationZ(0.0f);
+        sin = std::sin(0.0f);
+        cos = std::cos(0.0f);
+        REQUIRE(m.getRow(0) == Vector4f{1.0f, 0.0f, 0.0f, 0.0f});
+        REQUIRE(m.getRow(1) == Vector4f{0.0f, 1.0f, 0.0f, 0.0f});
+        REQUIRE(m.getRow(2) == Vector4f{0.0f, 0.0f, 1.0f, 0.0f});
+        REQUIRE(m.getRow(3) == Vector4f{0.0f, 0.0f, 0.0f, 1.0f});
+
+        m = Matrix4f::createRotationZ(pi<float>);
+        sin = std::sin(pi<float>);
+        cos = std::cos(pi<float>);
+        REQUIRE(m.getRow(0) == Vector4f{cos,  sin, 0.0f,  0.0f});
+        REQUIRE(m.getRow(1) == Vector4f{-sin, cos,  0.0f, 0.0f});
+        REQUIRE(m.getRow(2) == Vector4f{0.0f,  0.0f,  1.0f,  0.0f});
+        REQUIRE(m.getRow(3) == Vector4f{0.0f, 0.0f,  0.0f, 1.0f});
+
+        m = Matrix4f::createRotationZ(2.0f * pi<float>);
+        sin = std::sin(2.0f * pi<float>);
+        cos = std::cos(2.0f * pi<float>);
+        REQUIRE(m.getRow(0) == Vector4f{cos,  sin, 0.0f,  0.0f});
+        REQUIRE(m.getRow(1) == Vector4f{-sin, cos,  0.0f, 0.0f});
+        REQUIRE(m.getRow(2) == Vector4f{0.0f,  0.0f,  1.0f,  0.0f});
+        REQUIRE(m.getRow(3) == Vector4f{0.0f, 0.0f,  0.0f, 1.0f});
     }
 
     SECTION("createRotation with fixed axis should match the corresponding createRotation(X, Y Z) static methods") {
+        std::cout << Matrix4f::createRotation(pi<float>, {0.0f, 1.0f, 0.0f}) << std::endl;
+        std::cout << Matrix4f::createRotationY(pi<float>) << std::endl;
+
         // NOTE: this test assumes that createRotationX, createRotationY, createRotationZ are correct
+        REQUIRE(Matrix4f::createRotation(0.0f, {1.0f, 0.0f, 0.0f}) == Matrix4f::createIdentity());
+        REQUIRE(Matrix4f::createRotation(0.0f, {0.0f, 1.0f, 0.0f}) == Matrix4f::createIdentity());
+        REQUIRE(Matrix4f::createRotation(0.0f, {0.0f, 0.0f, 1.0f}) == Matrix4f::createIdentity());
+        REQUIRE(Matrix4f::createRotation(0.0f, {-1.0f, 0.0f, 0.0f}) == Matrix4f::createIdentity());
+        REQUIRE(Matrix4f::createRotation(0.0f, {0.0f, -1.0f, 0.0f}) == Matrix4f::createIdentity());
+        REQUIRE(Matrix4f::createRotation(0.0f, {0.0f, 0.0f, -1.0f}) == Matrix4f::createIdentity());
         
-        REQUIRE(Matrix4f::createRotation(0.0f, {1.0f, 0.0f, 0.0f}) == Matrix4f::createRotationX(0.0f));
         REQUIRE(Matrix4f::createRotation(-pi<float>, {1.0f, 0.0f, 0.0f}) == Matrix4f::createRotationX(-pi<float>));
+        REQUIRE(Matrix4f::createRotation(pi<float>, {1.0f, 0.0f, 0.0f}) == Matrix4f::createRotationX(pi<float>));
+        REQUIRE(Matrix4f::createRotation(1.25f, {1.0f, 0.0f, 0.0f}) == Matrix4f::createRotationX(1.25f));
 
-        REQUIRE(Matrix4f::createRotation(0.0f, {0.0f, 1.0f, 0.0f}) == Matrix4f::createRotationY(0.0f));
         REQUIRE(Matrix4f::createRotation(-pi<float>, {0.0f, 1.0f, 0.0f}) == Matrix4f::createRotationY(-pi<float>));
-
-        REQUIRE(Matrix4f::createRotation(0.0f, {0.0f, 0.0f, 1.0f}) == Matrix4f::createRotationZ(0.0f));
-        REQUIRE(Matrix4f::createRotation(-pi<float>, {0.0f, 0.0f, 1.0f}) == Matrix4f::createRotationZ(-pi<float>));
-
-        /*
-        REQUIRE(m.getRow(0) == Vector4f{1.0f, 0.0f, 0.0f, 0.0f});
-        REQUIRE(m.getRow(1) == Vector4f{0.0f, 1.0f, 0.0f, 0.0f});
-        REQUIRE(m.getRow(2) == Vector4f{0.0f, 0.0f, 1.0f, 0.0f});
-        REQUIRE(m.getRow(3) == Vector4f{2.0f, 3.0f, 4.0f, 1.0f});
-        */
+        REQUIRE(Matrix4f::createRotation(pi<float>, {0.0f, 1.0f, 0.0f}) == Matrix4f::createRotationY(pi<float>));
+        REQUIRE(Matrix4f::createRotation(1.25f, {0.0f, 1.0f, 0.0f}) == Matrix4f::createRotationY(1.25f));
     }
 
     SECTION("Determinant should compute the matrix determinant correctly") {
@@ -487,8 +616,8 @@ TEST_CASE("Math::Matrix<3, float>") {
     }
 
     SECTION("transpose should swap matrix rows and columns") {
-        auto mi = Matrix4f::createIdentity();
-        auto m0 = Matrix4f::createZero();
+        const auto mi = Matrix4f::createIdentity();
+        const auto m0 = Matrix4f::createZero();
 
         REQUIRE(mi == transpose(mi));
         REQUIRE(m0 == transpose(m0));
@@ -508,7 +637,7 @@ TEST_CASE("Math::Matrix<3, float>") {
         });
     }
 
-    SECTION("inverse should swap matrix rows and columns") {        
+    SECTION("inverse should compute the matrix inverse multiplicative") {
         const Matrix4f invMatA = {
             {0.25000f,  0.000f, -0.25000f,  0.000},
             {0.28125f,  0.125f,  0.09375f, -0.125},

@@ -3,6 +3,7 @@
 #define __XE_MATH_MATRIX_HPP__
 
 #include <cstdint>
+#include <cstring>
 #include "Vector.hpp"
 
 namespace XE {
@@ -307,19 +308,7 @@ namespace XE {
         }
 
         static Matrix<T, R, C> createTranslation(const Vector<T, R - 1> &displace) {
-            auto result = Matrix<T, R, C>::createIdentity();
-            
-            Vector<T, R> d;
-
-            for (int i=0; i<R - 1; i++) {
-                d[i] = displace[i];
-            }
-
-            d[R - 1] = T(1);
-
-            result.setRow(C - 1, d);
-            
-            return result;
+            return Matrix<T, R, C>::createTranslation({displace, T(1)});
         }
 
         static Matrix<T, R, C> createRotationX(const T radians) {
@@ -339,13 +328,13 @@ namespace XE {
         static Matrix<T, R, C> createRotationY(const T radians) {
             auto result = Matrix<T, R, C>::createIdentity();
             
-            const T Cos = std::cos(radians);
-            const T Sin = std::sin(radians);
+            const T cos = std::cos(radians);
+            const T sin = std::sin(radians);
             
-            result(0, 0) = Cos;
-            result(2, 2) = Cos;
-            result(0, 2) = -Sin;
-            result(2, 0) = Sin;
+            result(0, 0) = cos;
+            result(2, 2) = cos;
+            result(0, 2) = -sin;
+            result(2, 0) = sin;
             
             return result;
         }
@@ -353,13 +342,13 @@ namespace XE {
         static Matrix<T, R, C> createRotationZ(const T radians) {
             auto result = Matrix<T, R, C>::createIdentity();
             
-            const T Cos = std::cos(radians);
-            const T Sin = std::sin(radians);
+            const T cos = std::cos(radians);
+            const T sin = std::sin(radians);
             
-            result(0, 0) = Cos;
-            result(1, 1) = Cos;
-            result(0, 1) = Sin;
-            result(1, 0) = -Sin;
+            result(0, 0) = cos;
+            result(1, 1) = cos;
+            result(0, 1) = sin;
+            result(1, 0) = -sin;
             
             return result;
         }
@@ -368,11 +357,11 @@ namespace XE {
          * @brief Build a arbitrary rotation matrix 
          */
         static auto createRotation(const T rads, const Vector<T, 3> &axis) {
-            if constexpr ( (C>=3 && C<=4) && (R>=3 && R<=4) ) {
-                const auto I = Matrix<T, 3, 3>::createIdentity();
-
+            if constexpr ( (C>=3 && C<=4) && (R>=3 && R<=4) ) {                
                 assert(!std::isnan(rads));
                 assert(!std::isinf(rads));
+
+                const auto I = Matrix<T, 3, 3>::createIdentity();
 
                 const T cos = std::cos(rads);
                 const T sin = std::sin(rads);
@@ -446,7 +435,8 @@ namespace XE {
         
         static auto createOrthographic(const Vector<T, 3> &pmin,  const Vector<T, 3> &pmax) {
             if constexpr (C==4 && R==4) {
-                auto diff = pmax - pmin;
+                const T diff = pmax - pmin;
+                
                 auto result = Matrix<T, 4, 4>::createIdentity();
                 
                 result(0, 0) = T(2) / diff.X;
