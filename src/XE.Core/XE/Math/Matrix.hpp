@@ -302,7 +302,7 @@ namespace XE {
         static Matrix<T, R, C> createTranslation(const Vector<T, R> &displace) {
             auto result = Matrix<T, R, C>::createIdentity();
             
-            result.setRow(C - 1, displace);
+            result.setColumn(C - 1, displace);
             
             return result;
         }
@@ -333,8 +333,8 @@ namespace XE {
             
             result(0, 0) = cos;
             result(2, 2) = cos;
-            result(0, 2) = -sin;
-            result(2, 0) = sin;
+            result(0, 2) = sin;
+            result(2, 0) = -sin;
             
             return result;
         }
@@ -347,8 +347,8 @@ namespace XE {
             
             result(0, 0) = cos;
             result(1, 1) = cos;
-            result(0, 1) = sin;
-            result(1, 0) = -sin;
+            result(0, 1) = -sin;
+            result(1, 0) = sin;
             
             return result;
         }
@@ -655,8 +655,19 @@ namespace XE {
     Vector<T, R> Matrix<T, R, C>::operator* (const Vector<T, R> &v) const {
         Vector<T, R> result;
 
+        for (int row=0; row<R; row++) {
+            result[row] = dot(this->getRow(row), v);
+        }
+
+        return result;
+    }
+
+    template<typename T, int R, int C>
+    Vector<T, C> operator* (const Vector<T, C> &v, const Matrix<T, R, C> &m) {
+        Vector<T, C> result;
+
         for (int col=0; col<C; col++) {
-            result[col] = dot(this->getColumn(col), v);
+            result[col] = dot(m.getColumn(col), v);
         }
 
         return result;
