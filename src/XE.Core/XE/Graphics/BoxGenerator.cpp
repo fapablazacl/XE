@@ -1,7 +1,7 @@
 
 #include "BoxGenerator.hpp"
 
-#include <XE/Math/Util.hpp>
+#include <XE/Math/Common.hpp>
 
 namespace XE {
     const int faceCount = 6;

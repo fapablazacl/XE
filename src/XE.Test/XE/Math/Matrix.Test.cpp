@@ -1,39 +1,28 @@
 
 #include <catch.hpp>
 
-#include <XE/Math/Util.hpp>
+#include <XE/Math/Common.hpp>
 #include <XE/Math/Matrix.hpp>
-
-#include <iostream>
 
 namespace Catch {
     template<>
     struct StringMaker<XE::Matrix2f> {
         static std::string convert(XE::Matrix2f const& value) {
-            std::stringstream ss;
-            ss << value;
-
-            return ss.str();
+            return XE::toString(value);
         }
     };
 
     template<>
     struct StringMaker<XE::Matrix3f> {
         static std::string convert(XE::Matrix3f const& value) {
-            std::stringstream ss;
-            ss << value;
-
-            return ss.str();
+            return XE::toString(value);
         }
     };
 
     template<>
     struct StringMaker<XE::Matrix4f> {
         static std::string convert(XE::Matrix4f const& value) {
-            std::stringstream ss;
-            ss << value;
-
-            return ss.str();
+            return XE::toString(value);
         }
     };
 }
@@ -515,6 +504,26 @@ TEST_CASE("Math::Matrix<3, float>") {
         REQUIRE(Matrix4f::createRotation(1.0f * pi<float>, {0.0f, 0.0f, 1.0f}) == Matrix4f::createRotationZ(1.0f * pi<float>));
         REQUIRE(Matrix4f::createRotation(1.5f * pi<float>, {0.0f, 0.0f, 1.0f}) == Matrix4f::createRotationZ(1.5f * pi<float>));
         REQUIRE(Matrix4f::createRotation(2.0f * pi<float>, {0.0f, 0.0f, 1.0f}) == Matrix4f::createRotationZ(2.0f * pi<float>));
+    }
+
+    SECTION("createLookAt should create a transform matrix that simulate a standard look-at camera") {
+        const auto m1 = Matrix4f::createLookAt({0.0f, 0.0f, 1.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f});
+        
+        REQUIRE(m1 == Matrix4f{
+            {1.0f, 0.0f, 0.0f, 0.0f},
+            {0.0f, 1.0f, 0.0f, 0.0f},
+            {0.0f, 0.0f, 1.0f, -1.0f},
+            {0.0f, 0.0f, 0.0f, 1.0f}
+        });
+
+        const auto m2 = Matrix4f::createLookAt({1.0f, 1.0f, 0.0f}, {0.0f, 1.0f, -1.0f}, {0.0f, 1.0f, 0.0f});
+
+        REQUIRE(m2 == Matrix4f{
+            {0.707107f  , 0.0f, -0.707107f  , -0.707107f},
+            {0.0f       , 1.0f, 0.0f        , -1.0f},
+            {0.707107f  , 0.0f, 0.707107f   , -0.707107f},
+            {0.0f       , 0.0f, 0.0f        , 1.0f}
+        });
     }
 
     SECTION("Determinant should compute the matrix determinant correctly") {

@@ -2,6 +2,7 @@
 #ifndef __XE_MATH_HPP__
 #define __XE_MATH_HPP__
 
+#include <XE/Math/Common.hpp>
 #include <XE/Math/Boundary.hpp>
 #include <XE/Math/Ellipsoid.hpp>
 #include <XE/Math/Vector.hpp>
@@ -13,6 +14,5 @@
 #include <XE/Math/Box.hpp>
 #include <XE/Math/Sphere.hpp>
 #include <XE/Math/Triangle.hpp>
-#include <XE/Math/Util.hpp>
 
 #endif

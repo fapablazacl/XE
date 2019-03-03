@@ -31,8 +31,8 @@ set (src_xe_io
 )
 
 set (src_xe_math
-	"XE/Math/Util.hpp"
-    "XE/Math/Util.cpp"
+	"XE/Math/Common.hpp"
+    "XE/Math/Common.cpp"
     "XE/Math/Vector.hpp"
     "XE/Math/Vector.cpp"
 	"XE/Math/Matrix.hpp"

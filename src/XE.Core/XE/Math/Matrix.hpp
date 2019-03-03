@@ -672,6 +672,21 @@ namespace XE {
 
         return result;
     }
+
+    template<typename T, int R, int C>
+    std::string toString(const XE::Matrix<T, R, C>& m) {
+        std::string result;
+
+        result += "{\n";
+
+        for (int i=0; i<R; ++i) {
+            result += "    " + toString(m.getRow(i)) + "\n";
+        }
+
+        result += "}";
+
+        return result;
+    }
 }
 
 namespace std {
