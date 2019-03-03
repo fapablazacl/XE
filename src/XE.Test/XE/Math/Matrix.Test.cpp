@@ -539,6 +539,24 @@ TEST_CASE("Math::Matrix<3, float>") {
         });
     }
 
+    SECTION("createPerspective should create a perspective transformation matrix") {
+        const auto m1 = Matrix4f::createPerspective(radians(60.0f), 1.33333f, 0.1f, 100.0f);
+        REQUIRE(m1 == Matrix4f {
+            {1.299041152f, 0.000000000f, 0.000000000f, 0.000000000f},
+            {0.000000000f, 1.732050657f, 0.000000000f, 0.000000000f},
+            {0.000000000f, 0.000000000f, -1.002002001f, -0.200200200f},
+            {0.000000000f, 0.000000000f, -1.000000000f, 1.000000000f}
+        });
+
+        const auto m2 = Matrix4f::createPerspective(radians(120.0f), 1.33333f, 0.1f, 100.0f);
+        REQUIRE(m2 == Matrix4f {
+            {0.433013767f, 0.000000000f, 0.000000000f, 0.000000000f},
+            {0.000000000f, 0.577350259f, 0.000000000f, 0.000000000f},
+            {0.000000000f, 0.000000000f, -1.002002001f, -0.200200200f},
+            {0.000000000f, 0.000000000f, -1.000000000f, 1.000000000f}
+        });
+    }
+
     SECTION("createOrthographic should create a orthographic transformation matrix") {
         const auto m1 = Matrix4f::createOrthographic({-1.0f, -1.0f, -1.0f}, {1.0f, 1.0f, 1.0f});
         REQUIRE(m1 == Matrix4f {
