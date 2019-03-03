@@ -217,6 +217,16 @@ namespace XE {
         return v1.X*v2.Y - v1.Y*v2.X;
     }
 
+    template<typename T>
+    Vector<T, 3> triple_cross(const Vector<T, 3> &v1, const Vector<T, 3> &v2, const Vector<T, 3> &v3) {
+        return cross(cross(v1, v2), v3);
+    }
+    
+    template<typename T>
+    T triple_dot(const Vector<T, 3> &v1, const Vector<T, 3> &v2, const Vector<T, 3> &v3) {
+        return dot(cross(v1, v2), v3);
+    }
+    
     template<typename T, int N>
     T norm(const Vector<T, N> &v) {
         return static_cast<T>(std::sqrt(dot(v, v)));
@@ -464,13 +474,13 @@ namespace XE {
      * @brief Convert a Vector into a JSON-like string representation
      */
     template<typename T, int N>
-    std::string toString(const XE::Vector<T, N> &v) {
+    std::string toString(const XE::Vector<T, N> &v, const int precision) {
         std::string result;
 
         result += "{";
 
         for (int i=0; i<N; i++) {
-            result += std::to_string(v[i]);
+            result += toString(v[i], precision);
 
             if (i < N - 1) {
                 result += ", ";

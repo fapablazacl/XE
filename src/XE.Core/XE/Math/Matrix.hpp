@@ -674,13 +674,13 @@ namespace XE {
     }
 
     template<typename T, int R, int C>
-    std::string toString(const XE::Matrix<T, R, C>& m) {
+    std::string toString(const XE::Matrix<T, R, C>& m, const int precision) {
         std::string result;
 
         result += "{\n";
 
         for (int i=0; i<R; ++i) {
-            result += "    " + toString(m.getRow(i)) + "\n";
+            result += "    " + toString(m.getRow(i), precision) + "\n";
         }
 
         result += "}";

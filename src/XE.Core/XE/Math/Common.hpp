@@ -9,6 +9,8 @@
 #include <limits>
 #include <cmath>
 #include <cassert>
+#include <string>
+#include <sstream>
 
 namespace XE {
     /**
@@ -23,6 +25,16 @@ namespace XE {
         } else {
             return std::abs(a - b) <= epsilon;
         }
+    }
+
+    template<typename T>
+    std::string toString(const T value, const int precision) {
+        std::ostringstream ss;
+        
+        ss.precision(precision);
+        ss << std::fixed << value;
+
+        return ss.str();
     }
 
     template<typename T>

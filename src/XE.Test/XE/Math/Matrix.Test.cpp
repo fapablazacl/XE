@@ -4,25 +4,27 @@
 #include <XE/Math/Common.hpp>
 #include <XE/Math/Matrix.hpp>
 
+static const int precision = std::numeric_limits<float>::max_digits10;
+
 namespace Catch {
     template<>
     struct StringMaker<XE::Matrix2f> {
         static std::string convert(XE::Matrix2f const& value) {
-            return XE::toString(value);
+            return XE::toString(value, precision);
         }
     };
 
     template<>
     struct StringMaker<XE::Matrix3f> {
         static std::string convert(XE::Matrix3f const& value) {
-            return XE::toString(value);
+            return XE::toString(value, precision);
         }
     };
 
     template<>
     struct StringMaker<XE::Matrix4f> {
         static std::string convert(XE::Matrix4f const& value) {
-            return XE::toString(value);
+            return XE::toString(value, precision);
         }
     };
 }
@@ -508,7 +510,6 @@ TEST_CASE("Math::Matrix<3, float>") {
 
     SECTION("createLookAt should create a transform matrix that simulate a standard look-at camera") {
         const auto m1 = Matrix4f::createLookAt({0.0f, 0.0f, 1.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f});
-        
         REQUIRE(m1 == Matrix4f{
             {1.0f, 0.0f, 0.0f, 0.0f},
             {0.0f, 1.0f, 0.0f, 0.0f},
@@ -517,12 +518,24 @@ TEST_CASE("Math::Matrix<3, float>") {
         });
 
         const auto m2 = Matrix4f::createLookAt({1.0f, 1.0f, 0.0f}, {0.0f, 1.0f, -1.0f}, {0.0f, 1.0f, 0.0f});
-
         REQUIRE(m2 == Matrix4f{
-            {0.707107f  , 0.0f, -0.707107f  , -0.707107f},
-            {0.0f       , 1.0f, 0.0f        , -1.0f},
-            {0.707107f  , 0.0f, 0.707107f   , -0.707107f},
-            {0.0f       , 0.0f, 0.0f        , 1.0f}
+            {0.707106829f   , 0.0f, -0.707106829f   , -0.707106829f},
+            {0.0f           , 1.0f, 0.0f            , -1.0f},
+            {0.707106769f   , 0.0f, 0.707106769f    , -0.707106769f},
+            {0.0f           , 0.0f, 0.0f            , 1.0f}
+        });
+
+        const auto m3 = Matrix4f::createLookAt(
+            {123.34234f, 0.3421123f, -53.663421f}, 
+            {23.8337f, 1.0f, 53.36153f}, 
+            {0.3121f, 1.56f, 0.2625f}
+        );
+        
+        REQUIRE(m3 == Matrix4f{
+            {-0.707828343f, 0.252613336f, -0.659670711f, 51.818592072f},
+            {0.187970579f, 0.967556715f, 0.168821856f, -14.456184387f},
+            {0.680915534f, -0.004501780f, -0.732348025f, -123.284477234f},
+            {0.0f, 0.0f, 0.0f, 1.0f}
         });
     }
 
