@@ -435,7 +435,7 @@ namespace XE {
         
         static auto createOrthographic(const Vector<T, 3> &pmin,  const Vector<T, 3> &pmax) {
             if constexpr (C==4 && R==4) {
-                const T diff = pmax - pmin;
+                const auto diff = pmax - pmin;
                 
                 auto result = Matrix<T, 4, 4>::createIdentity();
                 

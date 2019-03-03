@@ -539,6 +539,40 @@ TEST_CASE("Math::Matrix<3, float>") {
         });
     }
 
+    SECTION("createOrthographic should create a orthographic transformation matrix") {
+        const auto m1 = Matrix4f::createOrthographic({-1.0f, -1.0f, -1.0f}, {1.0f, 1.0f, 1.0f});
+        REQUIRE(m1 == Matrix4f {
+            {1.0f, 0.0f, 0.0f, 0.0f},
+            {0.0f, 1.0f, 0.0f, 0.0f},
+            {0.0f, 0.0f, -1.0f, 0.0f},
+            {0.0f, 0.0f, 0.0f, 1.0f},
+        });
+
+        const auto m2 = Matrix4f::createOrthographic({-2.0f, -2.0f, -2.0f}, {2.0f, 2.0f, 2.0f});
+        REQUIRE(m2 == Matrix4f {
+            {0.5f, 0.0f, 0.0f, 0.0f},
+            {0.0f, 0.5f, 0.0f, 0.0f},
+            {0.0f, 0.0f, -0.5f, 0.0f},
+            {0.0f, 0.0f, 0.0f, 1.0f},
+        });
+
+        const auto m3 = Matrix4f::createOrthographic({-0.5f, -1.5f, 0.0f}, {2.5f, 3.5f, 100.0f});
+        REQUIRE(m3 == Matrix4f {
+            {0.666666687f, 0.000000000f, 0.000000000f, -0.666666687f},
+            {0.000000000f, 0.400000006f, 0.000000000f, -0.400000006f},
+            {0.000000000f, 0.000000000f, -0.020000000f, -1.000000000f},
+            {0.000000000f, 0.000000000f, 0.000000000f, 1.000000000f}
+        });
+
+        const auto m4 = Matrix4f::createOrthographic({-0.5f, -1.5f, 100.0f}, {2.5f, 3.5f, -50.0f});
+        REQUIRE(m4 == Matrix4f {
+            {0.666666687f, 0.000000000f, 0.000000000f, -0.666666687f},
+            {0.000000000f, 0.400000006f, 0.000000000f, -0.400000006f},
+            {0.000000000f, 0.000000000f, 0.013333334f, 0.333333343f},
+            {0.000000000f, 0.000000000f, 0.000000000f, 1.000000000f}
+        });
+    }
+    
     SECTION("Determinant should compute the matrix determinant correctly") {
         const Matrix4f matA = {
             {1.0f, 2.0f, 1.0f, 0.0f}, 
