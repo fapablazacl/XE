@@ -38,6 +38,7 @@ namespace XE {
     enum class PixelFormat;
     enum class ShaderType;
 
+    struct Viewport;
     struct BufferDescriptor;
     struct SubsetEnvelope;
     struct VertexLayout;
@@ -54,11 +55,6 @@ namespace XE {
 
     struct SubsetDescriptor;
     struct ProgramDescriptor;
-
-    struct Viewport {
-        Vector2i position;
-        Vector2i size;
-    };
 
     /**
      * @brief The 'Window' that is beign used as the render target for the graphics device contents

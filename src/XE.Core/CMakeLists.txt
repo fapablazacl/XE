@@ -96,6 +96,8 @@ set (src_xe_graphics
 	"XE/Graphics/ImageLoader.cpp"
 	"XE/Graphics/Material.hpp"
 	"XE/Graphics/Material.cpp"
+	"XE/Graphics/Viewport.hpp"
+	"XE/Graphics/Viewport.cpp"
 
 	"XE/Graphics/ShapeGenerator.hpp"
 	"XE/Graphics/ShapeGenerator.cpp"
@@ -105,6 +107,11 @@ set (src_xe_graphics
 	"XE/Graphics/PlaneGenerator.cpp"
 	"XE/Graphics/BoxGenerator.hpp"
 	"XE/Graphics/BoxGenerator.cpp"
+)
+
+set (src_xe_scene
+	"XE/Scene/Projection.hpp"
+	"XE/Scene/Projection.cpp"
 )
 
 set (src_xe_input
@@ -131,6 +138,7 @@ source_group ("\\XE" FILES ${src_xe})
 source_group ("\\XE\\Math" FILES ${src_xe_math})
 source_group ("\\XE\\IO" FILES ${src_xe_io})
 source_group ("\\XE\\Graphics" FILES ${src_xe_graphics})
+source_group ("\\XE\\Scene" FILES ${src_xe_scene})
 source_group ("\\XE\\Input" FILES ${src_xe_input})
 source_group ("\\XE\\UI" FILES ${src_xe_ui})
 source_group ("\\XE\\Util" FILES ${src_xe_util})
@@ -140,6 +148,7 @@ add_library (${target}
 	${src_xe_math} 
 	${src_xe_io} 
 	${src_xe_graphics} 
+	${src_xe_scene}
 	${src_xe_input} 
 	${src_xe_ui}
 	${src_xe_util}
