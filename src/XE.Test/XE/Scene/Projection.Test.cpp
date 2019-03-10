@@ -28,6 +28,11 @@ TEST_CASE("XE::Graphics::project function") {
             REQUIRE(XE::project({-2.0f, 0.0f, 0.0f, 1.0f}, projViewModel, viewport) == XE::Vector4f{-320.0f, 240.0f, 0.0f, 1.0f});
             REQUIRE(XE::project({-2.0f, 2.0f, 0.0f, 1.0f}, projViewModel, viewport) == XE::Vector4f{-320.0f, 720.0f, 0.0f, 1.0f});
         }
+
+        SECTION("Vectors (with W = 0) should keep pointing in the same direction") {
+            const auto projected = XE::project({1.0f, 1.0f, 0.0f, 0.0f}, projViewModel, viewport);
+            REQUIRE(projected == XE::Vector4f{640.0f, 480.0f, 0.0f, 0.0f});
+        }
     }
 
     SECTION("When consideraring a perspective transformation pipeline, with a viewport of (0, 0) - (640, 480)") {

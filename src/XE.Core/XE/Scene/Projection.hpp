@@ -14,9 +14,12 @@ namespace XE {
     Vector<T, 4> project(const Vector<T, 4> &world, const Matrix<T, 4, 4> &projViewModel, const Viewport &viewport) {
         const auto window = projViewModel * world;
 
-        // TODO: Add checking via Machine Epsilon
+        auto clip = window;
 
-        const auto clip = window / window.W;
+        if (clip.W > T(0.0)) {
+             clip /= window.W;
+        }
+
         const auto screen = Vector<T, 4> {
             (clip.X + T(1.0)) * T(0.5) * viewport.size.X + viewport.position.X,
             (clip.Y + T(1.0)) * T(0.5) * viewport.size.Y + viewport.position.Y,
