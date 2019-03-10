@@ -5,7 +5,7 @@ set (src "Main.cpp")
 set (src_xe_math 
     "XE/Math/Common.Test.cpp"
     "XE/Math/Vector.Test.cpp"
-	"XE/Math/Matrix.Test.cpp"
+    "XE/Scene/Projection.Test.cpp"
 )
 
 source_group("\\" FILES ${src})

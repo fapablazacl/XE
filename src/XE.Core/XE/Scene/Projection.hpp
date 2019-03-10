@@ -17,7 +17,7 @@ namespace XE {
         // TODO: Add checking via Machine Epsilon
 
         const auto clip = window / window.W;
-        const auto screen = {
+        const auto screen = Vector<T, 4> {
             (clip.X + T(1.0)) * T(0.5) * viewport.size.X + viewport.position.X,
             (clip.Y + T(1.0)) * T(0.5) * viewport.size.Y + viewport.position.Y,
             clip.Z,
