@@ -45,3 +45,24 @@ TEST_CASE("XE::Graphics::project function") {
         REQUIRE(XE::project({0.0f, 0.0f, 0.0f, 1.0f}, projViewModel, viewport).Y == 240.0f);
     }
 }
+
+
+TEST_CASE("XE::Graphics::unproject function") {
+    SECTION("When considering a default transformation pipeline, with a viewport of (0, 0) - (640, 480)") {
+        const XE::Matrix4f projViewModel = XE::Matrix4f::createIdentity();
+        const XE::Viewport viewport = { {0, 0}, {640, 480} };
+
+        SECTION("Points placed inside the screen are in the [-1, 1]^2 domain") {
+            REQUIRE(XE::unproject({320.0f, 240.0f, 0.0f, 1.0f}, projViewModel, viewport) == XE::Vector4f{0.0f, 0.0f, 0.0f, 1.0f});
+            REQUIRE(XE::unproject({0.0f, 240.0f, 0.0f, 1.0f}, projViewModel, viewport) == XE::Vector4f{-1.0f, 0.0f, 0.0f, 1.0f});
+            REQUIRE(XE::unproject({640.0f, 240.0f, 0.0f, 1.0f}, projViewModel, viewport) == XE::Vector4f{1.0f, 0.0f, 0.0f, 1.0f});
+            REQUIRE(XE::unproject({320.0f, 480.0f, 0.0f, 1.0f}, projViewModel, viewport) == XE::Vector4f{0.0f, 1.0f, 0.0f, 1.0f});
+            REQUIRE(XE::unproject({320.0f, 0.0f, 0.0f, 1.0f} , projViewModel, viewport) == XE::Vector4f{0.0f, -1.0f, 0.0f, 1.0f});
+        }
+
+        SECTION("Points placed outside the screen are out of the [-1.0, 1.0]^2") {
+            REQUIRE(XE::unproject({-320.0f, 240.0f, 0.0f, 1.0f}, projViewModel, viewport) == XE::Vector4f{-2.0f, 0.0f, 0.0f, 1.0f});
+            REQUIRE(XE::unproject({-320.0f, 720.0f, 0.0f, 1.0f}, projViewModel, viewport) == XE::Vector4f{-2.0f, 2.0f, 0.0f, 1.0f});
+        }
+    }
+}

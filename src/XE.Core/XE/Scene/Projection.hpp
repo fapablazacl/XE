@@ -16,6 +16,7 @@ namespace XE {
 
         auto clip = window;
 
+        // TODO: Add check with machine epsilon
         if (clip.W > T(0.0)) {
              clip /= window.W;
         }
@@ -35,21 +36,21 @@ namespace XE {
      */
     template<typename T>
     Vector<T, 4> unproject(const Vector<T, 4> &screen, const Matrix<T, 4, 4> &invProjViewModel, const Viewport &viewport) {
-        const auto clip = {
+        const auto clip = Vector<T, 4> {
             (screen.X - viewport.position.X) / (T(0.5) * viewport.size.X) - T(1.0),
             (screen.Y - viewport.position.Y) / (T(0.5) * viewport.size.Y) - T(1.0),
             screen.Z,
             screen.W
         };
 
-        const auto world = invProjViewModel * clip;
+        auto world = invProjViewModel * clip;
 
-        // TODO: Add checking via Machine Epsilon
-        if (world.W == T(0.0)) {
-            return world;
+        // TODO: Add check with machine epsilon
+        if (world.W > T(0.0)) {
+             world /= world.W;
         }
 
-        return world * (T(1) / world.W);
+        return world;
     }
 }
 
