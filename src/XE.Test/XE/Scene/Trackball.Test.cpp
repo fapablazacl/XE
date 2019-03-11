@@ -29,6 +29,7 @@ TEST_CASE("XE::Trackball class") {
         REQUIRE(rotation.angle == 0.0);
     }
 
+    /*
     SECTION("should generate a rotation around the Y axis with a horizontal mouse movement, inside the virtual unit trackball") {
         auto trackball = XE::Trackball{{100, 100}};
 
@@ -54,4 +55,5 @@ TEST_CASE("XE::Trackball class") {
         REQUIRE(rotation.axis == XE::Vector3f{1.0f, 0.0f, 0.0f});
         REQUIRE(rotation.angle > 0.0f);
     }
+    */
 }
