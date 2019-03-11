@@ -6,6 +6,9 @@
 #include <XE/Math/Rotation.hpp>
 
 namespace XE {
+    /**
+     * @brief Generate rotation information
+     */
     class Trackball {
     public:
         Trackball(const Vector2i &size);
@@ -33,6 +36,9 @@ namespace XE {
         Vector2i getSize() const {
             return size;
         }
+
+    private:
+        Vector3f mapToSphere(const Vector2i &position) const;
 
     private:
         Vector2i size;

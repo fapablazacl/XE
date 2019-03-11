@@ -25,4 +25,11 @@ namespace XE {
     Rotation<float> Trackball::computeRotation() const {
         return {0.0f, {0.0f, 0.0f, 0.0f}};
     }
+
+    Vector3f Trackball::mapToSphere(const Vector2i &position) const {
+        // map position to the [-1, 1] range
+        const float x = position.X / (0.5f * size.X) - 1.0f;
+
+        return Vector3f{};
+    }
 }
