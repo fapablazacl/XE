@@ -112,6 +112,8 @@ set (src_xe_graphics
 set (src_xe_scene
 	"XE/Scene/Projection.hpp"
 	"XE/Scene/Projection.cpp"
+	"XE/Scene/Trackball.hpp"
+	"XE/Scene/Trackball.cpp"
 )
 
 set (src_xe_input

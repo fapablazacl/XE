@@ -6,14 +6,10 @@
 #include <cstdint>
 #include <cassert>
 
-#include "Vector.hpp"
+#include <XE/Math/Vector.hpp>
+#include <XE/Math/Rotation.hpp>
 
 namespace XE {
-    template<typename T>
-    struct Rotation {
-        T angle;
-        Vector<T, 3> axis;
-    };
 
     template<typename T>
     struct Quaternion {
