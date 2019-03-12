@@ -18,7 +18,7 @@ namespace Catch {
     };
 }
 
-TEST_CASE("XE::Vector<3, float>") {
+TEST_CASE("XE::Vector<3, float>", "[Vector]") {
     SECTION("constructor should setup the vector components correctly") {
         const Vector3f v = {1.0f, 2.0f, 3.0f};
 

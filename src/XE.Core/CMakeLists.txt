@@ -114,6 +114,8 @@ set (src_xe_scene
 	"XE/Scene/Projection.cpp"
 	"XE/Scene/Trackball.hpp"
 	"XE/Scene/Trackball.cpp"
+	"XE/Scene/VirtualSphere.hpp"
+	"XE/Scene/VirtualSphere.cpp"
 )
 
 set (src_xe_input

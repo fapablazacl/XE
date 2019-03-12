@@ -3,7 +3,7 @@
 #include <XE/Math/Common.hpp>
 #include <XE/Scene/Projection.hpp>
 
-TEST_CASE("XE::Graphics::project function") {
+TEST_CASE("XE::Graphics::project function", "[Projection]") {
     SECTION("When considering a default transformation pipeline, with a viewport of (0, 0) - (640, 480)") {
         const XE::Matrix4f projViewModel = XE::Matrix4f::createIdentity();
         const XE::Viewport viewport = { {0, 0}, {640, 480} };

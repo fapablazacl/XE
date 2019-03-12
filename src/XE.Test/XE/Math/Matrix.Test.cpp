@@ -31,7 +31,7 @@ namespace Catch {
 
 using namespace XE;
 
-TEST_CASE("Math::Matrix<3, float>") {
+TEST_CASE("Math::Matrix<3, float>", "[Matrix]") {
     SECTION("constructor should setup the matrix components correctly") {
         SECTION("for two-dimensional matrices") {      
             const Matrix2f m = {

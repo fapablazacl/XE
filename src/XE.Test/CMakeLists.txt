@@ -12,6 +12,7 @@ set (src_xe_math
 set (src_xe_scene
     "XE/Scene/Projection.Test.cpp"
     "XE/Scene/Trackball.Test.cpp"
+    "XE/Scene/VirtualSphere.Test.cpp"
 )
 
 source_group("\\" FILES ${src})

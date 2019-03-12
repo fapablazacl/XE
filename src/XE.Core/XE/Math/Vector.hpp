@@ -46,15 +46,15 @@ namespace XE {
         }
 
         VectorBase(const VectorBase<T, 2> &v, T z) {
-            X = v.x;
-            Y = v.y;
+            X = v.X;
+            Y = v.Y;
             Z = z;
         }
 
         VectorBase(T x, const VectorBase<T, 2> &v) {
             X = x;
-            Y = v.x;
-            Z = v.y;
+            Y = v.X;
+            Z = v.Y;
         }
     };
     

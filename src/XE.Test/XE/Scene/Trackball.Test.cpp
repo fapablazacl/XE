@@ -2,7 +2,7 @@
 #include <catch.hpp>
 #include <XE/Scene/Trackball.hpp>
 
-TEST_CASE("XE::Trackball class") {
+TEST_CASE("XE::Trackball class", "[Trackball]") {
     SECTION("should fill its fields properly") {
         REQUIRE(XE::Trackball{{640, 480}}.getSize() == XE::Vector2i{640, 480});
         REQUIRE(XE::Trackball{{800, 600}}.getSize() == XE::Vector2i{800, 600});
@@ -29,7 +29,6 @@ TEST_CASE("XE::Trackball class") {
         REQUIRE(rotation.angle == 0.0);
     }
 
-    /*
     SECTION("should generate a rotation around the Y axis with a horizontal mouse movement, inside the virtual unit trackball") {
         auto trackball = XE::Trackball{{100, 100}};
 
@@ -43,6 +42,7 @@ TEST_CASE("XE::Trackball class") {
         REQUIRE(rotation.angle > 0.0f);
     }
 
+    /*
     SECTION("should generate a rotation around the X axis with a horizontal mouse movement, inside the virtual unit trackball") {
         auto trackball = XE::Trackball{{100, 100}};
 
