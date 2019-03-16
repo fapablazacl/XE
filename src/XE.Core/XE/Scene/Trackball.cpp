@@ -19,7 +19,7 @@ namespace XE {
     }
 
     void Trackball::resize(const Vector2i &size) {
-        this->size = size;
+        vsphere.setScreenSize(size);
     }
 
     Rotation<float> Trackball::computeRotation() const {
@@ -29,7 +29,7 @@ namespace XE {
     Vector2f Trackball::scalePosition(const Vector2i &position) const {
         // map position to the [-1, 1]^2 range domain
         const Vector2f position_f = position;
-        const Vector2f size_f = size;
+        const Vector2f size_f = vsphere.getScreenSize();
         const Vector2f mappedPosition = (position_f / (0.5f * size_f)) - Vector2f{1.0f};
 
         return mappedPosition;

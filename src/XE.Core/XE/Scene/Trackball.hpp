@@ -4,31 +4,10 @@
 
 #include <XE/Math/Vector.hpp>
 #include <XE/Math/Rotation.hpp>
+#include <XE/Math/Quaternion.hpp>
+#include <XE/Scene/VirtualSphere.hpp>
 
 namespace XE {
-
-    /**
-     * @brief Virtual sphere living into a screen. Used as an utility in the Trackball class.
-     */
-    class VirtualSphere {
-    public:
-        VirtualSphere(const Vector2i &screenSize, const float radius);
-
-        Vector2i getScreenSize() const;
-
-        void setScreenSize(const Vector2i &value);
-
-        float getRadius() const;
-
-        void setRadius(const float value);
-
-        Vector3f computePointAt(const Vector2i &screenPosition) const;
-
-    private:
-        Vector2i screenSize;
-        float radius;
-    };
-
     /**
      * @brief Generate rotation information
      */
@@ -56,8 +35,8 @@ namespace XE {
             return dragCurrent;
         }
 
-        Vector2i getSize() const {
-            return size;
+        VirtualSphere getVirtualSphere() const {
+            return vsphere;
         }
 
     private:
@@ -66,7 +45,7 @@ namespace XE {
         Vector3f computeSpherePosition(const Vector2f &normalizedPosition) const;
 
     private:
-        Vector2i size;
+        VirtualSphere vsphere;
         Vector2i dragBegin;
         Vector2i dragEnd;
         Vector2i dragCurrent;

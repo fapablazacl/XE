@@ -52,3 +52,28 @@ TEST_CASE("VirtualSphere computePointAt method should return points lying into t
         } 
     } 
 } 
+
+TEST_CASE("VirtualSphere comparison operators should compare sizes", "[VirtualSphere]") {
+    SECTION("Given virtual spheres with standard sizes") {
+        auto vs1 = XE::VirtualSphere{{640, 480}};
+        auto vs2 = XE::VirtualSphere{{800, 600}};
+        auto vs3 = XE::VirtualSphere{{640, 480}};
+        auto vs4 = XE::VirtualSphere{{800, 600}};
+
+        SECTION("equality operator should compare the sizes of the virtual sphere") {
+            REQUIRE(vs1 == vs3);
+            REQUIRE(vs3 == vs1);
+
+            REQUIRE(vs2 == vs4);
+            REQUIRE(vs4 == vs2);
+        }
+
+        SECTION("inequality operator should compare the sizes of the virtual sphere") {
+            REQUIRE(vs1 != vs2);
+            REQUIRE(vs2 != vs1);
+
+            REQUIRE(vs3 != vs4);
+            REQUIRE(vs4 != vs3);
+        }
+    }
+}

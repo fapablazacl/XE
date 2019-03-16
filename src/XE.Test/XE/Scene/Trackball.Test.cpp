@@ -4,8 +4,8 @@
 
 TEST_CASE("XE::Trackball class", "[Trackball]") {
     SECTION("should fill its fields properly") {
-        REQUIRE(XE::Trackball{{640, 480}}.getSize() == XE::Vector2i{640, 480});
-        REQUIRE(XE::Trackball{{800, 600}}.getSize() == XE::Vector2i{800, 600});
+        REQUIRE(XE::Trackball{{640, 480}}.getVirtualSphere() == XE::VirtualSphere{{640, 480}});
+        REQUIRE(XE::Trackball{{800, 600}}.getVirtualSphere() == XE::VirtualSphere{{800, 600}});
 
         auto trackball = XE::Trackball{{800, 600}};
 

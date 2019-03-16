@@ -23,6 +23,12 @@ namespace XE {
 
         Vector3f computePointAt(const Vector2i &screenPosition) const;
 
+        bool operator== (const VirtualSphere &rhs) const;
+
+        bool operator!= (const VirtualSphere &rhs) const {
+            return !(*this == rhs);
+        }
+
     private:
         Vector2i screenSize;
     };

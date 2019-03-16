@@ -27,4 +27,8 @@ namespace XE {
 
         return {sp, std::sqrt(1.0f - sp_length_squared)};
     }
+
+    bool VirtualSphere::operator== (const VirtualSphere &rhs) const {
+        return screenSize == rhs.screenSize;
+    }
 }
