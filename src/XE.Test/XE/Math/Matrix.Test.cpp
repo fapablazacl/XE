@@ -3,6 +3,7 @@
 
 #include <XE/Math/Common.hpp>
 #include <XE/Math/Matrix.hpp>
+#include <XE/Math/FormatUtils.hpp>
 
 static const int precision = std::numeric_limits<float>::max_digits10;
 

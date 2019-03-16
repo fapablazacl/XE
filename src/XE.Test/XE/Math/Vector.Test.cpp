@@ -1,19 +1,18 @@
 
 #include <catch.hpp>
 #include <XE/Math/Vector.hpp>
+#include <XE/Math/FormatUtils.hpp>
 #include <sstream>
 
 using namespace XE;
+
+static const int precision = std::numeric_limits<float>::max_digits10;
 
 namespace Catch {
     template<>
     struct StringMaker<XE::Vector3f> {
         static std::string convert(XE::Vector3f const& value) {
-            std::stringstream ss;
-
-            ss << value;
-
-            return ss.str();
+            return XE::toString(value, precision);
         }
     };
 }

@@ -2,7 +2,7 @@
 #include <catch.hpp>
 #include <XE/Scene/VirtualSphere.hpp>
 
-TEST_CASE("VirtualSphere accessors should full its fields properly", "[VirtualSphere]") {
+TEST_CASE("VirtualSphere accessors should fill its fields properly", "[VirtualSphere]") {
     SECTION("Given virtual spheres with standard sizes") {
         auto vs1 = XE::VirtualSphere{{640, 480}};
         auto vs2 = XE::VirtualSphere{{800, 600}};
@@ -22,7 +22,7 @@ TEST_CASE("VirtualSphere accessors should full its fields properly", "[VirtualSp
     }
 }
 
-TEST_CASE("VirtualSphere computePointAt should return points lying inside the surface of the sphere", "[VirtualSphere]") {
+TEST_CASE("VirtualSphere computePointAt method should return points lying into the surface of the sphere", "[VirtualSphere]") {
     SECTION("Given virtual spheres with standard sizes") {
         auto vs1 = XE::VirtualSphere{{640, 480}};
         auto vs2 = XE::VirtualSphere{{800, 600}};
@@ -33,8 +33,22 @@ TEST_CASE("VirtualSphere computePointAt should return points lying inside the su
             {{200, 320}},
         };
 
-        for (XE::VirtualSphere sphere : spheres) {
-            REQUIRE(sphere.computePointAt({0, 0}) == XE::Vector3f{-0.707107, -0.707107, 0});
+        SECTION("should compute the coordinates {-0.707106769, -0.707106769, 0} value at the Left-Bottom edge") {
+            REQUIRE(spheres[0].computePointAt({0, 0}) == XE::Vector3f{-0.707106769f, -0.707106769f, 0.0f});
+            REQUIRE(spheres[1].computePointAt({0, 0}) == XE::Vector3f{-0.707106769f, -0.707106769f, 0.0f});
+            REQUIRE(spheres[2].computePointAt({0, 0}) == XE::Vector3f{-0.707106769f, -0.707106769f, 0.0f});
         }
-    }
-}
+
+        SECTION("should compute the coordinates {0.707106769, 0.707106769, 0} value at the right-top edge") {
+            REQUIRE(spheres[0].computePointAt({100, 100}) == XE::Vector3f{0.707106769f, 0.707106769f, 0.0f});
+            REQUIRE(spheres[1].computePointAt({320, 200}) == XE::Vector3f{0.707106769f, 0.707106769f, 0.0f});
+            REQUIRE(spheres[2].computePointAt({200, 320}) == XE::Vector3f{0.707106769f, 0.707106769f, 0.0f});
+        }
+
+        SECTION("should compute the coordinates {0, 0, 1} value at the center of the screen") {
+            REQUIRE(spheres[0].computePointAt({50, 50}) == XE::Vector3f{0.0f, 0.0f, 1.0f});
+            REQUIRE(spheres[1].computePointAt({160, 100}) == XE::Vector3f{0.0f, 0.0f, 1.0f});
+            REQUIRE(spheres[2].computePointAt({100, 160}) == XE::Vector3f{0.0f, 0.0f, 1.0f});
+        } 
+    } 
+} 

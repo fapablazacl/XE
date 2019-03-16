@@ -6,8 +6,6 @@
 #include <cstdint>
 #include <cassert>
 #include <algorithm>
-#include <ostream>
-#include <string>
 
 namespace XE {
     template<typename T, int N>
@@ -468,50 +466,6 @@ namespace XE {
         }
         
         return true;
-    }
-
-    /**
-     * @brief Convert a Vector into a JSON-like string representation
-     */
-    template<typename T, int N>
-    std::string toString(const XE::Vector<T, N> &v, const int precision) {
-        std::string result;
-
-        result += "{";
-
-        for (int i=0; i<N; i++) {
-            result += toString(v[i], precision);
-
-            if (i < N - 1) {
-                result += ", ";
-            }
-        }
-
-        result += "}";
-
-        return result;
-    }
-}
-
-namespace std {
-    /**
-     * @brief Send a string-representation of the supplied row vector
-     */
-    template<typename T, int N>
-    std::ostream& operator<< (std::ostream &os, const XE::Vector<T, N> &v) {
-        os << "[";
-
-        for (int i=0; i<N; i++) {
-            os << v[i];
-
-            if (i < N - 1) {
-                os << ", ";
-            }
-        }
-
-        os << "]";
-
-        return os;
     }
 }
 

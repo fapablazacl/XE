@@ -672,37 +672,6 @@ namespace XE {
 
         return result;
     }
-
-    template<typename T, int R, int C>
-    std::string toString(const XE::Matrix<T, R, C>& m, const int precision) {
-        std::string result;
-
-        result += "{\n";
-
-        for (int i=0; i<R; ++i) {
-            result += "    " + toString(m.getRow(i), precision) + "\n";
-        }
-
-        result += "}";
-
-        return result;
-    }
-}
-
-namespace std {
-    template<typename T, int R, int C>
-    std::ostream& operator<< (std::ostream &os, const XE::Matrix<T, R, C>& m) {
-        os << std::endl;
-
-        for (int i=0; i<R; ++i) {
-            os << m.getRow(i);
-            os << std::endl;
-        }
-
-        os << std::endl;
-
-        return os;
-    }
 }
 
 #endif
