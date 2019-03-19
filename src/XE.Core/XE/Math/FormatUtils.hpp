@@ -98,4 +98,33 @@ namespace std {
     }
 }
 
+
+namespace XE {
+    template<typename T>
+    struct Quaternion;
+
+    /**
+     * @brief Convert a Vector into a JSON-like string representation
+     */
+    template<typename T>
+    std::string toString(const XE::Quaternion<T>& q, const int precision) {
+        constexpr int N = 4;
+        std::stringstream os;
+
+        os << std::setprecision(precision);
+        os << "{";
+
+        for (int i=0; i<N; i++) {
+            os << q.data[i];
+
+            if (i < N - 1) {
+                os << ", ";
+            }
+        }
+
+        os << "}";
+ 
+        return os.str();
+    }
+}
 #endif

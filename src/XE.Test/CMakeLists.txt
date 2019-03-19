@@ -7,6 +7,7 @@ set (src_xe_math
     "XE/Math/Common.Test.cpp"
     "XE/Math/Vector.Test.cpp"
     "XE/Math/Matrix.Test.cpp"
+    "XE/Math/Quaternion.Test.cpp"
 )
 
 set (src_xe_scene

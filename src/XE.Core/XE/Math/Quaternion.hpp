@@ -43,6 +43,13 @@ namespace XE {
             V = v;
             W = T(0);
         }
+                
+        explicit Quaternion(const T x, const T y, const T z) {
+            V.X = x;
+            V.Y = y;
+            V.Z = z;
+            W = T(0);
+        }
         
         Quaternion(const Vector<T, 3> &v, T w) {
             V = v;
