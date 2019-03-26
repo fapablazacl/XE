@@ -10,7 +10,6 @@
 #include <XE/Math/Rotation.hpp>
 
 namespace XE {
-
     template<typename T>
     struct Quaternion {
         union {
@@ -23,6 +22,13 @@ namespace XE {
         };
 
         Quaternion() {}
+
+        Quaternion(const T value) {
+            V.X = value;
+            V.Y = value;
+            V.Z = value;
+            W = value;
+        }
         
         explicit Quaternion(const T *values) {
             assert(values);
@@ -43,7 +49,7 @@ namespace XE {
             V = v;
             W = T(0);
         }
-                
+
         explicit Quaternion(const T x, const T y, const T z) {
             V.X = x;
             V.Y = y;
@@ -91,7 +97,7 @@ namespace XE {
             Quaternion<T> result;
 
             for (int i=0; i<4; i++) {
-                result.data[i] = this->data[i] + rhs.data[i];
+                result.data[i] = this->data[i] - rhs.data[i];
             }
 
             return result;
@@ -118,7 +124,7 @@ namespace XE {
             };
         }
         
-        Quaternion<T> operator / (const Quaternion<T> &rhs) const {
+        Quaternion<T> operator/ (const Quaternion<T> &rhs) const {
             return (*this) * Inverse(rhs);
         }
         
@@ -212,13 +218,13 @@ namespace XE {
             return Quaternion<T>({T(0), T(0), T(0)}, T(1));
         }
         
-        static Quaternion<T> Rotate(const T radians, const Vector<T, 3> &axis) {
+        static Quaternion<T> createRotation(const T radians, const Vector<T, 3> &axis) {
             auto q = Quaternion<T>(axis, std::cos(radians / T(2)));
             
             return normalize(q);
         }
         
-        static Quaternion<T> Rotate(const Vector<T, 3> &v1, const Vector<T, 3> &v2) {
+        static Quaternion<T> createRotation(const Vector<T, 3> &v1, const Vector<T, 3> &v2) {
             auto v = cross(v1, v2);
             auto w = std::sqrt(dot(v1, v1) * dot(v2, v2)) + dot(v1, v2);
             
@@ -252,11 +258,17 @@ namespace XE {
         return dot(q, q);
     }
 
+    /**
+     * @brief Compute the magnitude, module or length (AKA Absolute Value) for a given Quaternion.
+     */
     template<typename T>
-    T abs(const Quaternion<T> &q) {
+    T norm(const Quaternion<T> &q) {
         return static_cast<T>(std::sqrt(norm2(q)));
     }
 
+    /**
+     * @brief Compute a Quaternion with a unit magnitude (1)
+     */
     template<typename T>
     Quaternion<T> normalize(const Quaternion<T> &q) {
         return q / abs(q);
