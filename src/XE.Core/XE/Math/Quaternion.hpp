@@ -201,13 +201,7 @@ namespace XE {
         }
         
         bool operator!= (const Quaternion<T> &rhs) const {
-            for (int i=0; i<4; i++) {
-                if (this->data[i] == rhs.data[i]) {
-                    return false;
-                }
-            }
-
-            return true;
+            return !(*this == rhs);
         }
 
         static Quaternion<T> createZero() {

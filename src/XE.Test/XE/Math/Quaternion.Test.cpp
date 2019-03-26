@@ -79,8 +79,8 @@ TEST_CASE("Quaternion comparison operators should behave correctly", "[Quaternio
             REQUIRE(qa_1 != qb_2);
             REQUIRE(qa_2 != qb_1);
 
-            REQUIRE(qb_1 == qa_2);
-            REQUIRE(qb_2 == qa_1);
+            REQUIRE(qb_1 != qa_2);
+            REQUIRE(qb_2 != qa_1);
         }
     }
 }
