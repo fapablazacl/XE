@@ -132,7 +132,7 @@ namespace XE {
             Quaternion<T> result;
 
             for (int i=0; i<4; i++) {
-                result.data[i] = this->data[i] / s;
+                result.data[i] = this->data[i] * s;
             }
 
             return result;
@@ -233,13 +233,13 @@ namespace XE {
     };
 
     template<typename T>
-    Quaternion<T> Inverse(const Quaternion<T> &q) {
-        return conj(q) * norm2(q);
+    Quaternion<T> conjugate(const Quaternion<T> &q) {
+        return {-q.V, q.W};
     }
 
     template<typename T>
-    Quaternion<T> Conjugate(const Quaternion<T> &q) {
-        return {-q.V, q.W};
+    Quaternion<T> inverse(const Quaternion<T> &q) {
+        return conjugate(q) * norm2(q);
     }
 
     template<typename T>
