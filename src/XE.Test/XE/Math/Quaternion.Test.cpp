@@ -147,11 +147,55 @@ TEST_CASE("Quaternion basic arithmetic operators behave correctly", "[Quaternion
             REQUIRE(q4 * 2.0f == XE::Quaternion<float>{{-2.0f, 0.0f, -2.0f}, 0.0f});
         }
 
+        SECTION("scalar by quaternion operator multiply each component") {
+            REQUIRE(1.0f * q1 == XE::Quaternion<float>{{1.0f, 0.0f, 1.0f}, 1.0f});
+            REQUIRE(0.0f * q2 == XE::Quaternion<float>{{0.0f, 0.0f, 0.0f}, 0.0f});
+            REQUIRE(-1.0f * q3 == XE::Quaternion<float>{{-1.0f, 0.0f, -1.0f}, 0.0f});
+            REQUIRE(2.0f * q4 == XE::Quaternion<float>{{-2.0f, 0.0f, -2.0f}, 0.0f});
+        }
+
         SECTION("divide by scalar operator multiply each component") {
             REQUIRE(q1 / 1.0f == XE::Quaternion<float>{{1.0f, 0.0f, 1.0f}, 1.0f});
             REQUIRE(q2 / 0.5f == XE::Quaternion<float>{{0.0f, 2.0f, 0.0f}, 2.0f});
             REQUIRE(q3 / -1.0f == XE::Quaternion<float>{{-1.0f, 0.0f, -1.0f}, 0.0f});
             REQUIRE(q4 / -0.5f == XE::Quaternion<float>{{2.0f, 0.0f, 2.0f}, 0.0f});
+        }
+    }
+}
+
+TEST_CASE("Quaternion basic arithmetic accumulation operators behave correctly", "[Quaternion]") {
+    SECTION("given some test quaternions") {
+        auto q1 = XE::Quaternion<float>{{1.0f, 0.0f, 1.0f}, 1.0f};
+        auto q2 = XE::Quaternion<float>{{0.0f, 1.0f, 0.0f}, 1.0f};
+        auto q3 = XE::Quaternion<float>{{1.0f, 0.0f, 1.0f}, 0.0f};
+        auto q4 = XE::Quaternion<float>{{-1.0f, 0.0f, -1.0f}, 0.0f};
+        
+        SECTION("addition operator should add their each components together") {
+            REQUIRE((+q1 += q1) == XE::Quaternion<float>{{2.0f, 0.0f, 2.0f}, 2.0f});
+            REQUIRE((+q1 += q2) == XE::Quaternion<float>{{1.0f, 1.0f, 1.0f}, 2.0f});
+            REQUIRE((+q2 += q3) == XE::Quaternion<float>{{1.0f, 1.0f, 1.0f}, 1.0f});
+            REQUIRE((+q3 += q4) == XE::Quaternion<float>{{0.0f, 0.0f, 0.0f}, 0.0f});
+        }
+
+        SECTION("subtraction operator should subtract each component together") {
+            REQUIRE((+q1 -= q1) == XE::Quaternion<float>{{0.0f, 0.0f, 0.0f}, 0.0f});
+            REQUIRE((+q1 -= q2) == XE::Quaternion<float>{{1.0f, -1.0f, 1.0f}, 0.0f});
+            REQUIRE((+q2 -= q3) == XE::Quaternion<float>{{-1.0f, 1.0f, -1.0f}, 1.0f});
+            REQUIRE((+q3 -= q4) == XE::Quaternion<float>{{2.0f, 0.0f, 2.0f}, 0.0f});
+        }
+
+        SECTION("multiply by scalar operator multiply each component") {
+            REQUIRE((q1 *= 1.0f) == XE::Quaternion<float>{{1.0f, 0.0f, 1.0f}, 1.0f});
+            REQUIRE((q2 *= 0.0f) == XE::Quaternion<float>{{0.0f, 0.0f, 0.0f}, 0.0f});
+            REQUIRE((q3 *= -1.0f) == XE::Quaternion<float>{{-1.0f, 0.0f, -1.0f}, 0.0f});
+            REQUIRE((q4 *= 2.0f) == XE::Quaternion<float>{{-2.0f, 0.0f, -2.0f}, 0.0f});
+        }
+
+        SECTION("divide by scalar operator multiply each component") {
+            REQUIRE((q1 /= 1.0f) == XE::Quaternion<float>{{1.0f, 0.0f, 1.0f}, 1.0f});
+            REQUIRE((q2 /= 0.5f) == XE::Quaternion<float>{{0.0f, 2.0f, 0.0f}, 2.0f});
+            REQUIRE((q3 /= -1.0f) == XE::Quaternion<float>{{-1.0f, 0.0f, -1.0f}, 0.0f});
+            REQUIRE((q4 /= -0.5f) == XE::Quaternion<float>{{2.0f, 0.0f, 2.0f}, 0.0f});
         }
     }
 }
