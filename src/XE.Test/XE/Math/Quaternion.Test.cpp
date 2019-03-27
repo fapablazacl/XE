@@ -160,6 +160,46 @@ TEST_CASE("Quaternion basic arithmetic operators behave correctly", "[Quaternion
             REQUIRE(q3 / -1.0f == XE::Quaternion<float>{{-1.0f, 0.0f, -1.0f}, 0.0f});
             REQUIRE(q4 / -0.5f == XE::Quaternion<float>{{2.0f, 0.0f, 2.0f}, 0.0f});
         }
+
+        SECTION("multiply by another quaternion should combine them together") {
+            SECTION("identity should not affect any quaternion") {
+                const auto qi = XE::Quaternion<float>::createIdentity();
+
+                REQUIRE(q1 * qi == q1);
+                REQUIRE(q2 * qi == q2);
+                REQUIRE(q3 * qi == q3);
+                REQUIRE(q4 * qi == q4);
+            }
+
+            SECTION("zero should collapse any quaternion to zero") {
+                const auto qz = XE::Quaternion<float>::createZero();
+
+                REQUIRE(q1 * qz == qz);
+                REQUIRE(q2 * qz == qz);
+                REQUIRE(q3 * qz == qz);
+                REQUIRE(q4 * qz == qz);
+            }
+        }
+
+        SECTION("divide by another quaternion should be equivalent to multiply by the inverse") {
+            SECTION("identity should not affect any quaternion") {
+                const auto qi = XE::Quaternion<float>::createIdentity();
+
+                REQUIRE(q1 / qi == q1);
+                REQUIRE(q2 / qi == q2);
+                REQUIRE(q3 / qi == q3);
+                REQUIRE(q4 / qi == q4);
+            }
+
+            SECTION("zero should collapse any quaternion to zero") {
+                const auto qz = XE::Quaternion<float>::createZero();
+
+                REQUIRE(q1 / qz == qz);
+                REQUIRE(q2 / qz == qz);
+                REQUIRE(q3 / qz == qz);
+                REQUIRE(q4 / qz == qz);
+            }
+        }
     }
 }
 

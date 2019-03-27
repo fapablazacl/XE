@@ -119,13 +119,13 @@ namespace XE {
         
         Quaternion<T> operator* (const Quaternion<T> &rhs) const {
             return {
-                cross(V, rhs.V) + rhs.v*W + V*rhs.W,
+                cross(V, rhs.V) + rhs.V*W + V*rhs.W,
                 W*rhs.W - dot(V, rhs.V)
             };
         }
         
         Quaternion<T> operator/ (const Quaternion<T> &rhs) const {
-            return (*this) * Inverse(rhs);
+            return (*this) * inverse(rhs);
         }
         
         Quaternion<T> operator* (const T s) const {
