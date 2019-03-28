@@ -69,6 +69,11 @@ namespace XE {
             W = v.W;
         }
 
+        Quaternion(const Quaternion<T> &other) {
+            V = other.V;
+            W = other.W;
+        }
+
         explicit operator Rotation<T>() const {
             const T angle = T(2) * std::acos(W);
 

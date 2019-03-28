@@ -62,6 +62,14 @@ TEST_CASE("Quaternion basic members are initialized properly", "[Quaternion]") {
         REQUIRE(q.V == XE::Vector3f{4.0f, 2.0f, 3.0f});
         REQUIRE(q.W == 1.0f);
     }
+
+    SECTION("when using the copy constructor") {
+        const auto q1 = XE::Quaternion<float>{XE::Quaternion<float>{0.0f, 0.0f, 0.0f, 1.0f}};
+        const auto q2 = XE::Quaternion<float>{XE::Quaternion<float>{1.0f, 2.0f, 3.0f, 1.0f}};
+
+        REQUIRE(q1 == XE::Quaternion<float>{0.0f, 0.0f, 0.0f, 1.0f});
+        REQUIRE(q2 == XE::Quaternion<float>{1.0f, 2.0f, 3.0f, 1.0f});
+    }
 }
 
 TEST_CASE("Quaternion comparison operators should behave correctly", "[Quaternion]") {
