@@ -244,7 +244,7 @@ namespace XE {
 
     template<typename T>
     Quaternion<T> inverse(const Quaternion<T> &q) {
-        return conjugate(q) * norm2(q);
+        return conjugate(q) / norm2(q);
     }
 
     template<typename T>
@@ -276,7 +276,7 @@ namespace XE {
      */
     template<typename T>
     Quaternion<T> normalize(const Quaternion<T> &q) {
-        return q / abs(q);
+        return q / norm(q);
     }
 
     template<typename T>

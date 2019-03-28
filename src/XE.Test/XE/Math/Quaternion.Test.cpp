@@ -187,6 +187,10 @@ TEST_CASE("Quaternion basic arithmetic operators behave correctly", "[Quaternion
                 REQUIRE(q3 * qz == qz);
                 REQUIRE(q4 * qz == qz);
             }
+
+            REQUIRE(q1 * q2 != q2 * q1);
+            REQUIRE(q1 * q2 == XE::Quaternion<float>{{0.0f, 1.0f, 2.0f}, 1.0f});
+            REQUIRE(q2 * q1 == XE::Quaternion<float>{{2.0f, 1.0f, 0.0f}, 1.0f});
         }
 
         SECTION("divide by another quaternion should be equivalent to multiply by the inverse") {
@@ -199,13 +203,21 @@ TEST_CASE("Quaternion basic arithmetic operators behave correctly", "[Quaternion
                 REQUIRE(q4 / qi == q4);
             }
 
-            SECTION("zero should collapse any quaternion to zero") {
+            SECTION("zero should collapse any quaternion to NaN values") {
                 const auto qz = XE::Quaternion<float>::createZero();
 
-                REQUIRE(q1 / qz == qz);
-                REQUIRE(q2 / qz == qz);
-                REQUIRE(q3 / qz == qz);
-                REQUIRE(q4 / qz == qz);
+                const auto r1 = q1 / qz;
+                const auto r2 = q2 / qz;
+
+                REQUIRE(std::isnan(r1.V.X));
+                REQUIRE(std::isnan(r1.V.Y));
+                REQUIRE(std::isnan(r1.V.Z));
+                REQUIRE(std::isnan(r1.W));
+
+                REQUIRE(std::isnan(r2.V.X));
+                REQUIRE(std::isnan(r2.V.Y));
+                REQUIRE(std::isnan(r2.V.Z));
+                REQUIRE(std::isnan(r2.W));
             }
         }
     }
@@ -291,10 +303,20 @@ TEST_CASE("Quaternion operator functions", "[Quaternion]") {
     }
 
     SECTION("'inverse' should compute an inverse quaternion") {
-        const auto q1 = XE::Quaternion<float>{{1.0f, 1.0f, 1.0f}, 1.0f};
-        const auto q2 = XE::Quaternion<float>{{1.0f, 0.0f, 0.0f}, 1.0f};
+        const auto q1 = XE::Quaternion<float>{{3.0f, 4.0f, 5.0f}, 0.0f};
+        REQUIRE(XE::inverse(q1) == XE::Quaternion<float>{{-3.0f / 50.0f, -4.0f / 50.0f, -5.0f / 50.0f}, 0.0f});
 
-        REQUIRE(XE::inverse(q1) == XE::Quaternion<float>{{-4.0f, -4.0f, -4.0f}, 4.0f});
-        REQUIRE(XE::inverse(q2) == XE::Quaternion<float>{{-2.0f, 0.0f, 0.0f}, 2.0f});
+        const auto q2 = XE::Quaternion<float>{{1.0f, 1.0f, 1.0f}, 1.0f};
+        REQUIRE(XE::inverse(q2) == XE::Quaternion<float>{{-0.25f, -0.25f, -0.25f}, 0.25f});
+    }
+
+    SECTION("'normalize' should scale a quaternion to the Unit Length") {
+        const auto q1 = XE::Quaternion<float>{{1.0f, 1.0f, 1.0f}, 1.0f};
+        const auto q2 = XE::Quaternion<float>{{0.0f, 4.0f, 0.0f}, 0.0f};
+        const auto q3 = XE::Quaternion<float>{{0.0f, -1.0f, 0.0f}, 0.0f};
+
+        REQUIRE(XE::normalize(q1) == XE::Quaternion<float>{{0.5f, 0.5f, 0.5f}, 0.5f});
+        REQUIRE(XE::normalize(q2) == XE::Quaternion<float>{{0.0f, 1.0f, 0.0f}, 0.0f});
+        REQUIRE(XE::normalize(q3) == XE::Quaternion<float>{{0.0f, -1.0f, 0.0f}, 0.0f});
     }
 }
