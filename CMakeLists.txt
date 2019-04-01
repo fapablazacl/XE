@@ -4,6 +4,7 @@ option (XE_PLUGIN_PNG           "Include PNG image support via LodePNG" OFF)
 option (XE_PLUGIN_DIRECT3D11    "Include Direct3D 11 support" OFF)
 option (XE_PLUGIN_OPENGLCORE    "Include OpenGL Core support" OFF)
 option (XE_PLUGIN_VULKAN        "Include Vulkan support" OFF)
+option (XE_EXAMPLE_QT5RENDERING "Include the interoperation example program for Qt5" OFF)
 
 set (CMAKE_CXX_STANDARD 17)
 set (CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -27,6 +28,7 @@ add_definitions (-DXE_VERSION_REVISION=${XE_VERSION_REVISION})
 include_directories ("src/XE.Core")
 add_subdirectory ("src/XE.Core")
 
+#PLUGINS
 # include LodePNG image
 if (XE_PLUGIN_PNG)
     include_directories("dep/lodepng")
@@ -78,3 +80,8 @@ endif ()
 add_subdirectory("src/XE.Sandbox")
 
 add_subdirectory("src/XE.Demo")
+
+# EXAMPLES
+if (XE_EXAMPLE_QT5RENDERING)
+    add_subdirectory("examples/Qt5Rendering")
+endif()
