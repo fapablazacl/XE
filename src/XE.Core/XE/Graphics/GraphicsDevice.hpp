@@ -11,7 +11,6 @@
 
 namespace XE {
     class Buffer;
-    class InputManager;
 
     /**
      * @brief Specify wich buffer will be used to clear
@@ -57,28 +56,11 @@ namespace XE {
     struct ProgramDescriptor;
 
     /**
-     * @brief The 'Window' that is beign used as the render target for the graphics device contents
-     */
-    class XE_API Window {
-    public:
-        virtual ~Window() {}
-
-        /**
-         * @brief Get the current size of the Window, in Pixels, where the X and Y fields correspond to the Width and Height of the Window, respectively
-         */
-        virtual Vector2i getSize() const = 0;
-    };
-
-    /**
      * @brief Graphics API abstraction
      */
     class XE_API GraphicsDevice {
     public:
         virtual ~GraphicsDevice();
-
-        virtual InputManager* getInputManager() = 0;
-
-        virtual Window* getWindow() const = 0;
 
         /**
          * @brief Create a geometry subset composed of many geometry and indexation buffers

@@ -2,7 +2,8 @@ project (XE)
 
 option (XE_PLUGIN_PNG           "Include PNG image support via LodePNG" OFF)
 option (XE_PLUGIN_DIRECT3D11    "Include Direct3D 11 support" OFF)
-option (XE_PLUGIN_OPENGLCORE    "Include OpenGL Core support" OFF)
+option (XE_PLUGIN_GL            "Include OpenGL 3+ support" OFF)
+option (XE_PLUGIN_GL_GLFW       "Include GLFW-based Window and Context creation support (requires 'XE_PLUGIN_GL')" OFF)
 option (XE_PLUGIN_VULKAN        "Include Vulkan support" OFF)
 option (XE_EXAMPLE_QT5RENDERING "Include the interoperation example program for Qt5" OFF)
 
@@ -54,7 +55,7 @@ if (XE_PLUGIN_DIRECT3D11)
     include_directories ("src/XE.Graphics.D3D11.TestApp")
 endif ()
 
-if (XE_PLUGIN_OPENGLCORE)
+if (XE_PLUGIN_GL)
     include_directories ("src/khronos")
 
     add_subdirectory ("src/glad-gl4")
@@ -70,6 +71,11 @@ if (XE_PLUGIN_OPENGLCORE)
 
     add_subdirectory ("src/XE.Graphics.GL")
     include_directories ("src/XE.Graphics.GL")
+
+    if (XE_PLUGIN_GL_GLFW)
+        add_subdirectory("src/XE.Graphics.GL.GLFW")
+        include_directories("src/XE.Graphics.GL.GLFW")
+    endif()
 endif ()
 
 if (XE_PLUGIN_VULKAN)

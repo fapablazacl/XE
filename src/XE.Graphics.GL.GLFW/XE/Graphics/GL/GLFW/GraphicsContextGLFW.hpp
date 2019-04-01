@@ -2,7 +2,7 @@
 #ifndef __XE_GRAPHICS_GRAPHICSCONTEXTGLFW_HPP__
 #define __XE_GRAPHICS_GRAPHICSCONTEXTGLFW_HPP__
 
-#include "IGraphicsContextGL.hpp"
+#include <XE/Graphics/GL/IGraphicsContextGL.hpp>
 #include <GLFW/glfw3.h>
 
 namespace XE {

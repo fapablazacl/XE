@@ -6,20 +6,17 @@
 #include <XE/Graphics/GraphicsDevice.hpp>
 
 #include <glad/glad.h>
-#include <GLFW/glfw3.h>
 
 namespace XE {
     class ProgramGL;
 
+    class IGraphicsContextGL;
+
     class GraphicsDeviceGL : public GraphicsDevice {
     public:
-        GraphicsDeviceGL();
+        explicit GraphicsDeviceGL(IGraphicsContextGL *context);
 
         virtual ~GraphicsDeviceGL();
-        
-        virtual Window* getWindow() const override;
-
-        virtual InputManager* getInputManager() override;
 
         virtual std::unique_ptr<Subset> createSubset(
             SubsetDescriptor& desc, 
@@ -67,9 +64,8 @@ namespace XE {
         void postRenderMaterial(const Material *material);
 
     private:
-        GLFWwindow *m_windowGLFW = nullptr;
-        std::unique_ptr<Window> m_window;
-        std::unique_ptr<InputManager> m_inputManager;
+        IGraphicsContextGL *context = nullptr;
+
         const ProgramGL *m_program = nullptr;
         const Material *m_material = nullptr;
 
