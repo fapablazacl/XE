@@ -10,9 +10,13 @@ set (sources_xe_graphics_glcore
 	"${source_base}/WindowGLFW.hpp"
 	"${source_base}/WindowGLFW.cpp"
 
+	"${source_base}/IGraphicsContextGL.hpp"
+	"${source_base}/IGraphicsContextGL.cpp"
+	"${source_base}/GraphicsContextGLFW.hpp"
+	"${source_base}/GraphicsContextGLFW.cpp"
 	"${source_base}/GraphicsDeviceGL.hpp"
 	"${source_base}/GraphicsDeviceGL.cpp"
-	
+
 	"${source_base}/TextureBaseGL.hpp"
 	"${source_base}/TextureBaseGL.cpp"
 	"${source_base}/Texture2DGL.hpp"

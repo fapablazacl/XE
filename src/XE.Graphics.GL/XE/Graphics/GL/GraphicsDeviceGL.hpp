@@ -8,10 +8,6 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-namespace Input {
-    class InputManager;
-}
-
 namespace XE {
     class ProgramGL;
 
