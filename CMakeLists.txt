@@ -5,7 +5,10 @@ option (XE_PLUGIN_DIRECT3D11    "Include Direct3D 11 support" OFF)
 option (XE_PLUGIN_GL            "Include OpenGL 3+ support" OFF)
 option (XE_PLUGIN_GL_GLFW       "Include GLFW-based Window and Context creation support (requires 'XE_PLUGIN_GL')" OFF)
 option (XE_PLUGIN_VULKAN        "Include Vulkan support" OFF)
-option (XE_EXAMPLE_QT5RENDERING "Include the interoperation example program for Qt5" OFF)
+
+option (XE_EXAMPLE_QT5RENDERING "Include example program that shows rendering to a Qt5 widget" OFF)
+option (XE_EXAMPLE_DEMO         "Include example program that shows a tech demo" OFF)
+option (XE_EXAMPLE_SANDBOX      "Include example program that is used for various development activities" OFF)
 
 set (CMAKE_CXX_STANDARD 17)
 set (CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -83,11 +86,18 @@ if (XE_PLUGIN_VULKAN)
     include_directories ("src/XE.Graphics.Vk.TestApp")
 endif ()
 
-add_subdirectory("src/XE.Sandbox")
 
-add_subdirectory("src/XE.Demo")
+#========================================================
+# EXAMPLES SECTION
+#========================================================
+if (XE_EXAMPLE_DEMO)
+    add_subdirectory("examples/XE.Demo")
+endif()
 
-# EXAMPLES
+if (XE_EXAMPLE_SANDBOX)
+    add_subdirectory("examples/XE.Sandbox")
+endif()
+
 if (XE_EXAMPLE_QT5RENDERING)
     add_subdirectory("examples/Qt5Rendering")
 endif()
