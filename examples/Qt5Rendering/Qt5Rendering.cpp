@@ -11,7 +11,7 @@ class XEWidget : public QOpenGLWidget {
 
 public:
     XEWidget(QWidget *parent) : QOpenGLWidget(parent) {
-        deviceGL = new XE::GraphicsDeviceGL();
+        // deviceGL = new XE::GraphicsDeviceGL();
     }
 
     virtual void initializeGL() override {
