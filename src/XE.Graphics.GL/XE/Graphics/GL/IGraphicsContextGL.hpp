@@ -15,19 +15,21 @@ namespace XE {
          * @brief Interface that abstracts the underlying graphics context
          */
         struct Descriptor {
-            int major;
-            int minor;
+            int major = 0;
+            int minor = 0;
 
-            bool doubleBuffer;
-            bool coreProfile;
+            bool doubleBuffer = false;
+            bool coreProfile = false;
 
-            int redBits;
-            int greenBits;
-            int blueBits;
-            int alphaBits;
+            int redBits = 0;
+            int greenBits = 0;
+            int blueBits = 0;
+            int alphaBits = 0;
 
-            int depthBits;
-            int stencilBits;
+            int depthBits = 0;
+            int stencilBits = 0;
+
+            static Descriptor defaultGL4();
         };
 
         virtual ~IGraphicsContextGL();

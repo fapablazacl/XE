@@ -1,7 +1,7 @@
 
 # Abtraction utilities around GLFW
 
-set (target XE.GLFW)
+set (target XE.Graphics.GL.GLFW)
 
 set (sources
     "XE/Graphics/GL/GLFW/WindowGLFW.hpp"
