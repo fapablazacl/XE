@@ -32,7 +32,10 @@ add_definitions (-DXE_VERSION_REVISION=${XE_VERSION_REVISION})
 include_directories ("src/XE.Core")
 add_subdirectory ("src/XE.Core")
 
-#PLUGINS
+#========================================================
+# PLUGINS SECTION
+#========================================================
+
 # include LodePNG image
 if (XE_PLUGIN_PNG)
     include_directories("dep/lodepng")
