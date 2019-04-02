@@ -22,7 +22,7 @@ namespace XE {
             SubsetDescriptor& desc, 
             std::vector<std::unique_ptr<Buffer>> buffers, 
             const std::map<std::string, int> &bufferMapping, 
-            std::unique_ptr<Buffer> indexBuffer) override;
+            std::unique_ptr<Buffer> indexBuffer = std::unique_ptr<Buffer>()) override;
         
         virtual std::unique_ptr<Buffer> createBuffer(const BufferDescriptor &bufferDescriptor) override;
         
