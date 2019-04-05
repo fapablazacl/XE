@@ -4,15 +4,11 @@ set (source_base "XE/Graphics/GL")
 set (sources_xe_graphics_glcore
 	"XE/Graphics/GL.hpp"
 
-	"${source_base}/InputManagerGLFW.hpp"
-	"${source_base}/InputManagerGLFW.cpp"
-
-	"${source_base}/WindowGLFW.hpp"
-	"${source_base}/WindowGLFW.cpp"
-
+	"${source_base}/IGraphicsContextGL.hpp"
+	"${source_base}/IGraphicsContextGL.cpp"
 	"${source_base}/GraphicsDeviceGL.hpp"
 	"${source_base}/GraphicsDeviceGL.cpp"
-	
+
 	"${source_base}/TextureBaseGL.hpp"
 	"${source_base}/TextureBaseGL.cpp"
 	"${source_base}/Texture2DGL.hpp"
@@ -49,4 +45,4 @@ source_group ("\\XE\\Graphics\\GL" FILES ${sources_xe_graphics_glcore})
 
 add_library (${target} ${sources_xe_graphics_glcore})
 
-target_link_libraries (${target} glad-gl4 glfw XE.Core)
+target_link_libraries (${target} glad-gl4 XE.Core)

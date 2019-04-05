@@ -8,8 +8,7 @@
 #include "Texture2DArrayGL.hpp"
 #include "Texture3DGL.hpp"
 #include "ProgramGL.hpp"
-#include "InputManagerGLFW.hpp"
-#include "WindowGLFW.hpp"
+#include "IGraphicsContextGL.hpp"
 #include "Util.hpp"
 
 #include <XE/Graphics/Material.hpp>
@@ -31,45 +30,8 @@ namespace XE {
 #endif
 */
 
-    void errorCallback(int error, const char *description) {
-        std::cout << error << ":" << description << std::endl;
-    }
-
-    GraphicsDeviceGL::GraphicsDeviceGL() {
-        std::cout << "[GL] Initializing GLFW ..." << std::endl;
-        ::glfwInit();
-
-        ::glfwSetErrorCallback(errorCallback);
-
-#if defined(__APPLE__)
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
-        glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-        glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-#else
-        ::glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-        ::glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
-        ::glfwWindowHint(GLFW_OPENGL_CORE_PROFILE, 1);
-#endif
-        // ::glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, 1);
-        ::glfwWindowHint(GLFW_DEPTH_BITS, 24);
-        ::glfwWindowHint(GLFW_DOUBLEBUFFER, 1);
-        ::glfwWindowHint(GLFW_RED_BITS, 8);
-        ::glfwWindowHint(GLFW_GREEN_BITS, 8);
-        ::glfwWindowHint(GLFW_BLUE_BITS, 8);
-        ::glfwWindowHint(GLFW_ALPHA_BITS, 0);
-
-        std::cout << "[GL] Creating Window/Context ..." << std::endl;
-        m_windowGLFW = ::glfwCreateWindow(1200, 800, "Test", nullptr, nullptr);
-
-        if (!m_windowGLFW) {
-            const char description[256] = {};
-            int error = ::glfwGetError((const char **)&description);
-            throw std::runtime_error(description);
-        }
-
-        std::cout << "[GL] Making Context current ..." << std::endl;
-        ::glfwMakeContextCurrent(m_windowGLFW);
+    GraphicsDeviceGL::GraphicsDeviceGL(IGraphicsContextGL *context) {
+        this->context = context;
 
         std::cout << "[GL] Loading OpenGL Extensions ..." << std::endl;
         if (!gladLoadGL()) {
@@ -82,32 +44,11 @@ namespace XE {
     // glad_set_post_callback(gladPostCallback);
 #endif
 */
-        std::cout << "[GL] Creating the GLFW-based input manager ..." << std::endl;
-
-        m_window.reset(new WindowGLFW(m_windowGLFW));
-        m_inputManager.reset(new InputManagerGLFW(m_windowGLFW));
-
         XE_GRAPHICS_GL_CHECK_ERROR();
     }
 
-    GraphicsDeviceGL::~GraphicsDeviceGL() {
-        if (m_windowGLFW) {
-            ::glfwMakeContextCurrent(nullptr);
-            ::glfwDestroyWindow(m_windowGLFW);
-            ::glfwTerminate();
-
-            m_windowGLFW = nullptr;
-        }
-    }
+    GraphicsDeviceGL::~GraphicsDeviceGL() {}
     
-    Window* GraphicsDeviceGL::getWindow() const {
-        return m_window.get();
-    }
-
-    InputManager* GraphicsDeviceGL::getInputManager() {
-        return m_inputManager.get();
-    }
-
     std::unique_ptr<Subset> GraphicsDeviceGL::createSubset(
             SubsetDescriptor& desc, 
             std::vector<std::unique_ptr<Buffer>> buffers, 
@@ -189,7 +130,8 @@ namespace XE {
         
     void GraphicsDeviceGL::endFrame() {
         ::glFlush();
-        ::glfwSwapBuffers(m_windowGLFW);
+
+        context->present();
 
         XE_GRAPHICS_GL_CHECK_ERROR();
     }

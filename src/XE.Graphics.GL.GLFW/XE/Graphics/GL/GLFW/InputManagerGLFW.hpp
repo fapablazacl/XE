@@ -27,7 +27,7 @@ namespace XE {
         void fillKeyboardStatus();
 
     private:
-        GLFWwindow *m_windowGLFW;
+        GLFWwindow *m_windowGLFW = nullptr;
         KeyboardStatus m_keyboardStatus;
     };
 }

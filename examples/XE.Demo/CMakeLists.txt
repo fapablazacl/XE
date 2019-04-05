@@ -6,4 +6,4 @@ add_executable(${target} ${sources})
 
 include_directories(.)
 
-target_link_libraries(${target} XE.Core XE.Graphics.GL)
+target_link_libraries(${target} XE.Core XE.Graphics.GL XE.Graphics.GL.GLFW)

@@ -58,6 +58,8 @@ set (src_xe_math
 )
 
 set (src_xe_graphics
+	"XE/Graphics/IWindow.cpp"
+	"XE/Graphics/IWindow.hpp" 
 	"XE/Graphics/GraphicsDevice.cpp"
 	"XE/Graphics/GraphicsDevice.hpp" 
 	"XE/Graphics/BufferDescriptor.cpp" 

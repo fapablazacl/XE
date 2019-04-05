@@ -7,6 +7,7 @@
 #include <XE/Input.hpp>
 #include <XE/Graphics.hpp>
 #include <XE/Graphics/GL.hpp>
+#include <XE/Graphics/GL/GLFW/WindowGLFW.hpp>
 
 #include <map>
 
@@ -23,10 +24,9 @@ namespace XE {
 }
 
 int main(int argc, char **argv) {
-    auto graphicsDevice = std::make_unique<XE::GraphicsDeviceGL>();
-    auto window = graphicsDevice->getWindow();
-
-    auto inputManager = graphicsDevice->getInputManager();
+    auto window = XE::WindowGLFW::create(XE::ContextDescriptorGL::defaultGL4(), "XE.Demo example application", {1200, 800}, false);
+    auto graphicsDevice = std::make_unique<XE::GraphicsDeviceGL>(window->getContext());
+    auto inputManager = window->getInputManager();
     
     bool done = true;
 

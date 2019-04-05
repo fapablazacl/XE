@@ -6,30 +6,23 @@
 #include <XE/Graphics/GraphicsDevice.hpp>
 
 #include <glad/glad.h>
-#include <GLFW/glfw3.h>
-
-namespace Input {
-    class InputManager;
-}
 
 namespace XE {
     class ProgramGL;
 
+    class IGraphicsContextGL;
+
     class GraphicsDeviceGL : public GraphicsDevice {
     public:
-        GraphicsDeviceGL();
+        explicit GraphicsDeviceGL(IGraphicsContextGL *context);
 
         virtual ~GraphicsDeviceGL();
-        
-        virtual Window* getWindow() const override;
-
-        virtual InputManager* getInputManager() override;
 
         virtual std::unique_ptr<Subset> createSubset(
             SubsetDescriptor& desc, 
             std::vector<std::unique_ptr<Buffer>> buffers, 
             const std::map<std::string, int> &bufferMapping, 
-            std::unique_ptr<Buffer> indexBuffer) override;
+            std::unique_ptr<Buffer> indexBuffer = std::unique_ptr<Buffer>()) override;
         
         virtual std::unique_ptr<Buffer> createBuffer(const BufferDescriptor &bufferDescriptor) override;
         
@@ -71,9 +64,8 @@ namespace XE {
         void postRenderMaterial(const Material *material);
 
     private:
-        GLFWwindow *m_windowGLFW = nullptr;
-        std::unique_ptr<Window> m_window;
-        std::unique_ptr<InputManager> m_inputManager;
+        IGraphicsContextGL *context = nullptr;
+
         const ProgramGL *m_program = nullptr;
         const Material *m_material = nullptr;
 

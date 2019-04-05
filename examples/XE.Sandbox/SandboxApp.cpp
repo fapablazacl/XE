@@ -1,4 +1,5 @@
 
+
 #include "SandboxApp.hpp"
 #include "Assets.hpp"
 
@@ -8,6 +9,7 @@
 #include <XE/IO.hpp>
 #include <XE/Graphics.hpp>
 #include <XE/Graphics/GL.hpp>
+#include <XE/Graphics/GL/GLFW/WindowGLFW.hpp>
 #include <XE/Graphics/PNG.hpp>
 
 #include <string>
@@ -22,8 +24,16 @@ namespace XE {
 
         virtual void Initialize() override {
             std::cout << "Initializing Engine ..." << std::endl;
-            m_graphicsDevice = std::make_unique<GraphicsDeviceGL>();
-            m_inputManager = m_graphicsDevice->getInputManager();
+
+            m_window = WindowGLFW::create (
+                ContextDescriptorGL::defaultGL4(), 
+                "XE.SandboxApp",
+                {1200, 800},
+                false
+            );
+
+            m_graphicsDevice = std::make_unique<GraphicsDeviceGL>(m_window->getContext());
+            m_inputManager = m_window->getInputManager();
 
             std::cout << "Loading assets ..." << std::endl;
             m_streamSource = std::unique_ptr<FileStreamSource>();
@@ -32,7 +42,7 @@ namespace XE {
         }
 
         virtual void Update(const float seconds) override {
-            const Vector2i windowSize = m_graphicsDevice->getWindow()->getSize();
+            const Vector2i windowSize = m_window->getSize();
             m_graphicsDevice->setViewport({{0, 0}, windowSize});
 
             m_inputManager->poll();
@@ -276,6 +286,7 @@ namespace XE {
         }
 
     private:
+        std::unique_ptr<WindowGLFW> m_window;
         std::unique_ptr<GraphicsDevice> m_graphicsDevice;
         std::unique_ptr<Program> m_program;
         std::unique_ptr<Subset> m_subset;

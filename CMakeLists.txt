@@ -2,8 +2,13 @@ project (XE)
 
 option (XE_PLUGIN_PNG           "Include PNG image support via LodePNG" OFF)
 option (XE_PLUGIN_DIRECT3D11    "Include Direct3D 11 support" OFF)
-option (XE_PLUGIN_OPENGLCORE    "Include OpenGL Core support" OFF)
+option (XE_PLUGIN_GL            "Include OpenGL 3+ support" OFF)
+option (XE_PLUGIN_GL_GLFW       "Include GLFW-based Window and Context creation support (requires 'XE_PLUGIN_GL')" OFF)
 option (XE_PLUGIN_VULKAN        "Include Vulkan support" OFF)
+
+option (XE_EXAMPLE_QT5RENDERING "Include example program that shows rendering to a Qt5 widget" OFF)
+option (XE_EXAMPLE_DEMO         "Include example program that shows a tech demo" OFF)
+option (XE_EXAMPLE_SANDBOX      "Include example program that is used for various development activities" OFF)
 
 set (CMAKE_CXX_STANDARD 17)
 set (CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -26,6 +31,10 @@ add_definitions (-DXE_VERSION_REVISION=${XE_VERSION_REVISION})
 
 include_directories ("src/XE.Core")
 add_subdirectory ("src/XE.Core")
+
+#========================================================
+# PLUGINS SECTION
+#========================================================
 
 # include LodePNG image
 if (XE_PLUGIN_PNG)
@@ -52,7 +61,7 @@ if (XE_PLUGIN_DIRECT3D11)
     include_directories ("src/XE.Graphics.D3D11.TestApp")
 endif ()
 
-if (XE_PLUGIN_OPENGLCORE)
+if (XE_PLUGIN_GL)
     include_directories ("src/khronos")
 
     add_subdirectory ("src/glad-gl4")
@@ -68,6 +77,11 @@ if (XE_PLUGIN_OPENGLCORE)
 
     add_subdirectory ("src/XE.Graphics.GL")
     include_directories ("src/XE.Graphics.GL")
+
+    if (XE_PLUGIN_GL_GLFW)
+        add_subdirectory("src/XE.Graphics.GL.GLFW")
+        include_directories("src/XE.Graphics.GL.GLFW")
+    endif()
 endif ()
 
 if (XE_PLUGIN_VULKAN)
@@ -75,6 +89,18 @@ if (XE_PLUGIN_VULKAN)
     include_directories ("src/XE.Graphics.Vk.TestApp")
 endif ()
 
-add_subdirectory("src/XE.Sandbox")
 
-add_subdirectory("src/XE.Demo")
+#========================================================
+# EXAMPLES SECTION
+#========================================================
+if (XE_EXAMPLE_DEMO)
+    add_subdirectory("examples/XE.Demo")
+endif()
+
+if (XE_EXAMPLE_SANDBOX)
+    add_subdirectory("examples/XE.Sandbox")
+endif()
+
+if (XE_EXAMPLE_QT5RENDERING)
+    add_subdirectory("examples/Qt5Rendering")
+endif()
