@@ -1,6 +1,7 @@
 
 #include <XE/Math/Quaternion.hpp>
 #include <XE/Math/FormatUtils.hpp>
+#include <XE/Math/Common.hpp>
 #include <catch.hpp>
 
 static const int precision = std::numeric_limits<float>::max_digits10;
@@ -318,5 +319,32 @@ TEST_CASE("Quaternion operator functions", "[Quaternion]") {
         REQUIRE(XE::normalize(q1) == XE::Quaternion<float>{{0.5f, 0.5f, 0.5f}, 0.5f});
         REQUIRE(XE::normalize(q2) == XE::Quaternion<float>{{0.0f, 1.0f, 0.0f}, 0.0f});
         REQUIRE(XE::normalize(q3) == XE::Quaternion<float>{{0.0f, -1.0f, 0.0f}, 0.0f});
+    }
+}
+
+TEST_CASE("Quaternion advanced utility methods and functions", "[Quaternion]") {
+    SECTION("'transform' function should rotate a vector") {
+        SECTION("'transform' function should rotate a vector") {
+            auto q = XE::Quaternion<float>::createIdentity();
+        }
+
+        SECTION("'transform' function should rotate a vector") {
+            auto q = XE::Quaternion<float>::createIdentity();
+        }
+    }
+
+    SECTION("'createRotation' static method ") {
+        SECTION("should create a valid quaternion that rorates an vector on an axis and a angle") {
+            auto q = XE::Quaternion<float>::createRotation(XE::radians(180.0f), XE::Vector3f{0.0f, 1.0f, 0.0f});
+
+            REQUIRE(q.V.X == 0.0f);
+            REQUIRE(q.V.Y == 1.0f);
+            REQUIRE(q.V.Z == 0.0f);
+            REQUIRE(Approx(q.W).epsilon(0.00001) == 0.0f);
+        }
+
+        SECTION("should create a valid quaternion based on a vector arc") {
+
+        }
     }
 }
