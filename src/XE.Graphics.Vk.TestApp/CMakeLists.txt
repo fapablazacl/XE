@@ -10,4 +10,4 @@ source_group("\\" FILES ${src})
 
 add_executable(${target} ${src})
 
-target_link_libraries(${target} XE.Core ${Vulkan_LIBRARIES})
+target_link_libraries(${target} XE.Core ${Vulkan_LIBRARIES} glfw )
