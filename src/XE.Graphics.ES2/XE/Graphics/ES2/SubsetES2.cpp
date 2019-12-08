@@ -18,8 +18,10 @@ namespace XE {
         m_indexBuffer.reset((BufferES2*)indexBuffer.release());
 
         // setup the subset arrays based on the vertex format and the mapping information
+        /*
         ::glGenVertexArrays(1, &m_id);
         ::glBindVertexArray(m_id);
+        */
 
         int attribIndex = 0;
         for (const VertexAttribute &attrib : desc.attributes) {
@@ -42,14 +44,14 @@ namespace XE {
             ::glBindBuffer(m_indexBuffer->GetTarget(), m_indexBuffer->GetID());
         }
         
-        ::glBindVertexArray(0);
+        // ::glBindVertexArray(0);
 
         m_descriptor = desc;
     }
 
     SubsetGL::~SubsetGL() {
         if (m_id) {
-            ::glDeleteVertexArrays(1, &m_id);
+            // ::glDeleteVertexArrays(1, &m_id);
         }
     }
         

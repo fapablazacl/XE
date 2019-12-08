@@ -28,7 +28,8 @@ namespace XE {
         const int finalSize = size ? size : m_size;
 
         ::glBindBuffer(m_target, m_id);
-        ::glGetBufferSubData(m_target, offset, finalSize, &destination[destinationOffset]);
+        // ::glGetBufferSubData(m_target, offset, finalSize, &destination[destinationOffset]);
+        // return false;
         ::glBindBuffer(m_target, 0);
     }
 

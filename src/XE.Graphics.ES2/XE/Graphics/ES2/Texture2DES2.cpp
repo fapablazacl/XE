@@ -41,7 +41,8 @@ namespace XE {
         const GLenum dataTypeGL = convertToGL(surfaceDataType);
 
         ::glBindTexture(GL_TEXTURE_2D, m_id);
-        ::glGetTexImage(GL_TEXTURE_2D, mipLevel, formatGL, dataTypeGL, surfaceData);
+        /*::glGetTexImage(GL_TEXTURE_2D, mipLevel, formatGL, dataTypeGL, surfaceData);*/
+        // return false;
         ::glBindTexture(GL_TEXTURE_2D, 0);
 
         XE_GRAPHICS_GL_CHECK_ERROR();

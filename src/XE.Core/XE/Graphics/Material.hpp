@@ -82,12 +82,18 @@ namespace XE {
         BlendParam blendSource;
         BlendParam blendDestination;
 
+        [[deprecated("isn't supported on every driver, so will be removed on future revisions")]]
         float pointSize = 1.0f;
         float lineWidth = 1.0f;
         DepthFunc depthFunc = DepthFunc::LesserEqual;
         FrontFaceOrder frontFace = FrontFaceOrder::Clockwise;
+
+        [[deprecated("isn't supported on every driver, so will be removed on future revisions")]]
         PolygonMode polygonMode = PolygonMode::Fill;
+
+        [[deprecated("isn't supported on every driver, so will be removed on future revisions")]]
         std::array<bool, 8> clipDistances;
+
         int clipDistanceCount = 0;
     };
 

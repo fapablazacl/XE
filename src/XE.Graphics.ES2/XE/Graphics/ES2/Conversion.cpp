@@ -17,7 +17,7 @@ namespace XE {
             case DataType::Int16: return GL_SHORT;
             case DataType::Int32: return GL_INT;
             case DataType::Float32: return GL_FLOAT;
-            case DataType::Float64: return GL_DOUBLE;
+            // case DataType::Float64: return GL_DOUBLE;
             default: return 0;
         }
     }
@@ -42,24 +42,24 @@ namespace XE {
         switch (access) {
         case BufferAccess::Dynamic:
             switch (usage) {
-            case BufferUsage::Copy: return GL_DYNAMIC_COPY;
-            case BufferUsage::Read: return GL_DYNAMIC_READ;
+            // case BufferUsage::Copy: return GL_DYNAMIC_COPY;
+            // case BufferUsage::Read: return GL_DYNAMIC_READ;
             case BufferUsage::Write: return GL_DYNAMIC_DRAW;
             default: return 0;
             }
 
         case BufferAccess::Static:
             switch (usage) {
-            case BufferUsage::Copy: return GL_STATIC_COPY;
-            case BufferUsage::Read: return GL_STATIC_READ;
+            // case BufferUsage::Copy: return GL_STATIC_COPY;
+            // case BufferUsage::Read: return GL_STATIC_READ;
             case BufferUsage::Write: return GL_STATIC_DRAW;
             default: return 0;
             }
             
         case BufferAccess::Stream:
             switch (usage) {
-            case BufferUsage::Copy: return GL_STREAM_COPY;
-            case BufferUsage::Read: return GL_STREAM_READ;
+            // case BufferUsage::Copy: return GL_STREAM_COPY;
+            // case BufferUsage::Read: return GL_STREAM_READ;
             case BufferUsage::Write: return GL_STREAM_DRAW;
             default: return 0;
             }
@@ -96,12 +96,15 @@ namespace XE {
     }
 
     GLenum convertToGL(const PolygonMode mode) {
+        return 0;
+        /*
         switch (mode) {
             case PolygonMode::Fill: return GL_FILL;
             case PolygonMode::Line: return GL_LINE;
             case PolygonMode::Point: return GL_POINT;
             default: return 0;
         }
+        */
     }
 
     GLenum convertToGL(const FrontFaceOrder order) {
@@ -142,7 +145,7 @@ namespace XE {
 
     GLenum convertToGL(const TextureWrap wrap) {
         switch (wrap) {
-            case TextureWrap::Clamp: return GL_CLAMP_TO_BORDER;
+            // case TextureWrap::Clamp: return GL_CLAMP_TO_BORDER;
             case TextureWrap::Repeat: return GL_REPEAT;
             default: return 0;
         }

@@ -13,10 +13,6 @@ set (sources_xe_graphics_glcore
 	"${source_base}/TextureBaseES2.cpp"
 	"${source_base}/Texture2DES2.hpp"
 	"${source_base}/Texture2DES2.cpp"
-	"${source_base}/Texture2DArrayES2.hpp"
-	"${source_base}/Texture2DArrayES2.cpp"
-	"${source_base}/Texture3DES2.hpp"
-	"${source_base}/Texture3DES2.cpp"
 	"${source_base}/TextureCubeMapES2.hpp"
 	"${source_base}/TextureCubeMapES2.cpp"
 	

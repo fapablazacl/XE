@@ -5,8 +5,6 @@
 #include "BufferES2.hpp"
 #include "SubsetES2.hpp"
 #include "Texture2DES2.hpp"
-#include "Texture2DArrayES2.hpp"
-#include "Texture3DES2.hpp"
 #include "ProgramES2.hpp"
 #include "IGraphicsContextES2.hpp"
 #include "Util.hpp"
@@ -32,11 +30,6 @@ namespace XE {
 
     GraphicsDeviceES2::GraphicsDeviceES2(IGraphicsContextES2 *context) {
         this->context = context;
-
-        std::cout << "[GL] Loading OpenGL Extensions ..." << std::endl;
-        if (!gladLoadGL()) {
-            throw std::runtime_error("Failed to load OpenGL extensions");
-        }
 
 /*
 #if defined(GLAD_DEBUG)
@@ -66,11 +59,11 @@ namespace XE {
     }
         
     std::unique_ptr<Texture3D> GraphicsDeviceES2::createTexture3D(const PixelFormat format, const Vector3i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void *sourceData) {
-        return std::make_unique<Texture3DGL>(format, size, sourceFormat, sourceDataType, sourceData);
+        return std::unique_ptr<Texture3D>();
     }
 
     std::unique_ptr<Texture2DArray> GraphicsDeviceES2::createTexture2DArray(const PixelFormat format, const Vector2i &size, const int count) {
-        return std::make_unique<Texture2DArrayGL>(format, size, count);
+        return std::unique_ptr<Texture2DArray>();
     }
         
     std::unique_ptr<TextureCubeMap> GraphicsDeviceES2::createTextureCubeMap(const PixelFormat format, const Vector2i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void **sourceData) {
@@ -84,7 +77,8 @@ namespace XE {
     void GraphicsDeviceES2::draw(const Subset *subset, const SubsetEnvelope *envelopes, const int envelopeCount) {
         auto subsetGL = static_cast<const SubsetGL *>(subset);
         auto descriptor = subsetGL->GetDescriptor();
-        ::glBindVertexArray(subsetGL->GetID());
+
+        throw std::runtime_error("ES2: VAO rendering isn't supported");
 
         auto indexBuffer = subsetGL->getIndexBuffer();
 
@@ -105,23 +99,22 @@ namespace XE {
                 if (env.VertexStart == 0) {
                     ::glDrawElements(primitiveGL, env.VertexCount, indexTypeGL, nullptr);
                 } else {
-                    ::glDrawElementsBaseVertex(primitiveGL, env.VertexCount, indexTypeGL, nullptr, env.VertexStart);
+                    throw std::runtime_error("BaseVertex rendering isn't supported");
                 }
             }
         }
 
-        ::glBindVertexArray(0);
         XE_GRAPHICS_GL_CHECK_ERROR();
     }
-        
-    void GraphicsDeviceES2::beginFrame(const ClearFlags flags, const Vector4f &color, const float depth, const int stencil) {
+
+
+    void GraphicsDeviceES2::beginFrame(const ClearFlags flags, const Vector4f &color, const float, const int stencil) {
         const GLenum clearFlagsGL =
             (flags & ClearFlags::Color   ? GL_COLOR_BUFFER_BIT   : 0) | 
             (flags & ClearFlags::Depth   ? GL_DEPTH_BUFFER_BIT   : 0) | 
             (flags & ClearFlags::Stencil ? GL_STENCIL_BUFFER_BIT : 0) ;
 
         ::glClearColor(color.X, color.Y, color.Z, color.W);
-        ::glClearDepth(static_cast<GLdouble>(depth));
         ::glClearStencil(stencil);
         ::glClear(clearFlagsGL);
 
@@ -139,17 +132,6 @@ namespace XE {
     void GraphicsDeviceES2::preRenderMaterial(const Material *material) {
         const auto &rs = material->renderState;
 
-        // clip distances
-        for (int i=0; i<rs.clipDistanceCount; i++) {
-            const GLenum clipDistanceGL = GL_CLIP_DISTANCE0 + i;
-
-            if (rs.clipDistances[i]) {
-                ::glEnable(clipDistanceGL);
-            } else {
-                ::glDisable(clipDistanceGL);
-            }
-        }
-
         // depth buffer configuration
         if (rs.depthTest) {
             ::glEnable(GL_DEPTH_TEST);
@@ -159,10 +141,6 @@ namespace XE {
 
         const GLenum depthFuncGL = convertToGL(rs.depthFunc);
         ::glDepthFunc(depthFuncGL);
-
-        // polygon mode
-        const GLenum fillModeGL = convertToGL(rs.polygonMode);
-        ::glPolygonMode(GL_FRONT_AND_BACK, fillModeGL);
 
         // front face definition
         const GLenum faceGL = convertToGL(rs.frontFace);
@@ -176,7 +154,6 @@ namespace XE {
         }
 
         // point and line sizing
-        ::glPointSize(rs.pointSize);
         ::glLineWidth(rs.lineWidth);
 
         // blending
@@ -210,7 +187,7 @@ namespace XE {
             ::glTexParameteri(target, GL_TEXTURE_MIN_FILTER, convertToGL(layer.magFilter));
             ::glTexParameteri(target, GL_TEXTURE_WRAP_S, convertToGL(layer.wrapS));
             ::glTexParameteri(target, GL_TEXTURE_WRAP_T, convertToGL(layer.wrapT));
-            ::glTexParameteri(target, GL_TEXTURE_WRAP_R, convertToGL(layer.wrapR));
+            /*::glTexParameteri(target, GL_TEXTURE_WRAP_R, convertToGL(layer.wrapR));*/
         }
 
         XE_GRAPHICS_GL_CHECK_ERROR();
@@ -218,15 +195,6 @@ namespace XE {
 
     void GraphicsDeviceES2::postRenderMaterial(const Material *material) {
         const auto &rs = material->renderState;
-
-        // clip distances
-        for (int i=0; i<rs.clipDistanceCount; i++) {
-            const GLenum clipDistanceGL = GL_CLIP_DISTANCE0 + i;
-
-            if (rs.clipDistances[i]) {
-                ::glDisable(clipDistanceGL);
-            }
-        }
 
         // depth buffer configuration
         if (rs.depthTest) {
@@ -315,30 +283,29 @@ namespace XE {
                 case 2:
                     switch (current->Columns) {
                     case 2: ::glUniformMatrix2fv(location, current->Count, GL_FALSE, (const GLfloat*)&data[offset]); break;
-                    case 3: ::glUniformMatrix2x3fv(location, current->Count, GL_FALSE, (const GLfloat*)&data[offset]); break;
-                    case 4: ::glUniformMatrix2x4fv(location, current->Count, GL_FALSE, (const GLfloat*)&data[offset]); break;
+                    default: throw std::runtime_error("AAAAA");
                     }
                     break;
 
                 case 3:
                     switch (current->Columns) {
-                    case 2: ::glUniformMatrix3x2fv(location, current->Count, GL_FALSE, (const GLfloat*)&data[offset]); break;
                     case 3: ::glUniformMatrix3fv(location, current->Count, GL_FALSE, (const GLfloat*)&data[offset]); break;
-                    case 4: ::glUniformMatrix3x4fv(location, current->Count, GL_FALSE, (const GLfloat*)&data[offset]); break;
+                    default: throw std::runtime_error("AAAAA");
                     }
                     break;
 
                 case 4:
                     switch (current->Columns) {
-                    case 2: ::glUniformMatrix4x2fv(location, current->Count, GL_FALSE, (const GLfloat*)&data[offset]); break;
-                    case 3: ::glUniformMatrix4x3fv(location, current->Count, GL_FALSE, (const GLfloat*)&data[offset]); break;
                     case 4: ::glUniformMatrix4fv(location, current->Count, GL_FALSE, (const GLfloat*)&data[offset]); break;
+                    default: throw std::runtime_error("AAAAA");
                     }
                     break;
                 }
                 break;
 
             case DataType::Float64: 
+                throw std::runtime_error("AAAAA");
+                /*
                 switch (current->Rows) {
                 case 2:
                     switch (current->Columns) {
@@ -364,6 +331,7 @@ namespace XE {
                     }
                     break;
                 }
+                */
                 break;
             }
 
@@ -410,6 +378,8 @@ namespace XE {
                 break;
 
             case DataType::UInt32:
+                throw std::runtime_error("AAAAA");
+                /*
                 switch (current->size) {
                     case 1: ::glUniform1uiv(location, current->Count, (const GLuint*)&data[offset]); break;
                     case 2: ::glUniform2uiv(location, current->Count, (const GLuint*)&data[offset]); break;
@@ -417,6 +387,7 @@ namespace XE {
                     case 4: ::glUniform4uiv(location, current->Count, (const GLuint*)&data[offset]); break;
                     default: assert(false);
                 }
+                */
                 break;
 
             default:

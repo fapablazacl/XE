@@ -6,8 +6,7 @@
 namespace XE {
     static GLenum s_shaderTypesGL[] = {
         GL_VERTEX_SHADER,
-        GL_FRAGMENT_SHADER,
-        GL_GEOMETRY_SHADER
+        GL_FRAGMENT_SHADER
     };
 
     ShaderGL::ShaderGL(const ShaderType type, const std::string &source) {
