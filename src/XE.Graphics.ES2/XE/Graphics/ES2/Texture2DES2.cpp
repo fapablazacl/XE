@@ -1,5 +1,5 @@
 
-#include "Texture2DGL.hpp"
+#include "Texture2DES2.hpp"
 #include "Conversion.hpp"
 #include "Util.hpp"
 

@@ -1,12 +1,12 @@
 
-#ifndef __XE_GRAPHICS_IGRAPHICSCONTEXTGL_HPP__
-#define __XE_GRAPHICS_IGRAPHICSCONTEXTGL_HPP__
+#ifndef __XE_GRAPHICS_IGRAPHICSCONTEXT_ES2_HPP__
+#define __XE_GRAPHICS_IGRAPHICSCONTEXT_ES2_HPP__
 
 namespace XE {
     /**
      * @brief Interface that abstracts the underlying graphics context
      */
-    class IGraphicsContextGL {
+    class IGraphicsContextES2 {
     public:
         typedef void (*ProcAddress) ();
         typedef ProcAddress (*GetProcAddress)(const char *);
@@ -32,7 +32,7 @@ namespace XE {
             static Descriptor defaultGL4();
         };
 
-        virtual ~IGraphicsContextGL();
+        virtual ~IGraphicsContextES2();
 
         /**
          * @brief Gets the specific proc address function specific to the context.

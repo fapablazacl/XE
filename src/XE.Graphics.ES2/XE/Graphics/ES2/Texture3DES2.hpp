@@ -4,7 +4,7 @@
 
 #include <XE/Graphics/Texture3D.hpp>
 
-#include "TextureBaseGL.hpp"
+#include "TextureBaseES2.hpp"
 
 namespace XE {
     class Texture3DGL : public Texture3D, public TextureBaseGL {

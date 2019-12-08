@@ -2,12 +2,12 @@
 include_directories(.)
 
 set (sources 
-	glad/glad.c
-	glad/glad_debug.c.in
-	glad/glad_release.c.in
-	glad/glad.h
-	glad/glad_debug.h
-	glad/glad_release.h
+	glad/es2/glad.c
+	glad/es2/glad_debug.c.in
+	glad/es2/glad_release.c.in
+	glad/es2/glad.h
+	glad/es2/glad_debug.h
+	glad/es2/glad_release.h
 )
 
 set (target glad-es2)

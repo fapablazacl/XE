@@ -4,7 +4,7 @@
 
 #include <XE/Graphics/TextureCubeMap.hpp>
 
-#include "TextureBaseGL.hpp"
+#include "TextureBaseES2.hpp"
 
 namespace XE {
     /*

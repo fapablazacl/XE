@@ -1,5 +1,5 @@
 
-#include "ShaderGL.hpp"
+#include "ShaderES2.hpp"
 
 #include <stdexcept>
 

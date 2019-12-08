@@ -1,5 +1,5 @@
 
-#include "Texture2DArrayGL.hpp"
+#include "Texture2DArrayES2.hpp"
 #include "Conversion.hpp"
 
 namespace XE {

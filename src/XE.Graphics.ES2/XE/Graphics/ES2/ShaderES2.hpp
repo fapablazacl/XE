@@ -3,7 +3,7 @@
 #define __XE_GRAPHICS_GL_SHADERGL_HPP__
 
 #include <XE/Graphics/Shader.hpp>
-#include <glad/glad.h>
+#include <glad/es2/glad.h>
 
 namespace XE {
     class ShaderGL : public Shader {

@@ -7,7 +7,7 @@
 #include <string>
 #include <memory>
 #include <tuple>
-#include <glad/glad.h>
+#include <glad/es2/glad.h>
 
 namespace XE {
     enum class ShaderType;

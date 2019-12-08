@@ -1,11 +1,11 @@
 
-#include "IGraphicsContextGL.hpp"
+#include "IGraphicsContextES2.hpp"
 
 namespace XE {
-    IGraphicsContextGL::~IGraphicsContextGL() {}
+    IGraphicsContextES2::~IGraphicsContextES2() {}
 
-    IGraphicsContextGL::Descriptor IGraphicsContextGL::Descriptor::defaultGL4()  {
-        IGraphicsContextGL::Descriptor descriptor;
+    IGraphicsContextES2::Descriptor IGraphicsContextES2::Descriptor::defaultGL4()  {
+        IGraphicsContextES2::Descriptor descriptor;
 
         descriptor.major = 4;
         descriptor.minor = 1;

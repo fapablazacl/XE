@@ -1,5 +1,5 @@
 
-#include "TextureCubeMapGL.hpp"
+#include "TextureCubeMapES2.hpp"
 
 namespace XE {
 

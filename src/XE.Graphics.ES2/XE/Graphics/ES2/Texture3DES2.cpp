@@ -1,5 +1,5 @@
 
-#include "Texture3DGL.hpp"
+#include "Texture3DES2.hpp"
 #include "Conversion.hpp"
 
 namespace XE {

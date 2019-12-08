@@ -1,10 +1,10 @@
 
-#ifndef __XE_GRAPHICS_ES2_BUFFERES2_HPP__
-#define __XE_GRAPHICS_ES2_BUFFERES2_HPP__
+#ifndef __XE_GRAPHICS_ES2_BUFFER_ES2_HPP__
+#define __XE_GRAPHICS_ES2_BUFFER_ES2_HPP__
 
 #include <XE/Buffer.hpp>
 #include <XE/Graphics/BufferDescriptor.hpp>
-#include <glad/glad.h>
+#include <glad/es2/glad.h>
 
 namespace XE {
     enum class BufferUsage;

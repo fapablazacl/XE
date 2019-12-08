@@ -4,7 +4,7 @@
 
 #include <XE/Graphics/Texture2DArray.hpp>
 
-#include "TextureBaseGL.hpp"
+#include "TextureBaseES2.hpp"
 
 namespace XE {
     class Texture2DArrayGL : public Texture2DArray, public TextureBaseGL {

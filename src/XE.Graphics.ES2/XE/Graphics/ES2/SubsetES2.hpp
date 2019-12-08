@@ -3,9 +3,9 @@
 #define __XE_GRAPHICS_GL_SUBSETGL_HPP__
 
 #include <XE/Graphics/Subset.hpp>
-#include <glad/glad.h>
+#include <glad/es2/glad.h>
 
-#include "BufferGL.hpp"
+#include "BufferES2.hpp"
 
 namespace XE {
     class SubsetGL : public Subset {
@@ -20,13 +20,13 @@ namespace XE {
         
         virtual int getBufferCount() const override;
 
-        virtual BufferGL* getBuffer(const int index) override;
+        virtual BufferES2* getBuffer(const int index) override;
 
-        virtual BufferGL* getIndexBuffer() override;
+        virtual BufferES2* getIndexBuffer() override;
 
-        virtual const BufferGL* getBuffer(const int index) const override;
+        virtual const BufferES2* getBuffer(const int index) const override;
 
-        virtual const BufferGL* getIndexBuffer() const override;
+        virtual const BufferES2* getIndexBuffer() const override;
 
         virtual SubsetDescriptor GetDescriptor() const override {
             return m_descriptor;
@@ -39,8 +39,8 @@ namespace XE {
 
     private:
         GLuint m_id;
-        std::vector<std::unique_ptr<BufferGL>> m_buffers;
-        std::unique_ptr<BufferGL> m_indexBuffer;
+        std::vector<std::unique_ptr<BufferES2>> m_buffers;
+        std::unique_ptr<BufferES2> m_indexBuffer;
 
         SubsetDescriptor m_descriptor;
     };

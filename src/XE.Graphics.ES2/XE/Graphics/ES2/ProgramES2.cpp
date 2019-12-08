@@ -1,6 +1,6 @@
 
-#include "ProgramGL.hpp"
-#include "ShaderGL.hpp"
+#include "ProgramES2.hpp"
+#include "ShaderES2.hpp"
 
 namespace XE {
     ProgramGL::ProgramGL(const ProgramDescriptor &desc) {

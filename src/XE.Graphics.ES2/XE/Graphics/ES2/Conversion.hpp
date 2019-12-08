@@ -1,9 +1,9 @@
 
-#ifndef __XE_GRAPHICS_GL_CONVERSION_HPP__
-#define __XE_GRAPHICS_GL_CONVERSION_HPP__
+#ifndef __XE_GRAPHICS_ES2_CONVERSION_HPP__
+#define __XE_GRAPHICS_ES2_CONVERSION_HPP__
 
 #include <cstdint>
-#include <glad/glad.h>
+#include <glad/es2/glad.h>
 
 namespace XE {
     enum class DataType : std::int16_t;

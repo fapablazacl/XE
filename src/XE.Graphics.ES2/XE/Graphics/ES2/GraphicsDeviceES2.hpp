@@ -1,22 +1,22 @@
 
-#ifndef __XE_GRAPHICS_GL_GRAPHICSDEVICEGL_HPP__
-#define __XE_GRAPHICS_GL_GRAPHICSDEVICEGL_HPP__
+#ifndef __XE_GRAPHICS_ES2_GRAPHICSDEVICE_ES2_HPP__
+#define __XE_GRAPHICS_ES2_GRAPHICSDEVICE_ES2_HPP__
 
 #include <XE/Graphics/Viewport.hpp>
 #include <XE/Graphics/GraphicsDevice.hpp>
 
-#include <glad/glad.h>
+#include <glad/es2/glad.h>
 
 namespace XE {
     class ProgramGL;
 
-    class IGraphicsContextGL;
+    class IGraphicsContextES2;
 
-    class GraphicsDeviceGL : public GraphicsDevice {
+    class GraphicsDeviceES2 : public GraphicsDevice {
     public:
-        explicit GraphicsDeviceGL(IGraphicsContextGL *context);
+        explicit GraphicsDeviceES2(IGraphicsContextES2 *context);
 
-        virtual ~GraphicsDeviceGL();
+        virtual ~GraphicsDeviceES2();
 
         virtual std::unique_ptr<Subset> createSubset(
             SubsetDescriptor& desc, 
@@ -64,7 +64,7 @@ namespace XE {
         void postRenderMaterial(const Material *material);
 
     private:
-        IGraphicsContextGL *context = nullptr;
+        IGraphicsContextES2 *context = nullptr;
 
         const ProgramGL *m_program = nullptr;
         const Material *m_material = nullptr;
