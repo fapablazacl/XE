@@ -2,6 +2,7 @@
 #ifndef __XE_GRAPHICS_GRAPHICSDEVICE_HPP__
 #define __XE_GRAPHICS_GRAPHICSDEVICE_HPP__
 
+#include <string>
 #include <vector>
 #include <memory>
 #include <map>

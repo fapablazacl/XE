@@ -2,6 +2,7 @@
 #ifndef __XE_GRAPHICS_WINDOWGLFW_HPP__
 #define __XE_GRAPHICS_WINDOWGLFW_HPP__
 
+#include <string>
 #include <memory>
 #include <XE/Input/InputManager.hpp>
 #include <XE/Graphics/IWindow.hpp>

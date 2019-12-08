@@ -2,6 +2,8 @@
 #include "ProgramGL.hpp"
 #include "ShaderGL.hpp"
 
+#include <stdexcept>
+
 namespace XE {
     ProgramGL::ProgramGL(const ProgramDescriptor &desc) {
         for (const auto &source: desc.sources) {
