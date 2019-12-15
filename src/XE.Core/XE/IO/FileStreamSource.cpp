@@ -1,14 +1,12 @@
 
 #include "FileStreamSource.hpp"
 
-#include <string>
-#include <experimental/filesystem>
+#include <fstream>
 #include <XE/IO/FileStream.hpp>
 
 namespace XE {
-    namespace fs = std::experimental::filesystem;
-
     FileStreamSource::FileStreamSource(const std::string &directory) {
+        /*
         fs::path path;
 
         if (directory == "") {
@@ -29,19 +27,23 @@ namespace XE {
                 throw std::runtime_error(msg);
             }
         }
+        */
 
-        this->directory = path.string();
+        this->directory = directory;
     }
 
     std::unique_ptr<Stream> FileStreamSource::open(const std::string &path) {
-        const fs::path finalPath = fs::path(directory) / fs::path(path);
+        const std::string finalPath = directory + "/"  + path;
 
-        return std::make_unique<FileStream>(finalPath.string(), StreamFlags::Readable);
+        return std::make_unique<FileStream>(finalPath, StreamFlags::Readable);
     }
 
     bool FileStreamSource::exists(const std::string &path) const {
-        const fs::path finalPath = fs::path(directory) / fs::path(path);
-
-        return fs::exists(finalPath);
+        const std::string filePath = directory + "/" + path;
+        std::fstream fs;
+        
+        fs.open(filePath.c_str(), std::ios_base::in);
+        
+        return fs.is_open();
     }
 }

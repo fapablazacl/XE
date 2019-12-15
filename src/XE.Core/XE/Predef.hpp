@@ -3,14 +3,7 @@
 #define __XE_PREDEF_HPP__
 
 #include <cstdint>
-
-#if defined(__APPLE__)
-namespace std {
-    typedef uint8_t byte; 
-}
-#else 
 #include <cstddef>
-#endif
 
 #define XE_API
 
