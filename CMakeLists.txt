@@ -3,6 +3,7 @@ project (XE)
 option (XE_PLUGIN_PNG           "Include PNG image support via LodePNG" OFF)
 option (XE_PLUGIN_DIRECT3D11    "Include Direct3D 11 support" OFF)
 option (XE_PLUGIN_GL            "Include OpenGL 3+ support" OFF)
+option (XE_PLUGIN_ES2           "Include OpenGL ES 2 support" OFF)
 option (XE_PLUGIN_GL_GLFW       "Include GLFW-based Window and Context creation support (requires 'XE_PLUGIN_GL')" OFF)
 option (XE_PLUGIN_VULKAN        "Include Vulkan support" OFF)
 
@@ -83,6 +84,24 @@ if (XE_PLUGIN_GL)
         include_directories("src/XE.Graphics.GL.GLFW")
     endif()
 endif ()
+
+
+if (XE_PLUGIN_ES2)
+    include_directories ("src/khronos")
+
+    add_subdirectory ("src/glad-es2")
+    include_directories ("src/glad-es2")
+
+	set (GLFW_BUILD_DOCS CACHE BOOL OFF)
+	set (GLFW_BUILD_TESTS CACHE BOOL OFF)
+	set (GLFW_BUILD_EXAMPLES CACHE BOOL OFF)
+	set (GLFW_BUILD_INSTALL CACHE BOOL OFF)
+    set (GLFW_INSTALL CACHE BOOL OFF)
+    
+    add_subdirectory ("src/XE.Graphics.ES2")
+    include_directories ("src/XE.Graphics.ES2")
+endif()
+
 
 if (XE_PLUGIN_VULKAN)
     add_subdirectory ("src/XE.Graphics.Vk.TestApp")

@@ -3,7 +3,6 @@
 #define __XE_CORE_HPP__
 
 #include <XE/Predef.hpp>
-#include <cstddef>
 
 namespace XE {
     struct Version {
