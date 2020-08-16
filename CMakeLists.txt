@@ -102,8 +102,15 @@ if (XE_PLUGIN_ES2)
     include_directories ("src/XE.Graphics.ES2")
 endif()
 
-
 if (XE_PLUGIN_VULKAN)
+	set (GLFW_BUILD_DOCS CACHE BOOL OFF)
+	set (GLFW_BUILD_TESTS CACHE BOOL OFF)
+	set (GLFW_BUILD_EXAMPLES CACHE BOOL OFF)
+	set (GLFW_BUILD_INSTALL CACHE BOOL OFF)
+	set (GLFW_INSTALL CACHE BOOL OFF)
+	add_subdirectory ("dep/glfw")
+	include_directories ("dep/glfw/include")
+
     add_subdirectory ("src/XE.Graphics.Vk.TestApp")
     include_directories ("src/XE.Graphics.Vk.TestApp")
 endif ()
