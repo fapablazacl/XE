@@ -9,6 +9,15 @@
 #include <string>
 #include <stdexcept>
 #include <algorithm>
+#include <optional>
+
+struct QueryFamilyIndices {
+    std::optional<uint32_t> graphicsFamily;
+
+    bool isComplete() const {
+        return graphicsFamily.has_value();
+    }
+};
 
 static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(
     VkDebugUtilsMessageSeverityFlagBitsEXT severity,
@@ -189,10 +198,68 @@ namespace XE {
             }
         }
 
+        void pickPhysicalDevice() {
+            auto devices = enumeratePhysicalDevices();
+
+            if (devices.size() == 0) {
+                throw std::runtime_error("There is no available GPUs");
+            }
+
+            for (const auto& device : devices) {
+                if (isDeviceSuitable(device)) {
+                    physicaldevice = device;
+                }
+            }
+        }
+
+        std::vector<VkPhysicalDevice> enumeratePhysicalDevices() const {
+            uint32_t count;
+
+            vkEnumeratePhysicalDevices(instance, &count, nullptr);
+
+            std::vector<VkPhysicalDevice> physicalDevices;
+            physicalDevices.reserve(count);
+            vkEnumeratePhysicalDevices(instance, &count, physicalDevices.data());
+        }
+
+        //! Checks if the specified device is a Hardware accelerated GPU
+        bool isDeviceSuitable(VkPhysicalDevice device) const {
+            VkPhysicalDeviceProperties properties;
+            vkGetPhysicalDeviceProperties(device, &properties);
+
+            VkPhysicalDeviceFeatures features;
+            vkGetPhysicalDeviceFeatures(device, &features);
+
+            return (properties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU || properties.deviceType == VK_PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU) && features.geometryShader;
+        }
+
+        QueryFamilyIndices findQueueFamilies(VkPhysicalDevice device) {
+            uint32_t count;
+            vkGetPhysicalDeviceQueueFamilyProperties(device, &count, nullptr);
+
+            std::vector<VkQueueFamilyProperties> properties;
+            properties.reserve(count);
+            vkGetPhysicalDeviceQueueFamilyProperties(device, &count, properties.data());
+
+            QueryFamilyIndices indices;
+
+            for (size_t i = 0; i < properties.size(); i++) {
+                if (properties[i].queueFlags & VK_QUEUE_GRAPHICS_BIT) {
+                    indices.graphicsFamily = static_cast<int>(i);
+                    break;
+                }
+            }
+
+            return indices;
+        }
+
     private:
         GLFWwindow *window = nullptr;
         VkInstance instance;
         VkDebugUtilsMessengerEXT debugMessenger;
+
+        VkPhysicalDevice physicaldevice = VK_NULL_HANDLE;
+        VkDevice logicalDevice;
     };
 }
 
