@@ -70,7 +70,7 @@ namespace XE {
             glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
             glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 
-            window = glfwCreateWindow(ScreenWidth, ScreenHeight, "Vulkan Window", nullptr, nullptr);
+            mWindow = glfwCreateWindow(ScreenWidth, ScreenHeight, "Vulkan Window", nullptr, nullptr);
         }
 
         void initVulkan() {
@@ -79,22 +79,28 @@ namespace XE {
             if (enableValidationLayers) {
                 setupDebugMessenger();
             }
+
+            pickPhysicalDevice();
+
+            createLogicalDevice();
         }
 
         void loop() {
-            while (!glfwWindowShouldClose(window)) {
+            while (!glfwWindowShouldClose(mWindow)) {
                 glfwPollEvents();
             }
         }
 
         void terminate() {
+            vkDestroyDevice(mDevice, nullptr);
+
             if (enableValidationLayers) {
-                DestroyDebugUtilsMessengerEXT(instance, debugMessenger, nullptr);
+                DestroyDebugUtilsMessengerEXT(mInstance, mDebugMessenger, nullptr);
             }
 
-            vkDestroyInstance(instance, nullptr);
+            vkDestroyInstance(mInstance, nullptr);
             
-            if (window) {
+            if (mWindow) {
                 glfwPollEvents();
             }
 
@@ -137,7 +143,7 @@ namespace XE {
 
             createInfo.enabledLayerCount = 0;
 
-            if (vkCreateInstance(&createInfo, nullptr, &instance) != VK_SUCCESS) {
+            if (vkCreateInstance(&createInfo, nullptr, &mInstance) != VK_SUCCESS) {
                 throw std::runtime_error("Failed to create Instance");
             }
         }
@@ -193,7 +199,7 @@ namespace XE {
         void setupDebugMessenger() {
             VkDebugUtilsMessengerCreateInfoEXT msgInfo = makeDebugMessengerInfo();
 
-            if (CreateDebugUtilsMessengerEXT(instance, &msgInfo, nullptr, &debugMessenger) != VK_SUCCESS) {
+            if (CreateDebugUtilsMessengerEXT(mInstance, &msgInfo, nullptr, &mDebugMessenger) != VK_SUCCESS) {
                 throw std::runtime_error("failed to setup the debug messenger");
             }
         }
@@ -207,19 +213,54 @@ namespace XE {
 
             for (const auto& device : devices) {
                 if (isDeviceSuitable(device)) {
-                    physicaldevice = device;
+                    mPhysicaldevice = device;
                 }
             }
+        }
+
+        void createLogicalDevice() {
+            const auto indices = findQueueFamilies(mPhysicaldevice);
+            const float queuePriority = 1.0f;
+
+            VkDeviceQueueCreateInfo queueCreateInfo = {};
+            queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+            queueCreateInfo.queueFamilyIndex = indices.graphicsFamily.value();
+            queueCreateInfo.pQueuePriorities = &queuePriority;
+            queueCreateInfo.queueCount = 1;
+
+            VkPhysicalDeviceFeatures deviceFeatures = {};
+
+            VkDeviceCreateInfo deviceInfo = {};
+            deviceInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+            deviceInfo.pQueueCreateInfos = &queueCreateInfo;
+            deviceInfo.queueCreateInfoCount = 1;
+            deviceInfo.pEnabledFeatures = &deviceFeatures;
+            deviceInfo.enabledExtensionCount = 0;
+
+            if (enableValidationLayers) {
+                deviceInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());
+                deviceInfo.ppEnabledLayerNames = validationLayers.data();
+            } else {
+                deviceInfo.enabledLayerCount = 0;
+            }
+
+            if (vkCreateDevice(mPhysicaldevice, &deviceInfo, nullptr, &mDevice) != VK_SUCCESS) {
+                throw std::runtime_error("failed to create logical device!");
+            }
+
+            vkGetDeviceQueue(mDevice, indices.graphicsFamily.value(), 0, &mGraphicsQueue);
         }
 
         std::vector<VkPhysicalDevice> enumeratePhysicalDevices() const {
             uint32_t count;
 
-            vkEnumeratePhysicalDevices(instance, &count, nullptr);
+            vkEnumeratePhysicalDevices(mInstance, &count, nullptr);
 
             std::vector<VkPhysicalDevice> physicalDevices;
-            physicalDevices.reserve(count);
-            vkEnumeratePhysicalDevices(instance, &count, physicalDevices.data());
+            physicalDevices.resize(count);
+            vkEnumeratePhysicalDevices(mInstance, &count, physicalDevices.data());
+
+            return physicalDevices;
         }
 
         //! Checks if the specified device is a Hardware accelerated GPU
@@ -230,15 +271,23 @@ namespace XE {
             VkPhysicalDeviceFeatures features;
             vkGetPhysicalDeviceFeatures(device, &features);
 
-            return (properties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU || properties.deviceType == VK_PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU) && features.geometryShader;
+            // filter the device
+            const bool isGpuWithGeometryShader = (properties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU || properties.deviceType == VK_PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU) && features.geometryShader;
+
+            if (isGpuWithGeometryShader) {
+                const auto indices = findQueueFamilies(device);
+                return indices.isComplete();
+            }
+
+            return false;
         }
 
-        QueryFamilyIndices findQueueFamilies(VkPhysicalDevice device) {
+        QueryFamilyIndices findQueueFamilies(VkPhysicalDevice device) const {
             uint32_t count;
             vkGetPhysicalDeviceQueueFamilyProperties(device, &count, nullptr);
 
             std::vector<VkQueueFamilyProperties> properties;
-            properties.reserve(count);
+            properties.resize(count);
             vkGetPhysicalDeviceQueueFamilyProperties(device, &count, properties.data());
 
             QueryFamilyIndices indices;
@@ -254,12 +303,13 @@ namespace XE {
         }
 
     private:
-        GLFWwindow *window = nullptr;
-        VkInstance instance;
-        VkDebugUtilsMessengerEXT debugMessenger;
+        GLFWwindow *mWindow = nullptr;
+        VkInstance mInstance;
+        VkDebugUtilsMessengerEXT mDebugMessenger;
 
-        VkPhysicalDevice physicaldevice = VK_NULL_HANDLE;
-        VkDevice logicalDevice;
+        VkPhysicalDevice mPhysicaldevice = VK_NULL_HANDLE;
+        VkDevice mDevice;
+        VkQueue mGraphicsQueue;
     };
 }
 
