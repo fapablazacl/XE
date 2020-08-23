@@ -29,6 +29,14 @@ struct QueryFamilyIndices {
     }
 };
 
+
+struct SwapChainSupportDetails {
+    VkSurfaceCapabilitiesKHR capabilities;
+    std::vector<VkSurfaceFormatKHR> formats;
+    std::vector<VkPresentModeKHR> presentModes;
+};
+
+
 static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(
     VkDebugUtilsMessageSeverityFlagBitsEXT severity,
     VkDebugUtilsMessageTypeFlagsEXT type,
@@ -55,23 +63,28 @@ void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT
     }
 }
 
-const std::vector<const char*> validationLayers = {
+static const std::vector<const char*> validationLayers = {
     "VK_LAYER_KHRONOS_validation"
 };
 
+static const std::vector<const char*> deviceExtensions = {
+    VK_KHR_SWAPCHAIN_EXTENSION_NAME
+};
+
+
 namespace XE {
-    const int ScreenWidth = 1024;
-    const int ScreenHeight = 768;
+    const int SCREEN_WIDTH = 1024;
+    const int SCREEN_HEIGHT = 768;
 
     const bool enableValidationLayers = true;
 
-    class TriangleApplication {
+    class TriangleVulkanApplication {
     public:
         void run() {
-            this->initWindow();
-            this->initVulkan();
-            this->loop();
-            this->terminate();
+            initWindow();
+            initVulkan();
+            loop();
+            terminate();
         }
 
     private:
@@ -80,7 +93,7 @@ namespace XE {
             glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
             glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 
-            mWindow = glfwCreateWindow(ScreenWidth, ScreenHeight, "Vulkan Window", nullptr, nullptr);
+            mWindow = glfwCreateWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Vulkan Window", nullptr, nullptr);
         }
 
         void initVulkan() {
@@ -256,7 +269,9 @@ namespace XE {
             deviceInfo.pQueueCreateInfos = queueCreateInfos.data();
             deviceInfo.queueCreateInfoCount = static_cast<uint32_t>(queueCreateInfos.size());
             deviceInfo.pEnabledFeatures = &deviceFeatures;
-            deviceInfo.enabledExtensionCount = 0;
+
+            deviceInfo.enabledExtensionCount = static_cast<uint32_t>(deviceExtensions.size());
+            deviceInfo.ppEnabledExtensionNames = deviceExtensions.data();
 
             if (enableValidationLayers) {
                 deviceInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());
@@ -297,8 +312,16 @@ namespace XE {
             const bool isGpuWithGeometryShader = (properties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU || properties.deviceType == VK_PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU) && features.geometryShader;
 
             if (isGpuWithGeometryShader) {
+                const bool extensionsSupported = checkDeviceExtensionSupport(device);
+
+                bool swapChainAdequate = false;
+                if (extensionsSupported) {
+                    const auto details = querySwapChainSupport(device);
+                    swapChainAdequate = !details.formats.empty() && !details.presentModes.empty();
+                }
+
                 const auto indices = findQueueFamilies(device);
-                return indices.isComplete();
+                return indices.isComplete() && extensionsSupported && swapChainAdequate;
             }
 
             return false;
@@ -341,6 +364,47 @@ namespace XE {
         }
 
 
+        bool checkDeviceExtensionSupport(VkPhysicalDevice device) const {
+            uint32_t count;
+            vkEnumerateDeviceExtensionProperties(device, nullptr, &count, nullptr);
+
+            std::vector<VkExtensionProperties> extensions;
+            extensions.resize(count);
+            vkEnumerateDeviceExtensionProperties(device, nullptr, &count, extensions.data());
+
+            std::set<std::string> requiredExtensionNames(deviceExtensions.begin(), deviceExtensions.end());
+
+            for (const auto& extension : extensions) {
+                requiredExtensionNames.erase(extension.extensionName);
+            }
+
+            return requiredExtensionNames.empty();
+        }
+
+        SwapChainSupportDetails querySwapChainSupport(VkPhysicalDevice device) const {
+            SwapChainSupportDetails details;
+            vkGetPhysicalDeviceSurfaceCapabilitiesKHR(device, mSurface, &details.capabilities);
+
+            // format count
+            uint32_t formatCount;
+            vkGetPhysicalDeviceSurfaceFormatsKHR(device, mSurface, &formatCount, nullptr);
+
+            if (formatCount > 0) {
+                details.formats.resize(formatCount);
+                vkGetPhysicalDeviceSurfaceFormatsKHR(device, mSurface, &formatCount, details.formats.data());
+            }
+
+            // present modes
+            uint32_t presentModeCount;
+            vkGetPhysicalDeviceSurfacePresentModesKHR(device, mSurface, &presentModeCount, nullptr);
+            if (presentModeCount > 0) {
+                details.presentModes.resize(presentModeCount);
+                vkGetPhysicalDeviceSurfacePresentModesKHR(device, mSurface, &presentModeCount, details.presentModes.data());
+            }
+
+            return details;
+        }
+
     private:
         GLFWwindow *mWindow = nullptr;
         VkInstance mInstance;
@@ -357,7 +421,7 @@ namespace XE {
 
 
 int main() {
-    XE::TriangleApplication app;
+    XE::TriangleVulkanApplication app;
 
     try {
         app.run();
