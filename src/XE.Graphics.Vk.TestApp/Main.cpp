@@ -15,16 +15,16 @@
 
 struct QueryFamilyIndices {
     std::optional<uint32_t> graphicsFamily;
-    std::optional<uint32_t> presentationFamily;
+    std::optional<uint32_t> presentFamily;
 
     bool isComplete() const {
-        return graphicsFamily.has_value() && presentationFamily.has_value();
+        return graphicsFamily.has_value() && presentFamily.has_value();
     }
 
     std::set<uint32_t> uniques() const {
         return {
             graphicsFamily.value(), 
-            presentationFamily.value(), 
+            presentFamily.value(), 
         };
     }
 };
@@ -73,8 +73,8 @@ static const std::vector<const char*> deviceExtensions = {
 
 
 namespace XE {
-    const int SCREEN_WIDTH = 1024;
-    const int SCREEN_HEIGHT = 768;
+    const uint32_t SCREEN_WIDTH = 1024;
+    const uint32_t SCREEN_HEIGHT = 768;
 
     const bool enableValidationLayers = true;
 
@@ -106,6 +106,7 @@ namespace XE {
             createSurface();
             pickPhysicalDevice();
             createLogicalDevice();
+            createSwapChain();
         }
 
         void loop() {
@@ -115,6 +116,8 @@ namespace XE {
         }
 
         void terminate() {
+            vkDestroySwapchainKHR(mDevice, mSwapchain, nullptr);
+
             vkDestroyDevice(mDevice, nullptr);
 
             if (enableValidationLayers) {
@@ -285,7 +288,7 @@ namespace XE {
             }
 
             vkGetDeviceQueue(mDevice, indices.graphicsFamily.value(), 0, &mGraphicsQueue);
-            vkGetDeviceQueue(mDevice, indices.presentationFamily.value(), 0, &mPresentationQueue);
+            vkGetDeviceQueue(mDevice, indices.presentFamily.value(), 0, &mPresentationQueue);
         }
 
         std::vector<VkPhysicalDevice> enumeratePhysicalDevices() const {
@@ -350,7 +353,7 @@ namespace XE {
                 vkGetPhysicalDeviceSurfaceSupportKHR(device, i, mSurface, &presentationSupport);
 
                 if (presentationSupport == VK_TRUE) {
-                    indices.presentationFamily = i;
+                    indices.presentFamily = i;
                 }
             }
 
@@ -405,17 +408,119 @@ namespace XE {
             return details;
         }
 
+
+        std::optional<VkSurfaceFormatKHR> chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& surfaceformats) const {
+            for (auto surfaceFormat : surfaceformats) {
+                if (surfaceFormat.format == VK_FORMAT_B8G8R8A8_SRGB && surfaceFormat.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR) {
+                    return surfaceFormat;
+                }
+            }
+
+            return {};
+        }
+
+        VkPresentModeKHR chooseSwapPresentMode(const std::set<VkPresentModeKHR>& presentModes) const {
+            if (const auto it = presentModes.find(VK_PRESENT_MODE_MAILBOX_KHR); it != presentModes.end()) {
+                return VK_PRESENT_MODE_MAILBOX_KHR;
+            }
+
+            return VK_PRESENT_MODE_FIFO_KHR;
+        }
+
+        VkExtent2D chooseSwapExtent(const VkSurfaceCapabilitiesKHR& caps) const {
+            if (caps.currentExtent.width != UINT32_MAX) {
+                return caps.currentExtent;
+            }
+
+            return {
+                std::max(caps.minImageExtent.width, std::min(caps.maxImageExtent.width, SCREEN_WIDTH )), 
+                std::max(caps.minImageExtent.height, std::min(caps.maxImageExtent.height, SCREEN_HEIGHT))
+            };
+        }
+        
+        uint32_t chooseImageCount(const VkSurfaceCapabilitiesKHR& caps) const {
+            const uint32_t imageCount = caps.minImageCount + 1;
+
+            if (caps.maxImageCount > 0 && imageCount > caps.maxImageCount) {
+                return caps.maxImageCount;
+            }
+
+            return imageCount;
+        }
+
+
+        void createSwapChain() {
+            const SwapChainSupportDetails swapChainSupport = querySwapChainSupport(mPhysicaldevice);
+            const std::optional<VkSurfaceFormatKHR> surfaceFormat = chooseSwapSurfaceFormat(swapChainSupport.formats);
+
+            if (!surfaceFormat) {
+                throw std::runtime_error("No suitable swapchain surface format found");
+            }
+
+            const VkPresentModeKHR presentMode = chooseSwapPresentMode({swapChainSupport.presentModes.begin(), swapChainSupport.presentModes.end()});
+            const VkExtent2D extent = chooseSwapExtent(swapChainSupport.capabilities);
+            const uint32_t imageCount = chooseImageCount(swapChainSupport.capabilities);
+
+            VkSwapchainCreateInfoKHR info = {};
+            info.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
+            info.surface = mSurface;
+            info.minImageCount = imageCount;
+            info.imageFormat = surfaceFormat->format;
+            info.imageColorSpace = surfaceFormat->colorSpace;
+            info.imageExtent = extent;
+            info.imageArrayLayers = 1;
+            info.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+
+            const QueryFamilyIndices indices = findQueueFamilies(mPhysicaldevice);
+            const uint32_t queueFamilyIndices[] = {indices.graphicsFamily.value(), indices.presentFamily.value()};
+
+            if (indices.graphicsFamily != indices.presentFamily) {
+                info.imageSharingMode = VK_SHARING_MODE_CONCURRENT;
+                info.queueFamilyIndexCount = 2;
+                info.pQueueFamilyIndices = queueFamilyIndices;
+            } else {
+                info.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
+                info.queueFamilyIndexCount = 0;
+                info.pQueueFamilyIndices = nullptr;
+            }
+
+            info.preTransform = swapChainSupport.capabilities.currentTransform;
+            info.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
+            info.presentMode = presentMode;
+            info.clipped = VK_TRUE;
+            info.oldSwapchain = VK_NULL_HANDLE;
+
+            if (vkCreateSwapchainKHR(mDevice, &info, nullptr, &mSwapchain) != VK_SUCCESS) {
+                throw std::runtime_error("Failed to create swapchain!");
+            }
+
+            mSwapchainImageFormat = surfaceFormat->format;
+            mSwapchainExtent = extent;
+
+            retrieveSwapchainImages();
+        }
+
+        void retrieveSwapchainImages() {
+            uint32_t imageCount;
+            vkGetSwapchainImagesKHR(mDevice, mSwapchain, &imageCount, nullptr);
+
+            mSwapchainImages.resize(static_cast<size_t>(imageCount));
+            vkGetSwapchainImagesKHR(mDevice, mSwapchain, &imageCount, mSwapchainImages.data());
+        }
+
     private:
         GLFWwindow *mWindow = nullptr;
         VkInstance mInstance;
         VkDebugUtilsMessengerEXT mDebugMessenger;
-
         VkPhysicalDevice mPhysicaldevice = VK_NULL_HANDLE;
         VkDevice mDevice;
         VkQueue mGraphicsQueue;
         VkQueue mPresentationQueue;
-
         VkSurfaceKHR mSurface;
+        VkSwapchainKHR mSwapchain;
+        std::vector<VkImage> mSwapchainImages;
+        VkFormat mSwapchainImageFormat;
+        VkExtent2D mSwapchainExtent;
     };
 }
 
