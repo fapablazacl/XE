@@ -116,6 +116,10 @@ namespace XE {
         }
 
         void terminate() {
+            for (VkImageView imageView : mSwapchainImageViews) {
+                vkDestroyImageView(mDevice, imageView, nullptr);
+            }
+
             vkDestroySwapchainKHR(mDevice, mSwapchain, nullptr);
 
             vkDestroyDevice(mDevice, nullptr);
@@ -498,6 +502,7 @@ namespace XE {
             mSwapchainExtent = extent;
 
             retrieveSwapchainImages();
+            createImageViews();
         }
 
         void retrieveSwapchainImages() {
@@ -506,6 +511,36 @@ namespace XE {
 
             mSwapchainImages.resize(static_cast<size_t>(imageCount));
             vkGetSwapchainImagesKHR(mDevice, mSwapchain, &imageCount, mSwapchainImages.data());
+        }
+
+        void createImageViews() {
+            mSwapchainImageViews.reserve(mSwapchainImages.size());
+
+            std::transform(mSwapchainImages.begin(), mSwapchainImages.end(), std::back_inserter(mSwapchainImageViews), [this](VkImage image) {
+                VkImageViewCreateInfo info {};
+
+                info.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+                info.image = image;
+                info.viewType = VK_IMAGE_VIEW_TYPE_2D;
+                info.format = mSwapchainImageFormat;
+                info.components.r = VK_COMPONENT_SWIZZLE_IDENTITY;
+                info.components.g = VK_COMPONENT_SWIZZLE_IDENTITY;
+                info.components.b = VK_COMPONENT_SWIZZLE_IDENTITY;
+                info.components.a = VK_COMPONENT_SWIZZLE_IDENTITY;
+                info.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+                info.subresourceRange.baseMipLevel = 0;
+                info.subresourceRange.levelCount = 1;
+                info.subresourceRange.baseArrayLayer = 0;
+                info.subresourceRange.layerCount = 1;
+
+                VkImageView imageView;
+
+                if (vkCreateImageView(mDevice, &info, nullptr, &imageView) != VK_SUCCESS) {
+                    throw std::runtime_error("Failed to create image views from the swapchain images");
+                }
+
+                return imageView;
+            });
         }
 
     private:
@@ -521,6 +556,8 @@ namespace XE {
         std::vector<VkImage> mSwapchainImages;
         VkFormat mSwapchainImageFormat;
         VkExtent2D mSwapchainExtent;
+
+        std::vector<VkImageView> mSwapchainImageViews;
     };
 }
 
