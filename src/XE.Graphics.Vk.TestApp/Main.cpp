@@ -12,6 +12,7 @@
 #include <algorithm>
 #include <optional>
 #include <set>
+#include <fstream>
 
 struct QueryFamilyIndices {
     std::optional<uint32_t> graphicsFamily;
@@ -63,6 +64,25 @@ void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT
     }
 }
 
+static std::vector<char> readFile(const std::string& filename) {
+    std::ifstream fs{filename.c_str(), std::ios::ate | std::ios::binary};
+
+    if (! fs.is_open()) {
+        throw std::runtime_error("failed to open file " + filename);
+    }
+
+    const auto fileSize = static_cast<size_t>(fs.tellg());
+
+    std::vector<char> buffer;
+    buffer.resize(fileSize);
+
+    fs.seekg(0);
+    fs.read(buffer.data(), fileSize);
+    fs.close();
+
+    return buffer;
+}
+
 static const std::vector<const char*> validationLayers = {
     "VK_LAYER_KHRONOS_validation"
 };
@@ -107,6 +127,7 @@ namespace XE {
             pickPhysicalDevice();
             createLogicalDevice();
             createSwapChain();
+            createGraphicsPipeline();
         }
 
         void loop() {
@@ -541,6 +562,89 @@ namespace XE {
 
                 return imageView;
             });
+        }
+
+        void createGraphicsPipeline() {
+            const auto vertexShaderCode = readFile("media/shaders/triangle/vert.spv");
+            const auto fragmentShaderCode = readFile("media/shaders/triangle/frag.spv");
+
+            const VkShaderModule vertexShaderModule = createShaderModule(vertexShaderCode);
+            const VkShaderModule fragmentShaderModule = createShaderModule(fragmentShaderCode);
+
+            VkPipelineShaderStageCreateInfo vsStageInfo = {};
+            vsStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+            vsStageInfo.stage = VK_SHADER_STAGE_VERTEX_BIT;
+            vsStageInfo.module = vertexShaderModule;
+            vsStageInfo.pName = "main";
+
+            VkPipelineShaderStageCreateInfo fsStageInfo = {};
+            fsStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+            fsStageInfo.stage = VK_SHADER_STAGE_VERTEX_BIT;
+            fsStageInfo.module = fragmentShaderModule;
+            fsStageInfo.pName = "main";
+
+            VkPipelineShaderStageCreateInfo shaderStages[] = {
+                vsStageInfo, fsStageInfo
+            };
+
+            VkPipelineVertexInputStateCreateInfo vertexInputInfo {};
+            vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
+            vertexInputInfo.vertexAttributeDescriptionCount = 0;
+            vertexInputInfo.pVertexAttributeDescriptions = nullptr;
+            vertexInputInfo.vertexBindingDescriptionCount = 0;
+            vertexInputInfo.pVertexBindingDescriptions = nullptr;
+
+            VkPipelineInputAssemblyStateCreateInfo inputAssembly {};
+            inputAssembly.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
+            inputAssembly.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
+            inputAssembly.primitiveRestartEnable = VK_FALSE;
+
+            VkViewport viewport {};
+            viewport.x = 0.0f;
+            viewport.y = 0.0f;
+            viewport.width = mSwapchainExtent.width;
+            viewport.height = mSwapchainExtent.height;
+            viewport.minDepth = 0.0f;
+            viewport.maxDepth = 1.0f;
+
+            VkRect2D scissor {};
+            scissor.offset = {0, 0};
+            scissor.extent = mSwapchainExtent;
+
+            VkPipelineViewportStateCreateInfo viewportInfo {};
+            viewportInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
+            viewportInfo.viewportCount = 1;
+            viewportInfo.pViewports = &viewport;
+            viewportInfo.scissorCount = 1;
+            viewportInfo.pScissors = &scissor;
+
+            VkPipelineRasterizationStateCreateInfo rasterizationInfo {};
+            rasterizationInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
+            rasterizationInfo.depthClampEnable = VK_FALSE;
+            rasterizationInfo.rasterizerDiscardEnable = VK_FALSE;
+            rasterizationInfo.polygonMode = VK_POLYGON_MODE_FILL;
+            rasterizationInfo.lineWidth = 1.0f;
+            rasterizationInfo.cullMode = VK_CULL_MODE_BACK_BIT;
+            rasterizationInfo.frontFace = VK_FRONT_FACE_CLOCKWISE;
+            rasterizationInfo.depthBiasEnable = VK_FALSE;
+            
+            vkDestroyShaderModule(mDevice, vertexShaderModule, nullptr);
+            vkDestroyShaderModule(mDevice, fragmentShaderModule, nullptr);
+        }
+
+        VkShaderModule createShaderModule(const std::vector<char> &code) const {
+            VkShaderModuleCreateInfo info {};
+
+            info.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
+            info.pCode = (const uint32_t*) code.data();
+            info.codeSize = code.size();
+            
+            VkShaderModule shaderModule;
+            if (vkCreateShaderModule(mDevice, &info, nullptr, &shaderModule) != VK_SUCCESS) {
+                throw std::runtime_error("Cannot create shader module from code");
+            }
+
+            return shaderModule;
         }
 
     private:
