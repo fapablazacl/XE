@@ -137,6 +137,8 @@ namespace XE {
         }
 
         void terminate() {
+            vkDestroyPipelineLayout(mDevice, mPipelineLayout, nullptr);
+
             for (VkImageView imageView : mSwapchainImageViews) {
                 vkDestroyImageView(mDevice, imageView, nullptr);
             }
@@ -628,6 +630,33 @@ namespace XE {
             rasterizationInfo.frontFace = VK_FRONT_FACE_CLOCKWISE;
             rasterizationInfo.depthBiasEnable = VK_FALSE;
             
+            VkPipelineMultisampleStateCreateInfo multisampleInfo {};
+            multisampleInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
+            multisampleInfo.sampleShadingEnable = VK_FALSE;
+            multisampleInfo.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;
+            multisampleInfo.minSampleShading = 1.0f;
+
+            VkPipelineColorBlendAttachmentState attachmentState {};
+            attachmentState.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
+            attachmentState.blendEnable = VK_FALSE;
+
+            VkPipelineColorBlendStateCreateInfo colorBlendStateInfo {};
+            colorBlendStateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
+            colorBlendStateInfo.logicOpEnable = VK_FALSE;
+            colorBlendStateInfo.attachmentCount = 1;
+            colorBlendStateInfo.pAttachments = &attachmentState;
+            for (int i=0; i<4; i++) {
+                colorBlendStateInfo.blendConstants[i] = 0.0f;
+            }
+
+            VkPipelineLayoutCreateInfo pipelineLayoutInfo {};
+            pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+            pipelineLayoutInfo.setLayoutCount = 0;
+
+            if (vkCreatePipelineLayout(mDevice, &pipelineLayoutInfo, nullptr, &mPipelineLayout) != VK_SUCCESS) {
+                throw std::runtime_error("failed to create pipeline layout!");
+            }
+
             vkDestroyShaderModule(mDevice, vertexShaderModule, nullptr);
             vkDestroyShaderModule(mDevice, fragmentShaderModule, nullptr);
         }
@@ -660,8 +689,8 @@ namespace XE {
         std::vector<VkImage> mSwapchainImages;
         VkFormat mSwapchainImageFormat;
         VkExtent2D mSwapchainExtent;
-
         std::vector<VkImageView> mSwapchainImageViews;
+        VkPipelineLayout mPipelineLayout;
     };
 }
 
