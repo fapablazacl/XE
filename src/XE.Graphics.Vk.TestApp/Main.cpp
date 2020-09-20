@@ -127,6 +127,7 @@ namespace XE {
             pickPhysicalDevice();
             createLogicalDevice();
             createSwapChain();
+            createRenderPass();
             createGraphicsPipeline();
         }
 
@@ -137,7 +138,9 @@ namespace XE {
         }
 
         void terminate() {
+            vkDestroyPipeline(mDevice, mGraphicsPipeline, nullptr);
             vkDestroyPipelineLayout(mDevice, mPipelineLayout, nullptr);
+            vkDestroyRenderPass(mDevice, mRenderPass, nullptr);
 
             for (VkImageView imageView : mSwapchainImageViews) {
                 vkDestroyImageView(mDevice, imageView, nullptr);
@@ -657,6 +660,28 @@ namespace XE {
                 throw std::runtime_error("failed to create pipeline layout!");
             }
 
+            VkGraphicsPipelineCreateInfo graphicsPipelineInfo {};
+            graphicsPipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
+            graphicsPipelineInfo.stageCount = 2;
+            graphicsPipelineInfo.pStages = shaderStages;
+            graphicsPipelineInfo.pVertexInputState = &vertexInputInfo;
+            graphicsPipelineInfo.pInputAssemblyState = &inputAssembly;
+            graphicsPipelineInfo.pViewportState = &viewportInfo;
+            graphicsPipelineInfo.pRasterizationState = &rasterizationInfo;
+            graphicsPipelineInfo.pMultisampleState = &multisampleInfo;
+            graphicsPipelineInfo.pDepthStencilState = nullptr;
+            graphicsPipelineInfo.pColorBlendState = &colorBlendStateInfo;
+            graphicsPipelineInfo.pDynamicState = nullptr;
+            graphicsPipelineInfo.layout = mPipelineLayout;
+            graphicsPipelineInfo.renderPass = mRenderPass;
+            graphicsPipelineInfo.subpass = 0;
+            graphicsPipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
+            graphicsPipelineInfo.basePipelineIndex = -1;
+
+            if (vkCreateGraphicsPipelines(mDevice, VK_NULL_HANDLE, 1, &graphicsPipelineInfo, nullptr, &mGraphicsPipeline) != VK_SUCCESS) {
+                throw std::runtime_error("Couldn't create the pipeline!");
+            }
+
             vkDestroyShaderModule(mDevice, vertexShaderModule, nullptr);
             vkDestroyShaderModule(mDevice, fragmentShaderModule, nullptr);
         }
@@ -676,6 +701,38 @@ namespace XE {
             return shaderModule;
         }
 
+        void createRenderPass() {
+            VkAttachmentDescription attachDesc {};
+            attachDesc.format = mSwapchainImageFormat;
+            attachDesc.samples = VK_SAMPLE_COUNT_1_BIT;
+            attachDesc.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+            attachDesc.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+            attachDesc.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+            attachDesc.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+            attachDesc.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+            attachDesc.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+
+            VkAttachmentReference attachRef {};
+            attachRef.attachment = 0;
+            attachRef.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+
+            VkSubpassDescription subpassDesc {};
+            subpassDesc.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
+            subpassDesc.colorAttachmentCount = 1;
+            subpassDesc.pColorAttachments = &attachRef;
+
+            VkRenderPassCreateInfo renderPassInfo {};
+            renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
+            renderPassInfo.attachmentCount = 1;
+            renderPassInfo.pAttachments = &attachDesc;
+            renderPassInfo.subpassCount = 1;
+            renderPassInfo.pSubpasses = &subpassDesc;
+
+            if (vkCreateRenderPass(mDevice, &renderPassInfo, nullptr, &mRenderPass) != VK_SUCCESS) {
+                throw std::runtime_error("Couldn't create the render pass!");
+            }
+        }
+
     private:
         GLFWwindow *mWindow = nullptr;
         VkInstance mInstance;
@@ -690,7 +747,9 @@ namespace XE {
         VkFormat mSwapchainImageFormat;
         VkExtent2D mSwapchainExtent;
         std::vector<VkImageView> mSwapchainImageViews;
+        VkRenderPass mRenderPass;
         VkPipelineLayout mPipelineLayout;
+        VkPipeline mGraphicsPipeline;
     };
 }
 
