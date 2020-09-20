@@ -130,44 +130,13 @@ namespace XE {
             createRenderPass();
             createGraphicsPipeline();
             createSwapchainFramebuffers();
+            createCommandPool();
         }
 
         void loop() {
             while (!glfwWindowShouldClose(mWindow)) {
                 glfwPollEvents();
             }
-        }
-
-        void terminate() {
-            for (VkFramebuffer framebuffer : mSwapchainFramebuffers) {
-                vkDestroyFramebuffer(mDevice, framebuffer, nullptr);
-            }
-
-            vkDestroyPipeline(mDevice, mGraphicsPipeline, nullptr);
-            vkDestroyPipelineLayout(mDevice, mPipelineLayout, nullptr);
-            vkDestroyRenderPass(mDevice, mRenderPass, nullptr);
-
-            for (VkImageView imageView : mSwapchainImageViews) {
-                vkDestroyImageView(mDevice, imageView, nullptr);
-            }
-
-            vkDestroySwapchainKHR(mDevice, mSwapchain, nullptr);
-
-            vkDestroyDevice(mDevice, nullptr);
-
-            if (enableValidationLayers) {
-                DestroyDebugUtilsMessengerEXT(mInstance, mDebugMessenger, nullptr);
-            }
-
-            vkDestroySurfaceKHR(mInstance, mSurface, nullptr);
-
-            vkDestroyInstance(mInstance, nullptr);
-            
-            if (mWindow) {
-                glfwPollEvents();
-            }
-
-            glfwTerminate();
         }
 
         void setupInstance() {
@@ -759,6 +728,53 @@ namespace XE {
             }
         }
 
+        void createCommandPool() {
+            const QueryFamilyIndices queueFamilyIndices = findQueueFamilies(mPhysicaldevice);
+
+            VkCommandPoolCreateInfo commandPoolInfo {};
+            commandPoolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
+            commandPoolInfo.queueFamilyIndex = queueFamilyIndices.graphicsFamily.value();
+            commandPoolInfo.flags = 0;
+
+            if (vkCreateCommandPool(mDevice, &commandPoolInfo, nullptr, &mCommandPool) != VK_SUCCESS) {
+                throw std::runtime_error("Couldn't create the command pool");
+            }
+        }
+        
+        void terminate() {
+            vkDestroyCommandPool(mDevice, mCommandPool, nullptr);
+
+            for (VkFramebuffer framebuffer : mSwapchainFramebuffers) {
+                vkDestroyFramebuffer(mDevice, framebuffer, nullptr);
+            }
+
+            vkDestroyPipeline(mDevice, mGraphicsPipeline, nullptr);
+            vkDestroyPipelineLayout(mDevice, mPipelineLayout, nullptr);
+            vkDestroyRenderPass(mDevice, mRenderPass, nullptr);
+
+            for (VkImageView imageView : mSwapchainImageViews) {
+                vkDestroyImageView(mDevice, imageView, nullptr);
+            }
+
+            vkDestroySwapchainKHR(mDevice, mSwapchain, nullptr);
+
+            vkDestroyDevice(mDevice, nullptr);
+
+            if (enableValidationLayers) {
+                DestroyDebugUtilsMessengerEXT(mInstance, mDebugMessenger, nullptr);
+            }
+
+            vkDestroySurfaceKHR(mInstance, mSurface, nullptr);
+
+            vkDestroyInstance(mInstance, nullptr);
+            
+            if (mWindow) {
+                glfwPollEvents();
+            }
+
+            glfwTerminate();
+        }
+
     private:
         GLFWwindow *mWindow = nullptr;
         VkInstance mInstance;
@@ -777,6 +793,7 @@ namespace XE {
         VkPipelineLayout mPipelineLayout;
         VkPipeline mGraphicsPipeline;
         std::vector<VkFramebuffer> mSwapchainFramebuffers;
+        VkCommandPool mCommandPool;
     };
 }
 
