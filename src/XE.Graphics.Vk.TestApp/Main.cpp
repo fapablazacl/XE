@@ -129,6 +129,7 @@ namespace XE {
             createSwapChain();
             createRenderPass();
             createGraphicsPipeline();
+            createSwapchainFramebuffers();
         }
 
         void loop() {
@@ -138,6 +139,10 @@ namespace XE {
         }
 
         void terminate() {
+            for (VkFramebuffer framebuffer : mSwapchainFramebuffers) {
+                vkDestroyFramebuffer(mDevice, framebuffer, nullptr);
+            }
+
             vkDestroyPipeline(mDevice, mGraphicsPipeline, nullptr);
             vkDestroyPipelineLayout(mDevice, mPipelineLayout, nullptr);
             vkDestroyRenderPass(mDevice, mRenderPass, nullptr);
@@ -607,8 +612,8 @@ namespace XE {
             VkViewport viewport {};
             viewport.x = 0.0f;
             viewport.y = 0.0f;
-            viewport.width = mSwapchainExtent.width;
-            viewport.height = mSwapchainExtent.height;
+            viewport.width = static_cast<float>(mSwapchainExtent.width);
+            viewport.height = static_cast<float>(mSwapchainExtent.height);
             viewport.minDepth = 0.0f;
             viewport.maxDepth = 1.0f;
 
@@ -733,6 +738,27 @@ namespace XE {
             }
         }
 
+        void createSwapchainFramebuffers() {
+            mSwapchainFramebuffers.resize(mSwapchainImageViews.size());
+
+            for (size_t i=0; i<mSwapchainImageViews.size(); i++) {
+                VkImageView attachment[] = { mSwapchainImageViews[i] };
+
+                VkFramebufferCreateInfo framebufferInfo {};
+                framebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
+                framebufferInfo.renderPass = mRenderPass;
+                framebufferInfo.attachmentCount = 1;
+                framebufferInfo.pAttachments = attachment;
+                framebufferInfo.width = mSwapchainExtent.width;
+                framebufferInfo.height = mSwapchainExtent.height;
+                framebufferInfo.layers = 1;
+
+                if (vkCreateFramebuffer(mDevice, &framebufferInfo, nullptr, &mSwapchainFramebuffers[i]) != VK_SUCCESS) {
+                    throw std::runtime_error("failed to create the framebuffer");
+                }
+            }
+        }
+
     private:
         GLFWwindow *mWindow = nullptr;
         VkInstance mInstance;
@@ -750,6 +776,7 @@ namespace XE {
         VkRenderPass mRenderPass;
         VkPipelineLayout mPipelineLayout;
         VkPipeline mGraphicsPipeline;
+        std::vector<VkFramebuffer> mSwapchainFramebuffers;
     };
 }
 
