@@ -262,18 +262,6 @@ namespace XE {
         return result;
     }
 
-    extern template struct Vector<std::int32_t, 2>;
-    extern template struct Vector<std::int32_t, 3>;
-    extern template struct Vector<std::int32_t, 4>;
-
-    extern template struct Vector<float, 2>;
-    extern template struct Vector<float, 3>;
-    extern template struct Vector<float, 4>;
-
-    extern template struct Vector<double, 2>;
-    extern template struct Vector<double, 3>;
-    extern template struct Vector<double, 4>;
-
     typedef Vector<std::int32_t, 2> Vector2i;
     typedef Vector<std::int32_t, 3> Vector3i;
     typedef Vector<std::int32_t, 4> Vector4i;

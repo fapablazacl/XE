@@ -3,7 +3,7 @@
 #include "SandboxApp.hpp"
 #include "Assets.hpp"
 
-#include <XE.hpp>
+#include <XE/XE.hpp>
 #include <XE/Math.hpp>
 #include <XE/Input.hpp>
 #include <XE/IO.hpp>

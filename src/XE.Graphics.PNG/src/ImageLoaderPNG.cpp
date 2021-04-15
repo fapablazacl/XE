@@ -1,5 +1,5 @@
 
-#include "ImageLoaderPNG.hpp"
+#include <XE/Graphics/PNG/ImageLoaderPNG.hpp>
 
 #include <iostream>
 #include <vector>
