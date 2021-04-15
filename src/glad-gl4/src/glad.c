@@ -1,5 +1,5 @@
 
-#include "glad.h"
+#include <glad/glad.h>
 
 #if defined(_DEBUG)
   #include "glad_debug.c.in"
