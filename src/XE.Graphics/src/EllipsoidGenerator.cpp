@@ -1,5 +1,5 @@
 
-#include "EllipsoidGenerator.hpp"
+#include <XE/Graphics/EllipsoidGenerator.hpp>
 
 namespace XE {
     EllipsoidGenerator::EllipsoidGenerator(const int slices, const int stacks, const Vector3f &dimensions) {

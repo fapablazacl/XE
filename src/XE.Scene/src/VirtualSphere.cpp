@@ -1,5 +1,5 @@
 
-#include "VirtualSphere.hpp"
+#include <XE/Scene/VirtualSphere.hpp>
 
 namespace XE {
     VirtualSphere::VirtualSphere() {}

@@ -1,8 +1,6 @@
 
-#include "IWindow.hpp"
+#include <XE/Graphics/IWindow.hpp>
 
 namespace XE {
-    IWindow::~IWindow() {
-
-    }
+    IWindow::~IWindow() {}
 }

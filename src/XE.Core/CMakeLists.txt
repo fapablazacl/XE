@@ -57,15 +57,6 @@ set (src_xe_math
     "XE/Math/Ellipsoid.cpp"
 )
 
-set (src_xe_scene
-	"XE/Scene/Projection.hpp"
-	"XE/Scene/Projection.cpp"
-	"XE/Scene/Trackball.hpp"
-	"XE/Scene/Trackball.cpp"
-	"XE/Scene/VirtualSphere.hpp"
-	"XE/Scene/VirtualSphere.cpp"
-)
-
 set (src_xe_input
     "XE/Input/InputManager.hpp"
 	"XE/Input/InputManager.cpp"
@@ -89,7 +80,6 @@ set (src_xe_util
 source_group ("\\XE" FILES ${src_xe})
 source_group ("\\XE\\Math" FILES ${src_xe_math})
 source_group ("\\XE\\IO" FILES ${src_xe_io})
-source_group ("\\XE\\Scene" FILES ${src_xe_scene})
 source_group ("\\XE\\Input" FILES ${src_xe_input})
 source_group ("\\XE\\UI" FILES ${src_xe_ui})
 source_group ("\\XE\\Util" FILES ${src_xe_util})
@@ -98,13 +88,11 @@ add_library (${target}
 	${src_xe} 
 	${src_xe_math} 
 	${src_xe_io} 
-	${src_xe_scene}
 	${src_xe_input} 
 	${src_xe_ui}
 	${src_xe_util}
 )
 
-#
 #if (UNIX)
 #	target_link_libraries(${target} stdc++fs)
 #endif()

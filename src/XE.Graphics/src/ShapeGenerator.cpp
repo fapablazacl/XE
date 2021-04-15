@@ -1,5 +1,5 @@
 
-#include "ShapeGenerator.hpp"
+#include <XE/Graphics/ShapeGenerator.hpp>
 
 namespace XE {
     ShapeGenerator::~ShapeGenerator() {}

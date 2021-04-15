@@ -35,6 +35,7 @@ include_directories ("src/XE.Core")
 add_subdirectory ("src/XE.Core")
 
 add_subdirectory ("src/XE.Graphics")
+add_subdirectory ("src/XE.Scene")
 
 #========================================================
 # PLUGINS SECTION

@@ -1,5 +1,5 @@
 
-#include "Texture2D.hpp"
+#include <XE/Graphics/Texture2D.hpp>
 
 namespace XE {
 	Texture2D::~Texture2D() {}

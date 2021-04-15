@@ -1,5 +1,5 @@
 
-#include "PixelFormat.hpp"
+#include <XE/Graphics/PixelFormat.hpp>
 
 namespace XE {
     static int g_pixelFormatStorage[] = {

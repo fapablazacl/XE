@@ -1,5 +1,5 @@
 
-#include "ImageImpl.hpp"
+#include <XE/Graphics/ImageImpl.hpp>
 
 #include <cstdlib>
 #include <cassert>
