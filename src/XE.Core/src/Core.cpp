@@ -1,5 +1,5 @@
 
-#include "Core.hpp"
+#include <XE/Core.hpp>
 
 #ifndef XE_VERSION_MAJOR
 #define XE_VERSION_MAJOR 0

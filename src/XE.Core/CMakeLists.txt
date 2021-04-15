@@ -1,44 +1,30 @@
 
 set (target "XE.Core")
 
-set (src_xe
-	"XE/Predef.hpp"
-    "XE/Buffer.hpp"
-    "XE/Buffer.cpp"
-    "XE/DataType.hpp"
-    "XE/DataType.cpp"
-	"XE/Core.hpp"
-	"XE/Core.cpp"
-
-	# these will be future C++20 Modules
-	"XE.hpp"
-	"XE/Graphics.hpp"
-	"XE/Math.hpp"
-	"XE/Input.hpp"
+set (sources
+	"include/XE/XE.hpp"
+	"include/XE/Graphics.hpp"
+	"include/XE/Math.hpp"
+	"include/XE/Input.hpp"
+	"include/XE/Predef.hpp"
+    "include/XE/Buffer.hpp"
+    "include/XE/DataType.hpp"
+	"include/XE/Core.hpp"
+    "include/XE/Frame.hpp"
+	"include/XE/WindowSystem.hpp"
+	"include/XE/Timer.hpp"
+	
+	"src/Buffer.cpp"
+    "src/DataType.cpp"
+	"src/Core.cpp"
+	"src/Frame.cpp"
+	"src/WindowSystem.cpp"
+	"src/Timer.cpp"
 )
 
-set (src_xe_ui
-    "XE/UI/Frame.hpp"
-	"XE/UI/Frame.cpp"
-	"XE/UI/WindowSystem.hpp"
-	"XE/UI/WindowSystem.cpp"
-)
+add_library (${target} ${sources})
 
-set (src_xe_util
-	"XE/Util/Timer.hpp"
-	"XE/Util/Timer.cpp"
-)
-
-
-source_group ("\\XE" FILES ${src_xe})
-source_group ("\\XE\\UI" FILES ${src_xe_ui})
-source_group ("\\XE\\Util" FILES ${src_xe_util})
-
-add_library (${target} 
-	${src_xe} 
-	${src_xe_ui}
-	${src_xe_util}
-)
+target_include_directories(${target} PUBLIC "include/")
 
 #if (UNIX)
 #	target_link_libraries(${target} stdc++fs)
