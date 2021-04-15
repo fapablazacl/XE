@@ -1,15 +1,15 @@
 
-#include "GraphicsDeviceGL.hpp"
+#include <XE/Graphics/GL/GraphicsDeviceGL.hpp>
 
-#include "Conversion.hpp"
-#include "BufferGL.hpp"
-#include "SubsetGL.hpp"
-#include "Texture2DGL.hpp"
-#include "Texture2DArrayGL.hpp"
-#include "Texture3DGL.hpp"
-#include "ProgramGL.hpp"
-#include "IGraphicsContextGL.hpp"
-#include "Util.hpp"
+#include <XE/Graphics/GL/Conversion.hpp>
+#include <XE/Graphics/GL/BufferGL.hpp>
+#include <XE/Graphics/GL/SubsetGL.hpp>
+#include <XE/Graphics/GL/Texture2DGL.hpp>
+#include <XE/Graphics/GL/Texture2DArrayGL.hpp>
+#include <XE/Graphics/GL/Texture3DGL.hpp>
+#include <XE/Graphics/GL/ProgramGL.hpp>
+#include <XE/Graphics/GL/IGraphicsContextGL.hpp>
+#include <XE/Graphics/GL/Util.hpp>
 
 #include <XE/Graphics/Material.hpp>
 #include <XE/Graphics/Uniform.hpp>

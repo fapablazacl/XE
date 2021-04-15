@@ -1,6 +1,6 @@
 
-#include "Texture3DGL.hpp"
-#include "Conversion.hpp"
+#include <XE/Graphics/GL/Texture3DGL.hpp>
+#include <XE/Graphics/GL/Conversion.hpp>
 
 namespace XE {
     Texture3DGL::Texture3DGL(const PixelFormat format, const Vector3i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void *sourceData)

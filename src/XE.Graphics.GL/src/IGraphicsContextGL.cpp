@@ -1,5 +1,5 @@
 
-#include "IGraphicsContextGL.hpp"
+#include <XE/Graphics/GL/IGraphicsContextGL.hpp>
 
 namespace XE {
     IGraphicsContextGL::~IGraphicsContextGL() {}

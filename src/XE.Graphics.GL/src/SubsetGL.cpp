@@ -1,7 +1,8 @@
 
-#include "SubsetGL.hpp"
-#include "BufferGL.hpp"
-#include "Conversion.hpp"
+#include <XE/Graphics/GL/SubsetGL.hpp>
+#include <XE/Graphics/GL/BufferGL.hpp>
+#include <XE/Graphics/GL/Conversion.hpp>
+
 
 namespace XE {
     SubsetGL::SubsetGL(SubsetDescriptor& desc, 

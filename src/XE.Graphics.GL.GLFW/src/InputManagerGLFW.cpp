@@ -1,5 +1,6 @@
 
-#include "InputManagerGLFW.hpp"
+#include <XE/Graphics/GL/GLFW/InputManagerGLFW.hpp>
+
 #include <map>
 
 namespace XE {

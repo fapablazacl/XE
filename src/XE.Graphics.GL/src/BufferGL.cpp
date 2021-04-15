@@ -1,7 +1,9 @@
 
-#include "BufferGL.hpp"
-#include "Conversion.hpp"
+#include <XE/Graphics/GL/BufferGL.hpp>
+
+#include <XE/Graphics/GL/Conversion.hpp>
 #include <cstdint>
+
 
 namespace XE {
     BufferGL::BufferGL(const BufferDescriptor &desc) {

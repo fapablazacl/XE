@@ -1,13 +1,14 @@
 
-#include "WindowGLFW.hpp"
+#include <XE/Graphics/GL/GLFW/WindowGLFW.hpp>
 
 #include <memory>
 #include <GLFW/glfw3.h>
-#include "InputManagerGLFW.hpp"
-#include "GraphicsContextGLFW.hpp"
+#include <XE/Graphics/GL/GLFW/InputManagerGLFW.hpp>
+#include <XE/Graphics/GL/GLFW/GraphicsContextGLFW.hpp>
 
 #include <iostream>
 #include <map>
+
 
 namespace XE {    
     void static errorCallback(int error, const char *description) {

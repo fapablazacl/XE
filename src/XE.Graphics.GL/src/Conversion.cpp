@@ -1,5 +1,5 @@
 
-#include "Conversion.hpp"
+#include <XE/Graphics/GL/Conversion.hpp>
 
 #include <XE/DataType.hpp>
 #include <XE/Graphics/PixelFormat.hpp>
