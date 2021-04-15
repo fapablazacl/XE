@@ -34,6 +34,8 @@ add_definitions (-DXE_VERSION_REVISION=${XE_VERSION_REVISION})
 include_directories ("src/XE.Core")
 add_subdirectory ("src/XE.Core")
 
+add_subdirectory ("src/XE.Graphics")
+
 #========================================================
 # PLUGINS SECTION
 #========================================================

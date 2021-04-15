@@ -57,60 +57,6 @@ set (src_xe_math
     "XE/Math/Ellipsoid.cpp"
 )
 
-set (src_xe_graphics
-	"XE/Graphics/IWindow.cpp"
-	"XE/Graphics/IWindow.hpp" 
-	"XE/Graphics/GraphicsDevice.cpp"
-	"XE/Graphics/GraphicsDevice.hpp" 
-	"XE/Graphics/BufferDescriptor.cpp" 
-	"XE/Graphics/BufferDescriptor.hpp" 
-	"XE/Graphics/Subset.cpp" 
-	"XE/Graphics/Subset.hpp" 
-	"XE/Graphics/Texture.cpp" 
-	"XE/Graphics/Texture.hpp" 
-	"XE/Graphics/Texture2D.cpp" 
-	"XE/Graphics/Texture2D.hpp" 
-	"XE/Graphics/Texture2DArray.cpp" 
-	"XE/Graphics/Texture2DArray.hpp" 
-	"XE/Graphics/Texture3D.cpp" 
-	"XE/Graphics/Texture3D.hpp" 
-	"XE/Graphics/TextureCubeMap.cpp" 
-	"XE/Graphics/TextureCubeMap.hpp" 
-	"XE/Graphics/PixelFormat.cpp" 
-	"XE/Graphics/PixelFormat.hpp"
-	"XE/Graphics/Shader.cpp" 
-	"XE/Graphics/Shader.hpp"
-	"XE/Graphics/Program.cpp" 
-	"XE/Graphics/Program.hpp"
-	"XE/Graphics/Vertex.cpp"
-	"XE/Graphics/Vertex.hpp"
-	"XE/Graphics/VertexLayout.cpp"
-	"XE/Graphics/VertexLayout.hpp"
-	"XE/Graphics/VertexFormat.cpp"
-	"XE/Graphics/VertexFormat.hpp"
-	"XE/Graphics/Uniform.cpp"
-	"XE/Graphics/Uniform.hpp"
-	"XE/Graphics/ImageImpl.hpp"
-	"XE/Graphics/ImageImpl.cpp"
-	"XE/Graphics/Image.hpp"
-	"XE/Graphics/Image.cpp"
-	"XE/Graphics/ImageLoader.hpp"
-	"XE/Graphics/ImageLoader.cpp"
-	"XE/Graphics/Material.hpp"
-	"XE/Graphics/Material.cpp"
-	"XE/Graphics/Viewport.hpp"
-	"XE/Graphics/Viewport.cpp"
-
-	"XE/Graphics/ShapeGenerator.hpp"
-	"XE/Graphics/ShapeGenerator.cpp"
-	"XE/Graphics/EllipsoidGenerator.hpp"
-	"XE/Graphics/EllipsoidGenerator.cpp"
-	"XE/Graphics/PlaneGenerator.hpp"
-	"XE/Graphics/PlaneGenerator.cpp"
-	"XE/Graphics/BoxGenerator.hpp"
-	"XE/Graphics/BoxGenerator.cpp"
-)
-
 set (src_xe_scene
 	"XE/Scene/Projection.hpp"
 	"XE/Scene/Projection.cpp"
@@ -143,7 +89,6 @@ set (src_xe_util
 source_group ("\\XE" FILES ${src_xe})
 source_group ("\\XE\\Math" FILES ${src_xe_math})
 source_group ("\\XE\\IO" FILES ${src_xe_io})
-source_group ("\\XE\\Graphics" FILES ${src_xe_graphics})
 source_group ("\\XE\\Scene" FILES ${src_xe_scene})
 source_group ("\\XE\\Input" FILES ${src_xe_input})
 source_group ("\\XE\\UI" FILES ${src_xe_ui})
@@ -153,7 +98,6 @@ add_library (${target}
 	${src_xe} 
 	${src_xe_math} 
 	${src_xe_io} 
-	${src_xe_graphics} 
 	${src_xe_scene}
 	${src_xe_input} 
 	${src_xe_ui}
