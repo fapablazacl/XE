@@ -6,7 +6,7 @@
 #include <string>
 #include <functional>
 #include <XE/Predef.hpp>
-#include <XE/Math/Vector.hpp>
+// #include <XE/Math/Vector.hpp>
 
 namespace XE {
     class XE_API InputManager;
@@ -17,8 +17,8 @@ namespace XE {
 
     struct FrameProperties {
         std::string caption;
-        Vector2i size;
-        Vector2i position;
+        // Vector2i size;
+        // Vector2i position;
     };
 
     /**

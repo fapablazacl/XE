@@ -30,33 +30,6 @@ set (src_xe_io
 	"XE/IO/StreamSource.cpp"
 )
 
-set (src_xe_math
-	"XE/Math/Common.hpp"
-    "XE/Math/Common.cpp"
-    "XE/Math/Vector.hpp"
-    "XE/Math/Vector.cpp"
-	"XE/Math/Matrix.hpp"
-    "XE/Math/Matrix.cpp"
-	"XE/Math/Quaternion.hpp"
-	"XE/Math/Quaternion.cpp"
-	"XE/Math/Boundary.hpp"
-	"XE/Math/Boundary.cpp"
-	"XE/Math/Box.hpp"
-	"XE/Math/Box.cpp"
-	"XE/Math/Plane.hpp"
-	"XE/Math/Plane.cpp"
-	"XE/Math/Ray.hpp"
-	"XE/Math/Ray.cpp"
-	"XE/Math/Rect.hpp"
-	"XE/Math/Rect.cpp"
-	"XE/Math/Sphere.hpp"
-	"XE/Math/Sphere.cpp"
-	"XE/Math/Triangle.hpp"
-	"XE/Math/Triangle.cpp"
-    "XE/Math/Ellipsoid.hpp"
-    "XE/Math/Ellipsoid.cpp"
-)
-
 set (src_xe_ui
     "XE/UI/Frame.hpp"
 	"XE/UI/Frame.cpp"
@@ -71,14 +44,12 @@ set (src_xe_util
 
 
 source_group ("\\XE" FILES ${src_xe})
-source_group ("\\XE\\Math" FILES ${src_xe_math})
 source_group ("\\XE\\IO" FILES ${src_xe_io})
 source_group ("\\XE\\UI" FILES ${src_xe_ui})
 source_group ("\\XE\\Util" FILES ${src_xe_util})
 
 add_library (${target} 
 	${src_xe} 
-	${src_xe_math} 
 	${src_xe_io} 
 	${src_xe_ui}
 	${src_xe_util}
