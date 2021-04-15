@@ -36,7 +36,7 @@ namespace XE {
             m_inputManager = m_window->getInputManager();
 
             std::cout << "Loading assets ..." << std::endl;
-            m_streamSource = std::unique_ptr<FileStreamSource>();
+            m_streamSource = std::make_unique<FileStreamSource>(".");
             this->InitializeShaders();
             this->InitializeGeometry();
         }
@@ -121,6 +121,8 @@ namespace XE {
         }
 
         std::unique_ptr<Texture2D> CreateFileTexture(const std::string &filePath) {
+            assert(m_streamSource);
+            
             std::cout << "SandboxApp::CreateFileTexture: Loading texture from file " << filePath << " ..." << std::endl;
             auto stream = m_streamSource->open(filePath);
 
