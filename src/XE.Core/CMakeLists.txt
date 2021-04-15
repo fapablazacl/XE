@@ -57,13 +57,6 @@ set (src_xe_math
     "XE/Math/Ellipsoid.cpp"
 )
 
-set (src_xe_input
-    "XE/Input/InputManager.hpp"
-	"XE/Input/InputManager.cpp"
-	"XE/Input/DeviceStatus.hpp"
-	"XE/Input/DeviceStatus.cpp"
-)
-
 set (src_xe_ui
     "XE/UI/Frame.hpp"
 	"XE/UI/Frame.cpp"
@@ -80,7 +73,6 @@ set (src_xe_util
 source_group ("\\XE" FILES ${src_xe})
 source_group ("\\XE\\Math" FILES ${src_xe_math})
 source_group ("\\XE\\IO" FILES ${src_xe_io})
-source_group ("\\XE\\Input" FILES ${src_xe_input})
 source_group ("\\XE\\UI" FILES ${src_xe_ui})
 source_group ("\\XE\\Util" FILES ${src_xe_util})
 
@@ -88,7 +80,6 @@ add_library (${target}
 	${src_xe} 
 	${src_xe_math} 
 	${src_xe_io} 
-	${src_xe_input} 
 	${src_xe_ui}
 	${src_xe_util}
 )

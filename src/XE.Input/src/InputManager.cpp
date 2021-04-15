@@ -1,5 +1,5 @@
 
-#include "InputManager.hpp"
+#include <XE/Input/InputManager.hpp>
 
 namespace XE {
     InputManager::~InputManager() {}
