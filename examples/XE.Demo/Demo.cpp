@@ -14,9 +14,7 @@
 namespace XE {
     class ResourceManager {
     public:
-        std::string getString(const std::string &path) const {
-            
-        }
+        std::string getString(const std::string &path) const {}
         
     private:
         std::vector<std::unique_ptr<XE::StreamSource>> streamSources;

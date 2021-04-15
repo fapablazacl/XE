@@ -12,17 +12,25 @@
 
 namespace XE {    
     void static errorCallback(int error, const char *description) {
-        std::cout << error << ":" << description << std::endl;
+        std::cout << "errorCallback: " << error << ": " << description << std::endl;
     }
 
     static std::map<int, int> mapToHints(const ContextDescriptorGL &contextDescriptor) {
         std::map<int, int> hints;
 
         hints[GLFW_CONTEXT_VERSION_MAJOR] = contextDescriptor.major;
-        hints[GLFW_CONTEXT_VERSION_MINOR] = contextDescriptor.major;
-        hints[GLFW_OPENGL_CORE_PROFILE] = contextDescriptor.coreProfile ? 1 : 0;
+        hints[GLFW_CONTEXT_VERSION_MINOR] = contextDescriptor.minor;
+        
+        hints[GLFW_OPENGL_FORWARD_COMPAT] = GL_TRUE;
+        
+        if (contextDescriptor.coreProfile) {
+            hints[GLFW_OPENGL_PROFILE] = GLFW_OPENGL_CORE_PROFILE;
+        } else {
+            hints[GLFW_OPENGL_PROFILE] = GLFW_OPENGL_COMPAT_PROFILE;
+        }
+        
         hints[GLFW_DEPTH_BITS] = contextDescriptor.depthBits;
-        hints[GLFW_DOUBLEBUFFER] = contextDescriptor.doubleBuffer ? 1 : 0;
+        hints[GLFW_DOUBLEBUFFER] = contextDescriptor.doubleBuffer ? GL_TRUE : GL_FALSE;
         hints[GLFW_RED_BITS] = contextDescriptor.redBits;
         hints[GLFW_GREEN_BITS] = contextDescriptor.greenBits;
         hints[GLFW_BLUE_BITS] = contextDescriptor.blueBits;
@@ -57,9 +65,14 @@ namespace XE {
             );
 
             if (!glfwWindow) {
-                const char description[256] = {};
-                int error = ::glfwGetError((const char **)&description);
-                throw std::runtime_error(description);
+                std::string desc;
+                desc.resize(256);
+                
+                int error = ::glfwGetError((const char **)desc.c_str());
+                
+                std::cout << desc << std::endl;
+                
+                throw std::runtime_error(desc);
             }
 
             std::cout << "[GLFW] Making Context current ..." << std::endl;
