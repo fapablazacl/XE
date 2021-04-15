@@ -1,5 +1,5 @@
 
-#include "FileStreamSource.hpp"
+#include <XE/IO/FileStreamSource.hpp>
 
 #include <fstream>
 #include <XE/IO/FileStream.hpp>

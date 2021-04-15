@@ -38,6 +38,7 @@ add_subdirectory ("src/XE.Graphics")
 add_subdirectory ("src/XE.Scene")
 add_subdirectory ("src/XE.Input")
 add_subdirectory ("src/XE.Math")
+add_subdirectory ("src/XE.IO")
 
 #========================================================
 # PLUGINS SECTION

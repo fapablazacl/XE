@@ -1,5 +1,5 @@
 
-#include "StreamSource.hpp"
+#include <XE/IO/StreamSource.hpp>
 
 namespace XE {
     StreamSource::~StreamSource() {}

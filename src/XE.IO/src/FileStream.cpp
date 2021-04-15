@@ -1,5 +1,5 @@
 
-#include "FileStream.hpp"
+#include <XE/IO/FileStream.hpp>
 #include <cassert>
 
 namespace XE {
