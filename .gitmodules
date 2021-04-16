@@ -7,3 +7,6 @@
 [submodule "dep/lodepng"]
 	path = dep/lodepng
 	url = https://github.com/lvandeve/lodepng.git
+[submodule "dep/cgltf"]
+	path = dep/cgltf
+	url = https://github.com/jkuhlmann/cgltf.git
