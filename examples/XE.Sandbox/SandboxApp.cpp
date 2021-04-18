@@ -16,6 +16,7 @@
 #include <iostream>
 #include <fstream>
 
+
 namespace XE {
     class SandboxApp : public Application {
     public:
@@ -138,7 +139,7 @@ namespace XE {
         }
 
         virtual void Render() override {
-            m_graphicsDevice->beginFrame(ClearFlags::All, {0.2f, 0.2f, 0.2f, 1.0f}, 0.0f, 0);
+            m_graphicsDevice->beginFrame(ClearFlags::All, {0.2f, 0.2f, 0.8f, 1.0f}, 0.0f, 0);
             m_graphicsDevice->setProgram(m_program.get());
 
             this->RenderMatrices();
@@ -285,6 +286,10 @@ namespace XE {
             m_material = std::make_unique<Material>();
             m_material->layers[0].texture = m_texture.get();
             m_material->layerCount = 1;
+            
+            
+            // load the gltf scene
+            Sandbox::Assets::loadModel();
         }
 
     private:

@@ -15,6 +15,8 @@ namespace XE::Sandbox {
         static std::vector<Vector3f> normalData;
         static std::vector<Vector2f> texCoordData;
         static std::vector<int> indexData;
+        
+        static void loadModel();
     };
 }
 

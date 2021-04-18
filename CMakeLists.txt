@@ -38,6 +38,8 @@ add_subdirectory ("src/XE.Input")
 add_subdirectory ("src/XE.Math")
 add_subdirectory ("src/XE.IO")
 
+include_directories("dep/cgltf")
+
 #========================================================
 # PLUGINS SECTION
 #========================================================
