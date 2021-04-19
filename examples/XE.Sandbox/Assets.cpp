@@ -33,65 +33,45 @@ namespace XE::Sandbox {
     }
 
 
-    struct Material {
-        
-    };
-
-
-    struct MeshPrimitive {
-        const Material *material = nullptr;
-        XE::PrimitiveType type = XE::PrimitiveType::PointList;
-        std::vector<XE::Vector3f> coords;
-        std::vector<XE::Vector3f> normals;
-        std::vector<XE::Vector2f> texCoords;
-    };
-
-
-    struct Mesh {
-        std::vector<MeshPrimitive> primitives;
-    };
-
-
     class Asset_CGLTF {
     public:
+        ~Asset_CGLTF() {
+            if (mData) {
+                cgltf_free(mData);
+            }
+        }
+        
         void load(const std::string &filePath) {
-            std::vector<Mesh> meshes;
-            
             cgltf_options options = {};
             
-            cgltf_data* data = nullptr;
-            cgltf_result result = cgltf_parse_file(&options, filePath.c_str(), &data);
+            if (mData) {
+                cgltf_free(mData);
+            }
+            
+            cgltf_result result = cgltf_parse_file(&options, filePath.c_str(), &mData);
             
             if (result == cgltf_result_success) {
                 // load the binary data
-                
-                cgltf_load_buffers(&options, data, filePath.c_str());
+                cgltf_load_buffers(&options, mData, filePath.c_str());
 
-                /*
-                for (cgltf_size i=0; i<data->buffers_count; i++) {
-                    const auto buffer = data->buffers[i];
-                    
-                    // get buffer ubication
-                    const auto path = std::filesystem::path{filePath}.parent_path();
-                    const auto bufferPath = path / buffer.uri;
-                    
-                    
-                    
-                    int x = 0;
-                }
-                */
-                
                 // load the meshes
-                for (cgltf_size i=0; i<data->meshes_count; i++) {
-                    Mesh mesh = createMesh(data->meshes[i]);
+                mMeshes.clear();
+                for (cgltf_size i=0; i<mData->meshes_count; i++) {
+                    Mesh mesh = createMesh(mData->meshes[i]);
                     
-                    meshes.push_back(mesh);
+                    mMeshes.push_back(mesh);
                 }
-                
-                visitScene(data->scene);
-                
-                cgltf_free(data);
             }
+        }
+        
+        void render() {
+            // visitScene should be in the rendering stage
+            visitScene(mData->scene);
+        }
+        
+        
+        std::vector<Mesh> getMeshes() const {
+            return mMeshes;
         }
         
     private:
@@ -111,15 +91,55 @@ namespace XE::Sandbox {
         MeshPrimitive createMeshPrimitive(const cgltf_primitive &primitive) const {
             MeshPrimitive meshPrimitive;
             
-            meshPrimitive.type = XE::PrimitiveType::TriangleList;
+            switch (primitive.type) {
+                case cgltf_primitive_type_triangles:
+                    meshPrimitive.type = XE::PrimitiveType::TriangleList;
+                    break;
+                    
+                default:
+                    meshPrimitive.type = XE::PrimitiveType::PointList;
+            }
             
-            const cgltf_accessor *normalAccessor = primitive.attributes[0].data;
-            const cgltf_buffer_view *normalBufferView = normalAccessor->buffer_view;
-            const cgltf_buffer *buffer = normalBufferView->buffer;
-            
-            // normalAccessor->offset
-            // normalAccessor->stride
-            // normalAccessor->buffer_view
+            for (cgltf_size i=0; i<primitive.attributes_count; i++) {
+                const cgltf_accessor *accessor = primitive.attributes[i].data;
+                const cgltf_buffer_view *bufferView = accessor->buffer_view;
+                const cgltf_buffer *buffer = bufferView->buffer;
+                
+                const std::string attribName = primitive.attributes[i].name;
+                
+                if (attribName == "POSITION") {
+                    cgltf_size offset = 0;
+                    
+                    for (cgltf_size j=0; j<accessor->count; j++) {
+                        auto elementData = (const XE::Vector3f*)((std::byte*)buffer->data + bufferView->offset + accessor->offset + offset);
+                    
+                        meshPrimitive.coords.push_back(*elementData);
+                        
+                        offset += accessor->stride;
+                    }
+                } else if (attribName == "NORMAL") {
+                    cgltf_size offset = 0;
+                    
+                    for (cgltf_size j=0; j<accessor->count; j++) {
+                        auto elementData = (const XE::Vector3f*)((std::byte*)buffer->data + bufferView->offset + accessor->offset + offset);
+                    
+                        meshPrimitive.normals.push_back(*elementData);
+                        
+                        offset += accessor->stride;
+                    }
+                    
+                } else if (attribName == "TEXCOORD_0") {
+                    cgltf_size offset = 0;
+                    
+                    for (cgltf_size j=0; j<accessor->count; j++) {
+                        auto elementData = (const XE::Vector2f*)((std::byte*)buffer->data + bufferView->offset + accessor->offset + offset);
+                    
+                        meshPrimitive.texCoords.push_back(*elementData);
+                        
+                        offset += accessor->stride;
+                    }
+                }
+            }
             
             return meshPrimitive;
         }
@@ -168,6 +188,7 @@ namespace XE::Sandbox {
                 }
                 
                 if (node->has_rotation) {
+                    // TODO: Refactor this implementation. The correct math primitive is a quaternion.
                     const auto r = XE::Vector4f{node->rotation};
                     nodeMatrix *= XE::Matrix4f::createRotation(r.W, {r.X, r.Y, r.Z});
                 }
@@ -190,8 +211,6 @@ namespace XE::Sandbox {
             const XE::Matrix4f nodeMatrix = computeNodeMatrix(node);
             
             if (node->mesh) {
-                int x = 0;
-                
                 visitMesh(indentation + 2, node->mesh);
             }
             
@@ -212,15 +231,34 @@ namespace XE::Sandbox {
                 visitNode(0, scene->nodes[i]);
             }
         }
-
-
+        
+    private:
+        cgltf_data *mData = nullptr;
+        std::map<std::string, Mesh> mMeshesByName;
+        std::vector<Mesh> mMeshes;
     };
 
 
-    void Assets::loadModel() {
+    std::vector<Mesh> Assets::loadModel(const std::string &assetFilePath) {
         Asset_CGLTF assetGLTF;
         
-        assetGLTF.load("media/models/spaceship_corridorhallway/scene.gltf");
+        assetGLTF.load(assetFilePath);
+        
+        return assetGLTF.getMeshes();
+    }
+
+
+    MeshPrimitive Assets::getSquareMeshPrimitive() {
+        MeshPrimitive primitive;
+        
+        primitive.type = XE::PrimitiveType::TriangleList;
+        primitive.coords = coordData;
+        primitive.colors = colorData;
+        primitive.normals = normalData;
+        primitive.texCoords = texCoordData;
+        primitive.indices = indexData;
+        
+        return primitive;
     }
 
 

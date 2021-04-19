@@ -21,9 +21,10 @@ namespace XE {
     class SandboxApp : public Application {
     public:
         explicit SandboxApp(const std::vector<std::string> &args) {}
+        
         virtual ~SandboxApp() {}
 
-        virtual void Initialize() override {
+        void Initialize() override {
             std::cout << "Initializing Engine ..." << std::endl;
 
             m_window = WindowGLFW::create (
@@ -38,11 +39,13 @@ namespace XE {
 
             std::cout << "Loading assets ..." << std::endl;
             m_streamSource = std::make_unique<FileStreamSource>(".");
-            this->InitializeShaders();
-            this->InitializeGeometry();
+            
+            initializeShaders();
+            initializeGeometry();
         }
 
-        virtual void Update(const float seconds) override {
+        
+        void Update(const float seconds) override {
             const Vector2i windowSize = m_window->getSize();
             m_graphicsDevice->setViewport({{0, 0}, windowSize});
 
@@ -90,8 +93,9 @@ namespace XE {
                 m_cameraLookAt -= cameraDisplacement;
             }
         }
+        
 
-        void RenderMatrices() {
+        void renderMatrices() {
             const UniformMatrix matrixLayout = { "m_mvp", DataType::Float32, 4, 4, 1 };
 
             const Matrix4f modelViewProj = transpose (
@@ -103,7 +107,8 @@ namespace XE {
             m_graphicsDevice->applyUniform(&matrixLayout, 1, (const std::byte*)&modelViewProj);
         }
 
-        std::unique_ptr<Texture2D> CreateColorTexture(const int width, const int height, const Vector4f &color) {
+        
+        std::unique_ptr<Texture2D> createColorTexture(const int width, const int height, const Vector4f &color) {
             const auto format = PixelFormat::R8G8B8A8;
             const auto size = Vector2i{width, height};
 
@@ -121,7 +126,7 @@ namespace XE {
             return m_graphicsDevice->createTexture2D(format, size, sourceFormat, sourceDataType, pixels.data());
         }
 
-        std::unique_ptr<Texture2D> CreateFileTexture(const std::string &filePath) {
+        std::unique_ptr<Texture2D> createFileTexture(const std::string &filePath) {
             assert(m_streamSource);
             
             std::cout << "SandboxApp::CreateFileTexture: Loading texture from file " << filePath << " ..." << std::endl;
@@ -138,11 +143,12 @@ namespace XE {
             );
         }
 
-        virtual void Render() override {
+        
+        void Render() override {
             m_graphicsDevice->beginFrame(ClearFlags::All, {0.2f, 0.2f, 0.8f, 1.0f}, 0.0f, 0);
             m_graphicsDevice->setProgram(m_program.get());
 
-            this->RenderMatrices();
+            renderMatrices();
 
             Uniform textureUniform = {
                 "texture0", DataType::Int32, 1, 1
@@ -160,12 +166,14 @@ namespace XE {
             m_graphicsDevice->endFrame();
         }
 
-        virtual bool ShouldClose() const override {
+        
+        bool ShouldClose() const override {
             return m_shouldClose;
         }
 
+        
     private:
-        void InitializeShaders() {
+        void initializeShaders() {
             // setup program shader
             const ProgramDescriptor programDescriptor = {
                 {
@@ -177,6 +185,7 @@ namespace XE {
             m_program = m_graphicsDevice->createProgram(programDescriptor);
         }
 
+        
         std::string getShaderSource(const std::string &path) const {
             std::fstream fs;
             fs.open(path.c_str(), std::ios_base::in);
@@ -202,56 +211,81 @@ namespace XE {
 
             return content;
         }
+        
 
-        void InitializeGeometry() {
+        void initializeGeometry() {
+            // loadSubset("media/models/spaceship_corridorhallway/scene.gltf");
+            m_subset = createSubset(Sandbox::Assets::getSquareMeshPrimitive());
+            
+            // m_texture = createColorTexture(256, 256, {1.0f, 0.0f, 0.0f, 1.0f});
+            m_texture = createFileTexture("media/materials/Tiles_Azulejos_004_SD/Tiles_Azulejos_004_COLOR.png");
+
+            m_material = std::make_unique<Material>();
+            m_material->layers[0].texture = m_texture.get();
+            m_material->layerCount = 1;
+        }
+        
+        
+        std::unique_ptr<Subset> loadSubset(const std::string &sceneFilePath) {
+            auto meshes = Sandbox::Assets::loadModel(sceneFilePath);
+            
+            if (meshes.size() > 0) {
+                return createSubset(meshes[0].primitives[0]);
+            }
+            
+            return {};
+        }
+        
+        
+        std::unique_ptr<Subset> createSubset(const Sandbox::MeshPrimitive &meshPrimitive) {
             // create the vertex buffer
             BufferDescriptor coordBufferDescriptor = {
-                BufferType::Vertex, 
-                BufferUsage::Copy, 
-                BufferAccess::Static, 
-                (int)Sandbox::Assets::coordData.size() * (int)sizeof(Vector3f), 
-                (const std::byte*) Sandbox::Assets::coordData.data()
+                BufferType::Vertex,
+                BufferUsage::Copy,
+                BufferAccess::Static,
+                (int)meshPrimitive.coords.size() * (int)sizeof(Vector3f),
+                (const std::byte*) meshPrimitive.coords.data()
             };
-
+            
             auto coordBuffer = m_graphicsDevice->createBuffer(coordBufferDescriptor);
 
             BufferDescriptor colorBufferDescriptor = {
-                BufferType::Vertex, 
-                BufferUsage::Copy, 
-                BufferAccess::Static, 
-                (int)Sandbox::Assets::colorData.size() * (int)sizeof(Vector4f), 
-                (const std::byte*) Sandbox::Assets::colorData.data()
+                BufferType::Vertex,
+                BufferUsage::Copy,
+                BufferAccess::Static,
+                (int)meshPrimitive.colors.size() * (int)sizeof(Vector4f),
+                (const std::byte*) meshPrimitive.colors.data()
             };
 
             auto colorBuffer = m_graphicsDevice->createBuffer(colorBufferDescriptor);
 
             BufferDescriptor normalBufferDescriptor = {
-                BufferType::Vertex, 
-                BufferUsage::Copy, 
-                BufferAccess::Static, 
-                (int)Sandbox::Assets::normalData.size() * (int)sizeof(Vector3f), 
-                (const std::byte*) Sandbox::Assets::normalData.data()
+                BufferType::Vertex,
+                BufferUsage::Copy,
+                BufferAccess::Static,
+                (int)meshPrimitive.normals.size() * (int)sizeof(Vector3f),
+                (const std::byte*) meshPrimitive.normals.data()
             };
 
             auto normalBuffer = m_graphicsDevice->createBuffer(normalBufferDescriptor);
 
             BufferDescriptor texCoordBufferDescriptor = {
-                BufferType::Vertex, 
-                BufferUsage::Copy, 
-                BufferAccess::Static, 
-                (int)Sandbox::Assets::texCoordData.size() * (int)sizeof(Vector3f), 
-                (const std::byte*) Sandbox::Assets::texCoordData.data()
+                BufferType::Vertex,
+                BufferUsage::Copy,
+                BufferAccess::Static,
+                (int)meshPrimitive.texCoords.size() * (int)sizeof(Vector3f),
+                (const std::byte*) meshPrimitive.texCoords.data()
             };
 
             auto texCoordBuffer = m_graphicsDevice->createBuffer(texCoordBufferDescriptor);
 
             // create the index buffer
             BufferDescriptor indexBufferDescriptor = {
-                BufferType::Index, 
-                BufferUsage::Copy, 
-                BufferAccess::Static, 
-                (int)Sandbox::Assets::indexData.size() * (int)sizeof(int), 
-                (const std::byte*) Sandbox::Assets::indexData.data()
+                BufferType::Index,
+                BufferUsage::Copy,
+                BufferAccess::Static,
+                (int)meshPrimitive.indices.size() * (int)sizeof(int),
+                (const std::byte*) meshPrimitive.indices.data()
             };
 
             auto indexBuffer = m_graphicsDevice->createBuffer(indexBufferDescriptor);
@@ -260,7 +294,7 @@ namespace XE {
             SubsetDescriptor subsetDescriptor;
         
             subsetDescriptor.attributes = {
-                {"vertCoord", DataType::Float32, 3}, 
+                {"vertCoord", DataType::Float32, 3},
                 {"vertColor", DataType::Float32, 4},
                 {"vertNormal", DataType::Float32, 3},
                 {"vertTexCoord", DataType::Float32, 2}
@@ -278,20 +312,9 @@ namespace XE {
                 {"vertCoord", 0}, {"vertColor", 1}, {"vertNormal", 2}, {"vertTexCoord", 3}
             };
 
-            m_subset = m_graphicsDevice->createSubset(subsetDescriptor, std::move(buffers), bufferMapping, std::move(indexBuffer));
-
-            // m_texture = this->CreateColorTexture(256, 256, {1.0f, 0.0f, 0.0f, 1.0f});
-            m_texture = this->CreateFileTexture("media/materials/Tiles_Azulejos_004_SD/Tiles_Azulejos_004_COLOR.png");
-
-            m_material = std::make_unique<Material>();
-            m_material->layers[0].texture = m_texture.get();
-            m_material->layerCount = 1;
-            
-            
-            // load the gltf scene
-            Sandbox::Assets::loadModel();
+            return m_graphicsDevice->createSubset(subsetDescriptor, std::move(buffers), bufferMapping, std::move(indexBuffer));
         }
-
+        
     private:
         std::unique_ptr<WindowGLFW> m_window;
         std::unique_ptr<GraphicsDevice> m_graphicsDevice;
