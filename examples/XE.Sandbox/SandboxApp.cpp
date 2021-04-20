@@ -242,6 +242,8 @@ namespace XE {
             m_material = std::make_unique<Material>();
             m_material->layers[0].texture = m_texture.get();
             m_material->layerCount = 1;
+            // m_material->renderState.depthTest = true;
+            m_material->renderState.depthTest = false;
         }
         
         
