@@ -21,6 +21,14 @@ namespace XE::Sandbox {
         std::vector<XE::Vector4f> colors;
         std::vector<XE::Vector2f> texCoords;
         std::vector<int> indices;
+        
+        SubsetEnvelope getEnvelope() const {
+            if (indices.size()) {
+                return { nullptr, type, 0, (int)indices.size() };
+            }
+            
+            return { nullptr, type, 0, (int)coords.size() };
+        }
     };
 
 

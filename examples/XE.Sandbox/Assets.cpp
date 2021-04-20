@@ -64,6 +64,7 @@ namespace XE::Sandbox {
             }
         }
         
+        
         void render() {
             // visitScene should be in the rendering stage
             visitScene(mData->scene);

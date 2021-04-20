@@ -18,6 +18,14 @@
 
 
 namespace XE {
+
+    struct GeoObject {
+        std::vector<std::pair<
+            std::unique_ptr<Subset>,
+            SubsetEnvelope>> subsets;
+    };
+
+
     class SandboxApp : public Application {
     public:
         explicit SandboxApp(const std::vector<std::string> &args) {}
@@ -159,11 +167,13 @@ namespace XE {
 
             m_graphicsDevice->setMaterial(m_material.get());
 
-            SubsetEnvelope envelope = {
-                nullptr, PrimitiveType::TriangleList, 0, 316626
-            };
+            for (const auto &subset_N_envelope : mGeoObject.subsets) {
+                m_graphicsDevice->draw(
+                   subset_N_envelope.first.get(),
+                   &subset_N_envelope.second,
+                   1);
+            }
             
-            m_graphicsDevice->draw(m_subset.get(), &envelope, 1);
             m_graphicsDevice->endFrame();
         }
 
@@ -215,9 +225,8 @@ namespace XE {
         
 
         void initializeGeometry() {
-            // loadSubset("media/models/spaceship_corridorhallway/scene.gltf");
-            m_subset = loadSubset("media/models/spaceship_corridorhallway/scene.gltf");
-            // m_subset = createSubset(Sandbox::Assets::getSquareMeshPrimitive());
+            mGeoObject = loadGeoObject("media/models/spaceship_corridorhallway/scene.gltf");
+            // mGeoObject = createGeoObject(Sandbox::Assets::getSquareMeshPrimitive());
             
             // m_texture = createColorTexture(256, 256, {1.0f, 0.0f, 0.0f, 1.0f});
             m_texture = createFileTexture("media/materials/Tiles_Azulejos_004_SD/Tiles_Azulejos_004_COLOR.png");
@@ -228,18 +237,21 @@ namespace XE {
         }
         
         
-        std::unique_ptr<Subset> loadSubset(const std::string &sceneFilePath) {
+        GeoObject loadGeoObject(const std::string &sceneFilePath) {
+            GeoObject geoObject;
+            
             auto meshes = Sandbox::Assets::loadModel(sceneFilePath);
             
-            if (meshes.size() > 0) {
-                return createSubset(meshes[0].primitives[0]);
+            for (const auto &mesh : meshes) {
+                for (const auto &primitive : mesh.primitives) {
+                    geoObject.subsets.push_back(createSubset(primitive));
+                }
             }
             
-            return {};
+            return geoObject;
         }
         
-        
-        std::unique_ptr<Subset> createSubset(const Sandbox::MeshPrimitive &meshPrimitive) {
+        std::pair<std::unique_ptr<Subset>, SubsetEnvelope> createSubset(const Sandbox::MeshPrimitive &meshPrimitive) {
             // create the vertex buffer
             BufferDescriptor coordBufferDescriptor = {
                 BufferType::Vertex,
@@ -314,17 +326,21 @@ namespace XE {
                 {"vertCoord", 0}, {"vertColor", 1}, {"vertNormal", 2}, {"vertTexCoord", 3}
             };
 
-            return m_graphicsDevice->createSubset(subsetDescriptor, std::move(buffers), bufferMapping, std::move(indexBuffer));
+            return {
+                m_graphicsDevice->createSubset(subsetDescriptor, std::move(buffers), bufferMapping, std::move(indexBuffer)),
+                meshPrimitive.getEnvelope()
+            };
         }
         
     private:
         std::unique_ptr<WindowGLFW> m_window;
         std::unique_ptr<GraphicsDevice> m_graphicsDevice;
         std::unique_ptr<Program> m_program;
-        std::unique_ptr<Subset> m_subset;
+        GeoObject mGeoObject;
+        
         std::unique_ptr<Material> m_material;
         std::unique_ptr<Texture2D> m_texture;
-
+        
         std::unique_ptr<FileStreamSource> m_streamSource;
 
         InputManager *m_inputManager = nullptr;
