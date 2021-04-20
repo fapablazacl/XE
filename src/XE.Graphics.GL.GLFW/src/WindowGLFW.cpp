@@ -35,6 +35,7 @@ namespace XE {
         hints[GLFW_GREEN_BITS] = contextDescriptor.greenBits;
         hints[GLFW_BLUE_BITS] = contextDescriptor.blueBits;
         hints[GLFW_ALPHA_BITS] = contextDescriptor.alphaBits;
+        hints[GLFW_RESIZABLE] = GL_FALSE;
 
         return hints;
     }

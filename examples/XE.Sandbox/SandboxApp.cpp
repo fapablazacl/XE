@@ -38,7 +38,7 @@ namespace XE {
             m_window = WindowGLFW::create (
                 ContextDescriptorGL::defaultGL4(), 
                 "XE.SandboxApp",
-                {1200, 800},
+                {1024, 768},
                 false
             );
 
@@ -54,8 +54,8 @@ namespace XE {
 
         
         void Update(const float seconds) override {
-            const Vector2i windowSize = m_window->getSize();
-            m_graphicsDevice->setViewport({{0, 0}, windowSize});
+            // const Vector2i windowSize = m_window->getSize();
+            // m_graphicsDevice->setViewport({{0, 0}, windowSize});
 
             m_inputManager->poll();
             
@@ -133,6 +133,7 @@ namespace XE {
 
             return m_graphicsDevice->createTexture2D(format, size, sourceFormat, sourceDataType, pixels.data());
         }
+        
 
         std::unique_ptr<Texture2D> createFileTexture(const std::string &filePath) {
             assert(m_streamSource);
@@ -153,14 +154,21 @@ namespace XE {
 
         
         void Render() override {
+            /*
+            const Viewport viewport = {
+                {0, 0},
+                m_window->getSize()
+            };
+            
+            m_graphicsDevice->setViewport(viewport);
+            */
+            
             m_graphicsDevice->beginFrame(ClearFlags::All, {0.2f, 0.2f, 0.8f, 1.0f}, 0.0f, 0);
             m_graphicsDevice->setProgram(m_program.get());
 
             renderMatrices();
 
-            Uniform textureUniform = {
-                "texture0", DataType::Int32, 1, 1
-            };
+            Uniform textureUniform = { "texture0", DataType::Int32, 1, 1 };
             int textureUnit = 0;
 
             m_graphicsDevice->applyUniform(&textureUniform, 1, reinterpret_cast<std::byte*>(&textureUnit));
@@ -250,6 +258,7 @@ namespace XE {
             
             return geoObject;
         }
+        
         
         std::pair<std::unique_ptr<Subset>, SubsetEnvelope> createSubset(const Sandbox::MeshPrimitive &meshPrimitive) {
             // create the vertex buffer
@@ -359,6 +368,7 @@ namespace XE {
         float m_cameraZNear = 0.1f;
         float m_cameraZFar = 1000.0f;
     };
+
 
     std::unique_ptr<Application> Application::create(const std::vector<std::string> &args) {
         return std::make_unique<SandboxApp>(args);
