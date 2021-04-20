@@ -100,6 +100,22 @@ namespace XE::Sandbox {
                     meshPrimitive.type = XE::PrimitiveType::PointList;
             }
             
+            if (primitive.indices) {
+                const cgltf_accessor &accessor = *primitive.indices;
+                const cgltf_buffer_view &bufferView = *accessor.buffer_view;
+                const cgltf_buffer &buffer = *bufferView.buffer;
+                
+                cgltf_size offset = 0;
+                
+                for (cgltf_size i=0; i<accessor.count; i++) {
+                    auto elementData = (const int)(*(const uint32_t*)((std::byte*)buffer.data + bufferView.offset + accessor.offset + offset));
+                    
+                    meshPrimitive.indices.push_back(elementData);
+                    
+                    offset += accessor.stride;
+                }
+            }
+            
             for (cgltf_size i=0; i<primitive.attributes_count; i++) {
                 const cgltf_accessor *accessor = primitive.attributes[i].data;
                 const cgltf_buffer_view *bufferView = accessor->buffer_view;
@@ -139,6 +155,10 @@ namespace XE::Sandbox {
                         offset += accessor->stride;
                     }
                 }
+            }
+            
+            for (size_t i=0; i<meshPrimitive.coords.size(); i++) {
+                meshPrimitive.colors.push_back({1.0f, 1.0f, 1.0f, 1.0f});
             }
             
             return meshPrimitive;
@@ -234,7 +254,6 @@ namespace XE::Sandbox {
         
     private:
         cgltf_data *mData = nullptr;
-        std::map<std::string, Mesh> mMeshesByName;
         std::vector<Mesh> mMeshes;
     };
 

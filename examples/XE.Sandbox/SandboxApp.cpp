@@ -160,8 +160,9 @@ namespace XE {
             m_graphicsDevice->setMaterial(m_material.get());
 
             SubsetEnvelope envelope = {
-                nullptr, PrimitiveType::TriangleStrip, 0, 4
+                nullptr, PrimitiveType::TriangleList, 0, 316626
             };
+            
             m_graphicsDevice->draw(m_subset.get(), &envelope, 1);
             m_graphicsDevice->endFrame();
         }
@@ -215,7 +216,8 @@ namespace XE {
 
         void initializeGeometry() {
             // loadSubset("media/models/spaceship_corridorhallway/scene.gltf");
-            m_subset = createSubset(Sandbox::Assets::getSquareMeshPrimitive());
+            m_subset = loadSubset("media/models/spaceship_corridorhallway/scene.gltf");
+            // m_subset = createSubset(Sandbox::Assets::getSquareMeshPrimitive());
             
             // m_texture = createColorTexture(256, 256, {1.0f, 0.0f, 0.0f, 1.0f});
             m_texture = createFileTexture("media/materials/Tiles_Azulejos_004_SD/Tiles_Azulejos_004_COLOR.png");
