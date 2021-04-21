@@ -226,6 +226,7 @@ namespace XE {
 
         void initializeGeometry() {
             mObjectsByNameMap = loadGeoObject("media/models/spaceship_corridorhallway/scene.gltf");
+            
             // mGeoObject = createGeoObject(Sandbox::Assets::getSquareMeshPrimitive());
             
             // m_texture = createColorTexture(256, 256, {1.0f, 0.0f, 0.0f, 1.0f});
@@ -241,7 +242,9 @@ namespace XE {
         std::map<std::string, GeoObject> loadGeoObject(const std::string &sceneFilePath) {
             std::map<std::string, GeoObject> objectsByName;
             
-            auto meshes = Sandbox::Assets::loadModel(sceneFilePath);
+            mAssetGLTF.load(sceneFilePath);
+            
+            auto meshes = mAssetGLTF.getMeshes();
             
             for (const auto &mesh : meshes) {
                 GeoObject geoObject = {};
@@ -345,6 +348,8 @@ namespace XE {
         std::unique_ptr<Program> m_program;
         
         std::map<std::string, GeoObject> mObjectsByNameMap;
+        
+        Asset_CGLTF mAssetGLTF;
         
         std::unique_ptr<Material> m_material;
         std::unique_ptr<Texture2D> m_texture;

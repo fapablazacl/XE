@@ -40,15 +40,6 @@ namespace XE::Sandbox {
     static std::vector<int> indexData = {0, 1, 2, 3};
 
 
-    std::vector<Mesh> Assets::loadModel(const std::string &assetFilePath) {
-        Asset_CGLTF assetGLTF;
-        
-        assetGLTF.load(assetFilePath);
-        
-        return assetGLTF.getMeshes();
-    }
-
-
     MeshPrimitive Assets::getSquareMeshPrimitive() {
         MeshPrimitive primitive;
         

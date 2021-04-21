@@ -12,8 +12,6 @@
 namespace XE::Sandbox {
 
     struct Assets {
-        static std::vector<Mesh> loadModel(const std::string &assetFilePath);
-        
         static MeshPrimitive getSquareMeshPrimitive();
     };
 }
