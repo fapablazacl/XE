@@ -2,6 +2,7 @@
 #include "Asset_CGLTF.h"
 
 #include <iostream>
+#include <XE/Math/Quaternion.hpp>
 
 #define CGLTF_IMPLEMENTATION
 #include <cgltf.h>
@@ -38,7 +39,9 @@ void Asset_CGLTF::load(const std::string &filePath) {
 }
 
 
-void Asset_CGLTF::visitDefaultScene() {
+void Asset_CGLTF::visitDefaultScene(SceneNodeCallback callback) {
+    mCallback = callback;
+    
     visitScene(mData->scene);
 }
 
@@ -193,9 +196,18 @@ XE::Matrix4f Asset_CGLTF::computeNodeMatrix(const cgltf_node *node) {
         }
         
         if (node->has_rotation) {
-            // TODO: Refactor this implementation. The correct math primitive is a quaternion.
-            const auto r = XE::Vector4f{node->rotation};
-            nodeMatrix *= XE::Matrix4f::createRotation(r.W, {r.X, r.Y, r.Z});
+            // TODO: Add missing cases for angle = 0 and = 180º.
+            const auto q = XE::Quaternion<float>{node->rotation};
+            
+            const float radians = std::acosf(q.W);
+            const float inv_denom = 1.0f / std::sqrtf(1.0f - q.W*q.W);
+            
+            if (radians > 0.0f) {
+                const XE::Vector3f axis = q.V * inv_denom;
+                
+                const auto r = XE::Vector4f{node->rotation};
+                nodeMatrix *= XE::Matrix4f::createRotation(radians, axis);
+            }
         }
         
         if (node->has_scale) {
@@ -225,6 +237,25 @@ void Asset_CGLTF::visitNode(const int indentation, const cgltf_node *node) {
     
     for (cgltf_size i=0; i<node->children_count; i++) {
         visitNode(indentation + 2, node->children[i]);
+    }
+}
+
+
+void Asset_CGLTF::visitNode(const XE::Matrix4f &matrix, const cgltf_node *node) {
+    assert(node);
+    
+    const XE::Matrix4f nodeMatrix = matrix * computeNodeMatrix(node);
+    
+    if (node->mesh) {
+        mCallback(nodeMatrix, node->mesh->name);
+    }
+    
+    if (node->light) {
+        // TODO: Add support.
+    }
+    
+    for (cgltf_size i=0; i<node->children_count; i++) {
+        visitNode(nodeMatrix, node->children[i]);
     }
 }
 

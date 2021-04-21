@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include <functional>
 
 #include <XE/Graphics/Subset.hpp>
 #include <XE/Math/Vector.hpp>
@@ -38,6 +39,8 @@ struct Mesh {
 };
 
 
+using SceneNodeCallback = std::function<void (const XE::Matrix4f &transform, const std::string &meshName)>;
+
 
 class Asset_CGLTF {
 public:
@@ -49,7 +52,7 @@ public:
     
     void load(const std::string &filePath);
     
-    void visitDefaultScene();
+    void visitDefaultScene(SceneNodeCallback callback);
     
     std::vector<Mesh> getMeshes() const;
     
@@ -68,8 +71,11 @@ private:
 
     void visitNode(const int indentation, const cgltf_node *node);
 
+    void visitNode(const XE::Matrix4f &matrix, const cgltf_node *node);
+    
     void visitScene(const cgltf_scene *scene);
     
 private:
     cgltf_data *mData = nullptr;
+    SceneNodeCallback mCallback;
 };
