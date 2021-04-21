@@ -12,16 +12,6 @@
 namespace XE::Sandbox {
 
     struct Assets {
-        Assets() = delete;
-        
-        static std::vector<Vector3f> coordData;
-        static std::vector<Vector4f> colorData;
-        static std::vector<Vector3f> normalData;
-        static std::vector<Vector2f> texCoordData;
-        static std::vector<int> indexData;
-        
-        static void loadModel();
-        
         static std::vector<Mesh> loadModel(const std::string &assetFilePath);
         
         static MeshPrimitive getSquareMeshPrimitive();

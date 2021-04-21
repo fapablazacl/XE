@@ -9,6 +9,37 @@
 
 
 namespace XE::Sandbox {
+    static std::vector<Vector3f> coordData = {
+        {-1.5f,  1.5f, 0.0f},
+        { 1.5f,  1.5f, 0.0f},
+        {-1.5f, -1.5f, 0.0f},
+        { 1.5f, -1.5f, 0.0f}
+    };
+
+    static std::vector<Vector4f> colorData = {
+        {1.0f, 1.0f, 1.0f, 1.0f},
+        {1.0f, 1.0f, 1.0f, 1.0f},
+        {1.0f, 1.0f, 1.0f, 1.0f},
+        {1.0f, 1.0f, 1.0f, 1.0f}
+    };
+
+    static std::vector<Vector3f> normalData = {
+        {0.0f, 0.0f, 1.0f},
+        {0.0f, 0.0f, 1.0f},
+        {0.0f, 0.0f, 1.0f},
+        {0.0f, 0.0f, 1.0f}
+    };
+
+    static std::vector<Vector2f> texCoordData = {
+        {0.0f, 1.0f},
+        {1.0f, 1.0f},
+        {0.0f, 0.0f},
+        {1.0f, 0.0f}
+    };
+
+    static std::vector<int> indexData = {0, 1, 2, 3};
+
+
     std::vector<Mesh> Assets::loadModel(const std::string &assetFilePath) {
         Asset_CGLTF assetGLTF;
         
@@ -30,35 +61,4 @@ namespace XE::Sandbox {
         
         return primitive;
     }
-
-
-    std::vector<Vector3f> Assets::coordData = {
-        {-1.5f,  1.5f, 0.0f},
-        { 1.5f,  1.5f, 0.0f},
-        {-1.5f, -1.5f, 0.0f},
-        { 1.5f, -1.5f, 0.0f}
-    };
-
-    std::vector<Vector4f> Assets::colorData = {
-        {1.0f, 1.0f, 1.0f, 1.0f},
-        {1.0f, 1.0f, 1.0f, 1.0f},
-        {1.0f, 1.0f, 1.0f, 1.0f},
-        {1.0f, 1.0f, 1.0f, 1.0f}
-    };
-
-    std::vector<Vector3f> Assets::normalData = {
-        {0.0f, 0.0f, 1.0f},
-        {0.0f, 0.0f, 1.0f},
-        {0.0f, 0.0f, 1.0f},
-        {0.0f, 0.0f, 1.0f}
-    };
-
-    std::vector<Vector2f> Assets::texCoordData = {
-        {0.0f, 1.0f},
-        {1.0f, 1.0f},
-        {0.0f, 0.0f},
-        {1.0f, 0.0f}
-    };
-
-    std::vector<int> Assets::indexData = {0, 1, 2, 3};
 }
