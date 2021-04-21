@@ -102,7 +102,7 @@ namespace XE {
         }
         
 
-        void renderMatrices() {
+        void renderMatrices(const XE::Matrix4f &model = XE::Matrix4f::createIdentity()) {
             const UniformMatrix matrixLayout = { "m_mvp", DataType::Float32, 4, 4, 1 };
 
             const Matrix4f modelViewProj = transpose (
@@ -156,8 +156,6 @@ namespace XE {
             m_graphicsDevice->beginFrame(ClearFlags::All, {0.2f, 0.2f, 0.8f, 1.0f}, 1.0f, 0);
             m_graphicsDevice->setProgram(m_program.get());
 
-            renderMatrices();
-
             Uniform textureUniform = { "texture0", DataType::Int32, 1, 1 };
             int textureUnit = 0;
 
@@ -165,25 +163,43 @@ namespace XE {
 
             m_graphicsDevice->setMaterial(m_material.get());
 
-            for (const auto &pair : mObjectsByNameMap) {
-                for (const auto &subset_N_envelope : pair.second.subsets) {
-                    m_graphicsDevice->draw(
-                       subset_N_envelope.first.get(),
-                       &subset_N_envelope.second,
-                       1);
-                }
-            }
-            
+            renderScene();
+
             m_graphicsDevice->endFrame();
         }
 
-        
         bool ShouldClose() const override {
             return m_shouldClose;
         }
 
         
     private:
+        void renderScene() {
+            mAssetGLTF.visitDefaultScene([this](const XE::Matrix4f &matrix, const std::string &objectName) {
+                
+                renderMatrices(matrix);
+                
+                const GeoObject &object = mObjectsByNameMap[objectName];
+                
+                for (const auto &subset_N_envelope : object.subsets) {
+                    m_graphicsDevice->draw(
+                       subset_N_envelope.first.get(),
+                       &subset_N_envelope.second, 1);
+                }
+            });
+        }
+        
+        
+        void renderObjects() {
+            for (const auto &pair : mObjectsByNameMap) {
+                for (const auto &subset_N_envelope : pair.second.subsets) {
+                    m_graphicsDevice->draw(
+                       subset_N_envelope.first.get(),
+                       &subset_N_envelope.second, 1);
+                }
+            }
+        }
+        
         void initializeShaders() {
             // setup program shader
             const ProgramDescriptor programDescriptor = {
@@ -363,7 +379,7 @@ namespace XE {
 
         float m_angle = 0.0f;
 
-        Vector3f m_cameraPosition = {0.0f, 0.0f, 5.0f};
+        Vector3f m_cameraPosition = {0.0f, 0.0f, 15.0f};
         Vector3f m_cameraLookAt = {0.0f, 0.0f, 0.0f};
         Vector3f m_cameraUp = {0.0f, 1.0f, 0.0f};
 
