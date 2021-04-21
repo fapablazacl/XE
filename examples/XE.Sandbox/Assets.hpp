@@ -7,37 +7,9 @@
 #include <string>
 #include <vector>
 
-#include "Common.h"
+#include "Asset_CGLTF.h"
 
 namespace XE::Sandbox {
-    struct Material {
-        
-    };
-
-
-    struct MeshPrimitive {
-        const Material *material = nullptr;
-        XE::PrimitiveType type = XE::PrimitiveType::PointList;
-        std::vector<XE::Vector3f> coords;
-        std::vector<XE::Vector3f> normals;
-        std::vector<XE::Vector4f> colors;
-        std::vector<XE::Vector2f> texCoords;
-        std::vector<int> indices;
-        
-        SubsetEnvelope getEnvelope() const {
-            if (indices.size()) {
-                return { nullptr, type, 0, (int)indices.size() };
-            }
-            
-            return { nullptr, type, 0, (int)coords.size() };
-        }
-    };
-
-
-    struct Mesh {
-        std::vector<MeshPrimitive> primitives;
-    };
-
 
     struct Assets {
         Assets() = delete;

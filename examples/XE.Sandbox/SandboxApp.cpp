@@ -251,7 +251,7 @@ namespace XE {
         }
         
         
-        std::pair<std::unique_ptr<Subset>, SubsetEnvelope> createSubset(const Sandbox::MeshPrimitive &meshPrimitive) {
+        std::pair<std::unique_ptr<Subset>, SubsetEnvelope> createSubset(const MeshPrimitive &meshPrimitive) {
             // create the vertex buffer
             BufferDescriptor coordBufferDescriptor = {
                 BufferType::Vertex,
