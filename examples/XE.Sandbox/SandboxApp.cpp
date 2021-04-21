@@ -165,11 +165,13 @@ namespace XE {
 
             m_graphicsDevice->setMaterial(m_material.get());
 
-            for (const auto &subset_N_envelope : mGeoObject.subsets) {
-                m_graphicsDevice->draw(
-                   subset_N_envelope.first.get(),
-                   &subset_N_envelope.second,
-                   1);
+            for (const auto &pair : mObjectsByNameMap) {
+                for (const auto &subset_N_envelope : pair.second.subsets) {
+                    m_graphicsDevice->draw(
+                       subset_N_envelope.first.get(),
+                       &subset_N_envelope.second,
+                       1);
+                }
             }
             
             m_graphicsDevice->endFrame();
@@ -223,7 +225,7 @@ namespace XE {
         
 
         void initializeGeometry() {
-            mGeoObject = loadGeoObject("media/models/spaceship_corridorhallway/scene.gltf");
+            mObjectsByNameMap = loadGeoObject("media/models/spaceship_corridorhallway/scene.gltf");
             // mGeoObject = createGeoObject(Sandbox::Assets::getSquareMeshPrimitive());
             
             // m_texture = createColorTexture(256, 256, {1.0f, 0.0f, 0.0f, 1.0f});
@@ -236,18 +238,23 @@ namespace XE {
         }
         
         
-        GeoObject loadGeoObject(const std::string &sceneFilePath) {
-            GeoObject geoObject;
+        std::map<std::string, GeoObject> loadGeoObject(const std::string &sceneFilePath) {
+            std::map<std::string, GeoObject> objectsByName;
             
             auto meshes = Sandbox::Assets::loadModel(sceneFilePath);
             
             for (const auto &mesh : meshes) {
+                GeoObject geoObject = {};
+                
                 for (const auto &primitive : mesh.primitives) {
                     geoObject.subsets.push_back(createSubset(primitive));
                 }
+                
+                
+                objectsByName[mesh.name] = std::move(geoObject);
             }
             
-            return geoObject;
+            return objectsByName;
         }
         
         
@@ -336,7 +343,8 @@ namespace XE {
         std::unique_ptr<WindowGLFW> m_window;
         std::unique_ptr<GraphicsDevice> m_graphicsDevice;
         std::unique_ptr<Program> m_program;
-        GeoObject mGeoObject;
+        
+        std::map<std::string, GeoObject> mObjectsByNameMap;
         
         std::unique_ptr<Material> m_material;
         std::unique_ptr<Texture2D> m_texture;

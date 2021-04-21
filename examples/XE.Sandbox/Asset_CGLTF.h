@@ -10,9 +10,7 @@
 
 #include <cgltf.h>
 
-struct Material {
-    
-};
+struct Material {};
 
 
 struct MeshPrimitive {
@@ -35,6 +33,7 @@ struct MeshPrimitive {
 
 
 struct Mesh {
+    std::string name;
     std::vector<MeshPrimitive> primitives;
 };
 
@@ -42,11 +41,15 @@ struct Mesh {
 
 class Asset_CGLTF {
 public:
+    Asset_CGLTF();
+    
+    Asset_CGLTF(const std::string &filePath);
+    
     ~Asset_CGLTF();
     
     void load(const std::string &filePath);
     
-    void render();
+    void visitDefaultScene();
     
     std::vector<Mesh> getMeshes() const;
     
@@ -69,5 +72,4 @@ private:
     
 private:
     cgltf_data *mData = nullptr;
-    std::vector<Mesh> mMeshes;
 };

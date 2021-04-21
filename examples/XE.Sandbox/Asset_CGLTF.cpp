@@ -9,49 +9,59 @@
 #include "Common.h"
 
 
+Asset_CGLTF::Asset_CGLTF() {}
+
+
+Asset_CGLTF::Asset_CGLTF(const std::string &filePath) {
+    load(filePath);
+}
+
+
 Asset_CGLTF::~Asset_CGLTF() {
     if (mData) {
         cgltf_free(mData);
     }
 }
 
+
 void Asset_CGLTF::load(const std::string &filePath) {
     cgltf_options options = {};
     
-    if (mData) {
-        cgltf_free(mData);
-    }
+    this->~Asset_CGLTF();
     
     cgltf_result result = cgltf_parse_file(&options, filePath.c_str(), &mData);
     
     if (result == cgltf_result_success) {
         // load the binary data
         cgltf_load_buffers(&options, mData, filePath.c_str());
-
-        // load the meshes
-        mMeshes.clear();
-        for (cgltf_size i=0; i<mData->meshes_count; i++) {
-            Mesh mesh = createMesh(mData->meshes[i]);
-            
-            mMeshes.push_back(mesh);
-        }
     }
 }
 
 
-void Asset_CGLTF::render() {
-    // visitScene should be in the rendering stage
+void Asset_CGLTF::visitDefaultScene() {
     visitScene(mData->scene);
 }
 
 
 std::vector<Mesh> Asset_CGLTF::getMeshes() const {
-    return mMeshes;
+    std::vector<Mesh> meshes;
+    
+    // load the meshes
+    meshes.clear();
+    for (cgltf_size i=0; i<mData->meshes_count; i++) {
+        Mesh mesh = createMesh(mData->meshes[i]);
+        
+        meshes.push_back(mesh);
+    }
+    
+    return meshes;
 }
 
 
 Mesh Asset_CGLTF::createMesh(const cgltf_mesh &cgltfMesh) const {
     Mesh mesh;
+    
+    mesh.name = cgltfMesh.name;
     
     for (cgltf_size i=0; i<cgltfMesh.primitives_count; i++) {
         MeshPrimitive primitive = createMeshPrimitive(cgltfMesh.primitives[i]);
