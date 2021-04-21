@@ -18,7 +18,6 @@
 
 
 namespace XE {
-
     struct GeoObject {
         std::vector<std::pair<
             std::unique_ptr<Subset>,
@@ -154,16 +153,7 @@ namespace XE {
 
         
         void Render() override {
-            /*
-            const Viewport viewport = {
-                {0, 0},
-                m_window->getSize()
-            };
-            
-            m_graphicsDevice->setViewport(viewport);
-            */
-            
-            m_graphicsDevice->beginFrame(ClearFlags::All, {0.2f, 0.2f, 0.8f, 1.0f}, 0.0f, 0);
+            m_graphicsDevice->beginFrame(ClearFlags::All, {0.2f, 0.2f, 0.8f, 1.0f}, 1.0f, 0);
             m_graphicsDevice->setProgram(m_program.get());
 
             renderMatrices();
@@ -242,8 +232,7 @@ namespace XE {
             m_material = std::make_unique<Material>();
             m_material->layers[0].texture = m_texture.get();
             m_material->layerCount = 1;
-            // m_material->renderState.depthTest = true;
-            m_material->renderState.depthTest = false;
+            m_material->renderState.depthTest = true;
         }
         
         

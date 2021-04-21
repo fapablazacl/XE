@@ -1,5 +1,5 @@
 
-#include <XE/Graphics/BoxGenerator.hpp>
+#include <XE/Geometry/BoxGenerator.hpp>
 
 #include <XE/Math/Common.hpp>
 

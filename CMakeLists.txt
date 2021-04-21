@@ -37,6 +37,7 @@ add_subdirectory ("src/XE.Scene")
 add_subdirectory ("src/XE.Input")
 add_subdirectory ("src/XE.Math")
 add_subdirectory ("src/XE.IO")
+add_subdirectory ("src/XE.Geometry")
 
 include_directories("dep/cgltf")
 

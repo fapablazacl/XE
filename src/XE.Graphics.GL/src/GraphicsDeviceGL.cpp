@@ -115,10 +115,20 @@ namespace XE {
     }
         
     void GraphicsDeviceGL::beginFrame(const ClearFlags flags, const Vector4f &color, const float depth, const int stencil) {
-        const GLenum clearFlagsGL =
-            (flags & ClearFlags::Color   ? GL_COLOR_BUFFER_BIT   : 0) | 
-            (flags & ClearFlags::Depth   ? GL_DEPTH_BUFFER_BIT   : 0) | 
-            (flags & ClearFlags::Stencil ? GL_STENCIL_BUFFER_BIT : 0) ;
+        
+        GLenum clearFlagsGL = 0;
+        
+        if (flags & ClearFlags::Color) {
+            clearFlagsGL |= GL_COLOR_BUFFER_BIT;
+        }
+        
+        if (flags & ClearFlags::Depth) {
+            clearFlagsGL |= GL_DEPTH_BUFFER_BIT;
+        }
+        
+        if (flags & ClearFlags::Stencil) {
+            clearFlagsGL |= GL_STENCIL_BUFFER_BIT;
+        }
 
         ::glClearColor(color.X, color.Y, color.Z, color.W);
         ::glClearDepth(static_cast<GLdouble>(depth));
@@ -156,7 +166,7 @@ namespace XE {
         } else {
             ::glDisable(GL_DEPTH_TEST);
         }
-
+        
         const GLenum depthFuncGL = convertToGL(rs.depthFunc);
         ::glDepthFunc(depthFuncGL);
 
@@ -206,8 +216,8 @@ namespace XE {
 
             ::glActiveTexture(GL_TEXTURE0 + i);
             ::glBindTexture(target, textureBaseGL->GetID());
-            ::glTexParameteri(target, GL_TEXTURE_MAG_FILTER, convertToGL(layer.minFilter));
-            ::glTexParameteri(target, GL_TEXTURE_MIN_FILTER, convertToGL(layer.magFilter));
+            ::glTexParameteri(target, GL_TEXTURE_MAG_FILTER, convertToGL(layer.magFilter));
+            ::glTexParameteri(target, GL_TEXTURE_MIN_FILTER, convertToGL(layer.minFilter));
             ::glTexParameteri(target, GL_TEXTURE_WRAP_S, convertToGL(layer.wrapS));
             ::glTexParameteri(target, GL_TEXTURE_WRAP_T, convertToGL(layer.wrapT));
             ::glTexParameteri(target, GL_TEXTURE_WRAP_R, convertToGL(layer.wrapR));

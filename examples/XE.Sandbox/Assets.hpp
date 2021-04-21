@@ -7,6 +7,8 @@
 #include <string>
 #include <vector>
 
+#include "Common.h"
+
 namespace XE::Sandbox {
     struct Material {
         

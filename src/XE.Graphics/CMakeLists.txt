@@ -23,10 +23,6 @@ set (sources
 	"include/XE/Graphics/ImageLoader.hpp"
 	"include/XE/Graphics/Material.hpp"
 	"include/XE/Graphics/Viewport.hpp"
-	"include/XE/Graphics/ShapeGenerator.hpp"
-	"include/XE/Graphics/EllipsoidGenerator.hpp"
-	"include/XE/Graphics/PlaneGenerator.hpp"
-	"include/XE/Graphics/BoxGenerator.hpp"
 
 	"src/IWindow.cpp"	
 	"src/GraphicsDevice.cpp"
@@ -49,10 +45,6 @@ set (sources
 	"src/ImageLoader.cpp"
 	"src/Material.cpp"
 	"src/Viewport.cpp"
-	"src/ShapeGenerator.cpp"
-	"src/EllipsoidGenerator.cpp"
-	"src/PlaneGenerator.cpp"
-	"src/BoxGenerator.cpp"
 )
 
 add_library (${target} ${sources})
