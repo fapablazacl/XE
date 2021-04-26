@@ -33,3 +33,4 @@ add_library(${target} ${sources})
 
 target_include_directories(${target} PUBLIC "include/")
 target_link_libraries(${target} XE.Core)
+target_compile_options (${target} PUBLIC ${XE_CXX_FLAGS})
