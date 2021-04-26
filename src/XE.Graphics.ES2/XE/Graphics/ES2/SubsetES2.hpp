@@ -3,7 +3,7 @@
 #define __XE_GRAPHICS_GL_SUBSETGL_HPP__
 
 #include <XE/Graphics/Subset.hpp>
-#include <glad/es2/glad.h>
+#include <glad/glad.h>
 
 #include "BufferES2.hpp"
 

@@ -27,7 +27,7 @@ cd $BUILD_DIR/clang/debug
 export CXXFLAGS="-Wall"
 cmake ../../../ -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Debug -DXE_TEST=ON -DXE_PLUGIN_GL=ON -DXE_PLUGIN_ES2=ON -DXE_PLUGIN_GL_GLFW=ON
 
-if ! make ; then
+if ! make -j4 ; then
     exit 1
 fi
 
@@ -47,7 +47,7 @@ cd $BUILD_DIR/clang/release
 export CXXFLAGS="-Wall"
 cmake ../../../ -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release -DXE_TEST=ON -DXE_PLUGIN_GL=ON -DXE_PLUGIN_ES2=ON -DXE_PLUGIN_GL_GLFW=ON
 
-if ! make ; then
+if ! make -j4 ; then
     exit 1
 fi
 

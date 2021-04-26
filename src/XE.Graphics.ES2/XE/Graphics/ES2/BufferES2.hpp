@@ -4,7 +4,7 @@
 
 #include <XE/Buffer.hpp>
 #include <XE/Graphics/BufferDescriptor.hpp>
-#include <glad/es2/glad.h>
+#include <glad/glad.h>
 
 namespace XE {
     enum class BufferUsage;

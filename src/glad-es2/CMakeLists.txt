@@ -2,9 +2,9 @@
 set (target glad-es2)
 
 set (sources 
-	"include/glad/es2/glad.h"
-	"include/glad/es2/glad_debug.h"
-	"include/glad/es2/glad_release.h"
+	"include/glad/glad.h"
+	"include/glad/glad_debug.h"
+	"include/glad/glad_release.h"
 
 	"src/glad.c"
 	"src/glad_debug.c.in"
