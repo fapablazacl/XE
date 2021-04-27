@@ -149,18 +149,6 @@ namespace XE {
     void GraphicsDeviceGL::preRenderMaterial(const Material *material) {
         const auto &rs = material->renderState;
 
-        // clip distances
-        for (int i=0; i<rs.clipDistanceCount; i++) {
-            const GLenum clipDistanceGL = GL_CLIP_DISTANCE0 + i;
-
-            if (rs.clipDistances[i]) {
-                ::glEnable(clipDistanceGL);
-            } else {
-                ::glDisable(clipDistanceGL);
-            }
-        }
-
-        // depth buffer configuration
         if (rs.depthTest) {
             ::glEnable(GL_DEPTH_TEST);
         } else {
@@ -170,26 +158,17 @@ namespace XE {
         const GLenum depthFuncGL = convertToGL(rs.depthFunc);
         ::glDepthFunc(depthFuncGL);
 
-        // polygon mode
-        const GLenum fillModeGL = convertToGL(rs.polygonMode);
-        ::glPolygonMode(GL_FRONT_AND_BACK, fillModeGL);
-
-        // front face definition
         const GLenum faceGL = convertToGL(rs.frontFace);
         ::glFrontFace(faceGL);
 
-        // back face culling
         if (rs.cullBackFace) {
             ::glEnable(GL_CULL_FACE);
         } else {
             ::glDisable(GL_CULL_FACE);
         }
 
-        // point and line sizing
-        ::glPointSize(rs.pointSize);
         ::glLineWidth(rs.lineWidth);
 
-        // blending
         if (rs.blendEnable) {
             ::glEnable(GL_BLEND);
 
@@ -200,7 +179,6 @@ namespace XE {
             ::glDisable(GL_BLEND);
         }
 
-        // texture layers
         for (int i=0; i<material->layerCount; i++) {
             const auto &layer = material->layers[i];
 
@@ -229,31 +207,18 @@ namespace XE {
     void GraphicsDeviceGL::postRenderMaterial(const Material *material) {
         const auto &rs = material->renderState;
 
-        // clip distances
-        for (int i=0; i<rs.clipDistanceCount; i++) {
-            const GLenum clipDistanceGL = GL_CLIP_DISTANCE0 + i;
-
-            if (rs.clipDistances[i]) {
-                ::glDisable(clipDistanceGL);
-            }
-        }
-
-        // depth buffer configuration
         if (rs.depthTest) {
             ::glDisable(GL_DEPTH_TEST);
         }
 
-        // back face culling
         if (rs.cullBackFace) {
             ::glDisable(GL_CULL_FACE);
         }
 
-        // blending
         if (rs.blendEnable) {
             ::glDisable(GL_BLEND);
         }
 
-        // texture layers
         for (int i=0; i<material->layerCount; i++) {
             const auto &layer = material->layers[i];
 
@@ -375,6 +340,9 @@ namespace XE {
                     break;
                 }
                 break;
+                    
+                default:
+                    assert(false);
             }
 
             offset += ComputeByteSize(current->Type) * current->Rows * current->Columns * current->Count;
@@ -382,6 +350,25 @@ namespace XE {
 
         XE_GRAPHICS_GL_CHECK_ERROR();
     }
+
+/*
+    template<typename T>
+    using UniformFunction = void (*)(GLint location, GLsizei count, const T *value);
+
+    static const std::array<UniformFunction<GLint>, 4> uniformFunctionsI = {
+        glUniform1iv, glUniform2iv, glUniform3iv, glUniform4iv
+    };
+
+
+    static const std::array<UniformFunction<GLfloat>, 4> uniformFunctionsF = {
+        glUniform1fv, glUniform2fv, glUniform3fv, glUniform4fv
+    };
+
+    static const std::array<UniformFunction<GLuint>, 4> uniformFunctionsUI = {
+        glUniform1uiv, glUniform2uiv, glUniform3uiv, glUniform4uiv
+    };
+*/
+
 
     void GraphicsDeviceGL::applyUniform(const Uniform *uniform, const int count, const std::byte *data) {
         assert(m_program);
@@ -399,7 +386,6 @@ namespace XE {
 
             switch (current->Type) {
             case DataType::Int32:
-                // std::cout << current->Name << ": " << location << ", " << *((const GLint*)&data[offset]) << std::endl;
                 switch (current->size) {
                     case 1: ::glUniform1iv(location, current->Count, (const GLint*)&data[offset]); break;
                     case 2: ::glUniform2iv(location, current->Count, (const GLint*)&data[offset]); break;
