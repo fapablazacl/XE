@@ -131,6 +131,7 @@ namespace XE {
             createGraphicsPipeline();
             createSwapchainFramebuffers();
             createCommandPool();
+            createCommandBuffers();
         }
 
         void loop() {
@@ -653,8 +654,10 @@ namespace XE {
             graphicsPipelineInfo.basePipelineIndex = -1;
 
             if (vkCreateGraphicsPipelines(mDevice, VK_NULL_HANDLE, 1, &graphicsPipelineInfo, nullptr, &mGraphicsPipeline) != VK_SUCCESS) {
-                throw std::runtime_error("Couldn't create the pipeline!");
+                throw std::runtime_error("couldn't create the pipeline!");
             }
+
+            assert(mGraphicsPipeline);
 
             vkDestroyShaderModule(mDevice, vertexShaderModule, nullptr);
             vkDestroyShaderModule(mDevice, fragmentShaderModule, nullptr);
@@ -741,6 +744,52 @@ namespace XE {
             }
         }
         
+        void createCommandBuffers() {
+            mCommandBuffers.resize(mSwapchainFramebuffers.size());
+
+            VkCommandBufferAllocateInfo commandAllocInfo {};
+            commandAllocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+            commandAllocInfo.commandPool = mCommandPool;
+            commandAllocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+            commandAllocInfo.commandBufferCount = static_cast<uint32_t>(mCommandBuffers.size());
+
+            if (vkAllocateCommandBuffers(mDevice, &commandAllocInfo, mCommandBuffers.data()) != VK_SUCCESS) {
+                throw std::runtime_error("failed to allocate command buffers!");
+            }
+
+            // recording drawing commands
+            for (size_t i=0; i<mCommandBuffers.size(); i++) {
+                VkCommandBufferBeginInfo beginInfo {};
+                beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+                beginInfo.flags = 0;
+                beginInfo.pInheritanceInfo = nullptr;
+
+                if (vkBeginCommandBuffer(mCommandBuffers[i], &beginInfo) != VK_SUCCESS) {
+                    throw std::runtime_error("failed to begin recording command buffer");
+                }
+
+                VkRenderPassBeginInfo renderPassInfo {};
+                renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+                renderPassInfo.renderPass = mRenderPass;
+                renderPassInfo.framebuffer = mSwapchainFramebuffers[i];
+                renderPassInfo.renderArea.offset = {0, 0};
+                renderPassInfo.renderArea.extent = mSwapchainExtent;
+
+                VkClearValue clearValue = {0.0f, 0.0f, 0.0f, 1.0f};
+                renderPassInfo.clearValueCount = 1;
+                renderPassInfo.pClearValues = &clearValue;
+
+                vkCmdBeginRenderPass(mCommandBuffers[i], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+                vkCmdBindPipeline(mCommandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, mGraphicsPipeline);
+                vkCmdDraw(mCommandBuffers[i], 3, 1, 0, 0);
+                vkCmdEndRenderPass(mCommandBuffers[i]);
+
+                if (vkEndCommandBuffer(mCommandBuffers[i]) != VK_SUCCESS) {
+                    throw std::runtime_error("failed to record command buffer!");
+                }
+            }
+        }
+
         void terminate() {
             vkDestroyCommandPool(mDevice, mCommandPool, nullptr);
 
@@ -777,23 +826,24 @@ namespace XE {
 
     private:
         GLFWwindow *mWindow = nullptr;
-        VkInstance mInstance;
+        VkInstance mInstance = VK_NULL_HANDLE;
         VkDebugUtilsMessengerEXT mDebugMessenger;
         VkPhysicalDevice mPhysicaldevice = VK_NULL_HANDLE;
-        VkDevice mDevice;
-        VkQueue mGraphicsQueue;
-        VkQueue mPresentationQueue;
-        VkSurfaceKHR mSurface;
-        VkSwapchainKHR mSwapchain;
+        VkDevice mDevice = VK_NULL_HANDLE;
+        VkQueue mGraphicsQueue = VK_NULL_HANDLE;
+        VkQueue mPresentationQueue = VK_NULL_HANDLE;
+        VkSurfaceKHR mSurface = VK_NULL_HANDLE;
+        VkSwapchainKHR mSwapchain = VK_NULL_HANDLE;
         std::vector<VkImage> mSwapchainImages;
         VkFormat mSwapchainImageFormat;
         VkExtent2D mSwapchainExtent;
         std::vector<VkImageView> mSwapchainImageViews;
-        VkRenderPass mRenderPass;
-        VkPipelineLayout mPipelineLayout;
-        VkPipeline mGraphicsPipeline;
+        VkRenderPass mRenderPass = VK_NULL_HANDLE;
+        VkPipelineLayout mPipelineLayout = VK_NULL_HANDLE;
+        VkPipeline mGraphicsPipeline = VK_NULL_HANDLE;
         std::vector<VkFramebuffer> mSwapchainFramebuffers;
-        VkCommandPool mCommandPool;
+        VkCommandPool mCommandPool = VK_NULL_HANDLE;
+        std::vector<VkCommandBuffer> mCommandBuffers;
     };
 }
 
