@@ -3,7 +3,7 @@
 #include "SandboxApp.hpp"
 #include "Assets.hpp"
 
-#include <XE.hpp>
+#include <XE/XE.hpp>
 #include <XE/Math.hpp>
 #include <XE/Input.hpp>
 #include <XE/IO.hpp>
@@ -16,19 +16,28 @@
 #include <iostream>
 #include <fstream>
 
+
 namespace XE {
+    struct GeoObject {
+        std::vector<std::pair<
+            std::unique_ptr<Subset>,
+            SubsetEnvelope>> subsets;
+    };
+
+
     class SandboxApp : public Application {
     public:
         explicit SandboxApp(const std::vector<std::string> &args) {}
+        
         virtual ~SandboxApp() {}
 
-        virtual void Initialize() override {
+        void Initialize() override {
             std::cout << "Initializing Engine ..." << std::endl;
 
             m_window = WindowGLFW::create (
                 ContextDescriptorGL::defaultGL4(), 
                 "XE.SandboxApp",
-                {1200, 800},
+                {1024, 768},
                 false
             );
 
@@ -36,14 +45,16 @@ namespace XE {
             m_inputManager = m_window->getInputManager();
 
             std::cout << "Loading assets ..." << std::endl;
-            m_streamSource = std::unique_ptr<FileStreamSource>();
-            this->InitializeShaders();
-            this->InitializeGeometry();
+            m_streamSource = std::make_unique<FileStreamSource>(".");
+            
+            initializeShaders();
+            initializeGeometry();
         }
 
-        virtual void Update(const float seconds) override {
-            const Vector2i windowSize = m_window->getSize();
-            m_graphicsDevice->setViewport({{0, 0}, windowSize});
+        
+        void Update(const float seconds) override {
+            // const Vector2i windowSize = m_window->getSize();
+            // m_graphicsDevice->setViewport({{0, 0}, windowSize});
 
             m_inputManager->poll();
             
@@ -89,8 +100,9 @@ namespace XE {
                 m_cameraLookAt -= cameraDisplacement;
             }
         }
+        
 
-        void RenderMatrices() {
+        void renderMatrices(const XE::Matrix4f &model = XE::Matrix4f::createIdentity()) {
             const UniformMatrix matrixLayout = { "m_mvp", DataType::Float32, 4, 4, 1 };
 
             const Matrix4f modelViewProj = transpose (
@@ -102,7 +114,8 @@ namespace XE {
             m_graphicsDevice->applyUniform(&matrixLayout, 1, (const std::byte*)&modelViewProj);
         }
 
-        std::unique_ptr<Texture2D> CreateColorTexture(const int width, const int height, const Vector4f &color) {
+        
+        std::unique_ptr<Texture2D> createColorTexture(const int width, const int height, const Vector4f &color) {
             const auto format = PixelFormat::R8G8B8A8;
             const auto size = Vector2i{width, height};
 
@@ -119,8 +132,11 @@ namespace XE {
 
             return m_graphicsDevice->createTexture2D(format, size, sourceFormat, sourceDataType, pixels.data());
         }
+        
 
-        std::unique_ptr<Texture2D> CreateFileTexture(const std::string &filePath) {
+        std::unique_ptr<Texture2D> createFileTexture(const std::string &filePath) {
+            assert(m_streamSource);
+            
             std::cout << "SandboxApp::CreateFileTexture: Loading texture from file " << filePath << " ..." << std::endl;
             auto stream = m_streamSource->open(filePath);
 
@@ -135,34 +151,56 @@ namespace XE {
             );
         }
 
-        virtual void Render() override {
-            m_graphicsDevice->beginFrame(ClearFlags::All, {0.2f, 0.2f, 0.2f, 1.0f}, 0.0f, 0);
+        
+        void Render() override {
+            m_graphicsDevice->beginFrame(ClearFlags::All, {0.2f, 0.2f, 0.8f, 1.0f}, 1.0f, 0);
             m_graphicsDevice->setProgram(m_program.get());
 
-            this->RenderMatrices();
-
-            Uniform textureUniform = {
-                "texture0", DataType::Int32, 1, 1
-            };
+            Uniform textureUniform = { "texture0", DataType::Int32, 1, 1 };
             int textureUnit = 0;
 
             m_graphicsDevice->applyUniform(&textureUniform, 1, reinterpret_cast<std::byte*>(&textureUnit));
 
             m_graphicsDevice->setMaterial(m_material.get());
 
-            SubsetEnvelope envelope = {
-                nullptr, PrimitiveType::TriangleStrip, 0, 4
-            };
-            m_graphicsDevice->draw(m_subset.get(), &envelope, 1);
+            renderScene();
+
             m_graphicsDevice->endFrame();
         }
 
-        virtual bool ShouldClose() const override {
+        bool ShouldClose() const override {
             return m_shouldClose;
         }
 
+        
     private:
-        void InitializeShaders() {
+        void renderScene() {
+            mAssetGLTF.visitDefaultScene([this](const XE::Matrix4f &matrix, const std::string &objectName) {
+                
+                renderMatrices(matrix);
+                
+                const GeoObject &object = mObjectsByNameMap[objectName];
+                
+                for (const auto &subset_N_envelope : object.subsets) {
+                    m_graphicsDevice->draw(
+                       subset_N_envelope.first.get(),
+                       &subset_N_envelope.second, 1);
+                }
+            });
+        }
+        
+        
+        void renderObjects() {
+            for (const auto &pair : mObjectsByNameMap) {
+                for (const auto &subset_N_envelope : pair.second.subsets) {
+                    m_graphicsDevice->draw(
+                       subset_N_envelope.first.get(),
+                       &subset_N_envelope.second, 1);
+                }
+            }
+        }
+        
+        void initializeShaders() {
             // setup program shader
             const ProgramDescriptor programDescriptor = {
                 {
@@ -174,6 +212,7 @@ namespace XE {
             m_program = m_graphicsDevice->createProgram(programDescriptor);
         }
 
+        
         std::string getShaderSource(const std::string &path) const {
             std::fstream fs;
             fs.open(path.c_str(), std::ios_base::in);
@@ -199,56 +238,94 @@ namespace XE {
 
             return content;
         }
+        
 
-        void InitializeGeometry() {
+        void initializeGeometry() {
+            mObjectsByNameMap = loadGeoObject("media/models/spaceship_corridorhallway/scene.gltf");
+            
+            // mGeoObject = createGeoObject(Sandbox::Assets::getSquareMeshPrimitive());
+            
+            // m_texture = createColorTexture(256, 256, {1.0f, 0.0f, 0.0f, 1.0f});
+            m_texture = createFileTexture("media/materials/Tiles_Azulejos_004_SD/Tiles_Azulejos_004_COLOR.png");
+
+            m_material = std::make_unique<Material>();
+            m_material->layers[0].texture = m_texture.get();
+            m_material->layerCount = 1;
+            m_material->renderState.depthTest = true;
+        }
+        
+        
+        std::map<std::string, GeoObject> loadGeoObject(const std::string &sceneFilePath) {
+            std::map<std::string, GeoObject> objectsByName;
+            
+            mAssetGLTF.load(sceneFilePath);
+            
+            auto meshes = mAssetGLTF.getMeshes();
+            
+            for (const auto &mesh : meshes) {
+                GeoObject geoObject = {};
+                
+                for (const auto &primitive : mesh.primitives) {
+                    geoObject.subsets.push_back(createSubset(primitive));
+                }
+                
+                
+                objectsByName[mesh.name] = std::move(geoObject);
+            }
+            
+            return objectsByName;
+        }
+        
+        
+        std::pair<std::unique_ptr<Subset>, SubsetEnvelope> createSubset(const MeshPrimitive &meshPrimitive) {
             // create the vertex buffer
             BufferDescriptor coordBufferDescriptor = {
-                BufferType::Vertex, 
-                BufferUsage::Copy, 
-                BufferAccess::Static, 
-                (int)Sandbox::Assets::coordData.size() * (int)sizeof(Vector3f), 
-                (const std::byte*) Sandbox::Assets::coordData.data()
+                BufferType::Vertex,
+                BufferUsage::Copy,
+                BufferAccess::Static,
+                (int)meshPrimitive.coords.size() * (int)sizeof(Vector3f),
+                (const std::byte*) meshPrimitive.coords.data()
             };
-
+            
             auto coordBuffer = m_graphicsDevice->createBuffer(coordBufferDescriptor);
 
             BufferDescriptor colorBufferDescriptor = {
-                BufferType::Vertex, 
-                BufferUsage::Copy, 
-                BufferAccess::Static, 
-                (int)Sandbox::Assets::colorData.size() * (int)sizeof(Vector4f), 
-                (const std::byte*) Sandbox::Assets::colorData.data()
+                BufferType::Vertex,
+                BufferUsage::Copy,
+                BufferAccess::Static,
+                (int)meshPrimitive.colors.size() * (int)sizeof(Vector4f),
+                (const std::byte*) meshPrimitive.colors.data()
             };
 
             auto colorBuffer = m_graphicsDevice->createBuffer(colorBufferDescriptor);
 
             BufferDescriptor normalBufferDescriptor = {
-                BufferType::Vertex, 
-                BufferUsage::Copy, 
-                BufferAccess::Static, 
-                (int)Sandbox::Assets::normalData.size() * (int)sizeof(Vector3f), 
-                (const std::byte*) Sandbox::Assets::normalData.data()
+                BufferType::Vertex,
+                BufferUsage::Copy,
+                BufferAccess::Static,
+                (int)meshPrimitive.normals.size() * (int)sizeof(Vector3f),
+                (const std::byte*) meshPrimitive.normals.data()
             };
 
             auto normalBuffer = m_graphicsDevice->createBuffer(normalBufferDescriptor);
 
             BufferDescriptor texCoordBufferDescriptor = {
-                BufferType::Vertex, 
-                BufferUsage::Copy, 
-                BufferAccess::Static, 
-                (int)Sandbox::Assets::texCoordData.size() * (int)sizeof(Vector3f), 
-                (const std::byte*) Sandbox::Assets::texCoordData.data()
+                BufferType::Vertex,
+                BufferUsage::Copy,
+                BufferAccess::Static,
+                (int)meshPrimitive.texCoords.size() * (int)sizeof(Vector3f),
+                (const std::byte*) meshPrimitive.texCoords.data()
             };
 
             auto texCoordBuffer = m_graphicsDevice->createBuffer(texCoordBufferDescriptor);
 
             // create the index buffer
             BufferDescriptor indexBufferDescriptor = {
-                BufferType::Index, 
-                BufferUsage::Copy, 
-                BufferAccess::Static, 
-                (int)Sandbox::Assets::indexData.size() * (int)sizeof(int), 
-                (const std::byte*) Sandbox::Assets::indexData.data()
+                BufferType::Index,
+                BufferUsage::Copy,
+                BufferAccess::Static,
+                (int)meshPrimitive.indices.size() * (int)sizeof(int),
+                (const std::byte*) meshPrimitive.indices.data()
             };
 
             auto indexBuffer = m_graphicsDevice->createBuffer(indexBufferDescriptor);
@@ -257,7 +334,7 @@ namespace XE {
             SubsetDescriptor subsetDescriptor;
         
             subsetDescriptor.attributes = {
-                {"vertCoord", DataType::Float32, 3}, 
+                {"vertCoord", DataType::Float32, 3},
                 {"vertColor", DataType::Float32, 4},
                 {"vertNormal", DataType::Float32, 3},
                 {"vertTexCoord", DataType::Float32, 2}
@@ -275,24 +352,24 @@ namespace XE {
                 {"vertCoord", 0}, {"vertColor", 1}, {"vertNormal", 2}, {"vertTexCoord", 3}
             };
 
-            m_subset = m_graphicsDevice->createSubset(subsetDescriptor, std::move(buffers), bufferMapping, std::move(indexBuffer));
-
-            // m_texture = this->CreateColorTexture(256, 256, {1.0f, 0.0f, 0.0f, 1.0f});
-            m_texture = this->CreateFileTexture("media/materials/Tiles_Azulejos_004_SD/Tiles_Azulejos_004_COLOR.png");
-
-            m_material = std::make_unique<Material>();
-            m_material->layers[0].texture = m_texture.get();
-            m_material->layerCount = 1;
+            return {
+                m_graphicsDevice->createSubset(subsetDescriptor, std::move(buffers), bufferMapping, std::move(indexBuffer)),
+                meshPrimitive.getEnvelope()
+            };
         }
-
+        
     private:
         std::unique_ptr<WindowGLFW> m_window;
         std::unique_ptr<GraphicsDevice> m_graphicsDevice;
         std::unique_ptr<Program> m_program;
-        std::unique_ptr<Subset> m_subset;
+        
+        std::map<std::string, GeoObject> mObjectsByNameMap;
+        
+        Asset_CGLTF mAssetGLTF;
+        
         std::unique_ptr<Material> m_material;
         std::unique_ptr<Texture2D> m_texture;
-
+        
         std::unique_ptr<FileStreamSource> m_streamSource;
 
         InputManager *m_inputManager = nullptr;
@@ -302,7 +379,7 @@ namespace XE {
 
         float m_angle = 0.0f;
 
-        Vector3f m_cameraPosition = {0.0f, 0.0f, 5.0f};
+        Vector3f m_cameraPosition = {0.0f, 0.0f, 15.0f};
         Vector3f m_cameraLookAt = {0.0f, 0.0f, 0.0f};
         Vector3f m_cameraUp = {0.0f, 1.0f, 0.0f};
 
@@ -311,6 +388,7 @@ namespace XE {
         float m_cameraZNear = 0.1f;
         float m_cameraZFar = 1000.0f;
     };
+
 
     std::unique_ptr<Application> Application::create(const std::vector<std::string> &args) {
         return std::make_unique<SandboxApp>(args);

@@ -4,14 +4,17 @@
 set (target XE.Graphics.GL.GLFW)
 
 set (sources
-    "XE/Graphics/GL/GLFW/WindowGLFW.hpp"
-    "XE/Graphics/GL/GLFW/WindowGLFW.cpp"
-    "XE/Graphics/GL/GLFW/GraphicsContextGLFW.hpp"
-    "XE/Graphics/GL/GLFW/GraphicsContextGLFW.cpp"
-    "XE/Graphics/GL/GLFW/InputManagerGLFW.hpp"
-    "XE/Graphics/GL/GLFW/InputManagerGLFW.cpp"
+    "include/XE/Graphics/GL/GLFW/WindowGLFW.hpp"
+    "include/XE/Graphics/GL/GLFW/GraphicsContextGLFW.hpp"
+    "include/XE/Graphics/GL/GLFW/InputManagerGLFW.hpp"
+
+    "src/WindowGLFW.cpp"
+    "src/GraphicsContextGLFW.cpp"
+    "src/InputManagerGLFW.cpp"    
 )
 
 add_library(${target} ${sources})
 
-target_link_libraries(${target} glfw XE.Core XE.Graphics.GL)
+target_include_directories(${target} PUBLIC "include/")
+target_link_libraries(${target} glfw XE.Core XE.Input XE.Graphics.GL)
+target_compile_options (${target} PUBLIC ${XE_CXX_FLAGS})

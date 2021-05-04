@@ -26,4 +26,4 @@ add_executable(${target}
     ${src_xe_scene}
 )
 
-target_link_libraries(${target} XE.Core)
+target_link_libraries(${target} XE.Core XE.Math XE.Scene)

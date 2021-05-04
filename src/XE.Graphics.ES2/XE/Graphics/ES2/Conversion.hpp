@@ -3,7 +3,7 @@
 #define __XE_GRAPHICS_ES2_CONVERSION_HPP__
 
 #include <cstdint>
-#include <glad/es2/glad.h>
+#include <glad/glad.h>
 
 namespace XE {
     enum class DataType : std::int16_t;

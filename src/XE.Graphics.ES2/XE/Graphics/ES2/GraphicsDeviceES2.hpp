@@ -5,7 +5,7 @@
 #include <XE/Graphics/Viewport.hpp>
 #include <XE/Graphics/GraphicsDevice.hpp>
 
-#include <glad/es2/glad.h>
+#include <glad/glad.h>
 
 namespace XE {
     class ProgramGL;

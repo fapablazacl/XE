@@ -1,23 +1,23 @@
 
-include_directories(.)
-
-set (sources 
-	glad/es2/glad.c
-	glad/es2/glad_debug.c.in
-	glad/es2/glad_release.c.in
-	glad/es2/glad.h
-	glad/es2/glad_debug.h
-	glad/es2/glad_release.h
-)
-
 set (target glad-es2)
 
-source_group(\\glad FILES ${sources})
+set (sources 
+	"include/glad/glad.h"
+	"include/glad/glad_debug.h"
+	"include/glad/glad_release.h"
+
+	"src/glad.c"
+	"src/glad_debug.c.in"
+	"src/glad_release.c.in"
+)
+
+source_group (\\glad FILES ${sources})
 
 if (UNIX)
 	set (OS_LIBRARIES dl)
 endif ()
 
-add_library(${target} ${sources})
+add_library (${target} ${sources})
 
-target_link_libraries(${target} ${OS_LIBRARIES})
+target_include_directories (${target} PUBLIC "include/")
+target_link_libraries (${target} ${OS_LIBRARIES})

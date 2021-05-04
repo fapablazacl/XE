@@ -2,7 +2,7 @@
  * XE Tech demo
  */
 
-#include <XE.hpp>
+#include <XE/XE.hpp>
 #include <XE/IO.hpp>
 #include <XE/Input.hpp>
 #include <XE/Graphics.hpp>
@@ -14,9 +14,7 @@
 namespace XE {
     class ResourceManager {
     public:
-        std::string getString(const std::string &path) const {
-            
-        }
+        std::string getString(const std::string &path) const {}
         
     private:
         std::vector<std::unique_ptr<XE::StreamSource>> streamSources;
