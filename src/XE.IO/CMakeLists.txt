@@ -2,11 +2,11 @@
 set (target XE.IO)
 
 set (sources
-    "include/XE/IO/FileStream.hpp"
-	"include/XE/IO/FileStreamSource.hpp"
-    "include/XE/IO/MemoryStream.hpp"
-    "include/XE/IO/Stream.hpp"
-    "include/XE/IO/StreamSource.hpp"
+    "include/XE/IO/FileStream.h"
+	"include/XE/IO/FileStreamSource.h"
+    "include/XE/IO/MemoryStream.h"
+    "include/XE/IO/Stream.h"
+    "include/XE/IO/StreamSource.h"
 
     "src/FileStream.cpp"
 	"src/FileStreamSource.cpp"

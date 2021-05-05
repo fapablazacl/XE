@@ -3,9 +3,7 @@
 
 #include <cstring>
 #include <iostream>
-#include <XE/Math/Matrix.hpp>
-
-
+#include <XE/Math/Matrix.h>
 
 
 inline std::ostream& indent(std::ostream &os, const int indentation) {

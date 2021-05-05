@@ -3,14 +3,14 @@
 #include "SandboxApp.hpp"
 #include "Assets.hpp"
 
-#include <XE/XE.hpp>
-#include <XE/Math.hpp>
-#include <XE/Input.hpp>
-#include <XE/IO.hpp>
-#include <XE/Graphics.hpp>
-#include <XE/Graphics/GL.hpp>
-#include <XE/Graphics/GL/GLFW/WindowGLFW.hpp>
-#include <XE/Graphics/PNG.hpp>
+#include <XE/XE.h>
+#include <XE/Math.h>
+#include <XE/Input.h>
+#include <XE/IO.h>
+#include <XE/Graphics.h>
+#include <XE/Graphics/GL.h>
+#include <XE/Graphics/GL/GLFW/WindowGLFW.h>
+#include <XE/Graphics/PNG.h>
 
 #include <string>
 #include <iostream>

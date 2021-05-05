@@ -1,5 +1,5 @@
 
-#include <XE/Graphics/Subset.hpp>
+#include <XE/Graphics/Subset.h>
 
 namespace XE {
     Subset::~Subset() {}

@@ -1,5 +1,5 @@
 
-#include <XE/Graphics/ES2/ShaderES2.hpp>
+#include <XE/Graphics/ES2/ShaderES2.h>
 
 #include <stdexcept>
 

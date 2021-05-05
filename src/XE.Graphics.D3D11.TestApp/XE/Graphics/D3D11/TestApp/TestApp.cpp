@@ -1,7 +1,7 @@
 
 #include <stdexcept>
 #include <Windows.h>
-#include "Renderer.hpp"
+#include "Renderer.h"
 
 LRESULT CALLBACK WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
     switch (uMsg) {

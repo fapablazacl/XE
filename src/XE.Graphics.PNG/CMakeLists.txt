@@ -1,7 +1,7 @@
 
 set (target "XE.Graphics.PNG")
 set (sources 
-    "include/XE/Graphics/PNG/ImageLoaderPNG.hpp"
+    "include/XE/Graphics/PNG/ImageLoaderPNG.h"
 
     "src/ImageLoaderPNG.cpp"
 )

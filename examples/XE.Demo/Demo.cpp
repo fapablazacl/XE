@@ -2,12 +2,12 @@
  * XE Tech demo
  */
 
-#include <XE/XE.hpp>
-#include <XE/IO.hpp>
-#include <XE/Input.hpp>
-#include <XE/Graphics.hpp>
-#include <XE/Graphics/GL.hpp>
-#include <XE/Graphics/GL/GLFW/WindowGLFW.hpp>
+#include <XE/XE.h>
+#include <XE/IO.h>
+#include <XE/Input.h>
+#include <XE/Graphics.h>
+#include <XE/Graphics/GL.h>
+#include <XE/Graphics/GL/GLFW/WindowGLFW.h>
 
 #include <map>
 

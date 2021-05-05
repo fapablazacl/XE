@@ -2,7 +2,7 @@
 #include "Asset_CGLTF.h"
 
 #include <iostream>
-#include <XE/Math/Quaternion.hpp>
+#include <XE/Math/Quaternion.h>
 
 #define CGLTF_IMPLEMENTATION
 #include <cgltf.h>

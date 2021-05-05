@@ -1,5 +1,5 @@
 
-#include <XE/Frame.hpp>
+#include <XE/Frame.h>
 
 namespace XE {
     Frame::~Frame() {}

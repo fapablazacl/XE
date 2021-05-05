@@ -1,5 +1,5 @@
 
-#include "Shader.hpp"
+#include "Shader.h"
 
 #include <iostream>
 #include <d3dcompiler.h>

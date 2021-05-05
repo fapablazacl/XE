@@ -1,7 +1,7 @@
 
-#include <XE/Math/Quaternion.hpp>
-#include <XE/Math/FormatUtils.hpp>
-#include <XE/Math/Common.hpp>
+#include <XE/Math/Quaternion.h>
+#include <XE/Math/FormatUtils.h>
+#include <XE/Math/Common.h>
 #include <catch.hpp>
 
 static const int precision = std::numeric_limits<float>::max_digits10;

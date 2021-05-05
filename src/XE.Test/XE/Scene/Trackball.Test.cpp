@@ -1,6 +1,6 @@
 
 #include <catch.hpp>
-#include <XE/Scene/Trackball.hpp>
+#include <XE/Scene/Trackball.h>
 
 TEST_CASE("XE::Trackball class", "[Trackball]") {
     SECTION("should fill its fields properly") {

@@ -1,5 +1,5 @@
 
-#include <XE/Graphics/GraphicsDevice.hpp>
+#include <XE/Graphics/GraphicsDevice.h>
 
 namespace XE {
     GraphicsDevice::~GraphicsDevice() {}

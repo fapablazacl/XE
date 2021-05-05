@@ -2,9 +2,9 @@
 set (target XE.Scene)
 
 set (sources
-	"include/XE/Scene/Projection.hpp"
-	"include/XE/Scene/Trackball.hpp"
-    "include/XE/Scene/VirtualSphere.hpp"
+	"include/XE/Scene/Projection.h"
+	"include/XE/Scene/Trackball.h"
+    "include/XE/Scene/VirtualSphere.h"
 
     "src/Projection.cpp"
 	"src/Trackball.cpp"

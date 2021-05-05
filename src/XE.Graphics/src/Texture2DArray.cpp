@@ -1,5 +1,5 @@
 
-#include <XE/Graphics/Texture2DArray.hpp>
+#include <XE/Graphics/Texture2DArray.h>
 
 namespace XE {
 	Texture2DArray::~Texture2DArray() {}

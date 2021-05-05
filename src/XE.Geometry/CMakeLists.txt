@@ -2,10 +2,10 @@
 set (target XE.Geometry)
 
 set (sources
-    "include/XE/Geometry/ShapeGenerator.hpp"
-	"include/XE/Geometry/EllipsoidGenerator.hpp"
-	"include/XE/Geometry/PlaneGenerator.hpp"
-	"include/XE/Geometry/BoxGenerator.hpp"
+    "include/XE/Geometry/ShapeGenerator.h"
+	"include/XE/Geometry/EllipsoidGenerator.h"
+	"include/XE/Geometry/PlaneGenerator.h"
+	"include/XE/Geometry/BoxGenerator.h"
 
 	"src/ShapeGenerator.cpp"
 	"src/EllipsoidGenerator.cpp"

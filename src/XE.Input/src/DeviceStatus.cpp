@@ -1,5 +1,5 @@
 
-#include <XE/Input/DeviceStatus.hpp>
+#include <XE/Input/DeviceStatus.h>
 
 namespace XE {
     BinaryState KeyboardStatus::getState(KeyCode code) const {

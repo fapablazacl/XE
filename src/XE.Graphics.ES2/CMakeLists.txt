@@ -4,20 +4,20 @@ set (target "XE.Graphics.ES2")
 set (source_base "XE/Graphics/ES2")
 
 set (sources
-	"include/XE/Graphics/ES2.hpp"
+	"include/XE/Graphics/ES2.h"
 
-	"include/XE/Graphics/ES2/IGraphicsContextES2.hpp"
-	"include/XE/Graphics/ES2/GraphicsDeviceES2.hpp"
-	"include/XE/Graphics/ES2/TextureBaseES2.hpp"
-	"include/XE/Graphics/ES2/Texture2DES2.hpp"
-	"include/XE/Graphics/ES2/TextureCubeMapES2.hpp"
-	"include/XE/Graphics/ES2/ShaderES2.hpp"
-	"include/XE/Graphics/ES2/ProgramES2.hpp"
-	"include/XE/Graphics/ES2/ProgramES2.hpp"
-	"include/XE/Graphics/ES2/BufferES2.hpp"
-	"include/XE/Graphics/ES2/SubsetES2.hpp"
-	"include/XE/Graphics/ES2/Conversion.hpp"
-	"include/XE/Graphics/ES2/Util.hpp"
+	"include/XE/Graphics/ES2/IGraphicsContextES2.h"
+	"include/XE/Graphics/ES2/GraphicsDeviceES2.h"
+	"include/XE/Graphics/ES2/TextureBaseES2.h"
+	"include/XE/Graphics/ES2/Texture2DES2.h"
+	"include/XE/Graphics/ES2/TextureCubeMapES2.h"
+	"include/XE/Graphics/ES2/ShaderES2.h"
+	"include/XE/Graphics/ES2/ProgramES2.h"
+	"include/XE/Graphics/ES2/ProgramES2.h"
+	"include/XE/Graphics/ES2/BufferES2.h"
+	"include/XE/Graphics/ES2/SubsetES2.h"
+	"include/XE/Graphics/ES2/Conversion.h"
+	"include/XE/Graphics/ES2/Util.h"
 
 	"src/IGraphicsContextES2.cpp"
 	"src/GraphicsDeviceES2.cpp"

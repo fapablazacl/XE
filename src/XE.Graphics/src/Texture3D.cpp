@@ -1,5 +1,5 @@
 
-#include <XE/Graphics/Texture3D.hpp>
+#include <XE/Graphics/Texture3D.h>
 
 namespace XE {
 	Texture3D::~Texture3D() {}

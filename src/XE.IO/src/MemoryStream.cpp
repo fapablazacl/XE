@@ -1,5 +1,5 @@
 
-#include <XE/IO/MemoryStream.hpp>
+#include <XE/IO/MemoryStream.h>
 
 #include <cassert>
 #include <cstring>

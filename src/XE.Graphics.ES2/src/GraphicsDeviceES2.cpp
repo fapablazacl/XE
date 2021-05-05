@@ -1,20 +1,20 @@
 
-#include <XE/Graphics/ES2/GraphicsDeviceES2.hpp>
+#include <XE/Graphics/ES2/GraphicsDeviceES2.h>
 
-#include <XE/Graphics/ES2/Conversion.hpp>
-#include <XE/Graphics/ES2/BufferES2.hpp>
-#include <XE/Graphics/ES2/SubsetES2.hpp>
-#include <XE/Graphics/ES2/Texture2DES2.hpp>
-#include <XE/Graphics/ES2/ProgramES2.hpp>
-#include <XE/Graphics/ES2/IGraphicsContextES2.hpp>
-#include <XE/Graphics/ES2/Util.hpp>
+#include <XE/Graphics/ES2/Conversion.h>
+#include <XE/Graphics/ES2/BufferES2.h>
+#include <XE/Graphics/ES2/SubsetES2.h>
+#include <XE/Graphics/ES2/Texture2DES2.h>
+#include <XE/Graphics/ES2/ProgramES2.h>
+#include <XE/Graphics/ES2/IGraphicsContextES2.h>
+#include <XE/Graphics/ES2/Util.h>
 
-#include <XE/Graphics/Material.hpp>
-#include <XE/Graphics/Uniform.hpp>
-#include <XE/Graphics/Subset.hpp>
-#include <XE/Graphics/Texture3D.hpp>
-#include <XE/Graphics/Texture2DArray.hpp>
-#include <XE/Graphics/TextureCubeMap.hpp>
+#include <XE/Graphics/Material.h>
+#include <XE/Graphics/Uniform.h>
+#include <XE/Graphics/Subset.h>
+#include <XE/Graphics/Texture3D.h>
+#include <XE/Graphics/Texture2DArray.h>
+#include <XE/Graphics/TextureCubeMap.h>
 #include <iostream>
 
 namespace XE {

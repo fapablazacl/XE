@@ -1,5 +1,5 @@
 
-#include <XE/Graphics/GL/TextureCubeMapGL.hpp>
+#include <XE/Graphics/GL/TextureCubeMapGL.h>
 
 namespace XE {
 

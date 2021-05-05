@@ -1,5 +1,5 @@
 
-#include <XE/Graphics/Texture.hpp>
+#include <XE/Graphics/Texture.h>
 
 namespace XE {
 	Texture::~Texture() {}

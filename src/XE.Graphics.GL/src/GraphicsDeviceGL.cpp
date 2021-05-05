@@ -1,22 +1,22 @@
 
-#include <XE/Graphics/GL/GraphicsDeviceGL.hpp>
+#include <XE/Graphics/GL/GraphicsDeviceGL.h>
 
-#include <XE/Graphics/GL/Conversion.hpp>
-#include <XE/Graphics/GL/BufferGL.hpp>
-#include <XE/Graphics/GL/SubsetGL.hpp>
-#include <XE/Graphics/GL/Texture2DGL.hpp>
-#include <XE/Graphics/GL/Texture2DArrayGL.hpp>
-#include <XE/Graphics/GL/Texture3DGL.hpp>
-#include <XE/Graphics/GL/ProgramGL.hpp>
-#include <XE/Graphics/GL/IGraphicsContextGL.hpp>
-#include <XE/Graphics/GL/Util.hpp>
+#include <XE/Graphics/GL/Conversion.h>
+#include <XE/Graphics/GL/BufferGL.h>
+#include <XE/Graphics/GL/SubsetGL.h>
+#include <XE/Graphics/GL/Texture2DGL.h>
+#include <XE/Graphics/GL/Texture2DArrayGL.h>
+#include <XE/Graphics/GL/Texture3DGL.h>
+#include <XE/Graphics/GL/ProgramGL.h>
+#include <XE/Graphics/GL/IGraphicsContextGL.h>
+#include <XE/Graphics/GL/Util.h>
 
-#include <XE/Graphics/Material.hpp>
-#include <XE/Graphics/Uniform.hpp>
-#include <XE/Graphics/Subset.hpp>
-#include <XE/Graphics/Texture3D.hpp>
-#include <XE/Graphics/Texture2DArray.hpp>
-#include <XE/Graphics/TextureCubeMap.hpp>
+#include <XE/Graphics/Material.h>
+#include <XE/Graphics/Uniform.h>
+#include <XE/Graphics/Subset.h>
+#include <XE/Graphics/Texture3D.h>
+#include <XE/Graphics/Texture2DArray.h>
+#include <XE/Graphics/TextureCubeMap.h>
 #include <iostream>
 
 namespace XE {

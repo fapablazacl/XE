@@ -1,5 +1,5 @@
 
-#include <XE/Timer.hpp>
+#include <XE/Timer.h>
 
 #if defined(_WINDOWS)
 #include <Windows.h>

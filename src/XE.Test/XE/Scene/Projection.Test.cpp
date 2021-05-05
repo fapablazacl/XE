@@ -1,7 +1,7 @@
 
 #include <catch.hpp>
-#include <XE/Math/Common.hpp>
-#include <XE/Scene/Projection.hpp>
+#include <XE/Math/Common.h>
+#include <XE/Scene/Projection.h>
 
 TEST_CASE("XE::Graphics::project function", "[Projection]") {
     SECTION("When considering a default transformation pipeline, with a viewport of (0, 0) - (640, 480)") {

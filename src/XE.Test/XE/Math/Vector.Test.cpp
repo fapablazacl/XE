@@ -1,7 +1,7 @@
 
 #include <catch.hpp>
-#include <XE/Math/Vector.hpp>
-#include <XE/Math/FormatUtils.hpp>
+#include <XE/Math/Vector.h>
+#include <XE/Math/FormatUtils.h>
 #include <sstream>
 
 using namespace XE;

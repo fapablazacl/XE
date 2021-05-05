@@ -1,6 +1,6 @@
 
-#include <XE/Graphics/ES2/BufferES2.hpp>
-#include <XE/Graphics/ES2/Conversion.hpp>
+#include <XE/Graphics/ES2/BufferES2.h>
+#include <XE/Graphics/ES2/Conversion.h>
 
 #include <cstdint>
 

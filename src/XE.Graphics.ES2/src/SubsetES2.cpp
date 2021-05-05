@@ -1,7 +1,7 @@
 
-#include <XE/Graphics/ES2/SubsetES2.hpp>
-#include <XE/Graphics/ES2/BufferES2.hpp>
-#include <XE/Graphics/ES2/Conversion.hpp>
+#include <XE/Graphics/ES2/SubsetES2.h>
+#include <XE/Graphics/ES2/BufferES2.h>
+#include <XE/Graphics/ES2/Conversion.h>
 
 namespace XE {
     SubsetGL::SubsetGL(SubsetDescriptor& desc, 

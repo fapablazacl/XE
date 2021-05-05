@@ -1,5 +1,5 @@
 
-#include <XE/WindowSystem.hpp>
+#include <XE/WindowSystem.h>
 
 namespace XE {
     WindowSystem::~WindowSystem() {}

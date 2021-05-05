@@ -1,6 +1,6 @@
 
 #include <catch.hpp>
-#include <XE/Math/Common.hpp>
+#include <XE/Math/Common.h>
 
 TEST_CASE("Mathematical common functions") {
     SECTION("XE::equals") {

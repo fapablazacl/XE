@@ -1,11 +1,11 @@
 
-#include <XE/Graphics/GL/Conversion.hpp>
+#include <XE/Graphics/GL/Conversion.h>
 
-#include <XE/DataType.hpp>
-#include <XE/Graphics/PixelFormat.hpp>
-#include <XE/Graphics/BufferDescriptor.hpp>
-#include <XE/Graphics/Subset.hpp>
-#include <XE/Graphics/Material.hpp>
+#include <XE/DataType.h>
+#include <XE/Graphics/PixelFormat.h>
+#include <XE/Graphics/BufferDescriptor.h>
+#include <XE/Graphics/Subset.h>
+#include <XE/Graphics/Material.h>
 
 namespace XE {
     GLenum convertToGL(const DataType type) {

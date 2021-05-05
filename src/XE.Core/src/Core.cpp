@@ -1,5 +1,5 @@
 
-#include <XE/Core.hpp>
+#include <XE/Core.h>
 
 #ifndef XE_VERSION_MAJOR
 #define XE_VERSION_MAJOR 0

@@ -2,17 +2,17 @@
 set (target "XE.Core")
 
 set (sources
-	"include/XE/XE.hpp"
-	"include/XE/Graphics.hpp"
-	"include/XE/Math.hpp"
-	"include/XE/Input.hpp"
-	"include/XE/Predef.hpp"
-    "include/XE/Buffer.hpp"
-    "include/XE/DataType.hpp"
-	"include/XE/Core.hpp"
-    "include/XE/Frame.hpp"
-	"include/XE/WindowSystem.hpp"
-	"include/XE/Timer.hpp"
+	"include/XE/XE.h"
+	"include/XE/Graphics.h"
+	"include/XE/Math.h"
+	"include/XE/Input.h"
+	"include/XE/Predef.h"
+    "include/XE/Buffer.h"
+    "include/XE/DataType.h"
+	"include/XE/Core.h"
+    "include/XE/Frame.h"
+	"include/XE/WindowSystem.h"
+	"include/XE/Timer.h"
 	
 	"src/Buffer.cpp"
     "src/DataType.cpp"

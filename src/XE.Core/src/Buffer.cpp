@@ -1,5 +1,5 @@
 
-#include <XE/Buffer.hpp>
+#include <XE/Buffer.h>
 
 namespace XE {
     Buffer::~Buffer() {}

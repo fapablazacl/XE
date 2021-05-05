@@ -1,7 +1,7 @@
 
-#include <XE/Graphics/ES2/Texture2DES2.hpp>
-#include <XE/Graphics/ES2/Conversion.hpp>
-#include <XE/Graphics/ES2/Util.hpp>
+#include <XE/Graphics/ES2/Texture2DES2.h>
+#include <XE/Graphics/ES2/Conversion.h>
+#include <XE/Graphics/ES2/Util.h>
 
 namespace XE {
     Texture2DGL::Texture2DGL(const PixelFormat format, const Vector2i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void *sourceData)

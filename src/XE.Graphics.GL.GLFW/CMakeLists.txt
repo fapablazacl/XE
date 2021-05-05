@@ -4,9 +4,9 @@
 set (target XE.Graphics.GL.GLFW)
 
 set (sources
-    "include/XE/Graphics/GL/GLFW/WindowGLFW.hpp"
-    "include/XE/Graphics/GL/GLFW/GraphicsContextGLFW.hpp"
-    "include/XE/Graphics/GL/GLFW/InputManagerGLFW.hpp"
+    "include/XE/Graphics/GL/GLFW/WindowGLFW.h"
+    "include/XE/Graphics/GL/GLFW/GraphicsContextGLFW.h"
+    "include/XE/Graphics/GL/GLFW/InputManagerGLFW.h"
 
     "src/WindowGLFW.cpp"
     "src/GraphicsContextGLFW.cpp"

@@ -1,8 +1,8 @@
 
-#include <XE/IO/FileStreamSource.hpp>
+#include <XE/IO/FileStreamSource.h>
 
 #include <fstream>
-#include <XE/IO/FileStream.hpp>
+#include <XE/IO/FileStream.h>
 
 namespace XE {
     FileStreamSource::FileStreamSource(const std::string &directory) {

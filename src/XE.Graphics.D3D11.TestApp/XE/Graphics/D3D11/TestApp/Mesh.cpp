@@ -1,6 +1,6 @@
 
-#include "Mesh.hpp"
-#include <XE/Math/Vector.hpp>
+#include "Mesh.h"
+#include <XE/Math/Vector.h>
 
 namespace TestApp {
     struct VertexType {

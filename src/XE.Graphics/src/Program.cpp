@@ -1,5 +1,5 @@
 
-#include <XE/Graphics/Program.hpp>
+#include <XE/Graphics/Program.h>
 
 namespace XE {
     Program::~Program() {}

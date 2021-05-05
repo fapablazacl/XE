@@ -1,6 +1,6 @@
 
 #include <catch.hpp>
-#include <XE/Scene/VirtualSphere.hpp>
+#include <XE/Scene/VirtualSphere.h>
 
 TEST_CASE("VirtualSphere accessors should fill its fields properly", "[VirtualSphere]") {
     SECTION("Given virtual spheres with standard sizes") {

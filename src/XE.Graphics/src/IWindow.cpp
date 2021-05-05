@@ -1,5 +1,5 @@
 
-#include <XE/Graphics/IWindow.hpp>
+#include <XE/Graphics/IWindow.h>
 
 namespace XE {
     IWindow::~IWindow() {}

@@ -1,5 +1,5 @@
 
-#include <XE/Graphics/GL/GLFW/InputManagerGLFW.hpp>
+#include <XE/Graphics/GL/GLFW/InputManagerGLFW.h>
 
 #include <map>
 

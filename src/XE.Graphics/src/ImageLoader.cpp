@@ -1,5 +1,5 @@
 
-#include <XE/Graphics/ImageLoader.hpp>
+#include <XE/Graphics/ImageLoader.h>
 
 namespace XE {
     ImageLoader::~ImageLoader() {}

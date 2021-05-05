@@ -3,7 +3,7 @@
 #include <string>
 #include <iostream>
 #include <map>
-#include <XE/Timer.hpp>
+#include <XE/Timer.h>
 
 #include "SandboxApp.hpp"
 

@@ -1,5 +1,5 @@
 
-#include <XE/DataType.hpp>
+#include <XE/DataType.h>
 
 namespace XE {
     int ComputeByteSize(DataType dataType)  {

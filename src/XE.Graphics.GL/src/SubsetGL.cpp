@@ -1,7 +1,7 @@
 
-#include <XE/Graphics/GL/SubsetGL.hpp>
-#include <XE/Graphics/GL/BufferGL.hpp>
-#include <XE/Graphics/GL/Conversion.hpp>
+#include <XE/Graphics/GL/SubsetGL.h>
+#include <XE/Graphics/GL/BufferGL.h>
+#include <XE/Graphics/GL/Conversion.h>
 
 
 namespace XE {

@@ -1,5 +1,5 @@
 
-#include "Renderer.hpp"
+#include "Renderer.h"
 
 #include <array>
 #include <cassert>

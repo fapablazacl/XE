@@ -1,5 +1,5 @@
 
-#include <XE/Graphics/Image.hpp>
+#include <XE/Graphics/Image.h>
 
 namespace XE {
     Image::~Image() {}

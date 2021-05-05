@@ -2,8 +2,8 @@
 set (target XE.Input)
 
 set (sources
-    "include/XE/Input/InputManager.hpp"
-	"include/XE/Input/DeviceStatus.hpp"
+    "include/XE/Input/InputManager.h"
+	"include/XE/Input/DeviceStatus.h"
 
 	"src/DeviceStatus.cpp"
     "src/InputManager.cpp"
