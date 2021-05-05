@@ -11,8 +11,6 @@ set (sources
 	"src/glad_release.c.in"
 )
 
-source_group (\\glad FILES ${sources})
-
 if (UNIX)
 	set (OS_LIBRARIES dl)
 endif ()

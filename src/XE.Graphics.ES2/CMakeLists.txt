@@ -1,45 +1,40 @@
 
 set (target "XE.Graphics.ES2")
+
 set (source_base "XE/Graphics/ES2")
-set (sources_xe_graphics_glcore
-	"XE/Graphics/ES2.hpp"
 
-	"${source_base}/IGraphicsContextES2.hpp"
-	"${source_base}/IGraphicsContextES2.cpp"
-	"${source_base}/GraphicsDeviceES2.hpp"
-	"${source_base}/GraphicsDeviceES2.cpp"
+set (sources
+	"include/XE/Graphics/ES2.hpp"
 
-	"${source_base}/TextureBaseES2.hpp"
-	"${source_base}/TextureBaseES2.cpp"
-	"${source_base}/Texture2DES2.hpp"
-	"${source_base}/Texture2DES2.cpp"
-	"${source_base}/TextureCubeMapES2.hpp"
-	"${source_base}/TextureCubeMapES2.cpp"
-	
-	"${source_base}/ShaderES2.hpp"
-	"${source_base}/ShaderES2.cpp"
-	"${source_base}/ProgramES2.hpp"
-	"${source_base}/ProgramES2.cpp"
-	
-	"${source_base}/ProgramES2.hpp"
-	"${source_base}/ProgramES2.cpp"
-	
-	"${source_base}/BufferES2.hpp"
-	"${source_base}/BufferES2.cpp"
-	
-	"${source_base}/SubsetES2.hpp"
-	"${source_base}/SubsetES2.cpp"
+	"include/XE/Graphics/ES2/IGraphicsContextES2.hpp"
+	"include/XE/Graphics/ES2/GraphicsDeviceES2.hpp"
+	"include/XE/Graphics/ES2/TextureBaseES2.hpp"
+	"include/XE/Graphics/ES2/Texture2DES2.hpp"
+	"include/XE/Graphics/ES2/TextureCubeMapES2.hpp"
+	"include/XE/Graphics/ES2/ShaderES2.hpp"
+	"include/XE/Graphics/ES2/ProgramES2.hpp"
+	"include/XE/Graphics/ES2/ProgramES2.hpp"
+	"include/XE/Graphics/ES2/BufferES2.hpp"
+	"include/XE/Graphics/ES2/SubsetES2.hpp"
+	"include/XE/Graphics/ES2/Conversion.hpp"
+	"include/XE/Graphics/ES2/Util.hpp"
 
-	"${source_base}/Conversion.hpp"
-	"${source_base}/Conversion.cpp"
-
-	"${source_base}/Util.hpp"
-	"${source_base}/Util.cpp"
+	"src/IGraphicsContextES2.cpp"
+	"src/GraphicsDeviceES2.cpp"
+	"src/TextureBaseES2.cpp"
+	"src/Texture2DES2.cpp"
+	"src/TextureCubeMapES2.cpp"
+	"src/ShaderES2.cpp"
+	"src/ProgramES2.cpp"
+	"src/ProgramES2.cpp"
+	"src/BufferES2.cpp"
+	"src/SubsetES2.cpp"
+	"src/Conversion.cpp"
+	"src/Util.cpp"
 ) 
 
-source_group ("\\XE\\Graphics\\GL" FILES ${sources_xe_graphics_glcore})
-
-add_library (${target} ${sources_xe_graphics_glcore})
+add_library (${target} ${sources})
 
 target_link_libraries (${target} glad-es2 XE.Core XE.Graphics)
+target_include_directories (${target} PUBLIC "include/")
 target_compile_options (${target} PUBLIC ${XE_CXX_FLAGS})

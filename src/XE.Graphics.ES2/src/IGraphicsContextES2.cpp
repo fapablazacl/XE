@@ -1,5 +1,5 @@
 
-#include "IGraphicsContextES2.hpp"
+#include <XE/Graphics/ES2/IGraphicsContextES2.hpp>
 
 namespace XE {
     IGraphicsContextES2::~IGraphicsContextES2() {}

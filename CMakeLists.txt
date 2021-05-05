@@ -74,12 +74,8 @@ if (XE_PLUGIN_DIRECT3D11)
     include_directories ("src/XE.Graphics.D3D11.TestApp")
 endif ()
 
-if (XE_PLUGIN_GL)
-    include_directories ("src/khronos")
-
-    add_subdirectory ("src/glad-gl4")
-    include_directories ("src/glad-gl4")
-
+# include glfw
+if (XE_PLUGIN_GL OR XE_PLUGIN_ES2 OR XE_PLUGIN_VULKAN) 
 	set (GLFW_BUILD_DOCS CACHE BOOL OFF)
 	set (GLFW_BUILD_TESTS CACHE BOOL OFF)
 	set (GLFW_BUILD_EXAMPLES CACHE BOOL OFF)
@@ -87,44 +83,28 @@ if (XE_PLUGIN_GL)
 	set (GLFW_INSTALL CACHE BOOL OFF)
 	add_subdirectory ("dep/glfw")
 	include_directories ("dep/glfw/include")
-
-    add_subdirectory ("src/XE.Graphics.GL")
-    include_directories ("src/XE.Graphics.GL")
-
-    if (XE_PLUGIN_GL_GLFW)
-        add_subdirectory("src/XE.Graphics.GL.GLFW")
-        include_directories("src/XE.Graphics.GL.GLFW")
-    endif()
 endif ()
 
+if (XE_PLUGIN_GL)
+    include_directories ("src/khronos")
+
+    add_subdirectory ("src/glad-gl4")
+    add_subdirectory ("src/XE.Graphics.GL")
+endif ()
+
+if (XE_PLUGIN_GL_GLFW)
+    add_subdirectory("src/XE.Graphics.GL.GLFW")
+endif()
 
 if (XE_PLUGIN_ES2)
     include_directories ("src/khronos")
 
     add_subdirectory ("src/glad-es2")
-    include_directories ("src/glad-es2")
-
-	set (GLFW_BUILD_DOCS CACHE BOOL OFF)
-	set (GLFW_BUILD_TESTS CACHE BOOL OFF)
-	set (GLFW_BUILD_EXAMPLES CACHE BOOL OFF)
-	set (GLFW_BUILD_INSTALL CACHE BOOL OFF)
-    set (GLFW_INSTALL CACHE BOOL OFF)
-    
     add_subdirectory ("src/XE.Graphics.ES2")
-    include_directories ("src/XE.Graphics.ES2")
 endif()
 
 if (XE_PLUGIN_VULKAN)
-	set (GLFW_BUILD_DOCS CACHE BOOL OFF)
-	set (GLFW_BUILD_TESTS CACHE BOOL OFF)
-	set (GLFW_BUILD_EXAMPLES CACHE BOOL OFF)
-	set (GLFW_BUILD_INSTALL CACHE BOOL OFF)
-	set (GLFW_INSTALL CACHE BOOL OFF)
-	add_subdirectory ("dep/glfw")
-	include_directories ("dep/glfw/include")
-
     add_subdirectory ("src/XE.Graphics.Vk.TestApp")
-    include_directories ("src/XE.Graphics.Vk.TestApp")
 endif ()
 
 
