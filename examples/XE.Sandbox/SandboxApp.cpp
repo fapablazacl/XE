@@ -176,7 +176,6 @@ namespace XE {
     private:
         void renderScene() {
             mAssetGLTF.visitDefaultScene([this](const XE::Matrix4f &matrix, const std::string &objectName) {
-                
                 renderMatrices(matrix);
                 
                 const GeoObject &object = mObjectsByNameMap[objectName];
@@ -204,8 +203,8 @@ namespace XE {
             // setup program shader
             const ProgramDescriptor programDescriptor = {
                 {
-                    {ShaderType::Vertex, this->getShaderSource("media/shaders/simple/vertex.glsl")},
-                    {ShaderType::Fragment, this->getShaderSource("media/shaders/simple/fragment.glsl")}
+                    {ShaderType::Vertex, loadTextFile("media/shaders/simple/vertex.glsl")},
+                    {ShaderType::Fragment, loadTextFile("media/shaders/simple/fragment.glsl")}
                 }
             };
 
@@ -213,7 +212,7 @@ namespace XE {
         }
 
         
-        std::string getShaderSource(const std::string &path) const {
+        std::string loadTextFile(const std::string &path) const {
             std::fstream fs;
             fs.open(path.c_str(), std::ios_base::in);
 
