@@ -19,11 +19,8 @@
 
 namespace XE {
     struct GeoObject {
-        std::vector<std::pair<
-            std::unique_ptr<Subset>,
-            SubsetEnvelope>> subsets;
+        std::vector<std::pair<Subset*, SubsetEnvelope>> subsets;
     };
-
 
     class SandboxApp : public Application {
     public:
@@ -115,7 +112,7 @@ namespace XE {
         }
 
         
-        std::unique_ptr<Texture2D> createColorTexture(const int width, const int height, const Vector4f &color) {
+        Texture2D* createColorTexture(const int width, const int height, const Vector4f &color) {
             const auto format = PixelFormat::R8G8B8A8;
             const auto size = Vector2i{width, height};
 
@@ -134,7 +131,7 @@ namespace XE {
         }
         
 
-        std::unique_ptr<Texture2D> createFileTexture(const std::string &filePath) {
+        Texture2D* createFileTexture(const std::string &filePath) {
             assert(m_streamSource);
             
             std::cout << "SandboxApp::CreateFileTexture: Loading texture from file " << filePath << " ..." << std::endl;
@@ -154,7 +151,7 @@ namespace XE {
         
         void Render() override {
             m_graphicsDevice->beginFrame(ClearFlags::All, {0.2f, 0.2f, 0.8f, 1.0f}, 1.0f, 0);
-            m_graphicsDevice->setProgram(m_program.get());
+            m_graphicsDevice->setProgram(m_program);
 
             Uniform textureUniform = { "texture0", DataType::Int32, 1, 1 };
             int textureUnit = 0;
@@ -182,7 +179,7 @@ namespace XE {
                 
                 for (const auto &subset_N_envelope : object.subsets) {
                     m_graphicsDevice->draw(
-                       subset_N_envelope.first.get(),
+                       subset_N_envelope.first,
                        &subset_N_envelope.second, 1);
                 }
             });
@@ -193,7 +190,7 @@ namespace XE {
             for (const auto &pair : mObjectsByNameMap) {
                 for (const auto &subset_N_envelope : pair.second.subsets) {
                     m_graphicsDevice->draw(
-                       subset_N_envelope.first.get(),
+                       subset_N_envelope.first,
                        &subset_N_envelope.second, 1);
                 }
             }
@@ -248,7 +245,7 @@ namespace XE {
             m_texture = createFileTexture("media/materials/Tiles_Azulejos_004_SD/Tiles_Azulejos_004_COLOR.png");
 
             m_material = std::make_unique<Material>();
-            m_material->layers[0].texture = m_texture.get();
+            m_material->layers[0].texture = m_texture;
             m_material->layerCount = 1;
             m_material->renderState.depthTest = true;
         }
@@ -276,7 +273,7 @@ namespace XE {
         }
         
         
-        std::pair<std::unique_ptr<Subset>, SubsetEnvelope> createSubset(const MeshPrimitive &meshPrimitive) {
+        std::pair<Subset*, SubsetEnvelope> createSubset(const MeshPrimitive &meshPrimitive) {
             // create the vertex buffer
             BufferDescriptor coordBufferDescriptor = {
                 BufferType::Vertex,
@@ -341,18 +338,14 @@ namespace XE {
 
             subsetDescriptor.indexType = DataType::UInt32;
 
-            std::vector<std::unique_ptr<Buffer>> buffers;
-            buffers.push_back(std::move(coordBuffer));
-            buffers.push_back(std::move(colorBuffer));
-            buffers.push_back(std::move(normalBuffer));
-            buffers.push_back(std::move(texCoordBuffer));
+            std::vector<Buffer*> buffers = {coordBuffer, colorBuffer, normalBuffer, texCoordBuffer};
 
             std::map<std::string, int> bufferMapping = {
                 {"vertCoord", 0}, {"vertColor", 1}, {"vertNormal", 2}, {"vertTexCoord", 3}
             };
 
             return {
-                m_graphicsDevice->createSubset(subsetDescriptor, std::move(buffers), bufferMapping, std::move(indexBuffer)),
+                m_graphicsDevice->createSubset(subsetDescriptor, buffers, bufferMapping, indexBuffer),
                 meshPrimitive.getEnvelope()
             };
         }
@@ -360,14 +353,14 @@ namespace XE {
     private:
         std::unique_ptr<WindowGLFW> m_window;
         std::unique_ptr<GraphicsDevice> m_graphicsDevice;
-        std::unique_ptr<Program> m_program;
+        Program* m_program = nullptr;
         
         std::map<std::string, GeoObject> mObjectsByNameMap;
         
         Asset_CGLTF mAssetGLTF;
         
         std::unique_ptr<Material> m_material;
-        std::unique_ptr<Texture2D> m_texture;
+        Texture2D* m_texture = nullptr;
         
         std::unique_ptr<FileStreamSource> m_streamSource;
 
@@ -375,7 +368,6 @@ namespace XE {
         ImageLoaderPNG m_imageLoaderPNG;
         
         bool m_shouldClose = false;
-
         float m_angle = 0.0f;
 
         Vector3f m_cameraPosition = {0.0f, 0.0f, 15.0f};

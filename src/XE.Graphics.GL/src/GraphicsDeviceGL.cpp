@@ -49,36 +49,37 @@ namespace XE {
 
     GraphicsDeviceGL::~GraphicsDeviceGL() {}
     
-    std::unique_ptr<Subset> GraphicsDeviceGL::createSubset(
+    Subset* GraphicsDeviceGL::createSubset(
             SubsetDescriptor& desc, 
-            std::vector<std::unique_ptr<Buffer>> buffers, 
+            std::vector<Buffer*> buffers,
             const std::map<std::string, int> &bufferMapping, 
-            std::unique_ptr<Buffer> indexBuffer) {
-        return std::make_unique<SubsetGL>(desc, std::move(buffers), bufferMapping, std::move(indexBuffer));
+            Buffer* indexBuffer) {
+        return new SubsetGL(desc, buffers, bufferMapping, indexBuffer);
     }
         
-    std::unique_ptr<Buffer> GraphicsDeviceGL::createBuffer(const BufferDescriptor &desc) {
-        return std::make_unique<BufferGL>(desc);
+    Buffer* GraphicsDeviceGL::createBuffer(const BufferDescriptor &desc) {
+        return new BufferGL(desc);
     }
         
-    std::unique_ptr<Texture2D> GraphicsDeviceGL::createTexture2D(const PixelFormat format, const Vector2i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void *sourceData) {
-        return std::make_unique<Texture2DGL>(format, size, sourceFormat, sourceDataType, sourceData);
+    Texture2D* GraphicsDeviceGL::createTexture2D(const PixelFormat format, const Vector2i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void *sourceData) {
+        return new Texture2DGL(format, size, sourceFormat, sourceDataType, sourceData);
     }
         
-    std::unique_ptr<Texture3D> GraphicsDeviceGL::createTexture3D(const PixelFormat format, const Vector3i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void *sourceData) {
-        return std::make_unique<Texture3DGL>(format, size, sourceFormat, sourceDataType, sourceData);
+    Texture3D* GraphicsDeviceGL::createTexture3D(const PixelFormat format, const Vector3i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void *sourceData) {
+        return new Texture3DGL(format, size, sourceFormat, sourceDataType, sourceData);
     }
 
-    std::unique_ptr<Texture2DArray> GraphicsDeviceGL::createTexture2DArray(const PixelFormat format, const Vector2i &size, const int count) {
-        return std::make_unique<Texture2DArrayGL>(format, size, count);
+    Texture2DArray* GraphicsDeviceGL::createTexture2DArray(const PixelFormat format, const Vector2i &size, const int count) {
+        return new Texture2DArrayGL(format, size, count);
+    }
+
+    TextureCubeMap* GraphicsDeviceGL::createTextureCubeMap(const PixelFormat format, const Vector2i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void **sourceData) {
+        // return new TextureCubeMap();
+        return nullptr;
     }
         
-    std::unique_ptr<TextureCubeMap> GraphicsDeviceGL::createTextureCubeMap(const PixelFormat format, const Vector2i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void **sourceData) {
-        return std::unique_ptr<TextureCubeMap>();
-    }
-        
-    std::unique_ptr<Program> GraphicsDeviceGL::createProgram(const ProgramDescriptor &desc) {
-        return std::make_unique<ProgramGL>(desc);
+    Program* GraphicsDeviceGL::createProgram(const ProgramDescriptor &desc) {
+        return new ProgramGL(desc);
     }
     
     void GraphicsDeviceGL::draw(const Subset *subset, const SubsetEnvelope *envelopes, const int envelopeCount) {

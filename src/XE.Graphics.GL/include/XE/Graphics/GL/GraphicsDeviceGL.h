@@ -18,23 +18,23 @@ namespace XE {
 
         virtual ~GraphicsDeviceGL();
 
-        virtual std::unique_ptr<Subset> createSubset(
+        virtual Subset* createSubset(
             SubsetDescriptor& desc, 
-            std::vector<std::unique_ptr<Buffer>> buffers, 
+            std::vector<Buffer*> buffers,
             const std::map<std::string, int> &bufferMapping, 
-            std::unique_ptr<Buffer> indexBuffer = std::unique_ptr<Buffer>()) override;
+            Buffer* indexBuffer) override;
         
-        virtual std::unique_ptr<Buffer> createBuffer(const BufferDescriptor &bufferDescriptor) override;
+        virtual Buffer* createBuffer(const BufferDescriptor &bufferDescriptor) override;
         
-        virtual std::unique_ptr<Texture2D> createTexture2D(const PixelFormat format, const Vector2i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void *sourceData) override;
+        virtual Texture2D* createTexture2D(const PixelFormat format, const Vector2i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void *sourceData) override;
         
-        virtual std::unique_ptr<Texture3D> createTexture3D(const PixelFormat format, const Vector3i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void *sourceData) override;
+        virtual Texture3D* createTexture3D(const PixelFormat format, const Vector3i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void *sourceData) override;
         
-        virtual std::unique_ptr<Texture2DArray> createTexture2DArray(const PixelFormat format, const Vector2i &size, const int count) override;
+        virtual Texture2DArray* createTexture2DArray(const PixelFormat format, const Vector2i &size, const int count) override;
         
-        virtual std::unique_ptr<TextureCubeMap> createTextureCubeMap(const PixelFormat format, const Vector2i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void **sourceData) override;
+        virtual TextureCubeMap* createTextureCubeMap(const PixelFormat format, const Vector2i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void **sourceData) override;
         
-        virtual std::unique_ptr<Program> createProgram(const ProgramDescriptor &programDescriptor) override;
+        virtual Program* createProgram(const ProgramDescriptor &programDescriptor) override;
         
         virtual void setMaterial(const Material *material) override;
 

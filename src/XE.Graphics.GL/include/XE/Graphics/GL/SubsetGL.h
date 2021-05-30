@@ -12,9 +12,9 @@ namespace XE {
     public:
         SubsetGL(
             SubsetDescriptor& desc, 
-            std::vector<std::unique_ptr<Buffer>> buffers, 
-            const std::map<std::string, int> &bufferMapping, 
-            std::unique_ptr<Buffer> indexBuffer);
+            std::vector<Buffer*> buffers,
+            const std::map<std::string, int> &bufferMapping,
+            Buffer* indexBuffer);
 
         virtual ~SubsetGL();
         
@@ -38,10 +38,9 @@ namespace XE {
         }
 
     private:
-        GLuint m_id;
-        std::vector<std::unique_ptr<BufferGL>> m_buffers;
-        std::unique_ptr<BufferGL> m_indexBuffer;
-
+        GLuint m_id = 0;
+        std::vector<BufferGL*> m_buffers;
+        BufferGL* m_indexBuffer = nullptr;
         SubsetDescriptor m_descriptor;
     };
 }

@@ -25,14 +25,10 @@ namespace XE {
     };
     
     inline bool operator&(const ClearFlags flags, const ClearFlags value) {
-        int nflags = static_cast<int>(flags);
-        int nvalue = static_cast<int>(value);
-        
-        if (nflags & nvalue) {
-            return true;
-        } else {
-            return false;
-        }
+        const int nflags = static_cast<int>(flags);
+        const int nvalue = static_cast<int>(value);
+
+        return (nflags & nvalue);
     }
     
     enum class PixelFormat;
@@ -41,7 +37,6 @@ namespace XE {
     struct Viewport;
     struct BufferDescriptor;
     struct SubsetEnvelope;
-    struct VertexLayout;
     struct Uniform;
     struct UniformMatrix;
     
@@ -70,23 +65,23 @@ namespace XE {
          * @param indexBuffer The subset geometry index buffer
          * @todo Add support for packed vertex structures
          */
-        virtual std::unique_ptr<Subset> createSubset(
+        virtual Subset* createSubset(
             SubsetDescriptor& desc, 
-            std::vector<std::unique_ptr<Buffer>> buffers, 
-            const std::map<std::string, int> &bufferMapping, 
-            std::unique_ptr<Buffer> indexBuffer) = 0;
+            std::vector<Buffer*> buffers,
+            const std::map<std::string, int> &bufferMapping,
+            Buffer* indexBuffer) = 0;
         
-        virtual std::unique_ptr<Buffer> createBuffer(const BufferDescriptor &bufferDescriptor) = 0;
+        virtual Buffer* createBuffer(const BufferDescriptor &bufferDescriptor) = 0;
         
-        virtual std::unique_ptr<Texture2D> createTexture2D(const PixelFormat format, const Vector2i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void *sourceData) = 0;
+        virtual Texture2D* createTexture2D(const PixelFormat format, const Vector2i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void *sourceData) = 0;
         
-        virtual std::unique_ptr<Texture3D> createTexture3D(const PixelFormat format, const Vector3i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void *sourceData) = 0;
+        virtual Texture3D* createTexture3D(const PixelFormat format, const Vector3i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void *sourceData) = 0;
         
-        virtual std::unique_ptr<Texture2DArray> createTexture2DArray(const PixelFormat format, const Vector2i &size, const int count) = 0;
+        virtual Texture2DArray* createTexture2DArray(const PixelFormat format, const Vector2i &size, const int count) = 0;
         
-        virtual std::unique_ptr<TextureCubeMap> createTextureCubeMap(const PixelFormat format, const Vector2i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void **sourceData) = 0;
+        virtual TextureCubeMap* createTextureCubeMap(const PixelFormat format, const Vector2i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void **sourceData) = 0;
         
-        virtual std::unique_ptr<Program> createProgram(const ProgramDescriptor &programDescriptor) = 0;
+        virtual Program* createProgram(const ProgramDescriptor &programDescriptor) = 0;
         
         virtual void setViewport(const Viewport &viewport) = 0;
 

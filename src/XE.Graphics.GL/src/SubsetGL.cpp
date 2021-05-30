@@ -6,17 +6,16 @@
 
 namespace XE {
     SubsetGL::SubsetGL(SubsetDescriptor& desc, 
-            std::vector<std::unique_ptr<Buffer>> buffers, 
-            const std::map<std::string, int> &bufferMapping, 
-            std::unique_ptr<Buffer> indexBuffer) {
+            std::vector<Buffer*> buffers,
+            const std::map<std::string, int> &bufferMapping,
+                       Buffer* indexBuffer) {
         // take ownership for the buffers
         for (auto &buffer : buffers) {
-            auto bufferGL = dynamic_cast<BufferGL*>(buffer.get());
+            auto bufferGL = dynamic_cast<BufferGL*>(buffer);
             m_buffers.emplace_back(bufferGL);
-            buffer.release();
         }
 
-        m_indexBuffer.reset((BufferGL*)indexBuffer.release());
+        m_indexBuffer = (BufferGL*)indexBuffer;
 
         // setup the subset arrays based on the vertex format and the mapping information
         ::glGenVertexArrays(1, &m_id);
@@ -30,7 +29,7 @@ namespace XE {
             }
  
             const int bufferIndex = mappingIt->second;
-            const BufferGL *buffer = m_buffers[bufferIndex].get();
+            const BufferGL *buffer = m_buffers[bufferIndex];
 
             ::glBindBuffer(buffer->GetTarget(), buffer->GetID());
             ::glEnableVertexAttribArray(attribIndex);
@@ -59,18 +58,18 @@ namespace XE {
     }
 
     BufferGL* SubsetGL::getBuffer(const int index) {
-        return m_buffers[index].get();
+        return m_buffers[index];
     }
 
     BufferGL* SubsetGL::getIndexBuffer() {
-        return m_indexBuffer.get();
+        return m_indexBuffer;
     }
 
     const BufferGL* SubsetGL::getBuffer(const int index) const {
-        return m_buffers[index].get();
+        return m_buffers[index];
     }
 
     const BufferGL* SubsetGL::getIndexBuffer() const {
-        return m_indexBuffer.get();
+        return m_indexBuffer;
     }
 }
