@@ -191,11 +191,13 @@ XE::Matrix4f Asset_CGLTF::computeNodeMatrix(const cgltf_node *node) {
         nodeMatrix = makeMatrix(node->matrix);
     } else {
         if (node->has_translation) {
+            // TODO: Untested translation
             const auto t = XE::Vector3f{node->translation};
             nodeMatrix *= XE::Matrix4f::createTranslation(t);
         }
         
         if (node->has_rotation) {
+            // TODO: Untested rotation
             // TODO: Add missing cases for angle = 0 and = 180º.
             const auto q = XE::Quaternion<float>{node->rotation};
             
@@ -211,6 +213,7 @@ XE::Matrix4f Asset_CGLTF::computeNodeMatrix(const cgltf_node *node) {
         }
         
         if (node->has_scale) {
+            // TODO: Untested scale
             const auto s = XE::Vector3f{node->scale};
             nodeMatrix *= XE::Matrix4f::createScaling({s, 1.0f});
         }
@@ -261,9 +264,15 @@ void Asset_CGLTF::visitNode(const XE::Matrix4f &matrix, const cgltf_node *node) 
 
 
 void Asset_CGLTF::visitScene(const cgltf_scene *scene) {
-    std::cout << "Visiting scene " << scene->name << std::endl;
+    auto transformMatrix = XE::Matrix4f::createIdentity();
     
     for (cgltf_size i=0; i<scene->nodes_count; i++) {
-        visitNode(0, scene->nodes[i]);
+        visitNode(transformMatrix, scene->nodes[i]);
     }
+    
+    // std::cout << "Visiting scene " << scene->name << std::endl;
+    //
+    //     for (cgltf_size i=0; i<scene->nodes_count; i++) {
+    //     visitNode(0, scene->nodes[i]);
+    // }
 }

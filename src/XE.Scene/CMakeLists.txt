@@ -5,7 +5,7 @@ set (sources
 	"include/XE/Scene/Projection.h"
 	"include/XE/Scene/Trackball.h"
     "include/XE/Scene/VirtualSphere.h"
-
+    
     "src/Projection.cpp"
 	"src/Trackball.cpp"
 	"src/VirtualSphere.cpp"

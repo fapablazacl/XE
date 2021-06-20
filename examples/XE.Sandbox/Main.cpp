@@ -7,20 +7,10 @@
 
 #include "SandboxApp.hpp"
 
-std::vector<std::string> ConvertArgs(int argc, char **argv) {
-    std::vector<std::string> args;
-
-    for (int i=1; i<argc; i++) {
-        args.push_back(argv[i]);
-    }
-
-    return args;
-}
 
 int main(int argc, char **argv) {
     try {
-        std::vector<std::string> args = ConvertArgs(argc, argv);
-        auto app = XE::Application::create(args);
+        auto app = XE::Application::create();
 
         app->Initialize();
 

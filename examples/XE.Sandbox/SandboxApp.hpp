@@ -18,7 +18,7 @@ namespace XE {
         virtual bool ShouldClose() const = 0;
 
     public:
-        static std::unique_ptr<Application> create(const std::vector<std::string> &args);
+        static std::unique_ptr<Application> create();
     };
 }
 
