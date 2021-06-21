@@ -2,6 +2,7 @@
 
 #include "SandboxApp.hpp"
 #include "Assets.hpp"
+#include "Asset_CGLTF.h"
 
 #include <XE/XE.h>
 #include <XE/Math.h>
@@ -16,8 +17,42 @@
 #include <iostream>
 #include <fstream>
 
+using XE::Vector3f;
+using XE::Vector4f;
+using XE::Vector2i;
+using XE::radians;
+using XE::Matrix4f;
+using XE::WindowGLFW;
+using XE::GraphicsDeviceGL;
+using XE::Subset;
+using XE::SubsetEnvelope;
+using XE::ContextDescriptorGL;
+using XE::KeyboardStatus;
+using XE::KeyCode;
+using XE::FileStreamSource;
+using XE::UniformMatrix;
+using XE::Uniform;
+using XE::BinaryState;
+using XE::DataType;
+using XE::PixelFormat;
+using XE::GraphicsDevice;
+using XE::ImageLoaderPNG;
+using XE::InputManager;
+using XE::ProgramDescriptor;
+using XE::Texture2D;
+using XE::Program;
+using XE::Vector;
+using XE::ClearFlags;
+using XE::ShaderType;
+using XE::Buffer;
+using XE::BufferDescriptor;
+using XE::BufferType;
+using XE::BufferUsage;
+using XE::BufferAccess;
+using XE::SubsetDescriptor;
 
-namespace XE {
+
+namespace Sandbox {
     struct Camera {
         Vector3f position = {0.0f, 0.0f, 15.0f};
         Vector3f lookAt = {0.0f, 0.0f, 0.0f};
@@ -270,7 +305,7 @@ namespace XE {
             // m_texture = createColorTexture(256, 256, {1.0f, 0.0f, 0.0f, 1.0f});
             m_texture = createFileTexture("media/materials/Tiles_Azulejos_004_SD/Tiles_Azulejos_004_COLOR.png");
 
-            m_material = std::make_unique<Material>();
+            m_material = std::make_unique<XE::Material>();
             m_material->layers[0].texture = m_texture;
             m_material->layerCount = 1;
             m_material->renderState.depthTest = true;
@@ -388,7 +423,7 @@ namespace XE {
         
         Asset_CGLTF mAssetGLTF;
         
-        std::unique_ptr<Material> m_material;
+        std::unique_ptr<XE::Material> m_material;
         Texture2D* m_texture = nullptr;
         
         std::unique_ptr<FileStreamSource> m_streamSource;

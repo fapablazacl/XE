@@ -7,13 +7,13 @@
 #include <string>
 #include <vector>
 
-#include "Asset_CGLTF.h"
+#include "Common.h"
 
-namespace XE::Sandbox {
-
+namespace Sandbox {
     struct Assets {
         static MeshPrimitive getSquareMeshPrimitive();
     };
 }
 
 #endif
+

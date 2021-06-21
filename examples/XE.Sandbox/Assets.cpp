@@ -7,8 +7,11 @@
 
 #include <iostream>
 
+using XE::Vector2f;
+using XE::Vector3f;
+using XE::Vector4f;
 
-namespace XE::Sandbox {
+namespace Sandbox {
     static std::vector<Vector3f> coordData = {
         {-1.5f,  1.5f, 0.0f},
         { 1.5f,  1.5f, 0.0f},

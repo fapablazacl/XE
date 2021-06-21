@@ -10,6 +10,7 @@ set (src
 	"SandboxApp.hpp"
 
 	"Common.h"
+    "Common.cpp"
 
 	"AssetManager.cpp"
 	"AssetManager.h"

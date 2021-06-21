@@ -10,7 +10,7 @@
 
 int main(int argc, char **argv) {
     try {
-        auto app = XE::Application::create();
+        auto app = Sandbox::Application::create();
 
         app->Initialize();
 

@@ -6,7 +6,7 @@
 #include <string>
 #include <vector>
 
-namespace XE {
+namespace Sandbox {
     class Application {
     public:
         virtual ~Application() {}
