@@ -7,6 +7,8 @@
 #include <vector>
 #include <memory>
 #include <string>
+#include <optional>
+
 #include <XE/Predef.h>
 #include <XE/DataType.h>
 
@@ -31,9 +33,6 @@ namespace XE {
      * @brief Interpretation information for a given subset. Used in rendering operations.
      */
     struct SubsetEnvelope {
-        //! A CPU buffer, allocated on heap or stack memory, used for default attribute values.
-        const std::byte* DefaultData = nullptr;
-
         //! Geometric Primitive Shape basis for rendering
         PrimitiveType Primitive = PrimitiveType::PointList;
 
@@ -48,7 +47,7 @@ namespace XE {
      * @brief Describes a Vertex Attribute for use in the vertex shader
      */
     struct VertexAttribute {
-        //! Attribute Name in the Vertex Shader
+        //! attribute Name in the Vertex Shader
         std::string name;
 
         //! Basic data type
@@ -61,12 +60,51 @@ namespace XE {
     /**
      * @brief Describes a geometry subset
      */
-    struct SubsetDescriptor {
+    struct [[deprecated("Use SubsetDescriptor2. It's more flexible, and less error-prone")]] SubsetDescriptor {
         //! The vertex structure
         std::vector<VertexAttribute> attributes;
 
         //! The index buffer datatype
         DataType indexType = DataType::Unknown;
+    };
+
+    /**
+     * @brief Describes a Vertex Attribute for use in the vertex shader
+     */
+    struct SubsetVertexAttrib {
+        //! attribute layout location in the vertex shader
+        int shaderLocation = 0;
+
+        //! Basic data type
+        DataType type = DataType::Unknown;
+
+        //! attribute dimension (1, 2, 3 or 4)
+        int size = 0;
+
+        bool normalized = false;
+
+        size_t stride = 0;
+
+        //!
+        size_t bufferIndex = 0;
+
+        //! 
+        size_t bufferOffset = 0;
+    };
+
+    /**
+     * @brief Describes a geometry subset.
+     */
+    struct SubsetDescriptor2 {
+        const Buffer **buffers = nullptr;
+
+        size_t bufferCount = 0;
+
+        const SubsetVertexAttrib *attribs = nullptr;
+
+        size_t attribCount = 0;
+
+        const Buffer* indexBuffer = nullptr;
     };
 
     /**
@@ -108,6 +146,7 @@ namespace XE {
         /**
          * @brief Get the current description structure that leads to the creation of the subset
          */
+        [[deprecated]]
         virtual SubsetDescriptor GetDescriptor() const = 0;
     };
 }

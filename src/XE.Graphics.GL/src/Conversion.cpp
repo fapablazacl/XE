@@ -147,4 +147,8 @@ namespace XE {
             default: return 0;
         }
     }
+    
+    GLenum convertToGL(const bool value) {
+        return value ? GL_TRUE : GL_FALSE;
+    }
 }

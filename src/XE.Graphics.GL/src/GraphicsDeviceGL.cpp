@@ -56,7 +56,11 @@ namespace XE {
             Buffer* indexBuffer) {
         return new SubsetGL(desc, buffers, bufferMapping, indexBuffer);
     }
-        
+    
+    Subset* GraphicsDeviceGL::createSubset(const SubsetDescriptor2 &desc) {
+        return new SubsetGL(desc);
+    }
+
     Buffer* GraphicsDeviceGL::createBuffer(const BufferDescriptor &desc) {
         return new BufferGL(desc);
     }

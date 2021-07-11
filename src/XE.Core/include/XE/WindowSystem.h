@@ -6,9 +6,9 @@
 #include <XE/Predef.h>
 
 namespace XE {
-    class XE_API Frame;
+    class XE_API [[deprecated]] Frame;
 
-    class XE_API WindowSystem {
+    class XE_API [[deprecated]] WindowSystem {
     public:
         virtual ~WindowSystem();
 

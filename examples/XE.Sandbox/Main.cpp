@@ -8,8 +8,6 @@
 #include "SandboxApp.hpp"
 
 
-
-
 int main(int argc, char **argv) {
     try {
         auto app = Sandbox::Application::create();

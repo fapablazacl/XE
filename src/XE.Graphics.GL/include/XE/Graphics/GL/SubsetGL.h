@@ -16,6 +16,8 @@ namespace XE {
             const std::map<std::string, int> &bufferMapping,
             Buffer* indexBuffer);
 
+        SubsetGL(const SubsetDescriptor2 &desc);
+
         virtual ~SubsetGL();
         
         virtual int getBufferCount() const override;
@@ -39,8 +41,8 @@ namespace XE {
 
     private:
         GLuint m_id = 0;
-        std::vector<BufferGL*> m_buffers;
-        BufferGL* m_indexBuffer = nullptr;
+        std::vector<const BufferGL*> m_buffers;
+        const BufferGL* m_indexBuffer = nullptr;
         SubsetDescriptor m_descriptor;
     };
 }

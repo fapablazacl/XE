@@ -24,10 +24,10 @@ namespace Sandbox {
         
         XE::SubsetEnvelope getEnvelope() const {
             if (indices.size()) {
-                return { nullptr, type, 0, (int)indices.size() };
+                return { type, 0, (int)indices.size() };
             }
             
-            return { nullptr, type, 0, (int)coords.size() };
+            return { type, 0, (int)coords.size() };
         }
     };
 

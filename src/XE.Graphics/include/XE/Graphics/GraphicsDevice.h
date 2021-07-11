@@ -48,6 +48,7 @@ namespace XE {
     class Program;
     class Material;
 
+    struct SubsetDescriptor2;
     struct SubsetDescriptor;
     struct ProgramDescriptor;
 

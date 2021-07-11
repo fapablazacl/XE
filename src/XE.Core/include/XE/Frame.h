@@ -13,9 +13,10 @@ namespace XE {
     /**
      * @brief 
      */
+    [[deprecated]]
     typedef void* FrameHandle;
 
-    struct FrameProperties {
+    struct [[deprecated]] FrameProperties {
         std::string caption;
         // Vector2i size;
         // Vector2i position;
@@ -24,7 +25,7 @@ namespace XE {
     /**
      * @brief Abstract a (possible) native OS window frame, for presenting rendering content to the user.
      */
-    class Frame {
+    class [[deprecated]] Frame {
     public:
         virtual ~Frame();
 
