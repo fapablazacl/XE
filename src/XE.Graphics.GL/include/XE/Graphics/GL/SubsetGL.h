@@ -11,7 +11,7 @@ namespace XE {
     class SubsetGL : public Subset {
     public:
         SubsetGL(
-            SubsetDescriptor& desc, 
+            const SubsetDescriptor& desc, 
             std::vector<Buffer*> buffers,
             const std::map<std::string, int> &bufferMapping,
             Buffer* indexBuffer);

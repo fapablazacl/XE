@@ -66,7 +66,7 @@ namespace XE {
          * @todo Add support for packed vertex structures
          */
         virtual Subset* createSubset(
-            SubsetDescriptor& desc, 
+            const SubsetDescriptor& desc, 
             std::vector<Buffer*> buffers,
             const std::map<std::string, int> &bufferMapping,
             Buffer* indexBuffer) = 0;

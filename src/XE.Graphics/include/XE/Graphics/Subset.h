@@ -32,16 +32,16 @@ namespace XE {
      */
     struct SubsetEnvelope {
         //! A CPU buffer, allocated on heap or stack memory, used for default attribute values.
-        const std::byte* DefaultData;
+        const std::byte* DefaultData = nullptr;
 
         //! Geometric Primitive Shape basis for rendering
-        PrimitiveType Primitive;
+        PrimitiveType Primitive = PrimitiveType::PointList;
 
         //! From wich vertex we will render
-        int VertexStart;
+        int VertexStart = 0;
         
         //! How many vertices we must use for render
-        int VertexCount;
+        int VertexCount = 0;
     };
     
     /**
@@ -52,10 +52,10 @@ namespace XE {
         std::string name;
 
         //! Basic data type
-        DataType type;
+        DataType type = DataType::Unknown;
 
         //! Attribute dimension (1, 2, 3 or 4)
-        int size;
+        int size = 0;
     };
 
     /**
@@ -66,7 +66,7 @@ namespace XE {
         std::vector<VertexAttribute> attributes;
 
         //! The index buffer datatype
-        DataType indexType;
+        DataType indexType = DataType::Unknown;
     };
 
     /**

@@ -89,7 +89,7 @@ namespace XE {
     };
 
     /**
-     * @brief Describes the genric visual appearance of all the objects. For other properties, use uniforms.
+     * @brief Describes the generic visual appearance of all the objects. For other properties, use uniforms.
      * @note Very unstable interface.
      */
     class Material {

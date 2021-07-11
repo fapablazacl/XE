@@ -5,7 +5,7 @@
 
 
 namespace XE {
-    SubsetGL::SubsetGL(SubsetDescriptor& desc, 
+    SubsetGL::SubsetGL(const SubsetDescriptor& desc, 
             std::vector<Buffer*> buffers,
             const std::map<std::string, int> &bufferMapping,
                        Buffer* indexBuffer) {
