@@ -66,6 +66,7 @@ namespace XE {
          * @param indexBuffer The subset geometry index buffer
          * @todo Add support for packed vertex structures
          */
+        [[deprecated]]
         virtual Subset* createSubset(
             const SubsetDescriptor& desc, 
             std::vector<Buffer*> buffers,
@@ -102,6 +103,10 @@ namespace XE {
 
         virtual void draw(const Subset *subset, const SubsetEnvelope *envelopes, const int envelopeCount) = 0;
         
+        void beginFrame(const ClearFlags flags, const Vector4f &color) {
+            beginFrame(flags, color, 1.0f, 0);
+        }
+
         virtual void beginFrame(const ClearFlags flags, const Vector4f &color, const float depth, const int stencil) = 0;
         
         virtual void endFrame() = 0;

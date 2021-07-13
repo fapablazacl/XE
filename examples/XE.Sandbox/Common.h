@@ -73,7 +73,7 @@ namespace Sandbox {
         
         XE::Matrix4f matrix;
         
-        std::memcpy(matrix.data, data, 16 * sizeof(float));
+        std::memcpy(matrix.data(), data, 16 * sizeof(float));
         
         return matrix;
     }

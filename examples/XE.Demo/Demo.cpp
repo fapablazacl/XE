@@ -12,6 +12,9 @@
 
 #include <map>
 
+const int s_screenWidth = 1200;
+const int s_screenHeight = 800;
+
 const std::string s_simpleVS = R"(
 #version 410 core
 
@@ -23,7 +26,7 @@ layout(location = 1) in vec4 vsColor;
 out vec4 fsColor;
 
 void main() {
-    gl_Position = uProjViewModel * vec4(vsCoord, 1.0);
+    gl_Position = vec4(vsCoord, 1.0) * uProjViewModel;
     fsColor = vsColor;
 }
 )";
@@ -57,8 +60,8 @@ XE::ProgramDescriptor makeSimpleProgramDesc(const std::string &vs, const std::st
     XE::ProgramDescriptor desc;
 
     desc.sources = {
-        { XE::ShaderType::Vertex,  vs}, 
-        { XE::ShaderType::Fragment,  fs}, 
+        { XE::ShaderType::Vertex, vs}, 
+        { XE::ShaderType::Fragment, fs}, 
     };
 
     return desc;
@@ -108,14 +111,14 @@ Mesh makeCubeMesh(const float width, const float height, const float depth) {
     Mesh mesh;
 
     const std::vector<Vertex> vertices = {
-        {{-0.5f * width, -0.5f * height,  0.5f * depth}, {1.0f, 0.0f, 0.0f, 1.0f}},
-		{{0.5f * width, -0.5f * height,  0.5f * depth}, {0.0f, 1.0f, 0.0f, 1.0f}},
-		{{-0.5f * width,  0.5f * height,  0.5f * depth}, {0.0f, 0.0f, 1.0f, 1.0f}},
-		{{0.5f * width,  0.5f * height,  0.5f * depth}, {1.0f, 1.0f, 0.0f, 1.0f}},
-		{{-0.5f * width, -0.5f * height, -0.5f * depth}, {0.0f, 1.0f, 1.0f, 1.0f}},
-		{{0.5f * width, -0.5f * height, -0.5f * depth}, {1.0f, 0.0f, 1.0f, 1.0f}},
-		{{-0.5f * width,  0.5f * height, -0.5f * depth}, {0.0f, 0.0f, 0.0f, 1.0f}},
-		{{0.5f * width,  0.5f * height, -0.5f * depth}, {1.0f, 1.0f, 1.0f, 1.0f}}
+        {{-0.5f * width, -0.5f * height,  0.5f * depth}, {1.0f, 0.0f, 1.0f, 1.0f}},
+		{{0.5f * width, -0.5f * height,  0.5f * depth}, {1.0f, 0.0f, 1.0f, 1.0f}},
+		{{-0.5f * width,  0.5f * height,  0.5f * depth}, {0.0f, 1.0f, 1.0f, 1.0f}},
+		{{0.5f * width,  0.5f * height,  0.5f * depth}, {0.0f, 1.0f, 1.0f, 1.0f}},
+		{{-0.5f * width, -0.5f * height, -0.5f * depth}, {1.0f, 0.0f, 0.0f, 1.0f}},
+		{{0.5f * width, -0.5f * height, -0.5f * depth}, {1.0f, 0.0f, 0.0f, 1.0f}},
+		{{-0.5f * width,  0.5f * height, -0.5f * depth}, {0.0f, 1.0f, 0.0f, 1.0f}},
+		{{0.5f * width,  0.5f * height, -0.5f * depth}, {0.0f, 1.0f, 0.0f, 1.0f}}
 	};
 
     mesh.primitive = XE::PrimitiveType::TriangleList;
@@ -159,7 +162,7 @@ public:
 
 private:
     void initialize() {
-        mWindow = XE::WindowGLFW::create(XE::ContextDescriptorGL::defaultGL4(), "XE.Demo example application", {1200, 800}, false);
+        mWindow = XE::WindowGLFW::create(XE::ContextDescriptorGL::defaultGL4(), "XE.Demo example application", {s_screenWidth, s_screenHeight}, false);
         mGraphicsDevice = std::make_unique<XE::GraphicsDeviceGL>(mWindow->getContext());
         mInputManager = mWindow->getInputManager();
 
@@ -225,11 +228,11 @@ private:
         mInputManager->poll();
 
         auto keyboardStatus = mInputManager->getKeyboardStatus();
-        if (keyboardStatus.getState(XE::KeyCode::KeyEsc) == XE::BinaryState::Press) {
+        if (keyboardStatus.isPressed(XE::KeyCode::KeyEsc)) {
             mDone = false;
         }
 
-        mAngle += 0.5f;
+        mAngle += XE::radians(0.25f);
     }
 
     void renderFrame() {
@@ -239,15 +242,23 @@ private:
             4, 4, 1
         };
 
-        const XE::Matrix4f rotation = 
-            XE::Matrix4f::createRotationX(XE::radians(mAngle)) * 
-            XE::Matrix4f::createRotationY(XE::radians(mAngle)) * 
-            XE::Matrix4f::createRotationZ(XE::radians(mAngle));
+        const auto aspect = static_cast<float>(s_screenWidth) / static_cast<float>(s_screenHeight);
 
+        const auto proj = XE::M4::perspective(XE::radians(60.0f), aspect, 0.01f, 100.0f);
+        const auto view = XE::M4::lookAt({0.0f, 0.0f, -5.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f});
+        const auto model = XE::M4::translate({0.0f, 0.0f, 5.0f}) * XE::M4::rotateX(mAngle) * XE::M4::rotateY(mAngle) * XE::M4::rotateZ(mAngle);
+        // const auto projViewModel = model/* * view * proj*/;
+
+        const auto m1 = XE::M4::rotateY(mAngle);
+        const auto m2 = XE::M4::translate({0.25f, 0.0f, 0.0f});
+        const auto m3 = XE::M4::translate({-0.25f, 0.0f, 0.0f});
+
+        const auto projViewModel = m3 * m1 * m2;
+        
         mGraphicsDevice->beginFrame(XE::ClearFlags::All, {0.2f, 0.2f, 0.8f, 1.0f}, 1.0f, 0);
 
         mGraphicsDevice->setProgram(mSimpleProgram);
-        mGraphicsDevice->applyUniform(&uProjModelView, 1, reinterpret_cast<const std::byte*>(&rotation.data[0]));
+        mGraphicsDevice->applyUniform(&uProjModelView, 1, reinterpret_cast<const std::byte*>(projViewModel.data()));
         mGraphicsDevice->setMaterial(&mMaterial);
         mGraphicsDevice->draw(mCubeSubset, &mCubeSubsetEnvelope, 1);
 

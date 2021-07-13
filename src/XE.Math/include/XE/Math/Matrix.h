@@ -9,129 +9,112 @@
 namespace XE {
     template<typename T, int R, int C>
     struct MatrixBase {
-        union {
-            T data[R*C];
-            T element[R][C];
-        };
+        T element[C][R];
     };
 
     template<typename T>
     struct MatrixBase<T, 2, 2> {
-        union {
-            T data[4];
-            T element[2][2];
-            struct {
-                T M11, M12;
-                T M21, M22;
-            };
-        };
+        T element[2][2];
 
         MatrixBase() {}
 
+        [[deprecated]]
         MatrixBase(
             const T m11, const T m12,
             const T m21, const T m22
         ) {
-            M11 = m11; M12 = m12;
-            M21 = m21; M22 = m22;
+            element[0][0] = m11; element[0][1] = m12;
+            element[1][0] = m21; element[1][1] = m22;
         }
 
+        [[deprecated]]
         MatrixBase(
             const Vector<T, 2> &row1,
             const Vector<T, 2> &row2
         ) {
-            M11 = row1.X; M12 = row1.Y;
-            M21 = row2.X; M22 = row2.Y;
+            element[0][0] = row1.X; element[0][1] = row1.Y;
+            element[1][0] = row2.X; element[1][1] = row2.Y;
         }
     };
 
     template<typename T>
     struct MatrixBase<T, 3, 3> {
-        union {
-            T data[9];
-            T element[3][3];
-            struct {
-                T M11, M12, M13;
-                T M21, M22, M23;
-                T M31, M32, M33;
-            };
-        };
+        T element[3][3];
 
         MatrixBase() {}
 
+        [[deprecated]]
         MatrixBase(
             const T m11, const T m12, const T m13,
             const T m21, const T m22, const T m23,
             const T m31, const T m32, const T m33
         ) {
-            M11 = m11; M12 = m12; M13 = m13;
-            M21 = m21; M22 = m22; M23 = m23;
-            M31 = m31; M32 = m32; M33 = m33;
+            element[0][0] = m11; element[0][1] = m12; element[0][2] = m13;
+            element[1][0] = m21; element[1][1] = m22; element[1][2] = m23;
+            element[2][0] = m31; element[2][1] = m32; element[2][2] = m33;
         }
 
+        [[deprecated]]
         MatrixBase(
-            const Vector<T, 3> &row1,
-            const Vector<T, 3> &row2,
-            const Vector<T, 3> &row3
+            const Vector<T, 3> &col1,
+            const Vector<T, 3> &col2,
+            const Vector<T, 3> &col3
         ) {
-            M11 = row1.X; M12 = row1.Y; M13 = row1.Z;
-            M21 = row2.X; M22 = row2.Y; M23 = row2.Z;
-            M31 = row3.X; M32 = row3.Y; M33 = row3.Z;
+            element[0][0] = col1.X; element[0][1] = col1.Y; element[0][2] = col1.Z;
+            element[1][0] = col2.X; element[1][1] = col2.Y; element[1][2] = col2.Z;
+            element[2][0] = col3.X; element[2][1] = col3.Y; element[2][2] = col3.Z;
         }
     };
     
     template<typename T>
     struct MatrixBase<T, 4, 4> {
-        union {
-            T data[16];
-            T element[4][4];
-            struct {
-                T M11, M12, M13, M14;
-                T M21, M22, M23, M24;
-                T M31, M32, M33, M34;
-                T M41, M42, M43, M44;
-            };
-        };
+        T element[4][4];
 
         MatrixBase() {}
 
+        [[deprecated]]
         MatrixBase(
             const T m11, const T m12, const T m13, const T m14,
             const T m21, const T m22, const T m23, const T m24,
             const T m31, const T m32, const T m33, const T m34,
             const T m41, const T m42, const T m43, const T m44
         ) {
-            M11 = m11; M12 = m12; M13 = m13; M14 = m14;
-            M21 = m21; M22 = m22; M23 = m23; M24 = m24;
-            M31 = m31; M32 = m32; M33 = m33; M34 = m34;
-            M41 = m41; M42 = m42; M43 = m43; M44 = m44;
+            element[0][0] = m11; element[0][1] = m12; element[0][2] = m13; element[0][3] = m14;
+            element[1][0] = m21; element[1][1] = m22; element[1][2] = m23; element[1][3] = m24;
+            element[2][0] = m31; element[2][1] = m32; element[2][2] = m33; element[2][3] = m34;
+            element[3][0] = m41; element[3][1] = m42; element[3][2] = m43; element[3][3] = m44;
         }
 
+        [[deprecated]]
         MatrixBase(
-            const Vector<T, 4> &row1,
-            const Vector<T, 4> &row2,
-            const Vector<T, 4> &row3,
-            const Vector<T, 4> &row4
+            const Vector<T, 4> &col1,
+            const Vector<T, 4> &col2,
+            const Vector<T, 4> &col3,
+            const Vector<T, 4> &col4
         ) {
-            M11 = row1.X; M12 = row1.Y; M13 = row1.Z; M14 = row1.W;
-            M21 = row2.X; M22 = row2.Y; M23 = row2.Z; M24 = row2.W;
-            M31 = row3.X; M32 = row3.Y; M33 = row3.Z; M34 = row3.W;
-            M41 = row4.X; M42 = row4.Y; M43 = row4.Z; M44 = row4.W;
+            element[0][0] = col1.X; element[0][1] = col1.Y; element[0][2] = col1.Z; element[0][3] = col1.W;
+            element[1][0] = col2.X; element[1][1] = col2.Y; element[1][2] = col2.Z; element[1][3] = col2.W;
+            element[2][0] = col3.X; element[2][1] = col3.Y; element[2][2] = col3.Z; element[2][3] = col3.W;
+            element[3][0] = col4.X; element[3][1] = col4.Y; element[3][2] = col4.Z; element[3][3] = col4.W;
         }
     };
 
     template<typename T, int N>
     struct Vector;
 
+    /**
+     * @brief NxM matrix struct, in column-major order.
+     */
     template<typename T, int R, int C>
     struct Matrix : public MatrixBase<T, R, C> {
         using MatrixBase<T, R, C>::MatrixBase;
 
         Matrix() {}
 
+        [[deprecated]]
         Matrix(const Vector<T, R*C> &v) {
             constexpr int totalBytes = R * C * sizeof(T);
-            std::memcpy(this->data, v.data, totalBytes);
+            std::memcpy(data(), v.data, totalBytes);
         }
 
         bool operator== (const Matrix<T, R, C> &other) const;
@@ -173,7 +156,7 @@ namespace XE {
             assert(i < R);
             assert(j < C);
 
-            return this->element[i][j];
+            return element[j][i];
         }
 
         T operator() (const int i, const int j) const {
@@ -182,46 +165,46 @@ namespace XE {
             assert(i < R);
             assert(j < C);
 
-            return this->element[i][j];
+            return element[j][i];
         }
 
-        Vector<T, C> getRow(const int row) const {
-            assert(row >= 0);
-            assert(row < R);
+        Vector<T, C> getRow(const int i) const {
+            assert(i >= 0);
+            assert(i < R);
 
             Vector<T, C> result;
             
-            for (int col=0; col<C; col++) {
-                result.data[col] = this->element[row][col];
+            for (int j=0; j<C; j++) {
+                result.data[j] = element[j][i];
             }
             
             return result;
         }
         
-        Vector<T, R> getColumn(const int col) const {
-            assert(col >= 0);
-            assert(col < C);
+        Vector<T, R> getColumn(const int j) const {
+            assert(j >= 0);
+            assert(j < C);
 
             Vector<T, R> result;
             
-            for (int row=0; row<R; row++) {
-                result.data[row] = this->element[row][col];
+            for (int i=0; i<R; i++) {
+                result.data[i] = element[j][i];
             }
             
             return result;
         }
         
-        Matrix<T, R, C>& setRow(const int row, const Vector<T, C> &v) {
-            for (int col=0; col<C; col++) {
-                this->element[row][col] = v[col];
+        Matrix<T, R, C>& setRow(const int i, const Vector<T, C> &v) {
+            for (int j=0; j<C; j++) {
+                element[j][i] = v[j];
             }
 
             return *this;
         }
 
-        Matrix<T, R, C>& setColumn(const int col, const Vector<T, R> &v) {
-            for (int row=0; row<R; row++) {
-                this->element[row][col] = v[row];
+        Matrix<T, R, C>& setColumn(const int j, const Vector<T, R> &v) {
+            for (int i=0; i<R; i++) {
+                element[j][i] = v[i];
             }
 
             return *this;
@@ -261,34 +244,55 @@ namespace XE {
             }
         }
 
+        T* data() {
+            return &element[0][0];
+        }
+        
+        const T* data() const {
+            return &element[0][0];
+        }
+
         /**
          * @brief Build a matrix initialized with zeros.
          */
+        [[deprecated]]
         static Matrix<T, R, C> createZero() {
             Matrix<T, R, C> result;
             
-            for(int i=0; i<R*C; ++i) {
-                result.data[i] = T(0);
+            for(int j=0; j<C; ++j) {
+                for(int i=0; i<R; ++i) {
+                    result(i, j) = static_cast<T>(0);
+                }
             }
             
             return result;
         }
         
+        static Matrix<T, R, C> zero() {
+            return createZero();
+        }
+
         /**
          * @brief Build a identity matrix. Must be square.
          */
+        [[deprecated]]
         static auto createIdentity() {
             if constexpr (R == C) {
                 auto result = Matrix<T, R, C>::createZero();
                 
                 for (int i=0; i<R; ++i) {
-                    result(i, i) = T(1);
+                    result(i, i) = static_cast<T>(1);
                 }
                 
                 return result;
             }
         }
         
+        static auto identity() {
+            return createIdentity();
+        }
+
+        [[deprecated]]
         static Matrix<T, R, C> createScaling(const Vector<T, R> &scale) {
             auto result = Matrix<T, R, C>::createIdentity();
             
@@ -299,18 +303,33 @@ namespace XE {
             return result;
         }
         
+        static auto scale(const Vector<T, R> &scale) {
+            return createScaling(scale);
+        }
+
+        [[deprecated]]
         static Matrix<T, R, C> createTranslation(const Vector<T, R> &displace) {
             auto result = Matrix<T, R, C>::createIdentity();
             
-            result.setColumn(C - 1, displace);
+            result.setRow(R - 1, displace);
             
             return result;
         }
 
-        static Matrix<T, R, C> createTranslation(const Vector<T, R - 1> &displace) {
-            return Matrix<T, R, C>::createTranslation({displace, T(1)});
+        static Matrix<T, R, C> translate(const Vector<T, R> &displace) {
+            return createTranslation(displace);
         }
 
+        [[deprecated]]
+        static Matrix<T, R, C> createTranslation(const Vector<T, R - 1> &displace) {
+            return Matrix<T, R, C>::createTranslation({displace, static_cast<T>(1)});
+        }
+        
+        static Matrix<T, R, C> translate(const Vector<T, R - 1> &displace) {
+            return createTranslation(displace);
+        }
+
+        [[deprecated]]
         static Matrix<T, R, C> createRotationX(const T radians) {
             auto result = Matrix<T, R, C>::createIdentity();
             
@@ -324,7 +343,12 @@ namespace XE {
             
             return result;
         }
-        
+                
+        static Matrix<T, R, C> rotateX(const T radians) {
+            return createRotationX(radians);
+        }
+
+        [[deprecated]]
         static Matrix<T, R, C> createRotationY(const T radians) {
             auto result = Matrix<T, R, C>::createIdentity();
             
@@ -338,7 +362,12 @@ namespace XE {
             
             return result;
         }
-        
+                
+        static Matrix<T, R, C> rotateY(const T radians) {
+            return createRotationY(radians);
+        }
+
+        [[deprecated]]
         static Matrix<T, R, C> createRotationZ(const T radians) {
             auto result = Matrix<T, R, C>::createIdentity();
             
@@ -353,9 +382,14 @@ namespace XE {
             return result;
         }
         
+        static Matrix<T, R, C> rotateZ(const T radians) {
+            return createRotationZ(radians);
+        }
+
         /**
          * @brief Build a arbitrary rotation matrix 
          */
+        [[deprecated]]
         static auto createRotation(const T rads, const Vector<T, 3> &axis) {
             if constexpr ( (C>=3 && C<=4) && (R>=3 && R<=4) ) {                
                 assert(!std::isnan(rads));
@@ -390,6 +424,11 @@ namespace XE {
             }
         }
         
+        static auto rotate(const T rads, const Vector<T, 3> &axis) {
+            return createRotation(rads, axis);
+        }
+
+        [[deprecated]]
         static auto createLookAt(const Vector<T, 3> &Eye, const Vector<T, 3> &At, const Vector<T, 3> &Up) {
             if constexpr (C==4 && R==4) {
                 const auto forward = normalize(At - Eye);
@@ -401,7 +440,7 @@ namespace XE {
                 result(0, 0) = side.X;
                 result(0, 1) = side.Y;
                 result(0, 2) = side.Z;
-            
+                
                 result(1, 0) = up.X;
                 result(1, 1) = up.Y;
                 result(1, 2) = up.Z;
@@ -410,39 +449,54 @@ namespace XE {
                 result(2, 1) = -forward.Y;
                 result(2, 2) = -forward.Z;
                 
-                result *= Matrix<T, 4, 4>::createTranslation(-Eye);
+                result = Matrix<T, 4, 4>::createTranslation(-Eye) * result;
                 
                 return result;
             }
         }
+
+        static auto lookAt(const Vector<T, 3> &Eye, const Vector<T, 3> &At, const Vector<T, 3> &Up) {
+            return createLookAt(Eye, At, Up);
+        }
         
+        [[deprecated]]
         static auto createPerspective(const T fov_radians, const T aspect, const T znear, const T zfar) {
             if constexpr (C==4 && R==4) {
-                const T f = T(1) / std::tan(fov_radians / T(2));
+                assert(fov_radians > static_cast<T>(0));
+                assert(aspect > static_cast<T>(0));
+                assert(znear > static_cast<T>(0));
+
+                const T f = static_cast<T>(1) / std::tan(fov_radians / static_cast<T>(2));
                 const T zdiff = znear - zfar;
 
-                auto result = Matrix<T, 4, 4>::createIdentity();
+                auto result = Matrix<T, 4, 4>::identity();
                 
                 result(0, 0) = f / aspect;
                 result(1, 1) = f;
                 result(2, 2) = (zfar + znear) / zdiff;
-                result(3, 2) = T(-1);
-                result(2, 3) = (T(2)*znear * zfar) / zdiff;
+
+                result(2, 3) = static_cast<T>(-1);
+                result(3, 2) = (static_cast<T>(2)*znear * zfar) / zdiff;
                 
                 return result;
             }
         }
         
+        static auto perspective(const T fov_radians, const T aspect, const T znear, const T zfar) {
+            return createPerspective(fov_radians, aspect, znear, zfar);
+        }
+
+        [[deprecated]]
         static auto createOrthographic(const Vector<T, 3> &pmin,  const Vector<T, 3> &pmax) {
             if constexpr (C==4 && R==4) {
                 const auto diff = pmax - pmin;
                 
                 auto result = Matrix<T, 4, 4>::createIdentity();
                 
-                result(0, 0) = T(2) / diff.X;
-                result(1, 1) = T(2) / diff.Y;
-                result(2, 2) = T(-2) / diff.Z;
-                result(3, 3) = T(1);
+                result(0, 0) = static_cast<T>(2) / diff.X;
+                result(1, 1) = static_cast<T>(2) / diff.Y;
+                result(2, 2) = static_cast<T>(-2) / diff.Z;
+                result(3, 3) = static_cast<T>(1);
                 
                 result(0, 3) = -(pmax.X + pmin.X ) / diff.X;
                 result(1, 3) = -(pmax.Y + pmin.Y ) / diff.Y;
@@ -451,17 +505,24 @@ namespace XE {
                 return result;
             }
         }
+
+        static auto orthographic(const Vector<T, 3> &pmin,  const Vector<T, 3> &pmax) {
+            return createOrthographic(pmin, pmax);
+        }
     };
     
     typedef Matrix<float, 2, 2> Matrix2f;
     typedef Matrix<float, 3, 3> Matrix3f;
     typedef Matrix<float, 4, 4> Matrix4f;
+
+    using M3 = Matrix<float, 3, 3>;
+    using M4 = Matrix<float, 4, 4>;
     
     template<typename T, int R, int C>
     auto abs(const Matrix<T, R, C> &m) {
         if constexpr (R >= 2) {
             if constexpr (R == 2 && C == 2) {
-                return m.M22 * m.M11 - m.M12 * m.M21;
+                return m.element[1][1] * m.element[0][0] - m.element[0][1] * m.element[1][0];
             } else {
                 T factor = T(1);
                 T result = T(0);
@@ -487,7 +548,7 @@ namespace XE {
         
         for(int i=0; i<R; ++i) {
             for(int j=0; j<C; ++j) {
-                T factor = ((i+j)%2 == 1) ? T(1) : T(-1);
+                const T factor = ((i+j)%2 == 1) ? static_cast<T>(1) : static_cast<T>(-1);
                 result(i, j) = factor * abs(matrix.getSubMatrix(i, j));
             }
         }
@@ -520,9 +581,11 @@ namespace XE {
     
     template<typename T, int R, int C>
     bool Matrix<T, R, C>::operator== (const Matrix<T, R, C> &other) const {
-        for (int i=0; i<R*C; i++) {
-            if (this->data[i] != other.data[i]) {
-                return false;
+        for (int i=0; i<R; i++) {
+            for (int j=0; j<C; j++) {
+                if (element[i][j] != other.element[i][j]) {
+                    return false;
+                }
             }
         }
         
@@ -531,9 +594,11 @@ namespace XE {
 
     template<typename T, int R, int C>
     bool Matrix<T, R, C>::operator!= (const Matrix<T, R, C> &other) const {
-        for (int i=0; i<R*C; i++) {
-            if (this->data[i] == other.data[i]) {
-                return false;
+        for (int i=0; i<R; i++) {
+            for (int j=0; j<C; j++) {
+                if (element[i][j] == other.element[i][j]) {
+                    return false;
+                }
             }
         }
         
@@ -544,10 +609,12 @@ namespace XE {
     Matrix<T, R, C> Matrix<T, R, C>::operator+ (const Matrix<T, R, C>& rhs) const {
         Matrix<T, R, C> result;
         
-        for (int i=0; i<R*C; i++) {
-            result.data[i] = this->data[i] + rhs.data[i];
+        for (int i=0; i<R; i++) {
+            for (int j=0; j<C; j++) {
+                result.element[i][j] = element[i][j] + rhs.element[i][j];
+            }
         }
-        
+
         return result;
     }
     
@@ -555,8 +622,10 @@ namespace XE {
     Matrix<T, R, C> Matrix<T, R, C>::operator- () const {
         Matrix<T, R, C> result;
         
-        for (int i=0; i<R*C; i++) {
-            result.data[i] = -this->data[i];
+        for (int i=0; i<R; i++) {
+            for (int j=0; j<C; j++) {
+                result.element[i][j] = -element[i][j];
+            }
         }
         
         return result;
@@ -571,8 +640,10 @@ namespace XE {
     Matrix<T, R, C> Matrix<T, R, C>::operator- (const Matrix<T, R, C>& rhs) const {
         Matrix<T, R, C> result;
         
-        for (int i=0; i<R*C; i++) {
-            result.data[i] = this->data[i] - rhs.data[i];
+        for (int i=0; i<R; i++) {
+            for (int j=0; j<C; j++) {
+                result.element[i][j] = element[i][j] - rhs.element[i][j];
+            }
         }
         
         return result;
@@ -588,11 +659,11 @@ namespace XE {
         
         for (int i=0; i<R; i++) {
             for (int j=0; j<C2; j++) {
-                const auto rowI = this->getRow(i);
+                const auto rowI = getRow(i);
                 const auto colJ = rhs.getColumn(j);
                 const auto mIJ = dot(rowI, colJ);;
 
-                result.element[i][j] = mIJ;
+                result(i, j) = mIJ;
             }
         }
         
@@ -608,10 +679,12 @@ namespace XE {
     Matrix<T, R, C> Matrix<T, R, C>::operator* (const T s) const {
         Matrix<T, R, C> result;
         
-        for (int i=0; i<R*C; i++) {
-            result.data[i] = this->data[i] * s;
+        for (int i=0; i<R; i++) {
+            for (int j=0; j<C; j++) {
+                result(i, j) = (*this)(i, j) * s;
+            }
         }
-        
+
         return result;
     }
     
@@ -619,8 +692,10 @@ namespace XE {
     Matrix<T, R, C> Matrix<T, R, C>::operator/ (const T s) const {
         Matrix<T, R, C> result;
         
-        for (int i=0; i<R*C; i++) {
-            result.data[i] = this->data[i] / s;
+        for (int i=0; i<R; i++) {
+            for (int j=0; j<C; j++) {
+                result(i, j) = (*this)(i, j) / s;
+            }
         }
         
         return result;
@@ -628,8 +703,10 @@ namespace XE {
     
     template<typename T, int R, int C>
     Matrix<T, R, C>& Matrix<T, R, C>::operator+= (const Matrix<T, R, C>& rhs) {
-        for (int i=0; i<R*C; i++) {
-            this->data[i] += rhs.data[i];
+        for (int i=0; i<R; i++) {
+            for (int j=0; j<C; j++) {
+                element[i][j] += rhs.element[i][j];
+            }
         }
         
         return *this;
@@ -637,10 +714,12 @@ namespace XE {
     
     template<typename T, int R, int C>
     Matrix<T, R, C>& Matrix<T, R, C>::operator-= (const Matrix<T, R, C>& rhs) {
-        for (int i=0; i<R*C; i++) {
-            this->data[i] -= rhs.data[i];
+        for (int i=0; i<R; i++) {
+            for (int j=0; j<C; j++) {
+                element[i][j] -= rhs.element[i][j];
+            }
         }
-        
+
         return *this;
     }
     
@@ -656,7 +735,7 @@ namespace XE {
         Vector<T, R> result;
 
         for (int row=0; row<R; row++) {
-            result[row] = dot(this->getRow(row), v);
+            result[row] = dot(getRow(row), v);
         }
 
         return result;

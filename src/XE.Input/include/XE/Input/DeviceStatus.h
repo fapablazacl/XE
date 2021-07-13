@@ -27,6 +27,14 @@ namespace XE {
 
         void setState(const KeyCode code, const BinaryState state);
 
+        bool isPressed(const KeyCode code) const {
+            return getState(code) == BinaryState::Press;
+        }
+
+        bool isReleased(const KeyCode code) const {
+            return getState(code) == BinaryState::Release;
+        }
+
     private:
         BinaryState m_keys[static_cast<int>(KeyCode::Max)];
     };
