@@ -88,7 +88,7 @@ namespace XE {
     
     void GraphicsDeviceGL::draw(const Subset *subset, const SubsetEnvelope *envelopes, const int envelopeCount) {
         auto subsetGL = static_cast<const SubsetGL *>(subset);
-        auto descriptor = subsetGL->GetDescriptor();
+        
         ::glBindVertexArray(subsetGL->GetID());
 
         auto indexBuffer = subsetGL->getIndexBuffer();
@@ -96,21 +96,21 @@ namespace XE {
         if (!indexBuffer) {
             for (int i=0; i<envelopeCount; i++) {
                 const SubsetEnvelope &env = envelopes[i];
-                const GLenum primitiveGL = convertToGL(env.Primitive);
+                const GLenum primitiveGL = convertToGL(env.primitive);
 
-                ::glDrawArrays(primitiveGL, env.VertexStart, env.VertexCount);
+                ::glDrawArrays(primitiveGL, env.vertexStart, env.vertexCount);
             }
         } else {
-            const GLenum indexTypeGL = convertToGL(descriptor.indexType);
+            const GLenum indexTypeGL = GL_UNSIGNED_INT;
 
             for (int i=0; i<envelopeCount; i++) {
                 const SubsetEnvelope &env = envelopes[i];
-                const GLenum primitiveGL = convertToGL(env.Primitive);
+                const GLenum primitiveGL = convertToGL(env.primitive);
                 
-                if (env.VertexStart == 0) {
-                    ::glDrawElements(primitiveGL, env.VertexCount, indexTypeGL, nullptr);
+                if (env.vertexStart == 0) {
+                    ::glDrawElements(primitiveGL, env.vertexCount, indexTypeGL, nullptr);
                 } else {
-                    ::glDrawElementsBaseVertex(primitiveGL, env.VertexCount, indexTypeGL, nullptr, env.VertexStart);
+                    ::glDrawElementsBaseVertex(primitiveGL, env.vertexCount, indexTypeGL, nullptr, env.vertexStart);
                 }
             }
         }
@@ -118,7 +118,7 @@ namespace XE {
         ::glBindVertexArray(0);
         XE_GRAPHICS_GL_CHECK_ERROR();
     }
-        
+
     void GraphicsDeviceGL::beginFrame(const ClearFlags flags, const Vector4f &color, const float depth, const int stencil) {
         
         GLenum clearFlagsGL = 0;

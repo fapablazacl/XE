@@ -34,13 +34,13 @@ namespace XE {
      */
     struct SubsetEnvelope {
         //! Geometric Primitive Shape basis for rendering
-        PrimitiveType Primitive = PrimitiveType::PointList;
+        PrimitiveType primitive = PrimitiveType::PointList;
 
         //! From wich vertex we will render
-        int VertexStart = 0;
+        int vertexStart = 0;
         
         //! How many vertices we must use for render
-        int VertexCount = 0;
+        int vertexCount = 0;
     };
     
     /**

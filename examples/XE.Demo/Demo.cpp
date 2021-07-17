@@ -107,6 +107,22 @@ Mesh makeIndexedCubeMesh(const float width, const float height, const float dept
     return mesh;
 }
 
+
+Mesh makeAxisMesh(const float width, const float height, const float depth) {
+    Mesh mesh;
+    
+    mesh.vertices = {
+        {{0.0f, 0.0f, 0.0f}, {0.5f, 0.5f, 0.5f, 1.0f}},
+        {{width, 0.0f, 0.0f}, {1.0f, 0.5f, 0.5f, 1.0f}},
+        {{0.0f, height, 0.0f}, {0.5f, 1.0f, 0.5f, 1.0f}},
+        {{0.0f, 0.0f, depth}, {0.5f, 0.0f, 1.0f, 1.0f}}
+    };
+    mesh.primitive = XE::PrimitiveType::LineList;
+    mesh.indices = { 0, 1, 0, 2, 0, 3 };
+    
+    return mesh;
+}
+
 Mesh makeCubeMesh(const float width, const float height, const float depth) {
     Mesh mesh;
 
@@ -177,7 +193,7 @@ private:
     }
 
     void setupGeometry() {
-        const Mesh mesh = makeCubeMesh(1.0f, 1.0f, 1.0f);
+        const Mesh mesh = makeCubeMesh(0.5f, 0.5f, 0.5f);
 
         mCubeSubset = createCubeSubset2(mesh);
         mCubeSubsetEnvelope = {
@@ -185,10 +201,61 @@ private:
             0, 
             static_cast<int>(mesh.vertices.size())
         };
-
+        
+        const Mesh axisMesh = makeAxisMesh(1.0f, 1.0f, 1.0f);
+        
+        mAxisSubset = createSubset(axisMesh);
+        mAxisSubsetEnvelope = {
+            axisMesh.primitive,
+            0,
+            static_cast<int>(axisMesh.indices.size())
+        };
+        
         mMaterial.renderState.depthTest = true;
         mMaterial.renderState.cullBackFace = true;
     }
+    
+    XE::Subset* createSubset(const Mesh &mesh) {
+        const XE::BufferDescriptor bufferDesc {
+            XE::BufferType::Vertex,
+            XE::BufferUsage::Read,
+            XE::BufferAccess::Static,
+            static_cast<int>(sizeof(Vertex) * mesh.vertices.size()),
+            reinterpret_cast<const std::byte*>(mesh.vertices.data())
+        };
+
+        const XE::Buffer *vertexBuffer = mGraphicsDevice->createBuffer(bufferDesc);
+        
+        XE::Buffer *indexBuffer = nullptr;
+        
+        if (mesh.indices.size() > 0) {
+            const XE::BufferDescriptor indexBufferDesc {
+                XE::BufferType::Index,
+                XE::BufferUsage::Read,
+                XE::BufferAccess::Static,
+                static_cast<int>(sizeof(uint32_t) * mesh.indices.size()),
+                reinterpret_cast<const std::byte*>(mesh.indices.data())
+            };
+            
+            indexBuffer = mGraphicsDevice->createBuffer(indexBufferDesc);
+        }
+        
+        const std::vector<XE::SubsetVertexAttrib> attribs {
+            {0, XE::DataType::Float32, 3, false, sizeof(Vertex), 0, 0},
+            {1, XE::DataType::Float32, 4, false, sizeof(Vertex), 0, sizeof(Vertex::coord)}
+        };
+
+        const XE::SubsetDescriptor2 subsetDesc {
+            &vertexBuffer, 1,
+            attribs.data(), attribs.size(),
+            indexBuffer
+        };
+
+        XE::Subset *subset = mGraphicsDevice->createSubset(subsetDesc);
+
+        return subset;
+    }
+    
 
     XE::Subset* createCubeSubset2(const Mesh &mesh) {
         const XE::BufferDescriptor bufferDesc {
@@ -249,19 +316,31 @@ private:
         const auto model = XE::M4::translate({0.0f, 0.0f, 5.0f}) * XE::M4::rotateX(mAngle) * XE::M4::rotateY(mAngle) * XE::M4::rotateZ(mAngle);
         // const auto projViewModel = model/* * view * proj*/;
 
-        const auto m1 = XE::M4::rotateY(mAngle);
-        const auto m2 = XE::M4::translate({0.25f, 0.0f, 0.0f});
-        const auto m3 = XE::M4::translate({-0.25f, 0.0f, 0.0f});
-
-        const auto projViewModel = m3 * m1 * m2;
+        const auto rotY1 = XE::M4::rotateY(mAngle);
+        const auto rotX1 = XE::M4::rotateX(mAngle);
+        
+        const auto rotY2 = XE::M4::rotate(mAngle, {1.0f, 0.0f, 0.0f});
+        const auto rotX2 = XE::M4::rotate(mAngle, {0.0f, 1.0f, 0.0f});
         
         mGraphicsDevice->beginFrame(XE::ClearFlags::All, {0.2f, 0.2f, 0.8f, 1.0f}, 1.0f, 0);
 
         mGraphicsDevice->setProgram(mSimpleProgram);
-        mGraphicsDevice->applyUniform(&uProjModelView, 1, reinterpret_cast<const std::byte*>(projViewModel.data()));
+        
+        // const auto projViewModel1 = rotY1 * rotX1 * XE::M4::translate({-0.25f, 0.0f, 0.0f});
+        // mGraphicsDevice->applyUniform(&uProjModelView, 1, reinterpret_cast<const std::byte*>(projViewModel1.data()));
+        // mGraphicsDevice->setMaterial(&mMaterial);
+        // mGraphicsDevice->draw(mCubeSubset, &mCubeSubsetEnvelope, 1);
+        //
+        // const auto projViewModel2 = rotY2 * rotX2 * XE::M4::translate({0.25f, 0.0f, 0.0f});
+        // mGraphicsDevice->applyUniform(&uProjModelView, 1, reinterpret_cast<const std::byte*>(projViewModel2.data()));
+        // mGraphicsDevice->setMaterial(&mMaterial);
+        // mGraphicsDevice->draw(mCubeSubset, &mCubeSubsetEnvelope, 1);
+        
+        const auto projViewModel3 = XE::M4::identity();
+        mGraphicsDevice->applyUniform(&uProjModelView, 1, reinterpret_cast<const std::byte*>(projViewModel3.data()));
         mGraphicsDevice->setMaterial(&mMaterial);
-        mGraphicsDevice->draw(mCubeSubset, &mCubeSubsetEnvelope, 1);
-
+        mGraphicsDevice->draw(mAxisSubset, &mAxisSubsetEnvelope, 1);
+        
         mGraphicsDevice->endFrame();
     }
 
@@ -274,8 +353,13 @@ private:
     float mAngle = 0.0f;
 
     XE::Program *mSimpleProgram = nullptr;
+    
+    XE::Subset *mAxisSubset = nullptr;
+    XE::SubsetEnvelope mAxisSubsetEnvelope;
+    
     XE::Subset *mCubeSubset = nullptr;
     XE::SubsetEnvelope mCubeSubsetEnvelope;
+    
     XE::Material mMaterial;
 };
 

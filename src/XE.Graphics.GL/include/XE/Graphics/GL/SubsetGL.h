@@ -44,6 +44,7 @@ namespace XE {
         std::vector<const BufferGL*> m_buffers;
         const BufferGL* m_indexBuffer = nullptr;
         SubsetDescriptor m_descriptor;
+        SubsetDescriptor2 mDesc;
     };
 }
 

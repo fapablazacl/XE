@@ -40,7 +40,7 @@ namespace Sandbox {
 
     struct SceneNode {
         std::string name;
-        XE::Matrix4f localMatrix = XE::Matrix4f::createIdentity();
+        XE::Matrix4f localMatrix = XE::Matrix4f::identity();
         std::vector<SceneNode> children;
 
         std::string meshName;
