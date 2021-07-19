@@ -1,6 +1,7 @@
 
 #include <XE/Graphics/GL/Conversion.h>
 
+#include <cassert>
 #include <XE/DataType.h>
 #include <XE/Graphics/PixelFormat.h>
 #include <XE/Graphics/BufferDescriptor.h>

@@ -4,6 +4,7 @@
 
 #include <cstdint>
 #include <cstring>
+#include <array>
 #include "Vector.h"
 
 namespace XE {
@@ -185,7 +186,7 @@ namespace XE {
         }
 
         /**
-         * @brief Build a matrix initialized with zeros.
+         * @brief Build a matrix initialized with zeroes.
          */
         static Matrix<T, R, C> zero() {
             Matrix<T, R, C> result;
@@ -378,7 +379,7 @@ namespace XE {
             if constexpr (C==4 && R==4) {
                 const auto diff = pmax - pmin;
                 
-                auto result = Matrix<T, 4, 4>::createIdentity();
+                auto result = Matrix<T, 4, 4>::identity();
                 
                 result(0, 0) = static_cast<T>(2) / diff.X;
                 result(1, 1) = static_cast<T>(2) / diff.Y;

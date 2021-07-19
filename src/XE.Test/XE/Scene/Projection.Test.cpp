@@ -5,7 +5,7 @@
 
 TEST_CASE("XE::Graphics::project function", "[Projection]") {
     SECTION("When considering a default transformation pipeline, with a viewport of (0, 0) - (640, 480)") {
-        const XE::Matrix4f projViewModel = XE::Matrix4f::createIdentity();
+        const XE::Matrix4f projViewModel = XE::Matrix4f::identity();
         const XE::Viewport viewport = { {0, 0}, {640, 480} };
 
         SECTION("Points placed into the XY plane at Z = 0 should map directly inside the Viewport") {
@@ -37,8 +37,8 @@ TEST_CASE("XE::Graphics::project function", "[Projection]") {
 
     SECTION("When consideraring a perspective transformation pipeline, with a viewport of (0, 0) - (640, 480)") {
         const XE::Matrix4f projViewModel = 
-            XE::Matrix4f::createPerspective(XE::radians(90.0f), 640.0f/480.0f, 0.1f, 100.0f) * 
-            XE::Matrix4f::createLookAt({0.0f, 0.0f, -1.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f});
+            XE::Matrix4f::perspective(XE::radians(90.0f), 640.0f/480.0f, 0.1f, 100.0f) * 
+            XE::Matrix4f::lookAt({0.0f, 0.0f, -1.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f});
             
         const XE::Viewport viewport = { {0, 0}, {640, 480} };
         REQUIRE(XE::project({0.0f, 0.0f, 0.0f, 1.0f}, projViewModel, viewport).X == 320.0f);
@@ -49,7 +49,7 @@ TEST_CASE("XE::Graphics::project function", "[Projection]") {
 
 TEST_CASE("XE::Graphics::unproject function") {
     SECTION("When considering a default transformation pipeline, with a viewport of (0, 0) - (640, 480)") {
-        const XE::Matrix4f projViewModel = XE::Matrix4f::createIdentity();
+        const XE::Matrix4f projViewModel = XE::Matrix4f::identity();
         const XE::Viewport viewport = { {0, 0}, {640, 480} };
 
         SECTION("Points placed inside the screen are in the [-1, 1]^2 domain") {
