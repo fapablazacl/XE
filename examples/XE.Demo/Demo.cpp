@@ -11,12 +11,90 @@
 #include <XE/Graphics/GL/GLFW/WindowGLFW.h>
 
 #include <map>
+#include <functional>
 
 #include "Util.h"
 #include "Common.h"
 
 const int s_screenWidth = 1200;
 const int s_screenHeight = 800;
+
+class Renderable {
+public:
+    virtual ~Renderable() = 0 {}
+
+    virtual void render() = 0;
+};
+
+class SceneNode;
+
+using SceneNodeVisitor = std::function<void (SceneNode *)>;
+
+class SceneNode {
+public:
+    SceneNode(SceneNode *parent = nullptr) : mParent(parent) {}
+
+    ~SceneNode() {}
+
+    SceneNode* getParent() const {
+        return mParent;
+    }
+
+    XE::M4 getTransformation() const {
+        return mTransformation;
+    }
+
+    void setTransformation(const XE::M4 &transformation) {
+        mTransformation = transformation;
+    }
+
+    void setRenderable(Renderable *renderable) {
+        mRenderable = renderable;
+    }
+
+    Renderable* getRenderable() const {
+        return mRenderable;
+    }
+
+    SceneNode* createChild() {
+        auto child = new SceneNode{this};
+
+        mChildren.emplace_back(child);
+
+        return child;
+    }
+
+    void visit(SceneNodeVisitor visitor) {
+        visitor(this);
+
+        for (auto &child : mChildren) {
+            child->visit(visitor);
+        }
+    }
+
+private:
+    SceneNode *mParent = nullptr;
+    Renderable* mRenderable = nullptr;
+    XE::M4 mTransformation = XE::M4::identity();
+    std::vector<std::unique_ptr<SceneNode>> mChildren;
+};
+
+
+class DemoRenderable : public Renderable {
+public:
+    DemoRenderable(XE::GraphicsDevice *graphicsDevice, XE::Subset *subset, const XE::SubsetEnvelope &subsetEnvelope) 
+        : mGraphicsDevice(graphicsDevice), mSubset(subset), mSubsetEnvelope(subsetEnvelope) {}
+
+    void render() override {
+        mGraphicsDevice->draw(mSubset, &mSubsetEnvelope, 1);
+    }
+
+private:
+    XE::GraphicsDevice *mGraphicsDevice = nullptr;
+    XE::Subset *mSubset = nullptr;
+    XE::SubsetEnvelope mSubsetEnvelope;
+};
+
 
 namespace demo {
     class DemoApp {
@@ -155,10 +233,10 @@ namespace demo {
     
         XE::Subset *mAxisSubset = nullptr;
         XE::SubsetEnvelope mAxisSubsetEnvelope;
-    
+        
         XE::Subset *mCubeSubset = nullptr;
         XE::SubsetEnvelope mCubeSubsetEnvelope;
-    
+        
         XE::Material mMaterial;
     };
 }
