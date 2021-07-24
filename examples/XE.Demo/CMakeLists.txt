@@ -1,6 +1,6 @@
 
 set (target "XE.Demo")
-set (sources "Demo.cpp")
+set (sources "Demo.cpp" "Platform.cpp" "Platform.h" "Util.cpp" "Util.h" "Common.cpp" "Common.h")
 
 add_executable(${target} ${sources})
 

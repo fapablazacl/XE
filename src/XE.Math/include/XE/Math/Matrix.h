@@ -315,8 +315,6 @@ namespace XE {
                 
                 auto result = Matrix<T, C, R>::identity();
 
-                
-                
                 for (int i=0; i<3; ++i) {
                     for (int j=0; j<3; ++j) {
                         result(i, j) = tempResult(i, j);

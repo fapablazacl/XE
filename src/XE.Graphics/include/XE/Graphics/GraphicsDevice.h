@@ -73,6 +73,8 @@ namespace XE {
             const std::map<std::string, int> &bufferMapping,
             Buffer* indexBuffer) = 0;
         
+        virtual Subset* createSubset(const SubsetDescriptor2 &desc) = 0;
+
         virtual Buffer* createBuffer(const BufferDescriptor &bufferDescriptor) = 0;
         
         virtual Texture2D* createTexture2D(const PixelFormat format, const Vector2i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void *sourceData) = 0;
