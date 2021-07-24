@@ -52,7 +52,7 @@ namespace demo {
         }
 
         void setupGeometry() {
-            const Mesh mesh = makeCubeMesh(0.5f, 0.5f, 0.5f);
+            const Mesh mesh = makeCubeMesh(0.25f, 0.25f, 0.25f);
 
             mCubeSubset = createCubeSubset2(mGraphicsDevice.get(), mesh);
             mCubeSubsetEnvelope = {
@@ -109,27 +109,36 @@ namespace demo {
             const auto rotY1 = XE::M4::rotateY(mAngle);
             const auto rotX1 = XE::M4::rotateX(mAngle);
         
-            const auto rotY2 = XE::M4::rotate(mAngle, {1.0f, 0.0f, 0.0f});
-            const auto rotX2 = XE::M4::rotate(mAngle, {0.0f, 1.0f, 0.0f});
+            const auto rotY2 = XE::M4::rotate(mAngle, {0.0f, 1.0f, 0.0f});
+            const auto rotX2 = XE::M4::rotate(mAngle, {1.0f, 0.0f, 0.0f});
         
             mGraphicsDevice->beginFrame(XE::ClearFlags::All, {0.2f, 0.2f, 0.8f, 1.0f}, 1.0f, 0);
 
             mGraphicsDevice->setProgram(mSimpleProgram);
+            
+            {
+                // left cube
+                const auto projViewModel1 = rotY1 * rotX1 * XE::M4::translate({-0.25f, 0.0f, 0.0f});
+                mGraphicsDevice->applyUniform(&uProjModelView, 1, reinterpret_cast<const std::byte*>(projViewModel1.data()));
+                mGraphicsDevice->setMaterial(&mMaterial);
+                mGraphicsDevice->draw(mCubeSubset, &mCubeSubsetEnvelope, 1);
+            }
+            
+            {
+                // right cube
+                const auto projViewModel2 = rotY2 * rotX2 * XE::M4::translate({0.25f, 0.0f, 0.0f});
+                mGraphicsDevice->applyUniform(&uProjModelView, 1, reinterpret_cast<const std::byte*>(projViewModel2.data()));
+                mGraphicsDevice->setMaterial(&mMaterial);
+                mGraphicsDevice->draw(mCubeSubset, &mCubeSubsetEnvelope, 1);
+            }
         
-            // const auto projViewModel1 = rotY1 * rotX1 * XE::M4::translate({-0.25f, 0.0f, 0.0f});
-            // mGraphicsDevice->applyUniform(&uProjModelView, 1, reinterpret_cast<const std::byte*>(projViewModel1.data()));
-            // mGraphicsDevice->setMaterial(&mMaterial);
-            // mGraphicsDevice->draw(mCubeSubset, &mCubeSubsetEnvelope, 1);
-            //
-            // const auto projViewModel2 = rotY2 * rotX2 * XE::M4::translate({0.25f, 0.0f, 0.0f});
-            // mGraphicsDevice->applyUniform(&uProjModelView, 1, reinterpret_cast<const std::byte*>(projViewModel2.data()));
-            // mGraphicsDevice->setMaterial(&mMaterial);
-            // mGraphicsDevice->draw(mCubeSubset, &mCubeSubsetEnvelope, 1);
-        
-            const auto projViewModel3 = XE::M4::identity();
-            mGraphicsDevice->applyUniform(&uProjModelView, 1, reinterpret_cast<const std::byte*>(projViewModel3.data()));
-            mGraphicsDevice->setMaterial(&mMaterial);
-            mGraphicsDevice->draw(mAxisSubset, &mAxisSubsetEnvelope, 1);
+            {
+                // axis
+                const auto projViewModel3 = XE::M4::identity();
+                mGraphicsDevice->applyUniform(&uProjModelView, 1, reinterpret_cast<const std::byte*>(projViewModel3.data()));
+                mGraphicsDevice->setMaterial(&mMaterial);
+                mGraphicsDevice->draw(mAxisSubset, &mAxisSubsetEnvelope, 1);
+            }
         
             mGraphicsDevice->endFrame();
         }

@@ -321,7 +321,7 @@ namespace XE {
                     }
                 }
                 
-                return result;
+                return XE::transpose(result);
             }
         }
 
