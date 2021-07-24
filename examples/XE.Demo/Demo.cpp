@@ -24,6 +24,10 @@ public:
     virtual ~Renderable() = 0 {}
 
     virtual void render() = 0;
+
+    virtual void render(XE::GraphicsDevice *graphicsDevice) {
+
+    }
 };
 
 class SceneNode;
@@ -71,6 +75,18 @@ public:
             child->visit(visitor);
         }
     }
+    
+    void visit(const XE::M4 &parentTransformation) {
+        const XE::M4 current = parentTransformation * mTransformation;
+
+        if (mRenderable) {
+            mRenderable->render();
+        }
+
+        for (auto &child : mChildren) {
+            child->visit(current);
+        }
+    }
 
 private:
     SceneNode *mParent = nullptr;
@@ -82,6 +98,8 @@ private:
 
 class DemoRenderable : public Renderable {
 public:
+    DemoRenderable() {}
+
     DemoRenderable(XE::GraphicsDevice *graphicsDevice, XE::Subset *subset, const XE::SubsetEnvelope &subsetEnvelope) 
         : mGraphicsDevice(graphicsDevice), mSubset(subset), mSubsetEnvelope(subsetEnvelope) {}
 
@@ -104,6 +122,7 @@ namespace demo {
         int run(int argc, char **argv) {
             initialize();
             setupGeometry();
+            setupScene();
 
             mainLoop();
 
@@ -152,10 +171,25 @@ namespace demo {
             mMaterial.renderState.cullBackFace = true;
         }
 
+        void setupScene() {
+            mAxisRenderable = {mGraphicsDevice.get(),  mAxisSubset, mAxisSubsetEnvelope};
+            mCubeRenderable = {mGraphicsDevice.get(),  mCubeSubset, mCubeSubsetEnvelope};
+
+            mAxisNode = mSceneNode.createChild();
+            mAxisNode->setRenderable(&mAxisRenderable);
+
+            mLeftCubeNode = mSceneNode.createChild();
+            mLeftCubeNode->setRenderable(&mCubeRenderable);
+
+            mRightCubeNode = mSceneNode.createChild();
+            mRightCubeNode->setRenderable(&mCubeRenderable);
+        }
+
         void mainLoop() {
             while (mDone) {
                 update();
-                renderFrame();
+                // renderFrame();
+                renderSceneNode();
             }
         }
 
@@ -168,6 +202,13 @@ namespace demo {
             }
 
             mAngle += XE::radians(0.25f);
+
+            const auto rotY1 = XE::M4::rotateY(mAngle);
+            const auto rotX1 = XE::M4::rotateX(mAngle);
+            const auto rotY2 = XE::M4::rotate(mAngle, {0.0f, 1.0f, 0.0f});
+            const auto rotX2 = XE::M4::rotate(mAngle, {1.0f, 0.0f, 0.0f});
+            mLeftCubeNode->setTransformation(rotY2 * rotX2 * XE::M4::translate({0.25f, 0.0f, 0.0f}));
+            mRightCubeNode->setTransformation(rotY2 * rotX2 * XE::M4::translate({0.25f, 0.0f, 0.0f}));
         }
 
         void renderFrame() {
@@ -221,6 +262,27 @@ namespace demo {
             mGraphicsDevice->endFrame();
         }
 
+        void renderSceneNode() {
+            const XE::UniformMatrix uProjModelView = {"uProjViewModel", XE::DataType::Float32, 4, 4, 1};
+
+            mGraphicsDevice->beginFrame(XE::ClearFlags::All, {0.2f, 0.2f, 0.8f, 1.0f}, 1.0f, 0);
+
+            mGraphicsDevice->setProgram(mSimpleProgram);
+
+            XE::M4 projViewModel = XE::M4::identity();
+
+            mSceneNode.visit([this, &projViewModel, uProjModelView](SceneNode *node) {
+                projViewModel *= node->getTransformation();
+                this->mGraphicsDevice->applyUniform(&uProjModelView, 1, reinterpret_cast<const std::byte*>(projViewModel.data()));
+
+                if (node->getRenderable()) {
+                    node->getRenderable()->render();
+                }
+            });
+
+            mGraphicsDevice->endFrame();
+        }
+
     private:
         std::unique_ptr<XE::WindowGLFW> mWindow;
         std::unique_ptr<XE::GraphicsDeviceGL> mGraphicsDevice;
@@ -236,7 +298,16 @@ namespace demo {
         
         XE::Subset *mCubeSubset = nullptr;
         XE::SubsetEnvelope mCubeSubsetEnvelope;
-        
+
+        SceneNode mSceneNode;
+
+        SceneNode *mAxisNode = nullptr;
+        SceneNode *mLeftCubeNode = nullptr;
+        SceneNode *mRightCubeNode = nullptr;
+
+        DemoRenderable mAxisRenderable;
+        DemoRenderable mCubeRenderable;
+
         XE::Material mMaterial;
     };
 }
