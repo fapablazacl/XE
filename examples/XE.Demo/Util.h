@@ -17,4 +17,6 @@ namespace demo {
     XE::Subset* createCubeSubset2(XE::GraphicsDevice *graphicsDevice, const Mesh &mesh);
 	
 	XE::Subset* createSubset(XE::GraphicsDevice *graphicsDevice, const Mesh &mesh);
+
+	Mesh makeGridMesh(const float tileSize, const int tilesInX, const int tilesInZ);
 }

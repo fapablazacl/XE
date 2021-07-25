@@ -15,6 +15,7 @@ namespace demo {
 		return desc;
 	}
 
+
 	Mesh makeIndexedCubeMesh(const float width, const float height, const float depth) {
 		Mesh mesh;
 
@@ -71,6 +72,7 @@ namespace demo {
 		return mesh;
 	}
 
+
 	Mesh makeCubeMesh(const float width, const float height, const float depth) {
 		Mesh mesh;
 
@@ -111,12 +113,12 @@ namespace demo {
 		return mesh;
 	}
 
+
 	std::string loadTextFile(const std::string &filePath) {
 		std::fstream fs;
 		fs.open(filePath.c_str());
 
 		std::string content;
-
 		std::string line;
 
 		while(std::getline(fs, line)) {
@@ -125,6 +127,7 @@ namespace demo {
 
 		return content;
 	}
+
 
 	XE::Subset* createSubset(XE::GraphicsDevice *graphicsDevice, const Mesh &mesh) {
         const XE::BufferDescriptor bufferDesc {
@@ -194,4 +197,48 @@ namespace demo {
 
         return subset;
     }
+
+
+	Mesh makeGridMesh(const float tileSize, const int tilesInX, const int tilesInZ) {
+		const float half = tileSize * 0.5f;
+
+		const XE::Vector4f white = {0.8f, 0.8f, 0.8f, 1.0f};
+		const XE::Vector4f black = {0.2f, 0.2f, 0.2f, 1.0f};
+
+		const XE::Vector3f p1 = {-half, 0.0f, -half};
+		const XE::Vector3f p2 = {half, 0.0f, -half};
+		const XE::Vector3f p3 = {-half, 0.0f, half};
+		const XE::Vector3f p4 = {half, 0.0f, half};
+
+		Mesh mesh;
+
+		bool colorSide = false;
+
+		for (int i=0; i<tilesInX; i++) {
+			for (int k=0; k<tilesInZ; k++) {
+				const XE::Vector3f centroid = {
+					i * tileSize - half * tilesInX, 
+					0.0f, 
+					k * tileSize - half * tilesInZ
+				};
+
+				const auto color = colorSide ? white : black;
+
+				mesh.vertices.push_back({p1 + centroid, color});
+				mesh.vertices.push_back({p2 + centroid, color});
+				mesh.vertices.push_back({p3 + centroid, color});
+
+				mesh.vertices.push_back({p2 + centroid, color});
+				mesh.vertices.push_back({p4 + centroid, color});
+				mesh.vertices.push_back({p3 + centroid, color});
+
+				colorSide = !colorSide;
+			}
+			colorSide = !colorSide;
+		}
+
+		mesh.primitive = XE::PrimitiveType::TriangleList;
+
+		return mesh;
+	}
 }

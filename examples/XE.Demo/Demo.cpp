@@ -3,6 +3,7 @@
  */
 
 #include <XE/XE.h>
+#include <XE/Timer.h>
 #include <XE/IO.h>
 #include <XE/Input.h>
 #include <XE/Math.h>
@@ -23,11 +24,7 @@ class Renderable {
 public:
     virtual ~Renderable() = 0 {}
 
-    virtual void render() = 0;
-
-    virtual void render(XE::GraphicsDevice *graphicsDevice) {
-
-    }
+    virtual void render(XE::GraphicsDevice *graphicsDevice) = 0;
 };
 
 class SceneNode;
@@ -76,15 +73,20 @@ public:
         }
     }
     
-    void visit(const XE::M4 &parentTransformation) {
-        const XE::M4 current = parentTransformation * mTransformation;
+    void visit(XE::GraphicsDevice *graphicsDevice, const XE::M4 &parentTransformation) {
+        assert(graphicsDevice);
+
+        const XE::M4 current = mTransformation * parentTransformation;
 
         if (mRenderable) {
-            mRenderable->render();
+            const XE::UniformMatrix uProjModelView = {"uProjViewModel", XE::DataType::Float32, 4, 4, 1};
+            graphicsDevice->applyUniform(&uProjModelView, 1, reinterpret_cast<const std::byte*>(current.data()));
+
+            mRenderable->render(graphicsDevice);
         }
 
         for (auto &child : mChildren) {
-            child->visit(current);
+            child->visit(graphicsDevice, current);
         }
     }
 
@@ -95,20 +97,52 @@ private:
     std::vector<std::unique_ptr<SceneNode>> mChildren;
 };
 
+struct Camera {
+    XE::Vector3f position = {0.0f, 0.5f, 2.5f};
+    XE::Vector3f lookAt = {0.0f, 0.0f, 0.0f};
+    XE::Vector3f up = {0.0f, 1.0f, 0.0f};
+
+    float fov = XE::radians(60.0f);
+    float aspectRatio = static_cast<float>(s_screenWidth) / static_cast<float>(s_screenHeight);
+    float znear = 0.1f;
+    float zfar = 1000.0f;
+        
+    void update(const float seconds, const bool moveForward, const bool moveBackward, const bool turnLeft, const bool turnRight) {
+        XE::Vector3f forward = {0.0f, 0.0f, 0.0f};
+
+        if (moveForward) {
+            forward = {0.0f, 0.0f, -1.0f};
+        } else if (moveBackward) {
+            forward = {0.0f, 0.0f, 1.0f};
+        }
+
+        XE::Vector3f side = {0.0f, 0.0f, 0.0f};
+        if (turnLeft) {
+            side = {-1.0f, 0.0f, 0.0f};
+        } else if (turnRight) {
+            side = {1.0f, 0.0f, 0.0f};
+        }
+
+        const XE::Vector3f displacement = seconds * (forward + side);
+
+        position += displacement;
+        lookAt += displacement;
+    }
+};
+
 
 class DemoRenderable : public Renderable {
 public:
     DemoRenderable() {}
 
-    DemoRenderable(XE::GraphicsDevice *graphicsDevice, XE::Subset *subset, const XE::SubsetEnvelope &subsetEnvelope) 
-        : mGraphicsDevice(graphicsDevice), mSubset(subset), mSubsetEnvelope(subsetEnvelope) {}
+    DemoRenderable(XE::Subset *subset, const XE::SubsetEnvelope &subsetEnvelope) 
+        : mSubset(subset), mSubsetEnvelope(subsetEnvelope) {}
 
-    void render() override {
-        mGraphicsDevice->draw(mSubset, &mSubsetEnvelope, 1);
+    void render(XE::GraphicsDevice *graphicsDevice) override {
+        graphicsDevice->draw(mSubset, &mSubsetEnvelope, 1);
     }
 
 private:
-    XE::GraphicsDevice *mGraphicsDevice = nullptr;
     XE::Subset *mSubset = nullptr;
     XE::SubsetEnvelope mSubsetEnvelope;
 };
@@ -167,13 +201,25 @@ namespace demo {
                 static_cast<int>(axisMesh.indices.size())
             };
         
+            const Mesh floorMesh = makeGridMesh(1.0f, 10, 10);
+
+            mFloorSubset = createSubset(mGraphicsDevice.get(), floorMesh);
+            mFloorSubsetEnvelope = { 
+                floorMesh.primitive, 
+                0, 
+                static_cast<int>(floorMesh.vertices.size())
+            };
+
             mMaterial.renderState.depthTest = true;
             mMaterial.renderState.cullBackFace = true;
         }
 
         void setupScene() {
-            mAxisRenderable = {mGraphicsDevice.get(),  mAxisSubset, mAxisSubsetEnvelope};
-            mCubeRenderable = {mGraphicsDevice.get(),  mCubeSubset, mCubeSubsetEnvelope};
+            mFloorRenderable = {mFloorSubset, mFloorSubsetEnvelope};
+            mSceneNode.setRenderable(&mFloorRenderable);
+
+            mAxisRenderable = {mAxisSubset, mAxisSubsetEnvelope};
+            mCubeRenderable = {mCubeSubset, mCubeSubsetEnvelope};
 
             mAxisNode = mSceneNode.createChild();
             mAxisNode->setRenderable(&mAxisRenderable);
@@ -186,14 +232,20 @@ namespace demo {
         }
 
         void mainLoop() {
+            int lastTime = XE::Timer::getTick();
+
             while (mDone) {
-                update();
-                // renderFrame();
+                const int current = XE::Timer::getTick() - lastTime;
+                const float seconds = static_cast<float>(current) / 1000.0f;
+
+                lastTime = XE::Timer::getTick();
+
+                update(seconds);
                 renderSceneNode();
             }
         }
 
-        void update() {
+        void update(const float seconds) {
             mInputManager->poll();
 
             auto keyboardStatus = mInputManager->getKeyboardStatus();
@@ -201,85 +253,40 @@ namespace demo {
                 mDone = false;
             }
 
-            mAngle += XE::radians(0.25f);
+            // update animations
+            mAngle += XE::radians(60.0f * seconds);
 
             const auto rotY1 = XE::M4::rotateY(mAngle);
             const auto rotX1 = XE::M4::rotateX(mAngle);
             const auto rotY2 = XE::M4::rotate(mAngle, {0.0f, 1.0f, 0.0f});
             const auto rotX2 = XE::M4::rotate(mAngle, {1.0f, 0.0f, 0.0f});
-            mLeftCubeNode->setTransformation(rotY2 * rotX2 * XE::M4::translate({0.25f, 0.0f, 0.0f}));
-            mRightCubeNode->setTransformation(rotY2 * rotX2 * XE::M4::translate({0.25f, 0.0f, 0.0f}));
+            mLeftCubeNode->setTransformation(rotY1 * rotX1 * XE::M4::translate({-1.25f, 0.5f, 0.0f}));
+            mRightCubeNode->setTransformation(rotY2 * rotX2 * XE::M4::translate({1.25f, 0.5f, 0.0f}));
+
+            // update camera position
+            const bool moveForward = keyboardStatus.isPressed(XE::KeyCode::KeyUp);
+            const bool moveBackward = keyboardStatus.isPressed(XE::KeyCode::KeyDown);
+
+            const bool turnLeft = keyboardStatus.isPressed(XE::KeyCode::KeyLeft);
+            const bool turnRight = keyboardStatus.isPressed(XE::KeyCode::KeyRight);
+
+            mCamera.update(seconds, moveForward, moveBackward, turnLeft, turnRight);
         }
 
-        void renderFrame() {
-            const XE::UniformMatrix uProjModelView = {
-                "uProjViewModel",
-                XE::DataType::Float32,
-                4, 4, 1
-            };
-
-            const auto aspect = static_cast<float>(s_screenWidth) / static_cast<float>(s_screenHeight);
-
-            const auto proj = XE::M4::perspective(XE::radians(60.0f), aspect, 0.01f, 100.0f);
-            const auto view = XE::M4::lookAt({0.0f, 0.0f, -5.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f});
-            const auto model = XE::M4::translate({0.0f, 0.0f, 5.0f}) * XE::M4::rotateX(mAngle) * XE::M4::rotateY(mAngle) * XE::M4::rotateZ(mAngle);
-            // const auto projViewModel = model/* * view * proj*/;
-
-            const auto rotY1 = XE::M4::rotateY(mAngle);
-            const auto rotX1 = XE::M4::rotateX(mAngle);
-        
-            const auto rotY2 = XE::M4::rotate(mAngle, {0.0f, 1.0f, 0.0f});
-            const auto rotX2 = XE::M4::rotate(mAngle, {1.0f, 0.0f, 0.0f});
-        
-            mGraphicsDevice->beginFrame(XE::ClearFlags::All, {0.2f, 0.2f, 0.8f, 1.0f}, 1.0f, 0);
-
-            mGraphicsDevice->setProgram(mSimpleProgram);
-            
-            {
-                // left cube
-                const auto projViewModel1 = rotY1 * rotX1 * XE::M4::translate({-0.25f, 0.0f, 0.0f});
-                mGraphicsDevice->applyUniform(&uProjModelView, 1, reinterpret_cast<const std::byte*>(projViewModel1.data()));
-                mGraphicsDevice->setMaterial(&mMaterial);
-                mGraphicsDevice->draw(mCubeSubset, &mCubeSubsetEnvelope, 1);
-            }
-            
-            {
-                // right cube
-                const auto projViewModel2 = rotY2 * rotX2 * XE::M4::translate({0.25f, 0.0f, 0.0f});
-                mGraphicsDevice->applyUniform(&uProjModelView, 1, reinterpret_cast<const std::byte*>(projViewModel2.data()));
-                mGraphicsDevice->setMaterial(&mMaterial);
-                mGraphicsDevice->draw(mCubeSubset, &mCubeSubsetEnvelope, 1);
-            }
-        
-            {
-                // axis
-                const auto projViewModel3 = XE::M4::identity();
-                mGraphicsDevice->applyUniform(&uProjModelView, 1, reinterpret_cast<const std::byte*>(projViewModel3.data()));
-                mGraphicsDevice->setMaterial(&mMaterial);
-                mGraphicsDevice->draw(mAxisSubset, &mAxisSubsetEnvelope, 1);
-            }
-        
-            mGraphicsDevice->endFrame();
-        }
 
         void renderSceneNode() {
-            const XE::UniformMatrix uProjModelView = {"uProjViewModel", XE::DataType::Float32, 4, 4, 1};
+            const auto aspect = static_cast<float>(s_screenWidth) / static_cast<float>(s_screenHeight);
 
-            mGraphicsDevice->beginFrame(XE::ClearFlags::All, {0.2f, 0.2f, 0.8f, 1.0f}, 1.0f, 0);
+            const auto proj = XE::M4::perspective(mCamera.fov, mCamera.aspectRatio, mCamera.znear, mCamera.zfar);
+            const auto view = XE::M4::lookAt(mCamera.position, mCamera.lookAt, mCamera.up);
+            const auto viewProj = view * proj;
+            
+            mGraphicsDevice->beginFrame(XE::ClearFlags::All, {0.0f, 0.0f, 0.0f, 1.0f}, 1.0f, 0);
 
             mGraphicsDevice->setProgram(mSimpleProgram);
-
-            XE::M4 projViewModel = XE::M4::identity();
-
-            mSceneNode.visit([this, &projViewModel, uProjModelView](SceneNode *node) {
-                projViewModel *= node->getTransformation();
-                this->mGraphicsDevice->applyUniform(&uProjModelView, 1, reinterpret_cast<const std::byte*>(projViewModel.data()));
-
-                if (node->getRenderable()) {
-                    node->getRenderable()->render();
-                }
-            });
-
+            mGraphicsDevice->setMaterial(&mMaterial);
+            mSceneNode.visit(mGraphicsDevice.get(), viewProj);
+            
             mGraphicsDevice->endFrame();
         }
 
@@ -299,6 +306,9 @@ namespace demo {
         XE::Subset *mCubeSubset = nullptr;
         XE::SubsetEnvelope mCubeSubsetEnvelope;
 
+        XE::Subset *mFloorSubset = nullptr;
+        XE::SubsetEnvelope mFloorSubsetEnvelope;
+
         SceneNode mSceneNode;
 
         SceneNode *mAxisNode = nullptr;
@@ -307,8 +317,11 @@ namespace demo {
 
         DemoRenderable mAxisRenderable;
         DemoRenderable mCubeRenderable;
+        DemoRenderable mFloorRenderable;
 
         XE::Material mMaterial;
+
+        Camera mCamera;
     };
 }
 
