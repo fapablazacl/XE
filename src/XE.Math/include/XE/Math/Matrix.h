@@ -9,6 +9,33 @@
 
 namespace XE {
     template<typename T, int R, int C>
+    class Matrix;
+
+    template<typename T, int R, int C>
+    Matrix<T, C, R> transpose(const Matrix<T, R, C> &m) {
+        Matrix<T, C, R> result;
+
+        for (int i=0; i<R; i++) {
+            for (int j=0; j<C; j++) {
+                result.element[j][i] = m.element[i][j];
+            }
+        }
+
+        return result;
+    }
+
+    template<typename T, int R, int C>
+    Matrix<T, R, C> inverse(const Matrix<T, R, C> &m) {
+        return transpose(adjoint(m)) / abs(m);
+    }
+
+    template<typename T, int R, int C>
+    Matrix<T, R, C> inverse(const Matrix<T, R, C> &m, const T abs) {
+        return transpose(adjoint(m)) / abs;
+    }
+
+
+    template<typename T, int R, int C>
     struct MatrixBase {
         T element[C][R] = {};
     };
@@ -280,14 +307,7 @@ namespace XE {
             return result;
         }
 
-        /**
-         * @brief Build a arbitrary rotation matrix
-         */
-        static auto rotate2(const T rads, const Vector<T, 3> &axis) {
-            
-            
-        }
-        
+
         /**
          * @brief Build a arbitrary rotation matrix 
          */
@@ -438,29 +458,7 @@ namespace XE {
         return result;
     }
 
-    template<typename T, int R, int C>
-    Matrix<T, C, R> transpose(const Matrix<T, R, C> &m) {
-        Matrix<T, C, R> result;
-        
-        for (int i=0; i<R; i++) {
-            for (int j=0; j<C; j++) {
-                result.element[j][i] = m.element[i][j];
-            }
-        }
-        
-        return result;
-    }
-    
-    template<typename T, int R, int C>
-    Matrix<T, R, C> inverse(const Matrix<T, R, C> &m) {
-        return transpose(adjoint(m)) / abs(m);
-    }
-    
-    template<typename T, int R, int C>
-    Matrix<T, R, C> inverse(const Matrix<T, R, C> &m, const T abs) {
-        return transpose(adjoint(m)) / abs;
-    }
-    
+
     template<typename T, int R, int C>
     bool Matrix<T, R, C>::operator== (const Matrix<T, R, C> &other) const {
         for (int i=0; i<R; i++) {

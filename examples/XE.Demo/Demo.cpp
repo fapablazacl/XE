@@ -22,7 +22,7 @@ const int s_screenHeight = 800;
 
 class Renderable {
 public:
-    virtual ~Renderable() = 0 {}
+    virtual ~Renderable() {}
 
     virtual void render(XE::GraphicsDevice *graphicsDevice) = 0;
 };
