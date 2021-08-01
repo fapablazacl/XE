@@ -10,7 +10,7 @@ namespace demo {
 
 	Mesh makeAxisMesh(const float width, const float height, const float depth);
 
-	Mesh makeCubeMesh(const float width, const float height, const float depth);
+	Mesh makeColoredCubeMesh(const float width, const float height, const float depth);
 
 	std::string loadTextFile(const std::string &filePath);
 
@@ -19,4 +19,6 @@ namespace demo {
 	XE::Subset* createSubset(XE::GraphicsDevice *graphicsDevice, const Mesh &mesh);
 
 	Mesh makeGridMesh(const float tileSize, const int tilesInX, const int tilesInZ);
+
+	Mesh makeCubeMesh(const float width, const float height, const float depth);
 }

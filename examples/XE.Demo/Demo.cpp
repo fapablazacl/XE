@@ -104,10 +104,12 @@ struct Camera {
 
     float fov = XE::radians(60.0f);
     float aspectRatio = static_cast<float>(s_screenWidth) / static_cast<float>(s_screenHeight);
-    float znear = 0.1f;
+    float znear = 0.01f;
     float zfar = 1000.0f;
         
     void update(const float seconds, const bool moveForward, const bool moveBackward, const bool turnLeft, const bool turnRight) {
+        const float speed = 2.0f;
+
         XE::Vector3f forward = {0.0f, 0.0f, 0.0f};
 
         if (moveForward) {
@@ -123,7 +125,7 @@ struct Camera {
             side = {1.0f, 0.0f, 0.0f};
         }
 
-        const XE::Vector3f displacement = seconds * (forward + side);
+        const XE::Vector3f displacement = seconds * speed * (forward + side);
 
         position += displacement;
         lookAt += displacement;
@@ -183,12 +185,11 @@ namespace demo {
         }
 
         void setupGeometry() {
-            const Mesh mesh = makeCubeMesh(0.25f, 0.25f, 0.25f);
+            const Mesh mesh = makeColoredCubeMesh(0.25f, 0.25f, 0.25f);
 
-            mCubeSubset = createCubeSubset2(mGraphicsDevice.get(), mesh);
-            mCubeSubsetEnvelope = {
-                mesh.primitive,
-                0, 
+            mColoredCubeSubset = createCubeSubset2(mGraphicsDevice.get(), mesh);
+            mColoredCubeSubsetEnvelope = {
+                mesh.primitive, 0, 
                 static_cast<int>(mesh.vertices.size())
             };
         
@@ -196,17 +197,24 @@ namespace demo {
         
             mAxisSubset = createSubset(mGraphicsDevice.get(), axisMesh);
             mAxisSubsetEnvelope = {
-                axisMesh.primitive,
-                0,
+                axisMesh.primitive, 0,
                 static_cast<int>(axisMesh.indices.size())
             };
         
-            const Mesh floorMesh = makeGridMesh(1.0f, 10, 10);
+            const Mesh floorMesh = makeGridMesh(1.0f, 20, 20);
 
             mFloorSubset = createSubset(mGraphicsDevice.get(), floorMesh);
             mFloorSubsetEnvelope = { 
-                floorMesh.primitive, 
-                0, 
+                floorMesh.primitive, 0, 
+                static_cast<int>(floorMesh.vertices.size())
+            };
+
+            const Mesh cubeMesh = makeCubeMesh(0.5f, 0.5f, 0.5f);
+
+            mCubeSubset = createCubeSubset2(mGraphicsDevice.get(), cubeMesh);
+            
+            mCubeSubsetEnvelope = { 
+                floorMesh.primitive, 0, 
                 static_cast<int>(floorMesh.vertices.size())
             };
 
@@ -219,16 +227,21 @@ namespace demo {
             mSceneNode.setRenderable(&mFloorRenderable);
 
             mAxisRenderable = {mAxisSubset, mAxisSubsetEnvelope};
-            mCubeRenderable = {mCubeSubset, mCubeSubsetEnvelope};
+            mColoredCubeRenderable = {mColoredCubeSubset, mColoredCubeSubsetEnvelope};
 
             mAxisNode = mSceneNode.createChild();
             mAxisNode->setRenderable(&mAxisRenderable);
 
             mLeftCubeNode = mSceneNode.createChild();
-            mLeftCubeNode->setRenderable(&mCubeRenderable);
+            mLeftCubeNode->setRenderable(&mColoredCubeRenderable);
 
             mRightCubeNode = mSceneNode.createChild();
-            mRightCubeNode->setRenderable(&mCubeRenderable);
+            mRightCubeNode->setRenderable(&mColoredCubeRenderable);
+
+            mEnemyRenderable = {mCubeSubset, mCubeSubsetEnvelope};
+            mEnemyNode = mSceneNode.createChild();
+            mEnemyNode->setRenderable(&mEnemyRenderable);
+            mEnemyNode->setTransformation(XE::M4::translate({0.0f, 0.2501f, 0.0f}));
         }
 
         void mainLoop() {
@@ -303,11 +316,14 @@ namespace demo {
         XE::Subset *mAxisSubset = nullptr;
         XE::SubsetEnvelope mAxisSubsetEnvelope;
         
-        XE::Subset *mCubeSubset = nullptr;
-        XE::SubsetEnvelope mCubeSubsetEnvelope;
+        XE::Subset *mColoredCubeSubset = nullptr;
+        XE::SubsetEnvelope mColoredCubeSubsetEnvelope;
 
         XE::Subset *mFloorSubset = nullptr;
         XE::SubsetEnvelope mFloorSubsetEnvelope;
+        
+        XE::Subset *mCubeSubset = nullptr;
+        XE::SubsetEnvelope mCubeSubsetEnvelope;
 
         SceneNode mSceneNode;
 
@@ -316,12 +332,15 @@ namespace demo {
         SceneNode *mRightCubeNode = nullptr;
 
         DemoRenderable mAxisRenderable;
-        DemoRenderable mCubeRenderable;
+        DemoRenderable mColoredCubeRenderable;
         DemoRenderable mFloorRenderable;
 
         XE::Material mMaterial;
 
         Camera mCamera;
+
+        DemoRenderable mEnemyRenderable;
+        SceneNode *mEnemyNode = nullptr;
     };
 }
 

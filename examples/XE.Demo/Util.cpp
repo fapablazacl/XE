@@ -73,7 +73,7 @@ namespace demo {
 	}
 
 
-	Mesh makeCubeMesh(const float width, const float height, const float depth) {
+	Mesh makeColoredCubeMesh(const float width, const float height, const float depth) {
 		Mesh mesh;
 
 		const std::vector<Vertex> vertices = {
@@ -85,6 +85,47 @@ namespace demo {
 			{{0.5f * width, -0.5f * height, -0.5f * depth}, {1.0f, 0.0f, 0.0f, 1.0f}},
 			{{-0.5f * width,  0.5f * height, -0.5f * depth}, {0.0f, 1.0f, 0.0f, 1.0f}},
 			{{0.5f * width,  0.5f * height, -0.5f * depth}, {0.0f, 1.0f, 0.0f, 1.0f}}
+		};
+
+		mesh.primitive = XE::PrimitiveType::TriangleList;
+
+		const std::vector<int> indices = {
+			0, 1, 2, 3, 7, 1, 5, 4, 7, 6, 2, 4, 0, 1
+		};
+
+		// convertir primitiva a lista de triangulos
+		bool order = true;
+
+		for (size_t i=0; i<indices.size() - 2; i++) {
+			if (order) {
+				mesh.vertices.push_back(vertices[indices[i + 0]]);
+				mesh.vertices.push_back(vertices[indices[i + 1]]);
+				mesh.vertices.push_back(vertices[indices[i + 2]]);
+			} else {
+				mesh.vertices.push_back(vertices[indices[i + 0]]);
+				mesh.vertices.push_back(vertices[indices[i + 2]]);
+				mesh.vertices.push_back(vertices[indices[i + 1]]);
+			}
+
+			order = !order;
+		}
+
+		return mesh;
+	}
+	
+
+	Mesh makeCubeMesh(const float width, const float height, const float depth) {
+		Mesh mesh;
+
+		const std::vector<Vertex> vertices = {
+			{{-0.5f * width, -0.5f * height,  0.5f * depth}, {1.0f, 1.0f, 1.0f, 1.0f}},
+			{{0.5f * width, -0.5f * height,  0.5f * depth}, {1.0f, 1.0f, 1.0f, 1.0f}},
+			{{-0.5f * width,  0.5f * height,  0.5f * depth}, {1.0f, 1.0f, 1.0f, 1.0f}},
+			{{0.5f * width,  0.5f * height,  0.5f * depth}, {1.0f, 1.0f, 1.0f, 1.0f}},
+			{{-0.5f * width, -0.5f * height, -0.5f * depth}, {1.0f, 1.0f, 1.0f, 1.0f}},
+			{{0.5f * width, -0.5f * height, -0.5f * depth}, {1.0f, 1.0f, 1.0f, 1.0f}},
+			{{-0.5f * width,  0.5f * height, -0.5f * depth}, {1.0f, 1.0f, 1.0f, 1.0f}},
+			{{0.5f * width,  0.5f * height, -0.5f * depth}, {1.0f, 1.0f, 1.0f, 1.0f}}
 		};
 
 		mesh.primitive = XE::PrimitiveType::TriangleList;
