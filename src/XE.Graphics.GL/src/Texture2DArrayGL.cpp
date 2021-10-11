@@ -9,7 +9,7 @@ namespace XE {
         m_size = size;
         m_format = format;
 
-        const GLenum internalFormatGL = convertToGL(m_format);
+        // const GLenum internalFormatGL = convertToGL(m_format);
         const GLenum formatGL = convertToGL(format);
 
         ::glBindTexture(GL_TEXTURE_2D_ARRAY, m_id);

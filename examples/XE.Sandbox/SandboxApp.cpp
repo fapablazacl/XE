@@ -79,7 +79,7 @@ namespace Sandbox {
             // camera movement
             const auto cameraSpeed = 0.025f * seconds;
             const auto cameraDisplacement = cameraDirection * cameraSpeed * seconds;
-            const auto cameraSide = normalize(cross(cameraDirection, up));
+            // const auto cameraSide = normalize(cross(cameraDirection, up));
             
             if (moveForward) {
                 position += cameraDisplacement;

@@ -46,7 +46,7 @@ namespace Sandbox {
         
         Sandbox::indent(std::cout, indentation) << "visitNode: " << node->name << std::endl;
         
-        const XE::Matrix4f nodeMatrix = computeNodeMatrix(node);
+        // const XE::Matrix4f nodeMatrix = computeNodeMatrix(node);
         
         if (node->mesh) {
             visitMesh(indentation + 2, node->mesh);
@@ -68,9 +68,7 @@ namespace Sandbox {
         MeshPrimitive meshPrimitive;
         
         if (primitive.material) {
-            const cgltf_material &material = *primitive.material;
-            
-            int x = 0;
+            // const cgltf_material &material = *primitive.material;
         }
         
         // map primitive type
@@ -243,7 +241,6 @@ namespace Sandbox {
                 if (radians > 0.0f) {
                     const XE::Vector3f axis = q.V * inv_denom;
                     
-                    const auto r = XE::Vector4f{node->rotation};
                     nodeMatrix *= XE::Matrix4f::rotate(radians, axis);
                 }
             }

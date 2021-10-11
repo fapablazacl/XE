@@ -69,9 +69,9 @@ namespace XE {
                 std::string desc;
                 desc.resize(256);
                 
-                int error = ::glfwGetError((const char **)desc.c_str());
-                
-                std::cout << desc << std::endl;
+                const int error = ::glfwGetError((const char **)desc.c_str());
+
+                desc = "Error code " + std::to_string(error) + ": " + desc;
                 
                 throw std::runtime_error(desc);
             }
