@@ -1,7 +1,7 @@
 
 set (target "XE.Graphics.D3D11.TestApp")
-set (source_base "XE/Graphics/D3D11/TestApp")
-set (sources_xe_graphics_d3d11_testapp
+set (source_base "src")
+set (sources
 	"${source_base}/TestApp.cpp"
 	"${source_base}/Renderer.h"
 	"${source_base}/Renderer.cpp"
@@ -13,9 +13,7 @@ set (sources_xe_graphics_d3d11_testapp
 	"${source_base}/Color.ps"
 ) 
 
-source_group("\\XE\\Graphics\\D3D11\\TestApp" FILES ${sources_xe_graphics_d3d11_testapp})
+add_executable(${target} ${sources})
 
-add_executable(${target} ${sources_xe_graphics_d3d11_testapp})
-
-target_link_libraries(${target} d3d11 d3dcompiler)
+target_link_libraries(${target} d3d11 d3dcompiler XE.Math)
 target_compile_options (${target} PUBLIC ${XE_CXX_FLAGS})

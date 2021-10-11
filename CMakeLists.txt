@@ -19,9 +19,15 @@ set (CMAKE_CXX_STANDARD 17)
 set (CMAKE_CXX_STANDARD_REQUIRED ON)
 set (CMAKE_CXX_EXTENSIONS OFF)
 
-enable_testing()
+if (XE_UNIT_TEST)
+    enable_testing()
 
-#XE_CXX_FLAGS: Flags that will be passed for the targets, specific to the compilation of the targets (not its dependencies)
+    # FIXME: Define a imported target for Catch2
+    include_directories ("dep/Catch2/single_include")
+endif()
+
+# XE_CXX_FLAGS
+# Flags that will be passed for the targets, specific to the compilation of the targets (not its dependencies)
 
 set (XE_VERSION_MAJOR 0)
 set (XE_VERSION_MINOR 0)
@@ -66,10 +72,6 @@ if (XE_PLUGIN_PNG)
     include_directories("src/XE.Graphics.PNG")
     add_subdirectory("src/XE.Graphics.PNG")
 endif ()
-
-if (XE_UNIT_TEST)
-    include_directories ("dep/Catch2/single_include")
-endif()
 
 if (XE_PLUGIN_DIRECT3D11)
     add_subdirectory ("src/XE.Graphics.D3D11.TestApp")
