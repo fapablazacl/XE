@@ -49,14 +49,6 @@ namespace XE {
 
     GraphicsDeviceGL::~GraphicsDeviceGL() {}
     
-    Subset* GraphicsDeviceGL::createSubset(
-            const SubsetDescriptor& desc, 
-            std::vector<Buffer*> buffers,
-            const std::map<std::string, int> &bufferMapping, 
-            Buffer* indexBuffer) {
-        return new SubsetGL(desc, buffers, bufferMapping, indexBuffer);
-    }
-    
     Subset* GraphicsDeviceGL::createSubset(const SubsetDescriptor2 &desc) {
         return new SubsetGL(desc);
     }

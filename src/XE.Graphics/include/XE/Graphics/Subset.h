@@ -58,17 +58,6 @@ namespace XE {
     };
 
     /**
-     * @brief Describes a geometry subset
-     */
-    struct [[deprecated("Use SubsetDescriptor2. It's more flexible, and less error-prone")]] SubsetDescriptor {
-        //! The vertex structure
-        std::vector<VertexAttribute> attributes;
-
-        //! The index buffer datatype
-        DataType indexType = DataType::Unknown;
-    };
-
-    /**
      * @brief Describes a Vertex Attribute for use in the vertex shader
      */
     struct SubsetVertexAttrib {
@@ -142,12 +131,6 @@ namespace XE {
          * @brief Get a constant pointer to a buffer allocated in GPU memory. This buffer stores indexation data
          */
         virtual const Buffer* getIndexBuffer() const = 0;
-
-        /**
-         * @brief Get the current description structure that leads to the creation of the subset
-         */
-        [[deprecated]]
-        virtual SubsetDescriptor GetDescriptor() const = 0;
     };
 }
 

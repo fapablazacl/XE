@@ -10,13 +10,7 @@
 namespace XE {
     class SubsetGL : public Subset {
     public:
-        SubsetGL(
-            const SubsetDescriptor& desc, 
-            std::vector<Buffer*> buffers,
-            const std::map<std::string, int> &bufferMapping,
-            Buffer* indexBuffer);
-
-        SubsetGL(const SubsetDescriptor2 &desc);
+        explicit SubsetGL(const SubsetDescriptor2 &desc);
 
         virtual ~SubsetGL();
         
@@ -30,10 +24,6 @@ namespace XE {
 
         virtual const BufferGL* getIndexBuffer() const override;
 
-        virtual SubsetDescriptor GetDescriptor() const override {
-            return m_descriptor;
-        }
-
     public:
         GLuint GetID() const {
             return m_id;
@@ -43,7 +33,6 @@ namespace XE {
         GLuint m_id = 0;
         std::vector<const BufferGL*> m_buffers;
         const BufferGL* m_indexBuffer = nullptr;
-        SubsetDescriptor m_descriptor;
         SubsetDescriptor2 mDesc;
     };
 }

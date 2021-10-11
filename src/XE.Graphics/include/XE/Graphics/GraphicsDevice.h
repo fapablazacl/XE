@@ -49,7 +49,6 @@ namespace XE {
     class Material;
 
     struct SubsetDescriptor2;
-    struct SubsetDescriptor;
     struct ProgramDescriptor;
 
     /**
@@ -59,20 +58,6 @@ namespace XE {
     public:
         virtual ~GraphicsDevice();
 
-        /**
-         * @brief Create a geometry subset composed of many geometry and indexation buffers
-         * @param buffers The buffers that have data
-         * @param bufferMapping The mapping between the buffers and the vertex attributes
-         * @param indexBuffer The subset geometry index buffer
-         * @todo Add support for packed vertex structures
-         */
-        [[deprecated]]
-        virtual Subset* createSubset(
-            const SubsetDescriptor& desc, 
-            std::vector<Buffer*> buffers,
-            const std::map<std::string, int> &bufferMapping,
-            Buffer* indexBuffer) = 0;
-        
         virtual Subset* createSubset(const SubsetDescriptor2 &desc) = 0;
 
         virtual Buffer* createBuffer(const BufferDescriptor &bufferDescriptor) = 0;

@@ -49,7 +49,6 @@ using XE::BufferDescriptor;
 using XE::BufferType;
 using XE::BufferUsage;
 using XE::BufferAccess;
-using XE::SubsetDescriptor;
 
 
 namespace Sandbox {
@@ -335,6 +334,9 @@ namespace Sandbox {
         
         
         std::pair<Subset*, SubsetEnvelope> createSubset(const MeshPrimitive &meshPrimitive) {
+            return {};
+            /*
+
             // create the vertex buffer
             BufferDescriptor coordBufferDescriptor = {
                 BufferType::Vertex,
@@ -409,6 +411,7 @@ namespace Sandbox {
                 m_graphicsDevice->createSubset(subsetDescriptor, buffers, bufferMapping, indexBuffer),
                 meshPrimitive.getEnvelope()
             };
+            */
         }
         
     private:

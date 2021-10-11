@@ -19,13 +19,7 @@ namespace XE {
 
         ~GraphicsDeviceGL();
 
-        Subset* createSubset(
-            const SubsetDescriptor& desc, 
-            std::vector<Buffer*> buffers,
-            const std::map<std::string, int> &bufferMapping, 
-            Buffer* indexBuffer) override;
-        
-        Subset* createSubset(const SubsetDescriptor2 &desc);
+        Subset* createSubset(const SubsetDescriptor2 &desc) override;
 
         Buffer* createBuffer(const BufferDescriptor &bufferDescriptor) override;
         
