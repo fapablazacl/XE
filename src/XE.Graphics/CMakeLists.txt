@@ -26,7 +26,6 @@ set (sources
 
 	"src/IWindow.cpp"	
 	"src/GraphicsDevice.cpp"
-	"src/BufferDescriptor.cpp" 
 	"src/Subset.cpp" 
 	"src/Texture.cpp" 
 	"src/Texture2D.cpp" 
@@ -36,15 +35,10 @@ set (sources
 	"src/PixelFormat.cpp" 
 	"src/Shader.cpp" 
 	"src/Program.cpp" 
-	"src/Vertex.cpp"
-	"src/VertexLayout.cpp"
-	"src/VertexFormat.cpp"
-	"src/Uniform.cpp"
 	"src/ImageImpl.cpp"
 	"src/Image.cpp"
 	"src/ImageLoader.cpp"
 	"src/Material.cpp"
-	"src/Viewport.cpp"
 )
 
 add_library (${target} ${sources})

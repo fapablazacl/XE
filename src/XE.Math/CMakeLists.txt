@@ -14,26 +14,12 @@ set (sources
     "include/XE/Math/Sphere.h"
     "include/XE/Math/Triangle.h"
     "include/XE/Math/Ellipsoid.h"
-
-    "src/Common.cpp"
-    "src/Vector.cpp"
-    "src/Matrix.cpp"
-	"src/Quaternion.cpp"
-	"src/Boundary.cpp"
-	"src/Box.cpp"
-	"src/Plane.cpp"
-	"src/Ray.cpp"
-	"src/Rect.cpp"
-	"src/Sphere.cpp"
-	"src/Triangle.cpp"
-    "src/Ellipsoid.cpp"
 )
 
-add_library(${target} ${sources})
+add_library(${target} INTERFACE)
 
-target_include_directories(${target} PUBLIC "include/")
-target_link_libraries(${target} XE.Core)
-target_compile_options (${target} PUBLIC ${XE_CXX_FLAGS})
+target_include_directories(${target} INTERFACE "include/")
+target_compile_options (${target} INTERFACE ${XE_CXX_FLAGS})
 
 
 # Unit Test 

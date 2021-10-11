@@ -9,7 +9,6 @@ set (sources
 
 	"src/ShapeGenerator.cpp"
 	"src/EllipsoidGenerator.cpp"
-	"src/PlaneGenerator.cpp"
 	"src/BoxGenerator.cpp"
 )
 

@@ -11,15 +11,11 @@ set (sources
     "include/XE/Buffer.h"
     "include/XE/DataType.h"
 	"include/XE/Core.h"
-    "include/XE/Frame.h"
-	"include/XE/WindowSystem.h"
 	"include/XE/Timer.h"
 	
 	"src/Buffer.cpp"
     "src/DataType.cpp"
 	"src/Core.cpp"
-	"src/Frame.cpp"
-	"src/WindowSystem.cpp"
 	"src/Timer.cpp"
 )
 
