@@ -22,19 +22,20 @@ target_include_directories(${target} INTERFACE "include/")
 target_compile_options (${target} INTERFACE ${XE_CXX_FLAGS})
 
 
-# Unit Test 
-set (test_target "XE.Math.Test")
+if (XE_UNIT_TEST)
+    set (test_target "XE.Math.Test")
 
-set (test_sources 
-    "test/Main.cpp"
-    "test/Common.Test.cpp"
-    "test/Vector.Test.cpp"
-    "test/Matrix.Test.cpp"
-    "test/Quaternion.Test.cpp"
-)
+    set (test_sources 
+        "test/Main.cpp"
+        "test/Common.Test.cpp"
+        "test/Vector.Test.cpp"
+        "test/Matrix.Test.cpp"
+        "test/Quaternion.Test.cpp"
+    )
 
-add_executable(${test_target} ${test_sources})
-target_link_libraries(${test_target} XE.Math)
+    add_executable(${test_target} ${test_sources})
+    target_link_libraries(${test_target} XE.Math)
 
-# NOTE: The test name must have the same name as the command name
-add_test(NAME ${test_target} COMMAND ${test_target})
+    # NOTE: The test name must have the same name as the command name
+    add_test(NAME ${test_target} COMMAND ${test_target})
+endif()

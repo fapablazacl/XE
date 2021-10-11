@@ -9,7 +9,7 @@
 
 namespace XE {
     template<typename T, int R, int C>
-    class Matrix;
+    struct Matrix;
 
     template<typename T, int R, int C>
     Matrix<T, C, R> transpose(const Matrix<T, R, C> &m) {
