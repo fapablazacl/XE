@@ -22,12 +22,17 @@ namespace XE {
         ::glGetProgramiv(m_id, GL_LINK_STATUS, &status);
 
         if (status == GL_FALSE) {
-            const GLint logsize = 4096;
-            char buffer[logsize] = {};
+            std::string msg = "ProgramGL::ProgramGL:\n";
+            {
+                const GLint logsize = 4096;
+                char buffer[logsize] = {};
+                    
+                ::glGetProgramInfoLog(m_id, logsize, nullptr, buffer);
                 
-            ::glGetProgramInfoLog(m_id, logsize, nullptr, buffer);
-
-            throw std::runtime_error(buffer);
+                msg += buffer;
+            }
+            
+            throw std::runtime_error(msg);
         }
     }
 

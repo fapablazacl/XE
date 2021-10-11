@@ -27,12 +27,19 @@ namespace XE {
         ::glGetShaderiv(m_id, GL_COMPILE_STATUS, &status);
 
         if (status == GL_FALSE) {
-            const GLint logsize = 4096;
-            char buffer[logsize] = {};
+            std::string msg = "XE::ShaderGL::ShaderGL:\n";
+            {
+                const GLint logsize = 4096;
+                char buffer[logsize] = {};
+                    
+                ::glGetShaderInfoLog(m_id, logsize, nullptr, buffer);
                 
-            ::glGetShaderInfoLog(m_id, logsize, nullptr, buffer);
-
-            throw std::runtime_error(buffer);
+                msg += buffer;
+            }
+            
+            msg += "\n\n" + source;
+            
+            throw std::runtime_error(msg);
         }
     }
 
