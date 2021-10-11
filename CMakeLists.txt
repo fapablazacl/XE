@@ -1,3 +1,6 @@
+
+cmake_minimum_required (VERSION 3.10)
+
 project (XE)
 
 option (XE_PLUGIN_PNG           "Include PNG image support via LodePNG" OFF)
@@ -10,15 +13,15 @@ option (XE_PLUGIN_VULKAN        "Include Vulkan support" OFF)
 option (XE_EXAMPLE_QT5RENDERING "Include example program that shows rendering to a Qt5 widget" OFF)
 option (XE_EXAMPLE_DEMO         "Include example program that shows a tech demo" OFF)
 option (XE_EXAMPLE_SANDBOX      "Include example program that is used for various development activities" OFF)
-option (XE_TEST "Include unit-test suite" OFF)
+option (XE_UNIT_TEST            "Include unit-test suite" OFF)
 
 set (CMAKE_CXX_STANDARD 17)
 set (CMAKE_CXX_STANDARD_REQUIRED ON)
 set (CMAKE_CXX_EXTENSIONS OFF)
 
-#XE_CXX_FLAGS: Flags that will be passed for the targets, specific to the compilation of the targets (not its dependencies)
+enable_testing()
 
-cmake_minimum_required (VERSION 3.10)
+#XE_CXX_FLAGS: Flags that will be passed for the targets, specific to the compilation of the targets (not its dependencies)
 
 set (XE_VERSION_MAJOR 0)
 set (XE_VERSION_MINOR 0)
@@ -64,9 +67,8 @@ if (XE_PLUGIN_PNG)
     add_subdirectory("src/XE.Graphics.PNG")
 endif ()
 
-if (XE_TEST)
+if (XE_UNIT_TEST)
     include_directories ("dep/Catch2/single_include")
-    add_subdirectory ("src/XE.Test")
 endif()
 
 if (XE_PLUGIN_DIRECT3D11)
