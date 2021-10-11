@@ -20,7 +20,7 @@ set (CMAKE_CXX_STANDARD_REQUIRED ON)
 set (CMAKE_CXX_EXTENSIONS OFF)
 
 if (XE_UNIT_TEST)
-    enable_testing()
+    include(CTest)
 
     # FIXME: Define a imported target for Catch2
     include_directories ("dep/Catch2/single_include")
