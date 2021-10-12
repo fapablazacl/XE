@@ -1,6 +1,13 @@
 
 cmake_minimum_required (VERSION 3.10)
 
+include ("cmake/HunterGate.cmake")
+
+HunterGate(
+    URL "https://github.com/cpp-pm/hunter/archive/v0.23.297.tar.gz"
+    SHA1 "3319fe6a3b08090df7df98dee75134d68e2ef5a3"
+)
+
 project (XE)
 
 option (XE_PLUGIN_PNG           "Include PNG image support via LodePNG" OFF)
@@ -51,10 +58,8 @@ add_subdirectory ("src/XE.Math")
 add_subdirectory ("src/XE.IO")
 add_subdirectory ("src/XE.Geometry")
 
-
 # CGLTF dependency
 include_directories("dep/cgltf")
-
 
 #========================================================
 # PLUGINS SECTION
@@ -76,16 +81,18 @@ if (XE_PLUGIN_DIRECT3D11)
     add_subdirectory ("src/XE.Graphics.D3D11.TestApp")
 endif ()
 
-# include glfw
+# include glfw and glbinding
 if (XE_PLUGIN_GL OR XE_PLUGIN_ES2 OR XE_PLUGIN_VULKAN) 
-	set (GLFW_BUILD_DOCS CACHE BOOL OFF)
-	set (GLFW_BUILD_TESTS CACHE BOOL OFF)
-	set (GLFW_BUILD_EXAMPLES CACHE BOOL OFF)
-	set (GLFW_BUILD_INSTALL CACHE BOOL OFF)
-	set (GLFW_INSTALL CACHE BOOL OFF)
-	add_subdirectory ("dep/glfw")
+	# set (GLFW_BUILD_DOCS CACHE BOOL OFF)
+	# set (GLFW_BUILD_TESTS CACHE BOOL OFF)
+	# set (GLFW_BUILD_EXAMPLES CACHE BOOL OFF)
+	# set (GLFW_BUILD_INSTALL CACHE BOOL OFF)
+	# set (GLFW_INSTALL CACHE BOOL OFF)
+	# add_subdirectory ("dep/glfw")
+    # target_include_directories("glfw" INTERFACE "dep/glfw/include")
 
-    target_include_directories("glfw" INTERFACE "dep/glfw/include")
+    hunter_add_package(glfw)
+    find_package(glfw3 REQUIRED)
 endif ()
 
 if (XE_PLUGIN_GL)
