@@ -83,14 +83,6 @@ endif ()
 
 # include glfw and glbinding
 if (XE_PLUGIN_GL OR XE_PLUGIN_ES2 OR XE_PLUGIN_VULKAN) 
-	# set (GLFW_BUILD_DOCS CACHE BOOL OFF)
-	# set (GLFW_BUILD_TESTS CACHE BOOL OFF)
-	# set (GLFW_BUILD_EXAMPLES CACHE BOOL OFF)
-	# set (GLFW_BUILD_INSTALL CACHE BOOL OFF)
-	# set (GLFW_INSTALL CACHE BOOL OFF)
-	# add_subdirectory ("dep/glfw")
-    # target_include_directories("glfw" INTERFACE "dep/glfw/include")
-
     hunter_add_package(glfw)
     find_package(glfw3 REQUIRED)
 endif ()
