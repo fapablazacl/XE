@@ -171,7 +171,7 @@ namespace XE {
 
             const GLenum sfactorGL = convertToGL(rs.blendSource);
             const GLenum dfactorGL = convertToGL(rs.blendDestination);
-            ::glBlendFunc(sfactorGL, sfactorGL);
+            ::glBlendFunc(sfactorGL, dfactorGL);
         } else {
             ::glDisable(GL_BLEND);
         }

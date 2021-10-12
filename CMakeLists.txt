@@ -22,8 +22,8 @@ set (CMAKE_CXX_EXTENSIONS OFF)
 if (XE_UNIT_TEST)
     include(CTest)
 
-    # FIXME: Define a imported target for Catch2
-    include_directories ("dep/Catch2/single_include")
+    add_library(Catch2 INTERFACE)
+    target_include_directories(Catch2 INTERFACE "dep/Catch2/single_include")
 endif()
 
 # XE_CXX_FLAGS
@@ -35,6 +35,7 @@ set (XE_VERSION_REVISION 0)
 set (XE_VERSION "${XE_VERSION_MAJOR}.${XE_VERSION_MINOR}.${XE_VERSION_REVISION}")
 
 if (CMAKE_BUILD_TYPE MATCHES "Debug")
+    # this macro is required by Glad.
     add_definitions (-D_DEBUG)
 endif ()
 
@@ -50,7 +51,10 @@ add_subdirectory ("src/XE.Math")
 add_subdirectory ("src/XE.IO")
 add_subdirectory ("src/XE.Geometry")
 
+
+# CGLTF dependency
 include_directories("dep/cgltf")
+
 
 #========================================================
 # PLUGINS SECTION
@@ -58,24 +62,18 @@ include_directories("dep/cgltf")
 
 # include LodePNG image
 if (XE_PLUGIN_PNG)
-    include_directories("dep/lodepng")
-    set (lodepng_target "lodepng")
-    set (lodepng_sources 
+    add_library("lodepng" 
         "dep/lodepng/lodepng.h"
         "dep/lodepng/lodepng.cpp"
-        # "dep/lodepng/lodepng_util.h"
-        # "dep/lodepng/lodepng_util.cpp"
     )
 
-    add_library(${lodepng_target} ${lodepng_sources})
+    target_include_directories("lodepng" PUBLIC "dep/lodepng")
 
-    include_directories("src/XE.Graphics.PNG")
     add_subdirectory("src/XE.Graphics.PNG")
 endif ()
 
 if (XE_PLUGIN_DIRECT3D11)
     add_subdirectory ("src/XE.Graphics.D3D11.TestApp")
-    include_directories ("src/XE.Graphics.D3D11.TestApp")
 endif ()
 
 # include glfw
@@ -86,7 +84,8 @@ if (XE_PLUGIN_GL OR XE_PLUGIN_ES2 OR XE_PLUGIN_VULKAN)
 	set (GLFW_BUILD_INSTALL CACHE BOOL OFF)
 	set (GLFW_INSTALL CACHE BOOL OFF)
 	add_subdirectory ("dep/glfw")
-	include_directories ("dep/glfw/include")
+
+    target_include_directories("glfw" INTERFACE "dep/glfw/include")
 endif ()
 
 if (XE_PLUGIN_GL)
