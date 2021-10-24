@@ -24,7 +24,7 @@ namespace XE {
         return count;
     }
     
-    int write(const void *buffer, const int size, const int count) {
+    int MemoryStream::write(const void *buffer, const int size, const int count) {
         // TODO: Add implementation
         return 0;
     }

@@ -3,8 +3,8 @@
 #define __XE_GRAPHICS_GL_SUBSETGL_HPP__
 
 #include <XE/Graphics/Subset.h>
-#include <glad/glad.h>
 
+#include "glcore.h"
 #include "BufferGL.h"
 
 namespace XE {

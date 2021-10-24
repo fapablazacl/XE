@@ -3,7 +3,7 @@
 #define __XE_GRAPHICS_GL_CONVERSION_HPP__
 
 #include <cstdint>
-#include <glad/glad.h>
+#include "glcore.h"
 
 namespace XE {
     enum class DataType : std::int16_t;
@@ -35,7 +35,7 @@ namespace XE {
     extern GLenum convertToGL(const BlendParam param);
     extern GLenum convertToGL(const TextureFilter filter);
     extern GLenum convertToGL(const TextureWrap wrap);
-    extern GLenum convertToGL(const bool value);
+    extern GLboolean convertToGL(const bool value);
 }
 
 #endif 

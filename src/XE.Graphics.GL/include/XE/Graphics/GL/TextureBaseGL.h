@@ -2,7 +2,7 @@
 #ifndef __XE_GRAPHICS_GL_TEXTUREBASEGL_HPP__
 #define __XE_GRAPHICS_GL_TEXTUREBASEGL_HPP__
 
-#include <glad/glad.h>
+#include "glcore.h"
 
 namespace XE {
     /**

@@ -20,30 +20,13 @@
 #include <iostream>
 
 namespace XE {
-/*#if defined(GLAD_DEBUG)
-    void gladPostCallback(const char *name, void *funcptr, int len_args, ...) {
-        if (std::string(name) != "glGetError") {
-            GLenum error = glGetError();
-            assert(error == GL_NO_ERROR);
-        }
-    }
-#endif
-*/
-
     GraphicsDeviceGL::GraphicsDeviceGL(IGraphicsContextGL *context) {
         this->context = context;
 
         std::cout << "[GL] Loading OpenGL Extensions ..." << std::endl;
-        if (!gladLoadGL()) {
-            throw std::runtime_error("Failed to load OpenGL extensions");
-        }
 
-/*
-#if defined(GLAD_DEBUG)
-    // glad_set_pre_callback(gladPreCallback);
-    // glad_set_post_callback(gladPostCallback);
-#endif
-*/
+        glbinding::initialize(context->getProcAddressFunction());
+
         XE_GRAPHICS_GL_CHECK_ERROR();
     }
 
@@ -112,8 +95,7 @@ namespace XE {
     }
 
     void GraphicsDeviceGL::beginFrame(const ClearFlags flags, const Vector4f &color, const float depth, const int stencil) {
-        
-        GLenum clearFlagsGL = 0;
+        gl::ClearBufferMask clearFlagsGL;
         
         if (flags & ClearFlags::Color) {
             clearFlagsGL |= GL_COLOR_BUFFER_BIT;
@@ -186,8 +168,6 @@ namespace XE {
             // FIXME: This will cause segfaults if the real implementation isn't derived from the Texture/TextureBaseGL family
             auto textureBaseGL = dynamic_cast<const TextureBaseGL*>(layer.texture);
             auto target = textureBaseGL->GetTarget();
-            
-            std::cout << target << ", " << textureBaseGL->GetID() << std::endl;
 
             ::glActiveTexture(GL_TEXTURE0 + i);
             ::glBindTexture(target, textureBaseGL->GetID());
@@ -347,24 +327,6 @@ namespace XE {
 
         XE_GRAPHICS_GL_CHECK_ERROR();
     }
-
-/*
-    template<typename T>
-    using UniformFunction = void (*)(GLint location, GLsizei count, const T *value);
-
-    static const std::array<UniformFunction<GLint>, 4> uniformFunctionsI = {
-        glUniform1iv, glUniform2iv, glUniform3iv, glUniform4iv
-    };
-
-
-    static const std::array<UniformFunction<GLfloat>, 4> uniformFunctionsF = {
-        glUniform1fv, glUniform2fv, glUniform3fv, glUniform4fv
-    };
-
-    static const std::array<UniformFunction<GLuint>, 4> uniformFunctionsUI = {
-        glUniform1uiv, glUniform2uiv, glUniform3uiv, glUniform4uiv
-    };
-*/
 
 
     void GraphicsDeviceGL::applyUniform(const Uniform *uniform, const int count, const std::byte *data) {

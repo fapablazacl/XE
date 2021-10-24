@@ -1,4 +1,6 @@
 
+find_package (glbinding REQUIRED)
+
 set (target "XE.Graphics.GL")
 
 set (sources
@@ -34,6 +36,6 @@ set (sources
 
 add_library (${target} ${sources})
 
-target_include_directories(${target} PUBLIC "include/")
-target_link_libraries (${target} glad-gl4 XE.Core XE.Graphics)
+target_include_directories (${target} PUBLIC "include/")
+target_link_libraries (${target} XE.Core XE.Graphics glbinding::glbinding)
 target_compile_options (${target} PUBLIC ${XE_CXX_FLAGS})

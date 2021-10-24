@@ -21,7 +21,7 @@ namespace XE {
         GLint status;
         ::glGetProgramiv(m_id, GL_LINK_STATUS, &status);
 
-        if (status == GL_FALSE) {
+        if (status == static_cast<GLint>(GL_FALSE)) {
             std::string msg = "ProgramGL::ProgramGL:\n";
             {
                 const GLint logsize = 4096;
