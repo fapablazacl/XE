@@ -26,9 +26,11 @@ if (XE_UNIT_TEST)
     target_include_directories(Catch2 INTERFACE "dep/Catch2/single_include")
 endif()
 
+
 # XE_CXX_FLAGS
 # Flags that will be passed for the targets, specific to the compilation of the targets (not its dependencies)
 
+# TODO: Configure the version numbering mechanism
 set (XE_VERSION_MAJOR 0)
 set (XE_VERSION_MINOR 0)
 set (XE_VERSION_REVISION 0)
@@ -106,10 +108,6 @@ endif ()
 #========================================================
 # EXAMPLES SECTION
 #========================================================
-if (XE_EXAMPLE_DEMO)
-    add_subdirectory("examples/XE.Demo")
-endif()
-
 if (XE_EXAMPLE_SANDBOX)
     add_subdirectory("examples/XE.Sandbox")
 endif()
