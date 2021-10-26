@@ -63,6 +63,10 @@ namespace XE {
     }
     
     void GraphicsDeviceGL::draw(const Subset *subset, const SubsetEnvelope *envelopes, const int envelopeCount) {
+        assert(subset);
+        assert(envelopes);
+        assert(envelopeCount > 0);
+        
         auto subsetGL = static_cast<const SubsetGL *>(subset);
         
         glBindVertexArray(subsetGL->GetID());

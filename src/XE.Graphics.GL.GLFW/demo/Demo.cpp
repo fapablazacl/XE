@@ -214,8 +214,8 @@ namespace demo {
             mCubeSubset = createCubeSubset2(mGraphicsDevice.get(), cubeMesh);
             
             mCubeSubsetEnvelope = { 
-                floorMesh.primitive, 0, 
-                static_cast<int>(floorMesh.vertices.size())
+                floorMesh.primitive, 0,
+                static_cast<int>(cubeMesh.vertices.size())
             };
 
             mMaterial.renderState.depthTest = true;
@@ -236,10 +236,12 @@ namespace demo {
             mLeftCubeNode->setRenderable(&mColoredCubeRenderable);
 
             mRightCubeNode = mSceneNode.createChild();
+            // TODO: Commented
             mRightCubeNode->setRenderable(&mColoredCubeRenderable);
 
             mEnemyRenderable = {mCubeSubset, mCubeSubsetEnvelope};
             mEnemyNode = mSceneNode.createChild();
+            // TODO: Commented
             mEnemyNode->setRenderable(&mEnemyRenderable);
             mEnemyNode->setTransformation(XE::M4::translate({0.0f, 0.2501f, 0.0f}));
         }
