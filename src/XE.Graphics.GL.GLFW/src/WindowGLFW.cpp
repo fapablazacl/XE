@@ -44,21 +44,21 @@ namespace XE {
     public:
         WindowGLFWImpl(const ContextDescriptorGL &contextDescriptor, const std::string &title, const Vector2i &windowSize, const bool fullScreen) {
             if (usageCount++ == 0) {
-                ::glfwInit();
+                glfwInit();
             }
 
             std::cout << "[GLFW] Initializing GLFW ..." << std::endl;
 
-            ::glfwSetErrorCallback(errorCallback);
+            glfwSetErrorCallback(errorCallback);
 
             auto hints = mapToHints(contextDescriptor);
 
             for (auto &pair : hints) {
-                ::glfwWindowHint(pair.first, pair.second);
+                glfwWindowHint(pair.first, pair.second);
             }
 
             std::cout << "[GLFW] Creating Window/Context ..." << std::endl;
-            glfwWindow = ::glfwCreateWindow (
+            glfwWindow = glfwCreateWindow (
                 windowSize.X, windowSize.Y, 
                 title.c_str(), 
                 fullScreen ? glfwGetPrimaryMonitor() : nullptr,
@@ -69,7 +69,7 @@ namespace XE {
                 std::string desc;
                 desc.resize(256);
                 
-                const int error = ::glfwGetError((const char **)desc.c_str());
+                const int error = glfwGetError((const char **)desc.c_str());
 
                 desc = "Error code " + std::to_string(error) + ": " + desc;
                 
@@ -77,7 +77,7 @@ namespace XE {
             }
 
             std::cout << "[GLFW] Making Context current ..." << std::endl;
-            ::glfwMakeContextCurrent(glfwWindow);
+            glfwMakeContextCurrent(glfwWindow);
 
             graphicsContext = std::make_unique<GraphicsContextGLFW>(glfwWindow, contextDescriptor);
             inputManager = std::make_unique<InputManagerGLFW>(glfwWindow);
@@ -85,19 +85,19 @@ namespace XE {
 
         ~WindowGLFWImpl() {
             if (glfwWindow) {
-                ::glfwMakeContextCurrent(nullptr);
-                ::glfwDestroyWindow(glfwWindow);
+                glfwMakeContextCurrent(nullptr);
+                glfwDestroyWindow(glfwWindow);
             }
 
             if (--usageCount == 0) {
-                ::glfwTerminate();
+                glfwTerminate();
             }
         }
     
         virtual Vector2i getSize() const override {
             int width, height;
 
-            ::glfwGetWindowSize(glfwWindow, &width, &height);
+            glfwGetWindowSize(glfwWindow, &width, &height);
 
             return {width, height};
         }

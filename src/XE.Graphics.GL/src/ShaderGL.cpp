@@ -11,6 +11,8 @@ namespace XE {
     };
 
     ShaderGL::ShaderGL(const ShaderType type, const std::string &source) {
+        assert(source != "");
+        
         m_type = type;
         m_source = source;
         m_typeGL = s_shaderTypesGL[int(type)];

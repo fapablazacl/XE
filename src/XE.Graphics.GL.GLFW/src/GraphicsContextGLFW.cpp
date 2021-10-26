@@ -26,6 +26,6 @@ namespace XE {
 
 
     void GraphicsContextGLFW::present() {
-        ::glfwSwapBuffers(glfwWindow);
+        glfwSwapBuffers(glfwWindow);
     }
 }

@@ -37,5 +37,5 @@ set (sources
 add_library (${target} ${sources})
 
 target_include_directories (${target} PUBLIC "include/")
-target_link_libraries (${target} XE.Core XE.Graphics glbinding::glbinding)
+target_link_libraries (${target} XE.Core XE.Graphics glbinding::glbinding glbinding::glbinding-aux)
 target_compile_options (${target} PUBLIC ${XE_CXX_FLAGS})

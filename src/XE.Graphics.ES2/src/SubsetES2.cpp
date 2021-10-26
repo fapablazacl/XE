@@ -19,8 +19,8 @@ namespace XE {
 
         // setup the subset arrays based on the vertex format and the mapping information
         /*
-        ::glGenVertexArrays(1, &m_id);
-        ::glBindVertexArray(m_id);
+        glGenVertexArrays(1, &m_id);
+        glBindVertexArray(m_id);
         */
 
         int attribIndex = 0;
@@ -33,25 +33,25 @@ namespace XE {
             const int bufferIndex = mappingIt->second;
             const BufferES2 *buffer = m_buffers[bufferIndex].get();
 
-            ::glBindBuffer(buffer->GetTarget(), buffer->GetID());
-            ::glEnableVertexAttribArray(attribIndex);
-            ::glVertexAttribPointer(attribIndex, attrib.size, convertToGL(attrib.type), GL_FALSE, 0, 0);
+            glBindBuffer(buffer->GetTarget(), buffer->GetID());
+            glEnableVertexAttribArray(attribIndex);
+            glVertexAttribPointer(attribIndex, attrib.size, convertToGL(attrib.type), GL_FALSE, 0, 0);
 
             attribIndex++;
         }
 
         if (m_indexBuffer) {
-            ::glBindBuffer(m_indexBuffer->GetTarget(), m_indexBuffer->GetID());
+            glBindBuffer(m_indexBuffer->GetTarget(), m_indexBuffer->GetID());
         }
         
-        // ::glBindVertexArray(0);
+        // glBindVertexArray(0);
 
         m_descriptor = desc;
     }
 
     SubsetGL::~SubsetGL() {
         if (m_id) {
-            // ::glDeleteVertexArrays(1, &m_id);
+            // glDeleteVertexArrays(1, &m_id);
         }
     }
         

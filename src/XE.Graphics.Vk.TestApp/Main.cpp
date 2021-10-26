@@ -198,7 +198,7 @@ namespace XE {
 
         std::vector<const char*> getRequiredExtensions() const {
             uint32_t extensionCount;
-            const char **extensions = ::glfwGetRequiredInstanceExtensions(&extensionCount);
+            const char **extensions = glfwGetRequiredInstanceExtensions(&extensionCount);
 
             std::vector<const char*> result = {extensions, extensions + extensionCount};
 

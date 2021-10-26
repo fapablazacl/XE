@@ -62,7 +62,7 @@ namespace XE {
     }
 
     void InputManagerGLFW::poll() {
-        ::glfwPollEvents();
+        glfwPollEvents();
 
         this->fillKeyboardStatus();
     }
@@ -74,7 +74,7 @@ namespace XE {
             if (keyMappingIt == s_keyMapping.end()) {
                 continue;
             }
-            auto state = ::glfwGetKey(m_windowGLFW, key);
+            auto state = glfwGetKey(m_windowGLFW, key);
             auto stateMappingIt = s_stateMappings.find(state);
 
             if (stateMappingIt == s_stateMappings.end()) {
