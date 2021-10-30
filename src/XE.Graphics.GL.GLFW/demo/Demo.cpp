@@ -236,12 +236,10 @@ namespace demo {
             mLeftCubeNode->setRenderable(&mColoredCubeRenderable);
 
             mRightCubeNode = mSceneNode.createChild();
-            // TODO: Commented
             mRightCubeNode->setRenderable(&mColoredCubeRenderable);
 
             mEnemyRenderable = {mCubeSubset, mCubeSubsetEnvelope};
             mEnemyNode = mSceneNode.createChild();
-            // TODO: Commented
             mEnemyNode->setRenderable(&mEnemyRenderable);
             mEnemyNode->setTransformation(XE::M4::translate({0.0f, 0.2501f, 0.0f}));
         }
