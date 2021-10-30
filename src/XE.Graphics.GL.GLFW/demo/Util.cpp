@@ -21,7 +21,7 @@ namespace demo {
 	Mesh makeIndexedCubeMesh(const float width, const float height, const float depth) {
 		Mesh mesh;
         
-        const XE::Vector3f n = {0.0f, 1.0f, 0.0};
+        const XE::Vector3f n = {0.0f, 0.0f, 1.0};
         
 		const std::vector<Vertex> vertices = {
 			{{-0.5f * width, -0.5f * height,  0.5f * depth}, n, {1.0f, 0.0f, 0.0f, 1.0f}},
@@ -44,15 +44,29 @@ namespace demo {
 		bool order = true;
 
 		for (size_t i=0; i<indices.size() - 2; i++) {
-			if (order) {
-				mesh.vertices.push_back(vertices[indices[i + 0]]);
-				mesh.vertices.push_back(vertices[indices[i + 1]]);
-				mesh.vertices.push_back(vertices[indices[i + 2]]);
-			} else {
-				mesh.vertices.push_back(vertices[indices[i + 0]]);
-				mesh.vertices.push_back(vertices[indices[i + 2]]);
-				mesh.vertices.push_back(vertices[indices[i + 1]]);
-			}
+            Vertex p1, p2, p3;
+            
+            if (order) {
+                p1 = vertices[indices[i + 0]];
+                p2 = vertices[indices[i + 1]];
+                p3 = vertices[indices[i + 2]];
+            } else {
+                p1 = vertices[indices[i + 0]];
+                p2 = vertices[indices[i + 2]];
+                p3 = vertices[indices[i + 1]];
+            }
+            
+            const XE::Vector3f edge1 = p2.coord - p1.coord;
+            const XE::Vector3f edge2 = p3.coord - p1.coord;
+            const XE::Vector3f normal = XE::normalize(XE::cross(edge1, edge2));
+            
+            p1.normal = normal;
+            p2.normal = normal;
+            p3.normal = normal;
+            
+            mesh.vertices.push_back(p1);
+            mesh.vertices.push_back(p2);
+            mesh.vertices.push_back(p3);
 
 			order = !order;
 		}
@@ -80,7 +94,7 @@ namespace demo {
 
 
 	Mesh makeColoredCubeMesh(const float width, const float height, const float depth) {
-        const XE::Vector3f n = {0.0f, 1.0f, 0.0};
+        const XE::Vector3f n = {0.0f, 0.0f, 1.0};
         
 		Mesh mesh;
 
@@ -91,7 +105,7 @@ namespace demo {
 			{{0.5f * width,  0.5f * height,  0.5f * depth}, n, {0.0f, 1.0f, 1.0f, 1.0f}},
 			{{-0.5f * width, -0.5f * height, -0.5f * depth}, n, {1.0f, 0.0f, 0.0f, 1.0f}},
 			{{0.5f * width, -0.5f * height, -0.5f * depth}, n, {1.0f, 0.0f, 0.0f, 1.0f}},
-			{{-0.5f * width,  0.5f * height, -0.5f * depth}, n, {0.0f, 1.0f, 0.0f, 1.0f}},
+			{{-0.5f * width,  0.5f * height, -0.5f * depth}, n, {1.0f, 1.0f, 0.0f, 1.0f}},
 			{{0.5f * width,  0.5f * height, -0.5f * depth}, n, {0.0f, 1.0f, 0.0f, 1.0f}}
 		};
 
@@ -105,15 +119,29 @@ namespace demo {
 		bool order = true;
 
 		for (size_t i=0; i<indices.size() - 2; i++) {
+            Vertex p1, p2, p3;
+            
 			if (order) {
-				mesh.vertices.push_back(vertices[indices[i + 0]]);
-				mesh.vertices.push_back(vertices[indices[i + 1]]);
-				mesh.vertices.push_back(vertices[indices[i + 2]]);
+                p1 = vertices[indices[i + 0]];
+                p2 = vertices[indices[i + 2]];
+                p3 = vertices[indices[i + 1]];
 			} else {
-				mesh.vertices.push_back(vertices[indices[i + 0]]);
-				mesh.vertices.push_back(vertices[indices[i + 2]]);
-				mesh.vertices.push_back(vertices[indices[i + 1]]);
+                p1 = vertices[indices[i + 0]];
+                p2 = vertices[indices[i + 1]];
+                p3 = vertices[indices[i + 2]];
 			}
+            
+            const XE::Vector3f edge1 = p2.coord - p1.coord;
+            const XE::Vector3f edge2 = p3.coord - p1.coord;
+            const XE::Vector3f normal = XE::normalize(XE::cross(edge1, edge2));
+            
+            p1.normal = normal;
+            p2.normal = normal;
+            p3.normal = normal;
+            
+            mesh.vertices.push_back(p1);
+            mesh.vertices.push_back(p2);
+            mesh.vertices.push_back(p3);
 
 			order = !order;
 		}
@@ -148,16 +176,30 @@ namespace demo {
 		bool order = true;
 
 		for (size_t i=0; i<indices.size() - 2; i++) {
-			if (order) {
-				mesh.vertices.push_back(vertices[indices[i + 0]]);
-				mesh.vertices.push_back(vertices[indices[i + 1]]);
-				mesh.vertices.push_back(vertices[indices[i + 2]]);
-			} else {
-				mesh.vertices.push_back(vertices[indices[i + 0]]);
-				mesh.vertices.push_back(vertices[indices[i + 2]]);
-				mesh.vertices.push_back(vertices[indices[i + 1]]);
-			}
-
+            Vertex p1, p2, p3;
+            
+            if (order) {
+                p1 = vertices[indices[i + 0]];
+                p2 = vertices[indices[i + 2]];
+                p3 = vertices[indices[i + 1]];
+            } else {
+                p1 = vertices[indices[i + 0]];
+                p2 = vertices[indices[i + 1]];
+                p3 = vertices[indices[i + 2]];
+            }
+            
+            const XE::Vector3f edge1 = p2.coord - p1.coord;
+            const XE::Vector3f edge2 = p3.coord - p1.coord;
+            const XE::Vector3f normal = XE::normalize(XE::cross(edge1, edge2));
+            
+            p1.normal = normal;
+            p2.normal = normal;
+            p3.normal = normal;
+            
+            mesh.vertices.push_back(p1);
+            mesh.vertices.push_back(p2);
+            mesh.vertices.push_back(p3);
+            
 			order = !order;
 		}
 
@@ -206,12 +248,11 @@ namespace demo {
         }
         
         const std::vector<XE::SubsetVertexAttrib> attribs {
-            {0, XE::DataType::Float32, 3, false, sizeof(Vertex), 0, 0},
+            {0, XE::DataType::Float32, 3, false, sizeof(Vertex), 0, OFFSETOF(Vertex, coord)},
             {1, XE::DataType::Float32, 3, false, sizeof(Vertex), 0, OFFSETOF(Vertex, normal)},
             {2, XE::DataType::Float32, 4, false, sizeof(Vertex), 0, OFFSETOF(Vertex, color)}
         };
 
-    
         const XE::SubsetDescriptor2 subsetDesc {
             &vertexBuffer, 1,
             attribs.data(), attribs.size(),
@@ -236,7 +277,7 @@ namespace demo {
         const XE::Buffer *vertexBuffer = graphicsDevice->createBuffer(bufferDesc);
 
         const std::vector<XE::SubsetVertexAttrib> attribs {
-            {0, XE::DataType::Float32, 3, false, sizeof(Vertex), 0, 0},
+            {0, XE::DataType::Float32, 3, false, sizeof(Vertex), 0, OFFSETOF(Vertex, coord)},
             {1, XE::DataType::Float32, 3, false, sizeof(Vertex), 0, OFFSETOF(Vertex, normal)},
             {2, XE::DataType::Float32, 4, false, sizeof(Vertex), 0, OFFSETOF(Vertex, color)}
         };
@@ -256,7 +297,7 @@ namespace demo {
 	Mesh makeGridMesh(const float tileSize, const int tilesInX, const int tilesInZ) {
 		const float half = tileSize * 0.5f;
 
-        const XE::Vector3f normal = {0.0f, 1.0f, 0.0};
+        const XE::Vector3f normal = {0.0f, 0.0f, 1.0};
         
 		const XE::Vector4f white = {0.8f, 0.8f, 0.8f, 1.0f};
 		const XE::Vector4f black = {0.2f, 0.2f, 0.2f, 1.0f};
@@ -288,6 +329,18 @@ namespace demo {
 				mesh.vertices.push_back({p4 + centroid, normal, color});
 				mesh.vertices.push_back({p3 + centroid, normal, color});
 
+                const XE::Vector3f p1 = mesh.vertices[mesh.vertices.size() - 3].coord;
+                const XE::Vector3f p2 = mesh.vertices[mesh.vertices.size() - 2].coord;
+                const XE::Vector3f p3 = mesh.vertices[mesh.vertices.size() - 1].coord;
+                
+                const XE::Vector3f edge1 = p2 - p1;
+                const XE::Vector3f edge2 = p3 - p1;
+                const XE::Vector3f normal = XE::normalize(XE::cross(edge1, edge2));
+                
+                for (int ii=0; ii<6; ii++) {
+                    mesh.vertices[mesh.vertices.size() - ii - 1].normal = normal;
+                }
+                
 				colorSide = !colorSide;
 			}
 			colorSide = !colorSide;
