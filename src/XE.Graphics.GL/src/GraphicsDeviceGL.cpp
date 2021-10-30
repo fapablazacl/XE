@@ -22,6 +22,29 @@
 #include <glbinding-aux/debug.h>
 
 namespace XE {
+    inline int countElements(const UniformDimension dim) {
+        switch (dim) {
+            case UniformDimension::D1: return 1;
+            case UniformDimension::D2: return 2;
+            case UniformDimension::D3: return 3;
+            case UniformDimension::D4: return 4;
+        }
+    }
+
+    inline int countElements(const UniformMatrixShape shape) {
+        switch (shape) {
+            case UniformMatrixShape::R2C2: return 2*2;
+            case UniformMatrixShape::R2C3: return 2*3;
+            case UniformMatrixShape::R2C4: return 2*4;
+            case UniformMatrixShape::R3C2: return 3*2;
+            case UniformMatrixShape::R3C3: return 3*3;
+            case UniformMatrixShape::R3C4: return 3*4;
+            case UniformMatrixShape::R4C2: return 4*2;
+            case UniformMatrixShape::R4C3: return 4*3;
+            case UniformMatrixShape::R4C4: return 4*4;
+        }
+    }
+
     GraphicsDeviceGL::GraphicsDeviceGL(IGraphicsContextGL *context) {
         this->context = context;
 
@@ -254,67 +277,46 @@ namespace XE {
             const GLint location = m_program->getUniformLoction(current->Name);
 
             switch (current->Type) {
-            case DataType::Float32: 
-                switch (current->Rows) {
-                case 2:
-                    switch (current->Columns) {
-                    case 2: glUniformMatrix2fv(location, current->Count, GL_FALSE, (const GLfloat*)&data[offset]); break;
-                    case 3: glUniformMatrix2x3fv(location, current->Count, GL_FALSE, (const GLfloat*)&data[offset]); break;
-                    case 4: glUniformMatrix2x4fv(location, current->Count, GL_FALSE, (const GLfloat*)&data[offset]); break;
-                    }
-                    break;
-
-                case 3:
-                    switch (current->Columns) {
-                    case 2: glUniformMatrix3x2fv(location, current->Count, GL_FALSE, (const GLfloat*)&data[offset]); break;
-                    case 3: glUniformMatrix3fv(location, current->Count, GL_FALSE, (const GLfloat*)&data[offset]); break;
-                    case 4: glUniformMatrix3x4fv(location, current->Count, GL_FALSE, (const GLfloat*)&data[offset]); break;
-                    }
-                    break;
-
-                case 4:
-                    switch (current->Columns) {
-                    case 2: glUniformMatrix4x2fv(location, current->Count, GL_FALSE, (const GLfloat*)&data[offset]); break;
-                    case 3: glUniformMatrix4x3fv(location, current->Count, GL_FALSE, (const GLfloat*)&data[offset]); break;
-                    case 4: glUniformMatrix4fv(location, current->Count, GL_FALSE, (const GLfloat*)&data[offset]); break;
-                    }
-                    break;
-                }
-                break;
-
-            case DataType::Float64: 
-                switch (current->Rows) {
-                case 2:
-                    switch (current->Columns) {
-                    case 2: glUniformMatrix2dv(location, current->Count, GL_FALSE, (const GLdouble*)&data[offset]); break;
-                    case 3: glUniformMatrix2x3dv(location, current->Count, GL_FALSE, (const GLdouble*)&data[offset]); break;
-                    case 4: glUniformMatrix2x4dv(location, current->Count, GL_FALSE, (const GLdouble*)&data[offset]); break;
-                    }
-                    break;
-
-                case 3:
-                    switch (current->Columns) {
-                    case 2: glUniformMatrix3x2dv(location, current->Count, GL_FALSE, (const GLdouble*)&data[offset]); break;
-                    case 3: glUniformMatrix3dv(location, current->Count, GL_FALSE, (const GLdouble*)&data[offset]); break;
-                    case 4: glUniformMatrix3x4dv(location, current->Count, GL_FALSE, (const GLdouble*)&data[offset]); break;
-                    }
-                    break;
-
-                case 4:
-                    switch (current->Columns) {
-                    case 2: glUniformMatrix4x2dv(location, current->Count, GL_FALSE, (const GLdouble*)&data[offset]); break;
-                    case 3: glUniformMatrix4x3dv(location, current->Count, GL_FALSE, (const GLdouble*)&data[offset]); break;
-                    case 4: glUniformMatrix4dv(location, current->Count, GL_FALSE, (const GLdouble*)&data[offset]); break;
-                    }
-                    break;
-                }
-                break;
+                case DataType::Float32: {
+                    const auto values = (const GLfloat*)&data[offset];
                     
-                default:
-                    assert(false);
+                    switch (current->shape) {
+                        case UniformMatrixShape::R2C2: glUniformMatrix2fv(location, current->Count, GL_FALSE, values); break;
+                        case UniformMatrixShape::R2C3: glUniformMatrix2x3fv(location, current->Count, GL_FALSE, values); break;
+                        case UniformMatrixShape::R2C4: glUniformMatrix2x4fv(location, current->Count, GL_FALSE, values); break;
+                        case UniformMatrixShape::R3C2: glUniformMatrix3x2fv(location, current->Count, GL_FALSE, values); break;
+                        case UniformMatrixShape::R3C3: glUniformMatrix3fv(location, current->Count, GL_FALSE, values); break;
+                        case UniformMatrixShape::R3C4: glUniformMatrix3x4fv(location, current->Count, GL_FALSE, values); break;
+                        case UniformMatrixShape::R4C2: glUniformMatrix4x2fv(location, current->Count, GL_FALSE, values); break;
+                        case UniformMatrixShape::R4C3: glUniformMatrix4x3fv(location, current->Count, GL_FALSE, values); break;
+                        case UniformMatrixShape::R4C4: glUniformMatrix4fv(location, current->Count, GL_FALSE, values); break;
+                    }
+                    break;
+                }
+                    
+                case DataType::Float64: {
+                    const auto values = (const GLdouble*)&data[offset];
+                    
+                    switch (current->shape) {
+                        case UniformMatrixShape::R2C2: glUniformMatrix2dv(location, current->Count, GL_FALSE, values); break;
+                        case UniformMatrixShape::R2C3: glUniformMatrix2x3dv(location, current->Count, GL_FALSE, values); break;
+                        case UniformMatrixShape::R2C4: glUniformMatrix2x4dv(location, current->Count, GL_FALSE, values); break;
+                        case UniformMatrixShape::R3C2: glUniformMatrix3x2dv(location, current->Count, GL_FALSE, values); break;
+                        case UniformMatrixShape::R3C3: glUniformMatrix3dv(location, current->Count, GL_FALSE, values); break;
+                        case UniformMatrixShape::R3C4: glUniformMatrix3x4dv(location, current->Count, GL_FALSE, values); break;
+                        case UniformMatrixShape::R4C2: glUniformMatrix4x2dv(location, current->Count, GL_FALSE, values); break;
+                        case UniformMatrixShape::R4C3: glUniformMatrix4x3dv(location, current->Count, GL_FALSE, values); break;
+                        case UniformMatrixShape::R4C4: glUniformMatrix4dv(location, current->Count, GL_FALSE, values); break;
+                    }
+                    break;
+                }
+                    
+                default: {
+                    assert(false && "Supplied DataType isn't supported");
+                }
             }
 
-            offset += ComputeByteSize(current->Type) * current->Rows * current->Columns * current->Count;
+            offset += ComputeByteSize(current->Type) * countElements(current->shape) * current->Count;
         }
     }
 
@@ -335,40 +337,40 @@ namespace XE {
 
             switch (current->Type) {
             case DataType::Int32:
-                switch (current->size) {
-                    case 1: glUniform1iv(location, current->Count, (const GLint*)&data[offset]); break;
-                    case 2: glUniform2iv(location, current->Count, (const GLint*)&data[offset]); break;
-                    case 3: glUniform3iv(location, current->Count, (const GLint*)&data[offset]); break;
-                    case 4: glUniform4iv(location, current->Count, (const GLint*)&data[offset]); break;
+                switch (current->dimension) {
+                    case UniformDimension::D1: glUniform1iv(location, current->Count, (const GLint*)&data[offset]); break;
+                    case UniformDimension::D2: glUniform2iv(location, current->Count, (const GLint*)&data[offset]); break;
+                    case UniformDimension::D3: glUniform3iv(location, current->Count, (const GLint*)&data[offset]); break;
+                    case UniformDimension::D4: glUniform4iv(location, current->Count, (const GLint*)&data[offset]); break;
                     default: assert(false);
                 }
                 break;
             
             case DataType::Float32:
-                switch (current->size) {
-                    case 1: glUniform1fv(location, current->Count, (const GLfloat*)&data[offset]); break;
-                    case 2: glUniform2fv(location, current->Count, (const GLfloat*)&data[offset]); break;
-                    case 3: glUniform3fv(location, current->Count, (const GLfloat*)&data[offset]); break;
-                    case 4: glUniform4fv(location, current->Count, (const GLfloat*)&data[offset]); break;
+                switch (current->dimension) {
+                    case UniformDimension::D1: glUniform1fv(location, current->Count, (const GLfloat*)&data[offset]); break;
+                    case UniformDimension::D2: glUniform2fv(location, current->Count, (const GLfloat*)&data[offset]); break;
+                    case UniformDimension::D3: glUniform3fv(location, current->Count, (const GLfloat*)&data[offset]); break;
+                    case UniformDimension::D4: glUniform4fv(location, current->Count, (const GLfloat*)&data[offset]); break;
                     default: assert(false);
                 }
                 break;
 
             case DataType::UInt32:
-                switch (current->size) {
-                    case 1: glUniform1uiv(location, current->Count, (const GLuint*)&data[offset]); break;
-                    case 2: glUniform2uiv(location, current->Count, (const GLuint*)&data[offset]); break;
-                    case 3: glUniform3uiv(location, current->Count, (const GLuint*)&data[offset]); break;
-                    case 4: glUniform4uiv(location, current->Count, (const GLuint*)&data[offset]); break;
+                switch (current->dimension) {
+                    case UniformDimension::D1: glUniform1uiv(location, current->Count, (const GLuint*)&data[offset]); break;
+                    case UniformDimension::D2: glUniform2uiv(location, current->Count, (const GLuint*)&data[offset]); break;
+                    case UniformDimension::D3: glUniform3uiv(location, current->Count, (const GLuint*)&data[offset]); break;
+                    case UniformDimension::D4: glUniform4uiv(location, current->Count, (const GLuint*)&data[offset]); break;
                     default: assert(false);
                 }
                 break;
 
             default:
-                assert(false);
+                assert(false && "Supplied DataType isn't supported");
             }
 
-            offset += ComputeByteSize(current->Type) * current->size * current->Count;
+            offset += ComputeByteSize(current->Type) * countElements(current->dimension) * current->Count;
         }
     }
 
