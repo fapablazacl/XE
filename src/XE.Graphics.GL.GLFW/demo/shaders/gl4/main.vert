@@ -3,7 +3,8 @@
 uniform mat4 uProjViewModel;
 
 layout(location = 0) in vec3 vsCoord;
-layout(location = 1) in vec4 vsColor;
+layout(location = 1) in vec3 vsNormal;
+layout(location = 2) in vec4 vsColor;
 
 out vec4 fsColor;
 

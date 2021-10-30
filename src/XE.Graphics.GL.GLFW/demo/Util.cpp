@@ -207,9 +207,11 @@ namespace demo {
         
         const std::vector<XE::SubsetVertexAttrib> attribs {
             {0, XE::DataType::Float32, 3, false, sizeof(Vertex), 0, 0},
-            {1, XE::DataType::Float32, 4, false, sizeof(Vertex), 0, OFFSETOF(Vertex, color)}
+            {1, XE::DataType::Float32, 3, false, sizeof(Vertex), 0, OFFSETOF(Vertex, normal)},
+            {2, XE::DataType::Float32, 4, false, sizeof(Vertex), 0, OFFSETOF(Vertex, color)}
         };
 
+    
         const XE::SubsetDescriptor2 subsetDesc {
             &vertexBuffer, 1,
             attribs.data(), attribs.size(),
@@ -235,7 +237,8 @@ namespace demo {
 
         const std::vector<XE::SubsetVertexAttrib> attribs {
             {0, XE::DataType::Float32, 3, false, sizeof(Vertex), 0, 0},
-            {1, XE::DataType::Float32, 4, false, sizeof(Vertex), 0, OFFSETOF(Vertex, color)}
+            {1, XE::DataType::Float32, 3, false, sizeof(Vertex), 0, OFFSETOF(Vertex, normal)},
+            {2, XE::DataType::Float32, 4, false, sizeof(Vertex), 0, OFFSETOF(Vertex, color)}
         };
         
         const XE::SubsetDescriptor2 subsetDesc {
