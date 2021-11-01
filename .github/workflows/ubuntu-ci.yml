@@ -1,0 +1,16 @@
+name: Ubuntu CI
+on: [push]
+jobs:
+  Ubuntu-CI:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Source Code and Submodules
+        uses: actions/checkout@v2
+        with:
+          - submodules: true
+
+      - name: Configure a Debug Build
+        run: mkdir -p build/gcc/debug && cmake -B build/gcc/debug -DCMAKE_BUILD_TYPE=Debug
+
+      - name: Building Debug Configuration
+        run: cmake --build build/gcc/debug
