@@ -1,7 +1,7 @@
-name: Ubuntu CI
+name: CI on Ubuntu
 on: [push]
 jobs:
-  Ubuntu-CI:
+  ci-ubuntu-gcc:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Source Code and Submodules
@@ -9,14 +9,22 @@ jobs:
         with:
           submodules: true
 
-      - name: (gcc) Configure a Debug Build
+      - name: Configure a Debug Build
         run: mkdir -p build/gcc/debug && cmake -B build/gcc/debug -DCMAKE_BUILD_TYPE=Debug -DXE_CXX_FLAGS="-Wall" -DXE_PLUGIN_GL=ON -DXE_PLUGIN_ES2=OFF -DXE_PLUGIN_GL_GLFW=ON
 
-      - name: (gcc) Building Debug Configuration
+      - name: Building Debug Configuration
         run: cmake --build build/gcc/debug
-      
-      - name: (clang) Configure a Debug Build
+
+  ci-ubuntu-clang:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Source Code and Submodules
+        uses: actions/checkout@v2
+        with:
+          submodules: true
+
+      - name: Configure a Debug Build
         run: mkdir -p build/clang/debug && export CC=clang && export CXX=clang++ && cmake -B build/clang/debug -DCMAKE_BUILD_TYPE=Debug -DXE_CXX_FLAGS="-Wall" -DXE_PLUGIN_GL=ON -DXE_PLUGIN_ES2=OFF -DXE_PLUGIN_GL_GLFW=ON
 
-      - name: (clang) Building Debug Configuration
+      - name: Building Debug Configuration
         run: cmake --build build/clang/debug
