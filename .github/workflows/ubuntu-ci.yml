@@ -13,7 +13,7 @@ jobs:
         run: sudo apt install xorg-dev 
 
       - name: Installing "glbinding" from Upstream, v3.1.0
-        run: git clone --depth 1 --branch v3.1.0 https://github.com/cginternals/glbinding.git dep/glbinding && mkdir -p dep/glbinding/build/gcc && cmake -B dep/glbinding/build/gcc -DCMAKE_BUILD_TYPE=DEBUG && cmake --build dep/glbinding/build/gcc --target install
+        run: git clone --depth 1 --branch v3.1.0 https://github.com/cginternals/glbinding.git dep/glbinding && mkdir -p dep/glbinding/build/gcc && cmake -B dep/glbinding/build/gcc -DCMAKE_BUILD_TYPE=Debug && cmake --build dep/glbinding/build/gcc && cmake --build dep/glbinding/build/gcc --target install
 
       - name: Configure a Debug Build
         run: mkdir -p build/gcc/debug && cmake -B build/gcc/debug -DCMAKE_BUILD_TYPE=Debug -DXE_CXX_FLAGS="-Wall" -DXE_PLUGIN_GL=ON -DXE_PLUGIN_ES2=OFF -DXE_PLUGIN_GL_GLFW=ON
