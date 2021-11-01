@@ -10,7 +10,7 @@ jobs:
           submodules: true
 
       - name: Installing Development Dependencies
-        run: sudo apt install xorg-dev libglbinding-dev
+        run: sudo apt install xorg-dev libglbinding2
 
       - name: Configure a Debug Build
         run: mkdir -p build/gcc/debug && cmake -B build/gcc/debug -DCMAKE_BUILD_TYPE=Debug -DXE_CXX_FLAGS="-Wall" -DXE_PLUGIN_GL=ON -DXE_PLUGIN_ES2=OFF -DXE_PLUGIN_GL_GLFW=ON
@@ -27,7 +27,7 @@ jobs:
           submodules: true
 
       - name: Installing Development Dependencies
-        run: sudo apt install xorg-dev libglbinding-dev
+        run: sudo apt install xorg-dev libglbinding2
 
       - name: Configure a Debug Build
         run: mkdir -p build/clang/debug && export CC=clang && export CXX=clang++ && cmake -B build/clang/debug -DCMAKE_BUILD_TYPE=Debug -DXE_CXX_FLAGS="-Wall" -DXE_PLUGIN_GL=ON -DXE_PLUGIN_ES2=OFF -DXE_PLUGIN_GL_GLFW=ON
