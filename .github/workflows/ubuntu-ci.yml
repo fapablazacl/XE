@@ -7,7 +7,7 @@ jobs:
       - name: Checkout Source Code and Submodules
         uses: actions/checkout@v2
         with:
-          - submodules: true
+          submodules: true
 
       - name: Configure a Debug Build
         run: mkdir -p build/gcc/debug && cmake -B build/gcc/debug -DCMAKE_BUILD_TYPE=Debug
