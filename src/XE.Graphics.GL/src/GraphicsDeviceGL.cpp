@@ -29,6 +29,8 @@ namespace XE {
             case UniformDimension::D3: return 3;
             case UniformDimension::D4: return 4;
         }
+
+        return -1;
     }
 
     inline int countElements(const UniformMatrixShape shape) {
@@ -43,6 +45,8 @@ namespace XE {
             case UniformMatrixShape::R4C3: return 4*3;
             case UniformMatrixShape::R4C4: return 4*4;
         }
+
+        return -1;
     }
 
     GraphicsDeviceGL::GraphicsDeviceGL(IGraphicsContextGL *context) {

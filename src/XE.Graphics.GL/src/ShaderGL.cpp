@@ -2,6 +2,7 @@
 #include <XE/Graphics/GL/ShaderGL.h>
 
 #include <stdexcept>
+#include <cassert>
 
 namespace XE {
     static GLenum s_shaderTypesGL[] = {
