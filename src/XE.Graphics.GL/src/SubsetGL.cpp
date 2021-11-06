@@ -28,7 +28,7 @@ namespace XE {
                 attrib.size, 
                 convertToGL(attrib.type), 
                 convertToGL(attrib.normalized), 
-                attrib.stride,
+                static_cast<GLsizei>(attrib.stride),
                 reinterpret_cast<const void*>(attrib.bufferOffset)
             );
         }

@@ -22,6 +22,7 @@ set (sources
 add_library (${target} ${sources})
 
 target_include_directories(${target} PUBLIC "include/")
+target_compile_definitions(${target} PRIVATE _CRT_SECURE_NO_WARNINGS)
 
 #target_compile_options (${target} PUBLIC "${XE_CXX_FLAGS}")
 

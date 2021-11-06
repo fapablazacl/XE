@@ -79,8 +79,8 @@ namespace XE {
         bool cullBackFace = false;
         bool blendEnable = false;
 
-        BlendParam blendSource;
-        BlendParam blendDestination;
+        BlendParam blendSource = BlendParam::One;
+        BlendParam blendDestination = BlendParam::One;
 
         float lineWidth = 1.0f;
         DepthFunc depthFunc = DepthFunc::LesserEqual;
