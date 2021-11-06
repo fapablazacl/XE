@@ -1,5 +1,6 @@
 
-#include <catch.hpp>
+#include <catch2/catch.hpp>
+
 #include <XE/Scene/VirtualSphere.h>
 
 TEST_CASE("VirtualSphere accessors should fill its fields properly", "[VirtualSphere]") {

@@ -19,9 +19,6 @@ namespace XE {
             case DataType::Int32: return GL_INT;
             case DataType::Float32: return GL_FLOAT;
             case DataType::Float64: return GL_DOUBLE;
-            default:
-                assert(false);
-                return 0;
         }
     }
 
@@ -29,9 +26,6 @@ namespace XE {
         switch (format) {
             case PixelFormat::R8G8B8: return GL_RGB;
             case PixelFormat::R8G8B8A8: return GL_RGBA;
-            default:
-                assert(false);
-                return 0;
         }
     }
 
@@ -39,9 +33,6 @@ namespace XE {
         switch (type) {
             case BufferType::Vertex: return GL_ARRAY_BUFFER;
             case BufferType::Index: return GL_ELEMENT_ARRAY_BUFFER;
-            default:
-                assert(false);
-                return 0;
         }
     }
 
@@ -52,9 +43,6 @@ namespace XE {
             case BufferUsage::Copy: return GL_DYNAMIC_COPY;
             case BufferUsage::Read: return GL_DYNAMIC_READ;
             case BufferUsage::Write: return GL_DYNAMIC_DRAW;
-            default:
-                assert(false);
-                return 0;
             }
 
         case BufferAccess::Static:
@@ -62,9 +50,6 @@ namespace XE {
             case BufferUsage::Copy: return GL_STATIC_COPY;
             case BufferUsage::Read: return GL_STATIC_READ;
             case BufferUsage::Write: return GL_STATIC_DRAW;
-            default:
-                assert(false);
-                return 0;
             }
             
         case BufferAccess::Stream:
@@ -72,14 +57,7 @@ namespace XE {
             case BufferUsage::Copy: return GL_STREAM_COPY;
             case BufferUsage::Read: return GL_STREAM_READ;
             case BufferUsage::Write: return GL_STREAM_DRAW;
-            default:
-                assert(false);
-                return 0;
             }
-
-        default:
-            assert(false);
-            return 0;
         }
     }
 
@@ -91,9 +69,6 @@ namespace XE {
             case PrimitiveType::TriangleStrip: return GL_TRIANGLE_STRIP;
             case PrimitiveType::TriangleList: return GL_TRIANGLES;
             case PrimitiveType::TriangleFan: return GL_TRIANGLE_FAN;
-            default:
-                assert(false);
-                return 0;
         }
     }
 
@@ -107,9 +82,6 @@ namespace XE {
             case DepthFunc::NotEqual:       return GL_NOTEQUAL;
             case DepthFunc::GreaterEqual:   return GL_GEQUAL;
             case DepthFunc::Always:         return GL_ALWAYS;
-            default:
-                assert(false);
-                return 0;
         }
     }
 
@@ -118,9 +90,6 @@ namespace XE {
             case PolygonMode::Fill: return GL_FILL;
             case PolygonMode::Line: return GL_LINE;
             case PolygonMode::Point: return GL_POINT;
-            default:
-                assert(false);
-                return 0;
         }
     }
 
@@ -128,9 +97,6 @@ namespace XE {
         switch (order) {
             case FrontFaceOrder::CounterClockwise: return GL_CCW;
             case FrontFaceOrder::Clockwise: return GL_CW;
-            default:
-                assert(false);
-                return 0;
         }
     }
 
@@ -150,9 +116,6 @@ namespace XE {
             case BlendParam::OneMinusConstantColor: return GL_ONE_MINUS_CONSTANT_COLOR;
             case BlendParam::ConstantAlpha: return GL_CONSTANT_ALPHA;
             case BlendParam::OneMinusConstantAlpha: return GL_ONE_MINUS_CONSTANT_ALPHA;
-            default:
-                assert(false);
-                return 0;
         }
     }
 
@@ -160,9 +123,6 @@ namespace XE {
         switch (filter) {
             case TextureFilter::Linear: return GL_LINEAR;
             case TextureFilter::Nearest: return GL_NEAREST;
-            default:
-                assert(false);
-                return 0;
         }
     }
 
@@ -170,13 +130,10 @@ namespace XE {
         switch (wrap) {
             case TextureWrap::Clamp: return GL_CLAMP_TO_BORDER;
             case TextureWrap::Repeat: return GL_REPEAT;
-            default:
-                assert(false);
-                return 0;
         }
     }
     
-    GLenum convertToGL(const bool value) {
+    GLboolean convertToGL(const bool value) {
         return value ? GL_TRUE : GL_FALSE;
     }
 }

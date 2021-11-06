@@ -14,11 +14,9 @@ namespace XE {
         const GLenum formatGL = convertToGL(sourceFormat);
         const GLenum typeGL = convertToGL(sourceDataType);
 
-        ::glBindTexture(GL_TEXTURE_2D, m_id);
-        ::glTexImage2D(GL_TEXTURE_2D, 0, internalFormatGL, m_size.X, m_size.Y, 0, formatGL, typeGL, sourceData);
-        ::glBindTexture(GL_TEXTURE_2D, 0);
-
-        XE_GRAPHICS_GL_CHECK_ERROR();
+        glBindTexture(GL_TEXTURE_2D, m_id);
+        glTexImage2D(GL_TEXTURE_2D, 0, internalFormatGL, m_size.X, m_size.Y, 0, formatGL, typeGL, sourceData);
+        glBindTexture(GL_TEXTURE_2D, 0);
     }
 
     Texture2DGL::~Texture2DGL() {}
@@ -29,21 +27,17 @@ namespace XE {
         const GLenum formatGL = convertToGL(surfaceFormat);
         const GLenum dataTypeGL = convertToGL(surfaceDataType);
 
-        ::glBindTexture(GL_TEXTURE_2D, m_id);
-        ::glTexSubImage2D(GL_TEXTURE_2D, mipLevel, offset.X, offset.Y, size.X, size.Y, formatGL, dataTypeGL, surfaceData);
-        ::glBindTexture(GL_TEXTURE_2D, 0);
-
-        XE_GRAPHICS_GL_CHECK_ERROR();
+        glBindTexture(GL_TEXTURE_2D, m_id);
+        glTexSubImage2D(GL_TEXTURE_2D, mipLevel, offset.X, offset.Y, size.X, size.Y, formatGL, dataTypeGL, surfaceData);
+        glBindTexture(GL_TEXTURE_2D, 0);
     }
     
     void Texture2DGL::getData(std::byte *surfaceData, const int mipLevel, const PixelFormat surfaceFormat, const DataType surfaceDataType) const {
         const GLenum formatGL = convertToGL(surfaceFormat);
         const GLenum dataTypeGL = convertToGL(surfaceDataType);
 
-        ::glBindTexture(GL_TEXTURE_2D, m_id);
-        ::glGetTexImage(GL_TEXTURE_2D, mipLevel, formatGL, dataTypeGL, surfaceData);
-        ::glBindTexture(GL_TEXTURE_2D, 0);
-
-        XE_GRAPHICS_GL_CHECK_ERROR();
+        glBindTexture(GL_TEXTURE_2D, m_id);
+        glGetTexImage(GL_TEXTURE_2D, mipLevel, formatGL, dataTypeGL, surfaceData);
+        glBindTexture(GL_TEXTURE_2D, 0);
     }
 }

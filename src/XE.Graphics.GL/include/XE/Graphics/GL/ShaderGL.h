@@ -3,7 +3,8 @@
 #define __XE_GRAPHICS_GL_SHADERGL_HPP__
 
 #include <XE/Graphics/Shader.h>
-#include <glad/glad.h>
+
+#include "glcore.h"
 
 namespace XE {
     class ShaderGL : public Shader {
@@ -24,7 +25,7 @@ namespace XE {
         ShaderType m_type;
         std::string m_source;
 
-        GLenum m_id;
+        GLuint m_id;
         GLenum m_typeGL;
     };
 }

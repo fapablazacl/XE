@@ -4,7 +4,8 @@
 
 #include <XE/Buffer.h>
 #include <XE/Graphics/BufferDescriptor.h>
-#include <glad/glad.h>
+
+#include "glcore.h"
 
 namespace XE {
     enum class BufferUsage;

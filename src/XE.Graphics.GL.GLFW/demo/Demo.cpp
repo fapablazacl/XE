@@ -79,9 +79,12 @@ public:
         const XE::M4 current = mTransformation * parentTransformation;
 
         if (mRenderable) {
-            const XE::UniformMatrix uProjModelView = {"uProjViewModel", XE::DataType::Float32, 4, 4, 1};
+            const XE::UniformMatrix uProjModelView = {"uProjViewModel", XE::DataType::Float32, XE::UniformMatrixShape::R4C4, 1};
             graphicsDevice->applyUniform(&uProjModelView, 1, reinterpret_cast<const std::byte*>(current.data()));
-
+            
+            const XE::UniformMatrix uModel = {"uModel", XE::DataType::Float32, XE::UniformMatrixShape::R4C4, 1};
+            graphicsDevice->applyUniform(&uModel, 1, reinterpret_cast<const std::byte*>(mTransformation.data()));
+            
             mRenderable->render(graphicsDevice);
         }
 
@@ -98,8 +101,8 @@ private:
 };
 
 struct Camera {
-    XE::Vector3f position = {0.0f, 0.5f, 2.5f};
-    XE::Vector3f lookAt = {0.0f, 0.0f, 0.0f};
+    XE::Vector3f position = {0.0f, 1.5f, 2.5f};
+    XE::Vector3f lookAt = {0.0f, 1.5f, 0.0f};
     XE::Vector3f up = {0.0f, 1.0f, 0.0f};
 
     float fov = XE::radians(60.0f);
@@ -185,7 +188,7 @@ namespace demo {
         }
 
         void setupGeometry() {
-            const Mesh mesh = makeColoredCubeMesh(0.25f, 0.25f, 0.25f);
+            const Mesh mesh = makeCubeMesh(0.25f, 0.25f, 0.25f);
 
             mColoredCubeSubset = createCubeSubset2(mGraphicsDevice.get(), mesh);
             mColoredCubeSubsetEnvelope = {
@@ -214,8 +217,8 @@ namespace demo {
             mCubeSubset = createCubeSubset2(mGraphicsDevice.get(), cubeMesh);
             
             mCubeSubsetEnvelope = { 
-                floorMesh.primitive, 0, 
-                static_cast<int>(floorMesh.vertices.size())
+                floorMesh.primitive, 0,
+                static_cast<int>(cubeMesh.vertices.size())
             };
 
             mMaterial.renderState.depthTest = true;
@@ -237,7 +240,7 @@ namespace demo {
 
             mRightCubeNode = mSceneNode.createChild();
             mRightCubeNode->setRenderable(&mColoredCubeRenderable);
-
+            
             mEnemyRenderable = {mCubeSubset, mCubeSubsetEnvelope};
             mEnemyNode = mSceneNode.createChild();
             mEnemyNode->setRenderable(&mEnemyRenderable);
@@ -297,6 +300,10 @@ namespace demo {
             mGraphicsDevice->beginFrame(XE::ClearFlags::All, {0.0f, 0.0f, 0.0f, 1.0f}, 1.0f, 0);
 
             mGraphicsDevice->setProgram(mSimpleProgram);
+            
+            const XE::UniformMatrix uView = {"uView", XE::DataType::Float32, XE::UniformMatrixShape::R4C4, 1};
+            mGraphicsDevice->applyUniform(&uView, 1, reinterpret_cast<const std::byte*>(view.data()));
+            
             mGraphicsDevice->setMaterial(&mMaterial);
             mSceneNode.visit(mGraphicsDevice.get(), viewProj);
             

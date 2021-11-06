@@ -198,7 +198,7 @@ namespace XE {
 
         std::vector<const char*> getRequiredExtensions() const {
             uint32_t extensionCount;
-            const char **extensions = ::glfwGetRequiredInstanceExtensions(&extensionCount);
+            const char **extensions = glfwGetRequiredInstanceExtensions(&extensionCount);
 
             std::vector<const char*> result = {extensions, extensions + extensionCount};
 
@@ -776,7 +776,7 @@ namespace XE {
                 renderPassInfo.renderArea.offset = {0, 0};
                 renderPassInfo.renderArea.extent = mSwapchainExtent;
 
-                VkClearValue clearValue = {0.0f, 0.0f, 0.0f, 1.0f};
+                VkClearValue clearValue {0.0f, 0.0f, 0.0f, 1.0f};
                 renderPassInfo.clearValueCount = 1;
                 renderPassInfo.pClearValues = &clearValue;
 

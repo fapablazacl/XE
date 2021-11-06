@@ -1,13 +1,6 @@
 
 cmake_minimum_required (VERSION 3.10)
 
-include ("cmake/HunterGate.cmake")
-
-HunterGate(
-    URL "https://github.com/cpp-pm/hunter/archive/v0.23.297.tar.gz"
-    SHA1 "3319fe6a3b08090df7df98dee75134d68e2ef5a3"
-)
-
 project (XE)
 
 option (XE_PLUGIN_PNG           "Include PNG image support via LodePNG" OFF)
@@ -33,9 +26,11 @@ if (XE_UNIT_TEST)
     target_include_directories(Catch2 INTERFACE "dep/Catch2/single_include")
 endif()
 
+
 # XE_CXX_FLAGS
 # Flags that will be passed for the targets, specific to the compilation of the targets (not its dependencies)
 
+# TODO: Configure the version numbering mechanism
 set (XE_VERSION_MAJOR 0)
 set (XE_VERSION_MINOR 0)
 set (XE_VERSION_REVISION 0)
@@ -81,16 +76,19 @@ if (XE_PLUGIN_DIRECT3D11)
     add_subdirectory ("src/XE.Graphics.D3D11.TestApp")
 endif ()
 
-# include glfw and glbinding
+# include glfw
 if (XE_PLUGIN_GL OR XE_PLUGIN_ES2 OR XE_PLUGIN_VULKAN) 
-    hunter_add_package(glfw)
-    find_package(glfw3 REQUIRED)
+	set (GLFW_BUILD_DOCS CACHE BOOL OFF)
+	set (GLFW_BUILD_TESTS CACHE BOOL OFF)
+	set (GLFW_BUILD_EXAMPLES CACHE BOOL OFF)
+	set (GLFW_BUILD_INSTALL CACHE BOOL OFF)
+	set (GLFW_INSTALL CACHE BOOL OFF)
+	add_subdirectory ("dep/glfw")
+
+    target_include_directories("glfw" INTERFACE "dep/glfw/include")
 endif ()
 
 if (XE_PLUGIN_GL)
-    include_directories ("src/khronos")
-
-    add_subdirectory ("src/glad-gl4")
     add_subdirectory ("src/XE.Graphics.GL")
 endif ()
 
@@ -99,9 +97,6 @@ if (XE_PLUGIN_GL_GLFW)
 endif()
 
 if (XE_PLUGIN_ES2)
-    include_directories ("src/khronos")
-
-    add_subdirectory ("src/glad-es2")
     add_subdirectory ("src/XE.Graphics.ES2")
 endif()
 
@@ -113,10 +108,6 @@ endif ()
 #========================================================
 # EXAMPLES SECTION
 #========================================================
-if (XE_EXAMPLE_DEMO)
-    add_subdirectory("examples/XE.Demo")
-endif()
-
 if (XE_EXAMPLE_SANDBOX)
     add_subdirectory("examples/XE.Sandbox")
 endif()

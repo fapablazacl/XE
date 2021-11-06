@@ -1,5 +1,5 @@
 
-#include <catch.hpp>
+#include <catch2/catch.hpp>
 
 #include <XE/Math/Common.h>
 #include <XE/Math/Vector.h>
@@ -91,12 +91,12 @@ TEST_CASE("Math::Matrix<3, float>", "[Matrix]") {
             Vector4f{ -8.0f,  1.0f,  14.0f,  2.0f}
         });
     
-        const Matrix4f matDivResult = Matrix4f::make({
+        /*const Matrix4f matDivResult = Matrix4f::make({
             Vector4f{-1.0f, 2.0f, 0.f,  0.0f},
             Vector4f{ 2.0f, 0.0f, 3.0f, -1.0f},
             Vector4f{-3.0f, 1.0f, 1.0f,  0.0f},
             Vector4f{ 2.0f, 1.0f, 0.0f,  1.0f}
-        });
+        });*/
     
         // addition
         REQUIRE(matA == +matA);

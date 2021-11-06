@@ -1,5 +1,5 @@
 
-#include <catch.hpp>
+#include <catch2/catch.hpp>
 #include <XE/Math/Common.h>
 
 TEST_CASE("Mathematical common functions") {
