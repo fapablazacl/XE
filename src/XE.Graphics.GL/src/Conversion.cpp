@@ -9,28 +9,49 @@
 #include <XE/Graphics/Material.h>
 
 namespace XE {
-    static const std::array<GLenum, 8> dataType {
-        GL_UNSIGNED_BYTE, GL_UNSIGNED_SHORT, GL_UNSIGNED_INT,
-        GL_BYTE, GL_SHORT, GL_INT,
-        GL_FLOAT, GL_DOUBLE
+    static const std::array<GLenum, 12> dataType {
+        static_cast<GLenum>(0),
+        GL_UNSIGNED_BYTE, 
+        GL_UNSIGNED_SHORT, 
+        GL_UNSIGNED_INT,
+        static_cast<GLenum>(0),
+        GL_BYTE, 
+        GL_SHORT, 
+        GL_INT,
+        static_cast<GLenum>(0),
+        static_cast<GLenum>(0),
+        GL_FLOAT, 
+        GL_DOUBLE
     };
 
-    GLenum convertToGL(const DataType type) {
-        assert(type != DataType::Unknown);
-        assert(type != DataType::Float16);
 
-        return dataType[static_cast<int>(type)];
+    GLenum convertToGL(const DataType type) {
+        assert(type >= DataType::MetaFirst);
+        assert(type < DataType::MetaCount);
+
+        const GLenum result = dataType[static_cast<int>(type)];
+
+        assert(result != static_cast<GLenum>(0));
+
+        return result;
     }
 
 
-    static const std::array<GLenum, 2> pixelFormat {
-        GL_RGB, GL_RGBA
+    static const std::array<GLenum, 3> pixelFormat {
+        static_cast<GLenum>(0), 
+        GL_RGB, 
+        GL_RGBA
     };
 
     GLenum convertToGL(const PixelFormat format) {
-        assert(format != PixelFormat::Unknown);
+        assert(format >= PixelFormat::MetaFirst);
+        assert(format < PixelFormat::MetaCount);
 
-        return pixelFormat[static_cast<int>(format)];
+        const GLenum result = pixelFormat[static_cast<int>(format)];
+
+        assert(result != static_cast<GLenum>(0));
+
+        return result;
     }
 
 
@@ -51,16 +72,19 @@ namespace XE {
     }};
 
     GLenum convertToGL(const BufferUsage usage, const BufferAccess access) {
-        const auto& bufferAccess = bufferUsageAccess[static_cast<int>(usage)];
+        const auto& bufferUsage = bufferUsageAccess[static_cast<int>(access)];
 
-        return bufferAccess[static_cast<int>(access)];
+        return bufferUsage[static_cast<int>(usage)];
     }
 
 
     static const std::array<GLenum, 8> primitiveType {
         GL_POINTS,
-        GL_LINES, GL_LINE_STRIP,
-        GL_TRIANGLE_STRIP, GL_TRIANGLES, GL_TRIANGLE_FAN
+        GL_LINES, 
+        GL_LINE_STRIP,
+        GL_TRIANGLE_STRIP, 
+        GL_TRIANGLES, 
+        GL_TRIANGLE_FAN
     };
 
     GLenum convertToGL(const PrimitiveType type) {
@@ -80,7 +104,7 @@ namespace XE {
 
 
     static const std::array<GLenum, 3> polygonMode {
-        GL_FILL, GL_LINE, GL_POINT
+        GL_POINT, GL_LINE, GL_FILL
     };
 
     GLenum convertToGL(const PolygonMode mode) {
@@ -89,7 +113,7 @@ namespace XE {
 
     
     static const std::array<GLenum, 2> frontFaceOrder {
-        GL_CCW, GL_CW
+        GL_CW, GL_CCW
     };
 
     GLenum convertToGL(const FrontFaceOrder order) {
@@ -118,13 +142,19 @@ namespace XE {
     }
 
     
-    static const std::array<GLenum, 2> filters {GL_LINEAR, GL_NEAREST};
+    static const std::array<GLenum, 2> filters {
+        GL_NEAREST, 
+        GL_LINEAR
+    };
 
     GLenum convertToGL(const TextureFilter filter) {
         return filters[static_cast<int>(filter)];
     }
 
-    static const std::array<GLenum, 2> textureWraps {GL_CLAMP_TO_BORDER, GL_REPEAT};
+    static const std::array<GLenum, 2> textureWraps {
+        GL_REPEAT, 
+        GL_CLAMP_TO_BORDER
+    };
     
     GLenum convertToGL(const TextureWrap wrap) {
         return textureWraps[static_cast<int>(wrap)];

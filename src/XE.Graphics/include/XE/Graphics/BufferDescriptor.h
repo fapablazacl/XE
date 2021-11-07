@@ -11,7 +11,7 @@ namespace XE {
     };
 
     enum class BufferUsage {
-        Write, Read, Copy
+        Copy, Read, Write
     };
 
     enum class BufferType {

@@ -6,7 +6,8 @@
 
 namespace XE {
     enum class DataType : std::int16_t {
-        Unknown,
+        MetaFirst,
+        Unknown = MetaFirst,
         UInt8,
         UInt16,
         UInt32,
@@ -17,7 +18,8 @@ namespace XE {
         Int64,
         Float16,
         Float32,
-        Float64
+        Float64,
+        MetaCount
     };
 
     extern int ComputeByteSize(const DataType dataType);

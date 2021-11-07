@@ -4,9 +4,11 @@
 
 namespace XE {
     enum class PixelFormat {
-        Unknown,
+        MetaFirst,
+        Unknown = MetaFirst,
         R8G8B8,
         R8G8B8A8,
+        MetaCount
     };
 
     extern int ComputeStorage(const PixelFormat format);
