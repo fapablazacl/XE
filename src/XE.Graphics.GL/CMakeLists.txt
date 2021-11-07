@@ -39,3 +39,17 @@ add_library (${target} ${sources})
 target_include_directories (${target} PUBLIC "include/")
 target_link_libraries (${target} XE.Core XE.Graphics glbinding::glbinding glbinding::glbinding-aux)
 target_compile_options (${target} PUBLIC ${XE_CXX_FLAGS})
+
+if (XE_UNIT_TEST)
+    set (test_target "XE.Graphics.GL.UnitTest")
+
+    set (test_sources 
+        "unit-test/XEGraphicsGLUnitTest.cpp"
+    )
+
+    add_executable(${test_target} ${test_sources})
+    target_link_libraries(${test_target} Catch2 XE.Graphics.GL)
+
+    # NOTE: The test name must have the same name as the command name
+    add_test(NAME ${test_target} COMMAND ${test_target})
+endif()

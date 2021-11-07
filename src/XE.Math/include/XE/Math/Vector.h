@@ -65,7 +65,9 @@ namespace XE {
             struct {T X, Y, Z, W; };
         };
 
-        VectorBase() {}
+        VectorBase() {
+            X = Y = Z = W = static_cast<T>(0);
+        }
 
         VectorBase(T x, T y, T z, T w) {
             X = x;

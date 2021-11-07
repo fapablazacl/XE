@@ -5,7 +5,9 @@
 #include <XE/Graphics.h>
 #include <vector>
 
-#define OFFSETOF(type, field)    ((unsigned long) &(((type *) 0)->field))
+#define OFFSETOF(type, field)    reinterpret_cast<unsigned long long>(&(((type *) 0)->field))
+
+
 
 namespace demo {
     struct Vertex {
