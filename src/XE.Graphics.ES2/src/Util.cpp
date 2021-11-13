@@ -3,6 +3,7 @@
 
 #include <cassert>
 #include <iostream>
+
 #include <glad/glad.h>
 
 namespace XE {

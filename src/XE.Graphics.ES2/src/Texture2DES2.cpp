@@ -4,8 +4,8 @@
 #include <XE/Graphics/ES2/Util.h>
 
 namespace XE {
-    Texture2DGL::Texture2DGL(const PixelFormat format, const Vector2i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void *sourceData)
-            : TextureBaseGL(GL_TEXTURE_2D) {
+    Texture2DES::Texture2DES(const PixelFormat format, const Vector2i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void *sourceData)
+            : TextureBaseES(GL_TEXTURE_2D) {
 
         m_size = size;
         m_format = format;
@@ -21,9 +21,9 @@ namespace XE {
         XE_GRAPHICS_GL_CHECK_ERROR();
     }
 
-    Texture2DGL::~Texture2DGL() {}
+    Texture2DES::~Texture2DES() {}
 
-    void Texture2DGL::setData(const std::byte *surfaceData, const int mipLevel, const PixelFormat surfaceFormat, const DataType surfaceDataType, const Recti &area) {
+    void Texture2DES::setData(const std::byte *surfaceData, const int mipLevel, const PixelFormat surfaceFormat, const DataType surfaceDataType, const Recti &area) {
         const Vector2i offset = area.minEdge;
         const Vector2i size = area.computeSize();
         const GLenum formatGL = convertToGL(surfaceFormat);
@@ -36,7 +36,7 @@ namespace XE {
         XE_GRAPHICS_GL_CHECK_ERROR();
     }
     
-    void Texture2DGL::getData(std::byte *surfaceData, const int mipLevel, const PixelFormat surfaceFormat, const DataType surfaceDataType) const {
+    void Texture2DES::getData(std::byte *surfaceData, const int mipLevel, const PixelFormat surfaceFormat, const DataType surfaceDataType) const {
         const GLenum formatGL = convertToGL(surfaceFormat);
         const GLenum dataTypeGL = convertToGL(surfaceDataType);
 

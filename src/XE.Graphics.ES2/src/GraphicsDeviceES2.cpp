@@ -42,40 +42,37 @@ namespace XE {
 
     GraphicsDeviceES2::~GraphicsDeviceES2() {}
     
-    std::unique_ptr<Subset> GraphicsDeviceES2::createSubset(
-            SubsetDescriptor& desc, 
-            std::vector<std::unique_ptr<Buffer>> buffers, 
-            const std::map<std::string, int> &bufferMapping, 
-            std::unique_ptr<Buffer> indexBuffer) {
-        return std::make_unique<SubsetGL>(desc, std::move(buffers), bufferMapping, std::move(indexBuffer));
+    Subset* GraphicsDeviceES2::createSubset(const SubsetDescriptor2& desc) {
+        return nullptr;
     }
         
-    std::unique_ptr<Buffer> GraphicsDeviceES2::createBuffer(const BufferDescriptor &desc) {
-        return std::make_unique<BufferES2>(desc);
+    Buffer* GraphicsDeviceES2::createBuffer(const BufferDescriptor &desc) {
+        return new BufferES2(desc);
     }
         
-    std::unique_ptr<Texture2D> GraphicsDeviceES2::createTexture2D(const PixelFormat format, const Vector2i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void *sourceData) {
-        return std::make_unique<Texture2DGL>(format, size, sourceFormat, sourceDataType, sourceData);
+    Texture2D* GraphicsDeviceES2::createTexture2D(const PixelFormat format, const Vector2i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void *sourceData) {
+        return new Texture2DES(format, size, sourceFormat, sourceDataType, sourceData);
     }
         
-    std::unique_ptr<Texture3D> GraphicsDeviceES2::createTexture3D(const PixelFormat format, const Vector3i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void *sourceData) {
-        return std::unique_ptr<Texture3D>();
+    Texture3D* GraphicsDeviceES2::createTexture3D(const PixelFormat format, const Vector3i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void *sourceData) {
+        return nullptr;
     }
 
-    std::unique_ptr<Texture2DArray> GraphicsDeviceES2::createTexture2DArray(const PixelFormat format, const Vector2i &size, const int count) {
-        return std::unique_ptr<Texture2DArray>();
+    Texture2DArray* GraphicsDeviceES2::createTexture2DArray(const PixelFormat format, const Vector2i &size, const int count) {
+        return nullptr;
     }
         
-    std::unique_ptr<TextureCubeMap> GraphicsDeviceES2::createTextureCubeMap(const PixelFormat format, const Vector2i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void **sourceData) {
-        return std::unique_ptr<TextureCubeMap>();
+    TextureCubeMap* GraphicsDeviceES2::createTextureCubeMap(const PixelFormat format, const Vector2i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void **sourceData) {
+        return nullptr;
     }
         
-    std::unique_ptr<Program> GraphicsDeviceES2::createProgram(const ProgramDescriptor &desc) {
-        return std::make_unique<ProgramGL>(desc);
+    Program* GraphicsDeviceES2::createProgram(const ProgramDescriptor &desc) {
+        return new ProgramES(desc);
     }
     
     void GraphicsDeviceES2::draw(const Subset *subset, const SubsetEnvelope *envelopes, const int envelopeCount) {
-        auto subsetGL = static_cast<const SubsetGL *>(subset);
+        /*
+        auto subsetGL = static_cast<const SubsetES *>(subset);
         auto descriptor = subsetGL->GetDescriptor();
 
         throw std::runtime_error("ES2: VAO rendering isn't supported");
@@ -105,6 +102,7 @@ namespace XE {
         }
 
         XE_GRAPHICS_GL_CHECK_ERROR();
+        */
     }
 
 
@@ -176,7 +174,7 @@ namespace XE {
             }
 
             // FIXME: This will cause segfaults if the real implementation isn't derived from the Texture/TextureBaseGL family
-            auto textureBaseGL = dynamic_cast<const TextureBaseGL*>(layer.texture);
+            auto textureBaseGL = dynamic_cast<const TextureBaseES*>(layer.texture);
             auto target = textureBaseGL->GetTarget();
             
             std::cout << target << ", " << textureBaseGL->GetID() << std::endl;
@@ -220,7 +218,7 @@ namespace XE {
             }
 
             // FIXME: This will cause segfaults if the real implementation isn't derived from the Texture/TextureBaseGL family
-            auto textureBaseGL = reinterpret_cast<const TextureBaseGL*>(layer.texture);
+            auto textureBaseGL = reinterpret_cast<const TextureBaseES*>(layer.texture);
 
             glActiveTexture(GL_TEXTURE0 + i);
             glBindTexture(textureBaseGL->GetTarget(), 0);
@@ -248,7 +246,7 @@ namespace XE {
     }
 
     void GraphicsDeviceES2::setProgram(const Program *program) {
-        m_program = static_cast<const ProgramGL*>(program);
+        m_program = static_cast<const ProgramES*>(program);
 
         if (m_program) {
             glUseProgram(m_program->GetID());
@@ -278,64 +276,24 @@ namespace XE {
             const GLint location = m_program->getUniformLoction(current->Name);
 
             switch (current->Type) {
-            case DataType::Float32: 
-                switch (current->Rows) {
-                case 2:
-                    switch (current->Columns) {
-                    case 2: glUniformMatrix2fv(location, current->Count, GL_FALSE, (const GLfloat*)&data[offset]); break;
-                    default: throw std::runtime_error("AAAAA");
-                    }
-                    break;
-
-                case 3:
-                    switch (current->Columns) {
-                    case 3: glUniformMatrix3fv(location, current->Count, GL_FALSE, (const GLfloat*)&data[offset]); break;
-                    default: throw std::runtime_error("AAAAA");
-                    }
-                    break;
-
-                case 4:
-                    switch (current->Columns) {
-                    case 4: glUniformMatrix4fv(location, current->Count, GL_FALSE, (const GLfloat*)&data[offset]); break;
-                    default: throw std::runtime_error("AAAAA");
-                    }
-                    break;
+            case DataType::Float32: {
+                const auto values = (const GLfloat*)&data[offset];
+                
+                switch (current->shape) {
+                    case UniformMatrixShape::R2C2: glUniformMatrix2fv(location, current->Count, GL_FALSE, values); break;
+                    case UniformMatrixShape::R3C3: glUniformMatrix3fv(location, current->Count, GL_FALSE, values); break;
+                    case UniformMatrixShape::R4C4: glUniformMatrix4fv(location, current->Count, GL_FALSE, values); break;
+                    default:
+                        assert(false);
                 }
-                break;
-
-            case DataType::Float64: 
-                throw std::runtime_error("AAAAA");
-                /*
-                switch (current->Rows) {
-                case 2:
-                    switch (current->Columns) {
-                    case 2: glUniformMatrix2dv(location, current->Count, GL_FALSE, (const GLdouble*)&data[offset]); break;
-                    case 3: glUniformMatrix2x3dv(location, current->Count, GL_FALSE, (const GLdouble*)&data[offset]); break;
-                    case 4: glUniformMatrix2x4dv(location, current->Count, GL_FALSE, (const GLdouble*)&data[offset]); break;
-                    }
-                    break;
-
-                case 3:
-                    switch (current->Columns) {
-                    case 2: glUniformMatrix3x2dv(location, current->Count, GL_FALSE, (const GLdouble*)&data[offset]); break;
-                    case 3: glUniformMatrix3dv(location, current->Count, GL_FALSE, (const GLdouble*)&data[offset]); break;
-                    case 4: glUniformMatrix3x4dv(location, current->Count, GL_FALSE, (const GLdouble*)&data[offset]); break;
-                    }
-                    break;
-
-                case 4:
-                    switch (current->Columns) {
-                    case 2: glUniformMatrix4x2dv(location, current->Count, GL_FALSE, (const GLdouble*)&data[offset]); break;
-                    case 3: glUniformMatrix4x3dv(location, current->Count, GL_FALSE, (const GLdouble*)&data[offset]); break;
-                    case 4: glUniformMatrix4dv(location, current->Count, GL_FALSE, (const GLdouble*)&data[offset]); break;
-                    }
-                    break;
-                }
-                */
                 break;
             }
 
-            offset += ComputeByteSize(current->Type) * current->Rows * current->Columns * current->Count;
+            default:
+                assert(false);
+            }
+
+            offset += ComputeByteSize(current->Type) * countElements(current->shape) * current->Count;
         }
 
         XE_GRAPHICS_GL_CHECK_ERROR();
@@ -357,44 +315,30 @@ namespace XE {
 
             switch (current->Type) {
             case DataType::Int32:
-                // std::cout << current->Name << ": " << location << ", " << *((const GLint*)&data[offset]) << std::endl;
-                switch (current->size) {
-                    case 1: glUniform1iv(location, current->Count, (const GLint*)&data[offset]); break;
-                    case 2: glUniform2iv(location, current->Count, (const GLint*)&data[offset]); break;
-                    case 3: glUniform3iv(location, current->Count, (const GLint*)&data[offset]); break;
-                    case 4: glUniform4iv(location, current->Count, (const GLint*)&data[offset]); break;
+                switch (current->dimension) {
+                    case UniformDimension::D1: glUniform1iv(location, current->Count, (const GLint*)&data[offset]); break;
+                    case UniformDimension::D2: glUniform2iv(location, current->Count, (const GLint*)&data[offset]); break;
+                    case UniformDimension::D3: glUniform3iv(location, current->Count, (const GLint*)&data[offset]); break;
+                    case UniformDimension::D4: glUniform4iv(location, current->Count, (const GLint*)&data[offset]); break;
                     default: assert(false);
                 }
                 break;
             
             case DataType::Float32:
-                switch (current->size) {
-                    case 1: glUniform1fv(location, current->Count, (const GLfloat*)&data[offset]); break;
-                    case 2: glUniform2fv(location, current->Count, (const GLfloat*)&data[offset]); break;
-                    case 3: glUniform3fv(location, current->Count, (const GLfloat*)&data[offset]); break;
-                    case 4: glUniform4fv(location, current->Count, (const GLfloat*)&data[offset]); break;
+                switch (current->dimension) {
+                    case UniformDimension::D1: glUniform1fv(location, current->Count, (const GLfloat*)&data[offset]); break;
+                    case UniformDimension::D2: glUniform2fv(location, current->Count, (const GLfloat*)&data[offset]); break;
+                    case UniformDimension::D3: glUniform3fv(location, current->Count, (const GLfloat*)&data[offset]); break;
+                    case UniformDimension::D4: glUniform4fv(location, current->Count, (const GLfloat*)&data[offset]); break;
                     default: assert(false);
                 }
-                break;
-
-            case DataType::UInt32:
-                throw std::runtime_error("AAAAA");
-                /*
-                switch (current->size) {
-                    case 1: glUniform1uiv(location, current->Count, (const GLuint*)&data[offset]); break;
-                    case 2: glUniform2uiv(location, current->Count, (const GLuint*)&data[offset]); break;
-                    case 3: glUniform3uiv(location, current->Count, (const GLuint*)&data[offset]); break;
-                    case 4: glUniform4uiv(location, current->Count, (const GLuint*)&data[offset]); break;
-                    default: assert(false);
-                }
-                */
                 break;
 
             default:
                 assert(false);
             }
 
-            offset += ComputeByteSize(current->Type) * current->size * current->Count;
+            offset += ComputeByteSize(current->Type) * countElements(current->dimension) * current->Count;
         }
 
         XE_GRAPHICS_GL_CHECK_ERROR();

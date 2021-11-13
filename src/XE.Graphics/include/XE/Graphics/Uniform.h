@@ -45,6 +45,35 @@ namespace XE {
         UniformMatrixShape shape;
         int Count;
     };
+
+    
+    inline int countElements(const UniformDimension dim) {
+        switch (dim) {
+            case UniformDimension::D1: return 1;
+            case UniformDimension::D2: return 2;
+            case UniformDimension::D3: return 3;
+            case UniformDimension::D4: return 4;
+        }
+
+        return -1;
+    }
+
+
+    inline int countElements(const UniformMatrixShape shape) {
+        switch (shape) {
+            case UniformMatrixShape::R2C2: return 2*2;
+            case UniformMatrixShape::R2C3: return 2*3;
+            case UniformMatrixShape::R2C4: return 2*4;
+            case UniformMatrixShape::R3C2: return 3*2;
+            case UniformMatrixShape::R3C3: return 3*3;
+            case UniformMatrixShape::R3C4: return 3*4;
+            case UniformMatrixShape::R4C2: return 4*2;
+            case UniformMatrixShape::R4C3: return 4*3;
+            case UniformMatrixShape::R4C4: return 4*4;
+        }
+
+        return -1;
+    }
 }
 
 #endif

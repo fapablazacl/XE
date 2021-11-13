@@ -7,11 +7,11 @@
 #include "TextureBaseES2.h"
 
 namespace XE {
-    class Texture2DGL : public Texture2D, public TextureBaseGL {
+    class Texture2DES : public Texture2D, public TextureBaseES {
     public:
-        Texture2DGL(const PixelFormat format, const Vector2i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void *sourceData);
+        Texture2DES(const PixelFormat format, const Vector2i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void *sourceData);
 
-        virtual ~Texture2DGL();
+        virtual ~Texture2DES();
 
         virtual PixelFormat getFormat() const override {
             return m_format;

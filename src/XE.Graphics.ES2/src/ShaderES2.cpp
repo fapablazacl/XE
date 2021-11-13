@@ -9,7 +9,7 @@ namespace XE {
         GL_FRAGMENT_SHADER
     };
 
-    ShaderGL::ShaderGL(const ShaderType type, const std::string &source) {
+    ShaderES::ShaderES(const ShaderType type, const std::string &source) {
         m_type = type;
         m_source = source;
         m_typeGL = s_shaderTypesGL[int(type)];
@@ -35,17 +35,17 @@ namespace XE {
         }
     }
 
-    ShaderGL::~ShaderGL() {
+    ShaderES::~ShaderES() {
         if (m_id) {
             glDeleteShader(m_id);
         }
     }
 
-    ShaderType ShaderGL::getType() const {
+    ShaderType ShaderES::getType() const {
         return m_type;
     }
 
-    std::string ShaderGL::getSource() const {
+    std::string ShaderES::getSource() const {
         return m_source;
     }
 }

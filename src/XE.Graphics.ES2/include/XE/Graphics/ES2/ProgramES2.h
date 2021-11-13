@@ -15,12 +15,12 @@ namespace XE {
 }
 
 namespace XE {
-    class ShaderGL;
-    class ProgramGL : public Program {
+    class ShaderES;
+    class ProgramES : public Program {
     public:
-        ProgramGL(const ProgramDescriptor &desc);
+        ProgramES(const ProgramDescriptor &desc);
 
-        virtual ~ProgramGL();
+        virtual ~ProgramES();
 
         virtual int getShaderCount() const override;
 
@@ -37,7 +37,7 @@ namespace XE {
 
     private:
         GLuint m_id;
-        std::vector<std::unique_ptr<ShaderGL>> m_shaders;
+        std::vector<std::unique_ptr<ShaderES>> m_shaders;
     };
 }
 

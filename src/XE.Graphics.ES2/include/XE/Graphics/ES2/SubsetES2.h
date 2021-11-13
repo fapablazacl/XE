@@ -1,6 +1,6 @@
 
-#ifndef __XE_GRAPHICS_GL_SUBSETGL_HPP__
-#define __XE_GRAPHICS_GL_SUBSETGL_HPP__
+#ifndef __XE_GRAPHICS_ES_SUBSETS_H__
+#define __XE_GRAPHICS_ES_SUBSETS_H__
 
 #include <XE/Graphics/Subset.h>
 #include <glad/glad.h>
@@ -8,15 +8,11 @@
 #include "BufferES2.h"
 
 namespace XE {
-    class SubsetGL : public Subset {
+    class SubsetES : public Subset {
     public:
-        SubsetGL(
-            SubsetDescriptor& desc, 
-            std::vector<std::unique_ptr<Buffer>> buffers, 
-            const std::map<std::string, int> &bufferMapping, 
-            std::unique_ptr<Buffer> indexBuffer);
+        explicit SubsetES(const SubsetDescriptor2& desc);
 
-        virtual ~SubsetGL();
+        virtual ~SubsetES();
         
         virtual int getBufferCount() const override;
 
@@ -28,10 +24,6 @@ namespace XE {
 
         virtual const BufferES2* getIndexBuffer() const override;
 
-        virtual SubsetDescriptor GetDescriptor() const override {
-            return m_descriptor;
-        }
-
     public:
         GLuint GetID() const {
             return m_id;
@@ -42,7 +34,7 @@ namespace XE {
         std::vector<std::unique_ptr<BufferES2>> m_buffers;
         std::unique_ptr<BufferES2> m_indexBuffer;
 
-        SubsetDescriptor m_descriptor;
+        SubsetDescriptor2 m_descriptor;
     };
 }
 

@@ -6,11 +6,11 @@
 #include <glad/glad.h>
 
 namespace XE {
-    class ShaderGL : public Shader {
+    class ShaderES : public Shader {
     public:
-        ShaderGL(const ShaderType type, const std::string &source);
+        ShaderES(const ShaderType type, const std::string &source);
 
-        virtual ~ShaderGL();
+        virtual ~ShaderES();
 
         virtual ShaderType getType() const override;
 

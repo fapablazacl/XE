@@ -8,11 +8,11 @@ namespace XE {
     /**
      * @brief Structural base class for textures
      */
-    class TextureBaseGL {
+    class TextureBaseES {
     public:
-        explicit TextureBaseGL(const GLenum target);
+        explicit TextureBaseES(const GLenum target);
 
-        virtual ~TextureBaseGL() = 0;
+        virtual ~TextureBaseES() = 0;
 
     public:
         GLuint GetID() const {

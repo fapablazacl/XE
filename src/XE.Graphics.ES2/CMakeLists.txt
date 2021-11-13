@@ -1,11 +1,10 @@
 
-set (target "XE.Graphics.ES2")
+find_package (glades2 REQUIRED)
 
-set (source_base "XE/Graphics/ES2")
+set (target "XE.Graphics.ES2")
 
 set (sources
 	"include/XE/Graphics/ES2.h"
-
 	"include/XE/Graphics/ES2/IGraphicsContextES2.h"
 	"include/XE/Graphics/ES2/GraphicsDeviceES2.h"
 	"include/XE/Graphics/ES2/TextureBaseES2.h"
@@ -34,7 +33,10 @@ set (sources
 ) 
 
 add_library (${target} ${sources})
-
-target_link_libraries (${target} glad-es2 XE.Core XE.Graphics)
+target_link_libraries (${target} 
+	XE.Core 
+	XE.Graphics 
+	glades2
+)
 target_include_directories (${target} PUBLIC "include/")
 target_compile_options (${target} PUBLIC ${XE_CXX_FLAGS})
