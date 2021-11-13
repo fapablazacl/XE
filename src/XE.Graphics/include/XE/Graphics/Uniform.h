@@ -18,10 +18,10 @@ namespace XE {
      * @brief A variable visible to all the stages in a ShaderProgram
      */
     struct Uniform {
-        std::string Name;
-        DataType Type;
+        std::string name;
+        DataType type;
         UniformDimension dimension;
-        int Count;
+        int count;
     };
 
     enum class UniformMatrixShape : int {
@@ -40,10 +40,10 @@ namespace XE {
      * @brief A matrix visible to all the stages in a ShaderProgram
      */
     struct UniformMatrix {
-        std::string Name;
-        DataType Type;
+        std::string name;
+        DataType type;
         UniformMatrixShape shape;
-        int Count;
+        int count;
     };
 
     
