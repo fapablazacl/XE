@@ -12,7 +12,7 @@ namespace XE {
     ShaderES::ShaderES(const ShaderType type, const std::string &source) {
         m_type = type;
         m_source = source;
-        m_typeGL = s_shaderTypesGL[int(type)];
+        m_typeGL = s_shaderTypesGL[static_cast<int>(type)];
 
         m_id = glCreateShader(m_typeGL);
 

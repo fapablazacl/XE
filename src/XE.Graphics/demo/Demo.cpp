@@ -130,7 +130,8 @@ namespace demo {
 
             mFloorSubset = createSubset(mGraphicsDevice.get(), floorMesh);
             mFloorSubsetEnvelope = { 
-                floorMesh.primitive, 0, 
+                floorMesh.primitive,
+                0, 
                 static_cast<int>(floorMesh.vertices.size())
             };
 
@@ -155,17 +156,17 @@ namespace demo {
             mColoredCubeRenderable = {mColoredCubeSubset, mColoredCubeSubsetEnvelope};
 
             mAxisNode = mSceneNode.createChild();
-            mAxisNode->setRenderable(&mAxisRenderable);
+            // mAxisNode->setRenderable(&mAxisRenderable);
 
             mLeftCubeNode = mSceneNode.createChild();
-            mLeftCubeNode->setRenderable(&mColoredCubeRenderable);
+            // mLeftCubeNode->setRenderable(&mColoredCubeRenderable);
 
             mRightCubeNode = mSceneNode.createChild();
-            mRightCubeNode->setRenderable(&mColoredCubeRenderable);
+            // mRightCubeNode->setRenderable(&mColoredCubeRenderable);
             
             mEnemyRenderable = {mCubeSubset, mCubeSubsetEnvelope};
             mEnemyNode = mSceneNode.createChild();
-            mEnemyNode->setRenderable(&mEnemyRenderable);
+            // mEnemyNode->setRenderable(&mEnemyRenderable);
             mEnemyNode->setTransformation(XE::M4::translate({0.0f, 0.2501f, 0.0f}));
         }
 
@@ -219,7 +220,7 @@ namespace demo {
             const auto view = XE::M4::lookAt(mCamera.position, mCamera.lookAt, mCamera.up);
             const auto viewProj = view * proj;
             
-            mGraphicsDevice->beginFrame(XE::ClearFlags::All, {0.0f, 0.0f, 0.0f, 1.0f}, 1.0f, 0);
+            mGraphicsDevice->beginFrame(XE::ClearFlags::All, {0.2f, 0.2f, 0.8f, 1.0f}, 1.0f, 0);
 
             mGraphicsDevice->setProgram(mSimpleProgram);
             

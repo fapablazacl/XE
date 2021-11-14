@@ -235,7 +235,7 @@ namespace demo {
             reinterpret_cast<const std::byte*>(mesh.vertices.data())
         };
 
-        const XE::Buffer *vertexBuffer = graphicsDevice->createBuffer(bufferDesc);
+        XE::Buffer *vertexBuffer = graphicsDevice->createBuffer(bufferDesc);
         
         XE::Buffer *indexBuffer = nullptr;
         
@@ -257,12 +257,7 @@ namespace demo {
             {2, XE::DataType::Float32, 4, false, sizeof(Vertex), 0, OFFSETOF(Vertex, color)}
         };
 
-        const XE::SubsetDescriptor2 subsetDesc {
-            &vertexBuffer, 1,
-            attribs.data(), attribs.size(),
-            indexBuffer
-        };
-
+        XE::SubsetDescriptor2 subsetDesc { {vertexBuffer},  attribs, indexBuffer};
         XE::Subset *subset = graphicsDevice->createSubset(subsetDesc);
 
         return subset;
@@ -278,7 +273,7 @@ namespace demo {
             reinterpret_cast<const std::byte*>(mesh.vertices.data())
         };
         
-        const XE::Buffer *vertexBuffer = graphicsDevice->createBuffer(bufferDesc);
+        XE::Buffer *vertexBuffer = graphicsDevice->createBuffer(bufferDesc);
 
         const std::vector<XE::SubsetVertexAttrib> attribs {
             {0, XE::DataType::Float32, 3, false, sizeof(Vertex), 0, OFFSETOF(Vertex, coord)},
@@ -286,11 +281,7 @@ namespace demo {
             {2, XE::DataType::Float32, 4, false, sizeof(Vertex), 0, OFFSETOF(Vertex, color)}
         };
         
-        const XE::SubsetDescriptor2 subsetDesc {
-            &vertexBuffer, 1,
-            attribs.data(), attribs.size(),
-            nullptr
-        };
+        XE::SubsetDescriptor2 subsetDesc { {vertexBuffer},  attribs, nullptr};
 
         XE::Subset *subset = graphicsDevice->createSubset(subsetDesc);
 

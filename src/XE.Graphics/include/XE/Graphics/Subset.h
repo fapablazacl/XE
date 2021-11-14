@@ -85,15 +85,9 @@ namespace XE {
      * @brief Describes a geometry subset.
      */
     struct SubsetDescriptor2 {
-        const Buffer **buffers = nullptr;
-
-        size_t bufferCount = 0;
-
-        const SubsetVertexAttrib *attribs = nullptr;
-
-        size_t attribCount = 0;
-
-        const Buffer* indexBuffer = nullptr;
+        std::vector<Buffer*> buffers;
+        std::vector<SubsetVertexAttrib> attribs;
+        Buffer* indexBuffer = nullptr;
     };
 
     /**

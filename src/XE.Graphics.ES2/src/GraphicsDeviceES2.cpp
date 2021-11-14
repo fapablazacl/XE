@@ -19,13 +19,38 @@
 #include <iostream>
 
 namespace XE {
+    void GraphicsDeviceES2_pre_callback(const char *name, void *funcptr, int len_args, ...) {
+        GLenum error_code = glad_glGetError();
+
+        if (error_code != GL_NO_ERROR) {
+            fprintf(stderr, "[GraphicsDeviceES2_pre_callback] ERROR %d in %s\n", error_code, name);
+            assert(false);
+        }
+    }
+
+    void GraphicsDeviceES2_post_callback(const char *name, void *funcptr, int len_args, ...) {
+        GLenum error_code = glad_glGetError();
+
+        if (error_code != GL_NO_ERROR) {
+            fprintf(stderr, "[GraphicsDeviceES2_post_callback] ERROR %d in %s\n", error_code, name);
+            assert(false);
+        }
+    }
+
     GraphicsDeviceES2::GraphicsDeviceES2(GraphicsContext *context) {
         assert(context);
 
         this->context = context;
 
-        gladLoadGLES2Loader((GLADloadproc)context->getProcAddressFunctionGL());
+        if (!gladLoadGLES2Loader((GLADloadproc)context->getProcAddressFunctionGL())) {
+            assert(false);
+        }
         
+#if defined (GLAD_DEBUG)
+        glad_set_pre_callback(GraphicsDeviceES2_pre_callback);
+        glad_set_post_callback(GraphicsDeviceES2_post_callback);
+#endif
+
         XE_GRAPHICS_GL_CHECK_ERROR();
     }
 

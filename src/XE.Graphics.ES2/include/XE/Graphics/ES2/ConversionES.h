@@ -27,10 +27,9 @@ namespace XE {
     extern GLenum convertToES(const DataType type);
     extern GLenum convertToES(const PixelFormat format);
     extern GLenum convertToES(const BufferType type);
-    extern GLenum convertToES(const BufferUsage usage, const BufferAccess access);
+    extern GLenum convertToES(const BufferUsage, const BufferAccess access);
     extern GLenum convertToES(const PrimitiveType type);
     extern GLenum convertToES(const DepthFunc func);
-    extern GLenum convertToES(const PolygonMode mode);
     extern GLenum convertToES(const FrontFaceOrder order);
     extern GLenum convertToES(const BlendParam param);
     extern GLenum convertToES(const TextureFilter filter);
