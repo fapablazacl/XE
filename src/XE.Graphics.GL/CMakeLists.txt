@@ -5,7 +5,6 @@ set (target "XE.Graphics.GL")
 
 set (sources
 	"include/XE/Graphics/GL.h"
-	"include/XE/Graphics/GL/IGraphicsContextGL.h"
 	"include/XE/Graphics/GL/GraphicsDeviceGL.h"
 	"include/XE/Graphics/GL/TextureBaseGL.h"
 	"include/XE/Graphics/GL/Texture2DGL.h"
@@ -18,8 +17,7 @@ set (sources
 	"include/XE/Graphics/GL/SubsetGL.h"
 	"include/XE/Graphics/GL/Conversion.h"
 	"include/XE/Graphics/GL/Util.h"
-
-	"src/IGraphicsContextGL.cpp"
+	
 	"src/GraphicsDeviceGL.cpp"
 	"src/TextureBaseGL.cpp"
 	"src/Texture2DGL.cpp"

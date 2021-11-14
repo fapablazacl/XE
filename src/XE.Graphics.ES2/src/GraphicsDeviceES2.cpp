@@ -20,12 +20,12 @@
 #include <iostream>
 
 namespace XE {
-    GraphicsDeviceES2::GraphicsDeviceES2(IGraphicsContextES2 *context) {
+    GraphicsDeviceES2::GraphicsDeviceES2(GraphicsContext *context) {
         assert(context);
 
         this->context = context;
 
-        gladLoadGLES2Loader((GLADloadproc)context->getProcAddressFunction());
+        gladLoadGLES2Loader((GLADloadproc)context->getProcAddressFunctionGL());
 
         XE_GRAPHICS_GL_CHECK_ERROR();
     }

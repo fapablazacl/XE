@@ -9,11 +9,9 @@ namespace XE {
     class ProgramGL;
     class SubsetGL;
 
-    class IGraphicsContextGL;
-
     class GraphicsDeviceGL : public GraphicsDevice {
     public:
-        explicit GraphicsDeviceGL(IGraphicsContextGL *context);
+        explicit GraphicsDeviceGL(GraphicsContext *context);
 
         ~GraphicsDeviceGL();
 
@@ -59,7 +57,7 @@ namespace XE {
         void postRenderMaterial(const Material *material);
 
     private:
-        IGraphicsContextGL *context = nullptr;
+        GraphicsContext *context = nullptr;
 
         const ProgramGL *m_program = nullptr;
         const Material *m_material = nullptr;

@@ -42,17 +42,12 @@ private:
 
 
 namespace demo {
-    enum class GraphicsBackend {
-        DesktopGL,
-        MobileGL
-    };
-
     class DemoApp {
     public:
         DemoApp() {}
 
         int run(int argc, char **argv) {
-            const GraphicsBackend backend = GraphicsBackend::DesktopGL;
+            const XE::GraphicsBackend backend = XE::GraphicsBackend::GL_41;
 
             initialize(backend);
             setupGeometry();
@@ -64,24 +59,26 @@ namespace demo {
         }
 
     private:
-        void initialize(const GraphicsBackend backend) {
+        void initialize(const XE::GraphicsBackend backend) {
             const XE::Vector2i windowSize = { s_screenWidth, s_screenHeight };
             std::string title;
-            XE::ContextDescriptorGL context;
 
-            if (backend == GraphicsBackend::DesktopGL) {
+            XE::GraphicsContext::Descriptor descriptor;
+
+            descriptor.backend = backend;
+
+            if (descriptor.backend == XE::GraphicsBackend::GL_41) {
                 title = "Graphics Demo Application(Driver: Desktop OpenGL)";
-                context = XE::ContextDescriptorGL::defaultGL4();
             } else {
                 title = "Graphics Demo Application(Driver: Mobile OpenGL)";
             }
 
-            mWindow = XE::WindowGLFW::create(context, "XE.Demo example application", windowSize, false);
+            mWindow = XE::WindowGLFW::create(descriptor, "XE.Demo example application", windowSize, false);
             
-            if (backend == GraphicsBackend::DesktopGL) {
+            if (backend == XE::GraphicsBackend::GL_41) {
                 mGraphicsDevice = std::make_unique<XE::GraphicsDeviceGL>(mWindow->getContext());
             } else {
-                mGraphicsDevice = std::make_unique<XE::GraphicsDeviceES2>(nullptr/*mWindow->getContext()*/);
+                mGraphicsDevice = std::make_unique<XE::GraphicsDeviceES2>(mWindow->getContext());
             }
 
             mInputManager = mWindow->getInputManager();
@@ -90,8 +87,8 @@ namespace demo {
         }
 
 
-        XE::Program* createSimpleProgram(const GraphicsBackend backend) {
-            if (backend == GraphicsBackend::DesktopGL) {
+        XE::Program* createSimpleProgram(const XE::GraphicsBackend backend) {
+            if (backend == XE::GraphicsBackend::GL_41) {
                 const std::string simpleVS = loadTextFile("shaders/gl4/gl4-main.vert");
                 const std::string simpleFS = loadTextFile("shaders/gl4/gl4-main.frag");
 

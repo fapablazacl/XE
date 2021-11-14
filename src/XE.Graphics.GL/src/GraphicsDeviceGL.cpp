@@ -24,12 +24,12 @@
 #include <glbinding-aux/debug.h>
 
 namespace XE {
-    GraphicsDeviceGL::GraphicsDeviceGL(IGraphicsContextGL *context) {
+    GraphicsDeviceGL::GraphicsDeviceGL(GraphicsContext *context) {
         this->context = context;
 
         std::cout << "[GL] Loading OpenGL Extensions ..." << std::endl;
 
-        glbinding::initialize(context->getProcAddressFunction());
+        glbinding::initialize(context->getProcAddressFunctionGL());
         glbinding::aux::enableGetErrorCallback();
     }
 

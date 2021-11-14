@@ -5,7 +5,6 @@ set (target "XE.Graphics.ES2")
 
 set (sources
 	"include/XE/Graphics/ES2.h"
-	"include/XE/Graphics/ES2/IGraphicsContextES2.h"
 	"include/XE/Graphics/ES2/GraphicsDeviceES2.h"
 	"include/XE/Graphics/ES2/TextureBaseES2.h"
 	"include/XE/Graphics/ES2/Texture2DES2.h"
@@ -18,7 +17,6 @@ set (sources
 	"include/XE/Graphics/ES2/ConversionES.h"
 	"include/XE/Graphics/ES2/Util.h"
 
-	"src/IGraphicsContextES2.cpp"
 	"src/GraphicsDeviceES2.cpp"
 	"src/TextureBaseES2.cpp"
 	"src/Texture2DES2.cpp"

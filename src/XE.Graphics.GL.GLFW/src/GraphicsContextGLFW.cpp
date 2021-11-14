@@ -15,12 +15,12 @@ namespace XE {
     GraphicsContextGLFW::~GraphicsContextGLFW() {}
 
 
-    IGraphicsContextGL::GetProcAddress GraphicsContextGLFW::getProcAddressFunction() const {
-        return (GetProcAddress)glfwGetProcAddress;
+    GraphicsContext::GetProcAddressGL GraphicsContextGLFW::getProcAddressFunctionGL() const {
+        return (GraphicsContext::GetProcAddressGL)glfwGetProcAddress;
     }
 
 
-    IGraphicsContextGL::Descriptor GraphicsContextGLFW::getDescriptor() const {
+    GraphicsContext::Descriptor GraphicsContextGLFW::getDescriptor() const {
         return descriptor;
     }
 

@@ -12,7 +12,7 @@ namespace XE {
 
     class GraphicsDeviceES2 : public GraphicsDevice {
     public:
-        explicit GraphicsDeviceES2(IGraphicsContextES2 *context);
+        explicit GraphicsDeviceES2(GraphicsContext *context);
 
         virtual ~GraphicsDeviceES2();
 
@@ -58,7 +58,7 @@ namespace XE {
         void postRenderMaterial(const Material *material);
 
     private:
-        IGraphicsContextES2 *context = nullptr;
+        GraphicsContext *context = nullptr;
 
         const ProgramES *m_program = nullptr;
         const Material *m_material = nullptr;

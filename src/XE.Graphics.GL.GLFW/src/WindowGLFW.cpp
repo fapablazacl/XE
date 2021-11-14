@@ -15,26 +15,34 @@ namespace XE {
         std::cout << "errorCallback: " << error << ": " << description << std::endl;
     }
 
-    static std::map<int, int> mapToHints(const ContextDescriptorGL &contextDescriptor) {
+    static std::map<int, int> mapToHints(const GraphicsContext::Descriptor &descriptor) {
         std::map<int, int> hints;
 
-        hints[GLFW_CONTEXT_VERSION_MAJOR] = contextDescriptor.major;
-        hints[GLFW_CONTEXT_VERSION_MINOR] = contextDescriptor.minor;
+        auto version = get_version(descriptor.backend);
+
+        if (descriptor.backend == GraphicsBackend::GL_41) {
+            glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_API);
+            glfwWindowHint(GLFW_CONTEXT_CREATION_API, GLFW_NATIVE_CONTEXT_API);
+        } else {
+            glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_ES_API);
+            glfwWindowHint(GLFW_CONTEXT_CREATION_API, GLFW_NATIVE_CONTEXT_API);
+        }
+
+        hints[GLFW_CONTEXT_VERSION_MAJOR] = std::get<0>(version);
+        hints[GLFW_CONTEXT_VERSION_MINOR] = std::get<1>(version);
         
         hints[GLFW_OPENGL_FORWARD_COMPAT] = GL_TRUE;
-        
-        if (contextDescriptor.coreProfile) {
-            hints[GLFW_OPENGL_PROFILE] = GLFW_OPENGL_CORE_PROFILE;
-        } else {
-            hints[GLFW_OPENGL_PROFILE] = GLFW_OPENGL_COMPAT_PROFILE;
-        }
-        
-        hints[GLFW_DEPTH_BITS] = contextDescriptor.depthBits;
-        hints[GLFW_DOUBLEBUFFER] = contextDescriptor.doubleBuffer ? GL_TRUE : GL_FALSE;
-        hints[GLFW_RED_BITS] = contextDescriptor.redBits;
-        hints[GLFW_GREEN_BITS] = contextDescriptor.greenBits;
-        hints[GLFW_BLUE_BITS] = contextDescriptor.blueBits;
-        hints[GLFW_ALPHA_BITS] = contextDescriptor.alphaBits;
+        hints[GLFW_OPENGL_PROFILE] = GLFW_OPENGL_CORE_PROFILE;
+
+        hints[GLFW_DEPTH_BITS] = get_depth_bit_count(descriptor.depthBufferFormat);
+        hints[GLFW_DOUBLEBUFFER] = GL_TRUE;
+
+        auto colorBits = get_color_bit_count(descriptor.frameBufferFormat);
+
+        hints[GLFW_RED_BITS] = std::get<0>(colorBits);
+        hints[GLFW_GREEN_BITS] = std::get<1>(colorBits);
+        hints[GLFW_BLUE_BITS] = std::get<2>(colorBits);
+        hints[GLFW_ALPHA_BITS] = std::get<3>(colorBits);
         hints[GLFW_RESIZABLE] = GL_FALSE;
 
         return hints;
@@ -42,7 +50,7 @@ namespace XE {
 
     class WindowGLFWImpl : public WindowGLFW {
     public:
-        WindowGLFWImpl(const ContextDescriptorGL &contextDescriptor, const std::string &title, const Vector2i &windowSize, const bool fullScreen) {
+        WindowGLFWImpl(const GraphicsContext::Descriptor &contextDescriptor, const std::string &title, const Vector2i &windowSize, const bool fullScreen) {
             if (usageCount++ == 0) {
                 glfwInit();
             }
@@ -102,7 +110,7 @@ namespace XE {
             return {width, height};
         }
 
-        virtual IGraphicsContextGL* getContext() const override {
+        virtual GraphicsContext* getContext() const override {
             return graphicsContext.get();
         }
 
@@ -124,7 +132,7 @@ namespace XE {
     WindowGLFW::~WindowGLFW() {}
 
     std::unique_ptr<WindowGLFW> WindowGLFW::create(
-            const ContextDescriptorGL &contextDescriptor, 
+            const GraphicsContext::Descriptor &contextDescriptor, 
             const std::string &title, 
             const Vector2i &windowSize, 
             const bool fullScreen) {

@@ -14,7 +14,8 @@ namespace XE {
         /**
          * @brief Interface that abstracts the underlying graphics context
          */
-        struct Descriptor {
+        
+        struct [[deprecated]] Descriptor {
             int major = 0;
             int minor = 0;
 
@@ -42,6 +43,7 @@ namespace XE {
         /**
          * @brief Gets a structure that describes the context in detail.
          */
+        [[deprecated]] 
         virtual Descriptor getDescriptor() const = 0;
 
         /**

@@ -14,7 +14,7 @@ namespace XE {
         /**
          * @brief Interface that abstracts the underlying graphics context
          */
-        struct Descriptor {
+        struct [[deprecated]]  Descriptor {
             int major = 0;
             int minor = 0;
 
@@ -29,6 +29,7 @@ namespace XE {
             int depthBits = 0;
             int stencilBits = 0;
 
+            [[deprecated]] 
             static Descriptor defaultES2();
         };
 

@@ -10,6 +10,8 @@
 #include <XE/Predef.h>
 #include <XE/Math/Vector.h>
 
+#include "PixelFormat.h"
+
 namespace XE {
     class Buffer;
 
@@ -50,6 +52,50 @@ namespace XE {
 
     struct SubsetDescriptor2;
     struct ProgramDescriptor;
+
+    enum class GraphicsBackend {
+        Auto,
+        GL_41,
+        GL_ES_2
+    };
+    
+
+    inline std::tuple<int, int> get_version(const GraphicsBackend backend) {
+        switch (backend) {
+        case GraphicsBackend::GL_41: return { 4, 1 };
+        case GraphicsBackend::GL_ES_2: return { 2, 0 };
+        default: return { 0, 0 };
+        }
+    }
+
+
+    class GraphicsContext {
+    public:
+        struct Descriptor {
+            //! Requested Backend.
+            GraphicsBackend backend = GraphicsBackend::Auto;
+            
+            PixelFormat frameBufferFormat = PixelFormat::R8G8B8A8;
+            DepthFormat depthBufferFormat = DepthFormat::D24;
+            StencilFormat stencilBufferFormat = StencilFormat::SUnused;
+        };
+
+    public:
+        using ProcAddressGL = void (*) ();
+        using GetProcAddressGL = ProcAddressGL(*)(const char*);
+
+    public:
+        virtual ~GraphicsContext() {}
+
+        virtual GetProcAddressGL getProcAddressFunctionGL() const = 0;
+
+        virtual void present() = 0;
+
+        virtual Descriptor getRequestedDescriptor() const = 0;
+
+        virtual Descriptor getDescriptor() const = 0;
+    };
+
 
     /**
      * @brief Graphics API abstraction

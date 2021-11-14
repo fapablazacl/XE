@@ -2,24 +2,29 @@
 #ifndef __XE_GRAPHICS_GRAPHICSCONTEXTGLFW_HPP__
 #define __XE_GRAPHICS_GRAPHICSCONTEXTGLFW_HPP__
 
-#include <XE/Graphics/GL/IGraphicsContextGL.h>
+#include <XE/Graphics/GraphicsDevice.h>
 #include <GLFW/glfw3.h>
 
 namespace XE {
-    class GraphicsContextGLFW : public IGraphicsContextGL {
+    class GraphicsContextGLFW : public GraphicsContext {
     public:
         GraphicsContextGLFW(GLFWwindow *glfwWindow, Descriptor descriptor);
 
         ~GraphicsContextGLFW();
 
-        virtual GetProcAddress getProcAddressFunction() const;
+        GetProcAddressGL getProcAddressFunctionGL() const override;
 
-        virtual Descriptor getDescriptor() const;
+        Descriptor getDescriptor() const override;
 
-        virtual void present();
+        Descriptor getRequestedDescriptor() const override {
+            // TODO: Add proper implementation later
+            return descriptor;
+        }
+
+        void present() override;
 
     private:
-        GLFWwindow *glfwWindow;
+        GLFWwindow *glfwWindow = nullptr;
         Descriptor descriptor;
     };
 }
