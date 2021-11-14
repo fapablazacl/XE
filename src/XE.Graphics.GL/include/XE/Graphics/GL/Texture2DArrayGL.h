@@ -32,8 +32,8 @@ namespace XE {
 
     private:
         PixelFormat m_format;
-        Vector2i m_size;
-        int m_count;
+        Vector2i m_size = {0, 0};
+        int m_count = 0;
     };
 }
 

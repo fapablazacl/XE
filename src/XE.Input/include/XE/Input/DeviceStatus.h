@@ -36,7 +36,7 @@ namespace XE {
         }
 
     private:
-        BinaryState m_keys[static_cast<int>(KeyCode::Max)];
+        BinaryState m_keys[static_cast<int>(KeyCode::Max)] = {};
     };
 
     enum class MouseButton {

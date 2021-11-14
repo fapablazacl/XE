@@ -1,13 +1,13 @@
 
 #include <XE/Graphics/ES2/BufferES2.h>
-#include <XE/Graphics/ES2/Conversion.h>
+#include <XE/Graphics/ES2/ConversionES.h>
 
 #include <cstdint>
 
 namespace XE {
     BufferES2::BufferES2(const BufferDescriptor &desc) {
-        const GLenum targetGL = convertToGL(desc.type);
-        const GLenum usageGL = convertToGL(desc.usage, desc.access);
+        const GLenum targetGL = convertToES(desc.type);
+        const GLenum usageGL = convertToES(desc.usage, desc.access);
 
         glGenBuffers(1, &m_id);
         glBindBuffer(targetGL, m_id);
@@ -19,11 +19,13 @@ namespace XE {
         m_usage = usageGL;
     }
 
+
     BufferES2::~BufferES2() {
         if (m_id) {
             glDeleteBuffers(1, &m_id);
         }
     }
+
 
     void BufferES2::read(std::byte* destination, const int size, const int offset, const int destinationOffset) const {
         const int finalSize = size ? size : m_size;
@@ -33,6 +35,7 @@ namespace XE {
         // return false;
         glBindBuffer(m_target, 0);
     }
+
 
     void BufferES2::write(const std::byte *source, const int size, const int offset, const int sourceOffset) {
         const int finalSize = size ? size : m_size;

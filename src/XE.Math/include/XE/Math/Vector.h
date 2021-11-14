@@ -20,7 +20,9 @@ namespace XE {
             struct {T X, Y; };
         };
 
-        VectorBase() {}
+        VectorBase() {
+            X = Y = static_cast<T>(0);
+        }
 
         VectorBase(T x, T y) {
             X = x;

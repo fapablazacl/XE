@@ -5,8 +5,6 @@
 #include <XE/Graphics/Viewport.h>
 #include <XE/Graphics/GraphicsDevice.h>
 
-#include <glad/glad.h>
-
 namespace XE {
     class ProgramES;
 

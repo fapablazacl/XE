@@ -1,6 +1,6 @@
 
 #include <XE/Graphics/ES2/Texture2DES2.h>
-#include <XE/Graphics/ES2/Conversion.h>
+#include <XE/Graphics/ES2/ConversionES.h>
 #include <XE/Graphics/ES2/Util.h>
 
 namespace XE {
@@ -10,9 +10,9 @@ namespace XE {
         m_size = size;
         m_format = format;
 
-        const GLenum internalFormatGL = convertToGL(m_format);
-        const GLenum formatGL = convertToGL(sourceFormat);
-        const GLenum typeGL = convertToGL(sourceDataType);
+        const GLenum internalFormatGL = convertToES(m_format);
+        const GLenum formatGL = convertToES(sourceFormat);
+        const GLenum typeGL = convertToES(sourceDataType);
 
         glBindTexture(GL_TEXTURE_2D, m_id);
         glTexImage2D(GL_TEXTURE_2D, 0, internalFormatGL, m_size.X, m_size.Y, 0, formatGL, typeGL, sourceData);
@@ -21,13 +21,15 @@ namespace XE {
         XE_GRAPHICS_GL_CHECK_ERROR();
     }
 
+
     Texture2DES::~Texture2DES() {}
+
 
     void Texture2DES::setData(const std::byte *surfaceData, const int mipLevel, const PixelFormat surfaceFormat, const DataType surfaceDataType, const Recti &area) {
         const Vector2i offset = area.minEdge;
         const Vector2i size = area.computeSize();
-        const GLenum formatGL = convertToGL(surfaceFormat);
-        const GLenum dataTypeGL = convertToGL(surfaceDataType);
+        const GLenum formatGL = convertToES(surfaceFormat);
+        const GLenum dataTypeGL = convertToES(surfaceDataType);
 
         glBindTexture(GL_TEXTURE_2D, m_id);
         glTexSubImage2D(GL_TEXTURE_2D, mipLevel, offset.X, offset.Y, size.X, size.Y, formatGL, dataTypeGL, surfaceData);
@@ -36,9 +38,10 @@ namespace XE {
         XE_GRAPHICS_GL_CHECK_ERROR();
     }
     
+
     void Texture2DES::getData(std::byte *surfaceData, const int mipLevel, const PixelFormat surfaceFormat, const DataType surfaceDataType) const {
-        const GLenum formatGL = convertToGL(surfaceFormat);
-        const GLenum dataTypeGL = convertToGL(surfaceDataType);
+        const GLenum formatGL = convertToES(surfaceFormat);
+        const GLenum dataTypeGL = convertToES(surfaceDataType);
 
         glBindTexture(GL_TEXTURE_2D, m_id);
         /*glGetTexImage(GL_TEXTURE_2D, mipLevel, formatGL, dataTypeGL, surfaceData);*/

@@ -15,7 +15,7 @@ set (sources
 	"include/XE/Graphics/ES2/ProgramES2.h"
 	"include/XE/Graphics/ES2/BufferES2.h"
 	"include/XE/Graphics/ES2/SubsetES2.h"
-	"include/XE/Graphics/ES2/Conversion.h"
+	"include/XE/Graphics/ES2/ConversionES.h"
 	"include/XE/Graphics/ES2/Util.h"
 
 	"src/IGraphicsContextES2.cpp"
@@ -28,7 +28,7 @@ set (sources
 	"src/ProgramES2.cpp"
 	"src/BufferES2.cpp"
 	"src/SubsetES2.cpp"
-	"src/Conversion.cpp"
+	"src/ConversionES.cpp"
 	"src/Util.cpp"
 ) 
 

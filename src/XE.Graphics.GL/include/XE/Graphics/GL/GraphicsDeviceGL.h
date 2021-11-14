@@ -5,8 +5,6 @@
 #include <XE/Graphics/Viewport.h>
 #include <XE/Graphics/GraphicsDevice.h>
 
-#include "glcore.h"
-
 namespace XE {
     class ProgramGL;
     class SubsetGL;

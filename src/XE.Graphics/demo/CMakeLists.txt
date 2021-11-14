@@ -1,0 +1,22 @@
+
+set (target "graphics-demo")
+
+set (sources 
+	"Camera.cpp" 
+	"Camera.h" 
+	"Common.cpp"
+	"Common.h"
+	"Demo.cpp"
+	"Platform.cpp"
+	"Platform.h"
+	"Renderable.h"
+	"SceneNode.cpp"
+	"SceneNode.h"
+	"Util.cpp"
+	"Util.h" 
+)
+
+add_executable(${target} ${sources})
+
+target_include_directories(${target} PUBLIC ".")
+target_link_libraries(${target} XE.Core XE.IO XE.Graphics.GL XE.Graphics.GL.GLFW XE.Graphics.ES2)

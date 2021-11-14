@@ -836,7 +836,7 @@ namespace XE {
         VkSurfaceKHR mSurface = VK_NULL_HANDLE;
         VkSwapchainKHR mSwapchain = VK_NULL_HANDLE;
         std::vector<VkImage> mSwapchainImages;
-        VkFormat mSwapchainImageFormat;
+        VkFormat mSwapchainImageFormat = VK_FORMAT_UNDEFINED;
         VkExtent2D mSwapchainExtent;
         std::vector<VkImageView> mSwapchainImageViews;
         VkRenderPass mRenderPass = VK_NULL_HANDLE;

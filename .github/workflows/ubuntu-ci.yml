@@ -16,7 +16,7 @@ jobs:
         run: git clone --depth 1 --branch v3.1.0 https://github.com/cginternals/glbinding.git dep/glbinding && cd dep/glbinding && mkdir -p build/gcc && cmake -B build/gcc -DCMAKE_BUILD_TYPE=Debug && cmake --build build/gcc && sudo cmake --build build/gcc --target install
 
       - name: Configure a Debug Build
-        run: mkdir -p build/gcc/debug && cmake -B build/gcc/debug -DCMAKE_BUILD_TYPE=Debug -DXE_CXX_FLAGS="-Wall" -DXE_PLUGIN_GL=ON -DXE_PLUGIN_ES2=OFF -DXE_PLUGIN_GL_GLFW=ON
+        run: mkdir -p build/gcc/debug && cmake -B build/gcc/debug -DCMAKE_BUILD_TYPE=Debug -DXE_CXX_FLAGS="-Wall" -DXE_PLUGIN_GL=ON -DXE_PLUGIN_ES2=ON -DXE_PLUGIN_GL_GLFW=ON
 
       - name: Building Debug Configuration
         run: cmake --build build/gcc/debug
@@ -36,7 +36,7 @@ jobs:
         run: git clone --depth 1 --branch v3.1.0 https://github.com/cginternals/glbinding.git dep/glbinding && cd dep/glbinding && mkdir -p build/gcc && cmake -B build/gcc -DCMAKE_BUILD_TYPE=Debug && cmake --build build/gcc && sudo cmake --build build/gcc --target install
 
       - name: Configure a Debug Build
-        run: mkdir -p build/clang/debug && export CC=clang && export CXX=clang++ && cmake -B build/clang/debug -DCMAKE_BUILD_TYPE=Debug -DXE_CXX_FLAGS="-Wall" -DXE_PLUGIN_GL=ON -DXE_PLUGIN_ES2=OFF -DXE_PLUGIN_GL_GLFW=ON
+        run: mkdir -p build/clang/debug && export CC=clang && export CXX=clang++ && cmake -B build/clang/debug -DCMAKE_BUILD_TYPE=Debug -DXE_CXX_FLAGS="-Wall" -DXE_PLUGIN_GL=ON -DXE_PLUGIN_ES2=ON -DXE_PLUGIN_GL_GLFW=ON
 
       - name: Building Debug Configuration
         run: cmake --build build/clang/debug

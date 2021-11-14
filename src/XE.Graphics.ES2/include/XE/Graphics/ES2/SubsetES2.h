@@ -25,16 +25,14 @@ namespace XE {
         virtual const BufferES2* getIndexBuffer() const override;
 
     public:
-        GLuint GetID() const {
-            return m_id;
-        }
+        void bind() const;
 
-    private:
-        GLuint m_id;
-        std::vector<std::unique_ptr<BufferES2>> m_buffers;
-        std::unique_ptr<BufferES2> m_indexBuffer;
+        void unbind() const;
 
-        SubsetDescriptor2 m_descriptor;
+    public:
+        std::vector<const BufferES2*> buffers = {};
+        const BufferES2* indexBuffer = nullptr;
+        SubsetDescriptor2 descriptor = {};
     };
 }
 

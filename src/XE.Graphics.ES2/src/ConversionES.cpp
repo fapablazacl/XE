@@ -1,5 +1,5 @@
 
-#include <XE/Graphics/ES2/Conversion.h>
+#include <XE/Graphics/ES2/ConversionES.h>
 
 #include <XE/DataType.h>
 #include <XE/Graphics/PixelFormat.h>
@@ -8,7 +8,7 @@
 #include <XE/Graphics/Material.h>
 
 namespace XE {
-    GLenum convertToGL(const DataType type) {
+    GLenum convertToES(const DataType type) {
         switch (type) {
             case DataType::UInt8: return GL_UNSIGNED_BYTE;
             case DataType::UInt16: return GL_UNSIGNED_SHORT;
@@ -22,7 +22,7 @@ namespace XE {
         }
     }
 
-    GLenum convertToGL(const PixelFormat format) {
+    GLenum convertToES(const PixelFormat format) {
         switch (format) {
             case PixelFormat::R8G8B8: return GL_RGB;
             case PixelFormat::R8G8B8A8: return GL_RGBA;
@@ -30,7 +30,7 @@ namespace XE {
         }
     }
 
-    GLenum convertToGL(const BufferType type) {
+    GLenum convertToES(const BufferType type) {
         switch (type) {
         case BufferType::Vertex: return GL_ARRAY_BUFFER;
         case BufferType::Index: return GL_ELEMENT_ARRAY_BUFFER;
@@ -38,7 +38,7 @@ namespace XE {
         }
     }
 
-    GLenum convertToGL(const BufferUsage usage, const BufferAccess access) {
+    GLenum convertToES(const BufferUsage usage, const BufferAccess access) {
         switch (access) {
         case BufferAccess::Dynamic:
             switch (usage) {
@@ -69,7 +69,7 @@ namespace XE {
         }
     }
 
-    GLenum convertToGL(const PrimitiveType type) {
+    GLenum convertToES(const PrimitiveType type) {
         switch (type) {
             case PrimitiveType::PointList: return GL_POINTS;
             case PrimitiveType::LineList: return GL_LINES;
@@ -81,7 +81,7 @@ namespace XE {
         }
     }
 
-    GLenum convertToGL(const DepthFunc func) {
+    GLenum convertToES(const DepthFunc func) {
         switch (func) {
             case DepthFunc::Never:          return GL_NEVER;
             case DepthFunc::Less:           return GL_LESS;
@@ -95,7 +95,7 @@ namespace XE {
         }
     }
 
-    GLenum convertToGL(const PolygonMode mode) {
+    GLenum convertToES(const PolygonMode mode) {
         return 0;
         /*
         switch (mode) {
@@ -107,7 +107,7 @@ namespace XE {
         */
     }
 
-    GLenum convertToGL(const FrontFaceOrder order) {
+    GLenum convertToES(const FrontFaceOrder order) {
         switch (order) {
             case FrontFaceOrder::CounterClockwise: return GL_CCW;
             case FrontFaceOrder::Clockwise: return GL_CW;
@@ -115,7 +115,7 @@ namespace XE {
         }
     }
 
-    GLenum convertToGL(const BlendParam param) {
+    GLenum convertToES(const BlendParam param) {
         switch (param) {
             case BlendParam::Zero: return GL_ZERO;
             case BlendParam::One: return GL_ONE;
@@ -135,7 +135,7 @@ namespace XE {
         }
     }
 
-    GLenum convertToGL(const TextureFilter filter) {
+    GLenum convertToES(const TextureFilter filter) {
         switch (filter) {
             case TextureFilter::Linear: return GL_LINEAR;
             case TextureFilter::Nearest: return GL_NEAREST;
@@ -143,11 +143,15 @@ namespace XE {
         }
     }
 
-    GLenum convertToGL(const TextureWrap wrap) {
+    GLenum convertToES(const TextureWrap wrap) {
         switch (wrap) {
             // case TextureWrap::Clamp: return GL_CLAMP_TO_BORDER;
             case TextureWrap::Repeat: return GL_REPEAT;
             default: return 0;
         }
+    }
+
+    GLboolean convertToES(const bool value) {
+        return value ? GL_TRUE : GL_FALSE;
     }
 }

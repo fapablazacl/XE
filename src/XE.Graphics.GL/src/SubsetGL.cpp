@@ -6,7 +6,6 @@
 
 namespace XE {
     SubsetGL::SubsetGL(const SubsetDescriptor2 &desc) {
-        // take ownership for the buffers
         for (size_t i=0; i<desc.bufferCount; i++) {
             auto bufferGL = static_cast<const BufferGL*>(desc.buffers[i]);
             m_buffers.emplace_back(bufferGL);

@@ -29,7 +29,7 @@ namespace XE {
             int depthBits = 0;
             int stencilBits = 0;
 
-            static Descriptor defaultGL4();
+            static Descriptor defaultES2();
         };
 
         virtual ~IGraphicsContextES2();

@@ -1,6 +1,8 @@
 
 #include <XE/Graphics/GL/GraphicsDeviceGL.h>
 
+#include <XE/Graphics/GL/glcore.h>
+
 #include <XE/Graphics/GL/Conversion.h>
 #include <XE/Graphics/GL/BufferGL.h>
 #include <XE/Graphics/GL/SubsetGL.h>
@@ -54,7 +56,6 @@ namespace XE {
     }
 
     TextureCubeMap* GraphicsDeviceGL::createTextureCubeMap(const PixelFormat format, const Vector2i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void **sourceData) {
-        // return new TextureCubeMap();
         return nullptr;
     }
         

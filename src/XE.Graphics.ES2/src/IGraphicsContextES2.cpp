@@ -3,12 +3,12 @@
 
 namespace XE {
     IGraphicsContextES2::~IGraphicsContextES2() {}
-
-    IGraphicsContextES2::Descriptor IGraphicsContextES2::Descriptor::defaultGL4()  {
+    
+    IGraphicsContextES2::Descriptor IGraphicsContextES2::Descriptor::defaultES2()  {
         IGraphicsContextES2::Descriptor descriptor;
 
-        descriptor.major = 4;
-        descriptor.minor = 1;
+        descriptor.major = 2;
+        descriptor.minor = 0;
 
         descriptor.coreProfile = true;
         descriptor.depthBits = 24;

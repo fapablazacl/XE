@@ -1,7 +1,9 @@
 
 #include <XE/Graphics/ES2/GraphicsDeviceES2.h>
 
-#include <XE/Graphics/ES2/Conversion.h>
+#include <glad/glad.h>
+
+#include <XE/Graphics/ES2/ConversionES.h>
 #include <XE/Graphics/ES2/BufferES2.h>
 #include <XE/Graphics/ES2/SubsetES2.h>
 #include <XE/Graphics/ES2/Texture2DES2.h>
@@ -18,91 +20,89 @@
 #include <iostream>
 
 namespace XE {
-/*#if defined(GLAD_DEBUG)
-    void gladPostCallback(const char *name, void *funcptr, int len_args, ...) {
-        if (std::string(name) != "glGetError") {
-            GLenum error = glGetError();
-            assert(error == GL_NO_ERROR);
-        }
-    }
-#endif
-*/
-
     GraphicsDeviceES2::GraphicsDeviceES2(IGraphicsContextES2 *context) {
+        assert(context);
+
         this->context = context;
 
-/*
-#if defined(GLAD_DEBUG)
-    // glad_set_pre_callback(gladPreCallback);
-    // glad_set_post_callback(gladPostCallback);
-#endif
-*/
+        gladLoadGLES2Loader((GLADloadproc)context->getProcAddressFunction());
+
         XE_GRAPHICS_GL_CHECK_ERROR();
     }
 
+
     GraphicsDeviceES2::~GraphicsDeviceES2() {}
     
+
     Subset* GraphicsDeviceES2::createSubset(const SubsetDescriptor2& desc) {
-        return nullptr;
+        return new SubsetES(desc);
     }
+
         
     Buffer* GraphicsDeviceES2::createBuffer(const BufferDescriptor &desc) {
         return new BufferES2(desc);
     }
         
+
     Texture2D* GraphicsDeviceES2::createTexture2D(const PixelFormat format, const Vector2i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void *sourceData) {
         return new Texture2DES(format, size, sourceFormat, sourceDataType, sourceData);
     }
         
+
     Texture3D* GraphicsDeviceES2::createTexture3D(const PixelFormat format, const Vector3i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void *sourceData) {
         return nullptr;
     }
+
 
     Texture2DArray* GraphicsDeviceES2::createTexture2DArray(const PixelFormat format, const Vector2i &size, const int count) {
         return nullptr;
     }
         
+
     TextureCubeMap* GraphicsDeviceES2::createTextureCubeMap(const PixelFormat format, const Vector2i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void **sourceData) {
         return nullptr;
     }
         
+
     Program* GraphicsDeviceES2::createProgram(const ProgramDescriptor &desc) {
         return new ProgramES(desc);
     }
     
+
     void GraphicsDeviceES2::draw(const Subset *subset, const SubsetEnvelope *envelopes, const int envelopeCount) {
-        /*
-        auto subsetGL = static_cast<const SubsetES *>(subset);
-        auto descriptor = subsetGL->GetDescriptor();
+        assert(subset);
+        assert(envelopes);
+        assert(envelopeCount > 0);
 
-        throw std::runtime_error("ES2: VAO rendering isn't supported");
+        auto subsetES = static_cast<const SubsetES *>(subset);
 
-        auto indexBuffer = subsetGL->getIndexBuffer();
+        subsetES->bind();
+        
+        auto indexBuffer = subsetES->getIndexBuffer();
 
         if (!indexBuffer) {
             for (int i=0; i<envelopeCount; i++) {
                 const SubsetEnvelope &env = envelopes[i];
-                const GLenum primitiveGL = convertToGL(env.Primitive);
+                const GLenum primitiveGL = convertToES(env.primitive);
 
-                glDrawArrays(primitiveGL, env.VertexStart, env.VertexCount);
+                glDrawArrays(primitiveGL, env.vertexStart, env.vertexCount);
             }
         } else {
-            const GLenum indexTypeGL = convertToGL(descriptor.indexType);
+            const GLenum indexTypeGL = GL_INT;/* convertToES(descriptor.indexType)*/;
 
             for (int i=0; i<envelopeCount; i++) {
                 const SubsetEnvelope &env = envelopes[i];
-                const GLenum primitiveGL = convertToGL(env.Primitive);
+                const GLenum primitiveGL = convertToES(env.primitive);
+
+                assert(env.vertexCount);
                 
-                if (env.VertexStart == 0) {
-                    glDrawElements(primitiveGL, env.VertexCount, indexTypeGL, nullptr);
-                } else {
-                    throw std::runtime_error("BaseVertex rendering isn't supported");
-                }
+                glDrawElements(primitiveGL, env.vertexCount, indexTypeGL, nullptr);
             }
         }
 
+        subsetES->unbind();
+
         XE_GRAPHICS_GL_CHECK_ERROR();
-        */
     }
 
 
@@ -137,11 +137,11 @@ namespace XE {
             glDisable(GL_DEPTH_TEST);
         }
 
-        const GLenum depthFuncGL = convertToGL(rs.depthFunc);
+        const GLenum depthFuncGL = convertToES(rs.depthFunc);
         glDepthFunc(depthFuncGL);
 
         // front face definition
-        const GLenum faceGL = convertToGL(rs.frontFace);
+        const GLenum faceGL = convertToES(rs.frontFace);
         glFrontFace(faceGL);
 
         // back face culling
@@ -158,8 +158,8 @@ namespace XE {
         if (rs.blendEnable) {
             glEnable(GL_BLEND);
 
-            const GLenum sfactorGL = convertToGL(rs.blendSource);
-            const GLenum dfactorGL = convertToGL(rs.blendDestination);
+            const GLenum sfactorGL = convertToES(rs.blendSource);
+            const GLenum dfactorGL = convertToES(rs.blendDestination);
             glBlendFunc(sfactorGL, dfactorGL);
         } else {
             glDisable(GL_BLEND);
@@ -181,11 +181,11 @@ namespace XE {
 
             glActiveTexture(GL_TEXTURE0 + i);
             glBindTexture(target, textureBaseGL->GetID());
-            glTexParameteri(target, GL_TEXTURE_MAG_FILTER, convertToGL(layer.minFilter));
-            glTexParameteri(target, GL_TEXTURE_MIN_FILTER, convertToGL(layer.magFilter));
-            glTexParameteri(target, GL_TEXTURE_WRAP_S, convertToGL(layer.wrapS));
-            glTexParameteri(target, GL_TEXTURE_WRAP_T, convertToGL(layer.wrapT));
-            /*glTexParameteri(target, GL_TEXTURE_WRAP_R, convertToGL(layer.wrapR));*/
+            glTexParameteri(target, GL_TEXTURE_MAG_FILTER, convertToES(layer.minFilter));
+            glTexParameteri(target, GL_TEXTURE_MIN_FILTER, convertToES(layer.magFilter));
+            glTexParameteri(target, GL_TEXTURE_WRAP_S, convertToES(layer.wrapS));
+            glTexParameteri(target, GL_TEXTURE_WRAP_T, convertToES(layer.wrapT));
+            /*glTexParameteri(target, GL_TEXTURE_WRAP_R, convertToES(layer.wrapR));*/
         }
 
         XE_GRAPHICS_GL_CHECK_ERROR();
