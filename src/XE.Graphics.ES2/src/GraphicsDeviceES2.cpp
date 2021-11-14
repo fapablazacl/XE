@@ -8,7 +8,6 @@
 #include <XE/Graphics/ES2/SubsetES2.h>
 #include <XE/Graphics/ES2/Texture2DES2.h>
 #include <XE/Graphics/ES2/ProgramES2.h>
-#include <XE/Graphics/ES2/IGraphicsContextES2.h>
 #include <XE/Graphics/ES2/Util.h>
 
 #include <XE/Graphics/Material.h>
@@ -26,7 +25,7 @@ namespace XE {
         this->context = context;
 
         gladLoadGLES2Loader((GLADloadproc)context->getProcAddressFunctionGL());
-
+        
         XE_GRAPHICS_GL_CHECK_ERROR();
     }
 

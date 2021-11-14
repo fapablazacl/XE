@@ -10,7 +10,6 @@
 #include <XE/Graphics/GL/Texture2DArrayGL.h>
 #include <XE/Graphics/GL/Texture3DGL.h>
 #include <XE/Graphics/GL/ProgramGL.h>
-#include <XE/Graphics/GL/IGraphicsContextGL.h>
 #include <XE/Graphics/GL/Util.h>
 
 #include <XE/Graphics/Material.h>

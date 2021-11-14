@@ -47,7 +47,7 @@ namespace demo {
         DemoApp() {}
 
         int run(int argc, char **argv) {
-            const XE::GraphicsBackend backend = XE::GraphicsBackend::GL_41;
+            const XE::GraphicsBackend backend = XE::GraphicsBackend::GL_ES_2;
 
             initialize(backend);
             setupGeometry();
