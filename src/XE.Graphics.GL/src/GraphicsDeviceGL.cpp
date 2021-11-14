@@ -23,8 +23,8 @@
 #include <glbinding-aux/debug.h>
 
 namespace XE {
-    GraphicsDeviceGL::GraphicsDeviceGL(GraphicsContext *context) {
-        this->context = context;
+    GraphicsDeviceGL::GraphicsDeviceGL(GraphicsContext *context) : context(context) {
+        assert(context);
 
         std::cout << "[GL] Loading OpenGL Extensions ..." << std::endl;
 
@@ -32,9 +32,11 @@ namespace XE {
         glbinding::aux::enableGetErrorCallback();
     }
 
+
     GraphicsDeviceGL::~GraphicsDeviceGL() {}
     
-    Subset* GraphicsDeviceGL::createSubset(const SubsetDescriptor2 &desc) {
+
+    Subset* GraphicsDeviceGL::createSubset(const SubsetDescriptor &desc) {
         return new SubsetGL(desc);
     }
 
@@ -69,7 +71,7 @@ namespace XE {
         
         auto subsetGL = static_cast<const SubsetGL *>(subset);
         
-        glBindVertexArray(subsetGL->GetID());
+        glBindVertexArray(subsetGL->getID());
 
         auto indexBuffer = subsetGL->getIndexBuffer();
 
@@ -81,6 +83,7 @@ namespace XE {
                 glDrawArrays(primitiveGL, env.vertexStart, env.vertexCount);
             }
         } else {
+            // TODO: Obtain dynamically the index data-type
             const GLenum indexTypeGL = GL_UNSIGNED_INT;
 
             for (int i=0; i<envelopeCount; i++) {

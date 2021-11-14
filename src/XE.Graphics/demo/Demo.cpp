@@ -47,7 +47,7 @@ namespace demo {
         DemoApp() {}
 
         int run(int argc, char **argv) {
-            const XE::GraphicsBackend backend = XE::GraphicsBackend::GL_ES_2;
+            const XE::GraphicsBackend backend = XE::GraphicsBackend::GL_41;
 
             initialize(backend);
             setupGeometry();
@@ -73,7 +73,7 @@ namespace demo {
                 title = "Graphics Demo Application(Driver: Mobile OpenGL)";
             }
 
-            mWindow = XE::WindowGLFW::create(descriptor, "XE.Demo example application", windowSize, false);
+            mWindow = XE::WindowGLFW::create(descriptor, title, windowSize, false);
             
             if (backend == XE::GraphicsBackend::GL_41) {
                 mGraphicsDevice = std::make_unique<XE::GraphicsDeviceGL>(mWindow->getContext());

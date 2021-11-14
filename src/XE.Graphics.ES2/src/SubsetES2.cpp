@@ -4,7 +4,7 @@
 #include <XE/Graphics/ES2/ConversionES.h>
 
 namespace XE {
-    SubsetES::SubsetES(const SubsetDescriptor2& desc) : descriptor(desc) {
+    SubsetES::SubsetES(const SubsetDescriptor& desc) : descriptor(desc) {
         for (size_t i = 0; i < desc.buffers.size(); i++) {
             auto bufferGL = static_cast<const BufferES2*>(desc.buffers[i]);
             buffers.emplace_back(bufferGL);
@@ -15,7 +15,7 @@ namespace XE {
 
 
     void SubsetES::bind() const {
-        for (size_t i = 0; i < descriptor.buffers.size(); i++) {
+        for (size_t i = 0; i < descriptor.attribs.size(); i++) {
             const SubsetVertexAttrib& attrib = descriptor.attribs[i];
             const BufferES2* buffer = buffers[attrib.bufferIndex];
 

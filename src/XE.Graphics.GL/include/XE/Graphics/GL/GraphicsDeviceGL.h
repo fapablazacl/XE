@@ -15,7 +15,7 @@ namespace XE {
 
         ~GraphicsDeviceGL();
 
-        Subset* createSubset(const SubsetDescriptor2 &desc) override;
+        Subset* createSubset(const SubsetDescriptor &desc) override;
 
         Buffer* createBuffer(const BufferDescriptor &bufferDescriptor) override;
         

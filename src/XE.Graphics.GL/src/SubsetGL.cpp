@@ -5,21 +5,21 @@
 
 
 namespace XE {
-    SubsetGL::SubsetGL(const SubsetDescriptor2 &desc) {
+    SubsetGL::SubsetGL(const SubsetDescriptor &desc) : descriptor(desc) {
         for (size_t i=0; i<desc.buffers.size(); i++) {
             auto bufferGL = static_cast<const BufferGL*>(desc.buffers[i]);
-            m_buffers.emplace_back(bufferGL);
+            buffers.emplace_back(bufferGL);
         }
 
         // setup the subset arrays based on the vertex format and the mapping information
-        glGenVertexArrays(1, &m_id);
-        glBindVertexArray(m_id);
+        glGenVertexArrays(1, &id);
+        glBindVertexArray(id);
 
         for (size_t i=0; i<desc.attribs.size(); i++) {
             const SubsetVertexAttrib &attrib = desc.attribs[i];
-            const BufferGL *buffer = m_buffers[attrib.bufferIndex];
+            const BufferGL *buffer = buffers[attrib.bufferIndex];
 
-            glBindBuffer(buffer->GetTarget(), buffer->GetID());
+            glBindBuffer(buffer->getTarget(), buffer->getID());
             glEnableVertexAttribArray(attrib.shaderLocation);
 
             glVertexAttribPointer(
@@ -32,10 +32,10 @@ namespace XE {
             );
         }
         
-        m_indexBuffer = static_cast<const BufferGL*>(desc.indexBuffer);
+        indexBuffer = static_cast<const BufferGL*>(desc.indexBuffer);
 
-        if (m_indexBuffer) {
-            glBindBuffer(m_indexBuffer->GetTarget(), m_indexBuffer->GetID());
+        if (indexBuffer) {
+            glBindBuffer(indexBuffer->getTarget(), indexBuffer->getID());
         }
 
         glBindVertexArray(0);
@@ -43,28 +43,28 @@ namespace XE {
 
 
     SubsetGL::~SubsetGL() {
-        if (m_id) {
-            glDeleteVertexArrays(1, &m_id);
+        if (id) {
+            glDeleteVertexArrays(1, &id);
         }
     }
         
     int SubsetGL::getBufferCount() const {
-        return (int)m_buffers.size();
+        return (int)buffers.size();
     }
 
     BufferGL* SubsetGL::getBuffer(const int index) {
-        return const_cast<BufferGL*>(m_buffers[index]);
+        return const_cast<BufferGL*>(buffers[index]);
     }
 
     BufferGL* SubsetGL::getIndexBuffer() {
-        return const_cast<BufferGL*>(m_indexBuffer);
+        return const_cast<BufferGL*>(indexBuffer);
     }
 
     const BufferGL* SubsetGL::getBuffer(const int index) const {
-        return m_buffers[index];
+        return buffers[index];
     }
 
     const BufferGL* SubsetGL::getIndexBuffer() const {
-        return m_indexBuffer;
+        return indexBuffer;
     }
 }

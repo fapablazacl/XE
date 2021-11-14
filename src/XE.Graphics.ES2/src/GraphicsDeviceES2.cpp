@@ -37,10 +37,8 @@ namespace XE {
         }
     }
 
-    GraphicsDeviceES2::GraphicsDeviceES2(GraphicsContext *context) {
+    GraphicsDeviceES2::GraphicsDeviceES2(GraphicsContext *context) : context(context) {
         assert(context);
-
-        this->context = context;
 
         if (!gladLoadGLES2Loader((GLADloadproc)context->getProcAddressFunctionGL())) {
             assert(false);
@@ -58,7 +56,7 @@ namespace XE {
     GraphicsDeviceES2::~GraphicsDeviceES2() {}
     
 
-    Subset* GraphicsDeviceES2::createSubset(const SubsetDescriptor2& desc) {
+    Subset* GraphicsDeviceES2::createSubset(const SubsetDescriptor& desc) {
         return new SubsetES(desc);
     }
 

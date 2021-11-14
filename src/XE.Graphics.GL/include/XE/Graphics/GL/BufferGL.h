@@ -27,15 +27,15 @@ namespace XE {
         virtual void write(const std::byte *source, const int size, const int offset, const int sourceOffset) override;
 
     public:
-        GLuint GetID() const {
+        GLuint getID() const {
             return m_id;
         }
 
-        GLenum GetTarget() const {
+        GLenum getTarget() const {
             return m_target;
         }
 
-        GLenum GetUsage() const {
+        GLenum getUsage() const {
             return m_usage;
         }
 

@@ -50,7 +50,7 @@ namespace XE {
     class Program;
     class Material;
 
-    struct SubsetDescriptor2;
+    struct SubsetDescriptor;
     struct ProgramDescriptor;
 
     enum class GraphicsBackend {
@@ -104,7 +104,7 @@ namespace XE {
     public:
         virtual ~GraphicsDevice();
 
-        virtual Subset* createSubset(const SubsetDescriptor2 &desc) = 0;
+        virtual Subset* createSubset(const SubsetDescriptor &desc) = 0;
 
         virtual Buffer* createBuffer(const BufferDescriptor &bufferDescriptor) = 0;
         

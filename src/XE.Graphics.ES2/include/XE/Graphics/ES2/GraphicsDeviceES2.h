@@ -16,7 +16,7 @@ namespace XE {
 
         virtual ~GraphicsDeviceES2();
 
-        virtual Subset* createSubset(const SubsetDescriptor2 &desc) override;
+        virtual Subset* createSubset(const SubsetDescriptor &desc) override;
         
         virtual Buffer* createBuffer(const BufferDescriptor &bufferDescriptor) override;
         

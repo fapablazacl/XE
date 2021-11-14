@@ -10,7 +10,7 @@
 namespace XE {
     class SubsetES : public Subset {
     public:
-        explicit SubsetES(const SubsetDescriptor2& desc);
+        explicit SubsetES(const SubsetDescriptor& desc);
 
         virtual ~SubsetES();
         
@@ -32,7 +32,7 @@ namespace XE {
     public:
         std::vector<const BufferES2*> buffers = {};
         const BufferES2* indexBuffer = nullptr;
-        SubsetDescriptor2 descriptor = {};
+        SubsetDescriptor descriptor = {};
     };
 }
 

@@ -257,7 +257,7 @@ namespace demo {
             {2, XE::DataType::Float32, 4, false, sizeof(Vertex), 0, OFFSETOF(Vertex, color)}
         };
 
-        XE::SubsetDescriptor2 subsetDesc { {vertexBuffer},  attribs, indexBuffer};
+        XE::SubsetDescriptor subsetDesc { {vertexBuffer},  attribs, indexBuffer};
         XE::Subset *subset = graphicsDevice->createSubset(subsetDesc);
 
         return subset;
@@ -281,7 +281,7 @@ namespace demo {
             {2, XE::DataType::Float32, 4, false, sizeof(Vertex), 0, OFFSETOF(Vertex, color)}
         };
         
-        XE::SubsetDescriptor2 subsetDesc { {vertexBuffer},  attribs, nullptr};
+        XE::SubsetDescriptor subsetDesc { {vertexBuffer},  attribs, nullptr};
 
         XE::Subset *subset = graphicsDevice->createSubset(subsetDesc);
 

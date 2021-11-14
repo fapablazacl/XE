@@ -20,7 +20,5 @@ void main() {
     float d = dot(uLightDirection, (vec4(vsNormal, 0.0) * uModel).xyz);
     vec4 diffuse = vsColor * d;
 
-    // 
-    // fsColor = vec4(vsNormal, 1.0);
     fsColor = diffuse;
 }
