@@ -156,17 +156,17 @@ namespace demo {
             mColoredCubeRenderable = {mColoredCubeSubset, mColoredCubeSubsetEnvelope};
 
             mAxisNode = mSceneNode.createChild();
-            // mAxisNode->setRenderable(&mAxisRenderable);
+            mAxisNode->setRenderable(&mAxisRenderable);
 
             mLeftCubeNode = mSceneNode.createChild();
-            // mLeftCubeNode->setRenderable(&mColoredCubeRenderable);
+            mLeftCubeNode->setRenderable(&mColoredCubeRenderable);
 
             mRightCubeNode = mSceneNode.createChild();
-            // mRightCubeNode->setRenderable(&mColoredCubeRenderable);
+            mRightCubeNode->setRenderable(&mColoredCubeRenderable);
             
             mEnemyRenderable = {mCubeSubset, mCubeSubsetEnvelope};
             mEnemyNode = mSceneNode.createChild();
-            // mEnemyNode->setRenderable(&mEnemyRenderable);
+            mEnemyNode->setRenderable(&mEnemyRenderable);
             mEnemyNode->setTransformation(XE::M4::translate({0.0f, 0.2501f, 0.0f}));
         }
 
@@ -276,6 +276,8 @@ namespace demo {
 
 
 int main(int argc, char **argv) {
+    // std::system("pwd");
+    
     demo::DemoApp app;
 
     app.run(argc, argv);

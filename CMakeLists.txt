@@ -19,13 +19,11 @@ set (CMAKE_CXX_STANDARD 17)
 set (CMAKE_CXX_STANDARD_REQUIRED ON)
 set (CMAKE_CXX_EXTENSIONS OFF)
 
+# Unit-Test required dependencies
 if (XE_UNIT_TEST)
     include(CTest)
-
-    add_library(Catch2 INTERFACE)
-    target_include_directories(Catch2 INTERFACE "dep/Catch2/single_include")
+    find_package(Catch2 REQUIRED)
 endif()
-
 
 # XE_CXX_FLAGS
 # Flags that will be passed for the targets, specific to the compilation of the targets (not its dependencies)
