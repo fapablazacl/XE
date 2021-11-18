@@ -26,6 +26,7 @@ jobs:
     env:
       CC: clang
       CXX: clang++
+      CFLAGS: -Wall --analyze
     steps:
       - name: Checkout Source Code and Submodules
         uses: actions/checkout@v2
