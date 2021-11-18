@@ -20,3 +20,10 @@ mkdir -p dep/glfw/build
 cmake -B dep/glfw/build -DCMAKE_BUILD_TYPE=Debug -S . 
 cmake --build dep/glfw/build 
 sudo cmake --build dep/glfw/build --target install
+
+# Catch
+git clone --depth 1 --branch v3.0.0-preview3 git clone https://github.com/catchorg/catch2.git dep/catch2
+mkdir -p dep/catch2/build 
+cmake -B dep/catch2/build -DCMAKE_BUILD_TYPE=Debug -S . 
+cmake --build dep/catch2/build 
+sudo cmake --build dep/catch2/build --target install
