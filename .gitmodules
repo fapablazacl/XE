@@ -13,3 +13,6 @@
 [submodule "dep/glades2"]
 	path = dep/glades2
 	url = git@github.com:fapablazacl/glades2.git
+[submodule "dep/glbinding"]
+	path = dep/glbinding
+	url = https://github.com/cginternals/glbinding.git
