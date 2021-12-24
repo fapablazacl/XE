@@ -4,3 +4,12 @@
 [submodule "dep/cgltf"]
 	path = dep/cgltf
 	url = https://github.com/jkuhlmann/cgltf.git
+[submodule "dep/glfw"]
+	path = dep/glfw
+	url = https://github.com/glfw/glfw.git
+[submodule "dep/Catch2"]
+	path = dep/Catch2
+	url = https://github.com/catchorg/Catch2.git
+[submodule "dep/glades2"]
+	path = dep/glades2
+	url = git@github.com:fapablazacl/glades2.git
