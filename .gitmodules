@@ -1,18 +1,18 @@
 [submodule "dep/lodepng"]
-	path = dep/lodepng
+	path = dependencies/lodepng
 	url = https://github.com/lvandeve/lodepng.git
 [submodule "dep/cgltf"]
-	path = dep/cgltf
+	path = dependencies/cgltf
 	url = https://github.com/jkuhlmann/cgltf.git
 [submodule "dep/glfw"]
-	path = dep/glfw
+	path = dependencies/glfw
 	url = https://github.com/glfw/glfw.git
 [submodule "dep/Catch2"]
-	path = dep/Catch2
+	path = dependencies/Catch2
 	url = https://github.com/catchorg/Catch2.git
 [submodule "dep/glades2"]
-	path = dep/glades2
+	path = dependencies/glades2
 	url = git@github.com:fapablazacl/glades2.git
 [submodule "dep/glbinding"]
-	path = dep/glbinding
+	path = dependencies/glbinding
 	url = https://github.com/cginternals/glbinding.git
