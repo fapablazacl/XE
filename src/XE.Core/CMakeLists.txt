@@ -1,4 +1,3 @@
-add_compile_options(${XE_CXX_FLAGS})
 
 set (target "XE.Core")
 
@@ -23,9 +22,3 @@ add_library (${target} ${sources})
 
 target_include_directories(${target} PUBLIC "include/")
 target_compile_definitions(${target} PRIVATE _CRT_SECURE_NO_WARNINGS)
-
-#target_compile_options (${target} PUBLIC "${XE_CXX_FLAGS}")
-
-#if (UNIX)
-#	target_link_libraries(${target} stdc++fs)
-#endif()

@@ -25,9 +25,6 @@ if (XE_UNIT_TEST)
     find_package(Catch2 REQUIRED)
 endif()
 
-# XE_CXX_FLAGS
-# Flags that will be passed for the targets, specific to the compilation of the targets (not its dependencies)
-
 # TODO: Configure the version numbering mechanism
 set (XE_VERSION_MAJOR 0)
 set (XE_VERSION_MINOR 0)

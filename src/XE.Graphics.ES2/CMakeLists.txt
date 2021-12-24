@@ -37,4 +37,3 @@ target_link_libraries (${target}
 	glades2
 )
 target_include_directories (${target} PUBLIC "include/")
-target_compile_options (${target} PUBLIC ${XE_CXX_FLAGS})

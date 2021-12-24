@@ -16,4 +16,3 @@ set (sources
 add_executable(${target} ${sources})
 
 target_link_libraries(${target} d3d11 d3dcompiler XE.Math)
-target_compile_options (${target} PUBLIC ${XE_CXX_FLAGS})

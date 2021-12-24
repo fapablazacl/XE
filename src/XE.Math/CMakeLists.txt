@@ -19,7 +19,6 @@ set (sources
 add_library(${target} INTERFACE)
 
 target_include_directories(${target} INTERFACE "include/")
-target_compile_options (${target} INTERFACE ${XE_CXX_FLAGS})
 
 
 if (XE_UNIT_TEST)
@@ -34,7 +33,7 @@ if (XE_UNIT_TEST)
     )
 
     add_executable(${test_target} ${test_sources})
-    target_link_libraries(${test_target} Catch2 XE.Math)
+    target_link_libraries(${test_target} Catch2::Catch2 XE.Math)
 
     # NOTE: The test name must have the same name as the command name
     add_test(NAME ${test_target} COMMAND ${test_target})

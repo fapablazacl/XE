@@ -9,4 +9,3 @@ set (src "Main.cpp")
 add_executable(${target} ${src})
 
 target_link_libraries(${target} XE.Core ${Vulkan_LIBRARIES} glfw )
-target_compile_options (${target} PUBLIC ${XE_CXX_FLAGS})

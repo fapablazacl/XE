@@ -16,7 +16,7 @@ jobs:
         run: sh ci/unix-dependencies.sh
 
       - name: Configure a Debug Build
-        run: mkdir -p build/gcc/debug && cmake -B build/gcc/debug -DCMAKE_BUILD_TYPE=Debug -DXE_CXX_FLAGS="-Wall" -DXE_PLUGIN_GL=ON -DXE_PLUGIN_ES2=ON -DXE_PLUGIN_GL_GLFW=ON
+        run: mkdir -p build/gcc/debug && cmake -B build/gcc/debug -DCMAKE_BUILD_TYPE=Debug -DXE_PLUGIN_GL=ON -DXE_PLUGIN_ES2=ON -DXE_PLUGIN_GL_GLFW=ON
 
       - name: Building Debug Configuration
         run: cmake --build build/gcc/debug
@@ -40,7 +40,7 @@ jobs:
         run: sh ci/unix-dependencies.sh
 
       - name: Configure a Debug Build
-        run: mkdir -p build/clang/debug && cmake -B build/clang/debug -DCMAKE_BUILD_TYPE=Debug -DXE_CXX_FLAGS="-Wall" -DXE_PLUGIN_GL=ON -DXE_PLUGIN_ES2=ON -DXE_PLUGIN_GL_GLFW=ON
+        run: mkdir -p build/clang/debug && cmake -B build/clang/debug -DCMAKE_BUILD_TYPE=Debug -DXE_PLUGIN_GL=ON -DXE_PLUGIN_ES2=ON -DXE_PLUGIN_GL_GLFW=ON
 
       - name: Building Debug Configuration
         run: cmake --build build/clang/debug

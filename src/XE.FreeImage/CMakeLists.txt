@@ -11,5 +11,3 @@ set (sources_xe_graphics_fi
 source_group("\\XE\\Graphics\\FI" FILES ${sources_xe_graphics_fi})
 
 add_library(${target} ${sources_xe_graphics_fi})
-
-target_compile_options (${target} PUBLIC ${XE_CXX_FLAGS})

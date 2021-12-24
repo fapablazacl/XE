@@ -25,7 +25,7 @@ cd $SOURCE_DIR
 mkdir -p $BUILD_DIR/clang/debug
 cd $BUILD_DIR/clang/debug
 export CXXFLAGS="-Wall"
-cmake ../../../ -G "Unix Makefiles" -DXE_CXX_FLAGS="-Werror" -DCMAKE_BUILD_TYPE=Debug -DXE_TEST=ON -DXE_PLUGIN_GL=ON -DXE_PLUGIN_ES2=ON -DXE_PLUGIN_GL_GLFW=ON
+cmake ../../../ -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Debug -DXE_TEST=ON -DXE_PLUGIN_GL=ON -DXE_PLUGIN_ES2=ON -DXE_PLUGIN_GL_GLFW=ON
 
 if ! make ; then
     exit 1
@@ -45,7 +45,7 @@ cd $SOURCE_DIR
 mkdir -p $BUILD_DIR/clang/release
 cd $BUILD_DIR/clang/release
 export CXXFLAGS="-Wall"
-cmake ../../../ -G "Unix Makefiles" -DXE_CXX_FLAGS="-Werror" -DCMAKE_BUILD_TYPE=Release -DXE_TEST=ON -DXE_PLUGIN_GL=ON -DXE_PLUGIN_ES2=ON -DXE_PLUGIN_GL_GLFW=ON
+cmake ../../../ -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release -DXE_TEST=ON -DXE_PLUGIN_GL=ON -DXE_PLUGIN_ES2=ON -DXE_PLUGIN_GL_GLFW=ON
 
 if ! make ; then
     exit 1
