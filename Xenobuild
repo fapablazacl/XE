@@ -46,7 +46,7 @@ fi
 BUILD_TYPE_DEBUG="debug"
 BUILD_TYPE_RELEASE="release"
 BUILD_TYPE=$3
-if [ \( "$BUILD_TYPE" != "$BUILD_TYPE_DEBUG" \) && \( "$BUILD_TYPE" != "$BUILD_TYPE_RELEASE" \) ]; then
+if [ \( "$BUILD_TYPE" != "$BUILD_TYPE_DEBUG" \) -a \( "$BUILD_TYPE" != "$BUILD_TYPE_RELEASE" \) ]; then
     echo "Supplied build type \"$BUILD_TYPE\" is unknown"
     echo "  $BUILD_TYPE_DEBUG"
     echo "  $BUILD_TYPE_RELEASE"
