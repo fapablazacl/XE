@@ -1,6 +1,9 @@
 #!/bin/bash
 
-# Build Utility Tool for XE
+# Build Utility Tool for XE, on Unix platforms.
+# Supports Debug and Release build, using GCC and CLANG compilers.
+# Tested on:
+#   ArchLinux, with Zen Kernel.
 
 # Mode
 MODE_INSTALLDEPS="installdeps"

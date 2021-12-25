@@ -13,13 +13,17 @@ jobs:
         run: sudo apt install xorg-dev 
 
       - name: Installing Dependencies
-        run: sh ci/unix-dependencies.sh
+        run: sh Xenobuild installdeps gcc debug
 
       - name: Configure a Debug Build
-        run: mkdir -p build/gcc/debug && cmake -B build/gcc/debug -DCMAKE_BUILD_TYPE=Debug -DXE_PLUGIN_GL=ON -DXE_PLUGIN_ES2=ON -DXE_PLUGIN_GL_GLFW=ON
+        run: sh Xenobuild configure gcc debug
 
       - name: Building Debug Configuration
         run: cmake --build build/gcc/debug
+
+      - name: Running Unit Test Suite
+        run: cmake --build build/gcc/debug --target test
+
 
   ci-ubuntu-clang:
     runs-on: ubuntu-latest
@@ -37,10 +41,13 @@ jobs:
         run: sudo apt install xorg-dev
 
       - name: Installing Dependencies
-        run: sh ci/unix-dependencies.sh
+        run: sh Xenobuild installdeps clang debug
 
       - name: Configure a Debug Build
-        run: mkdir -p build/clang/debug && cmake -B build/clang/debug -DCMAKE_BUILD_TYPE=Debug -DXE_PLUGIN_GL=ON -DXE_PLUGIN_ES2=ON -DXE_PLUGIN_GL_GLFW=ON
+        run: sh Xenobuild configure clang debug
 
       - name: Building Debug Configuration
         run: cmake --build build/clang/debug
+
+      - name: Running Unit Test Suite
+        run: cmake --build build/clang/debug --target test
