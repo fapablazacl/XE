@@ -169,10 +169,14 @@ jobs:
           PowerShell .\Xenobuild -mode configure -toolchain vc -buildType debug
 
       - name: Build
-        run: cmake --build build/vc/debug
+        run: |
+          call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
+          cmake --build build/vc/debug
 
       - name: Run Unit Tests
-        run: cmake --build build/vc/debug --target test
+        run: |
+          call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
+          cmake --build build/vc/debug --target test
 
   ci-windows-latest-x86_64-vc-release:
     runs-on: windows-latest
@@ -195,7 +199,11 @@ jobs:
           PowerShell .\Xenobuild -mode configure -toolchain vc -buildType release
 
       - name: Build
-        run: cmake --build build/vc/release
+        run: |
+          call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
+          cmake --build build/vc/release
 
       - name: Run Unit Tests
-        run: cmake --build build/vc/release --target test
+        run: |
+          call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
+          cmake --build build/vc/release --target test
