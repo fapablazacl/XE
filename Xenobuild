@@ -9,8 +9,8 @@
 MODE_INSTALLDEPS="installdeps"
 MODE_CONFIGURE="configure"
 MODE=$1
-if [[ ( $MODE != $MODE_INSTALLDEPS ) && ( $MODE != $MODE_CONFIGURE ) ]]
-then
+
+if [ \( "$MODE" != "$MODE_INSTALLDEPS" \) -a \( "$MODE" != "$MODE_CONFIGURE" \) ]; then
     echo "Supplied mode \"$TOOLCHAIN\" is unknown."
     echo "  $MODE_INSTALLDEPS"
     echo "  $MODE_CONFIGURE"
