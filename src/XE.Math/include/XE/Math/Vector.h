@@ -5,6 +5,7 @@
 #include <cmath>
 #include <cstdint>
 #include <cassert>
+#include <ostream>
 #include <algorithm>
 
 namespace XE {
@@ -460,6 +461,19 @@ namespace XE {
         }
         
         return true;
+    }
+
+    template<typename T, int N>
+    inline std::ostream& operator<<(std::ostream &os, const Vector<T, N>& v) {
+        os << "XE::Vector<" << typeid(T).name() << ", " << N << ">{ ";
+
+        for (int i = 0; i < N - 1; i++) {
+            os << v[i] << ", ";
+        }
+
+        os << v[N - 1] << " }";
+
+        return os;
     }
 }
 
