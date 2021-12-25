@@ -96,12 +96,8 @@ jobs:
         run: cmake --build build/clang/release --target test
 
 
-  ci-macos-11-x86_64-clang-debug:
+  ci-macos-11-universal-clang-debug:
     runs-on: macos-11
-    env:
-      CC: clang
-      CXX: clang++
-      CFLAGS: -Wall --analyze
     steps:
       - name: Checkout Source Code and Submodules
         uses: actions/checkout@v2
@@ -124,7 +120,7 @@ jobs:
         run: cmake --build build/clang/debug --target test
 
 
-  ci-macos-11-x86_64-clang-release:
+  ci-macos-11-universal-clang-release:
     runs-on: macos-11
     steps:
       - name: Checkout Source Code and Submodules
