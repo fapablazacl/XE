@@ -1,7 +1,7 @@
 name: Continous Integration
 on: [push]
 jobs:
-  ci-ubuntu-x86_64-gcc-debug:
+  ci-ubuntu-latest-x86_64-gcc-debug:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Source Code and Submodules
@@ -24,7 +24,7 @@ jobs:
       - name: Run Unit Tests
         run: cmake --build build/gcc/debug --target test
 
-  ci-ubuntu-x86_64-gcc-release:
+  ci-ubuntu-latest-x86_64-gcc-release:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Source Code and Submodules
@@ -48,7 +48,7 @@ jobs:
         run: cmake --build build/gcc/release --target test
 
 
-  ci-ubuntu-x86_64-clang-debug:
+  ci-ubuntu-latest-x86_64-clang-debug:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Source Code and Submodules
@@ -72,7 +72,7 @@ jobs:
         run: cmake --build build/clang/debug --target test
 
 
-  ci-ubuntu-x86_64-clang-release:
+  ci-ubuntu-latest-x86_64-clang-release:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Source Code and Submodules
@@ -96,7 +96,7 @@ jobs:
         run: cmake --build build/clang/release --target test
 
 
-  ci-macos-x86_64-clang-debug:
+  ci-macos-11-x86_64-clang-debug:
     runs-on: macos-11
     env:
       CC: clang
@@ -124,7 +124,7 @@ jobs:
         run: cmake --build build/clang/debug --target test
 
 
-  ci-macos-x86_64-clang-release:
+  ci-macos-11-x86_64-clang-release:
     runs-on: macos-11
     steps:
       - name: Checkout Source Code and Submodules
@@ -146,3 +146,30 @@ jobs:
 
       - name: Run Unit Tests
         run: cmake --build build/clang/release --target test
+
+
+  ci-windows-latest-x86_64-vc-debug:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout Source Code and Submodules
+        uses: actions/checkout@v2
+        with:
+          submodules: true
+
+      - name: Install Dependencies
+        shell: cmd
+        run: |
+          call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
+          PowerShell Xenobuild.ps1 -mode installdeps -toolchain vc -buildType debug
+
+      - name: Configure
+        shell: cmd
+        run: |
+          call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
+          PowerShell Xenobuild.ps1 -mode configure -toolchain vc -buildType debug
+
+      - name: Build
+        run: cmake --build build/vc/debug
+
+      - name: Run Unit Tests
+        run: cmake --build build/vc/debug --target test
