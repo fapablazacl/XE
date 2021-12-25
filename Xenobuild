@@ -129,7 +129,8 @@ install_dependencies(){
         -DCMAKE_INSTALL_PREFIX=$GLFW3_INSTALL_PREFIX \
         -DGLFW_BUILD_DOCS=OFF \
         -DGLFW_BUILD_EXAMPLES=OFF \
-        -DGLFW_BUILD_TESTS=OFF
+        -DGLFW_BUILD_TESTS=OFF \
+        -DCMAKE_DEBUG_POSTFIX="d"
 
     cmake --build $GLFW3_BUILD_DIR
     cmake --install $GLFW3_BUILD_DIR
