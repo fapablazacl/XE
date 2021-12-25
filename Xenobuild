@@ -31,7 +31,7 @@ if [ \( "$TOOLCHAIN" != "$TOOLCHAIN_GCC" \) -a \( "$TOOLCHAIN" != "$TOOLCHAIN_CL
     exit 1
 fi
 
-if [ \( "$TOOLCHAIN" == "$TOOLCHAIN_GCC" \) ]; then
+if [ \( "$TOOLCHAIN" = "$TOOLCHAIN_GCC" \) ]; then
     export CC=gcc 
     export CXX=g++
 fi
