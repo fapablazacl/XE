@@ -1,7 +1,7 @@
 name: Continous Integration
 on: [push]
 jobs:
-  ci-ubuntu-gcc-debug:
+  ci-ubuntu-x86_64-gcc-debug:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Source Code and Submodules
@@ -24,7 +24,7 @@ jobs:
       - name: Run Unit Tests
         run: cmake --build build/gcc/debug --target test
 
-  ci-ubuntu-gcc-release:
+  ci-ubuntu-x86_64-gcc-release:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Source Code and Submodules
@@ -48,7 +48,7 @@ jobs:
         run: cmake --build build/gcc/release --target test
 
 
-  ci-ubuntu-clang-debug:
+  ci-ubuntu-x86_64-clang-debug:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Source Code and Submodules
@@ -72,7 +72,7 @@ jobs:
         run: cmake --build build/clang/debug --target test
 
 
-  ci-ubuntu-clang-release:
+  ci-ubuntu-x86_64-clang-release:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Source Code and Submodules
@@ -96,7 +96,7 @@ jobs:
         run: cmake --build build/clang/release --target test
 
 
-  ci-macos-clang-debug:
+  ci-macos-x86_64-clang-debug:
     runs-on: macos-11
     env:
       CC: clang
@@ -124,7 +124,7 @@ jobs:
         run: cmake --build build/clang/debug --target test
 
 
-  ci-macos-clang-release:
+  ci-macos-x86_64-clang-release:
     runs-on: macos-11
     steps:
       - name: Checkout Source Code and Submodules
