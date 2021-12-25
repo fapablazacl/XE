@@ -1,3 +1,0 @@
-language: cpp
-install: git submodule init && git submodule update
-script: cmake
