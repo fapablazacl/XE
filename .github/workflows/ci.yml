@@ -37,8 +37,33 @@ jobs:
         with:
           submodules: true
 
-      - name: Installing Development Dependencies
+      - name: Installing Ubuntu-specific Dependencies
         run: sudo apt install xorg-dev
+
+      - name: Installing Dependencies
+        run: sh Xenobuild installdeps clang debug
+
+      - name: Configure a Debug Build
+        run: sh Xenobuild configure clang debug
+
+      - name: Building Debug Configuration
+        run: cmake --build build/clang/debug
+
+      - name: Running Unit Test Suite
+        run: cmake --build build/clang/debug --target test
+
+
+  ci-macos-clang:
+    runs-on: macos-11
+    env:
+      CC: clang
+      CXX: clang++
+      CFLAGS: -Wall --analyze
+    steps:
+      - name: Checkout Source Code and Submodules
+        uses: actions/checkout@v2
+        with:
+          submodules: true
 
       - name: Installing Dependencies
         run: sh Xenobuild installdeps clang debug
