@@ -28,7 +28,7 @@ namespace XE {
     Matrix<T, R, C> adjoint(const Matrix<T, R, C> &matrix);
 
     template<typename T, int R, int C>
-    T abs(const Matrix<T, R, C> &m);
+    T determinant(const Matrix<T, R, C> &m);
 
     /**
      * @brief NxM matrix struct, in column-major order.
@@ -621,16 +621,16 @@ namespace XE {
 
     template<typename T, int R, int C>
     Matrix<T, R, C> inverse(const Matrix<T, R, C> &m) {
-        return transpose(adjoint(m)) / abs(m);
+        return transpose(adjoint(m)) / determinant(m);
     }
 
     template<typename T, int R, int C>
-    Matrix<T, R, C> inverse(const Matrix<T, R, C> &m, const T abs) {
-        return transpose(adjoint(m)) / abs;
+    Matrix<T, R, C> inverse(const Matrix<T, R, C> &m, const T det) {
+        return transpose(adjoint(m)) / det;
     }
 
     template<typename T, int R, int C>
-    auto abs(const Matrix<T, R, C> &m) {
+    T determinant(const Matrix<T, R, C> &m) {
         if constexpr (R == C && R > 0) {
             if constexpr (R == 1) {
                 return m(0, 0);
@@ -645,7 +645,7 @@ namespace XE {
             
                 for (int j=0; j<C; j++) {
                     const T factor = (j + 1) % 2 ? T(-1) : T(1);
-                    const T subdet = abs(m.getSubMatrix(i, j));
+                    const T subdet = determinant(m.getSubMatrix(i, j));
                 
                     result += factor * m(i, j) * subdet;
                 }
@@ -663,7 +663,7 @@ namespace XE {
         for(int i=0; i<R; ++i) {
             for(int j=0; j<C; ++j) {
                 const T factor = ((i+j)%2 == 1) ? static_cast<T>(1) : static_cast<T>(-1);
-                result(i, j) = factor * abs(matrix.getSubMatrix(i, j));
+                result(i, j) = factor * determinant(matrix.getSubMatrix(i, j));
             }
         }
         
