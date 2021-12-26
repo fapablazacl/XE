@@ -3,24 +3,20 @@
 XE is a framework, written in C++17 for building high-performance and cross-platform multimedia applications.
 
 ## Build Status
-| Compiler        | Status        |
-| -------------   |:-------------:|
-| Visual C++ 2017 | ![status][1]  |
 
-[1]: https://ci.appveyor.com/api/projects/status/github/devwarecl/XE?svg=true
+![Continuous Integration Build Status](https://github.com/fapablazacl/XE/actions/workflows/ci.yml/badge.svg)
 
 ## Preliminary Supported Platforms
-* Windows 7+
-* Linux (X Window System and Wayland)
-* HTML5 
-* Android
+* Windows 10
+* Ubuntu
+* macOS
 
 ## Supported Compilers
 * Visual C++
 * GCC
 * clang 
 
-## Feature Status Matrix
+## Feature Implementation Status Matrix
 | Module            | Feature                                      | Status    |
 | -------------     |:-------------:                               | ------    |
 | Core              | Memory Buffer Abstraction                    | TODO      |
