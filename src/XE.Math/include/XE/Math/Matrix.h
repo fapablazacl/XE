@@ -12,6 +12,24 @@
 
 
 namespace XE {
+    template<typename T, int R, int C>
+    struct Matrix;
+
+    template<typename T, int R, int C>
+    Matrix<T, R, C> transpose(const Matrix<T, R, C> &m);
+
+    template<typename T, int R, int C>
+    Matrix<T, R, C> inverse(const Matrix<T, R, C> &m);
+
+    template<typename T, int R, int C>
+    Matrix<T, R, C> inverse(const Matrix<T, R, C> &m, const T abs);
+
+    template<typename T, int R, int C>
+    Matrix<T, R, C> adjoint(const Matrix<T, R, C> &matrix);
+
+    template<typename T, int R, int C>
+    T abs(const Matrix<T, R, C> &m);
+
     /**
      * @brief NxM matrix struct, in column-major order.
      */
@@ -637,6 +655,7 @@ namespace XE {
         }
     }
 
+    
     template<typename T, int R, int C>
     Matrix<T, R, C> adjoint(const Matrix<T, R, C> &matrix) {
         Matrix<T, R, C> result;
