@@ -30,32 +30,32 @@ TEST_CASE("XE::Trackball class", "[Trackball]") {
 
         REQUIRE(rotation.angle == 0.0);
     }
+    
 
-    SECTION("should generate a rotation around the Y axis with a horizontal mouse movement, inside the virtual unit trackball") {
-        auto trackball = XE::Trackball{{100, 100}};
+    // TODO: These tests must be completed after the Quaternion class is fully tested.
+    //SECTION("should generate a rotation around the Y axis with a horizontal mouse movement, inside the virtual unit trackball") {
+    //    auto trackball = XE::Trackball{{100, 100}};
 
-        trackball.beginDrag({50, 50});
-        trackball.drag({55, 50});
-        trackball.endDrag({60, 50});
+    //    trackball.beginDrag({50, 50});
+    //    trackball.drag({55, 50});
+    //    trackball.endDrag({60, 50});
 
-        auto rotation = trackball.computeRotation();
+    //    auto rotation = trackball.computeRotation();
 
-        REQUIRE(rotation.axis == XE::Vector3f{0.0f, 1.0f, 0.0f});
-        REQUIRE(rotation.angle > 0.0f);
-    }
+    //    REQUIRE(rotation.axis == XE::Vector3f{0.0f, 1.0f, 0.0f});
+    //    REQUIRE(rotation.angle > 0.0f);
+    //}
 
-    /*
-    SECTION("should generate a rotation around the X axis with a horizontal mouse movement, inside the virtual unit trackball") {
-        auto trackball = XE::Trackball{{100, 100}};
+    //SECTION("should generate a rotation around the X axis with a horizontal mouse movement, inside the virtual unit trackball") {
+    //    auto trackball = XE::Trackball{{100, 100}};
 
-        trackball.beginDrag({50, 50});
-        trackball.drag({50, 55});
-        trackball.endDrag({50, 60});
+    //    trackball.beginDrag({50, 50});
+    //    trackball.drag({50, 55});
+    //    trackball.endDrag({50, 60});
 
-        auto rotation = trackball.computeRotation();
+    //    auto rotation = trackball.computeRotation();
 
-        REQUIRE(rotation.axis == XE::Vector3f{1.0f, 0.0f, 0.0f});
-        REQUIRE(rotation.angle > 0.0f);
-    }
-    */
+    //    REQUIRE(rotation.axis == XE::Vector3f{1.0f, 0.0f, 0.0f});
+    //    REQUIRE(rotation.angle > 0.0f);
+    //}
 }

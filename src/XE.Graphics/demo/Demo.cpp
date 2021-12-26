@@ -195,10 +195,10 @@ namespace demo {
             // update animations
             mAngle += XE::radians(60.0f * seconds);
 
-            const auto rotY1 = XE::M4::rotateY(mAngle);
-            const auto rotX1 = XE::M4::rotateX(mAngle);
-            const auto rotY2 = XE::M4::rotate(mAngle, {0.0f, 1.0f, 0.0f});
-            const auto rotX2 = XE::M4::rotate(mAngle, {1.0f, 0.0f, 0.0f});
+            const XE::M4 rotY1 = XE::M4::rotateY(mAngle);
+            const XE::M4 rotX1 = XE::M4::rotateX(mAngle);
+            const XE::M4 rotY2 = XE::M4::rotate(mAngle, {0.0f, 1.0f, 0.0f});
+            const XE::M4 rotX2 = XE::M4::rotate(mAngle, {1.0f, 0.0f, 0.0f});
             mLeftCubeNode->setTransformation(rotY1 * rotX1 * XE::M4::translate({-1.25f, 0.5f, 0.0f}));
             mRightCubeNode->setTransformation(rotY2 * rotX2 * XE::M4::translate({1.25f, 0.5f, 0.0f}));
 

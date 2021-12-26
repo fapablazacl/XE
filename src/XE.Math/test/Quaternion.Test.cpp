@@ -332,19 +332,4 @@ TEST_CASE("Quaternion advanced utility methods and functions", "[Quaternion]") {
             auto q = XE::Quaternion<float>::createIdentity();
         }
     }
-
-    SECTION("'createRotation' static method ") {
-        SECTION("should create a valid quaternion that rorates an vector on an axis and a angle") {
-            auto q = XE::Quaternion<float>::createRotation(XE::radians(180.0f), XE::Vector3f{0.0f, 1.0f, 0.0f});
-
-            REQUIRE(q.V.X == 0.0f);
-            REQUIRE(q.V.Y == 1.0f);
-            REQUIRE(q.V.Z == 0.0f);
-            REQUIRE(Approx(q.W).epsilon(0.00001) == 0.0f);
-        }
-
-        SECTION("should create a valid quaternion based on a vector arc") {
-
-        }
-    }
 }

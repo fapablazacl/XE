@@ -83,19 +83,7 @@ namespace XE {
 }
 
 namespace std {
-    template<typename T, int R, int C>
-    std::ostream& operator<< (std::ostream &os, const XE::Matrix<T, R, C>& m) {
-        os << std::endl;
 
-        for (int i=0; i<R; ++i) {
-            os << m.getRow(i);
-            os << std::endl;
-        }
-
-        os << std::endl;
-
-        return os;
-    }
 }
 
 
