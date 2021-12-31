@@ -18,8 +18,8 @@ namespace XE {
          * @brief Computes the point of the ray at 't' distance from the starting point, to the 
          * direction of the ray.
          */
-        Vector<T, 3> computePoint(const T t) const {
-            return position + t*direction;
+        Vector<T, 3> pointAt(const T t) const {
+            return position + t * direction;
         }
 
         /**

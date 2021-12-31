@@ -5,45 +5,64 @@
 #include "Vector.h"
 
 namespace XE {
+    enum class PlaneSide {
+        Front,
+        Back,
+        Inside
+    };
+
     /**
      * @brief Plane on 3-space.
      */
     template<typename T>
     struct Plane {
         Vector<T, 3> position;
-        Vector<T, 3> Normal;
+        Vector<T, 3> normal;
 
-        /**
-         * @brief Initialize a plane from three points. These points must be coplanar.
-         */
-        static Plane<T> FromTriangle(const Vector<T, 3>& p1, const Vector<T, 3>& p2, const Vector<T, 3>& p3) {
-            return {
-                (p1 + p2 + p3) / T(3),
-                normalize(cross(p2 - p1, p3 - p1))
-            };
+    public:
+        PlaneSide test(const Vector<T, 3> &point) const {
+            return PlaneSide::Inside;
         }
 
-        static Plane<T> MakeXY() {
+    public:
+        //! Initializes a plane from three points
+        static Plane<T> triangle(const Vector<T, 3>& p1, const Vector<T, 3>& p2, const Vector<T, 3>& p3) {
+            const auto position = (p1 + p2 + p3) * (T(1) / T(3));
+            const auto normal = normalize(cross(p2 - p1, p3 - p1));
+
+            return { position, normal };
+        }
+
+        //! Creates a Plane aligned at the XY-Plane
+        static Plane<T> xy() {
             return {
                 {T(0), T(0), T(0)},
                 {T(0), T(0), T(1)}
             };
         }
 
-        static Plane<T> MakeYZ() {
+        //! Creates a Plane aligned at the YZ-Plane
+        static Plane<T> yz() {
             return {
                 {T(0), T(0), T(0)},
                 {T(1), T(0), T(0)}
             };
         }
 
-        static Plane<T> MakeXZ() {
+        //! Creates a Plane aligned at the XZ-Plane
+        static Plane<T> xz() {
             return {
                 {T(0), T(0), T(0)},
                 {T(0), T(1), T(0)}
             };
         }
     };
+
+    //! Returns a inverted Plane, with the Normal negated.
+    template<typename T>
+    Plane<T> invert(const Plane<T> &plane) {
+        return { plane.position, -plane.normal };
+    }
 
     template<typename T>
     struct Ray;
@@ -53,25 +72,17 @@ namespace XE {
      */
     template<typename T>
     T test(const Plane<T> &plane, const Ray<T>& ray) {
-        auto p = plane.Point;
-        auto n = plane.Normal;
+        auto p = plane.position;
+        auto n = plane.normal;
         
-        auto r = ray.Point;
+        auto r = ray.point;
         auto d = ray.direction;
         
         return dot(n, p - r) / dot(n, d);
     }
 
-    /**
-     * @brief Inverts the side of the plane
-     */
-    template<typename T>
-    Plane<T> Invert(const Plane<T> &other) {
-        return { other.position, -other.Normal };
-    }
-
-    typedef Plane<float> Plane_f;
-    typedef Plane<double> Plane_d;
+    using Planef = Plane<float>;
+    using Planed = Plane<double>;
 }
 
 #endif

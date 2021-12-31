@@ -1,17 +1,19 @@
 #!/bin/bash
 
 # Build Utility Tool for XE, on Unix platforms.
+# Pending rewrite in C++.
 # Supports Debug and Release build, using GCC and CLANG compilers.
 # Tested on:
 #   ArchLinux, with Zen Kernel.
+#   macOS - Universal Binary arm64/x86_64
 
 # NOTES:
 # coverage for gcc
-# lcov -c -d .build/gcc-7.3.1/coverage/src/ -o coverage.info
-# genhtml coverage.info -o out
+#   lcov -c -d .build/gcc-7.3.1/coverage/src/ -o coverage.info
+#   genhtml coverage.info -o out
 
 # Clone specific branch:
-# git clone --depth 1 --branch v3.1.0 https://github.com/cginternals/glbinding.git dep/glbinding
+#   git clone --depth 1 --branch v3.1.0 https://github.com/cginternals/glbinding.git dep/glbinding
 
 # Flags used in all configurations
 XE_C_FLAGS="-Wall"
@@ -49,6 +51,9 @@ COVERAGE_LD_FLAGS=""
 if [ \( "$TOOLCHAIN" = "$TOOLCHAIN_GCC" \) ]; then
     export CC=gcc
     export CXX=g++
+    # Toolchain path in macOS 
+    # export CC=/opt/homebrew/Cellar/gcc/11.2.0_3/bin/gcc-11
+    # export CXX=/opt/homebrew/Cellar/gcc/11.2.0_3/bin/g++-11
 
     COVERAGE_CC_FLAGS="-fprofile-arcs -ftest-coverage"
     COVERAGE_LD_FLAGS="--coverage"
@@ -196,15 +201,19 @@ coverage_gen(){
     OUTPATH=$4
     MODULEPATH=$5
     
+    echo "PROFDATA -> $PROFDATA"
+    echo "EXECUTABLE -> $EXECUTABLE"
+    echo "MODULEPATH -> $MODULEPATH"
+
     # generate profile data from profile raw information
-    xcrun llvm-profdata merge $PROFRAW -o $PROFDATA
+    xcrun llvm-profdata merge $PROFRAW --instr --sparse=true -o $PROFDATA
 
     # show coverage report for reporting pipeline purposes
-    xcrun llvm-cov report -instr-profile=$PROFDATA $EXECUTABLE -arch=arm64 
+    xcrun llvm-cov report $EXECUTABLE -instr-profile=$PROFDATA  -arch=arm64 "$MODULEPATH/include"
 
     # export detailed coverage information, for visualization in dashboard-like tool
     #xcrun llvm-cov show -format=html -instr-profile=$PROFDATA $EXECUTABLE -show-line-counts-or-regions --show-branches=count --show-expansions -arch=arm64 "$MODULEPATH/include" "$MODULEPATH/src" -output-dir=$OUTPATH
-    xcrun llvm-cov show -format=html -instr-profile=$PROFDATA $EXECUTABLE -show-line-counts-or-regions --show-branches=count --show-expansions -arch=arm64 "$MODULEPATH/include" -output-dir=$OUTPATH
+    xcrun llvm-cov show $EXECUTABLE -instr-profile=$PROFDATA -format=html -show-branches=percent -show-line-counts-or-regions -show-expansions -arch=arm64 "$MODULEPATH/include" -output-dir=$OUTPATH
 }
 
 coverage(){
@@ -234,9 +243,9 @@ coverage(){
         XE_MATH_PATH="src/XE.Math"
         XE_GRAPHICS_PATH="src/XE.Graphics"
 
-        # coverage_gen $XE_SCENE_TEST         $XE_SCENE_PROFRAW       $XE_SCENE_PROFDATA          $COVERAGE_FOLDER_SCENE    $XE_SCENE_PATH
+        coverage_gen $XE_SCENE_TEST         $XE_SCENE_PROFRAW       $XE_SCENE_PROFDATA          $COVERAGE_FOLDER_SCENE    $XE_SCENE_PATH
         coverage_gen $XE_MATH_TEST          $XE_MATH_PROFRAW        $XE_MATH_PROFDATA           $COVERAGE_FOLDER_MATH    $XE_MATH_PATH
-        # coverage_gen $XE_GRAPHICS_GL_TEST   $XE_GRAPHICS_GL_PROFRAW $XE_GRAPHICS_GL_PROFDATA    $COVERAGE_FOLDER_GRAPHICS    $XE_GRAPHICS_PATH
+        coverage_gen $XE_GRAPHICS_GL_TEST   $XE_GRAPHICS_GL_PROFRAW $XE_GRAPHICS_GL_PROFDATA    $COVERAGE_FOLDER_GRAPHICS    $XE_GRAPHICS_PATH
     else
         echo "Profile information only implemented with the clang toolchain."
         exit 1

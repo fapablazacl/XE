@@ -29,6 +29,8 @@ namespace XE {
         }
     };
 
+    
+
     /*
     template<typename Vector>
     bool Triangle<Vector>::hit(const Ray& ray, IntersectInfo *info=nullptr) const {

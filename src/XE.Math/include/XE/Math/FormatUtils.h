@@ -82,11 +82,6 @@ namespace XE {
     }
 }
 
-namespace std {
-
-}
-
-
 namespace XE {
     template<typename T>
     struct Quaternion;
@@ -115,4 +110,5 @@ namespace XE {
         return os.str();
     }
 }
+
 #endif

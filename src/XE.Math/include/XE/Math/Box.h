@@ -5,8 +5,25 @@
 #include "Boundary.h"
 
 namespace XE {
-    typedef Boundary<float, 3> Boxf;
-    typedef Boundary<int, 3> Boxi;
+    template<typename T>
+    using Box = Boundary<T, 3>;
+
+    //! Bounding Box in 3-space, with floating-point values
+    using Boxf = Box<float>;
+
+    //! Bounding Box in 3-space, with integer values
+    using Boxi = Box<int>;
+
+    //! Serializes the content of a Box object to an ostream.
+    template<typename T>
+    inline std::ostream& operator<<(std::ostream &os, const Box<T>& box) {
+        os << "XE::Box<" << typeid(T).name() << "{ " << std::endl;
+        os << "    " << box.minEdge << ", " << std::endl;
+        os << "    " << box.maxEdge << std::endl;
+        os << "}" << std::endl;
+
+        return os;
+    }
 }
 
 #endif
