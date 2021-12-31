@@ -15,6 +15,9 @@ namespace XE {
         Vector<T, 3> center;
         T radius;
 
+        Sphere() {}
+
+
         /**
          * @brief Initializes a sphere in the origin with the specified radius
          */

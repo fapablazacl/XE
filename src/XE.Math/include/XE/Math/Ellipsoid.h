@@ -15,6 +15,8 @@ namespace XE {
         Vector<T, 3> center;
         Vector<T, 3> size;
         
+        Ellipsoid() {}
+
         /**
          * @brief Initializes a Ellipsoid from the given center and radius
          */

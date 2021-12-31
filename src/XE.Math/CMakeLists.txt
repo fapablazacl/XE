@@ -25,11 +25,19 @@ if (XE_UNIT_TEST)
     set (test_target "XE.Math.Test")
 
     set (test_sources 
-        "test/Main.cpp"
+        "test/Box.Test.cpp"
         "test/Common.Test.cpp"
-        "test/Vector.Test.cpp"
+        "test/Ellipsoid.Test.cpp"
+        "test/Main.cpp"
         "test/Matrix.Test.cpp"
+        "test/Plane.Test.cpp"
         "test/Quaternion.Test.cpp"
+        "test/Ray.Test.cpp"
+        "test/Rect.Test.cpp"
+        "test/Rotation.Test.cpp"
+        "test/Sphere.Test.cpp"
+        "test/Triangle.Test.cpp"
+        "test/Vector.Test.cpp"
     )
 
     add_executable(${test_target} ${test_sources})

@@ -12,6 +12,8 @@ namespace XE {
         Vector<T, 3> P2;
         Vector<T, 3> P3;
 
+        Triangle() {}
+
         Triangle(const Vector<T, 3> &p1, const Vector<T, 3> &p2, const Vector<T, 3> &p3) {
             P1 = p1;
             P2 = p2;

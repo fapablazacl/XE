@@ -9,3 +9,4 @@ project/*
 cmake-*
 Testing/*
 local/*
+coverage/*

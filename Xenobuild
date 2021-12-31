@@ -193,8 +193,9 @@ coverage_gen(){
     EXECUTABLE=$1
     PROFRAW=$2
     PROFDATA=$3
-    HTMLFILE=$4
-
+    OUTPATH=$4
+    MODULEPATH=$5
+    
     # generate profile data from profile raw information
     xcrun llvm-profdata merge $PROFRAW -o $PROFDATA
 
@@ -202,7 +203,8 @@ coverage_gen(){
     xcrun llvm-cov report -instr-profile=$PROFDATA $EXECUTABLE -arch=arm64 
 
     # export detailed coverage information, for visualization in dashboard-like tool
-    xcrun llvm-cov show -format=html -instr-profile=$PROFDATA $EXECUTABLE -show-line-counts-or-regions --show-branches=count --show-expansions -arch=arm64 > $HTMLFILE
+    #xcrun llvm-cov show -format=html -instr-profile=$PROFDATA $EXECUTABLE -show-line-counts-or-regions --show-branches=count --show-expansions -arch=arm64 "$MODULEPATH/include" "$MODULEPATH/src" -output-dir=$OUTPATH
+    xcrun llvm-cov show -format=html -instr-profile=$PROFDATA $EXECUTABLE -show-line-counts-or-regions --show-branches=count --show-expansions -arch=arm64 "$MODULEPATH/include" -output-dir=$OUTPATH
 }
 
 coverage(){
@@ -224,13 +226,17 @@ coverage(){
         XE_MATH_PROFDATA="coverage/XE.Math.profdata"
         XE_GRAPHICS_GL_PROFDATA="coverage/XE.Graphics.GL.profdata"
 
-        XE_SCENE_COVERAGE_HTML="coverage/XE.Scene.html"
-        XE_MATH_COVERAGE_HTML="coverage/XE.Math.html"
-        XE_GRAPHICS_GL_COVERAGE_HTML="coverage/XE.Graphics.GL.html"
+        COVERAGE_FOLDER_SCENE="coverage/XE.Scene"
+        COVERAGE_FOLDER_MATH="coverage/XE.Math"
+        COVERAGE_FOLDER_GRAPHICS="coverage/XE.Graphics"
 
-        coverage_gen $XE_SCENE_TEST         $XE_SCENE_PROFRAW       $XE_SCENE_PROFDATA          $XE_SCENE_COVERAGE_HTML  
-        coverage_gen $XE_MATH_TEST          $XE_MATH_PROFRAW        $XE_MATH_PROFDATA           $XE_MATH_COVERAGE_HTML
-        coverage_gen $XE_GRAPHICS_GL_TEST   $XE_GRAPHICS_GL_PROFRAW $XE_GRAPHICS_GL_PROFDATA    $XE_GRAPHICS_GL_COVERAGE_HTML
+        XE_SCENE_PATH="src/XE.Scene"
+        XE_MATH_PATH="src/XE.Math"
+        XE_GRAPHICS_PATH="src/XE.Graphics"
+
+        # coverage_gen $XE_SCENE_TEST         $XE_SCENE_PROFRAW       $XE_SCENE_PROFDATA          $COVERAGE_FOLDER_SCENE    $XE_SCENE_PATH
+        coverage_gen $XE_MATH_TEST          $XE_MATH_PROFRAW        $XE_MATH_PROFDATA           $COVERAGE_FOLDER_MATH    $XE_MATH_PATH
+        # coverage_gen $XE_GRAPHICS_GL_TEST   $XE_GRAPHICS_GL_PROFRAW $XE_GRAPHICS_GL_PROFDATA    $COVERAGE_FOLDER_GRAPHICS    $XE_GRAPHICS_PATH
     else
         echo "Profile information only implemented with the clang toolchain."
         exit 1
