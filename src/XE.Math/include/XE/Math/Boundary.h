@@ -7,10 +7,12 @@
 
 #include "Vector.h"
 
+
 namespace XE {
     //! N-dimensional boundary class
     //! Used as a basis for implementing boundary logic in specific dimensions, 
     //! like Rect (for 2-space), and Box (for 3-space).
+    //! NOTE: Consider replacing its implementation based on Vectors onto another more abstract entity
     template<typename T, int N>
     class Boundary {
     public:
@@ -102,13 +104,12 @@ namespace XE {
                 return maxEdge;
             }
 
-            const Vector<T, N> *edges = &minEdge;
+            auto edges = &minEdge;
 
             Vector<T, N> point;
             for(int i=0; i<N; ++i) {
                 const int remainder = pointIndex % 2;
                 pointIndex /= 2;
-        
                 point[i] = edges[remainder][i];
             }
     

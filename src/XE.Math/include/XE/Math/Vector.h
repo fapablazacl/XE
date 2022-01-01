@@ -454,13 +454,7 @@ namespace XE {
 
     template<typename T, int N>
     bool Vector<T, N>::operator!= (const Vector<T, N>& rhs) const {
-        for (int i=0; i<N; i++) {
-            if (this->data[i] == rhs.data[i]) {
-                return false;
-            }
-        }
-        
-        return true;
+        return !(*this == rhs);
     }
 
     template<typename T, int N>

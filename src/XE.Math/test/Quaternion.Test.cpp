@@ -4,16 +4,6 @@
 #include <XE/Math/Common.h>
 #include <catch2/catch_all.hpp>
 
-static const int precision = std::numeric_limits<float>::max_digits10;
-
-namespace Catch {
-    template<>
-    struct StringMaker<XE::Quaternion<float>> {
-        static std::string convert(XE::Quaternion<float> const& value) {
-            return XE::toString(value, precision);
-        }
-    };
-}
 
 TEST_CASE("Quaternion basic members are initialized properly", "[Quaternion]") {
     SECTION("when using the Vector-Scalar constructor") {
