@@ -8,6 +8,9 @@
 #include "Vector.h"
 
 namespace XE {
+    //! N-dimensional boundary class
+    //! Used as a basis for implementing boundary logic in specific dimensions, 
+    //! like Rect (for 2-space), and Box (for 3-space).
     template<typename T, int N>
     class Boundary {
     public:
@@ -23,6 +26,11 @@ namespace XE {
 
     public:
         enum { PointCount = Power<2, N>::Value };
+
+        enum {
+            MinEdge = 0,
+            MaxEdge = PointCount - 1
+        };
 
     public:
         Boundary() {}
@@ -72,12 +80,9 @@ namespace XE {
 
         bool isInside(const Vector<T, N> &point) const {
             for(int i=0; i<N; ++i) { 
-                T value = point[i];
+                const T value = point[i];
         
-                if (value < minEdge[i]) {
-                    return false;
-
-                } else if (value > maxEdge[i]) {
+                if (value < minEdge[i] || value > maxEdge[i]) {
                     return false;
                 }
             }
@@ -86,27 +91,28 @@ namespace XE {
         }
 
         Vector<T, N> getEdge(int pointIndex) const {
-            const int LastPoint = Boundary<T, N>::PointCount-1;
-            const Vector<T, N> *edges = &minEdge;   
+            assert(pointIndex >= MinEdge);
+            assert(pointIndex <= MaxEdge);
 
-            switch (pointIndex) {
-                case 0:         return edges[0];
-                case LastPoint: return edges[1];
-        
-                default: {
-                    Vector<T, N> point;
-                    int remainder;
-                    
-                    for(int i=0; i<N; ++i) {
-                        remainder = pointIndex % 2;
-                        pointIndex /= 2;
-                
-                        point[i] = edges[remainder][i];
-                    }
-            
-                    return point;
-                }
+            if (pointIndex == MinEdge) {
+                return minEdge;
             }
+
+            if (pointIndex == MaxEdge) {
+                return maxEdge;
+            }
+
+            const Vector<T, N> *edges = &minEdge;
+
+            Vector<T, N> point;
+            for(int i=0; i<N; ++i) {
+                const int remainder = pointIndex % 2;
+                pointIndex /= 2;
+        
+                point[i] = edges[remainder][i];
+            }
+    
+            return point;
         }
 
         bool intersect(const Boundary<T, N>& other) const {
@@ -116,7 +122,7 @@ namespace XE {
     private:
         bool intersectImpl(const Boundary<T, N>& other) const {
             for(int i=0; i<Boundary<T, N>::PointCount; ++i) {
-                if (this->isInside(other.getEdge(i))) {
+                if (isInside(other.getEdge(i))) {
                     return true;
                 }
             }

@@ -18,9 +18,9 @@ namespace XE {
     //! Serializes the content of a Box object to an ostream.
     template<typename T>
     inline std::ostream& operator<<(std::ostream &os, const Box<T>& box) {
-        os << "XE::Box<" << typeid(T).name() << "{ " << std::endl;
-        os << "    " << box.minEdge << ", " << std::endl;
-        os << "    " << box.maxEdge << std::endl;
+        os << "XE::Box<" << typeid(T).name() << ">{ " << std::endl;
+        os << "    " << box.getMinEdge() << ", " << std::endl;
+        os << "    " << box.getMaxEdge() << std::endl;
         os << "}" << std::endl;
 
         return os;
