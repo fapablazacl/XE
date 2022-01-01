@@ -5,6 +5,7 @@
 #include "Boundary.h"
 
 namespace XE {
+    //! Bounding box in 3-space. It's a Boundary speciallization
     template<typename T>
     using Box = Boundary<T, 3>;
 
