@@ -221,17 +221,6 @@ namespace XE {
         }
 
     private:
-        bool intersectImpl(const Boundary<T, N>& other) const {
-            for(int i=0; i<Boundary<T, N>::PointCount; ++i) {
-                if (isInside(other.getEdge(i))) {
-                    return true;
-                }
-            }
-            
-            return false;
-        }
-
-    private:
         Vector<T, N> minEdge;
         Vector<T, N> maxEdge;
     };

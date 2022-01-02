@@ -1,5 +1,6 @@
 
 #include <XE/Math/Range.h>
+#include <iostream>
 #include <catch2/catch_all.hpp>
 
 TEST_CASE("Range should have a valid state when perform correctly after each kind of operation", "[Range]") {
@@ -48,8 +49,13 @@ TEST_CASE("Range should have a valid state when perform correctly after each kin
         REQUIRE(subject.min == -2.0f);
         REQUIRE(subject.max == 2.0f);
     }
+}
 
-    SECTION("partialOverlap(const Range<T> &) should check if the current range overlaps with the supplied range") {
+
+TEST_CASE("Range overlappting detection methods should perform correctly", "[Range]") {
+    SECTION("partialOverlap(const Range<T> &) should return true overlaps with the supplied range") {
+        XE::Range<float> subject;
+
         const XE::Range<float> ranges[] = {
             XE::Range<float>{0.5f, 1.5f},
             XE::Range<float>{-1.5f, 0.5f},
@@ -61,6 +67,46 @@ TEST_CASE("Range should have a valid state when perform correctly after each kin
 
         for (const auto &range : ranges) {
             REQUIRE(subject.partialOverlap(range));
+        }
+    }
+
+    SECTION("overlap(const Range<T> &) should return true when the current range overlaps with the supplied range") {
+        XE::Range<float> subject;
+
+        const XE::Range<float> ranges[] = {
+            XE::Range<float>{0.5f, 1.5f},
+            XE::Range<float>{-1.5f, 0.5f},
+            XE::Range<float>{0.25f, 1.5f},
+            XE::Range<float>{-1.5f, 0.75f},
+            XE::Range<float>{-10.5f, 0.1f},
+            XE::Range<float>{-1.5f, 2.0f},
+            XE::Range<float>{-1.0f, 1.0f},
+            XE::Range<float>{0.0f, 1.0f},
+            XE::Range<float>{-2.0f, 2.0f},
+        };
+
+        for (const auto &range : ranges) {
+            REQUIRE(subject.overlap(range));
+        }
+    }
+
+    SECTION("overlap(const Range<T> &) should return false when using tightly positioned Ranges (one next after each other)") {
+        for (int i = -10; i < 10; i++) {
+            for (float offset = 0.0f; offset < 1.0f; offset += 0.125f) {
+                const float width = 1.0f;
+
+                const XE::Range<float> subject1{ 
+                    (i + 0) * width + offset,
+                    (i + 1) * width + offset
+                };
+
+                const XE::Range<float> subject2{ 
+                    (i + 1) * width + offset,
+                    (i + 2) * width + offset
+                };
+
+                REQUIRE(! subject1.partialOverlap(subject2));
+            }
         }
     }
 }

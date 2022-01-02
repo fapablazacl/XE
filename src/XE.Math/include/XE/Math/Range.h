@@ -6,6 +6,14 @@
 #include <ostream>
 
 namespace XE {
+    /**
+     * @brief Mathematical Range pair implementation.
+     * 
+     * This struct represent Ranges of the form:
+     * [min, max)
+     * 
+     * @tparam T 
+     */
     template<typename T>
     struct Range {
         T min = static_cast<T>(0);
@@ -39,11 +47,11 @@ namespace XE {
             assert(max >= min);
             assert(other.max >= other.min);
 
-            if (min >= other.min && min <= other.max) {
+            if (min >= other.min && min < other.max) {
                 return true;
             }
 
-            if (max >= other.min && max <= other.max) {
+            if (max > other.min && max < other.max) {
                 return true;
             }
 

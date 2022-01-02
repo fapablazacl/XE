@@ -170,6 +170,52 @@ TEST_CASE("Boxes can be tested against a Point and another Boxes", "[Box]") {
             }
         }
 
+        SECTION("should intersect when using a box with equal volume, but displaced using the Subject nearly the size in each dimension") {
+            const auto size = box.getSize();
+
+            const XE::Vector3f displacements[] = {
+                {0.99f * size.X, 0.0f, 0.0f},
+                {0.0f, 0.99f * size.Y, 0.0f},
+                {0.0f, 0.0f, 0.99f * size.Z},
+                {-0.99f * size.X, 0.0f, 0.0f},
+                {0.0f, -0.99f * size.Y, 0.0f},
+                {0.0f, 0.0f, -0.99f * size.Z},
+            };
+
+            for (const auto &displacement : displacements) {
+                const auto displaced = XE::Boxf{
+                    box.getMinEdge() + displacement,
+                    box.getMaxEdge() + displacement
+                };
+
+                REQUIRE(box.intersect(displaced));
+                REQUIRE(displaced.intersect(box));
+            }
+        }
+
+        SECTION("should not intersect when using a box with equal volume, but displaced using the Subject size in each dimension") {
+            const auto size = box.getSize();
+
+            const XE::Vector3f displacements[] = {
+                {size.X, 0.0f, 0.0f},
+                {0.0f, size.Y, 0.0f},
+                {0.0f, 0.0f, size.Z},
+                {-size.X, 0.0f, 0.0f},
+                {0.0f, -size.Y, 0.0f},
+                {0.0f, 0.0f, -size.Z},
+            };
+
+            for (const auto &displacement : displacements) {
+                const auto displaced = XE::Boxf{
+                    box.getMinEdge() + displacement,
+                    box.getMaxEdge() + displacement
+                };
+
+                REQUIRE(! box.intersect(displaced));
+                REQUIRE(! displaced.intersect(box));
+            }
+        }
+
         SECTION("not intesects when using a box with equal volume, but displaced using two and half times the size in each dimension") {
             const auto size = box.getSize();
 

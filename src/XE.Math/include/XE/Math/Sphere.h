@@ -4,6 +4,7 @@
 
 #include "Vector.h"
 
+#include <cassert>
 #include <limits>
 
 namespace XE {
@@ -13,34 +14,30 @@ namespace XE {
     template<typename T>
     struct Sphere {
         Vector<T, 3> center;
-        T radius;
+        T radius = static_cast<T>(1);
 
-        Sphere() {}
+        Sphere() : 
+            center({static_cast<T>(0), static_cast<T>(0), static_cast<T>(0)}), 
+            radius(static_cast<T>(1)) 
+        {
 
+        }
 
         /**
          * @brief Initializes a sphere in the origin with the specified radius
          */
-        explicit Sphere(T radius) {
-            this->radius = radius;
-        }
-        
-        /**
-         * @brief Initializes a Sphere from the given radius and center
-         */
-        Sphere(T radius, const Vector<T, 3> &center) {
-            this->center = center;
-            this->radius = radius;
+        explicit Sphere(T radius) : radius(radius) {
+            assert(radius >= static_cast<T>(0));
         }
 
         /**
          * @brief Initializes a Sphere from the given center and radius
          */
-        Sphere(const Vector<T, 3> &center, T radius) {
-            this->center = center;
-            this->radius = radius;
+        Sphere(const Vector<T, 3> &center, T radius) : center(center), radius(radius) {
+            assert(radius >= static_cast<T>(0));
         }
     };
+
 
     template<typename T>
     struct Ray;
@@ -50,10 +47,10 @@ namespace XE {
      */
     template<typename T>
     T test(const Sphere<T> &sphere, const Ray<T>& ray) {
-        const Vector<T, 3> r0 = ray.position;
-        const Vector<T, 3> d = ray.direction;
+        const Vector<T, 3> &r0 = ray.position;
+        const Vector<T, 3> &d = ray.direction;
 
-        const Vector<T, 3> c = sphere.center;
+        const Vector<T, 3> &c = sphere.center;
         const T r = sphere.radius;
         const T r_2 = r*r;
 
