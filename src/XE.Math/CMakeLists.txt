@@ -32,6 +32,7 @@ if (XE_UNIT_TEST)
         "test/Matrix.Test.cpp"
         "test/Plane.Test.cpp"
         "test/Quaternion.Test.cpp"
+        "test/Range.Test.cpp"
         "test/Ray.Test.cpp"
         "test/Rect.Test.cpp"
         "test/Rotation.Test.cpp"

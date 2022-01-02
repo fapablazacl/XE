@@ -4,17 +4,28 @@
 
 #include <limits>
 #include <cassert>
+#include <array>
 
 #include "Vector.h"
+#include "Range.h"
 
 
 namespace XE {
-    //! N-dimensional boundary class
-    //! Used as a basis for implementing boundary logic in specific dimensions, 
-    //! like Rect (for 2-space), and Box (for 3-space).
-    //! NOTE: Consider replacing its implementation based on Vectors onto another more abstract entity
+    /**
+     * @brief N-dimensional boundary class
+     * 
+     * Used as a basis for implementing boundary logic in specific dimensions, like Rect (for 2-space), and Box (for 3-space).
+     * 
+     * @note Consider replacing its implementation based on Vectors onto another more abstract entity
+     * 
+     * @tparam T 
+     * @tparam N 
+     */
     template<typename T, int N>
     class Boundary {
+    public:
+        static_assert(N == 2 || N ==3, "N template parameter must one of (2, 3)");
+
     public:
         template<int Base, int Exp> 
         struct Power {
@@ -27,6 +38,10 @@ namespace XE {
         };
 
     public:
+        enum {
+            SideCount = 2 * N
+        };
+
         enum { PointCount = Power<2, N>::Value };
 
         enum {
@@ -116,10 +131,95 @@ namespace XE {
             return point;
         }
 
-        bool intersect(const Boundary<T, N>& other) const {
-            return intersectImpl(other) || intersectImpl(*this);
+        /**
+         * @brief Generate all the Normals in the Boundary
+         * 
+         * @note Only implemented for N=2 and N=3 cases.
+         * 
+         * @return std::array<Vector<T, N>, SideCount> 
+         */
+        std::array<Vector<T, N>, SideCount> getNormals() const {
+            if constexpr(N == 2) {
+                return {
+                    Vector2<T>{static_cast<T>(-1), static_cast<T>(0)},
+                    Vector2<T>{static_cast<T>(0), static_cast<T>(-1)},
+                    Vector2<T>{static_cast<T>(1), static_cast<T>(0)},
+                    Vector2<T>{static_cast<T>(0), static_cast<T>(1)}
+                };
+            }
+
+            if constexpr(N == 3) {
+                return {
+                    Vector3<T>{static_cast<T>(-1), static_cast<T>(0), static_cast<T>(0)},
+                    Vector3<T>{static_cast<T>(0), static_cast<T>(-1), static_cast<T>(0)},
+                    Vector3<T>{static_cast<T>(0), static_cast<T>(0), static_cast<T>(-1)},
+                    Vector3<T>{static_cast<T>(1), static_cast<T>(0), static_cast<T>(0)},
+                    Vector3<T>{static_cast<T>(0), static_cast<T>(1), static_cast<T>(0)},
+                    Vector3<T>{static_cast<T>(0), static_cast<T>(0), static_cast<T>(1)}
+                };
+            }
         }
-        
+
+        /**
+         * @brief Perform an intersection test between two Boundaries using the Separating Axis Therorem (SAT).
+         * 
+         * @param other 
+         * @return true 
+         * @return false 
+         */
+        bool intersect(const Boundary<T, N>& other) const {
+            // axes are the same with both shapes
+            const auto axes = getNormals();
+
+            for (const auto &axis : axes) {
+                const Range<T> proj1 = project(axis);
+                const Range<T> proj2 = other.project(axis);
+
+                if (! proj1.overlap(proj2)) {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        /**
+         * @brief Get all the Edges (vertices) from the Box.
+         * 
+         * @return std::array<Vector<T, N>, PointCount> 
+         */
+        std::array<Vector<T, N>, PointCount> getEdges() const {
+            std::array<Vector<T, N>, PointCount> result;
+
+            for (int i = 0; i < PointCount; i++) {
+                result[i] = getEdge(i);
+            }
+            
+            return result;
+        }
+
+        /**
+         * @brief Perform a Projection from the specified Axis
+         * 
+         * @note Utility method to support the implementation of the Intersect method.
+         * 
+         * @return Projection 
+         */
+        Range<T> project(const Vector<T, N> &normal) const {
+            const auto edges = getEdges();
+
+            Range<T> range {dot(edges[0], normal)};
+
+            // compute the range for the rest 
+            for (size_t i=1; i<edges.size(); i++) {
+                const T value = dot(edges[i], normal);
+
+                range.expand(value);
+            }
+
+            return range;
+        }
+
     private:
         bool intersectImpl(const Boundary<T, N>& other) const {
             for(int i=0; i<Boundary<T, N>::PointCount; ++i) {

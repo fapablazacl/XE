@@ -4,6 +4,8 @@
 
 #include "Vector.h"
 
+#include <ostream>
+
 namespace XE {
     enum class PlaneSide {
         Front,
@@ -24,19 +26,73 @@ namespace XE {
         T c = T(0);
         T d = T(0);
 
-        //! extracts the current normal vector
-        Vector<T, 3> normal() const {
+        Plane() {}
+
+        Plane(const T a, const T b, const T c, const T d) 
+            : a(a), b(b), c(c), d(d) {}
+
+        Plane(const Vector3<T> n, const T d) 
+            : a(n.x), b(n.y), c(n.z), d(d) {}
+
+        /**
+         * @brief Returns the current normal vector
+         * 
+         * @return Vector3<T> 
+         */
+        Vector3<T> normal() const {
             return { a, b, c };
         }
 
-        //! evaluate the result of the following equation:
-        //! Ax + By + Cz - D
-        T evaluate(const Vector<T, 3> &point) const {
+        /**
+         * @brief Evaluate the point coordinates in the scalar Plane equation.
+         * 
+         * Evaluate the result of the following equation:
+         * Ax + By + Cz - D
+         * 
+         * where A, B, C and D are the scalar plane equation coefficients, represented in the Plane struct,
+         * and the coordinates (x, y, z) are taken from the input point to evaluate.
+         * 
+         * The result can be used later to determine how the point is related to the plane.
+         * 
+         * @param point The point to evaluate in 3-space.
+         * @return T 
+         */
+        T evaluate(const Vector3<T> &point) const {
             return dot(normal(), point) - d;
         }
-        
-        //! tests the point
-        PlaneSide test(const Vector<T, 3> &point) const {
+
+        bool operator== (const Plane<T> &rhs) const {
+            return (a == rhs.a && b == rhs.b && c == rhs.c && d == rhs.d);
+        }
+
+        bool operator!= (const Plane<T> &rhs) const {
+            return (a != rhs.a && b != rhs.b && c != rhs.c && d != rhs.d);
+        }
+
+        /**
+         * @brief Determines whenever two planes intersects or not.
+         * 
+         * Two planes intersects only if their normals are not parallel.
+         * This method computes the dot product between the two normals, and then checks the resulting value.
+         * 
+         * @note This method assumes that both normals ("this->normal" and "other.normal") are normalized for performance reasons.
+         * @param other Another plane to test intersection with,
+         * @return true if the dot product result is not one.
+         * @return false if the dot product result is one.
+         */
+        bool intersect(const Plane<T> &other) const {
+            const T product = dot(normal(), other.normal());
+
+            return product != static_cast<T>(1);
+        }
+
+        /**
+         * @brief tests the point against the Plane.
+         * 
+         * @param point 
+         * @return PlaneSide 
+         */
+        PlaneSide test(const Vector3<T> &point) const {
             const T det = evaluate(point);
 
             if (det < T(0)) {
@@ -48,65 +104,119 @@ namespace XE {
             return PlaneSide::Inside;
         }
 
+        /**
+         * @brief Returns a pointer to the raw data in the Plane.
+         * 
+         * @return T* 
+         */
         T* data() {
             return &a;
         }
 
+        /**
+         * @brief Returns a pointer to the raw data in the Plane.
+         * 
+         * @return const T* 
+         */
         const T* data() const {
             return &a;
         }
 
     public:
-        //! Create a Plane from its vectorial form (a Point and a Normal vector)
-        static Plane<T> vectorial(const Vector<T, 3>& normal, const Vector<T, 3>& position) {
+        /**
+         * @brief Create a Plane from its vectorial form (a Point and a Normal vector)
+         * 
+         * @param normal 
+         * @param position 
+         * @return Plane<T> 
+         */
+        static Plane<T> vectorial(const Vector3<T>& normal, const Vector3<T>& position) {
             return {
-                normal.x, 
-                normal.y, 
-                normal.z,
+                normalize(normal),
                 dot(position, normal)
             };
         }
 
-        //! Initializes a plane from three points
-        static Plane<T> triangle(const Vector<T, 3>& p1, const Vector<T, 3>& p2, const Vector<T, 3>& p3) {
+        /**
+         * @brief Initializes a plane from three points
+         * 
+         * @param p1 
+         * @param p2 
+         * @param p3 
+         * @return Plane<T> 
+         */
+        static Plane<T> triangle(const Vector3<T>& p1, const Vector3<T>& p2, const Vector3<T>& p3) {
             const auto normal = normalize(cross(p2 - p1, p3 - p1));
             const auto position = (p1 + p2 + p3) * (T(1) / T(3));
             
             return Plane<T>::vectorial( position, normal );
         }
 
-        //! Creates a Plane aligned at the YZ-Plane
+        /**
+         * @brief Creates a Plane aligned at the YZ-Plane
+         * 
+         * @return Plane<T> 
+         */
         static Plane<T> yz() {
             return {T(1), T(0), T(0), T(0)};
         }
 
-        //! Creates a Plane aligned at the XZ-Plane
+        /**
+         * @brief Creates a Plane aligned at the XZ-Plane 
+         * 
+         * @return Plane<T> 
+         */
         static Plane<T> xz() {
             return {T(0), T(1), T(0), T(0)};
         }
 
-        //! Creates a Plane aligned at the XY-Plane
+        /**
+         * @brief Creates a Plane aligned at the XY-Plane
+         * 
+         * @return Plane<T> 
+         */
         static Plane<T> xy() {
             return {T(0), T(0), T(1), T(0)};
         }
 
-        //! Creates a Plane aligned at the YZ-Plane, at the specified position
-        static Plane<T> yz(const Vector<T, 3>& position) {
-            return Plane<T>::vectorial( position, {T(1), T(0), T(0)} );
+        /**
+         * @brief Creates a Plane aligned at the YZ-Plane, at the specified position
+         * 
+         * @param position 
+         * @return Plane<T> 
+         */
+        static Plane<T> yz(const Vector3<T>& position) {
+            return {T(1), T(0), T(0), position.x};
         }
 
-        //! Creates a Plane aligned at the XZ-Plane, at the specified position
-        static Plane<T> xz(const Vector<T, 3>& position) {
-            return Plane<T>::vectorial( position, {T(0), T(1), T(0)} );
+        /**
+         * @brief Creates a Plane aligned at the XZ-Plane, at the specified position
+         * 
+         * @param position 
+         * @return Plane<T> 
+         */
+        static Plane<T> xz(const Vector3<T>& position) {
+            return {T(0), T(1), T(0), position.y};
         }
 
-        //! Creates a Plane aligned at the XY-Plane, at the specified position
-        static Plane<T> xy(const Vector<T, 3>& position) {
-            return Plane<T>::vectorial( position, {T(0), T(0), T(1)} );
+        /**
+         * @brief Creates a Plane aligned at the XY-Plane, at the specified position
+         * 
+         * @param position 
+         * @return Plane<T> 
+         */
+        static Plane<T> xy(const Vector3<T>& position) {
+            return {T(0), T(0), T(1), position.z};
         }
     };
     
-    //! Returns a inverted Plane, with the Normal part negated.
+    /**
+     * @brief Returns a inverted Plane, with the Normal part negated.
+     * 
+     * @tparam T 
+     * @param plane 
+     * @return Plane<T> 
+     */
     template<typename T>
     Plane<T> invert(const Plane<T> &plane) {
         return {
@@ -122,20 +232,45 @@ namespace XE {
 
     /**
      * @brief Test for collisions between a Plane and a Ray
+     * dot(P, N) = d    (1)
+     * P = R + t*D      (2)
+     * t = (d - R * N) / (D * N)
+     * 
+     * @tparam T The data type
+     * @param plane 
+     * @param ray 
+     * @todo Missing the validation when there is no intersection between the Plane and the Ray
+     * @return T The computed t scalar factor
      */
     template<typename T>
     T test(const Plane<T> &plane, const Ray<T>& ray) {
-        auto p = plane.position;
-        auto n = plane.normal;
-        
-        auto r = ray.point;
-        auto d = ray.direction;
-        
-        return dot(n, p - r) / dot(n, d);
+        const Vector3<T> n = plane.normal();
+        const T num = plane.d - dot(ray.point, n);
+        const T dem = dot(ray.direction, n);
+
+        return num / dem;
     }
 
+    //! Plane specialization with the float data type
     using Planef = Plane<float>;
+
+    //! Plane specialization with the double data type
     using Planed = Plane<double>;
+
+    /**
+     * @brief Serializes a Plane using the supplied ostream
+     */
+    template<typename T>
+    inline std::ostream& operator<<(std::ostream &os, const Plane<T>& plane) {
+        os << "XE::Plane<" << typeid(T).name() << ">{ ";
+
+        os << plane.a << ", ";
+        os << plane.b << ", ";
+        os << plane.c << ", ";
+        os << plane.d << " }";
+
+        return os;
+    }
 }
 
 #endif

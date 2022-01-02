@@ -170,7 +170,7 @@ TEST_CASE("Boxes can be tested against a Point and another Boxes", "[Box]") {
             }
         }
 
-        SECTION("not intesects when using a box with equal volume, but displaced using one and half times the size in each dimension") {
+        SECTION("not intesects when using a box with equal volume, but displaced using two and half times the size in each dimension") {
             const auto size = box.getSize();
 
             const XE::Vector3f displacements[] = {
@@ -182,16 +182,11 @@ TEST_CASE("Boxes can be tested against a Point and another Boxes", "[Box]") {
                 {0.0f, 0.0f, -2.5f * size.Z},
             };
 
-            std::cout << box << std::endl;
-
             for (const auto &displacement : displacements) {
                 const auto displaced = XE::Boxf{
                     box.getMinEdge() + displacement,
                     box.getMaxEdge() + displacement
                 };
-
-                std::cout << displaced << std::endl;
-                std::cout << "=================================================" << std::endl;
 
                 REQUIRE(! displaced.intersect(box));
                 REQUIRE(! box.intersect(displaced));

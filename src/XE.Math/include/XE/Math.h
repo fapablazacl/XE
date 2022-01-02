@@ -11,6 +11,7 @@
 #include "Math/Ray.h"
 #include "Math/Rect.h"
 #include "Math/Quaternion.h"
+#include "Math/Range.h"
 #include "Math/Rotation.h"
 #include "Math/Triangle.h"
 #include "Math/Vector.h"
