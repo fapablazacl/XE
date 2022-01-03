@@ -26,13 +26,13 @@ namespace XE {
         T c = T(0);
         T d = T(0);
 
-        Plane() {}
+        explicit Plane() {}
 
-        Plane(const T a, const T b, const T c, const T d) 
+        explicit Plane(const T a, const T b, const T c, const T d) 
             : a(a), b(b), c(c), d(d) {}
 
-        Plane(const Vector3<T> n, const T d) 
-            : a(n.x), b(n.y), c(n.z), d(d) {}
+        explicit Plane(const Vector3<T> &n, const T d) 
+            : a(n.X), b(n.Y), c(n.Z), d(d) {}
 
         /**
          * @brief Returns the current normal vector
@@ -66,7 +66,7 @@ namespace XE {
         }
 
         bool operator!= (const Plane<T> &rhs) const {
-            return (a != rhs.a && b != rhs.b && c != rhs.c && d != rhs.d);
+            return !(*this == rhs);
         }
 
         /**
@@ -131,7 +131,7 @@ namespace XE {
          * @return Plane<T> 
          */
         static Plane<T> vectorial(const Vector3<T>& normal, const Vector3<T>& position) {
-            return {
+            return Plane<T>{
                 normalize(normal),
                 dot(position, normal)
             };
@@ -158,7 +158,7 @@ namespace XE {
          * @return Plane<T> 
          */
         static Plane<T> yz() {
-            return {T(1), T(0), T(0), T(0)};
+            return Plane<T>{T(1), T(0), T(0), T(0)};
         }
 
         /**
@@ -167,7 +167,7 @@ namespace XE {
          * @return Plane<T> 
          */
         static Plane<T> xz() {
-            return {T(0), T(1), T(0), T(0)};
+            return Plane<T>{T(0), T(1), T(0), T(0)};
         }
 
         /**
@@ -176,7 +176,7 @@ namespace XE {
          * @return Plane<T> 
          */
         static Plane<T> xy() {
-            return {T(0), T(0), T(1), T(0)};
+            return Plane<T>{T(0), T(0), T(1), T(0)};
         }
 
         /**
@@ -186,7 +186,7 @@ namespace XE {
          * @return Plane<T> 
          */
         static Plane<T> yz(const Vector3<T>& position) {
-            return {T(1), T(0), T(0), position.x};
+            return Plane<T>{T(1), T(0), T(0), position.x};
         }
 
         /**
@@ -196,7 +196,7 @@ namespace XE {
          * @return Plane<T> 
          */
         static Plane<T> xz(const Vector3<T>& position) {
-            return {T(0), T(1), T(0), position.y};
+            return Plane<T>{T(0), T(1), T(0), position.y};
         }
 
         /**
@@ -206,7 +206,7 @@ namespace XE {
          * @return Plane<T> 
          */
         static Plane<T> xy(const Vector3<T>& position) {
-            return {T(0), T(0), T(1), position.z};
+            return Plane<T>{T(0), T(0), T(1), position.z};
         }
     };
     
