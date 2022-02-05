@@ -4,13 +4,12 @@
 
 #include <XE/XE.h>
 #include <XE/Timer.h>
-#include <XE/IO.h>
 #include <XE/Input.h>
 #include <XE/Math.h>
 #include <XE/Graphics.h>
-#include <XE/Graphics/GL/GLFW/WindowGLFW.h>
 #include <XE/Graphics/ES2/GraphicsDeviceES2.h>
 #include <XE/Graphics/GL/GraphicsDeviceGL.h>
+#include <XE/Graphics/GL/GLFW/WindowGLFW.h>
 
 #include <map>
 #include <functional>

@@ -19,4 +19,14 @@ set (sources
 add_executable(${target} ${sources})
 
 target_include_directories(${target} PUBLIC ".")
-target_link_libraries(${target} XE.Core XE.IO XE.Graphics.GL XE.Graphics.GL.GLFW XE.Graphics.ES2)
+
+target_link_libraries(${target} 
+	XE.Core 
+	XE.Math 
+	XE.IO 
+	XE.Graphics 
+	XE.Input 
+	XE.Graphics.GL 
+	XE.Graphics.ES2
+	XE.Graphics.GL.GLFW)
+

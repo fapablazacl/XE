@@ -3,9 +3,6 @@ set (target "XE.Core")
 
 set (sources
 	"include/XE/XE.h"
-	"include/XE/Graphics.h"
-	"include/XE/Math.h"
-	"include/XE/Input.h"
 	"include/XE/Predef.h"
     "include/XE/Buffer.h"
     "include/XE/DataType.h"

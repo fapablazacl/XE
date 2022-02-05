@@ -2,6 +2,7 @@
 set (target XE.Math)
 
 set (sources
+    "include/XE/Math.h"
     "include/XE/Math/Common.h"
     "include/XE/Math/Vector.h"
     "include/XE/Math/Matrix.h"
@@ -18,7 +19,7 @@ set (sources
 
 add_library(${target} INTERFACE)
 
-target_include_directories(${target} INTERFACE "include/")
+target_include_directories(${target} INTERFACE "include")
 
 
 if (XE_UNIT_TEST)
