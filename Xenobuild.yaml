@@ -15,6 +15,8 @@ dependencies:
       GLFW_BUILD_DOCS: OFF
       GLFW_BUILD_EXAMPLES: OFF
       GLFW_BUILD_TESTS: OFF
+    publicdefs:
+      glfw3_DIR: '${installPrefix}/lib/cmake/glfw3'
   - name: yaml-cpp
     version: '0.7.0'
     url: 'https://github.com/jbeder/yaml-cpp.git'
@@ -36,10 +38,10 @@ dependencies:
       OPTION_BUILD_EXAMPLES: OFF
       OPTION_BUILD_TOOLS: OFF
       BUILD_SHARED_LIBS: ON
+    publicdefs:
+      glbinding_DIR: '${installPrefix}/share/glbinding'
   - name: fapablazacl/glades2
     version: '1.0.0'
     url: 'https://github.com/fapablazacl/glades2.git'
-#  - name: cgltf
-#    version: '1.10.0'
-#    url: 'https://github.com/jkuhlmann/cgltf.git'
-#    tag: 'v1.10'
+    publicdefs:
+      glades2_DIR: '${installPrefix}/lib/cmake/glades2'
