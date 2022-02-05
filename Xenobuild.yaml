@@ -32,3 +32,10 @@ dependencies:
       OPTION_BUILD_EXAMPLES: OFF
       OPTION_BUILD_TOOLS: OFF
       BUILD_SHARED_LIBS: ON
+  - name: fapablazacl/glades2
+    version: '1.0.0'
+    url: 'https://github.com/fapablazacl/glades2.git'
+#  - name: cgltf
+#    version: '1.10.0'
+#    url: 'https://github.com/jkuhlmann/cgltf.git'
+#    tag: 'v1.10'
