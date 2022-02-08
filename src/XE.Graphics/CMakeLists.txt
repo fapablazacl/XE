@@ -46,4 +46,6 @@ add_library (${target} ${sources})
 target_include_directories(${target} PUBLIC "include/")
 target_link_libraries(${target} XE.Core XE.Math)
 
-add_subdirectory(demo)
+if (XE_EXAMPLE_DEMO)
+	add_subdirectory(demo)
+endif ()
