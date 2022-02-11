@@ -5,7 +5,7 @@
 #include <Windows.h>
 
 namespace XE {
-    int Timer::getTick() {
+    std::uint32_t Timer::getTick() {
         const DWORD dwTickCount = ::GetTickCount();
         return dwTickCount;
     }
