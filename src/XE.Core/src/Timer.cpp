@@ -44,7 +44,7 @@ static uint64_t monotonicTimeNanos() {
 }
 
 namespace XE {
-    int Timer::getTick() {
+    uint32_t Timer::getTick() {
         const uint64_t nanos = monotonicTimeNanos();
         return nanos / 1000000;
     }
