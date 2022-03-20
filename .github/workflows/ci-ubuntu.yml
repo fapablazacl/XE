@@ -10,7 +10,10 @@ jobs:
           submodules: true
 
       - name: Install OS Dependencies
-        run: sudo apt install xorg-dev 
+        run: |
+          sudo apt-get update
+          sudo apt-get upgrade
+          sudo apt install xorg-dev 
 
       - name: Install Dependencies
         run: sh Xenobuild installdeps gcc debug
@@ -33,7 +36,10 @@ jobs:
           submodules: true
 
       - name: Install OS Dependencies
-        run: sudo apt install xorg-dev 
+        run: |
+          sudo apt-get update
+          sudo apt-get upgrade
+          sudo apt install xorg-dev 
 
       - name: Install Dependencies
         run: sh Xenobuild installdeps gcc release
@@ -57,7 +63,10 @@ jobs:
           submodules: true
 
       - name: Install OS Dependencies
-        run: sudo apt install xorg-dev
+        run: |
+          sudo apt-get update
+          sudo apt-get upgrade
+          sudo apt install xorg-dev 
 
       - name: Install Dependencies
         run: sh Xenobuild installdeps clang debug
@@ -81,7 +90,10 @@ jobs:
           submodules: true
 
       - name: Install OS Dependencies
-        run: sudo apt install xorg-dev
+        run: |
+          sudo apt-get update
+          sudo apt-get upgrade
+          sudo apt install xorg-dev 
 
       - name: Install Dependencies
         run: sh Xenobuild installdeps clang release
