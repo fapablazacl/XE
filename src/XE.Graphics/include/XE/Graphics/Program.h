@@ -8,11 +8,6 @@
 namespace XE {
     enum class ShaderType;
 
-    enum ShaderLang {
-        GLSL,
-        HLSL
-    };
-    
     struct ProgramSource {
         ShaderType type;
         std::string text;
