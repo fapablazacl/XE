@@ -1,0 +1,96 @@
+name: CI Ubuntu
+on: [push]
+jobs:
+  ci-ubuntu-latest-x86_64-gcc-debug:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Source Code and Submodules
+        uses: actions/checkout@v2
+        with:
+          submodules: true
+
+      - name: Install OS Dependencies
+        run: sudo apt install xorg-dev 
+
+      - name: Install Dependencies
+        run: sh Xenobuild installdeps gcc debug
+
+      - name: Configure
+        run: sh Xenobuild configure gcc debug
+
+      - name: Build
+        run: cmake --build build/gcc/debug
+
+      - name: Run Unit Tests
+        run: cmake --build build/gcc/debug --target test
+
+  ci-ubuntu-latest-x86_64-gcc-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Source Code and Submodules
+        uses: actions/checkout@v2
+        with:
+          submodules: true
+
+      - name: Install OS Dependencies
+        run: sudo apt install xorg-dev 
+
+      - name: Install Dependencies
+        run: sh Xenobuild installdeps gcc release
+
+      - name: Configure
+        run: sh Xenobuild configure gcc release
+
+      - name: Build
+        run: cmake --build build/gcc/release
+
+      - name: Run Unit Tests
+        run: cmake --build build/gcc/release --target test
+
+
+  ci-ubuntu-latest-x86_64-clang-debug:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Source Code and Submodules
+        uses: actions/checkout@v2
+        with:
+          submodules: true
+
+      - name: Install OS Dependencies
+        run: sudo apt install xorg-dev
+
+      - name: Install Dependencies
+        run: sh Xenobuild installdeps clang debug
+
+      - name: Configure
+        run: sh Xenobuild configure clang debug
+
+      - name: Build
+        run: cmake --build build/clang/debug
+
+      - name: Run Unit Tests
+        run: cmake --build build/clang/debug --target test
+
+
+  ci-ubuntu-latest-x86_64-clang-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Source Code and Submodules
+        uses: actions/checkout@v2
+        with:
+          submodules: true
+
+      - name: Install OS Dependencies
+        run: sudo apt install xorg-dev
+
+      - name: Install Dependencies
+        run: sh Xenobuild installdeps clang release
+
+      - name: Configure
+        run: sh Xenobuild configure clang release
+
+      - name: Build
+        run: cmake --build build/clang/release
+
+      - name: Run Unit Tests
+        run: cmake --build build/clang/release --target test
