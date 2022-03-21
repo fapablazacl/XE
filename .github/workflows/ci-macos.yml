@@ -1,8 +1,8 @@
 name: CI macOS
 on: [push]
 jobs:
-  ci-macos-11-universal-clang-debug:
-    runs-on: macos-11
+  build-universal-appleclang:
+    runs-on: macos-latest
     steps:
       - name: Checkout Source Code and Submodules
         uses: actions/checkout@v2
@@ -13,43 +13,48 @@ jobs:
         run: brew install vulkan-headers
 
       - name: Install Dependencies
-        run: sh Xenobuild installdeps clang debug
+        run: |
+          sh Xenobuild installdeps clang debug
+          sh Xenobuild installdeps clang release
 
-      - name: Configure
+      - name: Configure [Debug]
         run: sh Xenobuild configure clang debug
 
-      - name: Build
+      - name: Build [Debug]
         run: cmake --build build/clang/debug
 
-      - name: Run Unit Tests
-        run: cmake --build build/clang/debug --target test
+      - name: Configure [Release]
+        run: sh Xenobuild configure clang release
 
-      - name: Generate Unit Test Coverage
-        run: | 
-          sh Xenobuild configure clang coverage 
-          sh Xenobuild coverage clang coverage
-          
+      - name: Build [Release]
+        run: cmake --build build/clang/release
 
-          
-  ci-macos-11-universal-clang-release:
-    runs-on: macos-11
+
+  test-universal-appleclang:
+    runs-on: macos-latest
+    needs: build-universal-appleclang
     steps:
       - name: Checkout Source Code and Submodules
         uses: actions/checkout@v2
         with:
           submodules: true
 
-      - name: Install OS Dependencies
-        run: brew install vulkan-headers
+      - name: Setup [Debug]
+        run: |
+          brew install vulkan-headers
+          sh Xenobuild installdeps clang debug
+          sh Xenobuild configure clang debug
+          cmake --build build/clang/debug
 
-      - name: Install Dependencies
-        run: sh Xenobuild installdeps clang release
+      - name: Run Unit Tests [Debug]
+        run: cmake --build build/clang/debug --target test
 
-      - name: Configure
-        run: sh Xenobuild configure clang release
+      - name: Setup [Release]
+        run: |
+          brew install vulkan-headers
+          sh Xenobuild installdeps clang release
+          sh Xenobuild configure clang release
+          cmake --build build/clang/release
 
-      - name: Build
-        run: cmake --build build/clang/release
-
-      - name: Run Unit Tests
+      - name: Run Unit Tests [Release]
         run: cmake --build build/clang/release --target test
