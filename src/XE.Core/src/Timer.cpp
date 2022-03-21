@@ -54,7 +54,7 @@ namespace XE {
 #include <time.h>
 
 namespace XE {
-    int Timer::getTick() {
+    std::uint32_t Timer::getTick() {
         timespec ts;
         clock_gettime(CLOCK_MONOTONIC, &ts);
 
