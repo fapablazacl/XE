@@ -21,7 +21,7 @@ namespace XE {
         std::string name;
         DataType type;
         UniformDimension dimension;
-        int count;
+        int count = 1;
     };
 
     enum class UniformMatrixShape : int {
@@ -43,7 +43,7 @@ namespace XE {
         std::string name;
         DataType type;
         UniformMatrixShape shape;
-        int count;
+        int count = 1;
     };
 
     

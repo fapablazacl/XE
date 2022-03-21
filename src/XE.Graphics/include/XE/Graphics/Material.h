@@ -69,14 +69,14 @@ namespace XE {
         ConstantAlpha,
         OneMinusConstantAlpha
     };
-
+    
     /**
      * @brief Graphics Device current render states
      */
     struct MaterialRenderState {
-        bool depthTest = false;
+        bool depthTest = true;
         bool stencilTest = false;
-        bool cullBackFace = false;
+        bool cullBackFace = true;
         bool blendEnable = false;
 
         BlendParam blendSource = BlendParam::One;
