@@ -93,7 +93,7 @@ void main() {
             XE::BufferUsage::Copy, 
             XE::BufferAccess::Static, 
             (int)coords.size() * (int)sizeof(XE::Vector3f), 
-            (const std::byte*) coords.data()
+            (const void*) coords.data()
         };
 
         auto coordBuffer = deviceGL->createBuffer(coordBufferDescriptor);
@@ -103,7 +103,7 @@ void main() {
             XE::BufferUsage::Copy, 
             XE::BufferAccess::Static, 
             (int)colors.size() * (int)sizeof(XE::Vector4f), 
-            (const std::byte*) colors.data()
+            (const void*) colors.data()
         };
 
         auto colorBuffer = deviceGL->createBuffer(colorBufferDescriptor);
@@ -144,7 +144,7 @@ void main() {
         deviceGL->beginFrame(XE::ClearFlags::All, {0.2f, 0.2f, 0.8f, 1.0f}, 0.0f, 0);
         {
             deviceGL->setProgram(program.get());
-            deviceGL->applyUniform(&matrixLayout, 1, (const std::byte*)&projViewModelMatrix);
+            deviceGL->applyUniform(&matrixLayout, 1, (const void*)&projViewModelMatrix);
             deviceGL->setMaterial(&material);
             deviceGL->draw(subset.get(), &envelope, 1);
         }

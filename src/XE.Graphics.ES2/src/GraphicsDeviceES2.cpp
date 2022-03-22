@@ -91,7 +91,7 @@ namespace XE {
     }
     
 
-    void GraphicsDeviceES2::draw(const Subset *subset, const SubsetEnvelope *envelopes, const int envelopeCount) {
+    void GraphicsDeviceES2::draw(const Subset *subset, const SubsetEnvelope *envelopes, const size_t envelopeCount) {
         assert(subset);
         assert(envelopes);
         assert(envelopeCount > 0);
@@ -283,7 +283,7 @@ namespace XE {
         return m_program;
     }
 
-    void GraphicsDeviceES2::applyUniform(const UniformMatrix *uniformMatrix, const int count, const std::byte *data) {
+    void GraphicsDeviceES2::applyUniform(const UniformMatrix *uniformMatrix, const size_t count, const void *data) {
         // TODO: Add support for matrix transposition
 
         assert(m_program);
@@ -291,7 +291,9 @@ namespace XE {
         assert(count > 0);
         assert(data);
 
-        int offset = 0;
+        size_t offset = 0;
+        
+        const auto ptr = reinterpret_cast<const std::byte*>(data);
 
         for (int i=0; i<count; i++) {
             const UniformMatrix *current = &uniformMatrix[i];
@@ -299,7 +301,7 @@ namespace XE {
 
             switch (current->type) {
             case DataType::Float32: {
-                const auto values = (const GLfloat*)&data[offset];
+                const auto values = (const GLfloat*)&ptr[offset];
                 
                 switch (current->shape) {
                     case UniformMatrixShape::R2C2: glUniformMatrix2fv(location, current->count, GL_FALSE, values); break;
@@ -321,13 +323,15 @@ namespace XE {
         XE_GRAPHICS_GL_CHECK_ERROR();
     }
 
-    void GraphicsDeviceES2::applyUniform(const Uniform *uniform, const int count, const std::byte *data) {
+    void GraphicsDeviceES2::applyUniform(const Uniform *uniform, const size_t count, const void *data) {
         assert(m_program);
         assert(uniform);
         assert(count > 0);
         assert(data);
 
-        int offset = 0;
+        const auto ptr = reinterpret_cast<const std::byte*>(data);
+        
+        size_t offset = 0;
 
         for (int i=0; i<count; i++) {
             const Uniform *current = &uniform[i];
@@ -338,20 +342,20 @@ namespace XE {
             switch (current->type) {
             case DataType::Int32:
                 switch (current->dimension) {
-                    case UniformDimension::D1: glUniform1iv(location, current->count, (const GLint*)&data[offset]); break;
-                    case UniformDimension::D2: glUniform2iv(location, current->count, (const GLint*)&data[offset]); break;
-                    case UniformDimension::D3: glUniform3iv(location, current->count, (const GLint*)&data[offset]); break;
-                    case UniformDimension::D4: glUniform4iv(location, current->count, (const GLint*)&data[offset]); break;
+                    case UniformDimension::D1: glUniform1iv(location, current->count, (const GLint*)&ptr[offset]); break;
+                    case UniformDimension::D2: glUniform2iv(location, current->count, (const GLint*)&ptr[offset]); break;
+                    case UniformDimension::D3: glUniform3iv(location, current->count, (const GLint*)&ptr[offset]); break;
+                    case UniformDimension::D4: glUniform4iv(location, current->count, (const GLint*)&ptr[offset]); break;
                     default: assert(false);
                 }
                 break;
             
             case DataType::Float32:
                 switch (current->dimension) {
-                    case UniformDimension::D1: glUniform1fv(location, current->count, (const GLfloat*)&data[offset]); break;
-                    case UniformDimension::D2: glUniform2fv(location, current->count, (const GLfloat*)&data[offset]); break;
-                    case UniformDimension::D3: glUniform3fv(location, current->count, (const GLfloat*)&data[offset]); break;
-                    case UniformDimension::D4: glUniform4fv(location, current->count, (const GLfloat*)&data[offset]); break;
+                    case UniformDimension::D1: glUniform1fv(location, current->count, (const GLfloat*)&ptr[offset]); break;
+                    case UniformDimension::D2: glUniform2fv(location, current->count, (const GLfloat*)&ptr[offset]); break;
+                    case UniformDimension::D3: glUniform3fv(location, current->count, (const GLfloat*)&ptr[offset]); break;
+                    case UniformDimension::D4: glUniform4fv(location, current->count, (const GLfloat*)&ptr[offset]); break;
                     default: assert(false);
                 }
                 break;

@@ -23,8 +23,8 @@ namespace XE {
         BufferType type;
         BufferUsage usage;
         BufferAccess access;
-        int size;
-        const std::byte *data;
+        std::size_t size;
+        const void *data;
     };
 }
 

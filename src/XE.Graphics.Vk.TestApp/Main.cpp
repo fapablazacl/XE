@@ -72,7 +72,7 @@ static std::vector<char> readFile(const std::string& filename) {
         throw std::runtime_error("failed to open file " + filename);
     }
 
-    const auto fileSize = static_cast<size_t>(fs.tellg());
+    const auto fileSize = static_cast<std::size_t>(fs.tellg());
 
     std::vector<char> buffer;
     buffer.resize(fileSize);
@@ -511,7 +511,7 @@ namespace XE {
             uint32_t imageCount;
             vkGetSwapchainImagesKHR(mDevice, mSwapchain, &imageCount, nullptr);
 
-            mSwapchainImages.resize(static_cast<size_t>(imageCount));
+            mSwapchainImages.resize(static_cast<std::size_t>(imageCount));
             vkGetSwapchainImagesKHR(mDevice, mSwapchain, &imageCount, mSwapchainImages.data());
         }
 
@@ -714,7 +714,7 @@ namespace XE {
         void createSwapchainFramebuffers() {
             mSwapchainFramebuffers.resize(mSwapchainImageViews.size());
 
-            for (size_t i=0; i<mSwapchainImageViews.size(); i++) {
+            for (std::size_t i=0; i<mSwapchainImageViews.size(); i++) {
                 VkImageView attachment[] = { mSwapchainImageViews[i] };
 
                 VkFramebufferCreateInfo framebufferInfo {};
@@ -759,7 +759,7 @@ namespace XE {
             }
 
             // recording drawing commands
-            for (size_t i=0; i<mCommandBuffers.size(); i++) {
+            for (std::size_t i=0; i<mCommandBuffers.size(); i++) {
                 VkCommandBufferBeginInfo beginInfo {};
                 beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
                 beginInfo.flags = 0;

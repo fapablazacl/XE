@@ -211,7 +211,7 @@ namespace XE {
             Range<T> range {dot(edges[0], normal)};
 
             // compute the range for the rest 
-            for (size_t i=1; i<edges.size(); i++) {
+            for (std::size_t i=1; i<edges.size(); i++) {
                 const T value = dot(edges[i], normal);
 
                 range.expand(value);

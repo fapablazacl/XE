@@ -20,7 +20,7 @@ namespace XE {
 
     Texture3DGL::~Texture3DGL() {}
 
-    void Texture3DGL::setData(const std::byte *surfaceData, const int mipLevel, const PixelFormat surfaceFormat, const DataType surfaceDataType, const Boxi &volume) {
+    void Texture3DGL::setData(const void *surfaceData, const int mipLevel, const PixelFormat surfaceFormat, const DataType surfaceDataType, const Boxi &volume) {
         const Vector3i offset = volume.getMinEdge();
         const Vector3i size = volume.getSize();
         const GLenum formatGL = convertToGL(surfaceFormat);
@@ -31,7 +31,7 @@ namespace XE {
         glBindTexture(GL_TEXTURE_3D, 0);
     }
     
-    void Texture3DGL::getData(std::byte *surfaceData, const int mipLevel, const PixelFormat surfaceFormat, const DataType surfaceDataType, const Boxi &volume) const {
+    void Texture3DGL::getData(void *surfaceData, const int mipLevel, const PixelFormat surfaceFormat, const DataType surfaceDataType, const Boxi &volume) const {
         const GLenum formatGL = convertToGL(surfaceFormat);
         const GLenum dataTypeGL = convertToGL(surfaceDataType);
 

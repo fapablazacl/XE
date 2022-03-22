@@ -18,13 +18,13 @@ namespace XE {
 
         virtual ~BufferGL();
 
-        virtual int getSize() const override {
+        virtual size_t getSize() const override {
             return m_size;
         }
 
-        virtual void read(std::byte* destination, const int size, const int offset, const int destinationOffset) const override;
+        virtual void read(void* destination, const size_t size, const size_t offset, const size_t destinationOffset) const override;
 
-        virtual void write(const std::byte *source, const int size, const int offset, const int sourceOffset) override;
+        virtual void write(const void *source, const size_t size, const size_t offset, const size_t sourceOffset) override;
 
     public:
         GLuint getID() const {
@@ -43,7 +43,7 @@ namespace XE {
         GLuint m_id;
         GLenum m_target;
         GLenum m_usage;
-        int m_size;
+        size_t m_size;
     };
 }
 

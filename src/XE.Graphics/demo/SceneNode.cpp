@@ -27,10 +27,10 @@ void SceneNode::visit(XE::GraphicsDevice *graphicsDevice, const XE::M4 &parentTr
 
     if (mRenderable) {
         const XE::UniformMatrix uProjModelView = {"uProjViewModel", XE::DataType::Float32, XE::UniformMatrixShape::R4C4, 1};
-        graphicsDevice->applyUniform(&uProjModelView, 1, reinterpret_cast<const std::byte*>(current.data()));
+        graphicsDevice->applyUniform(&uProjModelView, 1, reinterpret_cast<const void*>(current.data()));
             
         const XE::UniformMatrix uModel = {"uModel", XE::DataType::Float32, XE::UniformMatrixShape::R4C4, 1};
-        graphicsDevice->applyUniform(&uModel, 1, reinterpret_cast<const std::byte*>(mTransformation.data()));
+        graphicsDevice->applyUniform(&uModel, 1, reinterpret_cast<const void*>(mTransformation.data()));
             
         mRenderable->render(graphicsDevice);
     }

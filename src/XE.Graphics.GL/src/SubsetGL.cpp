@@ -6,7 +6,7 @@
 
 namespace XE {
     SubsetGL::SubsetGL(const SubsetDescriptor &desc) : descriptor(desc) {
-        for (size_t i=0; i<desc.buffers.size(); i++) {
+        for (std::size_t i=0; i<desc.buffers.size(); i++) {
             auto bufferGL = static_cast<const BufferGL*>(desc.buffers[i]);
             buffers.emplace_back(bufferGL);
         }
@@ -15,7 +15,7 @@ namespace XE {
         glGenVertexArrays(1, &id);
         glBindVertexArray(id);
 
-        for (size_t i=0; i<desc.attribs.size(); i++) {
+        for (std::size_t i=0; i<desc.attribs.size(); i++) {
             const SubsetVertexAttrib &attrib = desc.attribs[i];
             const BufferGL *buffer = buffers[attrib.bufferIndex];
 

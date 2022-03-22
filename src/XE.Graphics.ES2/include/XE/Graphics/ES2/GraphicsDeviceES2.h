@@ -38,13 +38,13 @@ namespace XE {
 
         virtual const Program* getProgram() const override;
 
-        virtual void applyUniform(const UniformMatrix *uniformMatrix, const int count, const std::byte *data) override;
+        virtual void applyUniform(const UniformMatrix *uniformMatrix, const size_t count, const void *data) override;
 
-        virtual void applyUniform(const Uniform *uniform, const int count, const std::byte *data) override;
+        virtual void applyUniform(const Uniform *uniform, const size_t count, const void *data) override;
 
         virtual void beginFrame(const ClearFlags flags, const Vector4f &color, const float depth, const int stencil) override;
         
-        virtual void draw(const Subset *subset, const SubsetEnvelope *envelopes, const int envelopeCount) override;
+        virtual void draw(const Subset *subset, const SubsetEnvelope *envelopes, const size_t envelopeCount) override;
 
         virtual void endFrame() override;
 

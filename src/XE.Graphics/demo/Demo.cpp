@@ -224,7 +224,7 @@ namespace demo {
             mGraphicsDevice->setProgram(mSimpleProgram);
             
             const XE::UniformMatrix uView = {"uView", XE::DataType::Float32, XE::UniformMatrixShape::R4C4, 1};
-            mGraphicsDevice->applyUniform(&uView, 1, reinterpret_cast<const std::byte*>(view.data()));
+            mGraphicsDevice->applyUniform(&uView, 1, reinterpret_cast<const void*>(view.data()));
             
             mGraphicsDevice->setMaterial(&mMaterial);
             mSceneNode.visit(mGraphicsDevice.get(), viewProj);

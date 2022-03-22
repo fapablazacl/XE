@@ -43,7 +43,7 @@ namespace demo {
 		// convertir primitiva a lista de triangulos
 		bool order = true;
 
-		for (size_t i=0; i<indices.size() - 2; i++) {
+		for (std::size_t i=0; i<indices.size() - 2; i++) {
             Vertex p1, p2, p3;
             
             if (order) {
@@ -118,7 +118,7 @@ namespace demo {
 		// convertir primitiva a lista de triangulos
 		bool order = true;
 
-		for (size_t i=0; i<indices.size() - 2; i++) {
+		for (std::size_t i=0; i<indices.size() - 2; i++) {
             Vertex p1, p2, p3;
             
 			if (order) {
@@ -175,7 +175,7 @@ namespace demo {
 		// convertir primitiva a lista de triangulos
 		bool order = true;
 
-		for (size_t i=0; i<indices.size() - 2; i++) {
+		for (std::size_t i=0; i<indices.size() - 2; i++) {
             Vertex p1, p2, p3;
             
             if (order) {
@@ -228,7 +228,7 @@ namespace demo {
             XE::BufferUsage::Read,
             XE::BufferAccess::Static,
             static_cast<int>(sizeof(Vertex) * mesh.vertices.size()),
-            reinterpret_cast<const std::byte*>(mesh.vertices.data())
+            reinterpret_cast<const void*>(mesh.vertices.data())
         };
 
         const XE::Buffer *vertexBuffer = graphicsDevice->createBuffer(bufferDesc);
@@ -241,7 +241,7 @@ namespace demo {
                 XE::BufferUsage::Read,
                 XE::BufferAccess::Static,
                 static_cast<int>(sizeof(uint32_t) * mesh.indices.size()),
-                reinterpret_cast<const std::byte*>(mesh.indices.data())
+                reinterpret_cast<const void*>(mesh.indices.data())
             };
             
             indexBuffer = graphicsDevice->createBuffer(indexBufferDesc);
@@ -271,7 +271,7 @@ namespace demo {
             XE::BufferUsage::Read,
             XE::BufferAccess::Static,
             static_cast<int>(sizeof(Vertex) * mesh.vertices.size()),
-            reinterpret_cast<const std::byte*>(mesh.vertices.data())
+            reinterpret_cast<const void*>(mesh.vertices.data())
         };
         
         const XE::Buffer *vertexBuffer = graphicsDevice->createBuffer(bufferDesc);

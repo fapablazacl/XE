@@ -80,10 +80,10 @@ public:
 
         if (mRenderable) {
             const XE::UniformMatrix uProjModelView = {"uProjViewModel", XE::DataType::Float32, XE::UniformMatrixShape::R4C4, 1};
-            graphicsDevice->applyUniform(&uProjModelView, 1, reinterpret_cast<const std::byte*>(current.data()));
+            graphicsDevice->applyUniform(&uProjModelView, 1, reinterpret_cast<const void*>(current.data()));
             
             const XE::UniformMatrix uModel = {"uModel", XE::DataType::Float32, XE::UniformMatrixShape::R4C4, 1};
-            graphicsDevice->applyUniform(&uModel, 1, reinterpret_cast<const std::byte*>(mTransformation.data()));
+            graphicsDevice->applyUniform(&uModel, 1, reinterpret_cast<const void*>(mTransformation.data()));
             
             mRenderable->render(graphicsDevice);
         }
@@ -302,7 +302,7 @@ namespace demo {
             mGraphicsDevice->setProgram(mSimpleProgram);
             
             const XE::UniformMatrix uView = {"uView", XE::DataType::Float32, XE::UniformMatrixShape::R4C4, 1};
-            mGraphicsDevice->applyUniform(&uView, 1, reinterpret_cast<const std::byte*>(view.data()));
+            mGraphicsDevice->applyUniform(&uView, 1, reinterpret_cast<const void*>(view.data()));
             
             mGraphicsDevice->setMaterial(&mMaterial);
             mSceneNode.visit(mGraphicsDevice.get(), viewProj);

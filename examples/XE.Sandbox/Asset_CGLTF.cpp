@@ -90,7 +90,7 @@ namespace Sandbox {
             cgltf_size offset = 0;
             
             for (cgltf_size i=0; i<accessor.count; i++) {
-                auto elementData = (const int)(*(const uint32_t*)((std::byte*)buffer.data + bufferView.offset + accessor.offset + offset));
+                auto elementData = (const int)(*(const uint32_t*)((void*)buffer.data + bufferView.offset + accessor.offset + offset));
                 
                 meshPrimitive.indices.push_back(elementData);
                 
@@ -110,7 +110,7 @@ namespace Sandbox {
                 cgltf_size offset = 0;
                 
                 for (cgltf_size j=0; j<accessor->count; j++) {
-                    auto elementData = (const XE::Vector3f*)((std::byte*)buffer->data + bufferView->offset + accessor->offset + offset);
+                    auto elementData = (const XE::Vector3f*)((void*)buffer->data + bufferView->offset + accessor->offset + offset);
                 
                     meshPrimitive.coords.push_back(*elementData);
                     
@@ -120,7 +120,7 @@ namespace Sandbox {
                 cgltf_size offset = 0;
                 
                 for (cgltf_size j=0; j<accessor->count; j++) {
-                    auto elementData = (const XE::Vector3f*)((std::byte*)buffer->data + bufferView->offset + accessor->offset + offset);
+                    auto elementData = (const XE::Vector3f*)((void*)buffer->data + bufferView->offset + accessor->offset + offset);
                 
                     meshPrimitive.normals.push_back(*elementData);
                     
@@ -131,7 +131,7 @@ namespace Sandbox {
                 cgltf_size offset = 0;
                 
                 for (cgltf_size j=0; j<accessor->count; j++) {
-                    auto elementData = (const XE::Vector2f*)((std::byte*)buffer->data + bufferView->offset + accessor->offset + offset);
+                    auto elementData = (const XE::Vector2f*)((void*)buffer->data + bufferView->offset + accessor->offset + offset);
                 
                     meshPrimitive.texCoords.push_back(*elementData);
                     
@@ -140,7 +140,7 @@ namespace Sandbox {
             }
         }
         
-        for (size_t i=0; i<meshPrimitive.coords.size(); i++) {
+        for (std::size_t i=0; i<meshPrimitive.coords.size(); i++) {
             meshPrimitive.colors.push_back({1.0f, 1.0f, 1.0f, 1.0f});
         }
         

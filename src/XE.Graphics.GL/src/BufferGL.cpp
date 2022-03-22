@@ -26,19 +26,21 @@ namespace XE {
         }
     }
 
-    void BufferGL::read(std::byte* destination, const int size, const int offset, const int destinationOffset) const {
+    void BufferGL::read(void* destination, const size_t size, const size_t offset, const size_t destinationOffset) const {
         const int finalSize = size ? size : m_size;
+        const auto ptr = reinterpret_cast<std::byte*>(destination);
 
         glBindBuffer(m_target, m_id);
-        glGetBufferSubData(m_target, offset, finalSize, &destination[destinationOffset]);
+        glGetBufferSubData(m_target, offset, finalSize, &ptr[destinationOffset]);
         glBindBuffer(m_target, 0);
     }
 
-    void BufferGL::write(const std::byte *source, const int size, const int offset, const int sourceOffset) {
+    void BufferGL::write(const void *source, const size_t size, const size_t offset, const size_t sourceOffset) {
         const int finalSize = size ? size : m_size;
+        const auto ptr = reinterpret_cast<const std::byte*>(source);
 
         glBindBuffer(m_target, m_id);
-        glBufferSubData(m_target, offset, finalSize, &source[sourceOffset]);
+        glBufferSubData(m_target, offset, finalSize, &ptr[sourceOffset]);
         glBindBuffer(m_target, 0);
     }
 }

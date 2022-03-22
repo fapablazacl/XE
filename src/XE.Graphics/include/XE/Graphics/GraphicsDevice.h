@@ -96,7 +96,6 @@ namespace XE {
         virtual Descriptor getDescriptor() const = 0;
     };
 
-
     /**
      * @brief Graphics API abstraction
      */
@@ -108,13 +107,28 @@ namespace XE {
 
         virtual Buffer* createBuffer(const BufferDescriptor &bufferDescriptor) = 0;
         
-        virtual Texture2D* createTexture2D(const PixelFormat format, const Vector2i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void *sourceData) = 0;
+        virtual Texture2D* createTexture2D(
+                                           const PixelFormat format,
+                                           const Vector2i &size,
+                                           const PixelFormat sourceFormat,
+                                           const DataType sourceDataType,
+                                           const void *sourceData) = 0;
         
-        virtual Texture3D* createTexture3D(const PixelFormat format, const Vector3i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void *sourceData) = 0;
+        virtual Texture3D* createTexture3D(const PixelFormat format,
+                                           const Vector3i &size,
+                                           const PixelFormat sourceFormat,
+                                           const DataType sourceDataType,
+                                           const void *sourceData) = 0;
         
-        virtual Texture2DArray* createTexture2DArray(const PixelFormat format, const Vector2i &size, const int count) = 0;
+        virtual Texture2DArray* createTexture2DArray(const PixelFormat format,
+                                                     const Vector2i &size,
+                                                     const int count) = 0;
         
-        virtual TextureCubeMap* createTextureCubeMap(const PixelFormat format, const Vector2i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void **sourceData) = 0;
+        virtual TextureCubeMap* createTextureCubeMap(const PixelFormat format,
+                                                     const Vector2i &size,
+                                                     const PixelFormat sourceFormat,
+                                                     const DataType sourceDataType,
+                                                     const void **sourceData) = 0;
         
         virtual Program* createProgram(const ProgramDescriptor &programDescriptor) = 0;
         
@@ -130,17 +144,26 @@ namespace XE {
 
         virtual const Program* getProgram() const = 0;
 
-        virtual void applyUniform(const UniformMatrix *uniformMatrix, const int count, const std::byte *data) = 0;
+        virtual void applyUniform(const UniformMatrix *uniformMatrix,
+                                  const std::size_t count,
+                                  const void *data) = 0;
 
-        virtual void applyUniform(const Uniform *uniform, const int count, const std::byte *data) = 0;
+        virtual void applyUniform(const Uniform *uniform,
+                                  const std::size_t count,
+                                  const void *data) = 0;
 
-        virtual void draw(const Subset *subset, const SubsetEnvelope *envelopes, const int envelopeCount) = 0;
+        virtual void draw(const Subset *subset,
+                          const SubsetEnvelope *envelopes,
+                          const std::size_t envelopeCount) = 0;
         
         void beginFrame(const ClearFlags flags, const Vector4f &color) {
             beginFrame(flags, color, 1.0f, 0);
         }
 
-        virtual void beginFrame(const ClearFlags flags, const Vector4f &color, const float depth, const int stencil) = 0;
+        virtual void beginFrame(const ClearFlags flags,
+                                const Vector4f &color,
+                                const float depth,
+                                const int stencil) = 0;
         
         virtual void endFrame() = 0;
     };

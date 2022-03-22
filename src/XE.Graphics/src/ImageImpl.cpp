@@ -11,7 +11,7 @@ namespace XE {
         this->free();
     }
 
-    const std::byte* ImageImpl::getPointer() const {
+    const void* ImageImpl::getPointer() const {
         return pixels;
     }
 
@@ -31,7 +31,7 @@ namespace XE {
 
         assert(byteSize);
 
-        pixels = static_cast<std::byte*>(std::malloc(byteSize));
+        pixels = static_cast<void*>(std::malloc(byteSize));
     }
 
     void ImageImpl::free() {

@@ -10,7 +10,7 @@ namespace XE {
     public:
         Timer() = delete;
 
-        static std::uint32_t getTick();
+        static uint32_t getTick();
     };
 }
 

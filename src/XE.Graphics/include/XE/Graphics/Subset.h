@@ -72,13 +72,13 @@ namespace XE {
 
         bool normalized = false;
 
-        size_t stride = 0;
+        std::size_t stride = 0;
 
         //!
-        size_t bufferIndex = 0;
+        std::size_t bufferIndex = 0;
 
         //! 
-        size_t bufferOffset = 0;
+        std::size_t bufferOffset = 0;
     };
 
     /**

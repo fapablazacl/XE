@@ -18,7 +18,7 @@ namespace XE {
         assert(m_data);
         assert(bufferOut);
         
-        std::memcpy(bufferOut, &m_data[m_offset], static_cast<size_t>(size) * count);
+        std::memcpy(bufferOut, &m_data[m_offset], static_cast<std::size_t>(size) * count);
         m_offset += (size * count);
     
         return count;

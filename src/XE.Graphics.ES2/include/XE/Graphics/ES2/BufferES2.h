@@ -17,13 +17,13 @@ namespace XE {
 
         virtual ~BufferES2();
 
-        virtual int getSize() const override {
+        std::size_t getSize() const override {
             return m_size;
         }
 
-        virtual void read(std::byte* destination, const int size, const int offset, const int destinationOffset) const override;
+        void read(void* destination, const size_t size, const size_t offset, const size_t destinationOffset) const override;
 
-        virtual void write(const std::byte *source, const int size, const int offset, const int sourceOffset) override;
+        void write(const void *source, const size_t size, const size_t offset, const size_t sourceOffset) override;
 
     public:
         GLuint getID() const {
@@ -42,7 +42,7 @@ namespace XE {
         GLuint m_id;
         GLenum m_target;
         GLenum m_usage;
-        int m_size;
+        std::size_t m_size;
     };
 }
 

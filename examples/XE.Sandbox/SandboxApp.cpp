@@ -156,7 +156,7 @@ namespace Sandbox {
                 Matrix4f::rotateY(radians(m_angle))
             );
 
-            m_graphicsDevice->applyUniform(&matrixLayout, 1, (const std::byte*)&modelViewProj);
+            m_graphicsDevice->applyUniform(&matrixLayout, 1, (const void*)&modelViewProj);
         }
 
         
@@ -216,7 +216,7 @@ namespace Sandbox {
             Uniform textureUniform = { "texture0", DataType::Int32, 1, 1 };
             int textureUnit = 0;
 
-            m_graphicsDevice->applyUniform(&textureUniform, 1, reinterpret_cast<std::byte*>(&textureUnit));
+            m_graphicsDevice->applyUniform(&textureUniform, 1, reinterpret_cast<void*>(&textureUnit));
 
             m_graphicsDevice->setMaterial(m_material.get());
 
@@ -343,7 +343,7 @@ namespace Sandbox {
                 BufferUsage::Copy,
                 BufferAccess::Static,
                 (int)meshPrimitive.coords.size() * (int)sizeof(Vector3f),
-                (const std::byte*) meshPrimitive.coords.data()
+                (const void*) meshPrimitive.coords.data()
             };
             
             auto coordBuffer = m_graphicsDevice->createBuffer(coordBufferDescriptor);
@@ -353,7 +353,7 @@ namespace Sandbox {
                 BufferUsage::Copy,
                 BufferAccess::Static,
                 (int)meshPrimitive.colors.size() * (int)sizeof(Vector4f),
-                (const std::byte*) meshPrimitive.colors.data()
+                (const void*) meshPrimitive.colors.data()
             };
 
             auto colorBuffer = m_graphicsDevice->createBuffer(colorBufferDescriptor);
@@ -363,7 +363,7 @@ namespace Sandbox {
                 BufferUsage::Copy,
                 BufferAccess::Static,
                 (int)meshPrimitive.normals.size() * (int)sizeof(Vector3f),
-                (const std::byte*) meshPrimitive.normals.data()
+                (const void*) meshPrimitive.normals.data()
             };
 
             auto normalBuffer = m_graphicsDevice->createBuffer(normalBufferDescriptor);
@@ -373,7 +373,7 @@ namespace Sandbox {
                 BufferUsage::Copy,
                 BufferAccess::Static,
                 (int)meshPrimitive.texCoords.size() * (int)sizeof(Vector3f),
-                (const std::byte*) meshPrimitive.texCoords.data()
+                (const void*) meshPrimitive.texCoords.data()
             };
 
             auto texCoordBuffer = m_graphicsDevice->createBuffer(texCoordBufferDescriptor);
@@ -384,7 +384,7 @@ namespace Sandbox {
                 BufferUsage::Copy,
                 BufferAccess::Static,
                 (int)meshPrimitive.indices.size() * (int)sizeof(int),
-                (const std::byte*) meshPrimitive.indices.data()
+                (const void*) meshPrimitive.indices.data()
             };
 
             auto indexBuffer = m_graphicsDevice->createBuffer(indexBufferDescriptor);

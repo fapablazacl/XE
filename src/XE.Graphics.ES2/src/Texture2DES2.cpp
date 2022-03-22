@@ -25,7 +25,7 @@ namespace XE {
     Texture2DES::~Texture2DES() {}
 
 
-    void Texture2DES::setData(const std::byte *surfaceData, const int mipLevel, const PixelFormat surfaceFormat, const DataType surfaceDataType, const Recti &area) {
+    void Texture2DES::setData(const void *surfaceData, const int mipLevel, const PixelFormat surfaceFormat, const DataType surfaceDataType, const Recti &area) {
         const Vector2i offset = area.getMinEdge();
         const Vector2i size = area.getSize();
         const GLenum formatGL = convertToES(surfaceFormat);
@@ -39,7 +39,7 @@ namespace XE {
     }
     
 
-    void Texture2DES::getData(std::byte *surfaceData, const int mipLevel, const PixelFormat surfaceFormat, const DataType surfaceDataType) const {
+    void Texture2DES::getData(void *surfaceData, const int mipLevel, const PixelFormat surfaceFormat, const DataType surfaceDataType) const {
         const GLenum formatGL = convertToES(surfaceFormat);
         const GLenum dataTypeGL = convertToES(surfaceDataType);
 

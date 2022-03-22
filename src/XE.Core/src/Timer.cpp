@@ -5,7 +5,7 @@
 #include <Windows.h>
 
 namespace XE {
-    std::uint32_t Timer::getTick() {
+    uint32_t Timer::getTick() {
         const DWORD dwTickCount = ::GetTickCount();
         return dwTickCount;
     }
@@ -54,7 +54,7 @@ namespace XE {
 #include <time.h>
 
 namespace XE {
-    std::uint32_t Timer::getTick() {
+    uint32_t Timer::getTick() {
         timespec ts;
         clock_gettime(CLOCK_MONOTONIC, &ts);
 

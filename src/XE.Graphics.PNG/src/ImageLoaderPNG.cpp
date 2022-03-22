@@ -11,7 +11,7 @@ namespace XE {
 
     class ImagePNG : public Image {
     public:
-        ImagePNG(const std::byte *pointer, const PixelFormat format, const Vector2i size) {
+        ImagePNG(const void *pointer, const PixelFormat format, const Vector2i size) {
             this->pointer = pointer;
             this->format = format;
             this->size = size;
@@ -19,7 +19,7 @@ namespace XE {
 
         virtual ~ImagePNG() {}
 
-        virtual const std::byte* getPointer() const override {
+        virtual const void* getPointer() const override {
             return pointer;
         }
 
@@ -32,7 +32,7 @@ namespace XE {
         }
 
     private:
-        const std::byte *pointer;
+        const void *pointer;
         PixelFormat format;
         Vector2i size;
     };
@@ -74,7 +74,7 @@ namespace XE {
         }
 
         return std::make_unique<ImagePNG> (
-            (const std::byte*)pixels, 
+            (const void*)pixels, 
             PixelFormat::R8G8B8A8, 
             Vector2i(int(width), int(height))
         );

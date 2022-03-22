@@ -18,7 +18,7 @@ namespace XE {
         /**
          * @brief Get a direct pointer to the image data resident in system memory.
          */
-        virtual const std::byte* getPointer() const = 0;
+        virtual const void* getPointer() const = 0;
 
         /**
          * @brief Get the image pixel format.

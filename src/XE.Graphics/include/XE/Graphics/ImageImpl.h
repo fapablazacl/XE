@@ -14,7 +14,7 @@ namespace XE {
 
         virtual ~ImageImpl();
 
-        virtual const std::byte* getPointer() const override;
+        virtual const void* getPointer() const override;
         
         virtual PixelFormat getFormat() const override;
 
@@ -25,7 +25,7 @@ namespace XE {
         void free();
 
     private:
-        std::byte *pixels = nullptr;
+        void *pixels = nullptr;
         PixelFormat format = PixelFormat::Unknown;
         Vector2i size = {0, 0};
     };

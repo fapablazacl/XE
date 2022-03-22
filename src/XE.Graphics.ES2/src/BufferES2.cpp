@@ -27,8 +27,10 @@ namespace XE {
     }
 
 
-    void BufferES2::read(std::byte* destination, const int size, const int offset, const int destinationOffset) const {
-        const int finalSize = size ? size : m_size;
+    void BufferES2::read(void* destination, const size_t size, const size_t offset, const size_t destinationOffset) const {
+        // TODO: Not Implemented
+        
+        const size_t finalSize = size ? size : m_size;
 
         glBindBuffer(m_target, m_id);
         // glGetBufferSubData(m_target, offset, finalSize, &destination[destinationOffset]);
@@ -37,11 +39,12 @@ namespace XE {
     }
 
 
-    void BufferES2::write(const std::byte *source, const int size, const int offset, const int sourceOffset) {
-        const int finalSize = size ? size : m_size;
+    void BufferES2::write(const void *source, const size_t size, const size_t offset, const size_t sourceOffset) {
+        const size_t finalSize = size ? size : m_size;
+        const auto ptr = reinterpret_cast<const std::byte*>(source);
 
         glBindBuffer(m_target, m_id);
-        glBufferSubData(m_target, offset, finalSize, &source[sourceOffset]);
+        glBufferSubData(m_target, offset, finalSize, &ptr[sourceOffset]);
         glBindBuffer(m_target, 0);
     }
 }

@@ -16,17 +16,23 @@ namespace XE {
         /**
          * @brief Get the size of the buffer, in bytes.
          */
-        virtual int getSize() const = 0;
+        virtual std::size_t getSize() const = 0;
 
         /**
          * @brief Read the buffer data into a user-defined memory region.
          */
-        virtual void read(std::byte* destination, const int size = 0, const int offset = 0, const int destinationOffset = 0) const = 0;
+        virtual void read(void* destination,
+                          const std::size_t size = 0,
+                          const std::size_t offset = 0,
+                          const std::size_t destinationOffset = 0) const = 0;
 
         /**
          * @brief Write a user-defined memory region to the buffer
          */
-        virtual void write(const std::byte *source, const int size = 0, const int offset = 0, const int sourceOffset = 0) = 0;
+        virtual void write(const void *source,
+                           const std::size_t = 0,
+                           const std::size_t offset = 0,
+                           const std::size_t sourceOffset = 0) = 0;
     };
 }
 

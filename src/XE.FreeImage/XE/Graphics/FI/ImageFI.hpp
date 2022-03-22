@@ -12,7 +12,7 @@ namespace XE {
     public:
         virtual ~ImageFI();
 
-        virtual std::byte* GetPointer() const = 0;
+        virtual void* GetPointer() const = 0;
 
         virtual PixelFormat GetFormat() const = 0;
 
