@@ -20,16 +20,13 @@
 #include <XE/Graphics/TextureCubeMap.h>
 #include <iostream>
 
-#include <glbinding-aux/debug.h>
-
 namespace XE {
     GraphicsDeviceGL::GraphicsDeviceGL(GraphicsContext *context) : context(context) {
         assert(context);
 
         std::cout << "[GL] Loading OpenGL Extensions ..." << std::endl;
 
-        glbinding::initialize(context->getProcAddressFunctionGL());
-        glbinding::aux::enableGetErrorCallback();
+        gladLoadGL();
     }
 
 
@@ -102,7 +99,7 @@ namespace XE {
     }
 
     void GraphicsDeviceGL::beginFrame(const ClearFlags flags, const Vector4f &color, const float depth, const int stencil) {
-        gl::ClearBufferMask clearFlagsGL = gl::ClearBufferMask{0};
+        GLenum clearFlagsGL = 0;
         
         if (flags & ClearFlags::Color) {
             clearFlagsGL |= GL_COLOR_BUFFER_BIT;

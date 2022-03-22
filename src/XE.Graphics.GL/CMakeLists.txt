@@ -1,6 +1,4 @@
 
-find_package (glbinding REQUIRED)
-
 set (target "XE.Graphics.GL")
 
 set (sources
@@ -38,8 +36,7 @@ target_include_directories (${target} PUBLIC "include/")
 target_link_libraries (${target} 
 	XE.Core 
 	XE.Graphics 
-	glbinding::glbinding 
-	glbinding::glbinding-aux
+	glad-gl4
 )
 
 if (XE_UNIT_TEST)

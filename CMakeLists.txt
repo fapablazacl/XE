@@ -77,6 +77,7 @@ if (XE_PLUGIN_GL OR XE_PLUGIN_ES2 OR XE_PLUGIN_VULKAN)
 endif ()
 
 if (XE_PLUGIN_GL)
+    add_subdirectory ("dependencies/glad-gl4")
     add_subdirectory ("src/XE.Graphics.GL")
 endif ()
 
@@ -85,6 +86,7 @@ if (XE_PLUGIN_GL_GLFW)
 endif()
 
 if (XE_PLUGIN_ES2)
+    add_subdirectory ("dependencies/glad-es2")
     add_subdirectory ("src/XE.Graphics.ES2")
 endif()
 

@@ -1,6 +1,4 @@
 
-find_package (glades2 REQUIRED)
-
 set (target "XE.Graphics.ES2")
 
 set (sources
@@ -34,8 +32,8 @@ add_library (${target} ${sources})
 
 target_link_libraries (${target} 
 	XE.Core 
-	XE.Graphics 
-	glades2
+	XE.Graphics
+	glad-es2
 )
 
 target_include_directories (${target} PUBLIC "include/")

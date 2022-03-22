@@ -104,17 +104,9 @@ CATCH2_BUILD_DIR="$BUILD_PREFIX/$TOOLCHAIN/Catch2/$BUILD_TYPE"
 CATCH2_SOURCE_DIR="$SOURCE_PREFIX/Catch2"
 CATCH2_INSTALL_PREFIX="$INSTALL_PREFIX/$TOOLCHAIN/Catch2"
 
-GLADES_BUILD_DIR="$BUILD_PREFIX/$TOOLCHAIN/glades2/$BUILD_TYPE"
-GLADES_SOURCE_DIR="$SOURCE_PREFIX/glades2"
-GLADES_INSTALL_PREFIX="$INSTALL_PREFIX/$TOOLCHAIN/glades2"
-
 GLFW3_BUILD_DIR="$BUILD_PREFIX/$TOOLCHAIN/glfw/$BUILD_TYPE"
 GLFW3_SOURCE_DIR="$SOURCE_PREFIX/glfw"
 GLFW3_INSTALL_PREFIX="$INSTALL_PREFIX/$TOOLCHAIN/glfw"
-
-GLBINDING_BUILD_DIR="$BUILD_PREFIX/$TOOLCHAIN/glbinding/$BUILD_TYPE"
-GLBINDING_SOURCE_DIR="$SOURCE_PREFIX/glbinding"
-GLBINDING_INSTALL_PREFIX="$INSTALL_PREFIX/$TOOLCHAIN/glbinding"
 
 install_dependencies(){
     # build catch
@@ -133,18 +125,6 @@ install_dependencies(){
     cmake --build $CATCH2_BUILD_DIR
     cmake --install $CATCH2_BUILD_DIR
 
-    # build glades2
-    cmake \
-        -B$GLADES_BUILD_DIR \
-        -S$GLADES_SOURCE_DIR \
-        -G "Unix Makefiles"  \
-        -DCMAKE_OSX_ARCHITECTURES="x86_64;arm64" \
-        -DCMAKE_BUILD_TYPE=$CMAKE_BUILD_TYPE \
-        -DCMAKE_INSTALL_PREFIX=$GLADES_INSTALL_PREFIX
-
-    cmake --build $GLADES_BUILD_DIR
-    cmake --install $GLADES_BUILD_DIR
-
     # build glfw
     cmake \
         -B$GLFW3_BUILD_DIR \
@@ -160,21 +140,6 @@ install_dependencies(){
 
     cmake --build $GLFW3_BUILD_DIR
     cmake --install $GLFW3_BUILD_DIR
-
-    # build glbinding
-    cmake \
-        -B$GLBINDING_BUILD_DIR \
-        -S$GLBINDING_SOURCE_DIR \
-        -G "Unix Makefiles"  \
-        -DCMAKE_OSX_ARCHITECTURES="x86_64;arm64" \
-        -DCMAKE_BUILD_TYPE=$CMAKE_BUILD_TYPE \
-        -DCMAKE_INSTALL_PREFIX=$GLBINDING_INSTALL_PREFIX \
-        -DOPTION_BUILD_EXAMPLES=OFF \
-        -DOPTION_BUILD_TOOLS=OFF \
-        -DBUILD_SHARED_LIBS=OFF
-
-    cmake --build $GLBINDING_BUILD_DIR
-    cmake --install $GLBINDING_BUILD_DIR
 }
 
 
@@ -189,8 +154,6 @@ configure(){
         -DCMAKE_BUILD_TYPE=$CMAKE_BUILD_TYPE \
         -DXE_PLUGIN_GL=ON -DXE_PLUGIN_ES2=ON -DXE_PLUGIN_GL_GLFW=ON -DXE_UNIT_TEST=ON \
         -Dglfw3_DIR="$GLFW3_INSTALL_PREFIX/lib/cmake/glfw3" \
-        -Dglbinding_DIR="$GLBINDING_INSTALL_PREFIX" \
-        -Dglades2_DIR="$GLADES_INSTALL_PREFIX/lib/cmake/glades2" \
         -DCatch2_DIR="$CATCH2_INSTALL_PREFIX/lib/cmake/Catch2"
 }
 
