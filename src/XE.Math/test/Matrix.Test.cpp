@@ -591,59 +591,51 @@ TEST_CASE("Math::Matrix<3, float>", "[Matrix]") {
         REQUIRE(XE::Matrix4f::rotate(2.0f * XE::pi<float>, {0.0f, 0.0f, 1.0f}) == XE::Matrix4f::rotateZ(2.0f * XE::pi<float>));
     }
 
-    // TODO: Compute the correct results
-    //SECTION("createLookAt should create a transform matrix that simulates a standard look-at camera") {
-    //    const auto m1 = XE::Matrix4f::lookAt({0.0f, 0.0f, 1.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f});
-    //    REQUIRE(m1 == XE::Matrix4f::rows({
-    //        XE::Vector4f{1.0f, 0.0f, 0.0f, 0.0f},
-    //        XE::Vector4f{0.0f, 1.0f, 0.0f, 0.0f},
-    //        XE::Vector4f{0.0f, 0.0f, 1.0f, 0.0f},
-    //        XE::Vector4f{0.0f, 0.0f, -1.0f, 1.0f}
-    //    }));
+    
+    SECTION("createLookAt should create a transform matrix that simulates a standard look-at camera") {
+        SECTION("with center at the origin, looking at the -Z Axis, and +Y orientation, should generate an identity matrix") {
+            const auto lookAt = XE::Matrix4f::lookAtRH({0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, -1.0f}, {0.0f, 1.0f, 0.0f});
+            REQUIRE(lookAt == XE::Matrix4f::identity());
+        }
+        
+        SECTION("with center at the origin, looking at the +Z Axis, and +Y orientation, should generate an pseudo identity matrix with some negative unit axis") {
+            const auto lookAt = XE::Matrix4f::lookAtRH({0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f, 0.0f});
+            
+            REQUIRE(lookAt == XE::Matrix4f::rows({
+                XE::Vector4f{ -1.0f, 0.0f, 0.0f, 0.0f },
+                XE::Vector4f{ 0.0f, 1.0f, 0.0f, 0.0f },
+                XE::Vector4f{ 0.0f, 0.0f, -1.0f, 0.0f },
+                XE::Vector4f{ 0.0f, 0.0f, 0.0f, 1.0f }
+            }));
+        }
+        
+        SECTION("with center at the -10 Z, looking at the +Z Axis, and +Y orientation, should generate a translation matrix") {
+            const auto lookAt1 = XE::Matrix4f::lookAtRH({0.0f, 0.0f, 10.0f}, {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f, 0.0f});
+            REQUIRE(lookAt1 == XE::Matrix4f::translate({0.0f, 0.0f, -10.0f}));
+            
+            const auto lookAt2 = XE::Matrix4f::lookAtRH({0.0f, 0.0f, 10.0f}, {0.0f, 0.0f, -1.0f}, {0.0f, 1.0f, 0.0f});
+            REQUIRE(lookAt2 == XE::Matrix4f::translate({0.0f, 0.0f, -10.0f}));
+        }
+    }
 
-    //    const auto m2 = XE::Matrix4f::lookAt({1.0f, 1.0f, 0.0f}, {0.0f, 1.0f, -1.0f}, {0.0f, 1.0f, 0.0f});
-
-    //    const auto m2_computed = XE::transpose(XE::Matrix4f::columns({
-    //        XE::Vector4f{0.707106829f   , 0.0f, -0.707106829f   , -0.707106829f},
-    //        XE::Vector4f{0.0f           , 1.0f, 0.0f            , -1.0f},
-    //        XE::Vector4f{0.707106769f   , 0.0f, 0.707106769f    , -0.707106769f},
-    //        XE::Vector4f{0.0f           , 0.0f, 0.0f            , 1.0f}
-    //    }));
-
-    //    REQUIRE(m2 == m2_computed);
-
-    //    const auto m3 = XE::Matrix4f::lookAt(
-    //        XE::Vector3f{123.34234f, 0.3421123f, -53.663421f},
-    //        XE::Vector3f{23.8337f, 1.0f, 53.36153f},
-    //        XE::Vector3f{0.3121f, 1.56f, 0.2625f}
-    //    );
-    //    
-    //    REQUIRE(m3 == XE::transpose(XE::Matrix4f::rows({
-    //        XE::Vector4f{-0.707828343f, 0.252613336f, -0.659670711f, 51.818592072f},
-    //        XE::Vector4f{0.187970579f, 0.967556715f, 0.168821856f, -14.456184387f},
-    //        XE::Vector4f{0.680915534f, -0.004501780f, -0.732348025f, -123.284477234f},
-    //        XE::Vector4f{0.0f, 0.0f, 0.0f, 1.0f}
-    //    })));
-    //}
-
-    // TODO: Compute proper results to test against
-    //SECTION("createPerspective should create a perspective transformation matrix") {
-    //    const auto m1 = XE::Matrix4f::perspective(radians(60.0f), (320.0f/240.0f), 0.1f, 100.0f);
-    //    REQUIRE(m1 == XE::Matrix4f::rows ({
-    //        XE::Vector4f{1.299038170f, 0.000000000f, 0.000000000f, 0.000000000f},
-    //        XE::Vector4f{0.000000000f, 1.73205090f, 0.000000000f, 0.000000000f},
-    //        XE::Vector4f{0.000000000f, 0.000000000f, -1.002002001f, -0.200200200f},
-    //        XE::Vector4f{0.000000000f, 0.000000000f, -1.000000000f, 1.000000000f}
-    //    }));
-
-    //    const auto m2 = XE::Matrix4f::perspective(radians(120.0f), 1.33333f, 0.1f, 100.0f);
-    //    REQUIRE(m2 == XE::Matrix4f::rows({
-    //        XE::Vector4f{0.433013767f, 0.000000000f, 0.000000000f, 0.000000000f},
-    //        XE::Vector4f{0.000000000f, 0.577350259f, 0.000000000f, 0.000000000f},
-    //        XE::Vector4f{0.000000000f, 0.000000000f, -1.002002001f, -0.200200200f},
-    //        XE::Vector4f{0.000000000f, 0.000000000f, -1.000000000f, 1.000000000f}
-    //    }));
-    //}
+    
+//    SECTION("createPerspective should create a perspective transformation matrix") {
+//        const auto m1 = XE::Matrix4f::perspective(XE::radians(60.0f), (320.0f/240.0f), 0.1f, 100.0f);
+//        REQUIRE(m1 == XE::Matrix4f::rows ({
+//            XE::Vector4f{1.299038170f, 0.000000000f, 0.000000000f, 0.000000000f},
+//            XE::Vector4f{0.000000000f, 1.73205090f, 0.000000000f, 0.000000000f},
+//            XE::Vector4f{0.000000000f, 0.000000000f, -1.002002001f, -0.200200200f},
+//            XE::Vector4f{0.000000000f, 0.000000000f, -1.000000000f, 1.000000000f}
+//        }));
+//
+//        const auto m2 = XE::Matrix4f::perspective(XE::radians(120.0f), 1.33333f, 0.1f, 100.0f);
+//        REQUIRE(m2 == XE::Matrix4f::rows({
+//            XE::Vector4f{0.433013767f, 0.000000000f, 0.000000000f, 0.000000000f},
+//            XE::Vector4f{0.000000000f, 0.577350259f, 0.000000000f, 0.000000000f},
+//            XE::Vector4f{0.000000000f, 0.000000000f, -1.002002001f, -0.200200200f},
+//            XE::Vector4f{0.000000000f, 0.000000000f, -1.000000000f, 1.000000000f}
+//        }));
+//    }
 
     SECTION("createOrthographic should create a orthographic transformation matrix") {
         const auto m1 = XE::Matrix4f::orthographic({-1.0f, -1.0f, -1.0f}, {1.0f, 1.0f, 1.0f});

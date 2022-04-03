@@ -21,12 +21,68 @@
 #include <iostream>
 
 namespace XE {
+    std::string hexstr(const GLenum value) {
+        std::string str;
+        
+        str.resize(16, ' ');
+        std::sprintf(str.data(), "%x", value);
+        
+        return str;
+    }
+    
+    std::string stringval(const GLenum err) {
+        switch (err) {
+        case GL_INVALID_ENUM: return "GL_INVALID_ENUM";
+        case GL_INVALID_VALUE: return "GL_INVALID_VALUE";
+        case GL_INVALID_OPERATION: return "GL_INVALID_OPERATION";
+        case GL_STACK_OVERFLOW: return "GL_STACK_OVERFLOW";
+        case GL_STACK_UNDERFLOW: return "GL_STACK_UNDERFLOW";
+        case GL_OUT_OF_MEMORY: return "GL_OUT_OF_MEMORY";
+        case GL_INVALID_FRAMEBUFFER_OPERATION: return "GL_INVALID_FRAMEBUFFER_OPERATION";
+        case GL_CONTEXT_LOST: return "GL_CONTEXT_LOST";
+            
+#if defined(GL_TABLE_TOO_LARGE)
+        case GL_TABLE_TOO_LARGE: return "GL_TABLE_TOO_LARGE";
+#endif
+            
+        default:
+            return "UNNOWN_ERR_CODE_" + hexstr(err);
+        }
+    }
+    
+    
+    void GraphicsDeviceGL_callback(const char *name, void *funcptr, int len_args, ...) {
+        if (std::string(name) == "glGetError") {
+            return;
+        }
+        
+        GLenum err = glGetError();
+        
+        if (err != GL_NO_ERROR) {
+            std::cerr << "GraphicsDeviceGL: Error while calling function " << name << std::endl;
+            std::cerr << "GraphicsDeviceGL: Errors generated:" << std::endl;
+            
+            while (err != GL_NO_ERROR) {
+                std::cerr << "GraphicsDeviceGL:" << stringval(err) << std::endl;
+                err = glGetError();
+            }
+            
+            throw std::runtime_error("GraphicsDeviceGL: Error while calling function " + std::string(name));
+        }
+    }
+    
+    
     GraphicsDeviceGL::GraphicsDeviceGL(GraphicsContext *context) : context(context) {
         assert(context);
 
         std::cout << "[GL] Loading OpenGL Extensions ..." << std::endl;
 
         gladLoadGL();
+        
+#ifndef NDEBUG
+        glad_set_post_callback_gl(GraphicsDeviceGL_callback);
+        glad_set_post_callback(GraphicsDeviceGL_callback);
+#endif
     }
 
 
@@ -294,7 +350,7 @@ namespace XE {
                 }
             }
 
-            offset += ComputeByteSize(current->type) * countElements(current->shape) * current->count;
+            offset += bytesize(current->type) * countElements(current->shape) * current->count;
         }
     }
 
@@ -349,7 +405,7 @@ namespace XE {
                 assert(false && "Supplied DataType isn't supported");
             }
 
-            offset += ComputeByteSize(current->type) * countElements(current->dimension) * current->count;
+            offset += bytesize(current->type) * elementcount(current->dimension) * current->count;
         }
     }
 

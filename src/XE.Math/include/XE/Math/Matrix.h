@@ -342,7 +342,7 @@ namespace XE {
             }
         }
 
-        static auto lookAt(const Vector<T, 3> &Eye, const Vector<T, 3> &At, const Vector<T, 3> &Up) {
+        static auto lookAtRH(const Vector<T, 3> &Eye, const Vector<T, 3> &At, const Vector<T, 3> &Up) {
             if constexpr (C==4 && R==4) {
                 const auto forward = normalize(At - Eye);
                 const auto side = normalize(cross(forward, Up));

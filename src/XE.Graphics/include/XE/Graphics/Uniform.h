@@ -47,7 +47,7 @@ namespace XE {
     };
 
     
-    inline int countElements(const UniformDimension dim) {
+    inline int elementcount(const UniformDimension dim) {
         switch (dim) {
             case UniformDimension::D1: return 1;
             case UniformDimension::D2: return 2;

@@ -317,7 +317,7 @@ namespace XE {
                 assert(false);
             }
 
-            offset += ComputeByteSize(current->type) * countElements(current->shape) * current->count;
+            offset += bytesize(current->type) * countElements(current->shape) * current->count;
         }
 
         XE_GRAPHICS_GL_CHECK_ERROR();
@@ -364,7 +364,7 @@ namespace XE {
                 assert(false);
             }
 
-            offset += ComputeByteSize(current->type) * countElements(current->dimension) * current->count;
+            offset += bytesize(current->type) * elementcount(current->dimension) * current->count;
         }
 
         XE_GRAPHICS_GL_CHECK_ERROR();

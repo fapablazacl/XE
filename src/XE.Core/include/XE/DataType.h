@@ -22,7 +22,7 @@ namespace XE {
         MetaCount
     };
 
-    extern int ComputeByteSize(const DataType dataType);
+    extern int bytesize(const DataType dataType);
 }
 
 #endif

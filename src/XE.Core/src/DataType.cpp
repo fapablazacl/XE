@@ -2,7 +2,7 @@
 #include <XE/DataType.h>
 
 namespace XE {
-    int ComputeByteSize(DataType dataType)  {
+    int bytesize(DataType dataType)  {
         switch (dataType) {
             case DataType::UInt8:
             case DataType::Int8:
