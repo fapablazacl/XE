@@ -109,7 +109,7 @@ namespace XE {
             Vector<T, C> result;
             
             for (int j=0; j<C; j++) {
-                result.data[j] = (*this)(i, j);
+                result.values[j] = (*this)(i, j);
             }
             
             return result;
@@ -122,7 +122,7 @@ namespace XE {
             Vector<T, R> result;
             
             for (int i=0; i<R; i++) {
-                result.data[i] = (*this)(i, j);
+                result.values[i] = (*this)(i, j);
             }
             
             return result;

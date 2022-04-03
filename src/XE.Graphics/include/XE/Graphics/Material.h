@@ -76,7 +76,7 @@ namespace XE {
     struct MaterialRenderState {
         bool depthTest = true;
         bool stencilTest = false;
-        bool cullBackFace = true;
+        bool cullBackFace = false;
         bool blendEnable = false;
 
         BlendParam blendSource = BlendParam::One;

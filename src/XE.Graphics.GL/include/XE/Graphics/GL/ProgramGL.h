@@ -32,7 +32,7 @@ namespace XE {
         }
 
     public:
-        int getUniformLoction(const std::string &name) const;
+        int getUniformLocation(const std::string &name) const;
 
         int getAttributeLocation(const std::string &name) const;
 

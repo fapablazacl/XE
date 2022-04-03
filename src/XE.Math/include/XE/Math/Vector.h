@@ -11,13 +11,13 @@
 namespace XE {
     template<typename T, int N>
     struct VectorBase {
-        T data[N];
+        T values[N];
     };
 
     template<typename T>
     struct VectorBase<T, 2> {
         union {
-            T data[2];
+            T values[2];
             struct {T X, Y; };
         };
 
@@ -34,7 +34,7 @@ namespace XE {
     template<typename T>
     struct VectorBase<T, 3> {
         union {
-            T data[3];
+            T values[3];
             struct {T X, Y, Z; };
         };
 
@@ -64,7 +64,7 @@ namespace XE {
     template<typename T>
     struct VectorBase<T, 4> {
         union {
-            T data[4];
+            T values[4];
             struct {T X, Y, Z, W; };
         };
 
@@ -162,12 +162,20 @@ namespace XE {
 
         bool operator!= (const Vector<T, N>& rhs) const;
 
+        T* data() {
+            return &this->values[0];
+        }
+        
+        const T* data() const {
+            return &this->values[0];
+        }
+        
         T& operator[] (const int index) {
-            return this->data[index];
+            return this->values[index];
         }
 
         const T operator[] (const int index) const {
-            return this->data[index];
+            return this->values[index];
         }
 
         inline friend Vector<T, N> operator* (const T s, const Vector<T, N>& v) {
@@ -179,7 +187,7 @@ namespace XE {
             Vector<T2, N> result;
 
             for (int i=0; i<N; i++) {
-                result.data[i] = static_cast<T2>(this->data[i]);
+                result.values[i] = static_cast<T2>(this->values[i]);
             }
 
             return result;
@@ -190,7 +198,7 @@ namespace XE {
             Vector<T2, N> result;
 
             for (int i=0; i<N; i++) {
-                result.data[i] = static_cast<T2>(this->data[i]);
+                result.values[i] = static_cast<T2>(this->values[i]);
             }
 
             return result;
@@ -202,7 +210,7 @@ namespace XE {
         T sum = T(0);
 
         for (int i=0; i<N; i++) {
-            sum += v1.data[i]*v2.data[i];
+            sum += v1.values[i] * v2.values[i];
         }
 
         return sum;
@@ -296,7 +304,7 @@ namespace XE {
         assert(values);
 
         for (int i=0; i<N; i++) {
-            this->data[i] = values[i];
+            this->values[i] = values[i];
         }
     }
 
@@ -315,7 +323,7 @@ namespace XE {
         Vector<T, N> result;
 
         for (int i=0; i<N; i++) {
-            result.data[i] = -this->data[i];
+            result.values[i] = -this->values[i];
         }
 
         return result;
@@ -326,7 +334,7 @@ namespace XE {
         Vector<T, N> result;
 
         for (int i=0; i<N; i++) {
-            result.data[i] = this->data[i] + rhs.data[i];
+            result.values[i] = this->values[i] + rhs.values[i];
         }
 
         return result;
@@ -337,7 +345,7 @@ namespace XE {
         Vector<T, N> result;
 
         for (int i=0; i<N; i++) {
-            result.data[i] = this->data[i] - rhs.data[i];
+            result.values[i] = this->values[i] - rhs.values[i];
         }
 
         return result;
@@ -348,7 +356,7 @@ namespace XE {
         Vector<T, N> result;
 
         for (int i=0; i<N; i++) {
-            result.data[i] = this->data[i] * rhs.data[i];
+            result.values[i] = this->values[i] * rhs.values[i];
         }
 
         return result;
@@ -370,7 +378,7 @@ namespace XE {
         Vector<T, N> result;
 
         for (int i=0; i<N; i++) {
-            result.data[i] = this->data[i] * rhs;
+            result.values[i] = this->values[i] * rhs;
         }
 
         return result;
@@ -381,7 +389,7 @@ namespace XE {
         Vector<T, N> result;
 
         for (int i=0; i<N; i++) {
-            result.data[i] = this->data[i] / rhs;
+            result.values[i] = this->values[i] / rhs;
         }
 
         return result;
@@ -390,7 +398,7 @@ namespace XE {
     template<typename T, int N>
     Vector<T, N>& Vector<T, N>::operator+= (const Vector<T, N>& rhs) {
         for (int i=0; i<N; i++) {
-            this->data[i] += rhs.data[i];
+            this->values[i] += rhs.values[i];
         }
 
         return *this;
@@ -399,7 +407,7 @@ namespace XE {
     template<typename T, int N>
     Vector<T, N>& Vector<T, N>::operator-= (const Vector<T, N>& rhs) {
         for (int i=0; i<N; i++) {
-            this->data[i] -= rhs.data[i];
+            this->values[i] -= rhs.values[i];
         }
         
         return *this;
@@ -426,7 +434,7 @@ namespace XE {
     template<typename T, int N>
     Vector<T, N>& Vector<T, N>::operator*= (const T rhs) {
         for (int i=0; i<N; i++) {
-            this->data[i] *= rhs;
+            this->values[i] *= rhs;
         }
         
         return *this;

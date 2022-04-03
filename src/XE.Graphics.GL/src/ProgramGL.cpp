@@ -58,7 +58,7 @@ namespace XE {
         return m_shaders[index].get();
     }
 
-    int ProgramGL::getUniformLoction(const std::string &name) const {
+    int ProgramGL::getUniformLocation(const std::string &name) const {
         return glGetUniformLocation(m_id, name.c_str());
     }
 
