@@ -25,13 +25,13 @@ namespace XE {
 
     //! Converts Degrees to Radians.
     template<typename T>
-    inline T radians(const T degrees) {
+    constexpr T radians(const T degrees) {
         return degrees * pi<T> / static_cast<T>(180);
     }
 
     //! Converts Radians to Degrees
     template<typename T>
-    inline T degrees(const T radians) {
+    constexpr T degrees(const T radians) {
         return radians * static_cast<T>(180) / pi<T>;
     }
 

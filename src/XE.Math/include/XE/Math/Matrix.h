@@ -7,6 +7,7 @@
 #include <array>
 #include <ostream>
 #include <iomanip>
+#include <cassert>
 
 #include "Vector.h"
 
@@ -253,7 +254,7 @@ namespace XE {
         static auto translate(const Vector<T, R> &displace) {
             auto result = Matrix<T, R, C>::identity();
             
-            result.setRow(R - 1, displace);
+            result.setColumn(R - 1, displace);
             
             return result;
         }
@@ -341,53 +342,42 @@ namespace XE {
                 return XE::transpose(result);
             }
         }
-
-        static auto lookAtRH(const Vector<T, 3> &Eye, const Vector<T, 3> &At, const Vector<T, 3> &Up) {
+        
+        
+        static auto lookAtRH(const Vector<T, 3> &eye, const Vector<T, 3> &at, const Vector<T, 3> &up) {
             if constexpr (C==4 && R==4) {
-                const auto forward = normalize(At - Eye);
-                const auto side = normalize(cross(forward, Up));
-                const auto up = cross(side, forward);
+                const auto zaxis = normalize(at - eye);
+                const auto xaxis = normalize(cross(zaxis, up));
+                const auto yaxis = cross(xaxis, zaxis);
                 
-                auto result = Matrix<T, 4, 4>::identity();
-                
-                result(0, 0) = side.X;
-                result(0, 1) = side.Y;
-                result(0, 2) = side.Z;
-                
-                result(1, 0) = up.X;
-                result(1, 1) = up.Y;
-                result(1, 2) = up.Z;
-            
-                result(2, 0) = -forward.X;
-                result(2, 1) = -forward.Y;
-                result(2, 2) = -forward.Z;
-                
-                result = Matrix<T, 4, 4>::translate(-Eye) * result;
-                
-                return result;
+                return Matrix<T, 4, 4>::rows({
+                    Vector<T, 4> {xaxis.X, xaxis.Y, xaxis.Z, -dot(xaxis, eye)},
+                    Vector<T, 4> {yaxis.X, yaxis.Y, yaxis.Z, -dot(yaxis, eye)},
+                    Vector<T, 4> {-zaxis.X, -zaxis.Y, -zaxis.Z, -dot(zaxis, eye)},
+                    Vector<T, 4> {T(0), T(0), T(0), T(1)},
+                });
             }
         }
 
 
         static auto perspective(const T fov_radians, const T aspect, const T znear, const T zfar) {
             if constexpr (C==4 && R==4) {
-                assert(fov_radians > static_cast<T>(0));
-                assert(aspect > static_cast<T>(0));
-                assert(znear > static_cast<T>(0));
-
-                const T f = static_cast<T>(1) / std::tan(fov_radians / static_cast<T>(2));
+                assert(fov_radians > T(0));
+                assert(aspect > T(0));
+                assert(znear > T(0));
+                assert(zfar > znear);
+                
+                const T half_fov = fov_radians / T(2);
+                const T f = T(1) / std::tan(half_fov);
                 const T zdiff = znear - zfar;
-
-                auto result = Matrix<T, 4, 4>::identity();
+                const T a = aspect;
                 
-                result(0, 0) = f / aspect;
-                result(1, 1) = f;
-                result(2, 2) = (zfar + znear) / zdiff;
-
-                result(2, 3) = static_cast<T>(-1);
-                result(3, 2) = (static_cast<T>(2)*znear * zfar) / zdiff;
-                
-                return result;
+                return Matrix<T, 4, 4>::rows({
+                    Vector<T, 4>{f / a, T(0),   T(0),                   T(0)},
+                    Vector<T, 4>{T(0),  f,      T(0),                   T(0)},
+                    Vector<T, 4>{T(0),  T(0),   (zfar + znear) / zdiff, (T(2) * zfar * znear) / zdiff},
+                    Vector<T, 4>{T(0),  T(0),   T(-1),                  T(0)}
+                });
             }
         }
         

@@ -5,6 +5,36 @@
 #include <XE/Math/Vector.h>
 #include <XE/Math/Matrix.h>
 
+
+TEST_CASE("Math::Matrix", "[Matrix]") {
+    SECTION("should have row-major order") {
+        const auto matA = XE::Matrix4f::rows({
+            XE::Vector4f{1.0f, 2.0f, 1.0f, 0.0f},
+            XE::Vector4f{2.0f, 1.0f, -3.0f, -1.0f},
+            XE::Vector4f{-3.0f, 2.0f, 1.0f, 0.0f},
+            XE::Vector4f{2.0f, -1.0f, 0.0f, -1.0f}
+        });
+        
+        REQUIRE(matA.data()[0] == 1.0f);
+        REQUIRE(matA.data()[1] == 2.0f);
+        REQUIRE(matA.data()[2] == 1.0f);
+        REQUIRE(matA.data()[3] == 0.0f);
+        REQUIRE(matA.data()[4] == 2.0f);
+        REQUIRE(matA.data()[5] == 1.0f);
+        REQUIRE(matA.data()[6] == -3.0f);
+        REQUIRE(matA.data()[7] == -1.0f);
+        REQUIRE(matA.data()[8] == -3.0f);
+        REQUIRE(matA.data()[9] == 2.0f);
+        REQUIRE(matA.data()[10] == 1.0f);
+        REQUIRE(matA.data()[11] == 0.0f);
+        REQUIRE(matA.data()[12] == 2.0f);
+        REQUIRE(matA.data()[13] == -1.0f);
+        REQUIRE(matA.data()[14] == 0.0f);
+        REQUIRE(matA.data()[15] == -1.0f);
+    }
+}
+
+
 TEST_CASE("Math::Matrix<3, float>", "[Matrix]") {
     SECTION("Determinant should compute the matrix determinant correctly") {
         const auto matA = XE::Matrix4f::rows({
@@ -456,26 +486,26 @@ TEST_CASE("Math::Matrix<3, float>", "[Matrix]") {
     
     SECTION("createTranslation static function should create a valid translate matrix") {
         const auto m1 = XE::Matrix4f::translate({2.0f, 3.0f, 4.0f, 1.0f});
-        REQUIRE(m1.getRow(0) == XE::Vector4f{1.0f, 0.0f, 0.0f, 0.0f});
-        REQUIRE(m1.getRow(1) == XE::Vector4f{0.0f, 1.0f, 0.0f, 0.0f});
-        REQUIRE(m1.getRow(2) == XE::Vector4f{0.0f, 0.0f, 1.0f, 0.0f});
-        REQUIRE(m1.getRow(3) == XE::Vector4f{2.0f, 3.0f, 4.0f, 1.0f});
+        REQUIRE(m1.getColumn(0) == XE::Vector4f{1.0f, 0.0f, 0.0f, 0.0f});
+        REQUIRE(m1.getColumn(1) == XE::Vector4f{0.0f, 1.0f, 0.0f, 0.0f});
+        REQUIRE(m1.getColumn(2) == XE::Vector4f{0.0f, 0.0f, 1.0f, 0.0f});
+        REQUIRE(m1.getColumn(3) == XE::Vector4f{2.0f, 3.0f, 4.0f, 1.0f});
 
         const auto m2 = XE::Matrix4f::translate({2.0f, -3.0f, 4.0f});
-        REQUIRE(m2.getRow(0) == XE::Vector4f{1.0f, 0.0f, 0.0f, 0.0f});
-        REQUIRE(m2.getRow(1) == XE::Vector4f{0.0f, 1.0f, 0.0f, 0.0f});
-        REQUIRE(m2.getRow(2) == XE::Vector4f{0.0f, 0.0f, 1.0f, 0.0f});
-        REQUIRE(m2.getRow(3) == XE::Vector4f{2.0f, -3.0f, 4.0f, 1.0f});
+        REQUIRE(m2.getColumn(0) == XE::Vector4f{1.0f, 0.0f, 0.0f, 0.0f});
+        REQUIRE(m2.getColumn(1) == XE::Vector4f{0.0f, 1.0f, 0.0f, 0.0f});
+        REQUIRE(m2.getColumn(2) == XE::Vector4f{0.0f, 0.0f, 1.0f, 0.0f});
+        REQUIRE(m2.getColumn(3) == XE::Vector4f{2.0f, -3.0f, 4.0f, 1.0f});
 
-        REQUIRE(XE::Vector4f{0.0f, 0.0f, 0.0f, 0.0f} * m1 == XE::Vector4f{0.0f, 0.0f, 0.0f, 0.0f});
-        REQUIRE(XE::Vector4f{2.0f, -2.0f, 1.0f, 1.0f} * m1 == XE::Vector4f{4.0f, 1.0f, 5.0f, 1.0f});
-        REQUIRE(XE::Vector4f{1.0f, 0.0f, 1.0f, 1.0f} * m1 == XE::Vector4f{3.0f, 3.0f, 5.0f, 1.0f});
-        REQUIRE(XE::Vector4f{1.0f, 1.0f, 1.0f, 1.0f} * m2 == XE::Vector4f{3.0f, -2.0f, 5.0f, 1.0f});
-        REQUIRE(XE::Vector4f{0.0f, 0.0f, 0.0f, 1.0f} * m2 == XE::Vector4f{2.0f, -3.0f, 4.0f, 1.0f});
+        REQUIRE(m1 * XE::Vector4f{0.0f, 0.0f, 0.0f, 0.0f} == XE::Vector4f{0.0f, 0.0f, 0.0f, 0.0f});
+        REQUIRE(m1 * XE::Vector4f{2.0f, -2.0f, 1.0f, 1.0f} == XE::Vector4f{4.0f, 1.0f, 5.0f, 1.0f});
+        REQUIRE(m1 * XE::Vector4f{1.0f, 0.0f, 1.0f, 1.0f} == XE::Vector4f{3.0f, 3.0f, 5.0f, 1.0f});
+        REQUIRE(m2 * XE::Vector4f{1.0f, 1.0f, 1.0f, 1.0f} == XE::Vector4f{3.0f, -2.0f, 5.0f, 1.0f});
+        REQUIRE(m2 * XE::Vector4f{0.0f, 0.0f, 0.0f, 1.0f} == XE::Vector4f{2.0f, -3.0f, 4.0f, 1.0f});
 
-        REQUIRE(XE::Vector4f{2.0f, -2.0f, 1.0f, 0.0f} * m1 == XE::Vector4f{2.0f, -2.0f, 1.0f, 0.0f});
-        REQUIRE(XE::Vector4f{1.0f, 0.0f, 1.0f, 0.0f} * m1 == XE::Vector4f{1.0f, 0.0f, 1.0f, 0.0f});
-        REQUIRE(XE::Vector4f{1.0f, 1.0f, 1.0f, 0.0f} * m2 == XE::Vector4f{1.0f, 1.0f, 1.0f, 0.0f});
+        REQUIRE(m1 * XE::Vector4f{2.0f, -2.0f, 1.0f, 0.0f} == XE::Vector4f{2.0f, -2.0f, 1.0f, 0.0f});
+        REQUIRE(m1 * XE::Vector4f{1.0f, 0.0f, 1.0f, 0.0f} == XE::Vector4f{1.0f, 0.0f, 1.0f, 0.0f});
+        REQUIRE(m2 * XE::Vector4f{1.0f, 1.0f, 1.0f, 0.0f} == XE::Vector4f{1.0f, 1.0f, 1.0f, 0.0f});
     }
         
     SECTION("rotateX static function should create a well-constructed rotation matrix") {
@@ -590,9 +620,9 @@ TEST_CASE("Math::Matrix<3, float>", "[Matrix]") {
         REQUIRE(XE::Matrix4f::rotate(1.5f * XE::pi<float>, {0.0f, 0.0f, 1.0f}) == XE::Matrix4f::rotateZ(1.5f * XE::pi<float>));
         REQUIRE(XE::Matrix4f::rotate(2.0f * XE::pi<float>, {0.0f, 0.0f, 1.0f}) == XE::Matrix4f::rotateZ(2.0f * XE::pi<float>));
     }
-
     
-    SECTION("createLookAt should create a transform matrix that simulates a standard look-at camera") {
+    
+    SECTION("lookAtRH should create a transform matrix that simulates a standard look-at camera") {
         SECTION("with center at the origin, looking at the -Z Axis, and +Y orientation, should generate an identity matrix") {
             const auto lookAt = XE::Matrix4f::lookAtRH({0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, -1.0f}, {0.0f, 1.0f, 0.0f});
             REQUIRE(lookAt == XE::Matrix4f::identity());
@@ -611,32 +641,33 @@ TEST_CASE("Math::Matrix<3, float>", "[Matrix]") {
         
         SECTION("with center at the -10 Z, looking at the +Z Axis, and +Y orientation, should generate a translation matrix") {
             const auto lookAt1 = XE::Matrix4f::lookAtRH({0.0f, 0.0f, 10.0f}, {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f, 0.0f});
-            REQUIRE(lookAt1 == XE::Matrix4f::translate({0.0f, 0.0f, -10.0f}));
+            REQUIRE(lookAt1 == XE::Matrix4f::translate({0.0f, 0.0f, 10.0f}));
             
             const auto lookAt2 = XE::Matrix4f::lookAtRH({0.0f, 0.0f, 10.0f}, {0.0f, 0.0f, -1.0f}, {0.0f, 1.0f, 0.0f});
-            REQUIRE(lookAt2 == XE::Matrix4f::translate({0.0f, 0.0f, -10.0f}));
+            REQUIRE(lookAt2 == XE::Matrix4f::translate({0.0f, 0.0f, 10.0f}));
         }
+    }
+    
+    
+    SECTION("createPerspective should create a perspective transformation matrix") {
+        const auto m1 = XE::Matrix4f::perspective(XE::radians(60.0f), (320.0f/240.0f), 0.1f, 100.0f);
+        REQUIRE(m1 == XE::Matrix4f::rows ({
+            XE::Vector4f{1.299038170f, 0.000000000f, 0.000000000f, 0.000000000f},
+            XE::Vector4f{0.000000000f, 1.73205090f, 0.000000000f, 0.000000000f},
+            XE::Vector4f{0.000000000f, 0.000000000f, -1.002002001f, -0.200200200f},
+            XE::Vector4f{0.000000000f, 0.000000000f, -1.000000000f, 0.000000000f}
+        }));
+
+        const auto m2 = XE::Matrix4f::perspective(XE::radians(120.0f), 1.33333f, 0.1f, 100.0f);
+        REQUIRE(m2 == XE::Matrix4f::rows({
+            XE::Vector4f{0.433013767f, 0.000000000f, 0.000000000f, 0.000000000f},
+            XE::Vector4f{0.000000000f, 0.577350259f, 0.000000000f, 0.000000000f},
+            XE::Vector4f{0.000000000f, 0.000000000f, -1.002002001f, -0.200200200f},
+            XE::Vector4f{0.000000000f, 0.000000000f, -1.000000000f, 0.000000000f}
+        }));
     }
 
     
-//    SECTION("createPerspective should create a perspective transformation matrix") {
-//        const auto m1 = XE::Matrix4f::perspective(XE::radians(60.0f), (320.0f/240.0f), 0.1f, 100.0f);
-//        REQUIRE(m1 == XE::Matrix4f::rows ({
-//            XE::Vector4f{1.299038170f, 0.000000000f, 0.000000000f, 0.000000000f},
-//            XE::Vector4f{0.000000000f, 1.73205090f, 0.000000000f, 0.000000000f},
-//            XE::Vector4f{0.000000000f, 0.000000000f, -1.002002001f, -0.200200200f},
-//            XE::Vector4f{0.000000000f, 0.000000000f, -1.000000000f, 1.000000000f}
-//        }));
-//
-//        const auto m2 = XE::Matrix4f::perspective(XE::radians(120.0f), 1.33333f, 0.1f, 100.0f);
-//        REQUIRE(m2 == XE::Matrix4f::rows({
-//            XE::Vector4f{0.433013767f, 0.000000000f, 0.000000000f, 0.000000000f},
-//            XE::Vector4f{0.000000000f, 0.577350259f, 0.000000000f, 0.000000000f},
-//            XE::Vector4f{0.000000000f, 0.000000000f, -1.002002001f, -0.200200200f},
-//            XE::Vector4f{0.000000000f, 0.000000000f, -1.000000000f, 1.000000000f}
-//        }));
-//    }
-
     SECTION("createOrthographic should create a orthographic transformation matrix") {
         const auto m1 = XE::Matrix4f::orthographic({-1.0f, -1.0f, -1.0f}, {1.0f, 1.0f, 1.0f});
         REQUIRE(m1 == XE::Matrix4f::rows ({
