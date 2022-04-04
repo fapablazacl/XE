@@ -1,7 +1,7 @@
 name: CI Windows
 on: [push]
 jobs:
-  ci-windows-2019-x86_64-vc-debug:
+  build-x86_64-vc:
     runs-on: windows-2019
     steps:
       - name: Checkout Source Code and Submodules
@@ -9,58 +9,33 @@ jobs:
         with:
           submodules: true
 
-      - name: Install Dependencies
+      - name: Install Dependencies (Debug, Release)
         shell: cmd
         run: |
           call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
           PowerShell .\Xenobuild -mode installdeps -toolchain vc -buildType debug
+          PowerShell .\Xenobuild -mode installdeps -toolchain vc -buildType release
 
-      - name: Configure
+      - name: Configure [Debug]
         shell: cmd
         run: |
           call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
           PowerShell .\Xenobuild -mode configure -toolchain vc -buildType debug
 
-      - name: Build
+      - name: Build [Debug]
         shell: cmd
         run: |
           call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
           cmake --build build/vc/debug
 
-      - name: Run Unit Tests
-        shell: cmd
-        run: |
-          call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
-          cmake --build build/vc/debug --target test
-
-  ci-windows-2019-x86_64-vc-release:
-    runs-on: windows-2019
-    steps:
-      - name: Checkout Source Code and Submodules
-        uses: actions/checkout@v2
-        with:
-          submodules: true
-
-      - name: Install Dependencies
-        shell: cmd
-        run: |
-          call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
-          PowerShell .\Xenobuild -mode installdeps -toolchain vc -buildType release
-
-      - name: Configure
+      - name: Configure [Release]
         shell: cmd
         run: |
           call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
           PowerShell .\Xenobuild -mode configure -toolchain vc -buildType release
 
-      - name: Build
+      - name: Build [Release]
         shell: cmd
         run: |
           call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
           cmake --build build/vc/release
-
-      - name: Run Unit Tests
-        shell: cmd
-        run: |
-          call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
-          cmake --build build/vc/release --target test
