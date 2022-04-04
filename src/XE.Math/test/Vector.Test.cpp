@@ -13,9 +13,9 @@ TEST_CASE("XE::Vector<3, float>", "[Vector]") {
         REQUIRE(v.Y == 2.0f);
         REQUIRE(v.Z == 3.0f);
 
-        REQUIRE(v.data[0] == 1.0f);
-        REQUIRE(v.data[1] == 2.0f);
-        REQUIRE(v.data[2] == 3.0f);
+        REQUIRE(v.values[0] == 1.0f);
+        REQUIRE(v.values[1] == 2.0f);
+        REQUIRE(v.values[2] == 3.0f);
 
         REQUIRE(v[0] == 1.0f);
         REQUIRE(v[1] == 2.0f);
@@ -39,8 +39,7 @@ TEST_CASE("XE::Vector<3, float>", "[Vector]") {
     SECTION("operator+ should add component-wise.") {
         const XE::Vector3f v1 = {1.0f, -2.0f, 3.0f};
         const XE::Vector3f v2 = {-2.0f, -1.0f, -2.0f};
-        const XE::Vector3f v3 = {0.0f, 1.0f, -1.0f};
-
+        
         REQUIRE((v2 + v1) == XE::Vector3f{-1.0f, -3.0f, 1.0f});
         REQUIRE((v1 + v2) == XE::Vector3f{-1.0f, -3.0f, 1.0f});
         REQUIRE(v1 == +v1);

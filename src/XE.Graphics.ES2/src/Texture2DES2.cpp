@@ -40,14 +40,5 @@ namespace XE {
     
 
     void Texture2DES::getData(void *surfaceData, const int mipLevel, const PixelFormat surfaceFormat, const DataType surfaceDataType) const {
-        const GLenum formatGL = convertToES(surfaceFormat);
-        const GLenum dataTypeGL = convertToES(surfaceDataType);
-
-        glBindTexture(GL_TEXTURE_2D, m_id);
-        /*glGetTexImage(GL_TEXTURE_2D, mipLevel, formatGL, dataTypeGL, surfaceData);*/
-        // return false;
-        glBindTexture(GL_TEXTURE_2D, 0);
-
-        XE_GRAPHICS_GL_CHECK_ERROR();
     }
 }

@@ -103,7 +103,7 @@ namespace XE {
         auto indexBuffer = subsetES->getIndexBuffer();
 
         if (!indexBuffer) {
-            for (int i=0; i<envelopeCount; i++) {
+            for (size_t i=0; i<envelopeCount; i++) {
                 const SubsetEnvelope &env = envelopes[i];
                 const GLenum primitiveGL = convertToES(env.primitive);
 
@@ -112,7 +112,7 @@ namespace XE {
         } else {
             const GLenum indexTypeGL = GL_INT;/* convertToES(descriptor.indexType)*/;
 
-            for (int i=0; i<envelopeCount; i++) {
+            for (size_t i=0; i<envelopeCount; i++) {
                 const SubsetEnvelope &env = envelopes[i];
                 const GLenum primitiveGL = convertToES(env.primitive);
 
@@ -295,7 +295,7 @@ namespace XE {
         
         const auto ptr = reinterpret_cast<const std::byte*>(data);
 
-        for (int i=0; i<count; i++) {
+        for (size_t i=0; i<count; i++) {
             const UniformMatrix *current = &uniformMatrix[i];
             const GLint location = m_program->getUniformLoction(current->name);
 
@@ -333,7 +333,7 @@ namespace XE {
         
         size_t offset = 0;
 
-        for (int i=0; i<count; i++) {
+        for (size_t i=0; i<count; i++) {
             const Uniform *current = &uniform[i];
             const GLint location = m_program->getUniformLoction(current->name);
 

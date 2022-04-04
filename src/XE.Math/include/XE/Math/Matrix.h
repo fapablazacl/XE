@@ -47,7 +47,7 @@ namespace XE {
             T* values = data();
 
             for (int i = 0; i < R * C; i++) {
-                values[i] = v.data[i];
+                values[i] = v.values[i];
             }
         }
 
@@ -319,7 +319,6 @@ namespace XE {
                 const T cos = std::cos(rads);
                 const T sin = std::sin(rads);
                 
-                Vector<T, 3> U = axis;
                 Vector<T, 3> V = normalize(axis);
                 
                 const auto c1 = Vector<T, 3>{static_cast<T>(0), -V.Z, V.Y};

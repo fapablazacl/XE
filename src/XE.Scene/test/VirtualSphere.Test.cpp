@@ -25,9 +25,6 @@ TEST_CASE("VirtualSphere accessors should fill its fields properly", "[VirtualSp
 
 TEST_CASE("VirtualSphere computePointAt method should return points lying into the surface of the sphere", "[VirtualSphere]") {
     SECTION("Given virtual spheres with standard sizes") {
-        auto vs1 = XE::VirtualSphere{{640, 480}};
-        auto vs2 = XE::VirtualSphere{{800, 600}};
-
         XE::VirtualSphere spheres[] = {
             {{100, 100}}, 
             {{320, 200}},

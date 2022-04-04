@@ -28,14 +28,7 @@ namespace XE {
 
 
     void BufferES2::read(void* destination, const size_t size, const size_t offset, const size_t destinationOffset) const {
-        // TODO: Not Implemented
-        
-        const size_t finalSize = size ? size : m_size;
-
-        glBindBuffer(m_target, m_id);
-        // glGetBufferSubData(m_target, offset, finalSize, &destination[destinationOffset]);
-        // return false;
-        glBindBuffer(m_target, 0);
+        return;
     }
 
 
