@@ -3,6 +3,8 @@
 #include <XE/Graphics/GL/BufferGL.h>
 #include <XE/Graphics/GL/Conversion.h>
 
+#include <cassert>
+
 
 namespace XE {
     SubsetGL::SubsetGL(const SubsetDescriptor &desc) : descriptor(desc) {
