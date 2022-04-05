@@ -3,6 +3,7 @@ set (target "XE.Graphics.GL")
 
 set (headers
 	"include/XE/Graphics/GL.h"
+	"include/XE/Graphics/GL/glcore.h"
 	"include/XE/Graphics/GL/GraphicsDeviceGL.h"
 	"include/XE/Graphics/GL/TextureBaseGL.h"
 	"include/XE/Graphics/GL/Texture2DGL.h"

@@ -16,7 +16,6 @@ set (sources
 
 add_library(${target} ${sources})
 
+target_precompile_headers(${target} PRIVATE ${headers})
 target_include_directories(${target} PUBLIC "include/")
 target_link_libraries(${target} glfw XE.Core XE.Input XE.Graphics)
-
-# add_subdirectory(demo)

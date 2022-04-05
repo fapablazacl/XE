@@ -1,7 +1,7 @@
 
 set (target XE.Math)
 
-set (sources
+set (headers
     "include/XE/Math.h"
     "include/XE/Math/Common.h"
     "include/XE/Math/Vector.h"
@@ -15,6 +15,10 @@ set (sources
     "include/XE/Math/Sphere.h"
     "include/XE/Math/Triangle.h"
     "include/XE/Math/Ellipsoid.h"
+)
+
+set (sources
+    ${headers}
 )
 
 add_library(${target} INTERFACE)

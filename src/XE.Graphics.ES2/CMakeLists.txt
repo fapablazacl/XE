@@ -9,7 +9,6 @@ set (headers
 	"include/XE/Graphics/ES2/TextureCubeMapES2.h"
 	"include/XE/Graphics/ES2/ShaderES2.h"
 	"include/XE/Graphics/ES2/ProgramES2.h"
-	"include/XE/Graphics/ES2/ProgramES2.h"
 	"include/XE/Graphics/ES2/BufferES2.h"
 	"include/XE/Graphics/ES2/SubsetES2.h"
 	"include/XE/Graphics/ES2/ConversionES.h"

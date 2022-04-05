@@ -2,6 +2,7 @@
 set (target "XE.Graphics")
 
 set (headers 
+	"include/XE/Graphics.h"
 	"include/XE/Graphics/IWindow.h"
 	"include/XE/Graphics/GraphicsDevice.h" 
 	"include/XE/Graphics/BufferDescriptor.h" 
