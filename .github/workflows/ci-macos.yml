@@ -18,6 +18,8 @@ jobs:
         with:
           path: local
           key: dependencies-${{ runner.os }}-appleclang
+          restore-keys: |
+            dependencies-${{ runner.os }}-appleclang
 
       - name: Install Dependencies
         if: steps.cache-dependencies.outputs.cache-hit != 'true'
