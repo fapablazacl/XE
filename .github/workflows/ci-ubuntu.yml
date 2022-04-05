@@ -15,7 +15,17 @@ jobs:
           sudo apt-get upgrade
           sudo apt install xorg-dev 
 
+      - name: Cache Dependencies
+        id: cache-dependencies
+        uses: actions/cache@v3
+        with:
+          path: local
+          key: dependencies-${{ runner.os }}-gcc
+          restore-keys: |
+            dependencies-${{ runner.os }}-gcc
+
       - name: Install Dependencies
+        if: steps.cache-dependencies.outputs.cache-hit != 'true'
         run: |
           sh Xenobuild installdeps gcc debug
           sh Xenobuild installdeps gcc release
@@ -46,7 +56,17 @@ jobs:
           sudo apt-get upgrade
           sudo apt install xorg-dev 
 
+      - name: Cache Dependencies
+        id: cache-dependencies
+        uses: actions/cache@v3
+        with:
+          path: local
+          key: dependencies-${{ runner.os }}-clang
+          restore-keys: |
+            dependencies-${{ runner.os }}-clang
+
       - name: Install Dependencies
+        if: steps.cache-dependencies.outputs.cache-hit != 'true'
         run: |
           sh Xenobuild installdeps clang debug
           sh Xenobuild installdeps clang release
