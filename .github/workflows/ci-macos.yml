@@ -12,7 +12,15 @@ jobs:
       - name: Install OS Dependencies
         run: brew install vulkan-headers
 
+      - name: Cache Dependencies
+        id: cache-dependencies
+        uses: actions/cache@v3
+        with:
+          path: local
+          key: dependencies-${{ runner.os }}-appleclang
+
       - name: Install Dependencies
+        if: steps.cache-dependencies.outputs.cache-hit != 'true'
         run: |
           sh Xenobuild installdeps clang debug
           sh Xenobuild installdeps clang release
