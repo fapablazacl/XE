@@ -9,7 +9,15 @@ jobs:
         with:
           submodules: true
 
+      - name: Cache Dependencies
+        id: cache-dependencies
+        uses: actions/cache@v3
+        with:
+          path: local
+          key: dependencies-${{ runner.os }}-vc
+
       - name: Install Dependencies (Debug, Release)
+        if: steps.cache-dependencies.outputs.cache-hit != 'true'
         shell: cmd
         run: |
           call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
