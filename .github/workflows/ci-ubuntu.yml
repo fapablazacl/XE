@@ -34,13 +34,13 @@ jobs:
         run: sh Xenobuild configure gcc debug
 
       - name: Build [Debug]
-        run: cmake --build build/gcc/debug
+        run: cmake --build build/gcc/debug --parallel 4
 
       - name: Configure [Release]
         run: sh Xenobuild configure gcc release
 
       - name: Build [Release]
-        run: cmake --build build/gcc/release
+        run: cmake --build build/gcc/release --parallel 4
 
   build-x86_64-clang:
     runs-on: ubuntu-latest
@@ -75,10 +75,10 @@ jobs:
         run: sh Xenobuild configure clang debug
 
       - name: Build [Debug]
-        run: cmake --build build/clang/debug
+        run: cmake --build build/clang/debug --parallel 4
 
       - name: Configure [Release]
         run: sh Xenobuild configure clang release
 
       - name: Build [Release]
-        run: cmake --build build/clang/release
+        run: cmake --build build/clang/release --parallel 4
