@@ -15,8 +15,8 @@ jobs:
         with:
           path: local
           key: dependencies-${{ runner.os }}-vc
-          restore-keys:
-            - dependencies-${{ runner.os }}-vc
+          restore-keys: |
+            dependencies-${{ runner.os }}-vc
 
       - name: Install Dependencies (Debug, Release)
         if: steps.cache-dependencies.outputs.cache-hit != 'true'
