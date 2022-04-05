@@ -1,11 +1,14 @@
 
 set (target XE.Graphics.GL.GLFW)
 
-set (sources
+set (headers
     "include/XE/Graphics/GL/GLFW/WindowGLFW.h"
     "include/XE/Graphics/GL/GLFW/GraphicsContextGLFW.h"
     "include/XE/Graphics/GL/GLFW/InputManagerGLFW.h"
+)
 
+set (sources
+    ${headers}
     "src/WindowGLFW.cpp"
     "src/GraphicsContextGLFW.cpp"
     "src/InputManagerGLFW.cpp"    

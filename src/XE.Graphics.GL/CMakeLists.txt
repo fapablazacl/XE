@@ -1,7 +1,7 @@
 
 set (target "XE.Graphics.GL")
 
-set (sources
+set (headers
 	"include/XE/Graphics/GL.h"
 	"include/XE/Graphics/GL/GraphicsDeviceGL.h"
 	"include/XE/Graphics/GL/TextureBaseGL.h"
@@ -15,7 +15,10 @@ set (sources
 	"include/XE/Graphics/GL/SubsetGL.h"
 	"include/XE/Graphics/GL/Conversion.h"
 	"include/XE/Graphics/GL/Util.h"
-	
+)
+
+set (sources
+	${headers}
 	"src/GraphicsDeviceGL.cpp"
 	"src/TextureBaseGL.cpp"
 	"src/Texture2DGL.cpp"
@@ -32,6 +35,7 @@ set (sources
 
 add_library (${target} ${sources})
 
+target_precompile_headers (${target} PRIVATE ${headers})
 target_include_directories (${target} PUBLIC "include/")
 target_link_libraries (${target} 
 	XE.Core 

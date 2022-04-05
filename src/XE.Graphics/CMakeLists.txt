@@ -1,7 +1,7 @@
 
 set (target "XE.Graphics")
 
-set (sources
+set (headers 
 	"include/XE/Graphics/IWindow.h"
 	"include/XE/Graphics/GraphicsDevice.h" 
 	"include/XE/Graphics/BufferDescriptor.h" 
@@ -23,6 +23,10 @@ set (sources
 	"include/XE/Graphics/ImageLoader.h"
 	"include/XE/Graphics/Material.h"
 	"include/XE/Graphics/Viewport.h"
+)
+
+set (sources
+	${headers}
 
 	"src/IWindow.cpp"	
 	"src/GraphicsDevice.cpp"
@@ -43,8 +47,9 @@ set (sources
 
 add_library (${target} ${sources})
 
-target_include_directories(${target} PUBLIC "include/")
-target_link_libraries(${target} XE.Core XE.Math)
+target_precompile_headers (${target} PRIVATE ${headers})
+target_include_directories (${target} PUBLIC "include/")
+target_link_libraries (${target} XE.Core XE.Math)
 
 if (XE_EXAMPLE_DEMO)
 	add_subdirectory(demo)
