@@ -31,7 +31,7 @@ namespace XE {
         return;
     }
 
-
+    
     void BufferES2::write(const void *source, const size_t size, const size_t offset, const size_t sourceOffset) {
         const size_t finalSize = size ? size : m_size;
         const auto ptr = reinterpret_cast<const std::byte*>(source);

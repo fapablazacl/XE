@@ -5,9 +5,7 @@
 #include <cstring>
 
 namespace XE {
-    MemoryStream::MemoryStream(const std::uint8_t *data, const std::size_t size)
-        : m_data(data), m_size(size) {
-        
+    MemoryStream::MemoryStream(std::uint8_t *data, const std::size_t size) : m_data(data), m_size(size) {
         assert(m_data);
         assert(m_size);
     }
@@ -25,8 +23,10 @@ namespace XE {
     }
     
     int MemoryStream::write(const void *buffer, const int size, const int count) {
-        // TODO: Add implementation
-        return 0;
+        std::memcpy(&m_data[m_offset], buffer, static_cast<std::size_t>(size) * count);
+        m_offset += (size * count);
+        
+        return count;
     }
 
     bool MemoryStream::seek(const int offset, const StreamOffset position) {

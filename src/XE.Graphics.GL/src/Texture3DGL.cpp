@@ -3,8 +3,7 @@
 #include <XE/Graphics/GL/Conversion.h>
 
 namespace XE {
-    Texture3DGL::Texture3DGL(const PixelFormat format, const Vector3i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void *sourceData)
-            : TextureBaseGL(GL_TEXTURE_3D) {
+    Texture3DGL::Texture3DGL(const PixelFormat format, const Vector3i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void *sourceData) : TextureBaseGL(GL_TEXTURE_3D) {
 
         m_size = size;
         m_format = format;
@@ -31,7 +30,7 @@ namespace XE {
         glBindTexture(GL_TEXTURE_3D, 0);
     }
     
-    void Texture3DGL::getData(void *surfaceData, const int mipLevel, const PixelFormat surfaceFormat, const DataType surfaceDataType, const Boxi &volume) const {
+    void Texture3DGL::getData(void *surfaceData, const int mipLevel, const PixelFormat surfaceFormat, const DataType surfaceDataType, const Boxi &) const {
         const GLenum formatGL = convertToGL(surfaceFormat);
         const GLenum dataTypeGL = convertToGL(surfaceDataType);
 
