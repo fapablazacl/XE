@@ -1,5 +1,5 @@
 
-#include <catch2/catch_all.hpp>
+#include "Common.h"
 
 #include <XE/Math/Vector.h>
 #include <XE/Math/FormatUtils.h>

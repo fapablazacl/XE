@@ -1,6 +1,6 @@
 
 #include <XE/Math/Rect.h>
-#include <catch2/catch_all.hpp>
+#include "Common.h"
 
 TEST_CASE("Rect") {
     SECTION("XE::equals") {

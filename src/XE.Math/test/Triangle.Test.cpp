@@ -1,6 +1,6 @@
 
 #include <XE/Math/Triangle.h>
-#include <catch2/catch_all.hpp>
+#include "Common.h"
 
 TEST_CASE("Triangle") {
     SECTION("XE::equals") {

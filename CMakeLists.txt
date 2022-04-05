@@ -14,6 +14,7 @@ option (XE_EXAMPLE_QT5RENDERING "Include example program that shows rendering to
 option (XE_EXAMPLE_DEMO         "Include example program that shows a tech demo" OFF)
 option (XE_EXAMPLE_SANDBOX      "Include example program that is used for various development activities" OFF)
 option (XE_UNIT_TEST            "Include unit-test suite" OFF)
+option (XE_WARNINGS_AS_ERRORS   "" OFF)
 
 set (CMAKE_CXX_STANDARD 17)
 set (CMAKE_CXX_STANDARD_REQUIRED ON)

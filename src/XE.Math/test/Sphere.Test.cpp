@@ -1,6 +1,6 @@
 
 #include <XE/Math/Sphere.h>
-#include <catch2/catch_all.hpp>
+#include "Common.h"
 
 TEST_CASE("Sphere") {
     SECTION("XE::equals") {

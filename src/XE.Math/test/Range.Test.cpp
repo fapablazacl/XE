@@ -1,7 +1,7 @@
 
 #include <XE/Math/Range.h>
 #include <iostream>
-#include <catch2/catch_all.hpp>
+#include "Common.h"
 
 TEST_CASE("Range should have a valid state when perform correctly after each kind of operation", "[Range]") {
     XE::Range<float> subject;

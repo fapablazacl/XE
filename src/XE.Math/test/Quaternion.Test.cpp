@@ -2,7 +2,7 @@
 #include <XE/Math/Quaternion.h>
 #include <XE/Math/FormatUtils.h>
 #include <XE/Math/Common.h>
-#include <catch2/catch_all.hpp>
+#include "Common.h"
 
 
 TEST_CASE("Quaternion basic members are initialized properly", "[Quaternion]") {

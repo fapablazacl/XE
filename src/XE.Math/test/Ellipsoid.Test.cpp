@@ -1,6 +1,6 @@
 
 #include <XE/Math/Ellipsoid.h>
-#include <catch2/catch_all.hpp>
+#include "Common.h"
 #include <sstream>
 
 

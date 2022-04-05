@@ -1,6 +1,6 @@
 
 #include <XE/Math/Rotation.h>
-#include <catch2/catch_all.hpp>
+#include "Common.h"
 
 TEST_CASE("Rotation") {
     SECTION("XE::equals") {
