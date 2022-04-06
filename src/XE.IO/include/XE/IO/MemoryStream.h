@@ -10,7 +10,7 @@
 namespace XE {
     class MemoryStream : public Stream {
     public:
-        MemoryStream(const std::uint8_t *data, const std::size_t size);
+        MemoryStream(std::uint8_t *data, const std::size_t size);
         
         virtual ~MemoryStream();
         
@@ -25,8 +25,8 @@ namespace XE {
         virtual StreamFlags getFlags() const override;
         
     private:
-        const std::uint8_t *m_data;
-        const std::size_t m_size;
+        std::uint8_t *m_data = nullptr;
+        const std::size_t m_size ;
         
         int m_offset = 0;
     };

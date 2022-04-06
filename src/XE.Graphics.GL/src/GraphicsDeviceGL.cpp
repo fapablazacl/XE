@@ -51,7 +51,7 @@ namespace XE {
     }
     
     
-    void GraphicsDeviceGL_callback(const char *name, void *funcptr, int len_args, ...) {
+    void GraphicsDeviceGL_callback(const char *name, void *, int , ...) {
         if (std::string(name) == "glGetError") {
             return;
         }

@@ -17,7 +17,7 @@ namespace XE {
          * @brief Get the size of the buffer, in bytes.
          */
         virtual std::size_t getSize() const = 0;
-
+        
         /**
          * @brief Read the buffer data into a user-defined memory region.
          */

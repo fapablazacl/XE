@@ -30,7 +30,7 @@ namespace XE {
         glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
     }
         
-    void Texture2DArrayGL::getData(void *surfaceData, const int mipLevel, const int arrayIndex, const PixelFormat surfaceFormat, const DataType surfaceDataType, const Recti &area) const {
+    void Texture2DArrayGL::getData(void *surfaceData, const int mipLevel, const int, const PixelFormat surfaceFormat, const DataType surfaceDataType, const Recti &) const {
         const GLenum formatGL = convertToGL(surfaceFormat);
         const GLenum dataTypeGL = convertToGL(surfaceDataType);
 
