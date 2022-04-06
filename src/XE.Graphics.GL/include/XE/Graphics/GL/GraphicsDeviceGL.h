@@ -4,6 +4,7 @@
 
 #include <XE/Graphics/Viewport.h>
 #include <XE/Graphics/GraphicsDevice.h>
+#include <XE/Graphics/GraphicsContext.h>
 
 namespace XE {
     class ProgramGL;

@@ -2,7 +2,11 @@
 #pragma once 
 
 #include "Graphics/IWindow.h"
+#include "Graphics/GraphicsAPI.h" 
+#include "Graphics/GraphicsContext.h" 
+#include "Graphics/GraphicsDeviceFactory.h" 
 #include "Graphics/GraphicsDevice.h" 
+#include "Graphics/GraphicsManager.h" 
 #include "Graphics/BufferDescriptor.h" 
 #include "Graphics/Subset.h" 
 #include "Graphics/Texture.h" 

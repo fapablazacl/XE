@@ -16,6 +16,7 @@
 #include <XE/Graphics/Texture3D.h>
 #include <XE/Graphics/Texture2DArray.h>
 #include <XE/Graphics/TextureCubeMap.h>
+#include <XE/Graphics/GraphicsContext.h>
 #include <iostream>
 
 namespace XE {

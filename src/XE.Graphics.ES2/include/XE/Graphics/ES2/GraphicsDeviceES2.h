@@ -8,8 +8,7 @@
 namespace XE {
     class ProgramES;
 
-    class IGraphicsContextES2;
-
+    class GraphicsContext;
     class GraphicsDeviceES2 : public GraphicsDevice {
     public:
         explicit GraphicsDeviceES2(GraphicsContext *context);
