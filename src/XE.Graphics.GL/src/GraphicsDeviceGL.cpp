@@ -9,6 +9,7 @@
 #include <XE/Graphics/GL/Texture2DGL.h>
 #include <XE/Graphics/GL/Texture2DArrayGL.h>
 #include <XE/Graphics/GL/Texture3DGL.h>
+#include <XE/Graphics/GL/TextureCubeMapGL.h>
 #include <XE/Graphics/GL/ProgramGL.h>
 #include <XE/Graphics/GL/Util.h>
 
@@ -109,9 +110,19 @@ namespace XE {
     }
 
     TextureCubeMap* GraphicsDeviceGL::createTextureCubeMap(const PixelFormat format, const Vector2i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void **sourceData) {
-        return nullptr;
-    }
         
+        const std::array<TextureCubeMapSide, 6> sides = {
+            TextureCubeMapSide::PositiveX,
+            TextureCubeMapSide::PositiveY,
+            TextureCubeMapSide::PositiveZ,
+            TextureCubeMapSide::NegativeX,
+            TextureCubeMapSide::NegativeY,
+            TextureCubeMapSide::NegativeZ,
+        };
+        
+        return new TextureCubeMapGL(format, size, sourceFormat, sourceDataType, sides, sourceData);
+    }
+    
     Program* GraphicsDeviceGL::createProgram(const ProgramDescriptor &desc) {
         return new ProgramGL(desc);
     }

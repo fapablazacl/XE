@@ -21,6 +21,7 @@ namespace XE {
     enum class BlendParam;
     enum class TextureFilter;
     enum class TextureWrap;
+    enum class TextureCubeMapSide;
 }
 
 namespace XE {
@@ -35,6 +36,7 @@ namespace XE {
     extern GLenum convertToGL(const BlendParam param);
     extern GLenum convertToGL(const TextureFilter filter);
     extern GLenum convertToGL(const TextureWrap wrap);
+    extern GLenum convertToGL(const TextureCubeMapSide side);
     extern GLboolean convertToGL(const bool value);
 }
 
