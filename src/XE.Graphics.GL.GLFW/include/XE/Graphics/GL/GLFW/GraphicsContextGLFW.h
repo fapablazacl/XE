@@ -2,7 +2,7 @@
 #ifndef __XE_GRAPHICS_GRAPHICSCONTEXTGLFW_HPP__
 #define __XE_GRAPHICS_GRAPHICSCONTEXTGLFW_HPP__
 
-#include <XE/Graphics/GraphicsDevice.h>
+#include <XE/Graphics/GraphicsContext.h>
 #include <GLFW/glfw3.h>
 
 namespace XE {

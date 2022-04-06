@@ -4,7 +4,11 @@ set (target "XE.Graphics")
 set (headers 
 	"include/XE/Graphics.h"
 	"include/XE/Graphics/IWindow.h"
+	"include/XE/Graphics/GraphicsAPI.h" 
+	"include/XE/Graphics/GraphicsContext.h" 
+	"include/XE/Graphics/GraphicsDeviceFactory.h" 
 	"include/XE/Graphics/GraphicsDevice.h" 
+	"include/XE/Graphics/GraphicsManager.h" 
 	"include/XE/Graphics/BufferDescriptor.h" 
 	"include/XE/Graphics/Subset.h" 
 	"include/XE/Graphics/Texture.h" 

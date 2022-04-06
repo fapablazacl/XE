@@ -7,6 +7,7 @@
 #include <XE/Input/InputManager.h>
 #include <XE/Graphics/IWindow.h>
 #include <XE/Graphics/GraphicsDevice.h>
+#include <XE/Graphics/GraphicsContext.h>
 
 namespace XE {
     /**
