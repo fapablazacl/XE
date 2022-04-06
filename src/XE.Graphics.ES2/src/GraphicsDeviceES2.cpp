@@ -19,34 +19,76 @@
 #include <iostream>
 
 namespace XE {
-    void GraphicsDeviceES2_pre_callback(const char *name, void *funcptr, int len_args, ...) {
-        GLenum error_code = glad_glGetError();
+    static std::string hexstr(const GLenum value) {
+        std::string str;
+        
+        str.resize(16, ' ');
+        std::sprintf(str.data(), "%x", value);
+        
+        return str;
+    }
+    
+    static std::string stringval(const GLenum err) {
+        switch (err) {
+        case GL_INVALID_ENUM: return "GL_INVALID_ENUM";
+        case GL_INVALID_VALUE: return "GL_INVALID_VALUE";
+        case GL_INVALID_OPERATION: return "GL_INVALID_OPERATION";
+            
+#if defined(GL_STACK_OVERFLOW)
+        case GL_STACK_OVERFLOW: return "GL_STACK_OVERFLOW";
+#endif
 
-        if (error_code != GL_NO_ERROR) {
-            fprintf(stderr, "[GraphicsDeviceES2_pre_callback] ERROR %d in %s\n", error_code, name);
-            assert(false);
+#if defined(GL_STACK_UNDERFLOW)
+        case GL_STACK_UNDERFLOW: return "GL_STACK_UNDERFLOW";
+#endif
+            
+        case GL_OUT_OF_MEMORY: return "GL_OUT_OF_MEMORY";
+        case GL_INVALID_FRAMEBUFFER_OPERATION: return "GL_INVALID_FRAMEBUFFER_OPERATION";
+            
+#if defined(GL_CONTEXT_LOST)
+        case GL_CONTEXT_LOST: return "GL_CONTEXT_LOST";
+#endif
+            
+#if defined(GL_TABLE_TOO_LARGE)
+        case GL_TABLE_TOO_LARGE: return "GL_TABLE_TOO_LARGE";
+#endif
+            
+        default:
+            return "UNNOWN_ERR_CODE_" + hexstr(err);
         }
     }
-
-    void GraphicsDeviceES2_post_callback(const char *name, void *funcptr, int len_args, ...) {
-        GLenum error_code = glad_glGetError();
-
-        if (error_code != GL_NO_ERROR) {
-            fprintf(stderr, "[GraphicsDeviceES2_post_callback] ERROR %d in %s\n", error_code, name);
-            assert(false);
+    
+    
+    void GraphicsDeviceES_callback(const char *name, void *, int , ...) {
+        if (std::string(name) == "glGetError") {
+            return;
+        }
+        
+        GLenum err = glGetError();
+        
+        if (err != GL_NO_ERROR) {
+            std::cerr << "GraphicsDeviceES: Error while calling function " << name << std::endl;
+            std::cerr << "GraphicsDeviceES: Errors generated:" << std::endl;
+            
+            while (err != GL_NO_ERROR) {
+                std::cerr << "GraphicsDeviceES:" << stringval(err) << std::endl;
+                err = glGetError();
+            }
+            
+            throw std::runtime_error("GraphicsDeviceES: Error while calling function " + std::string(name));
         }
     }
-
+    
     GraphicsDeviceES2::GraphicsDeviceES2(GraphicsContext *context) : context(context) {
         assert(context);
 
         if (!gladLoadGLES2Loader((GLADloadproc)context->getProcAddressFunctionGL())) {
-            assert(false);
+            throw std::runtime_error("Couldn't load ES extensions");
         }
         
-#if defined (GLAD_DEBUG)
-        glad_set_pre_callback(GraphicsDeviceES2_pre_callback);
-        glad_set_post_callback(GraphicsDeviceES2_post_callback);
+#ifndef NDEBUG
+        glad_set_post_callback_gl(GraphicsDeviceES_callback);
+        glad_set_post_callback(GraphicsDeviceES_callback);
 #endif
 
         XE_GRAPHICS_GL_CHECK_ERROR();

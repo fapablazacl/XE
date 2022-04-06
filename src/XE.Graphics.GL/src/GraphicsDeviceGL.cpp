@@ -21,7 +21,7 @@
 #include <iostream>
 
 namespace XE {
-    std::string hexstr(const GLenum value) {
+    static std::string hexstr(const GLenum value) {
         std::string str;
         
         str.resize(16, ' ');
@@ -30,7 +30,7 @@ namespace XE {
         return str;
     }
     
-    std::string stringval(const GLenum err) {
+    static std::string stringval(const GLenum err) {
         switch (err) {
         case GL_INVALID_ENUM: return "GL_INVALID_ENUM";
         case GL_INVALID_VALUE: return "GL_INVALID_VALUE";
@@ -76,7 +76,6 @@ namespace XE {
         assert(context);
 
         std::cout << "[GL] Loading OpenGL Extensions ..." << std::endl;
-
         gladLoadGL();
         
 #ifndef NDEBUG
