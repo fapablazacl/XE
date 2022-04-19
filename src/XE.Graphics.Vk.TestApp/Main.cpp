@@ -2,7 +2,7 @@
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
 
-#include <vulkan/vulkan.h>
+#include <vulkan/vulkan.hpp>
 
 #include <vector>
 #include <cassert>
@@ -65,6 +65,7 @@ void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT
     }
 }
 
+
 static std::vector<char> readFile(const std::string& filename) {
     std::ifstream fs{filename.c_str(), std::ios::ate | std::ios::binary};
 
@@ -89,16 +90,17 @@ static const std::vector<const char*> validationLayers = {
 };
 
 static const std::vector<const char*> deviceExtensions = {
+    // Introduce los objetos de vkSwapchainKHR, que permiten presentar
+    // los resultados de renderizacion en hacia una Surface.
+    // Se debe habilitar al momento de crear el PhysicalDevice
     VK_KHR_SWAPCHAIN_EXTENSION_NAME
 };
 
+static const uint32_t SCREEN_WIDTH = 1024;
+static const uint32_t SCREEN_HEIGHT = 768;
+static const bool enableValidationLayers = true;
 
 namespace XE {
-    const uint32_t SCREEN_WIDTH = 1024;
-    const uint32_t SCREEN_HEIGHT = 768;
-
-    const bool enableValidationLayers = true;
-
     class TriangleVulkanApplication {
     public:
         void run() {
@@ -244,6 +246,8 @@ namespace XE {
             if (devices.size() == 0) {
                 throw std::runtime_error("There is no available GPUs");
             }
+            
+            std::cout << "Physical Devices: " << devices.size() << std::endl;
 
             for (const auto& device : devices) {
                 if (isDeviceSuitable(device)) {
@@ -317,23 +321,16 @@ namespace XE {
             VkPhysicalDeviceFeatures features;
             vkGetPhysicalDeviceFeatures(device, &features);
 
-            // filter the device
-            const bool isGpuWithGeometryShader = (properties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU || properties.deviceType == VK_PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU) && features.geometryShader;
+            const bool extensionsSupported = checkDeviceExtensionSupport(device);
 
-            if (isGpuWithGeometryShader) {
-                const bool extensionsSupported = checkDeviceExtensionSupport(device);
-
-                bool swapChainAdequate = false;
-                if (extensionsSupported) {
-                    const auto details = querySwapChainSupport(device);
-                    swapChainAdequate = !details.formats.empty() && !details.presentModes.empty();
-                }
-
-                const auto indices = findQueueFamilies(device);
-                return indices.isComplete() && extensionsSupported && swapChainAdequate;
+            bool swapChainAdequate = false;
+            if (extensionsSupported) {
+                const auto details = querySwapChainSupport(device);
+                swapChainAdequate = !details.formats.empty() && !details.presentModes.empty();
             }
 
-            return false;
+            const auto indices = findQueueFamilies(device);
+            return indices.isComplete() && extensionsSupported && swapChainAdequate;
         }
 
         QueryFamilyIndices findQueueFamilies(VkPhysicalDevice device) const {
@@ -546,6 +543,7 @@ namespace XE {
         }
 
         void createGraphicsPipeline() {
+            
             const auto vertexShaderCode = readFile("media/shaders/triangle/vert.spv");
             const auto fragmentShaderCode = readFile("media/shaders/triangle/frag.spv");
 
@@ -560,7 +558,7 @@ namespace XE {
 
             VkPipelineShaderStageCreateInfo fsStageInfo = {};
             fsStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
-            fsStageInfo.stage = VK_SHADER_STAGE_VERTEX_BIT;
+            fsStageInfo.stage = VK_SHADER_STAGE_FRAGMENT_BIT;
             fsStageInfo.module = fragmentShaderModule;
             fsStageInfo.pName = "main";
 
@@ -655,6 +653,7 @@ namespace XE {
             graphicsPipelineInfo.basePipelineIndex = -1;
 
             if (vkCreateGraphicsPipelines(mDevice, VK_NULL_HANDLE, 1, &graphicsPipelineInfo, nullptr, &mGraphicsPipeline) != VK_SUCCESS) {
+                
                 throw std::runtime_error("couldn't create the pipeline!");
             }
 
@@ -849,14 +848,131 @@ namespace XE {
 }
 
 
-int main() {
-    XE::TriangleVulkanApplication app;
-
-    try {
-        app.run();
-    } catch (const std::exception &exp) {
-        std::cout << exp.what() << std::endl;
+class VulkanRenderer {
+public:
+    void initialize() {
+        window = initializeWindow();
+        instance = createInstance();
     }
+    
+    void terminate() {
+        terminateWindow(window);
+    }
+    
+    void renderLoop() {
+        if (!window) {
+            return;
+        }
+    }
+    
+private:
+    GLFWwindow* initializeWindow() {
+        glfwInit();
+        glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+        glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 
+        return glfwCreateWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Vulkan Window", nullptr, nullptr);
+    }
+    
+    void terminateWindow(GLFWwindow *window) {
+        if (window) {
+            glfwDestroyWindow(window);
+        }
+        
+        glfwTerminate();
+    }
+    
+    vk::ApplicationInfo createAppInfo() const {
+        // Identifica a la aplicacion / motor en uso, para que pueda ser (potencialmente)
+        // considerado por el implementador de Hardware (nVidia, Intel, etc), para aplicar
+        // ciertas optimizaciones a nivel del Driver.
+        vk::ApplicationInfo appInfo;
+        appInfo.setPApplicationName("VulkanTestApp");
+        appInfo.setApplicationVersion(VK_MAKE_VERSION(1, 0, 0));
+        appInfo.setPEngineName("XE");
+        appInfo.setEngineVersion(VK_MAKE_VERSION(1, 0, 0));
+        
+        // La version de la API de vulkan a usar.
+        // Se deberia detectar previamente la maxima version de vulkan soportada por el driver.
+        appInfo.apiVersion = VK_API_VERSION_1_0;
+        
+        return appInfo;
+    }
+    
+    
+    std::vector<const char*> getRequiredExtensions() const {
+        uint32_t extensionCount;
+        const char **extensions = glfwGetRequiredInstanceExtensions(&extensionCount);
+
+        std::vector<const char*> result = {extensions, extensions + extensionCount};
+
+        return result;
+    }
+    
+    vk::DebugUtilsMessengerCreateInfoEXT createDebugMessengerInfo() const {
+        vk::DebugUtilsMessengerCreateInfoEXT msgInfo;
+        
+        msgInfo.setMessageSeverity(vk::DebugUtilsMessageSeverityFlagBitsEXT::eError|
+                                   vk::DebugUtilsMessageSeverityFlagBitsEXT::eVerbose|
+                                   vk::DebugUtilsMessageSeverityFlagBitsEXT::eWarning|
+                                   vk::DebugUtilsMessageSeverityFlagBitsEXT::eInfo);
+        
+        msgInfo.setMessageType(
+            vk::DebugUtilsMessageTypeFlagBitsEXT::eGeneral | vk::DebugUtilsMessageTypeFlagBitsEXT::ePerformance | vk::DebugUtilsMessageTypeFlagBitsEXT::eValidation);
+
+        msgInfo.pfnUserCallback = debugCallback;
+        msgInfo.pUserData = nullptr;
+
+        return msgInfo;
+    }
+    
+    vk::DebugUtilsMessengerEXT createDebugMessenger(vk::Instance instance) const {
+        const auto debugInfo = static_cast<VkDebugUtilsMessengerCreateInfoEXT>(createDebugMessengerInfo());
+        
+        VkDebugUtilsMessengerEXT messenger;
+        const VkResult result = CreateDebugUtilsMessengerEXT(static_cast<VkInstance>(instance), &debugInfo, nullptr, &messenger);
+        
+        if (result != VK_SUCCESS) {
+            throw std::runtime_error("failed to setup the debug messenger");
+        }
+        
+        return vk::DebugUtilsMessengerEXT{messenger};
+    }
+    
+    
+    vk::Instance createInstance() const {
+        const vk::ApplicationInfo appInfo = createAppInfo();
+        std::vector<const char*> extensions = getRequiredExtensions();
+        
+        if (enableValidationLayers) {
+            extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
+        }
+        
+        // crear la instancia con una seria de extensiones / capas de validacion requeridas
+        vk::InstanceCreateInfo info;
+        info.setPApplicationInfo(&appInfo);
+        // establecer que requerimos layers referentes a la validacion del uso de la API
+        info.setPEnabledLayerNames(validationLayers);
+        // establecer las extensiones requeridas por GLFW
+        info.setPEnabledExtensionNames(extensions);
+        
+        return vk::createInstance(info);
+    }
+    
+private:
+    GLFWwindow *window = nullptr;
+    vk::Instance instance;
+};
+
+
+int main() {
+    // XE::TriangleVulkanApplication app;
+    // app.run();
+
+    VulkanRenderer renderer;
+    renderer.initialize();
+    renderer.renderLoop();
+    renderer.terminate();
+    
     return 0;
 }
