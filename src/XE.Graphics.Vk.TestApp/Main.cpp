@@ -15,6 +15,20 @@
 #include <set>
 #include <fstream>
 
+
+class Logger {
+public:
+    Logger(std::ostream &os) : os{os} {}
+    
+    void info(const std::string &line) {
+        std::cout << line << std::endl;
+    }
+    
+private:
+    std::ostream &os;
+};
+
+
 struct QueryFamilyIndices {
     std::optional<uint32_t> graphicsFamily;
     std::optional<uint32_t> presentFamily;
@@ -850,6 +864,8 @@ namespace XE {
 
 class VulkanRenderer {
 public:
+    VulkanRenderer(Logger &logger) : logger{logger} {}
+    
     void initialize() {
         window = initializeWindow();
         instance = createInstance();
@@ -960,16 +976,15 @@ private:
     }
     
 private:
+    Logger &logger;
     GLFWwindow *window = nullptr;
     vk::Instance instance;
 };
 
 
 int main() {
-    // XE::TriangleVulkanApplication app;
-    // app.run();
-
-    VulkanRenderer renderer;
+    Logger logger{std::cout};
+    VulkanRenderer renderer{logger};
     renderer.initialize();
     renderer.renderLoop();
     renderer.terminate();
