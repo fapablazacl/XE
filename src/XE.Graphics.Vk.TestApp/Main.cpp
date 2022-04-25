@@ -16,19 +16,6 @@
 #include <fstream>
 
 
-class Logger {
-public:
-    Logger(std::ostream &os) : os{os} {}
-    
-    void info(const std::string &line) {
-        std::cout << line << std::endl;
-    }
-    
-private:
-    std::ostream &os;
-};
-
-
 struct QueryFamilyIndices {
     std::optional<uint32_t> graphicsFamily;
     std::optional<uint32_t> presentFamily;
@@ -54,14 +41,16 @@ struct SwapChainSupportDetails {
 
 
 static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(
-    VkDebugUtilsMessageSeverityFlagBitsEXT severity,
-    VkDebugUtilsMessageTypeFlagsEXT type,
+    VkDebugUtilsMessageSeverityFlagBitsEXT /*severity*/,
+    VkDebugUtilsMessageTypeFlagsEXT /*type*/,
     const VkDebugUtilsMessengerCallbackDataEXT *pCallbackData,
-    void *pUserData) {
-
+    void */*pUserData*/) {
+    
     std::cout << pCallbackData->pMessage << std::endl;
+    
     return VK_FALSE;
 }
+
 
 VkResult CreateDebugUtilsMessengerEXT(VkInstance instance, const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkDebugUtilsMessengerEXT* pDebugMessenger) {
     auto func = (PFN_vkCreateDebugUtilsMessengerEXT) vkGetInstanceProcAddr(instance, "vkCreateDebugUtilsMessengerEXT");
@@ -71,6 +60,7 @@ VkResult CreateDebugUtilsMessengerEXT(VkInstance instance, const VkDebugUtilsMes
         return VK_ERROR_EXTENSION_NOT_PRESENT;
     }
 }
+
 
 void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT debugMessenger, const VkAllocationCallbacks* pAllocator) {
     auto func = (PFN_vkDestroyDebugUtilsMessengerEXT) vkGetInstanceProcAddr(instance, "vkDestroyDebugUtilsMessengerEXT");
@@ -789,7 +779,7 @@ namespace XE {
                 renderPassInfo.renderArea.offset = {0, 0};
                 renderPassInfo.renderArea.extent = mSwapchainExtent;
 
-                VkClearValue clearValue {0.0f, 0.0f, 0.0f, 1.0f};
+                VkClearValue clearValue = { 0.0f, 0.0f, 0.0f, 1.0f };
                 renderPassInfo.clearValueCount = 1;
                 renderPassInfo.pClearValues = &clearValue;
 
@@ -864,20 +854,41 @@ namespace XE {
 
 class VulkanRenderer {
 public:
-    VulkanRenderer(Logger &logger) : logger{logger} {}
+    VulkanRenderer() {}
     
     void initialize() {
         window = initializeWindow();
-        instance = createInstance();
+        assert(window);
+        
+        std::vector<const char*> extensions = getRequiredExtensions();
+        
+        if (enableValidationLayers) {
+            extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
+        }
+        
+        instance = createInstance(extensions, validationLayers);
+        assert(instance);
     }
+    
     
     void terminate() {
         terminateWindow(window);
     }
     
+    
     void renderLoop() {
         if (!window) {
             return;
+        }
+        
+        bool running = true;
+        
+        while (running) {
+            glfwPollEvents();
+            
+            if (glfwGetKey(window, GLFW_KEY_ESCAPE)) {
+                running = false;
+            }
         }
     }
     
@@ -886,9 +897,10 @@ private:
         glfwInit();
         glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
         glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
-
+        
         return glfwCreateWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Vulkan Window", nullptr, nullptr);
     }
+    
     
     void terminateWindow(GLFWwindow *window) {
         if (window) {
@@ -925,6 +937,7 @@ private:
         return result;
     }
     
+    
     vk::DebugUtilsMessengerCreateInfoEXT createDebugMessengerInfo() const {
         vk::DebugUtilsMessengerCreateInfoEXT msgInfo;
         
@@ -956,13 +969,8 @@ private:
     }
     
     
-    vk::Instance createInstance() const {
+    vk::Instance createInstance(const std::vector<const char*> &extensions, const std::vector<const char*> &validationLayers) const {
         const vk::ApplicationInfo appInfo = createAppInfo();
-        std::vector<const char*> extensions = getRequiredExtensions();
-        
-        if (enableValidationLayers) {
-            extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
-        }
         
         // crear la instancia con una seria de extensiones / capas de validacion requeridas
         vk::InstanceCreateInfo info;
@@ -976,15 +984,14 @@ private:
     }
     
 private:
-    Logger &logger;
     GLFWwindow *window = nullptr;
     vk::Instance instance;
 };
 
 
 int main() {
-    Logger logger{std::cout};
-    VulkanRenderer renderer{logger};
+    VulkanRenderer renderer;
+    
     renderer.initialize();
     renderer.renderLoop();
     renderer.terminate();
