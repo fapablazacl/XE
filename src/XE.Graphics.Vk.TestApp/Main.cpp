@@ -898,9 +898,8 @@ public:
         instance = createInstance(extensions, validationLayers);
         assert(instance);
         
-        const auto physicalDevice = pickPhysicalDevice(instance.enumeratePhysicalDevices());
-        
-        
+        physicalDevice = pickPhysicalDevice(instance.enumeratePhysicalDevices());
+        device = createDevice(physicalDevice);
     }
     
     
@@ -924,6 +923,12 @@ public:
             }
         }
     }
+    
+private:
+    GLFWwindow *window = nullptr;
+    vk::Instance instance;
+    vk::PhysicalDevice physicalDevice;
+    vk::Device device;
     
 private:
     GLFWwindow* initializeWindow() {
@@ -1038,9 +1043,10 @@ private:
         std::cout << "  driverVersion: " << "\"" << properties.driverVersion << "\"" << std::endl;
     }
     
-private:
-    GLFWwindow *window = nullptr;
-    vk::Instance instance;
+    
+    vk::Device createDevice(const vk::PhysicalDevice &physicalDevice) const {
+        return {};
+    }
 };
 
 
