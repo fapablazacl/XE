@@ -126,7 +126,10 @@ static const std::vector<const char*> deviceExtensions = {
     // Introduce los objetos de vkSwapchainKHR, que permiten presentar
     // los resultados de renderizacion en hacia una Surface.
     // Se debe habilitar al momento de crear el PhysicalDevice
-    VK_KHR_SWAPCHAIN_EXTENSION_NAME
+    VK_KHR_SWAPCHAIN_EXTENSION_NAME,
+    
+    // para plataformas en donde Vulkan no sea implementado directamente por el driver, se debe incluir esta extension
+    "VK_KHR_portability_subset"
 };
 
 static const uint32_t SCREEN_WIDTH = 1024;
@@ -898,8 +901,21 @@ public:
         instance = createInstance(extensions, validationLayers);
         assert(instance);
         
+        surface = createSurface(window, instance);
+        assert(surface);
+        
         physicalDevice = pickPhysicalDevice(instance.enumeratePhysicalDevices());
-        device = createDevice(physicalDevice);
+        families = identifyQueueFamilies(physicalDevice, surface);
+        assert(families.isComplete());
+        
+        device = createDevice(physicalDevice, families);
+        assert(device);
+        
+        device.getQueue(families.graphicsFamily.value(), 0, &graphicsQueue);
+        assert(graphicsQueue);
+        
+        device.getQueue(families.presentFamily.value(), 0, &presentationQueue);
+        assert(presentationQueue);
     }
     
     
@@ -928,7 +944,11 @@ private:
     GLFWwindow *window = nullptr;
     vk::Instance instance;
     vk::PhysicalDevice physicalDevice;
+    vk::SurfaceKHR surface;
     vk::Device device;
+    QueryFamilyIndices families;
+    vk::Queue graphicsQueue;
+    vk::Queue presentationQueue;
     
 private:
     GLFWwindow* initializeWindow() {
@@ -972,6 +992,8 @@ private:
 
         std::vector<const char*> result = {extensions, extensions + extensionCount};
 
+        result.push_back("VK_KHR_get_physical_device_properties2");
+        
         return result;
     }
     
@@ -1044,8 +1066,82 @@ private:
     }
     
     
-    vk::Device createDevice(const vk::PhysicalDevice &physicalDevice) const {
-        return {};
+    std::vector<vk::DeviceQueueCreateInfo> mapQueueCreateInfo(const QueryFamilyIndices &indices) const {
+        const float priority = 1.0f;
+        
+        std::vector<vk::DeviceQueueCreateInfo> infos;
+        
+        for (const uint32_t familyIndex : indices.uniques()) {
+            vk::DeviceQueueCreateInfo info;
+            
+            info.queueFamilyIndex = familyIndex;
+            info.setPQueuePriorities(&priority);
+            info.setQueueCount(1);
+            
+            infos.push_back(info);
+        }
+        
+        return infos;
+    }
+    
+    
+    vk::Device createDevice(const vk::PhysicalDevice &physicalDevice, const QueryFamilyIndices &indices) const {
+        const std::vector<vk::DeviceQueueCreateInfo> queueInfos = mapQueueCreateInfo(indices);
+        
+        vk::DeviceCreateInfo info;
+        
+        // set the required queues (graphics and presentation, for now).
+        info.setPQueueCreateInfos(queueInfos.data());
+        info.setQueueCreateInfoCount(queueInfos.size());
+        
+        // set the required device extensions
+        info.setPEnabledExtensionNames(deviceExtensions);
+        info.setEnabledExtensionCount(deviceExtensions.size());
+        
+        // set the validation layers
+        if (enableValidationLayers) {
+            info.setPEnabledLayerNames(validationLayers);
+            info.setEnabledLayerCount(validationLayers.size());
+        }
+        
+        return physicalDevice.createDevice(info);
+    }
+    
+    
+    QueryFamilyIndices identifyQueueFamilies(const vk::PhysicalDevice &physicalDevice, const vk::SurfaceKHR &surface) const {
+        
+        QueryFamilyIndices indices;
+        
+        const auto queueProperties = physicalDevice.getQueueFamilyProperties();
+        
+        for (size_t i = 0; i < queueProperties.size(); i++) {
+            const auto props = queueProperties[i];
+            
+            // grab the family index for graphics
+            if (props.queueFlags & vk::QueueFlagBits::eGraphics) {
+                indices.graphicsFamily = i;
+            }
+            
+            // check if the current queue has presentation capabilities
+            vk::Bool32 presentationSuport;
+            vk::Result result = physicalDevice.getSurfaceSupportKHR(i, surface, &presentationSuport);
+            
+            if (result == vk::Result::eSuccess && presentationSuport == VK_TRUE) {
+                indices.presentFamily = i;
+            }
+        }
+        
+        return indices;
+    }
+    
+    vk::SurfaceKHR createSurface(GLFWwindow* window, vk::Instance &instance) {
+        VkSurfaceKHR rawsurf;
+        
+        if (glfwCreateWindowSurface(instance, window, nullptr, &rawsurf) != VK_SUCCESS) {
+            return {};
+        }
+        
+        return rawsurf;
     }
 };
 
