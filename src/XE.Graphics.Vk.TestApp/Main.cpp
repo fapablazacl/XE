@@ -16,6 +16,35 @@
 #include <fstream>
 
 
+std::ostream& operator<< (std::ostream &os, const vk::PhysicalDeviceType deviceType) {
+    switch (deviceType) {
+    case vk::PhysicalDeviceType::eCpu:
+        os << "vk::PhysicalDeviceType::eCpu";
+        break;
+        
+    case vk::PhysicalDeviceType::eDiscreteGpu:
+        os << "vk::PhysicalDeviceType::eDiscreteGpu";
+        break;
+        
+    case vk::PhysicalDeviceType::eIntegratedGpu:
+        os << "vk::PhysicalDeviceType::eIntegratedGpu";
+        break;
+        
+    case vk::PhysicalDeviceType::eVirtualGpu:
+        os << "vk::PhysicalDeviceType::eVirtualGpu";
+        break;
+        
+    case vk::PhysicalDeviceType::eOther:
+        os << "vk::PhysicalDeviceType::eOther";
+        break;
+    default:
+        os << "<Unknown>:" << (int)deviceType;
+    }
+    
+    return os;
+}
+
+
 struct QueryFamilyIndices {
     std::optional<uint32_t> graphicsFamily;
     std::optional<uint32_t> presentFamily;
@@ -868,6 +897,10 @@ public:
         
         instance = createInstance(extensions, validationLayers);
         assert(instance);
+        
+        const auto physicalDevice = pickPhysicalDevice(instance.enumeratePhysicalDevices());
+        
+        
     }
     
     
@@ -981,6 +1014,28 @@ private:
         info.setPEnabledExtensionNames(extensions);
         
         return vk::createInstance(info);
+    }
+    
+    vk::PhysicalDevice pickPhysicalDevice(const std::vector<vk::PhysicalDevice> &devices) {
+        
+        for (const auto &device : devices) {
+            showPhysicalDeviceInformation(device);
+        }
+        
+        return devices[0];
+    }
+    
+    
+    void showPhysicalDeviceInformation(const vk::PhysicalDevice &device) {
+        const auto properties = device.getProperties();
+        
+        std::cout << "\"" << properties.deviceName << "\"" << std::endl;
+        std::cout << "  deviceID: " << "\"" << properties.deviceID << "\"" << std::endl;
+        std::cout << "  deviceName: " << "\"" << properties.deviceName << "\"" << std::endl;
+        std::cout << "  vendorID: " << "\"" << properties.vendorID << "\"" << std::endl;
+        std::cout << "  apiVersion: " << "\"" << properties.apiVersion << "\"" << std::endl;
+        std::cout << "  deviceType: " << "\"" << properties.deviceType << "\"" << std::endl;
+        std::cout << "  driverVersion: " << "\"" << properties.driverVersion << "\"" << std::endl;
     }
     
 private:
