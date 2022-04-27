@@ -113,9 +113,10 @@ static std::vector<char> readFile(const std::string& filename) {
     }
 
     const auto fileSize = fs.tellg();
+    assert(fileSize >= 0);
     
     std::vector<char> buffer;
-    buffer.resize(fileSize);
+    buffer.resize(static_cast<size_t>(fileSize));
 
     fs.seekg(0);
     fs.read(buffer.data(), fileSize);
@@ -124,11 +125,11 @@ static std::vector<char> readFile(const std::string& filename) {
     return buffer;
 }
 
-static const std::vector<const char*> validationLayers = {
+static const std::vector<const char*> gValidationLayers = {
     "VK_LAYER_KHRONOS_validation"
 };
 
-static const std::vector<const char*> deviceExtensions = {
+static const std::vector<const char*> gDeviceExtensions = {
     // Introduce los objetos de vkSwapchainKHR, que permiten presentar
     // los resultados de renderizacion en hacia una Surface.
     // Se debe habilitar al momento de crear el PhysicalDevice
@@ -142,7 +143,7 @@ static const std::vector<const char*> deviceExtensions = {
 
 static const uint32_t SCREEN_WIDTH = 1024;
 static const uint32_t SCREEN_HEIGHT = 768;
-static const bool enableValidationLayers = true;
+static const bool gEnableValidationLayers = true;
 
 namespace XE {
     class TriangleVulkanApplication {
@@ -166,7 +167,7 @@ namespace XE {
         void initVulkan() {
             setupInstance();
 
-            if (enableValidationLayers) {
+            if (gEnableValidationLayers) {
                 setupDebugMessenger();
             }
 
@@ -188,7 +189,7 @@ namespace XE {
         }
 
         void setupInstance() {
-            if (enableValidationLayers && !checkValidationLayers()) {
+            if (gEnableValidationLayers && !checkValidationLayers()) {
                 throw std::runtime_error("Vulkan Validation Layers requested but Not Available!");
             }
 
@@ -211,9 +212,9 @@ namespace XE {
 
             auto debugCreateInfo = makeDebugMessengerInfo();
 
-            if (enableValidationLayers) {
-                createInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());
-                createInfo.ppEnabledLayerNames = validationLayers.data();
+            if (gEnableValidationLayers) {
+                createInfo.enabledLayerCount = static_cast<uint32_t>(gValidationLayers.size());
+                createInfo.ppEnabledLayerNames = gValidationLayers.data();
 
                 createInfo.pNext = &debugCreateInfo;
             } else {
@@ -248,7 +249,7 @@ namespace XE {
 
             std::vector<const char*> result = {extensions, extensions + extensionCount};
 
-            if (enableValidationLayers) {
+            if (gEnableValidationLayers) {
                 result.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
             }
 
@@ -327,12 +328,12 @@ namespace XE {
             deviceInfo.queueCreateInfoCount = static_cast<uint32_t>(queueCreateInfos.size());
             deviceInfo.pEnabledFeatures = &deviceFeatures;
 
-            deviceInfo.enabledExtensionCount = static_cast<uint32_t>(deviceExtensions.size());
-            deviceInfo.ppEnabledExtensionNames = deviceExtensions.data();
+            deviceInfo.enabledExtensionCount = static_cast<uint32_t>(gDeviceExtensions.size());
+            deviceInfo.ppEnabledExtensionNames = gDeviceExtensions.data();
 
-            if (enableValidationLayers) {
-                deviceInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());
-                deviceInfo.ppEnabledLayerNames = validationLayers.data();
+            if (gEnableValidationLayers) {
+                deviceInfo.enabledLayerCount = static_cast<uint32_t>(gValidationLayers.size());
+                deviceInfo.ppEnabledLayerNames = gValidationLayers.data();
             } else {
                 deviceInfo.enabledLayerCount = 0;
             }
@@ -422,7 +423,7 @@ namespace XE {
             extensions.resize(count);
             vkEnumerateDeviceExtensionProperties(device, nullptr, &count, extensions.data());
 
-            std::set<std::string> requiredExtensionNames(deviceExtensions.begin(), deviceExtensions.end());
+            std::set<std::string> requiredExtensionNames(gDeviceExtensions.begin(), gDeviceExtensions.end());
 
             for (const auto& extension : extensions) {
                 requiredExtensionNames.erase(extension.extensionName);
@@ -855,7 +856,7 @@ namespace XE {
 
             vkDestroyDevice(mDevice, nullptr);
 
-            if (enableValidationLayers) {
+            if (gEnableValidationLayers) {
                 DestroyDebugUtilsMessengerEXT(mInstance, mDebugMessenger, nullptr);
             }
 
@@ -906,50 +907,50 @@ public:
     VulkanRenderer() {}
     
     void initialize() {
-        window = initializeWindow();
-        assert(window);
+        mWindow = initializeWindow();
+        assert(mWindow);
         
         std::vector<const char*> extensions = getRequiredExtensions();
         
-        if (enableValidationLayers) {
+        if (gEnableValidationLayers) {
             extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
         }
         
-        instance = createInstance(extensions, validationLayers);
-        assert(instance);
+        mInstance = createInstance(extensions, gValidationLayers);
+        assert(mInstance);
         
-        surface = createSurface(window, instance);
-        assert(surface);
+        mSurface = createSurface(mWindow, mInstance);
+        assert(mSurface);
         
-        physicalDevice = pickPhysicalDevice(instance.enumeratePhysicalDevices());
-        families = identifyQueueFamilies(physicalDevice, surface);
-        assert(families.isComplete());
+        mPhysicalDevice = pickPhysicalDevice(mInstance.enumeratePhysicalDevices());
+        mFamilies = identifyQueueFamilies(mPhysicalDevice, mSurface);
+        assert(mFamilies.isComplete());
         
-        device = createDevice(physicalDevice, families);
-        assert(device);
+        mDevice = createDevice(mPhysicalDevice, mFamilies);
+        assert(mDevice);
         
-        device.getQueue(families.graphicsFamily.value(), 0, &graphicsQueue);
-        assert(graphicsQueue);
+        mDevice.getQueue(mFamilies.graphicsFamily.value(), 0, &mGraphicsQueue);
+        assert(mGraphicsQueue);
         
-        device.getQueue(families.presentFamily.value(), 0, &presentationQueue);
-        assert(presentationQueue);
+        mDevice.getQueue(mFamilies.presentFamily.value(), 0, &mPresentationQueue);
+        assert(mPresentationQueue);
 
-        swapchain = createSwapchain(physicalDevice, device, surface, families);
-        assert(swapchain);
+        mSwapchain = createSwapchain(mPhysicalDevice, mDevice, mSurface, mFamilies);
+        assert(mSwapchain);
 
-        swapchainImages = device.getSwapchainImagesKHR(swapchain);
-        swapchainImageViews = createSwapchainImageViews(device, swapchainImages);
+        mSwapchainImages = mDevice.getSwapchainImagesKHR(mSwapchain);
+        mSwapchainImageViews = createSwapchainImageViews(mDevice, mSwapchainImages);
 
     }
     
     
     void terminate() {
-        terminateWindow(window);
+        terminateWindow(mWindow);
     }
     
     
     void renderLoop() {
-        if (!window) {
+        if (!mWindow) {
             return;
         }
         
@@ -958,24 +959,24 @@ public:
         while (running) {
             glfwPollEvents();
             
-            if (glfwGetKey(window, GLFW_KEY_ESCAPE)) {
+            if (glfwGetKey(mWindow, GLFW_KEY_ESCAPE)) {
                 running = false;
             }
         }
     }
     
 private:
-    GLFWwindow *window = nullptr;
-    vk::Instance instance;
-    vk::PhysicalDevice physicalDevice;
-    vk::SurfaceKHR surface;
-    vk::Device device;
-    QueryFamilyIndices families;
-    vk::Queue graphicsQueue;
-    vk::Queue presentationQueue;
-    vk::SwapchainKHR swapchain;
-    std::vector<vk::Image> swapchainImages;
-    std::vector<vk::ImageView> swapchainImageViews;
+    GLFWwindow *mWindow = nullptr;
+    vk::Instance mInstance;
+    vk::PhysicalDevice mPhysicalDevice;
+    vk::SurfaceKHR mSurface;
+    vk::Device mDevice;
+    QueryFamilyIndices mFamilies;
+    vk::Queue mGraphicsQueue;
+    vk::Queue mPresentationQueue;
+    vk::SwapchainKHR mSwapchain;
+    std::vector<vk::Image> mSwapchainImages;
+    std::vector<vk::ImageView> mSwapchainImageViews;
 
     
 private:
@@ -1119,16 +1120,16 @@ private:
         
         // set the required queues (graphics and presentation, for now).
         info.setPQueueCreateInfos(queueInfos.data());
-        info.setQueueCreateInfoCount(queueInfos.size());
+        info.setQueueCreateInfoCount(static_cast<uint32_t>(queueInfos.size()));
         
         // set the required device extensions
-        info.setPEnabledExtensionNames(deviceExtensions);
-        info.setEnabledExtensionCount(deviceExtensions.size());
+        info.setPEnabledExtensionNames(gDeviceExtensions);
+        info.setEnabledExtensionCount(static_cast<uint32_t>(gDeviceExtensions.size()));
         
         // set the validation layers
-        if (enableValidationLayers) {
-            info.setPEnabledLayerNames(validationLayers);
-            info.setEnabledLayerCount(validationLayers.size());
+        if (gEnableValidationLayers) {
+            info.setPEnabledLayerNames(gValidationLayers);
+            info.setEnabledLayerCount(static_cast<uint32_t>(gValidationLayers.size()));
         }
         
         return physicalDevice.createDevice(info);
@@ -1149,7 +1150,7 @@ private:
             }
             
             // check if the current queue has presentation capabilities
-            vk::Bool32 presentationSuport;
+            vk::Bool32 presentationSuport = VK_FALSE;
             vk::Result result = physicalDevice.getSurfaceSupportKHR(i, surface, &presentationSuport);
             
             if (result == vk::Result::eSuccess && presentationSuport == VK_TRUE) {
@@ -1177,7 +1178,7 @@ private:
 
         assert(surfaceFormat);
         const auto& presentModes = swapchainDetail.surfacePresentModes;
-        const vk::PresentModeKHR presentMode =  pickPresentMode({ presentModes.begin(), presentModes.end() });
+        const vk::PresentModeKHR presentMode =  pickPresentMode(presentModes);
         const vk::Extent2D extent = pickSwapExtent(swapchainDetail.surfaceCapabilities);
         const uint32_t imageCount = chooseImageCount(swapchainDetail.surfaceCapabilities);
         
@@ -1233,9 +1234,11 @@ private:
         return {};
     }
     
-    vk::PresentModeKHR pickPresentMode(const std::set<vk::PresentModeKHR> &presentModes) const {
-        
-        if (const auto it = presentModes.find(vk::PresentModeKHR::eMailbox); it != presentModes.end()) {
+
+    vk::PresentModeKHR pickPresentMode(const std::vector<vk::PresentModeKHR> &presentModes) const {
+        const auto it = std::find(presentModes.begin(), presentModes.end(), vk::PresentModeKHR::eMailbox);
+
+        if (it != presentModes.end()) {
             return vk::PresentModeKHR::eMailbox;
         }
         
