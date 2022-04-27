@@ -9,6 +9,7 @@
 #include <XE/Graphics/GL/Texture2DGL.h>
 #include <XE/Graphics/GL/Texture2DArrayGL.h>
 #include <XE/Graphics/GL/Texture3DGL.h>
+#include <XE/Graphics/GL/TextureCubeMapGL.h>
 #include <XE/Graphics/GL/ProgramGL.h>
 #include <XE/Graphics/GL/Util.h>
 
@@ -21,7 +22,7 @@
 #include <iostream>
 
 namespace XE {
-    std::string hexstr(const GLenum value) {
+    static std::string hexstr(const GLenum value) {
         std::string str;
         
         str.resize(16, ' ');
@@ -30,7 +31,7 @@ namespace XE {
         return str;
     }
     
-    std::string stringval(const GLenum err) {
+    static std::string stringval(const GLenum err) {
         switch (err) {
         case GL_INVALID_ENUM: return "GL_INVALID_ENUM";
         case GL_INVALID_VALUE: return "GL_INVALID_VALUE";
@@ -76,7 +77,6 @@ namespace XE {
         assert(context);
 
         std::cout << "[GL] Loading OpenGL Extensions ..." << std::endl;
-
         gladLoadGL();
         
 #ifndef NDEBUG
@@ -110,9 +110,19 @@ namespace XE {
     }
 
     TextureCubeMap* GraphicsDeviceGL::createTextureCubeMap(const PixelFormat format, const Vector2i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void **sourceData) {
-        return nullptr;
-    }
         
+        const std::array<TextureCubeMapSide, 6> sides = {
+            TextureCubeMapSide::PositiveX,
+            TextureCubeMapSide::PositiveY,
+            TextureCubeMapSide::PositiveZ,
+            TextureCubeMapSide::NegativeX,
+            TextureCubeMapSide::NegativeY,
+            TextureCubeMapSide::NegativeZ,
+        };
+        
+        return new TextureCubeMapGL(format, size, sourceFormat, sourceDataType, sides, sourceData);
+    }
+    
     Program* GraphicsDeviceGL::createProgram(const ProgramDescriptor &desc) {
         return new ProgramGL(desc);
     }

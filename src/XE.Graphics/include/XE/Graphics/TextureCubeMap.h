@@ -10,11 +10,15 @@ namespace XE {
     public:
         virtual ~TextureCubeMap();
         
+        TextureType getType() const override {
+            return TextureType::TexCubeMap;
+        }
+        
         virtual Vector2i getSize() const = 0;
         
-        virtual void setData(const void *surfaceData, const int mipLevel, TextureCubeMapSide cubeMap, const PixelFormat surfaceFormat, const Recti &area) = 0;
+        virtual void setData(const void *surfaceData, const int mipLevel, TextureCubeMapSide cubeMap, const DataType surfaceDataType, const PixelFormat surfaceFormat, const Recti &area) = 0;
         
-        virtual void GetData(void *surfaceData, const int mipLevel, TextureCubeMapSide cubeMap, const PixelFormat surfaceFormat, const Recti &area) const = 0;
+        virtual void getData(void *surfaceData, const int mipLevel, TextureCubeMapSide cubeMap, const DataType surfaceDataType, const PixelFormat surfaceFormat, const Recti &area) const = 0;
     };
 }
 
