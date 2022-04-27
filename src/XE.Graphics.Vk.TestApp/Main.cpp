@@ -1,8 +1,12 @@
 
+#pragma warning(push, 0)
+
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
 
 #include <vulkan/vulkan.hpp>
+
+#pragma warning(pop, 0)
 
 #include <vector>
 #include <cassert>
@@ -14,6 +18,8 @@
 #include <optional>
 #include <set>
 #include <fstream>
+
+#include <XE/Predef.h>
 
 
 std::ostream& operator<< (std::ostream &os, const vk::PhysicalDeviceType deviceType) {
@@ -82,7 +88,7 @@ static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(
 
 
 VkResult CreateDebugUtilsMessengerEXT(VkInstance instance, const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkDebugUtilsMessengerEXT* pDebugMessenger) {
-    auto func = (PFN_vkCreateDebugUtilsMessengerEXT) vkGetInstanceProcAddr(instance, "vkCreateDebugUtilsMessengerEXT");
+    auto func = reinterpret_cast<PFN_vkCreateDebugUtilsMessengerEXT>(vkGetInstanceProcAddr(instance, "vkCreateDebugUtilsMessengerEXT"));
     if (func != nullptr) {
         return func(instance, pCreateInfo, pAllocator, pDebugMessenger);
     } else {
@@ -106,8 +112,8 @@ static std::vector<char> readFile(const std::string& filename) {
         throw std::runtime_error("failed to open file " + filename);
     }
 
-    const auto fileSize = static_cast<std::size_t>(fs.tellg());
-
+    const auto fileSize = fs.tellg();
+    
     std::vector<char> buffer;
     buffer.resize(fileSize);
 
@@ -129,7 +135,9 @@ static const std::vector<const char*> deviceExtensions = {
     VK_KHR_SWAPCHAIN_EXTENSION_NAME,
     
     // para plataformas en donde Vulkan no sea implementado directamente por el driver, se debe incluir esta extension
+#if defined(XE_OS_MACOS) || defined(XE_OS_IOS)
     "VK_KHR_portability_subset"
+#endif
 };
 
 static const uint32_t SCREEN_WIDTH = 1024;
@@ -811,7 +819,9 @@ namespace XE {
                 renderPassInfo.renderArea.offset = {0, 0};
                 renderPassInfo.renderArea.extent = mSwapchainExtent;
 
-                VkClearValue clearValue = { 0.0f, 0.0f, 0.0f, 1.0f };
+                VkClearValue clearValue = {};
+                clearValue.color = { 0.0f, 0.0f, 0.0f, 1.0f };
+
                 renderPassInfo.clearValueCount = 1;
                 renderPassInfo.pClearValues = &clearValue;
 
@@ -923,7 +933,13 @@ public:
         
         device.getQueue(families.presentFamily.value(), 0, &presentationQueue);
         assert(presentationQueue);
-        
+
+        swapchain = createSwapchain(physicalDevice, device, surface, families);
+        assert(swapchain);
+
+        swapchainImages = device.getSwapchainImagesKHR(swapchain);
+        swapchainImageViews = createSwapchainImageViews(device, swapchainImages);
+
     }
     
     
@@ -957,6 +973,10 @@ private:
     QueryFamilyIndices families;
     vk::Queue graphicsQueue;
     vk::Queue presentationQueue;
+    vk::SwapchainKHR swapchain;
+    std::vector<vk::Image> swapchainImages;
+    std::vector<vk::ImageView> swapchainImageViews;
+
     
 private:
     GLFWwindow* initializeWindow() {
@@ -1052,7 +1072,6 @@ private:
     }
     
     vk::PhysicalDevice pickPhysicalDevice(const std::vector<vk::PhysicalDevice> &devices) {
-        
         for (const auto &device : devices) {
             showPhysicalDeviceInformation(device);
         }
@@ -1117,13 +1136,12 @@ private:
     
     
     QueryFamilyIndices identifyQueueFamilies(const vk::PhysicalDevice &physicalDevice, const vk::SurfaceKHR &surface) const {
-        
         QueryFamilyIndices indices;
         
         const auto queueProperties = physicalDevice.getQueueFamilyProperties();
         
         for (size_t i = 0; i < queueProperties.size(); i++) {
-            const auto props = queueProperties[i];
+            const auto &props = queueProperties[i];
             
             // grab the family index for graphics
             if (props.queueFlags & vk::QueueFlagBits::eGraphics) {
@@ -1153,32 +1171,59 @@ private:
     }
     
     
-    vk::SwapchainKHR createSwapchain(const vk::Device &device, const vk::SurfaceKHR &surface) const {
+    vk::SwapchainKHR createSwapchain(const vk::PhysicalDevice &physicalDevice, const vk::Device &device, const vk::SurfaceKHR &surface, const QueryFamilyIndices &indices) const {
+        const SwapchainDetail swapchainDetail = querySwapchainDetail(physicalDevice, surface);
+        const std::optional<vk::SurfaceFormatKHR> surfaceFormat = pickSwapchainSurfaceFormat(swapchainDetail.surfaceFormats);
+
+        assert(surfaceFormat);
+        const auto& presentModes = swapchainDetail.surfacePresentModes;
+        const vk::PresentModeKHR presentMode =  pickPresentMode({ presentModes.begin(), presentModes.end() });
+        const vk::Extent2D extent = pickSwapExtent(swapchainDetail.surfaceCapabilities);
+        const uint32_t imageCount = chooseImageCount(swapchainDetail.surfaceCapabilities);
         
-        
-        
-        return {};
+        vk::SwapchainCreateInfoKHR info = {};
+        info.surface = surface;
+        info.minImageCount = imageCount;
+        info.imageFormat = surfaceFormat->format;
+        info.imageColorSpace = surfaceFormat->colorSpace;
+        info.imageExtent = extent;
+        info.imageArrayLayers = 1;
+        info.imageUsage = vk::ImageUsageFlagBits::eColorAttachment;
+
+        if (indices.graphicsFamily != indices.presentFamily) {
+            const uint32_t queueFamilyIndices[] = {indices.graphicsFamily.value(), indices.presentFamily.value()};
+
+            info.imageSharingMode = vk::SharingMode::eConcurrent;
+            info.queueFamilyIndexCount = 2;
+            info.pQueueFamilyIndices = queueFamilyIndices;
+        }
+        else {
+            info.imageSharingMode = vk::SharingMode::eExclusive;
+            info.queueFamilyIndexCount = 0;
+            info.pQueueFamilyIndices = nullptr;
+        }
+
+        info.preTransform = swapchainDetail.surfaceCapabilities.currentTransform;
+        info.compositeAlpha = vk::CompositeAlphaFlagBitsKHR::eOpaque;
+        info.presentMode = presentMode;
+        info.oldSwapchain = nullptr;
+
+        return device.createSwapchainKHR(info);
     }
     
+
     SwapchainDetail querySwapchainDetail(const vk::PhysicalDevice &physicalDevice, const vk::SurfaceKHR &surface) const {
-    
         SwapchainDetail detail;
-        
-        // get physical surface capabilities
+
         detail.surfaceCapabilities = physicalDevice.getSurfaceCapabilitiesKHR(surface);
-        
-        // get surface formats
         detail.surfaceFormats = physicalDevice.getSurfaceFormatsKHR(surface);
-        
-        // get present modes
         detail.surfacePresentModes = physicalDevice.getSurfacePresentModesKHR(surface);
         
         return detail;
     }
     
     //! picks an required surface format
-    vk::SurfaceFormatKHR pickSwapchainSurfaceFormat(const std::vector<vk::SurfaceFormatKHR> &surfaceFormats) const {
-        
+    std::optional<vk::SurfaceFormatKHR> pickSwapchainSurfaceFormat(const std::vector<vk::SurfaceFormatKHR> &surfaceFormats) const {
         for (const vk::SurfaceFormatKHR &surfaceFormat : surfaceFormats) {
             if (surfaceFormat.format == vk::Format::eB8G8R8A8Srgb && surfaceFormat.colorSpace == vk::ColorSpaceKHR::eSrgbNonlinear) {
                 return surfaceFormat;
@@ -1207,6 +1252,47 @@ private:
             std::max(surfaceCaps.minImageExtent.width, std::min(surfaceCaps.maxImageExtent.width, SCREEN_WIDTH)),
             std::max(surfaceCaps.minImageExtent.height, std::min(surfaceCaps.maxImageExtent.height, SCREEN_HEIGHT)),
         };
+    }
+
+
+    uint32_t chooseImageCount(const vk::SurfaceCapabilitiesKHR& caps) const {
+        const uint32_t imageCount = caps.minImageCount + 1;
+
+        if (caps.maxImageCount > 0 && imageCount > caps.maxImageCount) {
+            return caps.maxImageCount;
+        }
+
+        return imageCount;
+    }
+
+
+    std::vector<vk::ImageView> createSwapchainImageViews(const vk::Device &device, const std::vector<vk::Image> &swapchainImages) const {
+        std::vector<vk::ImageView> imageViews;
+
+        imageViews.reserve(swapchainImages.size());
+
+        for (const vk::Image& image : swapchainImages) {
+            vk::ImageViewCreateInfo info = {};
+
+            info.image = image;
+            info.viewType = vk::ImageViewType::e2D;
+            
+            info.components.r = vk::ComponentSwizzle::eIdentity;
+            info.components.g = vk::ComponentSwizzle::eIdentity;
+            info.components.b = vk::ComponentSwizzle::eIdentity;
+            info.components.a = vk::ComponentSwizzle::eIdentity;
+            info.subresourceRange.aspectMask = vk::ImageAspectFlagBits::eColor;
+            info.subresourceRange.baseMipLevel = 0;
+            info.subresourceRange.levelCount = 1;
+            info.subresourceRange.baseArrayLayer = 0;
+            info.subresourceRange.layerCount = 1;
+
+            vk::ImageView imageView = device.createImageView(info);
+
+            imageViews.push_back(imageView);
+        }
+
+        return imageViews;
     }
 };
 

@@ -30,7 +30,7 @@ namespace XE {
         assert(type >= DataType::MetaFirst);
         assert(type < DataType::MetaCount);
 
-        const GLenum result = dataType[static_cast<int>(type)];
+        const GLenum result = dataType[static_cast<size_t>(type)];
 
         assert(result != static_cast<GLenum>(0));
 
@@ -48,7 +48,7 @@ namespace XE {
         assert(format >= PixelFormat::MetaFirst);
         assert(format < PixelFormat::MetaCount);
 
-        const GLenum result = pixelFormat[static_cast<int>(format)];
+        const GLenum result = pixelFormat[static_cast<size_t>(format)];
 
         assert(result != static_cast<GLenum>(0));
 
@@ -62,7 +62,7 @@ namespace XE {
     };
 
     GLenum convertToGL(const BufferType type) {
-        return bufferType[static_cast<int>(type)];
+        return bufferType[static_cast<size_t>(type)];
     }
 
 
@@ -73,9 +73,9 @@ namespace XE {
     }};
 
     GLenum convertToGL(const BufferUsage usage, const BufferAccess access) {
-        const auto& bufferUsage = bufferUsageAccess[static_cast<int>(access)];
+        const auto& bufferUsage = bufferUsageAccess[static_cast<size_t>(access)];
 
-        return bufferUsage[static_cast<int>(usage)];
+        return bufferUsage[static_cast<size_t>(usage)];
     }
 
 
@@ -89,7 +89,7 @@ namespace XE {
     };
 
     GLenum convertToGL(const PrimitiveType type) {
-        return primitiveType[static_cast<int>(type)];
+        return primitiveType[static_cast<size_t>(type)];
     }
     
 
@@ -100,7 +100,7 @@ namespace XE {
     };
 
     GLenum convertToGL(const DepthFunc func) {
-        return depthFunc[static_cast<int>(func)];
+        return depthFunc[static_cast<size_t>(func)];
     }
 
 
@@ -109,7 +109,7 @@ namespace XE {
     };
 
     GLenum convertToGL(const PolygonMode mode) {
-        return polygonMode[static_cast<int>(mode)];
+        return polygonMode[static_cast<size_t>(mode)];
     }
 
     
@@ -118,7 +118,7 @@ namespace XE {
     };
 
     GLenum convertToGL(const FrontFaceOrder order) {
-        return frontFaceOrder[static_cast<int>(order)];
+        return frontFaceOrder[static_cast<size_t>(order)];
     }
 
     static const std::array<GLenum, 14> blendParams {
@@ -139,7 +139,7 @@ namespace XE {
     };
 
     GLenum convertToGL(const BlendParam param) {
-        return blendParams[static_cast<int>(param)];
+        return blendParams[static_cast<size_t>(param)];
     }
 
     
@@ -149,7 +149,7 @@ namespace XE {
     };
 
     GLenum convertToGL(const TextureFilter filter) {
-        return filters[static_cast<int>(filter)];
+        return filters[static_cast<size_t>(filter)];
     }
 
     static const std::array<GLenum, 2> textureWraps {
@@ -158,11 +158,11 @@ namespace XE {
     };
     
     GLenum convertToGL(const TextureWrap wrap) {
-        return textureWraps[static_cast<int>(wrap)];
+        return textureWraps[static_cast<size_t>(wrap)];
     }
     
     GLboolean convertToGL(const bool value) {
-        return value ? GL_TRUE : GL_FALSE;
+        return static_cast<GLboolean>(value ? GL_TRUE : GL_FALSE);
     }
     
     GLenum convertToGL(const TextureCubeMapSide side) {
@@ -185,6 +185,9 @@ namespace XE {
         case TextureCubeMapSide::NegativeZ:
             return GL_TEXTURE_CUBE_MAP_NEGATIVE_Z;
             
+        case TextureCubeMapSide::Unknown:
+            return GL_INVALID_ENUM;
+
         default:
             return GL_INVALID_ENUM;
         }

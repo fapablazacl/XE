@@ -29,8 +29,8 @@ namespace XE {
             case PixelFormat::R8G8B8: return GL_RGB;
             case PixelFormat::R8G8B8A8: return GL_RGBA;
             default: 
-                return 0;
                 assert(false);
+                return 0;
         }
     }
 
@@ -39,8 +39,8 @@ namespace XE {
         case BufferType::Vertex: return GL_ARRAY_BUFFER;
         case BufferType::Index: return GL_ELEMENT_ARRAY_BUFFER;
         default: 
-            return 0;
             assert(false);
+            return 0;
         }
     }
 
@@ -56,8 +56,8 @@ namespace XE {
             return GL_STREAM_DRAW;
 
         default:
-            return 0;
             assert(false);
+            return 0;
         }
     }
 
