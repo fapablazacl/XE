@@ -884,6 +884,13 @@ namespace XE {
 }
 
 
+struct SwapchainDetail {
+    vk::SurfaceCapabilitiesKHR surfaceCapabilities;
+    std::vector<vk::SurfaceFormatKHR> surfaceFormats;
+    std::vector<vk::PresentModeKHR> surfacePresentModes;
+};
+
+
 class VulkanRenderer {
 public:
     VulkanRenderer() {}
@@ -916,6 +923,7 @@ public:
         
         device.getQueue(families.presentFamily.value(), 0, &presentationQueue);
         assert(presentationQueue);
+        
     }
     
     
@@ -1134,7 +1142,7 @@ private:
         return indices;
     }
     
-    vk::SurfaceKHR createSurface(GLFWwindow* window, vk::Instance &instance) {
+    vk::SurfaceKHR createSurface(GLFWwindow* window, vk::Instance &instance) const {
         VkSurfaceKHR rawsurf;
         
         if (glfwCreateWindowSurface(instance, window, nullptr, &rawsurf) != VK_SUCCESS) {
@@ -1142,6 +1150,63 @@ private:
         }
         
         return rawsurf;
+    }
+    
+    
+    vk::SwapchainKHR createSwapchain(const vk::Device &device, const vk::SurfaceKHR &surface) const {
+        
+        
+        
+        return {};
+    }
+    
+    SwapchainDetail querySwapchainDetail(const vk::PhysicalDevice &physicalDevice, const vk::SurfaceKHR &surface) const {
+    
+        SwapchainDetail detail;
+        
+        // get physical surface capabilities
+        detail.surfaceCapabilities = physicalDevice.getSurfaceCapabilitiesKHR(surface);
+        
+        // get surface formats
+        detail.surfaceFormats = physicalDevice.getSurfaceFormatsKHR(surface);
+        
+        // get present modes
+        detail.surfacePresentModes = physicalDevice.getSurfacePresentModesKHR(surface);
+        
+        return detail;
+    }
+    
+    //! picks an required surface format
+    vk::SurfaceFormatKHR pickSwapchainSurfaceFormat(const std::vector<vk::SurfaceFormatKHR> &surfaceFormats) const {
+        
+        for (const vk::SurfaceFormatKHR &surfaceFormat : surfaceFormats) {
+            if (surfaceFormat.format == vk::Format::eB8G8R8A8Srgb && surfaceFormat.colorSpace == vk::ColorSpaceKHR::eSrgbNonlinear) {
+                return surfaceFormat;
+            }
+        }
+        
+        return {};
+    }
+    
+    vk::PresentModeKHR pickPresentMode(const std::set<vk::PresentModeKHR> &presentModes) const {
+        
+        if (const auto it = presentModes.find(vk::PresentModeKHR::eMailbox); it != presentModes.end()) {
+            return vk::PresentModeKHR::eMailbox;
+        }
+        
+        return vk::PresentModeKHR::eFifo;
+    }
+    
+    
+    vk::Extent2D pickSwapExtent(const vk::SurfaceCapabilitiesKHR &surfaceCaps) const {
+        if (surfaceCaps.currentExtent.width != UINT32_MAX) {
+            return surfaceCaps.currentExtent;
+        }
+        
+        return {
+            std::max(surfaceCaps.minImageExtent.width, std::min(surfaceCaps.maxImageExtent.width, SCREEN_WIDTH)),
+            std::max(surfaceCaps.minImageExtent.height, std::min(surfaceCaps.maxImageExtent.height, SCREEN_HEIGHT)),
+        };
     }
 };
 
