@@ -1,12 +1,18 @@
 
+#include <XE/Predef.h>
+
+#if defined(_MSVC)
 #pragma warning(push, 0)
+#endif
 
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
 
 #include <vulkan/vulkan.hpp>
 
+#if defined(_MSVC)
 #pragma warning(pop, 0)
+#endif
 
 #include <vector>
 #include <cassert>
@@ -18,9 +24,6 @@
 #include <optional>
 #include <set>
 #include <fstream>
-
-#include <XE/Predef.h>
-
 
 std::ostream& operator<< (std::ostream &os, const vk::PhysicalDeviceType deviceType) {
     switch (deviceType) {
