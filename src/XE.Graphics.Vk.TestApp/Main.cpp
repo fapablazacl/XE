@@ -1,7 +1,7 @@
 
 #include <XE/Predef.h>
 
-#if defined(_MSVC)
+#if defined(_MSC_VER)
 #pragma warning(push, 0)
 #endif
 
@@ -10,7 +10,7 @@
 
 #include <vulkan/vulkan.hpp>
 
-#if defined(_MSVC)
+#if defined(_MSC_VER)
 #pragma warning(pop, 0)
 #endif
 
@@ -76,6 +76,7 @@ struct SwapChainSupportDetails {
     std::vector<VkSurfaceFormatKHR> formats;
     std::vector<VkPresentModeKHR> presentModes;
 };
+
 
 
 static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(
@@ -938,15 +939,33 @@ public:
         mDevice.getQueue(mFamilies.presentFamily.value(), 0, &mPresentationQueue);
         assert(mPresentationQueue);
 
-        mSwapchain = createSwapchain(mPhysicalDevice, mDevice, mSurface, mFamilies);
+        /*Swapchain initialization section*/
+        const SwapchainDetail swapchainDetail = querySwapchainDetail(mPhysicalDevice, mSurface);
+        const uint32_t imageCount = chooseImageCount(swapchainDetail.surfaceCapabilities);
+
+        const std::optional<vk::SurfaceFormatKHR> surfaceFormat = pickSwapchainSurfaceFormat(swapchainDetail.surfaceFormats);
+        assert(surfaceFormat);
+
+        mSwapchainFormat = surfaceFormat.value();
+        mSwapchainExtent = pickSwapExtent(swapchainDetail.surfaceCapabilities);
+
+        mSwapchain = createSwapchain(
+            mPhysicalDevice, 
+            mDevice, 
+            mSurface, 
+            mSwapchainFormat, 
+            mSwapchainExtent, 
+            pickPresentMode(swapchainDetail.surfacePresentModes), 
+            imageCount, 
+            swapchainDetail.surfaceCapabilities.currentTransform, 
+            mFamilies);
         assert(mSwapchain);
 
         mSwapchainImages = mDevice.getSwapchainImagesKHR(mSwapchain);
-        mSwapchainImageViews = createSwapchainImageViews(mDevice, mSwapchainImages);
-
+        mSwapchainImageViews = createSwapchainImageViews(mDevice, mSwapchainFormat, mSwapchainImages);
     }
     
-    
+
     void terminate() {
         terminateWindow(mWindow);
     }
@@ -980,8 +999,9 @@ private:
     vk::SwapchainKHR mSwapchain;
     std::vector<vk::Image> mSwapchainImages;
     std::vector<vk::ImageView> mSwapchainImageViews;
+    vk::Extent2D mSwapchainExtent;
+    vk::SurfaceFormatKHR mSwapchainFormat;
 
-    
 private:
     GLFWwindow* initializeWindow() {
         glfwInit();
@@ -1175,22 +1195,23 @@ private:
     }
     
     
-    vk::SwapchainKHR createSwapchain(const vk::PhysicalDevice &physicalDevice, const vk::Device &device, const vk::SurfaceKHR &surface, const QueryFamilyIndices &indices) const {
-        const SwapchainDetail swapchainDetail = querySwapchainDetail(physicalDevice, surface);
-        const std::optional<vk::SurfaceFormatKHR> surfaceFormat = pickSwapchainSurfaceFormat(swapchainDetail.surfaceFormats);
-
-        assert(surfaceFormat);
-        const auto& presentModes = swapchainDetail.surfacePresentModes;
-        const vk::PresentModeKHR presentMode =  pickPresentMode(presentModes);
-        const vk::Extent2D extent = pickSwapExtent(swapchainDetail.surfaceCapabilities);
-        const uint32_t imageCount = chooseImageCount(swapchainDetail.surfaceCapabilities);
-        
+    vk::SwapchainKHR createSwapchain(
+        const vk::PhysicalDevice &physicalDevice, 
+        const vk::Device &device, 
+        const vk::SurfaceKHR &surface, 
+        const vk::SurfaceFormatKHR &swapchainFormat,
+        const vk::Extent2D &swapchainExtent,
+        const vk::PresentModeKHR presentMode,
+        const uint32_t imageCount,
+        const vk::SurfaceTransformFlagBitsKHR preTransform,
+        const QueryFamilyIndices &indices
+    ) const {
         vk::SwapchainCreateInfoKHR info = {};
         info.surface = surface;
         info.minImageCount = imageCount;
-        info.imageFormat = surfaceFormat->format;
-        info.imageColorSpace = surfaceFormat->colorSpace;
-        info.imageExtent = extent;
+        info.imageFormat = swapchainFormat.format;
+        info.imageColorSpace = swapchainFormat.colorSpace;
+        info.imageExtent = swapchainExtent;
         info.imageArrayLayers = 1;
         info.imageUsage = vk::ImageUsageFlagBits::eColorAttachment;
 
@@ -1207,7 +1228,7 @@ private:
             info.pQueueFamilyIndices = nullptr;
         }
 
-        info.preTransform = swapchainDetail.surfaceCapabilities.currentTransform;
+        info.preTransform = preTransform;
         info.compositeAlpha = vk::CompositeAlphaFlagBitsKHR::eOpaque;
         info.presentMode = presentMode;
         info.oldSwapchain = nullptr;
@@ -1272,7 +1293,11 @@ private:
     }
 
 
-    std::vector<vk::ImageView> createSwapchainImageViews(const vk::Device &device, const std::vector<vk::Image> &swapchainImages) const {
+    std::vector<vk::ImageView> createSwapchainImageViews(
+        const vk::Device &device, 
+        const vk::SurfaceFormatKHR &swapchainFormat, 
+        const std::vector<vk::Image> &swapchainImages
+    ) const {
         std::vector<vk::ImageView> imageViews;
 
         imageViews.reserve(swapchainImages.size());
@@ -1282,7 +1307,7 @@ private:
 
             info.image = image;
             info.viewType = vk::ImageViewType::e2D;
-            
+            info.format = swapchainFormat.format;
             info.components.r = vk::ComponentSwizzle::eIdentity;
             info.components.g = vk::ComponentSwizzle::eIdentity;
             info.components.b = vk::ComponentSwizzle::eIdentity;
@@ -1293,9 +1318,7 @@ private:
             info.subresourceRange.baseArrayLayer = 0;
             info.subresourceRange.layerCount = 1;
 
-            vk::ImageView imageView = device.createImageView(info);
-
-            imageViews.push_back(imageView);
+            imageViews.push_back(device.createImageView(info));
         }
 
         return imageViews;
