@@ -824,9 +824,9 @@ namespace XE {
                 renderPassInfo.renderArea.offset = {0, 0};
                 renderPassInfo.renderArea.extent = mSwapchainExtent;
 
-                VkClearValue clearValue = {};
+                VkClearValue clearValue;
                 clearValue.color = { 0.0f, 0.0f, 0.0f, 1.0f };
-
+                
                 renderPassInfo.clearValueCount = 1;
                 renderPassInfo.pClearValues = &clearValue;
 
@@ -950,7 +950,6 @@ public:
         mSwapchainExtent = pickSwapExtent(swapchainDetail.surfaceCapabilities);
 
         mSwapchain = createSwapchain(
-            mPhysicalDevice, 
             mDevice, 
             mSurface, 
             mSwapchainFormat, 
@@ -1196,7 +1195,6 @@ private:
     
     
     vk::SwapchainKHR createSwapchain(
-        const vk::PhysicalDevice &physicalDevice, 
         const vk::Device &device, 
         const vk::SurfaceKHR &surface, 
         const vk::SurfaceFormatKHR &swapchainFormat,
