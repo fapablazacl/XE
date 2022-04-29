@@ -83,7 +83,7 @@ static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(
     VkDebugUtilsMessageSeverityFlagBitsEXT /*severity*/,
     VkDebugUtilsMessageTypeFlagsEXT /*type*/,
     const VkDebugUtilsMessengerCallbackDataEXT *pCallbackData,
-    void */*pUserData*/) {
+    void * /*pUserData*/) {
     
     std::cout << pCallbackData->pMessage << std::endl;
     
@@ -1321,6 +1321,69 @@ private:
 
         return imageViews;
     }
+    
+    vk::Pipeline createGraphicsPipeline(vk::Device &device, const vk::Extent2D &swapchainExtent) const {
+        vk::ShaderModule vertModule = createShaderModule(device, readFile("media/shaders/triangle/vert.spv"));
+        vk::ShaderModule fragModule = createShaderModule(device, readFile("media/shaders/triangle/frag.spv"));
+        
+        vk::PipelineShaderStageCreateInfo vertexShaderStageInfo;
+        vertexShaderStageInfo.stage = vk::ShaderStageFlagBits::eVertex;
+        vertexShaderStageInfo.module = vertModule;
+        vertexShaderStageInfo.pName = "main";
+        
+        vk::PipelineShaderStageCreateInfo fragmentShaderStageInfo;
+        fragmentShaderStageInfo.stage = vk::ShaderStageFlagBits::eFragment;
+        fragmentShaderStageInfo.module = fragModule;
+        fragmentShaderStageInfo.pName = "main";
+        
+        // configured shader stages
+        const std::vector<vk::PipelineShaderStageCreateInfo> shaderStages = {
+            vertexShaderStageInfo,
+            fragmentShaderStageInfo
+        };
+        
+        // vertex layout
+        vk::PipelineVertexInputStateCreateInfo vertexInputInfo;
+        vertexInputInfo.vertexBindingDescriptionCount = 0;
+        vertexInputInfo.pVertexBindingDescriptions = nullptr;
+        vertexInputInfo.vertexAttributeDescriptionCount = 0;
+        vertexInputInfo.pVertexAttributeDescriptions = nullptr;
+        
+        // primitive used to draw
+        vk::PipelineInputAssemblyStateCreateInfo inputAssemblyInfo;
+        inputAssemblyInfo.topology = vk::PrimitiveTopology::eTriangleList;
+        inputAssemblyInfo.primitiveRestartEnable = VK_FALSE;
+        
+        // viewport
+        vk::Viewport viewport;
+        viewport.x = 0.0f;
+        viewport.y = 0.0f;
+        viewport.width = static_cast<float>(swapchainExtent.width);
+        viewport.height = static_cast<float>(swapchainExtent.height);
+        viewport.minDepth = 0.0f;
+        viewport.maxDepth = 1.0f;
+        
+        vk::Rect2D scissor;
+        scissor.extent = swapchainExtent;
+        
+        vk::PipelineViewportStateCreateInfo viewportInfo;
+        viewportInfo.pViewports = &viewport;
+        viewportInfo.viewportCount = 1;
+        viewportInfo.pScissors = &scissor;
+        viewportInfo.scissorCount = 1;
+        
+    }
+    
+    vk::ShaderModule createShaderModule(const vk::Device &device, const std::vector<char> &shaderCode) const {
+        vk::ShaderModuleCreateInfo info;
+        
+        info.codeSize = shaderCode.size();
+        info.pCode = reinterpret_cast<const uint32_t*>(shaderCode.data());
+        
+        return device.createShaderModule(info);
+    }
+    
+    
 };
 
 
