@@ -962,6 +962,11 @@ public:
 
         mSwapchainImages = mDevice.getSwapchainImagesKHR(mSwapchain);
         mSwapchainImageViews = createSwapchainImageViews(mDevice, mSwapchainFormat, mSwapchainImages);
+        
+        mPipelineLayout = createPipelineLayout(mDevice);
+        mRenderPass = createRenderPass(mDevice, mSwapchainFormat.format);
+        mGraphicsPipeline = createGraphicsPipeline(mDevice, mSwapchainExtent, mPipelineLayout, mRenderPass);
+        
     }
     
 
@@ -1000,7 +1005,10 @@ private:
     std::vector<vk::ImageView> mSwapchainImageViews;
     vk::Extent2D mSwapchainExtent;
     vk::SurfaceFormatKHR mSwapchainFormat;
-
+    vk::RenderPass mRenderPass;
+    vk::PipelineLayout mPipelineLayout;
+    vk::Pipeline mGraphicsPipeline;
+    
 private:
     GLFWwindow* initializeWindow() {
         glfwInit();
@@ -1322,7 +1330,7 @@ private:
         return imageViews;
     }
     
-    vk::Pipeline createGraphicsPipeline(vk::Device &device, const vk::Extent2D &swapchainExtent) const {
+    vk::Pipeline createGraphicsPipeline(vk::Device &device, const vk::Extent2D &swapchainExtent, const vk::PipelineLayout &pipelineLayout, const vk::RenderPass &renderPass) const {
         vk::ShaderModule vertModule = createShaderModule(device, readFile("media/shaders/triangle/vert.spv"));
         vk::ShaderModule fragModule = createShaderModule(device, readFile("media/shaders/triangle/frag.spv"));
         
@@ -1354,7 +1362,8 @@ private:
         inputAssemblyInfo.topology = vk::PrimitiveTopology::eTriangleList;
         inputAssemblyInfo.primitiveRestartEnable = VK_FALSE;
         
-        // viewport
+        // viewport specification
+        // region of the framebuffer
         vk::Viewport viewport;
         viewport.x = 0.0f;
         viewport.y = 0.0f;
@@ -1366,13 +1375,85 @@ private:
         vk::Rect2D scissor;
         scissor.extent = swapchainExtent;
         
-        vk::PipelineViewportStateCreateInfo viewportInfo;
-        viewportInfo.pViewports = &viewport;
-        viewportInfo.viewportCount = 1;
-        viewportInfo.pScissors = &scissor;
-        viewportInfo.scissorCount = 1;
+        vk::PipelineViewportStateCreateInfo viewportStateInfo;
+        viewportStateInfo.pViewports = &viewport;
+        viewportStateInfo.viewportCount = 1;
+        viewportStateInfo.pScissors = &scissor;
+        viewportStateInfo.scissorCount = 1;
         
+        // rasterization
+        // equivalent to RenderState
+        vk::PipelineRasterizationStateCreateInfo rasterizationStateInfo;
+        rasterizationStateInfo.depthClampEnable = VK_FALSE;
+        rasterizationStateInfo.rasterizerDiscardEnable = VK_FALSE;
+        rasterizationStateInfo.polygonMode = vk::PolygonMode::eFill;
+        rasterizationStateInfo.lineWidth = 1.0f;
+        rasterizationStateInfo.cullMode = vk::CullModeFlagBits::eBack;
+        rasterizationStateInfo.depthBiasEnable = VK_FALSE;
+        
+        // multisampling
+        vk::PipelineMultisampleStateCreateInfo multisampleStateInfo;
+        multisampleStateInfo.sampleShadingEnable = VK_FALSE;
+        multisampleStateInfo.rasterizationSamples = vk::SampleCountFlagBits::e1;
+        
+        // fragment color blending parameters
+        // describes how to combine the fragment's final color with its previous color
+        vk::PipelineColorBlendAttachmentState colorBlendAttachment;
+        colorBlendAttachment.colorWriteMask =
+            vk::ColorComponentFlagBits::eR |
+            vk::ColorComponentFlagBits::eG |
+            vk::ColorComponentFlagBits::eB |
+            vk::ColorComponentFlagBits::eA;
+        colorBlendAttachment.blendEnable = VK_FALSE;
+        
+        vk::PipelineColorBlendStateCreateInfo colorBlendStateInfo;
+        colorBlendStateInfo.logicOpEnable = VK_FALSE;
+        colorBlendStateInfo.attachmentCount = 1;
+        colorBlendStateInfo.pAttachments = &colorBlendAttachment;
+        
+        // dynamic state specification
+        std::vector<vk::DynamicState> dynamicStates = {
+            vk::DynamicState::eViewport, vk::DynamicState::eLineWidth
+        };
+        
+        vk::PipelineDynamicStateCreateInfo dynamicStateInfo;
+        dynamicStateInfo.dynamicStateCount = dynamicStates.size();
+        dynamicStateInfo.pDynamicStates = dynamicStates.data();
+        
+        vk::GraphicsPipelineCreateInfo pipelineInfo;
+        
+        // reference all the description states, created earlier in this method
+        
+        // shader stages used
+        pipelineInfo.stageCount = shaderStages.size();
+        pipelineInfo.pStages = shaderStages.data();
+        
+        pipelineInfo.pVertexInputState = &vertexInputInfo;
+        pipelineInfo.pInputAssemblyState = &inputAssemblyInfo;
+        pipelineInfo.pViewportState = &viewportStateInfo;
+        pipelineInfo.pRasterizationState = &rasterizationStateInfo;
+        pipelineInfo.pMultisampleState = &multisampleStateInfo;
+        pipelineInfo.pDepthStencilState = nullptr;
+        pipelineInfo.pColorBlendState = &colorBlendStateInfo;
+        pipelineInfo.pDynamicState = nullptr;
+        
+        pipelineInfo.layout = pipelineLayout;
+        
+        // the render pass that this pipeline will use
+        pipelineInfo.renderPass = renderPass;
+        
+        // the index of the sub pass within the sub pass that will be used
+        pipelineInfo.subpass = 0;
+        
+        auto pipelineResult = device.createGraphicsPipeline({}, pipelineInfo);
+        
+        if (pipelineResult.result != vk::Result::eSuccess) {
+            throw std::runtime_error("Can't create a GraphicsPipeline with those parameters.");
+        }
+        
+        return pipelineResult.value;
     }
+    
     
     vk::ShaderModule createShaderModule(const vk::Device &device, const std::vector<char> &shaderCode) const {
         vk::ShaderModuleCreateInfo info;
@@ -1383,7 +1464,82 @@ private:
         return device.createShaderModule(info);
     }
     
+    vk::PipelineLayout createPipelineLayout(const vk::Device &device) const {
+        // pipeline layout
+        // used for passing values to the uniforms found in the current shader program
+        vk::PipelineLayoutCreateInfo info;
+        info.setLayoutCount = 0;
+        
+        return device.createPipelineLayout(info);
+    }
     
+    vk::RenderPass createRenderPass(const vk::Device &device, const vk::Format &swapchainFormat) const {
+        // Color Buffer Attachment
+        // its represented from by one of the images in the Swapchain
+        vk::AttachmentDescription colorAttachment;
+        
+        // format should match the format of the swapchain images
+        colorAttachment.format = swapchainFormat;
+        
+        // no multisampling.
+        colorAttachment.samples = vk::SampleCountFlagBits::e1;
+        
+        // what to do before rendering
+        // in this case, clear the color buffer
+        // apply for color and depth data
+        colorAttachment.loadOp = vk::AttachmentLoadOp::eClear;
+        
+        // what to do after rendering
+        // in this case, rendered content will be stored in memory
+        // apply for color and depth data
+        colorAttachment.storeOp = vk::AttachmentStoreOp::eStore;
+        
+        // what to do before and after rendering, this time, for the stencil buffer.
+        // dont-care for now.
+        colorAttachment.stencilLoadOp = vk::AttachmentLoadOp::eDontCare;
+        colorAttachment.stencilStoreOp = vk::AttachmentStoreOp::eDontCare;
+        
+        // what change to make with respecto to the layout of the pixels in memory
+        // describes wich layout the image will have before the render pass begins
+        colorAttachment.initialLayout = vk::ImageLayout::eUndefined;
+        
+        // specified wich layout the image will have after the render pass finish.
+        // present with the swapchain.
+        colorAttachment.finalLayout = vk::ImageLayout::ePresentSrcKHR;
+        
+        
+        // subpass specification
+        
+        // Attachment reference
+        // specifies references to use within a subpass
+        vk::AttachmentReference colorAttachmentRef;
+        
+        // attachment index from the attachment description array
+        colorAttachmentRef.attachment = 0;
+        
+        // we will use the attachment as a Color Buffer
+        colorAttachmentRef.layout = vk::ImageLayout::eColorAttachmentOptimal;
+        
+        // describes a render subpass
+        vk::SubpassDescription subpass;
+        
+        // this is a graphics subpass
+        subpass.pipelineBindPoint = vk::PipelineBindPoint::eGraphics;
+        
+        subpass.colorAttachmentCount = 1;
+        subpass.pColorAttachments = &colorAttachmentRef;
+        
+        // render pass creation
+        // use the attachment and the sub pass specification
+        // subpasses uses internally the attachments specified here, via the attachment reference, specified earlier.
+        vk::RenderPassCreateInfo renderPassInfo;
+        renderPassInfo.attachmentCount = 1;
+        renderPassInfo.pAttachments = &colorAttachment;
+        renderPassInfo.subpassCount = 1;
+        renderPassInfo.pSubpasses = &subpass;
+        
+        return device.createRenderPass(renderPassInfo);
+    }
 };
 
 
