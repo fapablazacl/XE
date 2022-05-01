@@ -967,6 +967,9 @@ public:
         mRenderPass = createRenderPass(mDevice, mSwapchainFormat.format);
         mGraphicsPipeline = createGraphicsPipeline(mDevice, mSwapchainExtent, mPipelineLayout, mRenderPass);
         
+        for (const vk::ImageView &imageView : mSwapchainImageViews) {
+            mSwapchainFramebuffers.push_back(createFramebuffer(mDevice, imageView, mRenderPass, mSwapchainExtent));
+        }
     }
     
 
@@ -1008,6 +1011,7 @@ private:
     vk::RenderPass mRenderPass;
     vk::PipelineLayout mPipelineLayout;
     vk::Pipeline mGraphicsPipeline;
+    std::vector<vk::Framebuffer> mSwapchainFramebuffers;
     
 private:
     GLFWwindow* initializeWindow() {
@@ -1345,7 +1349,7 @@ private:
         fragmentShaderStageInfo.pName = "main";
         
         // configured shader stages
-        const std::vector<vk::PipelineShaderStageCreateInfo> shaderStages = {
+        const std::vector<vk::PipelineShaderStageCreateInfo> shaderStages {
             vertexShaderStageInfo,
             fragmentShaderStageInfo
         };
@@ -1381,8 +1385,8 @@ private:
         viewportStateInfo.pScissors = &scissor;
         viewportStateInfo.scissorCount = 1;
         
-        // rasterization
-        // equivalent to RenderState
+        // rasterization state
+        // equivalent to RenderState in Direct3D 7-ish
         vk::PipelineRasterizationStateCreateInfo rasterizationStateInfo;
         rasterizationStateInfo.depthClampEnable = VK_FALSE;
         rasterizationStateInfo.rasterizerDiscardEnable = VK_FALSE;
@@ -1539,6 +1543,27 @@ private:
         renderPassInfo.pSubpasses = &subpass;
         
         return device.createRenderPass(renderPassInfo);
+    }
+    
+    
+    vk::Framebuffer createFramebuffer(const vk::Device &device, const vk::ImageView &imageView, const vk::RenderPass &renderPass, const vk::Extent2D &swapchainExtent) const {
+        vk::FramebufferCreateInfo info;
+        
+        // render pass to be compatible with
+        info.renderPass = renderPass;
+        
+        // image views to bind with
+        info.attachmentCount = 1;
+        info.pAttachments = &imageView;
+        
+        // size of the framebuffer
+        info.width = swapchainExtent.width;
+        info.height = swapchainExtent.height;
+        
+        // our image views from the swapchain are single-layered, so we put 1 one
+        info.layers = 1;
+        
+        return device.createFramebuffer(info);
     }
 };
 
