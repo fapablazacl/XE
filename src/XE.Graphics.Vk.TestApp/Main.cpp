@@ -970,9 +970,12 @@ public:
         for (const vk::ImageView &imageView : mSwapchainImageViews) {
             mSwapchainFramebuffers.push_back(createFramebuffer(mDevice, imageView, mRenderPass, mSwapchainExtent));
         }
+        
+        mCommandPool = createCommandPool(mDevice, mFamilies.graphicsFamily.value());
+        mCommandBuffer = allocateCommandBuffer(mDevice, mCommandPool);
     }
     
-
+    
     void terminate() {
         terminateWindow(mWindow);
     }
@@ -1012,6 +1015,9 @@ private:
     vk::PipelineLayout mPipelineLayout;
     vk::Pipeline mGraphicsPipeline;
     std::vector<vk::Framebuffer> mSwapchainFramebuffers;
+    
+    vk::CommandPool mCommandPool;
+    vk::CommandBuffer mCommandBuffer;
     
 private:
     GLFWwindow* initializeWindow() {
@@ -1564,6 +1570,77 @@ private:
         info.layers = 1;
         
         return device.createFramebuffer(info);
+    }
+    
+    vk::CommandPool createCommandPool(const vk::Device &device, const uint32_t queueFamily) const {
+        // a commandPool is an Object that records different types of commands (like rendering and memory transfer),
+        // to be executed by the GPU.
+        
+        vk::CommandPoolCreateInfo info;
+        
+        // specifies we will be recretating the command pool in every render frame
+        info.flags = vk::CommandPoolCreateFlagBits::eResetCommandBuffer;
+        
+        // put this command pool in the specified Queue Family
+        info.queueFamilyIndex = queueFamily;
+        
+        return device.createCommandPool(info);
+    }
+    
+    
+    vk::CommandBuffer allocateCommandBuffer(const vk::Device &device, const vk::CommandPool &commandPool) const {
+        vk::CommandBufferAllocateInfo info;
+        
+        info.commandPool = commandPool;
+        // a primary buffer is a buffer that can be submitted to a queue for execution directly, but can't be called from another buffers
+        // a secondary buffer is a buffer that can't be submitted to a queue for execution, but can be called from primary buffers
+        info.level = vk::CommandBufferLevel::ePrimary;
+        
+        // the number of buffers to allocate
+        info.commandBufferCount = 1;
+        
+        vk::CommandBuffer commandBuffer;
+        
+        const vk::Result result = device.allocateCommandBuffers(&info, &commandBuffer);
+        
+        if (result != vk::Result::eSuccess) {
+            throw std::runtime_error("Can't allocate the CommandBuffer with the supplied parameters.");
+        }
+        
+        return commandBuffer;
+    }
+    
+    
+    vk::RenderPassBeginInfo createRenderPassBeginInfo(const vk::Framebuffer &framebuffer, const vk::ClearValue &clearValue, const vk::RenderPass &renderPass, const vk::Extent2D &swapchainExtent) const {
+        
+        // render pass
+        vk::RenderPassBeginInfo info;
+        
+        info.renderPass = renderPass;
+        info.framebuffer = framebuffer;
+        info.renderArea.offset = vk::Offset2D{0, 0};
+        info.renderArea.extent = swapchainExtent;
+        info.clearValueCount = 1;
+        info.pClearValues = &clearValue;
+        
+        return info;
+    }
+    
+    
+    void recordCommandBuffer(const vk::CommandBuffer &commandBuffer, const vk::Framebuffer &framebuffer, const vk::RenderPass &renderPass, const vk::Extent2D &swapchainExtent, const vk::Pipeline &graphicsPipeline) const {
+        
+        vk::ClearValue clearColor;
+        clearColor.color.setFloat32({0.0f, 0.0f, 0.0f, 1.0f});
+        
+        vk::CommandBufferBeginInfo beginInfo;
+        
+        // implicitlt, resets the command buffer
+        commandBuffer.begin(beginInfo);
+        commandBuffer.beginRenderPass(createRenderPassBeginInfo(framebuffer, clearColor, renderPass, swapchainExtent), vk::SubpassContents::eInline);
+        commandBuffer.bindPipeline(vk::PipelineBindPoint::eGraphics, graphicsPipeline);
+        commandBuffer.draw(3, 1, 0, 0);
+        commandBuffer.endRenderPass();
+        commandBuffer.end();
     }
 };
 
