@@ -678,7 +678,7 @@ private:
         rasterizationStateInfo.rasterizerDiscardEnable = VK_FALSE;
         rasterizationStateInfo.polygonMode = vk::PolygonMode::eFill;
         rasterizationStateInfo.lineWidth = 1.0f;
-        rasterizationStateInfo.cullMode = vk::CullModeFlagBits::eNone;
+        rasterizationStateInfo.cullMode = vk::CullModeFlagBits::eBack;
         rasterizationStateInfo.frontFace = vk::FrontFace::eClockwise;
         rasterizationStateInfo.depthBiasEnable = VK_FALSE;
         
