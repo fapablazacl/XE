@@ -825,7 +825,6 @@ namespace XE {
                 renderPassInfo.renderArea.extent = mSwapchainExtent;
 
                 VkClearValue clearValue;
-                clearValue.color = { 0.0f, 0.0f, 0.0f, 1.0f };
                 
                 renderPassInfo.clearValueCount = 1;
                 renderPassInfo.pClearValues = &clearValue;
@@ -973,6 +972,10 @@ public:
         
         mCommandPool = createCommandPool(mDevice, mFamilies.graphicsFamily.value());
         mCommandBuffer = allocateCommandBuffer(mDevice, mCommandPool);
+        
+        mImageAvailableSemaphore = mDevice.createSemaphore({});
+        mRenderFinishedSemaphore = mDevice.createSemaphore({});
+        mInFlightFence = createFence(mDevice);
     }
     
     
@@ -988,12 +991,14 @@ public:
         
         bool running = true;
         
-        while (running) {
+        while (running && !glfwWindowShouldClose(mWindow)) {
             glfwPollEvents();
             
             if (glfwGetKey(mWindow, GLFW_KEY_ESCAPE)) {
                 running = false;
             }
+            
+            drawFrame();
         }
     }
     
@@ -1018,6 +1023,15 @@ private:
     
     vk::CommandPool mCommandPool;
     vk::CommandBuffer mCommandBuffer;
+    
+    //! signals when an image is available from the swapchain
+    vk::Semaphore mImageAvailableSemaphore;
+    
+    //! signals when an image is ready for presentation (rendering process finished)
+    vk::Semaphore mRenderFinishedSemaphore;
+    
+    //! pending
+    vk::Fence mInFlightFence;
     
 private:
     GLFWwindow* initializeWindow() {
@@ -1641,6 +1655,73 @@ private:
         commandBuffer.draw(3, 1, 0, 0);
         commandBuffer.endRenderPass();
         commandBuffer.end();
+    }
+    
+    
+    vk::Fence createFence(const vk::Device &device) const {
+        vk::FenceCreateInfo info;
+        
+        info.flags = vk::FenceCreateFlagBits::eSignaled;
+        
+        return device.createFence(info);
+    }
+    
+    
+    void drawFrame() const {
+        // first, wait for the previous frame to render
+        const auto waitResult = mDevice.waitForFences(1, &mInFlightFence, VK_TRUE, UINT64_MAX);
+        
+        if (waitResult != vk::Result::eSuccess) {
+            vk::throwResultException(waitResult, "Fence Wait operation failed.");
+        }
+        
+        // reset the frame-rendering fence
+        const auto resetResult = mDevice.resetFences(1, &mInFlightFence);
+        
+        if (resetResult != vk::Result::eSuccess) {
+            vk::throwResultException(resetResult, "Fence Reset operation failed.");
+        }
+        
+        // image index, in the mSwapchainImage member array
+        uint32_t imageIndex;
+        
+        // acquire an image from the swapchain
+        const auto acquireResult = mDevice.acquireNextImageKHR(mSwapchain, UINT64_MAX, mImageAvailableSemaphore, nullptr, &imageIndex);
+        if (acquireResult != vk::Result::eSuccess) {
+            vk::throwResultException(acquireResult, "Acquire image from the swapchain operation failed.");
+        }
+        
+        assert(imageIndex < mSwapchainFramebuffers.size());
+        
+        // record the necesary commands render the frame
+        mCommandBuffer.reset();
+        recordCommandBuffer(mCommandBuffer, mSwapchainFramebuffers[imageIndex], mRenderPass, mSwapchainExtent, mGraphicsPipeline);
+        
+        // submit the command buffer to the graphics pipeline queue
+        const vk::Semaphore waitSemaphores[] = { mImageAvailableSemaphore };
+        const vk::PipelineStageFlags waitStages[] = { vk::PipelineStageFlagBits::eColorAttachmentOutput };
+        const vk::Semaphore signalSemaphores[] = { mRenderFinishedSemaphore };
+        
+        vk::SubmitInfo submitInfo;
+        
+        // configure the semaphores to use for waiting the execution in specific
+        // pipeline stages (color attachment output, in this case), begins.
+        submitInfo.waitSemaphoreCount = 1;
+        submitInfo.pWaitSemaphores = waitSemaphores;
+        submitInfo.pWaitDstStageMask = waitStages;
+        
+        // the commands to be submitted
+        submitInfo.commandBufferCount = 1;
+        submitInfo.pCommandBuffers = &mCommandBuffer;
+        
+        // the semaphores to signal qhen
+        submitInfo.signalSemaphoreCount = 1;
+        submitInfo.pSignalSemaphores = signalSemaphores;
+        
+        const auto resultSubmit = mGraphicsQueue.submit(1, &submitInfo, mInFlightFence);
+        if (resultSubmit != vk::Result::eSuccess) {
+            vk::throwResultException(resetResult, "Graphics queue submit operation failed.");
+        }
     }
 };
 
