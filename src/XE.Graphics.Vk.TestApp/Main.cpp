@@ -780,7 +780,7 @@ private:
         colorAttachment.stencilLoadOp = vk::AttachmentLoadOp::eDontCare;
         colorAttachment.stencilStoreOp = vk::AttachmentStoreOp::eDontCare;
         
-        // what change to make with respecto to the layout of the pixels in memory
+        // what change to make with respect to the layout of the pixels in memory
         // describes wich layout the image will have before the render pass begins
         colorAttachment.initialLayout = vk::ImageLayout::eUndefined;
         
