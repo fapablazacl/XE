@@ -200,7 +200,7 @@ public:
         assert(surfaceFormat);
 
         mSwapchainFormat = surfaceFormat.value();
-        mSwapchainExtent = pickSwapExtent(swapchainDetail.surfaceCapabilities);
+        mSwapchainExtent = pickSwapExtent(mWindow, swapchainDetail.surfaceCapabilities);
 
         mSwapchain = createSwapchain(
             mDevice, 
@@ -555,14 +555,24 @@ private:
     }
     
     
-    vk::Extent2D pickSwapExtent(const vk::SurfaceCapabilitiesKHR &surfaceCaps) const {
+    vk::Extent2D pickSwapExtent(GLFWwindow *window, const vk::SurfaceCapabilitiesKHR &surfaceCaps) const {
+        assert(window);
+
         if (surfaceCaps.currentExtent.width != UINT32_MAX) {
             return surfaceCaps.currentExtent;
         }
         
+        int width, height;
+        glfwGetFramebufferSize(window, &width, &height);
+
+        const vk::Extent2D actualExtent = {
+            static_cast<uint32_t>(width), 
+            static_cast<uint32_t>(height)
+        };
+
         return {
-            std::max(surfaceCaps.minImageExtent.width, std::min(surfaceCaps.maxImageExtent.width, SCREEN_WIDTH)),
-            std::max(surfaceCaps.minImageExtent.height, std::min(surfaceCaps.maxImageExtent.height, SCREEN_HEIGHT)),
+            std::clamp(actualExtent.width, surfaceCaps.minImageExtent.width, surfaceCaps.maxImageExtent.width),
+            std::clamp(actualExtent.height, surfaceCaps.minImageExtent.height, surfaceCaps.maxImageExtent.height),
         };
     }
 
