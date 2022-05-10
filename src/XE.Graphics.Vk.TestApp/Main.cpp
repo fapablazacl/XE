@@ -25,6 +25,129 @@
 #include <set>
 #include <fstream>
 
+enum class HostPlatformFlagBits {
+    None = 0x00,
+    Debug = 0x01
+};
+
+
+class HostPlatform {
+public:
+    explicit HostPlatform(const std::string &title, const uint32_t screenWidth, const uint32_t screenHeight, const HostPlatformFlagBits flags) : mScreenWidth(screenWidth), mScreenHeight(screenHeight), mFlags(flags) {
+        assert(screenWidth > 0);
+        assert(screenHeight > 0);
+        
+        glfwInit();
+        glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+        glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
+        
+        mWindow = glfwCreateWindow(mScreenWidth, mScreenHeight, title.c_str(), nullptr, nullptr);
+    }
+    
+    ~HostPlatform() {
+        destroyWindow();
+        glfwTerminate();
+    }
+    
+    bool closeWasRequested() const {
+        return glfwGetKey(mWindow, GLFW_KEY_ESCAPE) == GLFW_PRESS || glfwWindowShouldClose(mWindow) == GLFW_TRUE;
+    }
+    
+    uint32_t getScreenWidth() const {
+        return mScreenWidth;
+    }
+    
+    uint32_t getScreenHeight() const {
+        return mScreenHeight;
+    }
+    
+    std::vector<const char*> enumerateRequiredInstanceExtensions() const {
+        uint32_t extensionCount = 0;
+        const char **extensions = glfwGetRequiredInstanceExtensions(&extensionCount);
+
+        std::vector<const char*> result = {extensions, extensions + extensionCount};
+
+        result.push_back("VK_KHR_get_physical_device_properties2");
+        
+        if (mFlags == HostPlatformFlagBits::Debug) {
+            result.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
+        }
+        
+        return result;
+    }
+    
+    std::vector<const char*> enumerateRequiredDeviceExtensions() const {
+        return {
+            // this extensions provides all the objects required for swapchains
+            VK_KHR_SWAPCHAIN_EXTENSION_NAME,
+            
+            // required for platforms where Vulkan isn't supported directly by the OS
+        #if defined(XE_OS_MACOS) || defined(XE_OS_IOS)
+            "VK_KHR_portability_subset"
+        #endif
+        };
+    }
+    
+    std::vector<const char*> enumerateValidationLayers() const {
+        if (mFlags == HostPlatformFlagBits::Debug) {
+            return { "VK_LAYER_KHRONOS_validation" };
+        }
+        
+        return {};
+    }
+    
+    void pollEvents() {
+        glfwPollEvents();
+    }
+    
+    vk::Extent2D pickSwapExtent(const vk::SurfaceCapabilitiesKHR &surfaceCaps) const {
+        assert(mWindow);
+
+        if (surfaceCaps.currentExtent.width != UINT32_MAX) {
+            return surfaceCaps.currentExtent;
+        }
+        
+        int width, height;
+        glfwGetFramebufferSize(mWindow, &width, &height);
+
+        const vk::Extent2D actualExtent = {
+            static_cast<uint32_t>(width),
+            static_cast<uint32_t>(height)
+        };
+
+        return {
+            std::clamp(actualExtent.width, surfaceCaps.minImageExtent.width, surfaceCaps.maxImageExtent.width),
+            std::clamp(actualExtent.height, surfaceCaps.minImageExtent.height, surfaceCaps.maxImageExtent.height),
+        };
+    }
+    
+    
+    vk::SurfaceKHR createSurface(vk::Instance &instance) const {
+        VkSurfaceKHR rawsurf;
+        
+        if (glfwCreateWindowSurface(instance, mWindow, nullptr, &rawsurf) != VK_SUCCESS) {
+            return {};
+        }
+        
+        return rawsurf;
+    }
+    
+private:
+    void destroyWindow() {
+        if (mWindow) {
+            glfwDestroyWindow(mWindow);
+            mWindow = nullptr;
+        }
+    }
+    
+private:
+    GLFWwindow *mWindow = nullptr;
+    uint32_t mScreenWidth = 1024;
+    uint32_t mScreenHeight = 768;
+    HostPlatformFlagBits mFlags;
+};
+
+
 std::ostream& operator<< (std::ostream &os, const vk::PhysicalDeviceType deviceType) {
     switch (deviceType) {
     case vk::PhysicalDeviceType::eCpu:
@@ -115,7 +238,7 @@ static std::vector<char> readFile(const std::string& filename) {
     if (! fs.is_open()) {
         throw std::runtime_error("failed to open file " + filename);
     }
-
+    
     const auto fileSize = fs.tellg();
     assert(fileSize >= 0);
     
@@ -129,27 +252,6 @@ static std::vector<char> readFile(const std::string& filename) {
     return buffer;
 }
 
-static const std::vector<const char*> gValidationLayers = {
-    "VK_LAYER_KHRONOS_validation"
-};
-
-static const std::vector<const char*> gDeviceExtensions = {
-    // Introduce los objetos de vkSwapchainKHR, que permiten presentar
-    // los resultados de renderizacion en hacia una Surface.
-    // Se debe habilitar al momento de crear el PhysicalDevice
-    VK_KHR_SWAPCHAIN_EXTENSION_NAME,
-    
-    // para plataformas en donde Vulkan no sea implementado directamente por el driver, se debe incluir esta extension
-#if defined(XE_OS_MACOS) || defined(XE_OS_IOS)
-    "VK_KHR_portability_subset"
-#endif
-};
-
-static const uint32_t SCREEN_WIDTH = 1024;
-static const uint32_t SCREEN_HEIGHT = 768;
-static const bool gEnableValidationLayers = true;
-
-
 struct SwapchainDetail {
     vk::SurfaceCapabilitiesKHR surfaceCapabilities;
     std::vector<vk::SurfaceFormatKHR> surfaceFormats;
@@ -159,24 +261,17 @@ struct SwapchainDetail {
 
 class VulkanRenderer {
 public:
-    VulkanRenderer() {}
+    explicit VulkanRenderer(HostPlatform &platform) : mPlatform(platform) {}
     
     void initialize() {
-        mWindow = initializeWindow();
-        assert(mWindow);
+        std::vector<const char*> extensions = mPlatform.enumerateRequiredInstanceExtensions();
         
-        std::vector<const char*> extensions = getRequiredExtensions();
-        
-        if (gEnableValidationLayers) {
-            extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
-        }
-        
-        mInstance = createInstance(extensions, gValidationLayers);
+        mInstance = createInstance(extensions, mPlatform.enumerateValidationLayers());
         assert(mInstance);
         
         mDebugMessenger = createDebugMessenger(mInstance);
         
-        mSurface = createSurface(mWindow, mInstance);
+        mSurface = mPlatform.createSurface(mInstance);
         assert(mSurface);
         
         mPhysicalDevice = pickPhysicalDevice(mInstance.enumeratePhysicalDevices());
@@ -200,8 +295,8 @@ public:
         assert(surfaceFormat);
 
         mSwapchainFormat = surfaceFormat.value();
-        mSwapchainExtent = pickSwapExtent(mWindow, swapchainDetail.surfaceCapabilities);
-
+        mSwapchainExtent = mPlatform.pickSwapExtent(swapchainDetail.surfaceCapabilities);
+        
         mSwapchain = createSwapchain(
             mDevice, 
             mSurface, 
@@ -233,31 +328,18 @@ public:
     }
     
     
-    void terminate() {
-        terminateWindow(mWindow);
-    }
+    void terminate() {}
     
     
     void renderLoop() {
-        if (!mWindow) {
-            return;
-        }
-        
-        bool running = true;
-        
-        while (running && !glfwWindowShouldClose(mWindow)) {
-            glfwPollEvents();
-            
-            if (glfwGetKey(mWindow, GLFW_KEY_ESCAPE)) {
-                running = false;
-            }
-            
+        while (! mPlatform.closeWasRequested()) {
+            mPlatform.pollEvents();
             drawFrame();
         }
     }
     
 private:
-    GLFWwindow *mWindow = nullptr;
+    HostPlatform &mPlatform;
     vk::Instance mInstance;
     vk::DebugUtilsMessengerEXT mDebugMessenger;
     vk::PhysicalDevice mPhysicalDevice;
@@ -289,23 +371,6 @@ private:
     vk::Fence mInFlightFence;
     
 private:
-    GLFWwindow* initializeWindow() {
-        glfwInit();
-        glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-        glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
-        
-        return glfwCreateWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Vulkan Window", nullptr, nullptr);
-    }
-    
-    
-    void terminateWindow(GLFWwindow *window) {
-        if (window) {
-            glfwDestroyWindow(window);
-        }
-        
-        glfwTerminate();
-    }
-    
     vk::ApplicationInfo createAppInfo() const {
         // Identifica a la aplicacion / motor en uso, para que pueda ser (potencialmente)
         // considerado por el implementador de Hardware (nVidia, Intel, etc), para aplicar
@@ -432,13 +497,19 @@ private:
         info.setQueueCreateInfoCount(static_cast<uint32_t>(queueInfos.size()));
         
         // set the required device extensions
-        info.setPEnabledExtensionNames(gDeviceExtensions);
-        info.setEnabledExtensionCount(static_cast<uint32_t>(gDeviceExtensions.size()));
+        const auto deviceExtensions = mPlatform.enumerateRequiredDeviceExtensions();
+        
+        if (deviceExtensions.size() > 0) {
+            info.setPEnabledExtensionNames(deviceExtensions);
+            info.setEnabledExtensionCount(static_cast<uint32_t>(deviceExtensions.size()));
+        }
         
         // set the validation layers
-        if (gEnableValidationLayers) {
-            info.setPEnabledLayerNames(gValidationLayers);
-            info.setEnabledLayerCount(static_cast<uint32_t>(gValidationLayers.size()));
+        auto validationLayers = mPlatform.enumerateValidationLayers();
+        
+        if (validationLayers.size() > 0) {
+            info.setPEnabledLayerNames(validationLayers);
+            info.setEnabledLayerCount(static_cast<uint32_t>(validationLayers.size()));
         }
         
         return physicalDevice.createDevice(info);
@@ -470,15 +541,7 @@ private:
         return indices;
     }
     
-    vk::SurfaceKHR createSurface(GLFWwindow* window, vk::Instance &instance) const {
-        VkSurfaceKHR rawsurf;
-        
-        if (glfwCreateWindowSurface(instance, window, nullptr, &rawsurf) != VK_SUCCESS) {
-            return {};
-        }
-        
-        return rawsurf;
-    }
+
     
     
     vk::SwapchainKHR createSwapchain(
@@ -554,28 +617,6 @@ private:
         return vk::PresentModeKHR::eFifo;
     }
     
-    
-    vk::Extent2D pickSwapExtent(GLFWwindow *window, const vk::SurfaceCapabilitiesKHR &surfaceCaps) const {
-        assert(window);
-
-        if (surfaceCaps.currentExtent.width != UINT32_MAX) {
-            return surfaceCaps.currentExtent;
-        }
-        
-        int width, height;
-        glfwGetFramebufferSize(window, &width, &height);
-
-        const vk::Extent2D actualExtent = {
-            static_cast<uint32_t>(width), 
-            static_cast<uint32_t>(height)
-        };
-
-        return {
-            std::clamp(actualExtent.width, surfaceCaps.minImageExtent.width, surfaceCaps.maxImageExtent.width),
-            std::clamp(actualExtent.height, surfaceCaps.minImageExtent.height, surfaceCaps.maxImageExtent.height),
-        };
-    }
-
 
     uint32_t chooseImageCount(const vk::SurfaceCapabilitiesKHR& caps) const {
         const uint32_t imageCount = caps.minImageCount + 1;
@@ -1037,7 +1078,11 @@ private:
 
 
 int main() {
-    VulkanRenderer renderer;
+    const uint32_t SCREEN_WIDTH = 1024;
+    const uint32_t SCREEN_HEIGHT = 768;
+    
+    HostPlatform platform{"", SCREEN_WIDTH, SCREEN_HEIGHT, HostPlatformFlagBits::Debug};
+    VulkanRenderer renderer{platform};
     
     renderer.initialize();
     renderer.renderLoop();
