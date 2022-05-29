@@ -1,5 +1,6 @@
 
 #include <XE/Predef.h>
+#include <XE/Math/Vector.h>
 
 #if defined(_MSC_VER)
 #pragma warning(push, 0)
@@ -24,6 +25,38 @@
 #include <optional>
 #include <set>
 #include <fstream>
+
+
+struct Vertex {
+    XE::Vector2f pos;
+    XE::Vector3f color;
+    
+    static vk::VertexInputBindingDescription createBindingDescription() {
+        vk::VertexInputBindingDescription desc;
+        
+        // all the vertex data is packed in just one array.
+        desc.binding = 0;
+        
+        // size, in bytes, of each vertex
+        desc.stride = sizeof(Vertex);
+        
+        // no instancing
+        desc.inputRate = vk::VertexInputRate::eVertex;
+        
+        return desc;
+    }
+    
+    static std::vector<vk::VertexInputAttributeDescription> createAttributeDescription() {
+        
+    }
+};
+
+const std::vector<Vertex> vertices {
+    {{0.0f, -0.5f}, {1.0f, 0.0f, 0.0f}},
+    {{0.5f, 0.5f}, {0.0f, 1.0f, 0.0f}},
+    {{-0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}}
+};
+
 
 enum class HostPlatformFlagBits {
     None = 0x00,
