@@ -1,0 +1,40 @@
+
+shader-program:
+  name: simple
+  - shader-module:
+    type: vertex
+    src: shaders/simple/vertex.glsl
+  - shader-module:
+    type: fragment
+    src: shaders/simple/fragment.glsl
+    
+scene:
+  name: "scene"
+  node:
+    name: "root"
+    - node:
+      name: "light"
+      light:
+        directional:
+          direction: [0.0, 0.0, -1.0]
+          ambient: [0.2, 0.2, 0.2, 1.0]
+          diffuse: [0.8, 0.8, 0.8, 1.0]
+    - node:
+      name: "camera"
+      camera: 
+        lookat:
+          position: [0.0, 0.0, -1.0]
+          lookat: [0.0, 0.0, 0.0]
+          up: [0.0, 1.0, 0.0]
+        perspective:
+          fov: 60.0 
+          aspect: auto
+          znear: 0.1
+          zfar: 1000.0
+    - node:
+      name: "box"
+      geometry:
+        mesh:
+          box:
+            position: [0.0, 0.0, 0.0]
+            size: [0.5, 0.5, 0.5]
