@@ -33,7 +33,7 @@
 #define XE_OS_UNKNOWN
 #endif
 
-#if XE_OS_UNKNOWN
+#if defined(XE_OS_UNKNOWN)
 #pragma message "Unknown OS isn't Supported. You are on your own.'"
 #endif
 

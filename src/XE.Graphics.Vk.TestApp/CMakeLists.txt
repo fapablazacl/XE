@@ -7,7 +7,7 @@ set (src "Main.cpp")
 add_executable(${target} ${src})
 
 target_include_directories(${target} PRIVATE ${Vulkan_INCLUDE_DIRS})
-target_link_libraries(${target} XE.Core ${Vulkan_LIBRARIES} glfw )
+target_link_libraries(${target} XE.Core XE.Math ${Vulkan_LIBRARIES} glfw )
 
 # Enable all warnings
 if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU")
