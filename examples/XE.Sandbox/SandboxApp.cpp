@@ -236,7 +236,7 @@ namespace Sandbox {
 
         
     private:
-        SceneDescription createFromCommandLine(int argc, char **argv) {
+        SceneDescription createSceneDescription(int argc, char **argv) {
             assert(argc > 0);
             assert(argv);
 
