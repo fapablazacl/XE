@@ -26,7 +26,7 @@ using XE::WindowGLFW;
 using XE::GraphicsDeviceGL;
 using XE::Subset;
 using XE::SubsetEnvelope;
-using XE::ContextDescriptorGL;
+using XE::GraphicsContext;
 using XE::KeyboardStatus;
 using XE::KeyCode;
 using XE::FileStreamSource;
@@ -106,8 +106,11 @@ namespace Sandbox {
         void Initialize() override {
             std::cout << "Initializing Engine ..." << std::endl;
 
+            GraphicsContext::Descriptor descriptor;
+            descriptor.backend = XE::GraphicsBackend::GL_41;
+
             m_window = WindowGLFW::create (
-                ContextDescriptorGL::defaultGL4(), 
+                descriptor, 
                 "XE.SandboxApp",
                 {1024, 768},
                 false
@@ -148,11 +151,11 @@ namespace Sandbox {
 
         
         void renderMatrices(const XE::Matrix4f &model = XE::M4::identity()) {
-            const UniformMatrix matrixLayout = { "m_mvp", DataType::Float32, 4, 4, 1 };
+            const UniformMatrix matrixLayout = { "m_mvp", DataType::Float32, XE::UniformMatrixShape::R4C4, 1 };
             
-            const Matrix4f modelViewProj = transpose (
+            const Matrix4f modelViewProj = XE::transpose<float, 4, 4> (
                 Matrix4f::perspective(mCamera.fov, mCamera.aspectRatio, mCamera.znear, mCamera.zfar) *
-                Matrix4f::lookAt(mCamera.position, mCamera.lookAt, mCamera.up) *
+                Matrix4f::lookAtRH(mCamera.position, mCamera.lookAt, mCamera.up) *
                 Matrix4f::rotateY(radians(m_angle))
             );
 
@@ -212,8 +215,8 @@ namespace Sandbox {
         void Render() override {
             m_graphicsDevice->beginFrame(ClearFlags::All, {0.2f, 0.2f, 0.8f, 1.0f}, 1.0f, 0);
             m_graphicsDevice->setProgram(m_program);
-
-            Uniform textureUniform = { "texture0", DataType::Int32, 1, 1 };
+            
+            Uniform textureUniform = { "texture0", DataType::Int32, XE::UniformDimension::D1, 1 };
             int textureUnit = 0;
 
             m_graphicsDevice->applyUniform(&textureUniform, 1, reinterpret_cast<void*>(&textureUnit));

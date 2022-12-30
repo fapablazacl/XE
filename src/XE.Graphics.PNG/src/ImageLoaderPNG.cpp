@@ -8,7 +8,6 @@
 #include <XE/Graphics/Image.h>
 
 namespace XE {
-
     class ImagePNG : public Image {
     public:
         ImagePNG(const void *pointer, const PixelFormat format, const Vector2i size) {

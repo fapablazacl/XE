@@ -216,7 +216,7 @@ namespace demo {
             const auto aspect = static_cast<float>(s_screenWidth) / static_cast<float>(s_screenHeight);
 
             const auto proj = XE::M4::perspective(mCamera.fov, mCamera.aspectRatio, mCamera.znear, mCamera.zfar);
-            const auto view = XE::M4::lookAt(mCamera.position, mCamera.lookAt, mCamera.up);
+            const auto view = XE::M4::lookAtRH(mCamera.position, mCamera.lookAt, mCamera.up);
             const auto viewProj = view * proj;
             
             mGraphicsDevice->beginFrame(XE::ClearFlags::All, {0.2f, 0.2f, 0.8f, 1.0f}, 1.0f, 0);
@@ -275,9 +275,6 @@ namespace demo {
 
 
 int main(int argc, char **argv) {
-    // std::system("pwd");
-    
     demo::DemoApp app;
-
     app.run(argc, argv);
 }

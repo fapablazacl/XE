@@ -2,6 +2,7 @@
 #include "Asset_CGLTF.h"
 
 #include <iostream>
+#include <cmath>
 #include <XE/Math/Quaternion.h>
 
 #define CGLTF_IMPLEMENTATION
@@ -235,8 +236,8 @@ namespace Sandbox {
                 // TODO: Add missing cases for angle = 0 and = 180º.
                 const auto q = XE::Quaternion<float>{node->rotation};
                 
-                const float radians = std::acosf(q.W);
-                const float inv_denom = 1.0f / std::sqrtf(1.0f - q.W*q.W);
+                const float radians = std::acos(q.W);
+                const float inv_denom = 1.0f / std::sqrt(1.0f - q.W*q.W);
                 
                 if (radians > 0.0f) {
                     const XE::Vector3f axis = q.V * inv_denom;

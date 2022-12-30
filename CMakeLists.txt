@@ -16,9 +16,9 @@ option (XE_EXAMPLE_SANDBOX      "Include example program that is used for variou
 option (XE_UNIT_TEST            "Include unit-test suite" OFF)
 option (XE_WARNINGS_AS_ERRORS   "" OFF)
 
-set (CMAKE_CXX_STANDARD 17)
-set (CMAKE_CXX_STANDARD_REQUIRED ON)
-set (CMAKE_CXX_EXTENSIONS OFF)
+set (CMAKE_CXX_STANDARD             17)
+set (CMAKE_CXX_STANDARD_REQUIRED    ON)
+set (CMAKE_CXX_EXTENSIONS           OFF)
 
 # Unit-Test required dependencies
 if (XE_UNIT_TEST)
@@ -50,7 +50,7 @@ add_subdirectory ("src/XE.IO")
 add_subdirectory ("src/XE.Geometry")
 
 # CGLTF dependency
-include_directories("dep/cgltf")
+include_directories("dependencies/cgltf")
 
 #========================================================
 # PLUGINS SECTION
@@ -59,11 +59,11 @@ include_directories("dep/cgltf")
 # include LodePNG image
 if (XE_PLUGIN_PNG)
     add_library("lodepng" 
-        "dep/lodepng/lodepng.h"
-        "dep/lodepng/lodepng.cpp"
+        "dependencies/lodepng/lodepng.h"
+        "dependencies/lodepng/lodepng.cpp"
     )
 
-    target_include_directories("lodepng" PUBLIC "dep/lodepng")
+    target_include_directories("lodepng" PUBLIC "dependencies/lodepng")
 
     add_subdirectory("src/XE.Graphics.PNG")
 endif ()
