@@ -3,6 +3,7 @@
 #include "SandboxApp.hpp"
 #include "Assets.hpp"
 #include "Asset_CGLTF.h"
+#include "Scene.h"
 
 #include <XE/XE.h>
 #include <XE/Math.h>
@@ -99,7 +100,9 @@ namespace Sandbox {
     
     class SandboxApp : public Application {
     public:
-        explicit SandboxApp() {}
+        explicit SandboxApp(int argc, char **argv) {
+            sceneDescription = createFromCommandLine(argc, argv);
+        }
         
         virtual ~SandboxApp() {}
 
@@ -149,7 +152,6 @@ namespace Sandbox {
             mCamera.update(seconds, moveForward, moveBackward, turnLeft, turnRight);
         }
 
-        
         void renderMatrices(const XE::Matrix4f &model = XE::M4::identity()) {
             const UniformMatrix matrixLayout = { "m_mvp", DataType::Float32, XE::UniformMatrixShape::R4C4, 1 };
             
@@ -234,6 +236,21 @@ namespace Sandbox {
 
         
     private:
+        SceneDescription createFromCommandLine(int argc, char **argv) {
+            assert(argc > 0);
+            assert(argv);
+
+            if (argc < 2) {
+                throw std::runtime_error("Missing 3D model file in command line");
+            }
+
+            SceneDescription description;
+            description.models.push_back(SceneModel(argv[1]));
+
+            return description;
+        }
+
+
         void renderScene() {
             mAssetGLTF.visitDefaultScene([this](const XE::Matrix4f &matrix, const std::string &objectName) {
                 renderMatrices(matrix);
@@ -260,6 +277,8 @@ namespace Sandbox {
         }
         
         void initializeShaders() {
+            std::cout << "Loading shaders" << std::endl;
+
             // setup program shader
             const ProgramDescriptor programDescriptor = {
                 {
@@ -293,14 +312,21 @@ namespace Sandbox {
                 }
             }
 
-            std::cout << content << std::endl;
-
             return content;
         }
         
 
         void initializeGeometry() {
-            mObjectsByNameMap = loadGeoObject("media/models/spaceship_corridorhallway/scene.gltf");
+            if (sceneDescription.models.size() == 0) {
+                std::cout << "The models arrays is empty" << std::endl;
+                return;
+            }
+
+            const std::string filePath = sceneDescription.models[0].filePath;
+
+            std::cout << "Loading " << filePath << " model" << std::endl;
+
+            mObjectsByNameMap = loadGeoObject(filePath);
             
             // mGeoObject = createGeoObject(Sandbox::Assets::getSquareMeshPrimitive());
             
@@ -418,6 +444,8 @@ namespace Sandbox {
         }
         
     private:
+        SceneDescription sceneDescription;
+
         std::unique_ptr<WindowGLFW> m_window;
         std::unique_ptr<GraphicsDevice> m_graphicsDevice;
         Program* m_program = nullptr;
@@ -444,7 +472,7 @@ namespace Sandbox {
     };
 
 
-    std::unique_ptr<Application> Application::create() {
-        return std::make_unique<SandboxApp>();
+    std::unique_ptr<Application> Application::create(int argc, char** argv) {
+        return std::make_unique<SandboxApp>(argc, argv);
     }
 }

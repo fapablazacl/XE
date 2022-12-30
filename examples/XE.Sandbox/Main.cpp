@@ -5,13 +5,17 @@
 #include <map>
 #include <XE/Timer.h>
 
+#include "Scene.h"
 #include "SandboxApp.hpp"
 
 
 int main(int argc, char **argv) {
     try {
-        auto app = Sandbox::Application::create();
+        if (argc < 2) {
+            throw std::runtime_error("Missing 3D model file in command line");
+        }
 
+        auto app = Sandbox::Application::create(argc, argv);
         app->Initialize();
 
         int lastTime = XE::Timer::getTick();
