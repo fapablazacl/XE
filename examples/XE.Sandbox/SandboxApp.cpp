@@ -101,7 +101,7 @@ namespace Sandbox {
     class SandboxApp : public Application {
     public:
         explicit SandboxApp(int argc, char **argv) {
-            sceneDescription = createFromCommandLine(argc, argv);
+            sceneDescription = createSceneDescription(argc, argv);
         }
         
         virtual ~SandboxApp() {}
@@ -354,7 +354,6 @@ namespace Sandbox {
                     geoObject.subsets.push_back(createSubset(primitive));
                 }
                 
-                
                 objectsByName[mesh.name] = std::move(geoObject);
             }
             
@@ -363,9 +362,6 @@ namespace Sandbox {
         
         
         std::pair<Subset*, SubsetEnvelope> createSubset(const MeshPrimitive &meshPrimitive) {
-            return {};
-            /*
-
             // create the vertex buffer
             BufferDescriptor coordBufferDescriptor = {
                 BufferType::Vertex,
@@ -375,7 +371,7 @@ namespace Sandbox {
                 (const void*) meshPrimitive.coords.data()
             };
             
-            auto coordBuffer = m_graphicsDevice->createBuffer(coordBufferDescriptor);
+            XE::Buffer* coordBuffer = m_graphicsDevice->createBuffer(coordBufferDescriptor);
 
             BufferDescriptor colorBufferDescriptor = {
                 BufferType::Vertex,
@@ -385,7 +381,7 @@ namespace Sandbox {
                 (const void*) meshPrimitive.colors.data()
             };
 
-            auto colorBuffer = m_graphicsDevice->createBuffer(colorBufferDescriptor);
+            XE::Buffer* colorBuffer = m_graphicsDevice->createBuffer(colorBufferDescriptor);
 
             BufferDescriptor normalBufferDescriptor = {
                 BufferType::Vertex,
@@ -395,7 +391,7 @@ namespace Sandbox {
                 (const void*) meshPrimitive.normals.data()
             };
 
-            auto normalBuffer = m_graphicsDevice->createBuffer(normalBufferDescriptor);
+            XE::Buffer* normalBuffer = m_graphicsDevice->createBuffer(normalBufferDescriptor);
 
             BufferDescriptor texCoordBufferDescriptor = {
                 BufferType::Vertex,
@@ -405,7 +401,7 @@ namespace Sandbox {
                 (const void*) meshPrimitive.texCoords.data()
             };
 
-            auto texCoordBuffer = m_graphicsDevice->createBuffer(texCoordBufferDescriptor);
+            XE::Buffer* texCoordBuffer = m_graphicsDevice->createBuffer(texCoordBufferDescriptor);
 
             // create the index buffer
             BufferDescriptor indexBufferDescriptor = {
@@ -416,31 +412,26 @@ namespace Sandbox {
                 (const void*) meshPrimitive.indices.data()
             };
 
-            auto indexBuffer = m_graphicsDevice->createBuffer(indexBufferDescriptor);
+            XE::Buffer* indexBuffer = m_graphicsDevice->createBuffer(indexBufferDescriptor);
 
             // create the geometry subset
-            SubsetDescriptor subsetDescriptor;
+            XE::SubsetDescriptor subsetDescriptor;
         
-            subsetDescriptor.attributes = {
-                {"vertCoord", DataType::Float32, 3},
-                {"vertColor", DataType::Float32, 4},
-                {"vertNormal", DataType::Float32, 3},
-                {"vertTexCoord", DataType::Float32, 2}
+            subsetDescriptor.attribs = {
+                XE::SubsetVertexAttrib{0, DataType::Float32, 3},
+                XE::SubsetVertexAttrib{1, DataType::Float32, 4},
+                XE::SubsetVertexAttrib{2, DataType::Float32, 3},
+                XE::SubsetVertexAttrib{3, DataType::Float32, 2}
             };
-
-            subsetDescriptor.indexType = DataType::UInt32;
-
-            std::vector<Buffer*> buffers = {coordBuffer, colorBuffer, normalBuffer, texCoordBuffer};
-
-            std::map<std::string, int> bufferMapping = {
-                {"vertCoord", 0}, {"vertColor", 1}, {"vertNormal", 2}, {"vertTexCoord", 3}
+            subsetDescriptor.indexBuffer = indexBuffer;
+            subsetDescriptor.buffers = {
+                coordBuffer, colorBuffer, normalBuffer, texCoordBuffer
             };
 
             return {
-                m_graphicsDevice->createSubset(subsetDescriptor, buffers, bufferMapping, indexBuffer),
+                m_graphicsDevice->createSubset(subsetDescriptor),
                 meshPrimitive.getEnvelope()
             };
-            */
         }
         
     private:
@@ -470,7 +461,6 @@ namespace Sandbox {
         
         Camera mCamera;
     };
-
 
     std::unique_ptr<Application> Application::create(int argc, char** argv) {
         return std::make_unique<SandboxApp>(argc, argv);
