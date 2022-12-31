@@ -38,7 +38,6 @@ target_precompile_headers (${target} PRIVATE ${headers})
 target_include_directories (${target} PUBLIC "include/")
 target_link_libraries (${target} 
 	XE.Core 
-	XE.Graphics
 	glad-es2
 )
 

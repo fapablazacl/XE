@@ -24,7 +24,6 @@ target_link_libraries(${target}
 	XE.Core 
 	XE.Math 
 	XE.IO 
-	XE.Graphics 
 	XE.Input 
 	XE.Graphics.GL 
 	XE.Graphics.ES2

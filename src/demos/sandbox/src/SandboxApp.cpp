@@ -6,12 +6,12 @@
 #include "Scene.h"
 
 #include <xe/XE.h>
-#include <xe/math.h>
-#include <xe/input.h>
-#include <xe/io.h>
-#include <xe/graphics.h>
+#include <xe/math/Math.h>
+#include <xe/io/IO.h>
+#include <xe/input/Input.h>
+#include <xe/graphics/Graphics.h>
 #include <xe/graphics/GL.h>
-#include <xe/graphics/gl/GLFW/WindowGLFW.h>
+#include <xe/platform/glfw/WindowGLFW.h>
 #include <xe/graphics/PNG.h>
 
 #include <string>
@@ -364,7 +364,7 @@ namespace Sandbox {
                 BufferType::Vertex,
                 BufferUsage::Copy,
                 BufferAccess::Static,
-                (int)meshPrimitive.coords.size() * (int)sizeof(Vector3f),
+                meshPrimitive.coords.size() * sizeof(Vector3f),
                 (const void*) meshPrimitive.coords.data()
             };
             
@@ -374,7 +374,7 @@ namespace Sandbox {
                 BufferType::Vertex,
                 BufferUsage::Copy,
                 BufferAccess::Static,
-                (int)meshPrimitive.colors.size() * (int)sizeof(Vector4f),
+                meshPrimitive.colors.size() * sizeof(Vector4f),
                 (const void*) meshPrimitive.colors.data()
             };
 
@@ -384,7 +384,7 @@ namespace Sandbox {
                 BufferType::Vertex,
                 BufferUsage::Copy,
                 BufferAccess::Static,
-                (int)meshPrimitive.normals.size() * (int)sizeof(Vector3f),
+                meshPrimitive.normals.size() * sizeof(Vector3f),
                 (const void*) meshPrimitive.normals.data()
             };
 
@@ -394,7 +394,7 @@ namespace Sandbox {
                 BufferType::Vertex,
                 BufferUsage::Copy,
                 BufferAccess::Static,
-                (int)meshPrimitive.texCoords.size() * (int)sizeof(Vector3f),
+                meshPrimitive.texCoords.size() * sizeof(Vector3f),
                 (const void*) meshPrimitive.texCoords.data()
             };
 
@@ -405,7 +405,7 @@ namespace Sandbox {
                 BufferType::Index,
                 BufferUsage::Copy,
                 BufferAccess::Static,
-                (int)meshPrimitive.indices.size() * (int)sizeof(int),
+                meshPrimitive.indices.size() * sizeof(int),
                 (const void*) meshPrimitive.indices.data()
             };
 

@@ -1,8 +1,8 @@
 
 #pragma once
 
-#include "IO/FileStream.h"
-#include "IO/FileStreamSource.h"
-#include "IO/MemoryStream.h"
-#include "IO/StreamSource.h"
-#include "IO/StreamSourceImpl.h"
+#include "FileStream.h"
+#include "FileStreamSource.h"
+#include "MemoryStream.h"
+#include "StreamSource.h"
+#include "StreamSourceImpl.h"

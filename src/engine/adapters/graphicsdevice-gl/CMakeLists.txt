@@ -1,10 +1,9 @@
 add_subdirectory("dependencies/glad-gl4")
 
-
 set (target "XE.Graphics.GL")
 
 set (headers
-	"include/XE/Graphics/GL.h"
+	"include/xe/graphics/GL.h"
 	"include/xe/graphics/gl/glcore.h"
 	"include/xe/graphics/gl/GraphicsDeviceGL.h"
 	"include/xe/graphics/gl/TextureBaseGL.h"
@@ -44,7 +43,6 @@ target_precompile_headers (${target} PRIVATE ${headers})
 target_include_directories (${target} PUBLIC "include/")
 target_link_libraries (${target} 
 	XE.Core 
-	XE.Graphics 
 	glad-gl4
 )
 

@@ -18,4 +18,4 @@ set (sources
 add_library(${target} ${sources})
 
 target_include_directories(${target} PUBLIC "include/")
-target_link_libraries(${target} XE.IO XE.Graphics lodepng)
+target_link_libraries(${target} XE.Core lodepng)

@@ -91,7 +91,7 @@ namespace Sandbox {
             cgltf_size offset = 0;
             
             for (cgltf_size i=0; i<accessor.count; i++) {
-                auto elementData = (const int)(*(const uint32_t*)((void*)buffer.data + bufferView.offset + accessor.offset + offset));
+                const int elementData = (int)(*(const uint32_t*)((uint8_t*)buffer.data + bufferView.offset + accessor.offset + offset));
                 
                 meshPrimitive.indices.push_back(elementData);
                 
@@ -111,7 +111,7 @@ namespace Sandbox {
                 cgltf_size offset = 0;
                 
                 for (cgltf_size j=0; j<accessor->count; j++) {
-                    auto elementData = (const XE::Vector3f*)((void*)buffer->data + bufferView->offset + accessor->offset + offset);
+                    const XE::Vector3f *elementData = (const XE::Vector3f*)((uint8_t*)buffer->data + bufferView->offset + accessor->offset + offset);
                 
                     meshPrimitive.coords.push_back(*elementData);
                     
@@ -121,7 +121,7 @@ namespace Sandbox {
                 cgltf_size offset = 0;
                 
                 for (cgltf_size j=0; j<accessor->count; j++) {
-                    auto elementData = (const XE::Vector3f*)((void*)buffer->data + bufferView->offset + accessor->offset + offset);
+                    const XE::Vector3f *elementData = (const XE::Vector3f*)((uint8_t*)buffer->data + bufferView->offset + accessor->offset + offset);
                 
                     meshPrimitive.normals.push_back(*elementData);
                     
@@ -132,7 +132,7 @@ namespace Sandbox {
                 cgltf_size offset = 0;
                 
                 for (cgltf_size j=0; j<accessor->count; j++) {
-                    auto elementData = (const XE::Vector2f*)((void*)buffer->data + bufferView->offset + accessor->offset + offset);
+                    const XE::Vector2f *elementData = (const XE::Vector2f*)((uint8_t*)buffer->data + bufferView->offset + accessor->offset + offset);
                 
                     meshPrimitive.texCoords.push_back(*elementData);
                     

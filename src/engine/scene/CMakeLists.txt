@@ -11,7 +11,7 @@ set (sources
 add_library(${target} ${sources})
 
 target_include_directories(${target} PUBLIC "src/")
-target_link_libraries(${target} XE.Graphics XE.Core)
+target_link_libraries(${target} XE.Core)
 
 # Enable all warnings
 if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU")
