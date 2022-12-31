@@ -8,8 +8,8 @@
 #include <xe/math.h>
 #include <xe/graphics.h>
 #include <xe/graphics/ES2/GraphicsDeviceES2.h>
-#include <xe/graphics/GL/GraphicsDeviceGL.h>
-#include <xe/graphics/GL/GLFW/WindowGLFW.h>
+#include <xe/graphics/gl/GraphicsDeviceGL.h>
+#include <xe/graphics/gl/GLFW/WindowGLFW.h>
 
 #include <map>
 #include <functional>

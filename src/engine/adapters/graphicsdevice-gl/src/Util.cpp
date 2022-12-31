@@ -1,5 +1,5 @@
 
-#include <xe/graphics/GL/Util.h>
+#include <xe/graphics/gl/Util.h>
 
 #include <cassert>
 #include <iostream>

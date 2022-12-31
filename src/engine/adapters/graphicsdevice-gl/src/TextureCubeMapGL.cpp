@@ -1,5 +1,5 @@
 
-#include <xe/graphics/GL/TextureCubeMapGL.h>
+#include <xe/graphics/gl/TextureCubeMapGL.h>
 
 namespace XE {
     TextureCubeMapGL::TextureCubeMapGL(const PixelFormat format, const Vector2i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const std::array<TextureCubeMapSide, 6> &sourceDataSides, const void **sourceData) : TextureBaseGL(GL_TEXTURE_CUBE_MAP) {
@@ -38,8 +38,7 @@ namespace XE {
     }
     
     
-    void TextureCubeMapGL::getData(void *surfaceData, const int mipLevel, TextureCubeMapSide cubeMapSide, const DataType surfaceDataType, const PixelFormat surfaceFormat, const Recti &area) const {
-        
+    void TextureCubeMapGL::getData(void *surfaceData, const int mipLevel, TextureCubeMapSide cubeMapSide, const DataType surfaceDataType, const PixelFormat surfaceFormat, const Recti &) const {        
         const GLenum sideGL = convertToGL(cubeMapSide);
         const GLenum formatGL = convertToGL(surfaceFormat);
         const GLenum dataTypeGL = convertToGL(surfaceDataType);

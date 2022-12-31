@@ -7,7 +7,7 @@
 #include <xe/graphics/Subset.h>
 #include <xe/graphics/Material.h>
 
-#include <xe/graphics/GL/Conversion.h>
+#include <xe/graphics/gl/Conversion.h>
 
 
 TEST_CASE("OpenGL Conversion Function Enumerations") {

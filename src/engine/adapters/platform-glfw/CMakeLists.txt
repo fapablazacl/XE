@@ -6,9 +6,9 @@ find_package(glfw3 REQUIRED)
 set (target XE.Graphics.GL.GLFW)
 
 set (headers
-    "include/XE/Graphics/GL/GLFW/WindowGLFW.h"
-    "include/XE/Graphics/GL/GLFW/GraphicsContextGLFW.h"
-    "include/XE/Graphics/GL/GLFW/InputManagerGLFW.h"
+    "include/xe/graphics/gl/GLFW/WindowGLFW.h"
+    "include/xe/graphics/gl/GLFW/GraphicsContextGLFW.h"
+    "include/xe/graphics/gl/GLFW/InputManagerGLFW.h"
 )
 
 set (sources

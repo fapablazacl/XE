@@ -11,7 +11,7 @@
 #include <xe/io.h>
 #include <xe/graphics.h>
 #include <xe/graphics/GL.h>
-#include <xe/graphics/GL/GLFW/WindowGLFW.h>
+#include <xe/graphics/gl/GLFW/WindowGLFW.h>
 #include <xe/graphics/PNG.h>
 
 #include <string>

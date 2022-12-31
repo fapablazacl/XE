@@ -1,22 +1,24 @@
+add_subdirectory("dependencies/glad-gl4")
+
 
 set (target "XE.Graphics.GL")
 
 set (headers
 	"include/XE/Graphics/GL.h"
-	"include/XE/Graphics/GL/glcore.h"
-	"include/XE/Graphics/GL/GraphicsDeviceGL.h"
-	"include/XE/Graphics/GL/TextureBaseGL.h"
-	"include/XE/Graphics/GL/Texture2DGL.h"
-	"include/XE/Graphics/GL/Texture2DArrayGL.h"
-	"include/XE/Graphics/GL/Texture3DGL.h"
-	"include/XE/Graphics/GL/TextureCubeMapGL.h"
-	"include/XE/Graphics/GL/ShaderGL.h"
-	"include/XE/Graphics/GL/ProgramGL.h"
-	"include/XE/Graphics/GL/ProgramGL.h"
-	"include/XE/Graphics/GL/BufferGL.h"
-	"include/XE/Graphics/GL/SubsetGL.h"
-	"include/XE/Graphics/GL/Conversion.h"
-	"include/XE/Graphics/GL/Util.h"
+	"include/xe/graphics/gl/glcore.h"
+	"include/xe/graphics/gl/GraphicsDeviceGL.h"
+	"include/xe/graphics/gl/TextureBaseGL.h"
+	"include/xe/graphics/gl/Texture2DGL.h"
+	"include/xe/graphics/gl/Texture2DArrayGL.h"
+	"include/xe/graphics/gl/Texture3DGL.h"
+	"include/xe/graphics/gl/TextureCubeMapGL.h"
+	"include/xe/graphics/gl/ShaderGL.h"
+	"include/xe/graphics/gl/ProgramGL.h"
+	"include/xe/graphics/gl/ProgramGL.h"
+	"include/xe/graphics/gl/BufferGL.h"
+	"include/xe/graphics/gl/SubsetGL.h"
+	"include/xe/graphics/gl/Conversion.h"
+	"include/xe/graphics/gl/Util.h"
 )
 
 set (sources
@@ -62,15 +64,5 @@ elseif (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
 endif()
 
 if (XE_UNIT_TEST)
-    set (test_target "XE.Graphics.GL.UnitTest")
-
-    set (test_sources 
-        "unit-test/XEGraphicsGLUnitTest.cpp"
-    )
-
-    add_executable(${test_target} ${test_sources})
-    target_link_libraries(${test_target} Catch2::Catch2WithMain XE.Graphics.GL)
-
-    # NOTE: The test name must have the same name as the command name
-    add_test(NAME ${test_target} COMMAND ${test_target})
+	add_subdirectory("unit-test")
 endif()

@@ -1,5 +1,5 @@
 
-#include <xe/graphics/GL/TextureBaseGL.h>
+#include <xe/graphics/gl/TextureBaseGL.h>
 
 namespace XE {
     TextureBaseGL::TextureBaseGL(const GLenum target) {

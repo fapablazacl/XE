@@ -1,17 +1,17 @@
 
-#include <xe/graphics/GL/GraphicsDeviceGL.h>
+#include <xe/graphics/gl/GraphicsDeviceGL.h>
 
-#include <xe/graphics/GL/glcore.h>
+#include <xe/graphics/gl/glcore.h>
 
-#include <xe/graphics/GL/Conversion.h>
-#include <xe/graphics/GL/BufferGL.h>
-#include <xe/graphics/GL/SubsetGL.h>
-#include <xe/graphics/GL/Texture2DGL.h>
-#include <xe/graphics/GL/Texture2DArrayGL.h>
-#include <xe/graphics/GL/Texture3DGL.h>
-#include <xe/graphics/GL/TextureCubeMapGL.h>
-#include <xe/graphics/GL/ProgramGL.h>
-#include <xe/graphics/GL/Util.h>
+#include <xe/graphics/gl/Conversion.h>
+#include <xe/graphics/gl/BufferGL.h>
+#include <xe/graphics/gl/SubsetGL.h>
+#include <xe/graphics/gl/Texture2DGL.h>
+#include <xe/graphics/gl/Texture2DArrayGL.h>
+#include <xe/graphics/gl/Texture3DGL.h>
+#include <xe/graphics/gl/TextureCubeMapGL.h>
+#include <xe/graphics/gl/ProgramGL.h>
+#include <xe/graphics/gl/Util.h>
 
 #include <xe/graphics/Material.h>
 #include <xe/graphics/Uniform.h>

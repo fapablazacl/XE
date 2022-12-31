@@ -1,7 +1,7 @@
 
-#include <xe/graphics/GL/Texture2DGL.h>
-#include <xe/graphics/GL/Conversion.h>
-#include <xe/graphics/GL/Util.h>
+#include <xe/graphics/gl/Texture2DGL.h>
+#include <xe/graphics/gl/Conversion.h>
+#include <xe/graphics/gl/Util.h>
 
 namespace XE {
     Texture2DGL::Texture2DGL(const PixelFormat format, const Vector2i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void *sourceData)

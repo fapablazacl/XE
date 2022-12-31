@@ -1,5 +1,5 @@
 
-#include <xe/graphics/GL/Conversion.h>
+#include <xe/graphics/gl/Conversion.h>
 
 #include <cassert>
 #include <xe/DataType.h>
