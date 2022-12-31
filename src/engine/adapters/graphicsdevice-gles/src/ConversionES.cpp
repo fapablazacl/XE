@@ -1,5 +1,5 @@
 
-#include <xe/graphics/ES2/ConversionES.h>
+#include <xe/graphics/gles2/ConversionES.h>
 
 #include <cassert>
 #include <xe/DataType.h>

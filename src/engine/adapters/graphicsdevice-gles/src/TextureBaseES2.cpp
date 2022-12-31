@@ -1,5 +1,5 @@
 
-#include <xe/graphics/ES2/TextureBaseES2.h>
+#include <xe/graphics/gles2/TextureBaseES2.h>
 
 namespace XE {
     TextureBaseES::TextureBaseES(const GLenum target) {

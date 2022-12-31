@@ -1,7 +1,7 @@
 
-#include <xe/graphics/ES2/SubsetES2.h>
-#include <xe/graphics/ES2/BufferES2.h>
-#include <xe/graphics/ES2/ConversionES.h>
+#include <xe/graphics/gles2/SubsetES2.h>
+#include <xe/graphics/gles2/BufferES2.h>
+#include <xe/graphics/gles2/ConversionES.h>
 
 namespace XE {
     SubsetES::SubsetES(const SubsetDescriptor& desc) : descriptor(desc) {

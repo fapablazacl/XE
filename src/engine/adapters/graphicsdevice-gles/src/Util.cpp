@@ -1,5 +1,5 @@
 
-#include <xe/graphics/ES2/Util.h>
+#include <xe/graphics/gles2/Util.h>
 
 #include <cassert>
 #include <iostream>

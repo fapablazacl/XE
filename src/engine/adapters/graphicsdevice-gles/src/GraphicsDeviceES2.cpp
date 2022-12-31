@@ -1,14 +1,14 @@
 
-#include <xe/graphics/ES2/GraphicsDeviceES2.h>
+#include <xe/graphics/gles2/GraphicsDeviceES2.h>
 
 #include <glad/glad.h>
 
-#include <xe/graphics/ES2/ConversionES.h>
-#include <xe/graphics/ES2/BufferES2.h>
-#include <xe/graphics/ES2/SubsetES2.h>
-#include <xe/graphics/ES2/Texture2DES2.h>
-#include <xe/graphics/ES2/ProgramES2.h>
-#include <xe/graphics/ES2/Util.h>
+#include <xe/graphics/gles2/ConversionES.h>
+#include <xe/graphics/gles2/BufferES2.h>
+#include <xe/graphics/gles2/SubsetES2.h>
+#include <xe/graphics/gles2/Texture2DES2.h>
+#include <xe/graphics/gles2/ProgramES2.h>
+#include <xe/graphics/gles2/Util.h>
 
 #include <xe/graphics/Material.h>
 #include <xe/graphics/Uniform.h>

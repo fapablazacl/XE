@@ -1,6 +1,6 @@
 
-#include <xe/graphics/ES2/ProgramES2.h>
-#include <xe/graphics/ES2/ShaderES2.h>
+#include <xe/graphics/gles2/ProgramES2.h>
+#include <xe/graphics/gles2/ShaderES2.h>
 
 #include <stdexcept>
 

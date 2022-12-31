@@ -1,18 +1,20 @@
 
+add_subdirectory("dependencies/glad-es2")
+
 set (target "XE.Graphics.ES2")
 
 set (headers
 	"include/XE/Graphics/ES2.h"
-	"include/XE/Graphics/ES2/GraphicsDeviceES2.h"
-	"include/XE/Graphics/ES2/TextureBaseES2.h"
-	"include/XE/Graphics/ES2/Texture2DES2.h"
-	"include/XE/Graphics/ES2/TextureCubeMapES2.h"
-	"include/XE/Graphics/ES2/ShaderES2.h"
-	"include/XE/Graphics/ES2/ProgramES2.h"
-	"include/XE/Graphics/ES2/BufferES2.h"
-	"include/XE/Graphics/ES2/SubsetES2.h"
-	"include/XE/Graphics/ES2/ConversionES.h"
-	"include/XE/Graphics/ES2/Util.h"
+	"include/xe/graphics/gles2/GraphicsDeviceES2.h"
+	"include/xe/graphics/gles2/TextureBaseES2.h"
+	"include/xe/graphics/gles2/Texture2DES2.h"
+	"include/xe/graphics/gles2/TextureCubeMapES2.h"
+	"include/xe/graphics/gles2/ShaderES2.h"
+	"include/xe/graphics/gles2/ProgramES2.h"
+	"include/xe/graphics/gles2/BufferES2.h"
+	"include/xe/graphics/gles2/SubsetES2.h"
+	"include/xe/graphics/gles2/ConversionES.h"
+	"include/xe/graphics/gles2/Util.h"
 )
 
 set (sources
