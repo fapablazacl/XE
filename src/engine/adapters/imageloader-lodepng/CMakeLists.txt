@@ -1,4 +1,13 @@
 
+# lodepng 
+add_library("lodepng" 
+    "dependencies/lodepng/lodepng.h"
+    "dependencies/lodepng/lodepng.cpp"
+)
+
+target_include_directories("lodepng" PUBLIC "dependencies/lodepng")
+
+# actual plugin
 set (target "XE.Graphics.PNG")
 set (sources 
     "include/XE/Graphics/PNG/ImageLoaderPNG.h"

@@ -1,33 +1,27 @@
 
+# CGLTF dependency
+include_directories("dependencies/cgltf")
+
 set (target "XE.Sandbox")
 set (src 
-	"Main.cpp"
-
-	"Assets.cpp"
-	"Assets.hpp"
-
-	"SandboxApp.cpp"
-	"SandboxApp.hpp"
-
-	"Common.h"
-    "Common.cpp"
-
-	"AssetManager.cpp"
-	"AssetManager.h"
-	
-	"Asset.cpp"
-	"Asset.h"
-
-	"Asset_CGLTF.cpp"
-	"Asset_CGLTF.h"
-	
-	"Object.cpp"
-	"Object.h"
-	
-	"Model.cpp"
-	"Model.h"
-
-	"Scene.h"
+	"src/Main.cpp"
+	"src/Assets.cpp"
+	"src/Assets.hpp"
+	"src/SandboxApp.cpp"
+	"src/SandboxApp.hpp"
+	"src/Common.h"
+    "src/Common.cpp"
+	"src/AssetManager.cpp"
+	"src/AssetManager.h"
+	"src/Asset.cpp"
+	"src/Asset.h"
+	"src/Asset_CGLTF.cpp"
+	"src/Asset_CGLTF.h"
+	"src/Object.cpp"
+	"src/Object.h"
+	"src/Model.cpp"
+	"src/Model.h"
+	"src/Scene.h"
 )
 
 add_executable (${target} ${src})
