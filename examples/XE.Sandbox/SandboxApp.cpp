@@ -53,12 +53,13 @@ using XE::BufferAccess;
 
 
 namespace Sandbox {
-    struct Camera {
-        Vector3f position = {0.0f, 0.0f, 15.0f};
-        Vector3f lookAt = {0.0f, 0.0f, 0.0f};
-        Vector3f up = {0.0f, 1.0f, 0.0f};
+    class Camera {
+    public:
+        XE::Vector3f position = {0.0f, 0.0f, 15.0f};
+        XE::Vector3f lookAt = {0.0f, 0.0f, 0.0f};
+        XE::Vector3f up = {0.0f, 1.0f, 0.0f};
 
-        float fov = radians(60.0f);
+        float fov = XE::radians(60.0f);
         float aspectRatio = 640.0f / 480.0f;
         float znear = 0.1f;
         float zfar = 1000.0f;
@@ -68,9 +69,9 @@ namespace Sandbox {
             const auto cameraDirection = normalize(lookAt - position);
             float turnSpeed = 0.0f;
             if (turnLeft) {
-                turnSpeed = -radians(1.25f * seconds);
+                turnSpeed = -XE::radians(turnSpeedPerSecond * seconds);
             } else if (turnRight) {
-                turnSpeed = radians(1.25f * seconds);
+                turnSpeed = XE::radians(turnSpeedPerSecond * seconds);
             }
 
             const auto cdt = Matrix4f::rotate(turnSpeed, up) * Vector4f(cameraDirection, 0.0f);
@@ -78,7 +79,7 @@ namespace Sandbox {
             lookAt = position + Vector3f{cdt.X, cdt.Y, cdt.Z} * norm(cameraDirection);
 
             // camera movement
-            const auto cameraSpeed = 0.025f * seconds;
+            const auto cameraSpeed = moveSpeedPerSecond * seconds;
             const auto cameraDisplacement = cameraDirection * cameraSpeed * seconds;
             // const auto cameraSide = normalize(cross(cameraDirection, up));
             
@@ -90,6 +91,10 @@ namespace Sandbox {
                 lookAt -= cameraDisplacement;
             }
         }
+
+    private:
+        const float turnSpeedPerSecond = 1.25f;
+        const float moveSpeedPerSecond = 0.025f;
     };
 
 
@@ -151,9 +156,53 @@ namespace Sandbox {
 
             mCamera.update(seconds, moveForward, moveBackward, turnLeft, turnRight);
         }
+        
+        void Render() override {
+            m_graphicsDevice->beginFrame(ClearFlags::All, {0.2f, 0.2f, 0.8f, 1.0f}, 1.0f, 0);
+            m_graphicsDevice->setProgram(m_program);
+            
+            Uniform textureUniform = { "texture0", DataType::Int32, XE::UniformDimension::D1, 1 };
+            int textureUnit = 0;
 
+            m_graphicsDevice->applyUniform(&textureUniform, 1, reinterpret_cast<void*>(&textureUnit));
+            m_graphicsDevice->setMaterial(m_material.get());
+
+            renderScene();
+
+            m_graphicsDevice->endFrame();
+        }
+
+        bool ShouldClose() const override {
+            return m_shouldClose;
+        }
+
+    private:
+        void renderScene() {
+            mAssetGLTF.visitDefaultScene([this](const XE::Matrix4f &matrix, const std::string &objectName) {
+                renderMatrices(matrix);
+                
+                const GeoObject &object = mObjectsByNameMap[objectName];
+                
+                for (const auto &subset_N_envelope : object.subsets) {
+                    m_graphicsDevice->draw(
+                       subset_N_envelope.first,
+                       &subset_N_envelope.second, 1);
+                }
+            });
+        }
+        
+        void renderObjects() {
+            for (const auto &pair : mObjectsByNameMap) {
+                for (const auto &subset_N_envelope : pair.second.subsets) {
+                    m_graphicsDevice->draw(
+                       subset_N_envelope.first,
+                       &subset_N_envelope.second, 1);
+                }
+            }
+        }
+        
         void renderMatrices(const XE::Matrix4f &model = XE::M4::identity()) {
-            const UniformMatrix matrixLayout = { "m_mvp", DataType::Float32, XE::UniformMatrixShape::R4C4, 1 };
+            const XE::UniformMatrix matrixLayout = { "m_mvp", XE::DataType::Float32, XE::UniformMatrixShape::R4C4, 1 };
             
             const Matrix4f modelViewProj = XE::transpose<float, 4, 4> (
                 Matrix4f::perspective(mCamera.fov, mCamera.aspectRatio, mCamera.znear, mCamera.zfar) *
@@ -166,17 +215,17 @@ namespace Sandbox {
 
         
         Texture2D* createColorTexture(const int width, const int height, const Vector4f &color) {
-            const auto format = PixelFormat::R8G8B8A8;
-            const auto size = Vector2i{width, height};
+            const PixelFormat format = PixelFormat::R8G8B8A8;
+            const Vector2i size = Vector2i{width, height};
 
-            const auto sourceFormat = PixelFormat::R8G8B8A8;
-            const auto sourceDataType = DataType::UInt8;
+            const PixelFormat sourceFormat = PixelFormat::R8G8B8A8;
+            const DataType sourceDataType = DataType::UInt8;
 
             std::vector<Vector<std::uint8_t, 4>> pixels;
 
             pixels.resize(width * height);
 
-            for (auto &pixel : pixels) {
+            for (Vector<std::uint8_t, 4> &pixel : pixels) {
                 pixel = (color * Vector4f{255.0f}).cast<std::uint8_t>();
             }
 
@@ -213,29 +262,6 @@ namespace Sandbox {
             return texture;
         }
 
-        
-        void Render() override {
-            m_graphicsDevice->beginFrame(ClearFlags::All, {0.2f, 0.2f, 0.8f, 1.0f}, 1.0f, 0);
-            m_graphicsDevice->setProgram(m_program);
-            
-            Uniform textureUniform = { "texture0", DataType::Int32, XE::UniformDimension::D1, 1 };
-            int textureUnit = 0;
-
-            m_graphicsDevice->applyUniform(&textureUniform, 1, reinterpret_cast<void*>(&textureUnit));
-
-            m_graphicsDevice->setMaterial(m_material.get());
-
-            renderScene();
-
-            m_graphicsDevice->endFrame();
-        }
-
-        bool ShouldClose() const override {
-            return m_shouldClose;
-        }
-
-        
-    private:
         SceneDescription createSceneDescription(int argc, char **argv) {
             assert(argc > 0);
             assert(argv);
@@ -250,32 +276,6 @@ namespace Sandbox {
             return description;
         }
 
-
-        void renderScene() {
-            mAssetGLTF.visitDefaultScene([this](const XE::Matrix4f &matrix, const std::string &objectName) {
-                renderMatrices(matrix);
-                
-                const GeoObject &object = mObjectsByNameMap[objectName];
-                
-                for (const auto &subset_N_envelope : object.subsets) {
-                    m_graphicsDevice->draw(
-                       subset_N_envelope.first,
-                       &subset_N_envelope.second, 1);
-                }
-            });
-        }
-        
-        
-        void renderObjects() {
-            for (const auto &pair : mObjectsByNameMap) {
-                for (const auto &subset_N_envelope : pair.second.subsets) {
-                    m_graphicsDevice->draw(
-                       subset_N_envelope.first,
-                       &subset_N_envelope.second, 1);
-                }
-            }
-        }
-        
         void initializeShaders() {
             std::cout << "Loading shaders" << std::endl;
 
@@ -328,9 +328,6 @@ namespace Sandbox {
 
             mObjectsByNameMap = loadGeoObject(filePath);
             
-            // mGeoObject = createGeoObject(Sandbox::Assets::getSquareMeshPrimitive());
-            
-            // m_texture = createColorTexture(256, 256, {1.0f, 0.0f, 0.0f, 1.0f});
             m_texture = createFileTexture("media/materials/Tiles_Azulejos_004_SD/Tiles_Azulejos_004_COLOR.png");
 
             m_material = std::make_unique<XE::Material>();
@@ -416,7 +413,7 @@ namespace Sandbox {
 
             // create the geometry subset
             XE::SubsetDescriptor subsetDescriptor;
-        
+    
             subsetDescriptor.attribs = {
                 XE::SubsetVertexAttrib{0, DataType::Float32, 3},
                 XE::SubsetVertexAttrib{1, DataType::Float32, 4},

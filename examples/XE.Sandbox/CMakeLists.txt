@@ -24,6 +24,9 @@ set (src
 	"Object.cpp"
 	"Object.h"
 	
+	"Model.cpp"
+	"Model.h"
+
 	"Scene.h"
 )
 
