@@ -2,18 +2,15 @@
 #include <xe/math/Common.h>
 #include "Common.h"
 
-TEST_CASE("Mathematical common functions") {
-    SECTION("XE::equals") {
-        SECTION("should behave exact like the == operator for epsilon values") {
-            REQUIRE(XE::equals(1.0f, 1.0f, 0.0f) == true);
-            REQUIRE((1.0f == 1.0f) == true);
-        }
 
-        SECTION("should have the tolareance of the supplied Epsilon value used for comparisons") {
-            REQUIRE(XE::equals(1.00001f, 1.0f, 0.0001f) == true);
-            REQUIRE(XE::equals(-1.00001f, -1.0f, 0.0001f) == true);
-            REQUIRE(XE::equals(1.001f, 1.0f, 0.0001f) == false);
-            REQUIRE(XE::equals(-1.001f, -1.0f, 0.0001f) == false);
-        }
-    }
+TEST(EqualsTest, WithNoEpsilonComparesExactly) {
+    EXPECT_EQ(XE::equals(1.0f, 1.0f, 0.0f),true);
+    EXPECT_EQ(XE::equals(1.0f, 1.0f), true);
+}
+
+TEST(EqualsTest, WithEpsilonComparesApproximetly) {
+    EXPECT_EQ(XE::equals(1.00001f, 1.0f, 0.0001f), true);
+    EXPECT_EQ(XE::equals(-1.00001f, -1.0f, 0.0001f), true);
+    EXPECT_EQ(XE::equals(1.001f, 1.0f, 0.0001f), false);
+    EXPECT_EQ(XE::equals(-1.001f, -1.0f, 0.0001f), false);
 }

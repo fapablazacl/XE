@@ -5,7 +5,7 @@
 #include <xe/math/Vector.h>
 #include <xe/math/Matrix.h>
 
-
+/*
 TEST_CASE("Math::Matrix", "[Matrix]") {
     SECTION("should have row-major order") {
         const auto matA = XE::Matrix4f::rows({
@@ -93,12 +93,12 @@ TEST_CASE("Math::Matrix<3, float>", "[Matrix]") {
             XE::Vector4f{ -8.0f,  1.0f,  14.0f,  2.0f}
         });
     
-        /*const XE::Matrix4f matDivResult = XE::Matrix4f::rows({
+        const XE::Matrix4f matDivResult = XE::Matrix4f::rows({
             XE::Vector4f{-1.0f, 2.0f, 0.f,  0.0f},
             XE::Vector4f{ 2.0f, 0.0f, 3.0f, -1.0f},
             XE::Vector4f{-3.0f, 1.0f, 1.0f,  0.0f},
             XE::Vector4f{ 2.0f, 1.0f, 0.0f,  1.0f}
-        });*/
+        });
     
         // addition
         REQUIRE(matA == +matA);
@@ -702,3 +702,4 @@ TEST_CASE("Math::Matrix<3, float>", "[Matrix]") {
         }));
     }
 }
+*/

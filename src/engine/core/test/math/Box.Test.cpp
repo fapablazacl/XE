@@ -4,34 +4,32 @@
 #include <sstream>
 #include <iostream>
 
+TEST(BoxTest, DefaultConstructorZeroesEdges) {
+    XE::Boxf box;
 
-TEST_CASE("Box's can be created using common constructors, with a valid state", "[Box]") {
-    SECTION("default constructor should have zero-vector in its edges") {
-        XE::Boxf box{};
+    EXPECT_EQ(box.getMinEdge(), XE::Vector3f(0.0f, 0.0f, 0.0f));
+    EXPECT_EQ(box.getMaxEdge(), XE::Vector3f(0.0f, 0.0f, 0.0f));
+    EXPECT_EQ(box.isValid(), true);
+}
 
-        REQUIRE(box.getMinEdge() == XE::Vector3f{0.0f, 0.0f, 0.0f});
-        REQUIRE(box.getMaxEdge() == XE::Vector3f{0.0f, 0.0f, 0.0f});
-        REQUIRE(box.isValid());
-    }
+TEST(BoxTest, ConstructorFromOneVectorInitializeEdges) {
+    XE::Boxf box{{1.0f, 2.0f, 3.0f}};
 
-    SECTION("Boundary(const Vector&) should set both edges with the supplied parameter ") {
-        XE::Boxf box{{1.0f, 2.0f, 3.0f}};
-
-        REQUIRE(box.getMinEdge() == XE::Vector3f{1.0f, 2.0f, 3.0f});
-        REQUIRE(box.getMaxEdge() == XE::Vector3f{1.0f, 2.0f, 3.0f});
-        REQUIRE(box.isValid());
-    }
-
-    SECTION("Boundary(const Vector&, const Vector&) should let the box with a Valid state") {
-        XE::Boxf box{{1.0f, 2.0f, -3.0f}, {-1.0f, 8.0f, 3.0f}};
-
-        REQUIRE(box.getMinEdge() == XE::Vector3f{-1.0f, 2.0f, -3.0f});
-        REQUIRE(box.getMaxEdge() == XE::Vector3f{1.0f, 8.0f, 3.0f});
-        REQUIRE(box.isValid());
-    }
+    EXPECT_EQ(box.getMinEdge(), XE::Vector3f(1.0f, 2.0f, 3.0f));
+    EXPECT_EQ(box.getMaxEdge(), XE::Vector3f(1.0f, 2.0f, 3.0f));
+    EXPECT_EQ(box.isValid(), true);
 }
 
 
+TEST(BoxTest, ConstructorFromTwoVectorsInitalizeEdges) {
+    XE::Boxf box{{1.0f, 2.0f, -3.0f}, {-1.0f, 8.0f, 3.0f}};
+
+    EXPECT_EQ(box.getMinEdge(), XE::Vector3f(-1.0f, 2.0f, -3.0f));
+    EXPECT_EQ(box.getMaxEdge(), XE::Vector3f(1.0f, 8.0f, 3.0f));
+    EXPECT_EQ(box.isValid(), true);
+}
+
+/*
 TEST_CASE("Box's attributes change based on values supplied via constructors and mutator methods", "[Box]") {
     XE::Boxf box {{1.0f, 2.0f, -3.0f}, {-1.0f, 8.0f, 3.0f}};
 
@@ -267,3 +265,4 @@ TEST_CASE("Box's can be serialized to an ostream", "[Box]") {
         REQUIRE(ss.str() != ss1.str());
     }
 }
+*/

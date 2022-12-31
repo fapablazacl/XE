@@ -15,7 +15,7 @@
 namespace XE {
     //! Perform a safe comparison between two floating point using a reference 'epsilon'
     template<typename T>
-    bool equals(const T a, const T b, const T epsilon = std::numeric_limits<T>::epsilon) {
+    bool equals(const T a, const T b, const T epsilon = std::numeric_limits<T>::epsilon()) {
         return std::abs(a - b) <= epsilon;
     }
 

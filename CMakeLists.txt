@@ -19,12 +19,6 @@ set (CMAKE_CXX_STANDARD             17)
 set (CMAKE_CXX_STANDARD_REQUIRED    ON)
 set (CMAKE_CXX_EXTENSIONS           OFF)
 
-# Unit-Test required dependencies
-if (XE_UNIT_TEST)
-    include(CTest)
-    find_package(Catch2 REQUIRED)
-endif()
-
 # TODO: Configure the version numbering mechanism
 set (XE_VERSION_MAJOR 1)
 set (XE_VERSION_MINOR 0)

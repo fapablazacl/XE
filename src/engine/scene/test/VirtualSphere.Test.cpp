@@ -1,4 +1,5 @@
 
+/*
 #include <catch2/catch_all.hpp>
 
 #include <xe/Scene/VirtualSphere.h>
@@ -75,3 +76,4 @@ TEST_CASE("VirtualSphere comparison operators should compare sizes", "[VirtualSp
         }
     }
 }
+*/

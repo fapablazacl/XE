@@ -5,6 +5,7 @@
 #include "Common.h"
 
 
+/*
 TEST_CASE("Quaternion basic members are initialized properly", "[Quaternion]") {
     SECTION("when using the Vector-Scalar constructor") {
         const auto q1 = XE::Quaternion<float>{{0.0f, 0.0f, 0.0f}, 0.0f};
@@ -315,3 +316,4 @@ TEST_CASE("Quaternion operator functions", "[Quaternion]") {
 TEST_CASE("Quaternion advanced utility methods and functions", "[Quaternion]") {
     SECTION("'transform' function should rotate a vector") {}
 }
+*/

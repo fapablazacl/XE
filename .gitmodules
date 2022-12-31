@@ -10,3 +10,6 @@
 [submodule "dep/Catch2"]
 	path = src/engine/dependencies/Catch2
 	url = https://github.com/catchorg/Catch2.git
+[submodule "src/engine/dependencies/googletest"]
+	path = src/engine/dependencies/googletest
+	url = https://github.com/google/googletest.git

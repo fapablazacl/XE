@@ -3,6 +3,7 @@
 #include <iostream>
 #include "Common.h"
 
+/*
 TEST_CASE("Range should have a valid state when perform correctly after each kind of operation", "[Range]") {
     XE::Range<float> subject;
 
@@ -110,3 +111,4 @@ TEST_CASE("Range overlappting detection methods should perform correctly", "[Ran
         }
     }
 }
+*/

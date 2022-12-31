@@ -5,6 +5,7 @@
 #include <xe/math/FormatUtils.h>
 #include <sstream>
 
+/*
 TEST_CASE("XE::Vector<3, float>", "[Vector]") {
     SECTION("constructor should setup the vector components correctly") {
         const XE::Vector3f v = {1.0f, 2.0f, 3.0f};
@@ -209,3 +210,4 @@ TEST_CASE("XE::Vector<3, float>", "[Vector]") {
         REQUIRE(norm(v3) == std::sqrt(3.0f));
     }
 }
+*/
