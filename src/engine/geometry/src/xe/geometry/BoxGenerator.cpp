@@ -1,6 +1,5 @@
 
-#include <xe/Geometry/BoxGenerator.h>
-
+#include <xe/geometry/BoxGenerator.h>
 #include <xe/math/Common.h>
 
 namespace XE {

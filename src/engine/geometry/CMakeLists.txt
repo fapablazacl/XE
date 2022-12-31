@@ -2,17 +2,16 @@
 set (target XE.Geometry)
 
 set (sources
-    "include/XE/Geometry/ShapeGenerator.h"
-	"include/XE/Geometry/EllipsoidGenerator.h"
-	"include/XE/Geometry/PlaneGenerator.h"
-	"include/XE/Geometry/BoxGenerator.h"
-
-	"src/ShapeGenerator.cpp"
-	"src/EllipsoidGenerator.cpp"
-	"src/BoxGenerator.cpp"
+    "src/xe/geometry/ShapeGenerator.h"
+	"src/xe/geometry/EllipsoidGenerator.h"
+	"src/xe/geometry/PlaneGenerator.h"
+	"src/xe/geometry/BoxGenerator.h"
+	"src/xe/geometry/ShapeGenerator.cpp"
+	"src/xe/geometry/EllipsoidGenerator.cpp"
+	"src/xe/geometry/BoxGenerator.cpp"
 )
 
 add_library(${target} ${sources})
 
-target_include_directories(${target} PUBLIC "include/")
-target_link_libraries(${target} XE.Math)
+target_include_directories(${target} PUBLIC "src/")
+target_link_libraries(${target} XE.Core)

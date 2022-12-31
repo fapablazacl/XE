@@ -1,19 +1,17 @@
 
 set (target "XE.Scene")
-
 set (sources
-	"include/XE/Scene/Projection.h"
-	"include/XE/Scene/Trackball.h"
-    "include/XE/Scene/VirtualSphere.h"
-	
-	"src/Trackball.cpp"
-	"src/VirtualSphere.cpp"
+	"src/xe/scene/Projection.h"
+	"src/xe/scene/Trackball.h"
+    "src/xe/scene/VirtualSphere.h"
+	"src/xe/scene/Trackball.cpp"
+	"src/xe/scene/VirtualSphere.cpp"
 )
 
 add_library(${target} ${sources})
 
-target_include_directories(${target} PUBLIC "include/")
-target_link_libraries(${target} XE.Graphics XE.Math)
+target_include_directories(${target} PUBLIC "src/")
+target_link_libraries(${target} XE.Graphics XE.Core)
 
 # Enable all warnings
 if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU")

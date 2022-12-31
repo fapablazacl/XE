@@ -1,5 +1,5 @@
 
-#include <xe/Geometry/ShapeGenerator.h>
+#include <xe/geometry/ShapeGenerator.h>
 
 namespace XE {
     ShapeGenerator::~ShapeGenerator() {}

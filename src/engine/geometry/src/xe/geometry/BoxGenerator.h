@@ -3,7 +3,7 @@
 #define __XE_GRAPHICS_BOXGENERATOR_HPP__
 
 #include <vector>
-#include <xe/math.h>
+#include <xe/math/Math.h>
 
 #include "ShapeGenerator.h"
 

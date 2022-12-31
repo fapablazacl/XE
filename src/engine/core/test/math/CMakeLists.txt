@@ -20,8 +20,7 @@ set (test_sources
 set (test_headers "Common.h" ${headers})
 
 add_executable(${test_target} ${test_sources})
-target_precompile_headers(${test_target} PRIVATE ${test_headers})
-target_link_libraries(${test_target} Catch2::Catch2WithMain XE.Math)
+target_link_libraries(${test_target} Catch2::Catch2WithMain XE.Core)
 
 # Enable all warnings
 if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU")

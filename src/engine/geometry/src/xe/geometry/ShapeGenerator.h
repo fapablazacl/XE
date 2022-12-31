@@ -3,7 +3,7 @@
 #define __XE_GRAPHICS_SHAPEGENERATOR_HPP__
 
 #include <vector>
-#include <xe/math.h>
+#include <xe/math/Math.h>
 
 namespace XE {
     class ShapeGenerator {
@@ -17,9 +17,6 @@ namespace XE {
         virtual std::vector<Vector2f> generateVertexTexCoords() const = 0;
 
         virtual std::vector<int> generateIndices() const = 0;
-
-    public:
-    
     };
 }
 

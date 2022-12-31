@@ -5,7 +5,7 @@
 #include <xe/math/Vector.h>
 #include <xe/math/Rotation.h>
 #include <xe/math/Quaternion.h>
-#include <xe/Scene/VirtualSphere.h>
+#include <xe/scene/VirtualSphere.h>
 
 namespace XE {
     /**
