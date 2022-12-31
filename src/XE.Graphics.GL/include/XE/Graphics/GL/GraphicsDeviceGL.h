@@ -2,9 +2,9 @@
 #ifndef __XE_GRAPHICS_GL_GRAPHICSDEVICEGL_HPP__
 #define __XE_GRAPHICS_GL_GRAPHICSDEVICEGL_HPP__
 
-#include <XE/Graphics/Viewport.h>
-#include <XE/Graphics/GraphicsDevice.h>
-#include <XE/Graphics/GraphicsContext.h>
+#include <xe/graphics/Viewport.h>
+#include <xe/graphics/GraphicsDevice.h>
+#include <xe/graphics/GraphicsContext.h>
 
 namespace XE {
     class ProgramGL;

@@ -1,7 +1,7 @@
 
-#include <XE/Graphics/GL/BufferGL.h>
+#include <xe/graphics/GL/BufferGL.h>
 
-#include <XE/Graphics/GL/Conversion.h>
+#include <xe/graphics/GL/Conversion.h>
 #include <cstdint>
 #include <cassert>
 

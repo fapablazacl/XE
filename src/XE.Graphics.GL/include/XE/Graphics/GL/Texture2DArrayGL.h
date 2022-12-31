@@ -2,7 +2,7 @@
 #ifndef __XE_GRAPHICS_GL_TEXTURE2DARRAYGL_HPP__
 #define __XE_GRAPHICS_GL_TEXTURE2DARRAYGL_HPP__
 
-#include <XE/Graphics/Texture2DArray.h>
+#include <xe/graphics/Texture2DArray.h>
 
 #include "TextureBaseGL.h"
 

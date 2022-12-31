@@ -5,14 +5,14 @@
 #include "Asset_CGLTF.h"
 #include "Scene.h"
 
-#include <XE/XE.h>
-#include <XE/Math.h>
-#include <XE/Input.h>
-#include <XE/IO.h>
-#include <XE/Graphics.h>
-#include <XE/Graphics/GL.h>
-#include <XE/Graphics/GL/GLFW/WindowGLFW.h>
-#include <XE/Graphics/PNG.h>
+#include <xe/XE.h>
+#include <xe/math.h>
+#include <xe/input.h>
+#include <xe/io.h>
+#include <xe/graphics.h>
+#include <xe/graphics/GL.h>
+#include <xe/graphics/GL/GLFW/WindowGLFW.h>
+#include <xe/graphics/PNG.h>
 
 #include <string>
 #include <iostream>

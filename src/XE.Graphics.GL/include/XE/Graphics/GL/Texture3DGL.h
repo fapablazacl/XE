@@ -2,7 +2,7 @@
 #ifndef __XE_GRAPHICS_GL_TEXTURE3DGL_HPP__
 #define __XE_GRAPHICS_GL_TEXTURE3DGL_HPP__
 
-#include <XE/Graphics/Texture3D.h>
+#include <xe/graphics/Texture3D.h>
 
 #include "TextureBaseGL.h"
 

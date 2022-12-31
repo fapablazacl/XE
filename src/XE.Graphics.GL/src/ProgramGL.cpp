@@ -1,6 +1,6 @@
 
-#include <XE/Graphics/GL/ProgramGL.h>
-#include <XE/Graphics/GL/ShaderGL.h>
+#include <xe/graphics/GL/ProgramGL.h>
+#include <xe/graphics/GL/ShaderGL.h>
 
 #include <stdexcept>
 #include <iostream>

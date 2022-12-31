@@ -1,13 +1,13 @@
 
 #include <catch2/catch_all.hpp>
 
-#include <XE/DataType.h>
-#include <XE/Graphics/PixelFormat.h>
-#include <XE/Graphics/BufferDescriptor.h>
-#include <XE/Graphics/Subset.h>
-#include <XE/Graphics/Material.h>
+#include <xe/DataType.h>
+#include <xe/graphics/PixelFormat.h>
+#include <xe/graphics/BufferDescriptor.h>
+#include <xe/graphics/Subset.h>
+#include <xe/graphics/Material.h>
 
-#include <XE/Graphics/GL/Conversion.h>
+#include <xe/graphics/GL/Conversion.h>
 
 
 TEST_CASE("OpenGL Conversion Function Enumerations") {

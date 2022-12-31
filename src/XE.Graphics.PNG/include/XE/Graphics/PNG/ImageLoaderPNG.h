@@ -2,7 +2,7 @@
 #ifndef __XE_GRAPHICS_PNG_IMAGELOADERPNG_HPP__
 #define __XE_GRAPHICS_PNG_IMAGELOADERPNG_HPP__
 
-#include <XE/Graphics/ImageLoader.h>
+#include <xe/graphics/ImageLoader.h>
 
 namespace XE {
     class ImageLoaderPNG : public ImageLoader {

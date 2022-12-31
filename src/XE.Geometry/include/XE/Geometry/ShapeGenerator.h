@@ -3,7 +3,7 @@
 #define __XE_GRAPHICS_SHAPEGENERATOR_HPP__
 
 #include <vector>
-#include <XE/Math.h>
+#include <xe/math.h>
 
 namespace XE {
     class ShapeGenerator {

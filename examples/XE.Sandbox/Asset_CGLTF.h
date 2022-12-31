@@ -5,9 +5,9 @@
 #include <vector>
 #include <functional>
 
-#include <XE/Graphics/Subset.h>
-#include <XE/Math/Vector.h>
-#include <XE/Math/Matrix.h>
+#include <xe/graphics/Subset.h>
+#include <xe/math/Vector.h>
+#include <xe/math/Matrix.h>
 
 #include <cgltf.h>
 

@@ -2,8 +2,8 @@
 #ifndef __XE_GRAPHICS_ES2_BUFFER_ES2_HPP__
 #define __XE_GRAPHICS_ES2_BUFFER_ES2_HPP__
 
-#include <XE/Buffer.h>
-#include <XE/Graphics/BufferDescriptor.h>
+#include <xe/Buffer.h>
+#include <xe/graphics/BufferDescriptor.h>
 #include <glad/glad.h>
 
 namespace XE {

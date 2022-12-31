@@ -3,7 +3,7 @@
 #include <string>
 #include <iostream>
 #include <map>
-#include <XE/Timer.h>
+#include <xe/Timer.h>
 
 #include "Scene.h"
 #include "SandboxApp.hpp"

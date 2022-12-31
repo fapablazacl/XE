@@ -1,7 +1,7 @@
 
-#include <XE/Geometry/BoxGenerator.h>
+#include <xe/Geometry/BoxGenerator.h>
 
-#include <XE/Math/Common.h>
+#include <xe/math/Common.h>
 
 namespace XE {
     const int faceCount = 6;

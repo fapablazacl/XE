@@ -1,6 +1,6 @@
 
 
-#include <XE/Scene/Trackball.h>
+#include <xe/Scene/Trackball.h>
 
 #include <catch2/catch_all.hpp>
 

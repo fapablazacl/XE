@@ -2,8 +2,8 @@
 #ifndef __XE_GRAPHICS_GL_INPUTMANAGERGLFW_HPP__
 #define __XE_GRAPHICS_GL_INPUTMANAGERGLFW_HPP__
 
-#include <XE/Input/InputManager.h>
-#include <XE/Input/DeviceStatus.h>
+#include <xe/input/InputManager.h>
+#include <xe/input/DeviceStatus.h>
 #include <GLFW/glfw3.h>
 
 namespace XE {

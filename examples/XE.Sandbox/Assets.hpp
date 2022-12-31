@@ -2,8 +2,8 @@
 #ifndef __XE_SANDBOX_ASSETS_HPP__
 #define __XE_SANDBOX_ASSETS_HPP__
 
-#include <XE/Graphics/Subset.h>
-#include <XE/Math/Vector.h>
+#include <xe/graphics/Subset.h>
+#include <xe/math/Vector.h>
 #include <string>
 #include <vector>
 

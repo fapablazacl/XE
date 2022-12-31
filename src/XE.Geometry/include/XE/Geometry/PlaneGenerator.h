@@ -3,7 +3,7 @@
 #define __XE_GRAPHICS_PLANEGENERATOR_HPP__
 
 #include <vector>
-#include <XE/Math.h>
+#include <xe/math.h>
 
 #include "ShapeGenerator.h"
 

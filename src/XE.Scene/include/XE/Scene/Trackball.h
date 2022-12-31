@@ -2,10 +2,10 @@
 #ifndef __XE_SCENE_TRACKBALL_HPP__
 #define __XE_SCENE_TRACKBALL_HPP__
 
-#include <XE/Math/Vector.h>
-#include <XE/Math/Rotation.h>
-#include <XE/Math/Quaternion.h>
-#include <XE/Scene/VirtualSphere.h>
+#include <xe/math/Vector.h>
+#include <xe/math/Rotation.h>
+#include <xe/math/Quaternion.h>
+#include <xe/Scene/VirtualSphere.h>
 
 namespace XE {
     /**

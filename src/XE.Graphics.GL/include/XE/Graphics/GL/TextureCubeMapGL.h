@@ -2,7 +2,7 @@
 #ifndef __XE_GRAPHICS_GL_TEXTURECUBEMAPGL_HPP__
 #define __XE_GRAPHICS_GL_TEXTURECUBEMAPGL_HPP__
 
-#include <XE/Graphics/TextureCubeMap.h>
+#include <xe/graphics/TextureCubeMap.h>
 
 #include <array>
 #include "TextureBaseGL.h"

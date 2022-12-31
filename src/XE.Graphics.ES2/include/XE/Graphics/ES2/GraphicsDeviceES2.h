@@ -2,8 +2,8 @@
 #ifndef __XE_GRAPHICS_ES2_GRAPHICSDEVICE_ES2_HPP__
 #define __XE_GRAPHICS_ES2_GRAPHICSDEVICE_ES2_HPP__
 
-#include <XE/Graphics/Viewport.h>
-#include <XE/Graphics/GraphicsDevice.h>
+#include <xe/graphics/Viewport.h>
+#include <xe/graphics/GraphicsDevice.h>
 
 namespace XE {
     class ProgramES;

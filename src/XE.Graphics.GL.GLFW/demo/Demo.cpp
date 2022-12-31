@@ -2,14 +2,14 @@
  * XE Tech demo
  */
 
-#include <XE/XE.h>
-#include <XE/Timer.h>
-#include <XE/IO.h>
-#include <XE/Input.h>
-#include <XE/Math.h>
-#include <XE/Graphics.h>
-#include <XE/Graphics/GL.h>
-#include <XE/Graphics/GL/GLFW/WindowGLFW.h>
+#include <xe/XE.h>
+#include <xe/Timer.h>
+#include <xe/io.h>
+#include <xe/input.h>
+#include <xe/math.h>
+#include <xe/graphics.h>
+#include <xe/graphics/GL.h>
+#include <xe/graphics/GL/GLFW/WindowGLFW.h>
 
 #include <map>
 #include <functional>

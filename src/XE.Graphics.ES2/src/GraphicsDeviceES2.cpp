@@ -1,22 +1,22 @@
 
-#include <XE/Graphics/ES2/GraphicsDeviceES2.h>
+#include <xe/graphics/ES2/GraphicsDeviceES2.h>
 
 #include <glad/glad.h>
 
-#include <XE/Graphics/ES2/ConversionES.h>
-#include <XE/Graphics/ES2/BufferES2.h>
-#include <XE/Graphics/ES2/SubsetES2.h>
-#include <XE/Graphics/ES2/Texture2DES2.h>
-#include <XE/Graphics/ES2/ProgramES2.h>
-#include <XE/Graphics/ES2/Util.h>
+#include <xe/graphics/ES2/ConversionES.h>
+#include <xe/graphics/ES2/BufferES2.h>
+#include <xe/graphics/ES2/SubsetES2.h>
+#include <xe/graphics/ES2/Texture2DES2.h>
+#include <xe/graphics/ES2/ProgramES2.h>
+#include <xe/graphics/ES2/Util.h>
 
-#include <XE/Graphics/Material.h>
-#include <XE/Graphics/Uniform.h>
-#include <XE/Graphics/Subset.h>
-#include <XE/Graphics/Texture3D.h>
-#include <XE/Graphics/Texture2DArray.h>
-#include <XE/Graphics/TextureCubeMap.h>
-#include <XE/Graphics/GraphicsContext.h>
+#include <xe/graphics/Material.h>
+#include <xe/graphics/Uniform.h>
+#include <xe/graphics/Subset.h>
+#include <xe/graphics/Texture3D.h>
+#include <xe/graphics/Texture2DArray.h>
+#include <xe/graphics/TextureCubeMap.h>
+#include <xe/graphics/GraphicsContext.h>
 #include <iostream>
 
 namespace XE {

@@ -2,7 +2,7 @@
 #ifndef __XE_GRAPHICS_GL_SUBSETGL_HPP__
 #define __XE_GRAPHICS_GL_SUBSETGL_HPP__
 
-#include <XE/Graphics/Subset.h>
+#include <xe/graphics/Subset.h>
 
 #include "glcore.h"
 #include "BufferGL.h"

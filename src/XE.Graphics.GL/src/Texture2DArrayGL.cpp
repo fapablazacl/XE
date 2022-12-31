@@ -1,6 +1,6 @@
 
-#include <XE/Graphics/GL/Texture2DArrayGL.h>
-#include <XE/Graphics/GL/Conversion.h>
+#include <xe/graphics/GL/Texture2DArrayGL.h>
+#include <xe/graphics/GL/Conversion.h>
 
 namespace XE {
     Texture2DArrayGL::Texture2DArrayGL(const PixelFormat format, const Vector2i &size, const int count) 

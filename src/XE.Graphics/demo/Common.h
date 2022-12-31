@@ -1,8 +1,8 @@
 
 #pragma once 
 
-#include <XE/Math.h>
-#include <XE/Graphics.h>
+#include <xe/math.h>
+#include <xe/graphics.h>
 #include <vector>
 
 #define OFFSETOF(type, field)    reinterpret_cast<unsigned long long>(&(((type *) 0)->field))

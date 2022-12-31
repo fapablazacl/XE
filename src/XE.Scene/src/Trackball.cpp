@@ -1,5 +1,5 @@
 
-#include <XE/Scene/Trackball.h>
+#include <xe/Scene/Trackball.h>
 
 namespace XE {
     Trackball::Trackball(const Vector2i &size) {

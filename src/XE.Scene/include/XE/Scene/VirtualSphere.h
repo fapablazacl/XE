@@ -2,8 +2,8 @@
 #ifndef __XE_SCENE_VIRTUALSPHERE_HPP__
 #define __XE_SCENE_VIRTUALSPHERE_HPP__
 
-#include <XE/Math/Vector.h>
-#include <XE/Math/Rotation.h>
+#include <xe/math/Vector.h>
+#include <xe/math/Rotation.h>
 
 namespace XE {
     /**

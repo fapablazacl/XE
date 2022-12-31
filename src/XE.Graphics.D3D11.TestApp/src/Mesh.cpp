@@ -1,6 +1,6 @@
 
 #include "Mesh.h"
-#include <XE/Math/Vector.h>
+#include <xe/math/Vector.h>
 
 namespace TestApp {
     using namespace XE;

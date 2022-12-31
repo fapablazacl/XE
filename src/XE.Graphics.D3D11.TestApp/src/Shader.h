@@ -3,7 +3,7 @@
 #define __XE_GRAPHICS_D3D11_TESTAPP_SHADER_HPP__
 
 #include <d3d11.h>
-#include <XE/Math/Matrix.h>
+#include <xe/math/Matrix.h>
 
 namespace TestApp {
     class Shader {

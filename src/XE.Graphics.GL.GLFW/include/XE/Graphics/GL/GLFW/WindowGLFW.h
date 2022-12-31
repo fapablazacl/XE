@@ -4,10 +4,10 @@
 
 #include <string>
 #include <memory>
-#include <XE/Input/InputManager.h>
-#include <XE/Graphics/IWindow.h>
-#include <XE/Graphics/GraphicsDevice.h>
-#include <XE/Graphics/GraphicsContext.h>
+#include <xe/input/InputManager.h>
+#include <xe/graphics/IWindow.h>
+#include <xe/graphics/GraphicsDevice.h>
+#include <xe/graphics/GraphicsContext.h>
 
 namespace XE {
     /**

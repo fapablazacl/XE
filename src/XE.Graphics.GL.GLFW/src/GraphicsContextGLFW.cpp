@@ -1,5 +1,5 @@
 
-#include <XE/Graphics/GL/GLFW/GraphicsContextGLFW.h>
+#include <xe/graphics/GL/GLFW/GraphicsContextGLFW.h>
 
 #include <cassert>
 

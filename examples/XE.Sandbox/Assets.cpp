@@ -1,9 +1,9 @@
 
 #include "Assets.hpp"
 
-#include <XE/Math/Matrix.h>
-#include <XE/Math/Vector.h>
-#include <XE/Graphics/Subset.h>
+#include <xe/math/Matrix.h>
+#include <xe/math/Vector.h>
+#include <xe/graphics/Subset.h>
 
 #include <iostream>
 

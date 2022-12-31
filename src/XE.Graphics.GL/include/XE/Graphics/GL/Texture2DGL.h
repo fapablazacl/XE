@@ -2,7 +2,7 @@
 #ifndef __XE_GRAPHICS_GL_TEXTURE2DGL_HPP__
 #define __XE_GRAPHICS_GL_TEXTURE2DGL_HPP__
 
-#include <XE/Graphics/Texture2D.h>
+#include <xe/graphics/Texture2D.h>
 
 #include "TextureBaseGL.h"
 

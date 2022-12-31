@@ -3,7 +3,7 @@
 
 #include <iostream>
 #include <cmath>
-#include <XE/Math/Quaternion.h>
+#include <xe/math/Quaternion.h>
 
 #define CGLTF_IMPLEMENTATION
 #include <cgltf.h>

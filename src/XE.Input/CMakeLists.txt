@@ -2,15 +2,12 @@
 set (target XE.Input)
 
 set (headers
-    "include/XE/Input.h"
-    "include/XE/Input/InputManager.h"
-    "include/XE/Input/DeviceStatus.h"
+
 )
 
 set (sources
     ${headers}
-	"src/DeviceStatus.cpp"
-    "src/InputManager.cpp"
+
 )
 
 add_library(${target} ${sources})

@@ -2,7 +2,7 @@
 #ifndef __XE_GRAPHICS_ES_SUBSETS_H__
 #define __XE_GRAPHICS_ES_SUBSETS_H__
 
-#include <XE/Graphics/Subset.h>
+#include <xe/graphics/Subset.h>
 #include <glad/glad.h>
 
 #include "BufferES2.h"

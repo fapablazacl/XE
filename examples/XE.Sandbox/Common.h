@@ -7,8 +7,8 @@
 #include <iostream>
 #include <map>
 
-#include <XE/Math.h>
-#include <XE/Graphics.h>
+#include <xe/math.h>
+#include <xe/graphics.h>
 
 namespace Sandbox {
     struct Material {};

@@ -1,7 +1,7 @@
 
-#include <XE/Math/Matrix.hpp>
-#include <XE/Graphics.hpp>
-#include <XE/Graphics/GL.hpp>
+#include <xe/math/Matrix.hpp>
+#include <xe/graphics.hpp>
+#include <xe/graphics/GL.hpp>
 
 #include <QApplication>
 #include <QMainWindow>

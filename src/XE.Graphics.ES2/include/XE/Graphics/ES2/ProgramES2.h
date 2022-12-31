@@ -2,7 +2,7 @@
 #ifndef __XE_GRAPHICS_GL_PROGRAMGL_HPP__
 #define __XE_GRAPHICS_GL_PROGRAMGL_HPP__
 
-#include <XE/Graphics/Program.h>
+#include <xe/graphics/Program.h>
 #include <vector>
 #include <string>
 #include <memory>

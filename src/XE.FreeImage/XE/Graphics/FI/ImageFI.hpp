@@ -2,7 +2,7 @@
 #ifndef __XE_GRAPHICS_IMAGEFI_HPP__
 #define __XE_GRAPHICS_IMAGEFI_HPP__
 
-#include <XE/Graphics/Image.h>
+#include <xe/graphics/Image.h>
 
 namespace XE {
     /**

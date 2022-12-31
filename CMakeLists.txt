@@ -42,11 +42,7 @@ add_definitions (-DXE_VERSION_MINOR=${XE_VERSION_MINOR})
 add_definitions (-DXE_VERSION_REVISION=${XE_VERSION_REVISION})
 
 add_subdirectory ("src/XE.Core")
-add_subdirectory ("src/XE.Graphics")
 add_subdirectory ("src/XE.Scene")
-add_subdirectory ("src/XE.Input")
-add_subdirectory ("src/XE.Math")
-add_subdirectory ("src/XE.IO")
 add_subdirectory ("src/XE.Geometry")
 
 # CGLTF dependency

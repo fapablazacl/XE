@@ -2,8 +2,8 @@
 #ifndef __XE_GRAPHICS_GL_BUFFERGL_HPP__
 #define __XE_GRAPHICS_GL_BUFFERGL_HPP__
 
-#include <XE/Buffer.h>
-#include <XE/Graphics/BufferDescriptor.h>
+#include <xe/Buffer.h>
+#include <xe/graphics/BufferDescriptor.h>
 
 #include "glcore.h"
 

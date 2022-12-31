@@ -2,9 +2,9 @@
 #ifndef __XE_SCENE_PROJECTION_HPP__
 #define __XE_SCENE_PROJECTION_HPP__
 
-#include <XE/Math/Vector.h>
-#include <XE/Math/Matrix.h>
-#include <XE/Graphics/Viewport.h>
+#include <xe/math/Vector.h>
+#include <xe/math/Matrix.h>
+#include <xe/graphics/Viewport.h>
 
 namespace XE {
     /**

@@ -1,6 +1,6 @@
 
-#include <XE/Predef.h>
-#include <XE/Math/Vector.h>
+#include <xe/Predef.h>
+#include <xe/math/Vector.h>
 
 #if defined(_MSC_VER)
 #pragma warning(push, 0)

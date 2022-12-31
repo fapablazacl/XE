@@ -2,20 +2,12 @@
 set (target XE.IO)
 
 set (headers
-    "include/XE/IO/FileStream.h"
-    "include/XE/IO/FileStreamSource.h"
-    "include/XE/IO/MemoryStream.h"
-    "include/XE/IO/Stream.h"
-    "include/XE/IO/StreamSource.h"
+
 )
 
 set (sources
     ${headers}
-    "src/FileStream.cpp"
-	"src/FileStreamSource.cpp"
-	"src/MemoryStream.cpp"
-	"src/Stream.cpp"
-	"src/StreamSource.cpp"
+
 )
 
 add_library(${target} ${sources})
