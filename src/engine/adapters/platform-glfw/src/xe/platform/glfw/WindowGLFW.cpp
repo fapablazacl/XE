@@ -1,10 +1,10 @@
 
-#include <xe/graphics/gl/GLFW/WindowGLFW.h>
+#include "WindowGLFW.h"
 
 #include <memory>
 #include <GLFW/glfw3.h>
-#include <xe/graphics/gl/GLFW/InputManagerGLFW.h>
-#include <xe/graphics/gl/GLFW/GraphicsContextGLFW.h>
+#include "InputManagerGLFW.h"
+#include "GraphicsContextGLFW.h"
 
 #include <iostream>
 #include <map>

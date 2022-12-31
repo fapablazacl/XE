@@ -3,26 +3,26 @@ add_subdirectory(dependencies/glfw)
 
 find_package(glfw3 REQUIRED)
 
-set (target XE.Graphics.GL.GLFW)
+set (target XE.Platform.GLFW)
 
 set (headers
-    "include/xe/graphics/gl/GLFW/WindowGLFW.h"
-    "include/xe/graphics/gl/GLFW/GraphicsContextGLFW.h"
-    "include/xe/graphics/gl/GLFW/InputManagerGLFW.h"
+    "src/xe/platform/glfw/WindowGLFW.h"
+    "src/xe/platform/glfw/GraphicsContextGLFW.h"
+    "src/xe/platform/glfw/InputManagerGLFW.h"
 )
 
 set (sources
     ${headers}
-    "src/WindowGLFW.cpp"
-    "src/GraphicsContextGLFW.cpp"
-    "src/InputManagerGLFW.cpp"    
+    "src/xe/platform/glfw/WindowGLFW.cpp"
+    "src/xe/platform/glfw/GraphicsContextGLFW.cpp"
+    "src/xe/platform/glfw/InputManagerGLFW.cpp"    
 )
 
 add_library(${target} ${sources})
 
 target_precompile_headers(${target} PRIVATE ${headers})
-target_include_directories(${target} PUBLIC "include/")
-target_link_libraries(${target} glfw XE.Core XE.Input XE.Graphics)
+target_include_directories(${target} PUBLIC "src/")
+target_link_libraries(${target} glfw XE.Core)
 
 # Enable all warnings
 if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU")
