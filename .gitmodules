@@ -1,11 +1,11 @@
 [submodule "dep/lodepng"]
-	path = dependencies/lodepng
+	path = src/engine/adapters/imageloader-lodepng/dependencies/lodepng
 	url = https://github.com/lvandeve/lodepng.git
 [submodule "dep/cgltf"]
 	path = dependencies/cgltf
 	url = https://github.com/jkuhlmann/cgltf.git
 [submodule "dep/glfw"]
-	path = dependencies/glfw
+	path = src/engine/adapters/platform-glfw/dependencies/glfw
 	url = https://github.com/glfw/glfw.git
 [submodule "dep/Catch2"]
 	path = dependencies/Catch2
