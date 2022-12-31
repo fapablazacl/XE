@@ -1,4 +1,8 @@
 
+add_subdirectory(dependencies/glfw)
+
+find_package(glfw3 REQUIRED)
+
 set (target XE.Graphics.GL.GLFW)
 
 set (headers
