@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Build Utility Tool for XE, on Unix platforms.
-# Pending rewrite in C++.
+# Pending rewrite in Python, for rapid prototyping.
 # Supports Debug and Release build, using GCC and CLANG compilers.
 # Tested on:
 #   ArchLinux, with Zen Kernel.
@@ -170,13 +170,15 @@ coverage_gen(){
 
     # generate profile data from profile raw information
     xcrun llvm-profdata merge $PROFRAW --instr --sparse=true -o $PROFDATA
+    # xcrun llvm-profdata merge build/src/engine/scene/default.profraw --instr --sparse=true -o build/src/engine/scene/default.profdata 
 
     # show coverage report for reporting pipeline purposes
     xcrun llvm-cov report $EXECUTABLE -instr-profile=$PROFDATA  -arch=arm64 "$MODULEPATH/include"
+    # xcrun llvm-cov report build/src/engine/scene/XE.Scene.Test -instr-profile=build/src/engine/scene/default.profdata -arch=x86_64
 
     # export detailed coverage information, for visualization in dashboard-like tool
     #xcrun llvm-cov show -format=html -instr-profile=$PROFDATA $EXECUTABLE -show-line-counts-or-regions --show-branches=count --show-expansions -arch=arm64 "$MODULEPATH/include" "$MODULEPATH/src" -output-dir=$OUTPATH
-    xcrun llvm-cov show $EXECUTABLE -instr-profile=$PROFDATA -format=html -show-branches=percent -show-line-counts-or-regions -show-expansions -arch=arm64 "$MODULEPATH/include" -output-dir=$OUTPATH
+    xcrun llvm-cov show build/src/engine/scene/XE.Scene.Test -instr-profile=$PROFDATA -format=html -show-branches=percent -show-line-counts-or-regions -show-expansions -arch=arm64 "$MODULEPATH/include" -output-dir=$OUTPATH
 }
 
 coverage(){
