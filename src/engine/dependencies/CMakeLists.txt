@@ -1,4 +1,5 @@
 if (XE_UNIT_TEST)
     include(CTest)
+    enable_testing()
     add_subdirectory(googletest)
 endif()
