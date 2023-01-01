@@ -47,6 +47,6 @@ target_link_libraries (${target}
 	PRIVATE XE.Interface
 )
 
-if (XE_UNIT_TEST)
+if (XE_DEV_UNIT_TEST)
 	add_subdirectory("unit-test")
 endif()

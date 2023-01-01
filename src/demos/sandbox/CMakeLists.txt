@@ -26,4 +26,4 @@ set (src
 
 add_executable (${target} ${src})
 
-target_link_libraries (${target} XE.Core XE.Graphics.GL XE.Platform.GLFW XE.Graphics.PNG)
+target_link_libraries (${target} XE.Interface XE.Core XE.Graphics.GL XE.Platform.GLFW XE.Graphics.PNG)

@@ -12,8 +12,8 @@ option (XE_PLUGIN_VULKAN        "Include Vulkan support" OFF)
 
 option (XE_EXAMPLE_DEMO         "Include example program that shows a tech demo" OFF)
 option (XE_EXAMPLE_SANDBOX      "Include example program that is used for various development activities" OFF)
-option (XE_UNIT_TEST            "Include unit-test suite" ON)
-option (XE_WARNINGS_AS_ERRORS   "" ON)
+option (XE_DEV_UNIT_TEST            "Include unit-test suite" ON)
+option (XE_DEV_WARNINGS_AS_ERRORS   "" ON)
 option (XE_DEV_COVERAGE         "Intrument code for unit test coverage")
 
 set (CMAKE_CXX_STANDARD             17)
@@ -42,26 +42,28 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
     set (XE_CXXFLAGS_WALL -Wall -Wextra)
     set (XE_CXXFLAGS_WERROR -Werror)
     set (XE_CXXFLAGS_COVERAGE -fprofile-arcs -ftest-coverage)
+    set (XE_LDFLAGS_COVERAGE )
 
 elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     set (XE_CXXFLAGS_WALL -Wall -Wextra)
     set (XE_CXXFLAGS_WERROR -Werror)
-    set (XE_CXXFLAGS_COVERAGE )
+    set (XE_CXXFLAGS_COVERAGE -fprofile-instr-generate -fcoverage-mapping)
+    set (XE_LDFLAGS_COVERAGE -fprofile-instr-generate)
 
 elseif (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
     set (XE_CXXFLAGS_WALL /Wall)
     set (XE_CXXFLAGS_WERROR /WX)
     set (XE_CXXFLAGS_COVERAGE )
-
+    set (XE_LDFLAGS_COVERAGE )
 endif()
 
 target_compile_options(${target} INTERFACE ${XE_CXXFLAGS_WALL})
-if (XE_WARNINGS_AS_ERRORS)
+if (XE_DEV_WARNINGS_AS_ERRORS)
     target_compile_options(${target} INTERFACE ${XE_CXXFLAGS_WERROR})
 endif()
-
 if (XE_DEV_COVERAGE)
     target_compile_options(${target} INTERFACE ${XE_CXXFLAGS_COVERAGE})
+    target_link_options(${target} INTERFACE ${XE_LDFLAGS_COVERAGE})
 endif() 
 
 add_subdirectory ("src")

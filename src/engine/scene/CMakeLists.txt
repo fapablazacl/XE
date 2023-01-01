@@ -11,24 +11,9 @@ set (sources
 add_library(${target} ${sources})
 
 target_include_directories(${target} PUBLIC "src/")
-target_link_libraries(${target} XE.Core)
+target_link_libraries(${target} PUBLIC XE.Core PRIVATE XE.Interface)
 
-# Enable all warnings
-if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU")
-	target_compile_options(${target} PRIVATE -Wall -Wextra)
-
-    if (XE_WARNINGS_AS_ERRORS)
-		target_compile_options(${target} PRIVATE -Werror)
-    endif()
-elseif (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
-    target_compile_options(${target} PRIVATE /Wall)
-
-    if (XE_WARNINGS_AS_ERRORS)
-        target_compile_options(${target} PRIVATE /WX)
-    endif()
-endif()
-
-if (XE_UNIT_TEST)
+if (XE_DEV_UNIT_TEST)
     set (test_target "XE.Scene.Test")
 
     set (test_sources
@@ -39,7 +24,7 @@ if (XE_UNIT_TEST)
     )
 
     add_executable(${test_target} ${test_sources})
-    target_link_libraries(${test_target} gtest XE.Scene)
+    target_link_libraries(${test_target} gtest XE.Scene XE.Interface)
 
     # NOTE: The test name must have the same name as the command name
     add_test(NAME ${test_target} COMMAND ${test_target})

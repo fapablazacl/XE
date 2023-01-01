@@ -103,6 +103,6 @@ target_compile_definitions(${target} PRIVATE _CRT_SECURE_NO_WARNINGS)
 target_compile_options(${target} PRIVATE ${XE_CXXFLAGS})
 target_link_libraries(${target} PRIVATE XE.Interface)
 
-if (XE_UNIT_TEST)
+if (XE_DEV_UNIT_TEST)
 	add_subdirectory("test/math")
 endif()
