@@ -19,4 +19,4 @@ jobs:
         run: cmake -G "Unix Makefiles" -S . -B build -DCMAKE_BUILD_TYPE=${{ matrix.cmake-build-type }}
 
       - name: Build
-        run: cmake --build build/clang/debug --parallel 4
+        run: cmake --build build --parallel 4
