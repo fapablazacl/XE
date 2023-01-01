@@ -1,0 +1,22 @@
+name: CI Pipeline
+on: [push]
+jobs:
+  build:
+    strategy:
+      fail-fast: true
+      matrix: 
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        cmake-build-type: [Debug, Release]
+
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout Source Code and Submodules
+        uses: actions/checkout@v2
+        with:
+          submodules: true
+
+      - name: Configure
+        run: cmake -G "Unix Makefiles" -S . -B build -DCMAKE_BUILD_TYPE=${{ matrix.cmake-build-type }}
+
+      - name: Build
+        run: cmake --build build/clang/debug --parallel 4
