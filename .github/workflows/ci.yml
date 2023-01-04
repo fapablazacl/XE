@@ -10,8 +10,8 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-      - name: Coverage Check
-        run: echo "Format check"
+      - name: clang-tidy
+        run: echo "Coverage check"
 
   build:
     strategy:
@@ -39,6 +39,24 @@ jobs:
   coverage:
     runs-on: ubuntu-latest
     needs: build
+    strategy:
+      fail-fast: false
+      matrix: 
+        cmake-build-type: [Debug, Release]
     steps:
-      - name: Coverage Check
-        run: echo "Format check"
+      - name: Checkout Source Code and Submodules
+        uses: actions/checkout@v2
+        with:
+          submodules: true
+
+      - name: Configure
+        run: CC=clang CXX=clang++ cmake -S . -B build -DCMAKE_BUILD_TYPE=${{ matrix.cmake-build-type }} -DXE_DEV_WARNINGS_AS_ERRORS=OFF -DXE_DEV_UNIT_TEST=ON -DXE_DEV_INSTRUMENT_COVERAGE=ON
+
+      - name: Build
+        run: cmake --build build --parallel 4
+
+      - name: Run unit tests
+        run: cd build && ctest --output-on-failure
+
+      - name: Check Coverage > 80%
+        run: echo "Add collector"
