@@ -1,9 +1,15 @@
 name: CI Pipeline
 on: [push]
 jobs:
+  format:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Format check
+        run: echo "Format check"
+
   build:
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix: 
         os: [ubuntu-latest, windows-latest, macos-latest]
         cmake-build-type: [Debug, Release]
