@@ -7,12 +7,6 @@ jobs:
       - name: Format check
         run: echo "Format check"
 
-  lint:
-    runs-on: ubuntu-latest
-    steps:
-      - name: clang-tidy
-        run: echo "Coverage check"
-
   build:
     strategy:
       fail-fast: false
@@ -35,6 +29,25 @@ jobs:
 
       - name: Run unit tests
         run: cd build && ctest --output-on-failure
+
+  lint:
+    needs: build
+    strategy:
+      fail-fast: false
+      matrix: 
+        cmake-build-type: [Debug, Release]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Source Code and Submodules
+        uses: actions/checkout@v2
+        with:
+          submodules: true
+
+      - name: Configure
+        run: CC=clang CXX=clang++ cmake -S . -B build -DCMAKE_BUILD_TYPE=${{ matrix.cmake-build-type }} -DXE_DEV_WARNINGS_AS_ERRORS=OFF -DXE_DEV_UNIT_TEST=ON -DCMAKE_CXX_CLANG_TIDY="clang-tidy"
+
+      - name: Build
+        run: cmake --build build --parallel 4
 
   coverage:
     runs-on: ubuntu-latest
