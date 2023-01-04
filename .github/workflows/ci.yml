@@ -38,13 +38,16 @@ jobs:
         cmake-build-type: [Debug, Release]
     runs-on: ubuntu-latest
     steps:
+      - name: Install clang-tidy
+        run: sudo apt-get update && sudo apt-get install clang-tidy
+
       - name: Checkout Source Code and Submodules
         uses: actions/checkout@v2
         with:
           submodules: true
 
       - name: Configure
-        run: CC=clang CXX=clang++ cmake -S . -B build -DCMAKE_BUILD_TYPE=${{ matrix.cmake-build-type }} -DXE_DEV_WARNINGS_AS_ERRORS=OFF -DXE_DEV_UNIT_TEST=ON -DCMAKE_CXX_CLANG_TIDY="clang-tidy"
+        run: CC=clang CXX=clang++ cmake -S . -B build -DCMAKE_BUILD_TYPE=${{ matrix.cmake-build-type }} -DXE_DEV_WARNINGS_AS_ERRORS=OFF -DXE_DEV_UNIT_TEST=ON -DCMAKE_CXX_CLANG_TIDY=clang-tidy
 
       - name: Build
         run: cmake --build build --parallel 4
