@@ -4,7 +4,7 @@ add_subdirectory("dependencies/glad-es2")
 set (target "XE.Graphics.ES2")
 
 set (headers
-	"include/XE/Graphics/ES2.h"
+	"include/xe/graphics/ES2.h"
 	"include/xe/graphics/gles2/GraphicsDeviceES2.h"
 	"include/xe/graphics/gles2/TextureBaseES2.h"
 	"include/xe/graphics/gles2/Texture2DES2.h"
