@@ -1,11 +1,23 @@
 name: CI Pipeline
 on: [push]
 jobs:
-  format:
+  formatting-check:
+    name: Formatting Check
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        path:
+          - check: 'src/engine'
+            exclude: '(dependencies)' # Exclude file paths containing "hello" or "world"
+            # exclude: '(hello|world)' # Exclude file paths containing "hello" or "world"
     steps:
-      - name: Format check
-        run: echo "Format check"
+    - uses: actions/checkout@v3
+    - name: Run clang-format style check for C/C++/Protobuf programs.
+      uses: jidicula/clang-format-action@v4.10.1
+      with:
+        clang-format-version: '13'
+        check-path: ${{ matrix.path['check'] }}
+        exclude-regex: ${{ matrix.path['exclude'] }}
 
   build:
     strategy:
@@ -13,7 +25,7 @@ jobs:
       matrix: 
         os: [ubuntu-latest, windows-latest, macos-latest]
         cmake-build-type: [Debug, Release]
-    needs: format
+    needs: formatting-check
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout Source Code and Submodules
