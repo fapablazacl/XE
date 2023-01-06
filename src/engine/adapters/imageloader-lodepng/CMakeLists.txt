@@ -10,7 +10,7 @@ target_include_directories("lodepng" PUBLIC "dependencies/lodepng")
 # actual plugin
 set (target "XE.Graphics.PNG")
 set (sources 
-    "include/XE/Graphics/PNG/ImageLoaderPNG.h"
+    "include/xe/graphics/png/ImageLoaderPNG.h"
 
     "src/ImageLoaderPNG.cpp"
 )

@@ -97,10 +97,11 @@ set (sources
 
 add_library (${target} ${sources})
 
-target_precompile_headers(${target} PRIVATE ${headers})
+if (XE_DEV_PRECOMPILED_HEADERS)
+	target_precompile_headers(${target} PRIVATE ${headers})
+endif()
+
 target_include_directories(${target} PUBLIC "src/")
-target_compile_definitions(${target} PRIVATE _CRT_SECURE_NO_WARNINGS)
-target_compile_options(${target} PRIVATE ${XE_CXXFLAGS})
 target_link_libraries(${target} PRIVATE XE.Interface)
 
 if (XE_DEV_UNIT_TEST)

@@ -14,9 +14,12 @@ option (XE_EXAMPLE_DEMO         "Include example program that shows a tech demo"
 option (XE_EXAMPLE_SANDBOX      "Include example program that is used for various development activities" OFF)
 
 # options suited for development
-option (XE_DEV_UNIT_TEST            "Include unit test suite" ON)
+option (XE_DEV_UNIT_TEST            "Enable unit test suite" ON)
 option (XE_DEV_WARNINGS_AS_ERRORS   "Marks all warnings as errors" OFF)
-option (XE_DEV_INSTRUMENT_COVERAGE  "Intrument code for unit test coverage" OFF)
+option (XE_DEV_INSTRUMENT_COVERAGE  "Intrument code for code coverage reporting during unit tests" OFF)
+option (XE_DEV_PRECOMPILED_HEADERS  "Enable precompiled headers for internal libraries, to improve build times" OFF)
+option (XE_DEV_LINT_CLANG_TIDY      "Enable linting via clang-tidy headers" OFF)
+option (XE_DEV_IWYU                 "Enable include-what-you-use checks" OFF)
 
 set (CMAKE_CXX_STANDARD             17)
 set (CMAKE_CXX_STANDARD_REQUIRED    ON)
@@ -67,5 +70,13 @@ if (XE_DEV_INSTRUMENT_COVERAGE)
     target_compile_options(${target} INTERFACE ${XE_CXXFLAGS_COVERAGE})
     target_link_options(${target} INTERFACE ${XE_LDFLAGS_COVERAGE})
 endif() 
+
+if (XE_DEV_LINT_CLANG_TIDY)
+    set (CMAKE_CXX_CLANG_TIDY "clang-tidy")
+endif()
+
+if (XE_DEV_IWYU)
+    set (CMAKE_CXX_INCLUDE_WHAT_YOU_USE "iwyu")
+endif()
 
 add_subdirectory ("src")

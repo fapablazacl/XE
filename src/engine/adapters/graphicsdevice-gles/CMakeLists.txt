@@ -34,7 +34,10 @@ set (sources
 
 add_library (${target} ${sources})
 
-target_precompile_headers (${target} PRIVATE ${headers})
+if (XE_DEV_PRECOMPILED_HEADERS)
+	target_precompile_headers (${target} PRIVATE ${headers})
+endif()
+
 target_include_directories (${target} PUBLIC "include/")
 target_link_libraries (${target} 
 	PUBLIC XE.Core 

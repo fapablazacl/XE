@@ -22,7 +22,7 @@ jobs:
           submodules: true
 
       - name: Configure
-        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=${{ matrix.cmake-build-type }} -DXE_DEV_WARNINGS_AS_ERRORS=OFF -DXE_DEV_UNIT_TEST=ON 
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=${{ matrix.cmake-build-type }} -DXE_DEV_WARNINGS_AS_ERRORS=ON -DXE_DEV_UNIT_TEST=ON 
 
       - name: Build
         run: cmake --build build --parallel 4
@@ -47,7 +47,7 @@ jobs:
           submodules: true
 
       - name: Configure
-        run: CC=clang CXX=clang++ cmake -S . -B build -DCMAKE_BUILD_TYPE=${{ matrix.cmake-build-type }} -DXE_DEV_WARNINGS_AS_ERRORS=OFF -DXE_DEV_UNIT_TEST=ON -DCMAKE_CXX_CLANG_TIDY=clang-tidy
+        run: CC=clang CXX=clang++ cmake -S . -B build -DCMAKE_BUILD_TYPE=${{ matrix.cmake-build-type }} -DXE_DEV_WARNINGS_AS_ERRORS=OFF -DXE_DEV_UNIT_TEST=OFF -DXE_DEV_LINT_CLANG_TIDY=ON
 
       - name: Build
         run: cmake --build build --parallel 4

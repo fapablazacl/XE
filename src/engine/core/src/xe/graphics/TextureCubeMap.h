@@ -4,6 +4,7 @@
 
 #include <xe/Predef.h>
 #include <xe/graphics/Texture.h>
+#include <xe/DataType.h>
 
 namespace XE {
     class TextureCubeMap : public Texture {
