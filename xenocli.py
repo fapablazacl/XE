@@ -37,8 +37,7 @@ class Formatter:
 
     def _is_file_formatteable(self, file):
         return self._checker.check(file)
-
-
+    
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("command")
