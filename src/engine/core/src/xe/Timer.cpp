@@ -29,9 +29,7 @@ static uint64_t monotonicTimeNanos() {
             return (high << 32) + highRem + low;
         }
 
-        Data(uint64_t bias_) : bias(bias_) {
-            mtiStatus = mach_timebase_info(&tb);
-        }
+        Data(uint64_t bias_) : bias(bias_) { mtiStatus = mach_timebase_info(&tb); }
 
         uint64_t scale(uint64_t i) { return scaleHighPrecision(i - bias, tb.numer, tb.denom); }
 
@@ -39,9 +37,7 @@ static uint64_t monotonicTimeNanos() {
         uint64_t bias;
         kern_return_t mtiStatus;
 
-        bool valid() const {
-            return mtiStatus == KERN_SUCCESS;
-        }
+        bool valid() const { return mtiStatus == KERN_SUCCESS; }
 
     } data(now);
 
