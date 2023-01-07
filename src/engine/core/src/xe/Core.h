@@ -11,11 +11,11 @@ namespace XE {
 
     /**
      * @brief The Core Root class
-     */ 
+     */
     class XE_API Core {
     public:
         Version GetVersion() const;
     };
-}
+} // namespace XE
 
 #endif

@@ -15,6 +15,6 @@ namespace XE {
 
         virtual bool exists(const std::string &path) const = 0;
     };
-}
+} // namespace XE
 
 #endif

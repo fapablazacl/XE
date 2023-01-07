@@ -1,6 +1,4 @@
 
 #include <xe/graphics/GraphicsDeviceFactory.h>
 
-namespace XE {
-
-}
+namespace XE {}

@@ -19,6 +19,6 @@ namespace XE {
 
         virtual std::string getSource() const = 0;
     };
-}
+} // namespace XE
 
 #endif

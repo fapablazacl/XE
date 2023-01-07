@@ -2,8 +2,8 @@
 #ifndef __XE_TIMER_HPP__
 #define __XE_TIMER_HPP__
 
-#include <xe/Predef.h>
 #include <cstdint>
+#include <xe/Predef.h>
 
 namespace XE {
     class XE_API Timer {
@@ -12,6 +12,6 @@ namespace XE {
 
         static uint32_t getTick();
     };
-}
+} // namespace XE
 
 #endif

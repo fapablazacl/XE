@@ -1,13 +1,12 @@
 
 #include <array>
-#include <string>
 #include <iostream>
 #include <map>
+#include <string>
 #include <xe/Timer.h>
 
-#include "Scene.h"
 #include "SandboxApp.hpp"
-
+#include "Scene.h"
 
 int main(int argc, char **argv) {
     try {

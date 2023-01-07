@@ -1,9 +1,9 @@
 
 #include "Common.h"
 
-#include <xe/math/Vector.h>
-#include <xe/math/FormatUtils.h>
 #include <sstream>
+#include <xe/math/FormatUtils.h>
+#include <xe/math/Vector.h>
 
 /*
 TEST_CASE("XE::Vector<3, float>", "[Vector]") {
@@ -40,7 +40,7 @@ TEST_CASE("XE::Vector<3, float>", "[Vector]") {
     SECTION("operator+ should add component-wise.") {
         const XE::Vector3f v1 = {1.0f, -2.0f, 3.0f};
         const XE::Vector3f v2 = {-2.0f, -1.0f, -2.0f};
-        
+
         REQUIRE((v2 + v1) == XE::Vector3f{-1.0f, -3.0f, 1.0f});
         REQUIRE((v1 + v2) == XE::Vector3f{-1.0f, -3.0f, 1.0f});
         REQUIRE(v1 == +v1);
@@ -64,7 +64,7 @@ TEST_CASE("XE::Vector<3, float>", "[Vector]") {
         REQUIRE((XE::Vector3f{0.0f} -= v1) == -v1);
         REQUIRE((XE::Vector3f{0.0f} -= v2) == -v2);
     }
-    
+
     SECTION("operator* should multiply component-wise") {
         const XE::Vector3f v1 = {1.0f, -2.0f, 3.0f};
         const XE::Vector3f v2 = {-2.0f, -1.0f, -2.0f};
@@ -139,7 +139,7 @@ TEST_CASE("XE::Vector<3, float>", "[Vector]") {
         REQUIRE(cross(v2, v2) == XE::Vector3f{0.0f});
         REQUIRE(cross(v3, v3) == XE::Vector3f{0.0f});
     }
-    
+
     SECTION("minimize function should return the minimun values between two vectors") {
         const XE::Vector3f v1 = {1.0f, -2.0f, -1.3f};
         const XE::Vector3f v2 = {1.3f, -1.6f, 0.0f};

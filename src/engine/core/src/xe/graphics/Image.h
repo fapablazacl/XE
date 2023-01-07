@@ -4,8 +4,8 @@
 
 #include <cstddef>
 #include <xe/Predef.h>
-#include <xe/math/Vector.h>
 #include <xe/graphics/PixelFormat.h>
+#include <xe/math/Vector.h>
 
 namespace XE {
     /**
@@ -18,7 +18,7 @@ namespace XE {
         /**
          * @brief Get a direct pointer to the image data resident in system memory.
          */
-        virtual const void* getPointer() const = 0;
+        virtual const void *getPointer() const = 0;
 
         /**
          * @brief Get the image pixel format.
@@ -30,6 +30,6 @@ namespace XE {
          */
         virtual Vector2i getSize() const = 0;
     };
-}
+} // namespace XE
 
 #endif

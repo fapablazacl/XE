@@ -1,6 +1,6 @@
 
-#include <xe/math/Rect.h>
 #include "Common.h"
+#include <xe/math/Rect.h>
 
 /*
 TEST_CASE("Rect") {
@@ -8,7 +8,7 @@ TEST_CASE("Rect") {
         XE::Rectf r1;
 
         r1.isValid();
-        
+
         REQUIRE(true);
     }
 }

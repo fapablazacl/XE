@@ -3,4 +3,4 @@
 
 namespace XE {
     Shader::~Shader() {}
-}
+} // namespace XE

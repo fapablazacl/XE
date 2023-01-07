@@ -1,8 +1,8 @@
 //
-//#ifndef __XE_GRAPHICS_VERTEXLAYOUT_HPP__
-//#define __XE_GRAPHICS_VERTEXLAYOUT_HPP__
+// #ifndef __XE_GRAPHICS_VERTEXLAYOUT_HPP__
+// #define __XE_GRAPHICS_VERTEXLAYOUT_HPP__
 //
-//namespace XE {
+// namespace XE {
 //    /**
 //     * @brief The Vertex Layout specifies how the information stored in a Vertex is structured in memory.
 //     */
@@ -11,4 +11,4 @@
 //    };
 //}
 //
-//#endif
+// #endif

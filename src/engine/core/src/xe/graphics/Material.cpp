@@ -3,4 +3,4 @@
 
 namespace XE {
     Material::~Material() {}
-}
+} // namespace XE

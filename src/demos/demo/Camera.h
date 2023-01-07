@@ -1,5 +1,5 @@
 
-#pragma once 
+#pragma once
 
 #include <xe/math.h>
 
@@ -12,6 +12,6 @@ struct Camera {
     float aspectRatio = 1.33333f;
     float znear = 0.01f;
     float zfar = 1000.0f;
-    
+
     void update(const float seconds, const bool moveForward, const bool moveBackward, const bool turnLeft, const bool turnRight);
 };

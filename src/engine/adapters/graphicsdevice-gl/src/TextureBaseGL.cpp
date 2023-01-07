@@ -13,4 +13,4 @@ namespace XE {
             glDeleteTextures(1, &m_id);
         }
     }
-}
+} // namespace XE

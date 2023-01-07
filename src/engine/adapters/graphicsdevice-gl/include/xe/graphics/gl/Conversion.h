@@ -2,8 +2,8 @@
 #ifndef __XE_GRAPHICS_GL_CONVERSION_HPP__
 #define __XE_GRAPHICS_GL_CONVERSION_HPP__
 
-#include <cstdint>
 #include "glcore.h"
+#include <cstdint>
 
 namespace XE {
     enum class DataType : std::int16_t;
@@ -22,7 +22,7 @@ namespace XE {
     enum class TextureFilter;
     enum class TextureWrap;
     enum class TextureCubeMapSide;
-}
+} // namespace XE
 
 namespace XE {
     extern GLenum convertToGL(const DataType type);
@@ -38,6 +38,6 @@ namespace XE {
     extern GLenum convertToGL(const TextureWrap wrap);
     extern GLenum convertToGL(const TextureCubeMapSide side);
     extern GLboolean convertToGL(const bool value);
-}
+} // namespace XE
 
-#endif 
+#endif

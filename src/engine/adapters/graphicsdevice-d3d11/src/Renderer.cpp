@@ -5,7 +5,6 @@
 #include <cassert>
 #include <stdexcept>
 
-
 namespace TestApp {
     class ComResultChecker {
     public:
@@ -33,9 +32,7 @@ namespace TestApp {
             }
         }
 
-        operator HRESULT() const {
-            return m_hr;
-        }
+        operator HRESULT() const { return m_hr; }
 
     private:
         HRESULT m_hr = 0;
@@ -43,9 +40,9 @@ namespace TestApp {
 
     // tipos de controladores disponibles
     static std::array<D3D_DRIVER_TYPE, 3> g_driverTypes = {
-        D3D_DRIVER_TYPE_HARDWARE,   // aceleracion por hardware
-        D3D_DRIVER_TYPE_WARP,       // aceleracion por software optimizada
-        D3D_DRIVER_TYPE_SOFTWARE    // aceleracion por software
+        D3D_DRIVER_TYPE_HARDWARE, // aceleracion por hardware
+        D3D_DRIVER_TYPE_WARP,     // aceleracion por software optimizada
+        D3D_DRIVER_TYPE_SOFTWARE  // aceleracion por software
     };
 
     static std::array<D3D_FEATURE_LEVEL, 3> g_featureLevels = {
@@ -56,9 +53,7 @@ namespace TestApp {
 
     Renderer::Renderer() {}
 
-    Renderer::~Renderer() {
-        this->Terminate();
-    }
+    Renderer::~Renderer() { this->Terminate(); }
 
     void Renderer::Initialize(HWND hWnd) {
         m_hWnd = hWnd;
@@ -91,11 +86,8 @@ namespace TestApp {
         ComResultChecker resultChecker = 0;
 
         for (auto driverType : g_driverTypes) {
-            resultChecker = D3D11CreateDeviceAndSwapChain(
-                nullptr, driverType, 0, creationFlags, 
-                g_featureLevels.data(), static_cast<UINT>(g_featureLevels.size()),
-                D3D11_SDK_VERSION, &swapChainDesc, &m_swapChain, &m_device, &m_featureLevel, &m_context
-            );
+            resultChecker = D3D11CreateDeviceAndSwapChain(nullptr, driverType, 0, creationFlags, g_featureLevels.data(), static_cast<UINT>(g_featureLevels.size()),
+                                                          D3D11_SDK_VERSION, &swapChainDesc, &m_swapChain, &m_device, &m_featureLevel, &m_context);
 
             if (resultChecker.Succeeded()) {
                 m_driverType = driverType;
@@ -104,13 +96,13 @@ namespace TestApp {
         }
 
         // obtener un render target
-        resultChecker = m_swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&m_backBufferTexture);
+        resultChecker = m_swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID *)&m_backBufferTexture);
         resultChecker = m_device->CreateRenderTargetView(m_backBufferTexture, nullptr, &m_backBufferTarget);
 
         if (m_backBufferTexture) {
             m_backBufferTexture->Release();
         }
-    
+
         m_context->OMSetRenderTargets(1, &m_backBufferTarget, nullptr);
 
         // establecer el viewport
@@ -126,11 +118,16 @@ namespace TestApp {
     }
 
     void Renderer::Terminate() {
-        if (m_backBufferTarget) m_backBufferTarget->Release();
-        if (m_backBufferTexture) m_backBufferTexture->Release();
-        if (m_context) m_context->Release();
-        if (m_swapChain) m_swapChain->Release();
-        if (m_device) m_device->Release();
+        if (m_backBufferTarget)
+            m_backBufferTarget->Release();
+        if (m_backBufferTexture)
+            m_backBufferTexture->Release();
+        if (m_context)
+            m_context->Release();
+        if (m_swapChain)
+            m_swapChain->Release();
+        if (m_device)
+            m_device->Release();
     }
 
     void Renderer::Render() {
@@ -140,4 +137,4 @@ namespace TestApp {
 
         m_swapChain->Present(0, 0);
     }
-}
+} // namespace TestApp

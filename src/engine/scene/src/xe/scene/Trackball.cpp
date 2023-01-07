@@ -2,29 +2,17 @@
 #include <xe/scene/Trackball.h>
 
 namespace XE {
-    Trackball::Trackball(const Vector2i &size) {
-        this->resize(size);
-    }
+    Trackball::Trackball(const Vector2i &size) { this->resize(size); }
 
-    void Trackball::beginDrag(const Vector2i &position) {
-        dragBegin = position;
-    }
+    void Trackball::beginDrag(const Vector2i &position) { dragBegin = position; }
 
-    void Trackball::drag(const Vector2i &position) {
-        dragCurrent = position;
-    }
+    void Trackball::drag(const Vector2i &position) { dragCurrent = position; }
 
-    void Trackball::endDrag(const Vector2i &position) {
-        dragEnd = position;
-    }
+    void Trackball::endDrag(const Vector2i &position) { dragEnd = position; }
 
-    void Trackball::resize(const Vector2i &size) {
-        vsphere.setScreenSize(size);
-    }
+    void Trackball::resize(const Vector2i &size) { vsphere.setScreenSize(size); }
 
-    Rotation<float> Trackball::computeRotation() const {
-        return {0.0f, {0.0f, 0.0f, 0.0f}};
-    }
+    Rotation<float> Trackball::computeRotation() const { return {0.0f, {0.0f, 0.0f, 0.0f}}; }
 
     Vector2f Trackball::scalePosition(const Vector2i &position) const {
         // map position to the [-1, 1]^2 range domain
@@ -35,14 +23,14 @@ namespace XE {
         return mappedPosition;
     }
 
-     Vector3f Trackball::computeSpherePosition(const Vector2f &scaledPosition) const {
-         const auto sp = scaledPosition;
-         const auto sp_length_squared = norm2(sp);
+    Vector3f Trackball::computeSpherePosition(const Vector2f &scaledPosition) const {
+        const auto sp = scaledPosition;
+        const auto sp_length_squared = norm2(sp);
 
-         if (sp_length_squared > 1.0f) {
-             return normalize(Vector3f{sp, 0.0f});
-         }
+        if (sp_length_squared > 1.0f) {
+            return normalize(Vector3f{sp, 0.0f});
+        }
 
-         return {sp, std::sqrt(1.0f - sp_length_squared)};
-     }
-}
+        return {sp, std::sqrt(1.0f - sp_length_squared)};
+    }
+} // namespace XE

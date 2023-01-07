@@ -10,19 +10,11 @@ namespace XE {
 
     EllipsoidGenerator::~EllipsoidGenerator() {}
 
-    std::vector<Vector3f> EllipsoidGenerator::generateVertexCoordinates() const {
-        return {};
-    }
+    std::vector<Vector3f> EllipsoidGenerator::generateVertexCoordinates() const { return {}; }
 
-    std::vector<Vector3f> EllipsoidGenerator::generateVertexNormals() const {
-        return {};
-    }
+    std::vector<Vector3f> EllipsoidGenerator::generateVertexNormals() const { return {}; }
 
-    std::vector<Vector2f> EllipsoidGenerator::generateVertexTexCoords() const {
-        return {};
-    }
+    std::vector<Vector2f> EllipsoidGenerator::generateVertexTexCoords() const { return {}; }
 
-    std::vector<int> EllipsoidGenerator::generateIndices() const {
-        return {};
-    }
-}
+    std::vector<int> EllipsoidGenerator::generateIndices() const { return {}; }
+} // namespace XE

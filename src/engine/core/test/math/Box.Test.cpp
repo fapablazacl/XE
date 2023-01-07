@@ -1,8 +1,8 @@
 
-#include <xe/math/Box.h>
 #include "Common.h"
-#include <sstream>
 #include <iostream>
+#include <sstream>
+#include <xe/math/Box.h>
 
 TEST(BoxTest, DefaultConstructorZeroesEdges) {
     XE::Boxf box;
@@ -19,7 +19,6 @@ TEST(BoxTest, ConstructorFromOneVectorInitializeEdges) {
     EXPECT_EQ(box.getMaxEdge(), XE::Vector3f(1.0f, 2.0f, 3.0f));
     EXPECT_EQ(box.isValid(), true);
 }
-
 
 TEST(BoxTest, ConstructorFromTwoVectorsInitalizeEdges) {
     XE::Boxf box{{1.0f, 2.0f, -3.0f}, {-1.0f, 8.0f, 3.0f}};
@@ -48,13 +47,13 @@ TEST_CASE("Box's attributes change based on values supplied via constructors and
 
             REQUIRE(box.getEdge(0) == XE::Vector3f{-1.0f, -1.0f, -1.0f});
             REQUIRE(box.getEdge(1) == XE::Vector3f{1.0f, -1.0f, -1.0f});
-            
+
             REQUIRE(box.getEdge(2) == XE::Vector3f{-1.0f, 1.0f, -1.0f});
             REQUIRE(box.getEdge(3) == XE::Vector3f{1.0f, 1.0f, -1.0f});
 
             REQUIRE(box.getEdge(4) == XE::Vector3f{-1.0f, -1.0f, 1.0f});
             REQUIRE(box.getEdge(5) == XE::Vector3f{1.0f, -1.0f, 1.0f});
-            
+
             REQUIRE(box.getEdge(6) == XE::Vector3f{-1.0f, 1.0f, 1.0f});
             REQUIRE(box.getEdge(7) == XE::Vector3f{1.0f, 1.0f, 1.0f});
         }
@@ -94,7 +93,7 @@ TEST_CASE("Box's attributes change based on values supplied via constructors and
         REQUIRE(box.getSize() == XE::Vector3f{2.0f, 6.0f, 6.0f});
         REQUIRE(box.getCenter() == XE::Vector3f{0.0f, 5.0f, 0.0f});
     }
-    
+
     SECTION("expand() should mutate the state when using it with a point outside the Box") {
         const auto prevCenter = box.getCenter();
         const auto prevSize = box.getSize();
@@ -144,7 +143,7 @@ TEST_CASE("Boxes can be tested against a Point and another Boxes", "[Box]") {
             REQUIRE(box.intersect(within));
             REQUIRE(within.intersect(box));
         }
-        
+
         SECTION("intesects when using a box with equal volume, but displaced using half times the size in each dimension") {
             const auto size = box.getSize();
 

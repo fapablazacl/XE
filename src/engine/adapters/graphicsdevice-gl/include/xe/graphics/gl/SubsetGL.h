@@ -4,8 +4,8 @@
 
 #include <xe/graphics/Subset.h>
 
-#include "glcore.h"
 #include "BufferGL.h"
+#include "glcore.h"
 
 namespace XE {
     class SubsetGL : public Subset {
@@ -13,28 +13,26 @@ namespace XE {
         explicit SubsetGL(const SubsetDescriptor &desc);
 
         virtual ~SubsetGL();
-        
+
         virtual int getBufferCount() const override;
 
-        virtual BufferGL* getBuffer(const int index) override;
+        virtual BufferGL *getBuffer(const int index) override;
 
-        virtual BufferGL* getIndexBuffer() override;
+        virtual BufferGL *getIndexBuffer() override;
 
-        virtual const BufferGL* getBuffer(const int index) const override;
+        virtual const BufferGL *getBuffer(const int index) const override;
 
-        virtual const BufferGL* getIndexBuffer() const override;
+        virtual const BufferGL *getIndexBuffer() const override;
 
     public:
-        GLuint getID() const {
-            return id;
-        }
+        GLuint getID() const { return id; }
 
     private:
         GLuint id = 0;
-        std::vector<const BufferGL*> buffers;
-        const BufferGL* indexBuffer = nullptr;
+        std::vector<const BufferGL *> buffers;
+        const BufferGL *indexBuffer = nullptr;
         SubsetDescriptor descriptor;
     };
-}
+} // namespace XE
 
 #endif

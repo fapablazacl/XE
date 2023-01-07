@@ -2,14 +2,14 @@
 #ifndef __XE_PREDEF_HPP__
 #define __XE_PREDEF_HPP__
 
-#include <cstdint>
 #include <cstddef>
+#include <cstdint>
 
 //! API export/import definition.
 //! Defined when we are using a DLL/Shared Object/DYLIB.
 #define XE_API
 
-//! detect target OS 
+//! detect target OS
 #if defined(_WINDOWS)
 #define XE_OS_WINDOWS
 #elif defined(__linux__)

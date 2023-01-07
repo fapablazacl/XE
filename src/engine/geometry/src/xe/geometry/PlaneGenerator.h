@@ -8,10 +8,7 @@
 #include "ShapeGenerator.h"
 
 namespace XE {
-    template<typename FloatT>
-    inline FloatT ratio(const int a, const int b) {
-        return static_cast<FloatT>(a) / static_cast<FloatT>(b);
-    }
+    template <typename FloatT> inline FloatT ratio(const int a, const int b) { return static_cast<FloatT>(a) / static_cast<FloatT>(b); }
 
     /**
      * @brief Generate a geometry mesh over the plane XZ
@@ -20,8 +17,7 @@ namespace XE {
     // TODO: Add the following generation parameters: Reference Plane, Rotation
     // TODO: Add a method to return required rendering parameters via the SubsetEnvelope class
     // TODO: Add control parameter for the Face Vertex Ordering
-    template<typename T>
-    class PlaneGenerator {
+    template <typename T> class PlaneGenerator {
     public:
         PlaneGenerator(const Vector2i &division, const Vector<T, 2> &size, const Plane<T> &plane) {
             assert(division.X > 0);
@@ -44,10 +40,10 @@ namespace XE {
 
             int vertexIndex = 0;
 
-            for (int i=0; i<slices + 1; i++) {
+            for (int i = 0; i < slices + 1; i++) {
                 const auto ti = ratio<T>(i, slices);
 
-                for (int j=0; j<stacks + 1; j++) {
+                for (int j = 0; j < stacks + 1; j++) {
                     const auto tj = ratio<T>(j, stacks);
 
                     if (coordinates) {
@@ -67,16 +63,15 @@ namespace XE {
             }
         }
 
-        template<typename I>
-        void generateIndices(I *indices) const {
+        template <typename I> void generateIndices(I *indices) const {
             const int slices = division.X;
             const int stacks = division.Y;
             const int slices_plus_1 = slices + 1;
 
             int index = 0;
 
-            for (int i=0; i<slices; i++) {
-                for (int j=0; j<stacks; j++) {
+            for (int i = 0; i < slices; i++) {
+                for (int j = 0; j < stacks; j++) {
                     const int p0 = (i + 0) + (j + 0) * (slices_plus_1);
                     const int p1 = (i + 1) + (j + 0) * (slices_plus_1);
                     const int p2 = (i + 0) + (j + 1) * (slices_plus_1);
@@ -93,33 +88,16 @@ namespace XE {
             }
         }
 
-        int getVertexCount() const {
-            return vertexCount;
-        }
+        int getVertexCount() const { return vertexCount; }
 
-        int getIndexCount() const {
-            return indexCount;
-        }
+        int getIndexCount() const { return indexCount; }
 
     private:
-        Vector<T, 3> computeCoordinate(const T ti, const T tj) const {
-            return {
-                lerp(T(-0.5), T(0.5), tj), 
-                lerp(T(0.5), T(-0.5), ti), 
-                T(0.0)
-            };
-        }
+        Vector<T, 3> computeCoordinate(const T ti, const T tj) const { return {lerp(T(-0.5), T(0.5), tj), lerp(T(0.5), T(-0.5), ti), T(0.0)}; }
 
-        Vector<T, 3> computeNormal(const T ti, const T tj) const {
-            return { T(0), T(0), T(-1) };
-        }
+        Vector<T, 3> computeNormal(const T ti, const T tj) const { return {T(0), T(0), T(-1)}; }
 
-        Vector<T, 2> computeTextureCoordinate(const T ti, const T tj) const {
-            return {
-                lerp(T(0), T(1), tj),
-                lerp(T(1), T(0), ti)
-            };
-        }
+        Vector<T, 2> computeTextureCoordinate(const T ti, const T tj) const { return {lerp(T(0), T(1), tj), lerp(T(1), T(0), ti)}; }
 
         int computeVertexCount() const {
             const int slices = division.X;
@@ -136,13 +114,13 @@ namespace XE {
         }
 
     private:
-        Vector2i division; 
+        Vector2i division;
         Vector<T, 2> size;
         Plane<T> plane;
 
         int vertexCount;
         int indexCount;
     };
-}
+} // namespace XE
 
 #endif

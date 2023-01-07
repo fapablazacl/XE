@@ -3,22 +3,21 @@
 #define __XE_GRAPHICS_D3D11_TESTAPP_RENDERER_HPP__
 
 #include <Windows.h>
+#include <cassert>
 #include <d3d11.h>
 #include <dxgi.h>
-#include <cassert>
 
-namespace TestApp {    
+namespace TestApp {
     /**
      * @brief A pointer that handles COM objects automatically
      */
-    template<class T>
-    class COMPtr {
+    template <class T> class COMPtr {
         // static_assert(std::is_base_of<IUnknown, T>)
 
     public:
         COMPtr() {}
 
-        COMPtr(T* object) : m_obj(object) {}
+        COMPtr(T *object) : m_obj(object) {}
 
         ~COMPtr() {
             if (m_obj) {
@@ -26,30 +25,24 @@ namespace TestApp {
             }
         }
 
-        T** operator& () {
-            return &m_obj;
-        }
+        T **operator&() { return &m_obj; }
 
-        T* operator->() {
+        T *operator->() {
             assert(m_obj);
             return m_obj;
         }
 
-        const T* operator->() const {
+        const T *operator->() const {
             assert(m_obj);
             return m_obj;
         }
 
-        operator T*() {
-            return m_obj;
-        }
-        
-        operator const T*() const {
-            return m_obj;
-        }
+        operator T *() { return m_obj; }
+
+        operator const T *() const { return m_obj; }
 
     private:
-        T* m_obj = nullptr;
+        T *m_obj = nullptr;
     };
 
     class Renderer {
@@ -75,6 +68,6 @@ namespace TestApp {
         ID3D11Texture2D *m_backBufferTexture;
         ID3D11RenderTargetView *m_backBufferTarget;
     };
-}
+} // namespace TestApp
 
 #endif

@@ -3,4 +3,4 @@
 
 namespace XE {
     Stream::~Stream() {}
-}
+} // namespace XE

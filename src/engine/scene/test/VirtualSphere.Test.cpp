@@ -27,7 +27,7 @@ TEST_CASE("VirtualSphere accessors should fill its fields properly", "[VirtualSp
 TEST_CASE("VirtualSphere computePointAt method should return points lying into the surface of the sphere", "[VirtualSphere]") {
     SECTION("Given virtual spheres with standard sizes") {
         XE::VirtualSphere spheres[] = {
-            {{100, 100}}, 
+            {{100, 100}},
             {{320, 200}},
             {{200, 320}},
         };
@@ -48,9 +48,9 @@ TEST_CASE("VirtualSphere computePointAt method should return points lying into t
             REQUIRE(spheres[0].computePointAt({50, 50}) == XE::Vector3f{0.0f, 0.0f, 1.0f});
             REQUIRE(spheres[1].computePointAt({160, 100}) == XE::Vector3f{0.0f, 0.0f, 1.0f});
             REQUIRE(spheres[2].computePointAt({100, 160}) == XE::Vector3f{0.0f, 0.0f, 1.0f});
-        } 
-    } 
-} 
+        }
+    }
+}
 
 TEST_CASE("VirtualSphere comparison operators should compare sizes", "[VirtualSphere]") {
     SECTION("Given virtual spheres with standard sizes") {

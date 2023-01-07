@@ -11,6 +11,6 @@ namespace XE {
 
         virtual std::unique_ptr<Image> load(Stream *inputStream) override;
     };
-}
+} // namespace XE
 
 #endif

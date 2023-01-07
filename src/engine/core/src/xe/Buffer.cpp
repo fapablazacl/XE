@@ -3,4 +3,4 @@
 
 namespace XE {
     Buffer::~Buffer() {}
-}
+} // namespace XE

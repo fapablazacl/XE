@@ -2,22 +2,15 @@
 #ifndef __XE_GRAPHICS_BUFFERDESCRIPTOR_HPP__
 #define __XE_GRAPHICS_BUFFERDESCRIPTOR_HPP__
 
-#include <xe/Predef.h>
 #include <cstddef>
+#include <xe/Predef.h>
 
 namespace XE {
-    enum class BufferAccess {
-        Static, Dynamic, Stream
-    };
+    enum class BufferAccess { Static, Dynamic, Stream };
 
-    enum class BufferUsage {
-        Copy, Read, Write
-    };
+    enum class BufferUsage { Copy, Read, Write };
 
-    enum class BufferType {
-        Vertex,
-        Index
-    };
+    enum class BufferType { Vertex, Index };
 
     struct BufferDescriptor {
         BufferType type;
@@ -26,6 +19,6 @@ namespace XE {
         std::size_t size;
         const void *data;
     };
-}
+} // namespace XE
 
 #endif

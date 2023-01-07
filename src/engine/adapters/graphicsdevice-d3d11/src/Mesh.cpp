@@ -12,41 +12,18 @@ namespace TestApp {
 
     Mesh::Mesh() {}
 
-    Mesh::~Mesh() {
-        this->Shutdown();
-    }
+    Mesh::~Mesh() { this->Shutdown(); }
 
-    bool Mesh::Initialize(ID3D11Device *device) {
-        return this->InitializeBuffers(device);
-    }
+    bool Mesh::Initialize(ID3D11Device *device) { return this->InitializeBuffers(device); }
 
-    void Mesh::Shutdown() {
-        this->ShutdownBuffers();
-    }
+    void Mesh::Shutdown() { this->ShutdownBuffers(); }
 
-    void Mesh::Render(ID3D11DeviceContext *context) {
-        this->RenderBuffers(context);
-    }
+    void Mesh::Render(ID3D11DeviceContext *context) { this->RenderBuffers(context); }
 
-    int Mesh::GetIndexCount() const {
-        return indexCount;
-    }
-        
+    int Mesh::GetIndexCount() const { return indexCount; }
+
     bool Mesh::InitializeBuffers(ID3D11Device *device) {
-        VertexType vertices[] = {
-            {
-                {-1.0f, -1.0f, 0.0f}, 
-                {1.0f, 0.0f, 0.0f, 1.0f}
-            },
-            {
-                {0.0f, 1.0f, 0.0f}, 
-                {1.0f, 0.0f, 0.0f, 1.0f}
-            },
-            {
-                {1.0f, -1.0f, 0.0f}, 
-                {1.0f, 0.0f, 0.0f, 1.0f}
-            }
-        };
+        VertexType vertices[] = {{{-1.0f, -1.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 1.0f}}, {{0.0f, 1.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 1.0f}}, {{1.0f, -1.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 1.0f}}};
 
         int indices[] = {0, 1, 2};
 
@@ -65,7 +42,7 @@ namespace TestApp {
             return false;
         }
 
-        //setup index data
+        // setup index data
         D3D11_BUFFER_DESC indexBufferDesc = {};
         indexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
         indexBufferDesc.ByteWidth = sizeof(int) * 3;
@@ -103,4 +80,4 @@ namespace TestApp {
         context->IASetIndexBuffer(indexBuffer, DXGI_FORMAT_R32_UINT, 0);
         context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     }
-}
+} // namespace TestApp

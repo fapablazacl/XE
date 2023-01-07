@@ -19,25 +19,20 @@ namespace XE {
         m_usage = usageGL;
     }
 
-
     BufferES2::~BufferES2() {
         if (m_id) {
             glDeleteBuffers(1, &m_id);
         }
     }
 
+    void BufferES2::read(void *destination, const size_t size, const size_t offset, const size_t destinationOffset) const { return; }
 
-    void BufferES2::read(void* destination, const size_t size, const size_t offset, const size_t destinationOffset) const {
-        return;
-    }
-
-    
     void BufferES2::write(const void *source, const size_t size, const size_t offset, const size_t sourceOffset) {
         const size_t finalSize = size ? size : m_size;
-        const auto ptr = reinterpret_cast<const std::byte*>(source);
+        const auto ptr = reinterpret_cast<const std::byte *>(source);
 
         glBindBuffer(m_target, m_id);
         glBufferSubData(m_target, offset, finalSize, &ptr[sourceOffset]);
         glBindBuffer(m_target, 0);
     }
-}
+} // namespace XE

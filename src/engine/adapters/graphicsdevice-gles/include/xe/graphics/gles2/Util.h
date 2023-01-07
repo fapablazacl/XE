@@ -7,9 +7,11 @@ namespace XE {
 }
 
 #if defined(_DEBUG)
-#  define XE_GRAPHICS_GL_CHECK_ERROR()  __checkErrorImpl(__FILE__, __LINE__)
-#else 
-#  define XE_GRAPHICS_GL_CHECK_ERROR()  do{} while(false)
+#define XE_GRAPHICS_GL_CHECK_ERROR() __checkErrorImpl(__FILE__, __LINE__)
+#else
+#define XE_GRAPHICS_GL_CHECK_ERROR()                                                                                                                                               \
+    do {                                                                                                                                                                           \
+    } while (false)
 #endif
 
 #endif

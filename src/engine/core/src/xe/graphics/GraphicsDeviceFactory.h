@@ -1,5 +1,5 @@
 
-#pragma once 
+#pragma once
 
 namespace XE {
     class GraphicsDevice;
@@ -7,6 +7,6 @@ namespace XE {
     public:
         virtual ~GraphicsDeviceFactory() {}
 
-        virtual GraphicsDevice* createDevice();
+        virtual GraphicsDevice *createDevice();
     };
-}
+} // namespace XE

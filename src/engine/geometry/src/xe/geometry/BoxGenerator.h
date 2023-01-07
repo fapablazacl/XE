@@ -33,9 +33,9 @@ namespace XE {
         std::vector<Vector2f> generateBaseTexCoords() const;
 
     private:
-        Vector3i division; 
+        Vector3i division;
         Vector3f size;
     };
-}
+} // namespace XE
 
 #endif

@@ -3,4 +3,4 @@
 
 namespace XE {
     InputManager::~InputManager() {}
-}
+} // namespace XE

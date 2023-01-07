@@ -21,7 +21,7 @@ namespace XE {
     enum class BlendParam;
     enum class TextureFilter;
     enum class TextureWrap;
-}
+} // namespace XE
 
 namespace XE {
     extern GLenum convertToES(const DataType type);
@@ -35,6 +35,6 @@ namespace XE {
     extern GLenum convertToES(const TextureFilter filter);
     extern GLenum convertToES(const TextureWrap wrap);
     extern GLboolean convertToES(const bool value);
-}
+} // namespace XE
 
-#endif 
+#endif

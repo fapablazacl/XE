@@ -1,6 +1,5 @@
 
 #include "Camera.h"
-        
 
 void Camera::update(const float seconds, const bool moveForward, const bool moveBackward, const bool turnLeft, const bool turnRight) {
     const float speed = 2.0f;

@@ -3,4 +3,4 @@
 
 namespace XE {
     Subset::~Subset() {}
-}
+} // namespace XE

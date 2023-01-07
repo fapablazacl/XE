@@ -2,23 +2,23 @@
  * XE Tech demo
  */
 
-#include <xe/XE.h>
 #include <xe/Timer.h>
+#include <xe/XE.h>
+#include <xe/graphics.h>
+#include <xe/graphics/gl/GLFW/WindowGLFW.h>
+#include <xe/graphics/gl/GraphicsDeviceGL.h>
+#include <xe/graphics/gles2/GraphicsDeviceES2.h>
 #include <xe/input.h>
 #include <xe/math.h>
-#include <xe/graphics.h>
-#include <xe/graphics/gles2/GraphicsDeviceES2.h>
-#include <xe/graphics/gl/GraphicsDeviceGL.h>
-#include <xe/graphics/gl/GLFW/WindowGLFW.h>
 
-#include <map>
 #include <functional>
+#include <map>
 
-#include "Util.h"
+#include "Camera.h"
 #include "Common.h"
 #include "Renderable.h"
 #include "SceneNode.h"
-#include "Camera.h"
+#include "Util.h"
 
 const int s_screenWidth = 1200;
 const int s_screenHeight = 800;
@@ -27,18 +27,14 @@ class DemoRenderable : public Renderable {
 public:
     DemoRenderable() {}
 
-    DemoRenderable(XE::Subset *subset, const XE::SubsetEnvelope &subsetEnvelope) 
-        : mSubset(subset), mSubsetEnvelope(subsetEnvelope) {}
+    DemoRenderable(XE::Subset *subset, const XE::SubsetEnvelope &subsetEnvelope) : mSubset(subset), mSubsetEnvelope(subsetEnvelope) {}
 
-    void render(XE::GraphicsDevice *graphicsDevice) override {
-        graphicsDevice->draw(mSubset, &mSubsetEnvelope, 1);
-    }
+    void render(XE::GraphicsDevice *graphicsDevice) override { graphicsDevice->draw(mSubset, &mSubsetEnvelope, 1); }
 
 private:
     XE::Subset *mSubset = nullptr;
     XE::SubsetEnvelope mSubsetEnvelope;
 };
-
 
 namespace demo {
     class DemoApp {
@@ -59,7 +55,7 @@ namespace demo {
 
     private:
         void initialize(const XE::GraphicsBackend backend) {
-            const XE::Vector2i windowSize = { s_screenWidth, s_screenHeight };
+            const XE::Vector2i windowSize = {s_screenWidth, s_screenHeight};
             std::string title;
 
             XE::GraphicsContext::Descriptor descriptor;
@@ -73,7 +69,7 @@ namespace demo {
             }
 
             mWindow = XE::WindowGLFW::create(descriptor, title, windowSize, false);
-            
+
             if (backend == XE::GraphicsBackend::GL_41) {
                 mGraphicsDevice = std::make_unique<XE::GraphicsDeviceGL>(mWindow->getContext());
             } else {
@@ -85,8 +81,7 @@ namespace demo {
             mSimpleProgram = createSimpleProgram(backend);
         }
 
-
-        XE::Program* createSimpleProgram(const XE::GraphicsBackend backend) {
+        XE::Program *createSimpleProgram(const XE::GraphicsBackend backend) {
             if (backend == XE::GraphicsBackend::GL_41) {
                 const std::string simpleVS = loadTextFile("shaders/gl4/gl4-main.vert");
                 const std::string simpleFS = loadTextFile("shaders/gl4/gl4-main.frag");
@@ -104,44 +99,29 @@ namespace demo {
 
                 return program;
             }
-
         }
-
 
         void setupGeometry() {
             const Mesh mesh = makeCubeMesh(0.25f, 0.25f, 0.25f);
 
             mColoredCubeSubset = createCubeSubset2(mGraphicsDevice.get(), mesh);
-            mColoredCubeSubsetEnvelope = {
-                mesh.primitive, 0, 
-                static_cast<int>(mesh.vertices.size())
-            };
-        
+            mColoredCubeSubsetEnvelope = {mesh.primitive, 0, static_cast<int>(mesh.vertices.size())};
+
             const Mesh axisMesh = makeAxisMesh(1.0f, 1.0f, 1.0f);
-        
+
             mAxisSubset = createSubset(mGraphicsDevice.get(), axisMesh);
-            mAxisSubsetEnvelope = {
-                axisMesh.primitive, 0,
-                static_cast<int>(axisMesh.indices.size())
-            };
-        
+            mAxisSubsetEnvelope = {axisMesh.primitive, 0, static_cast<int>(axisMesh.indices.size())};
+
             const Mesh floorMesh = makeGridMesh(1.0f, 20, 20);
 
             mFloorSubset = createSubset(mGraphicsDevice.get(), floorMesh);
-            mFloorSubsetEnvelope = { 
-                floorMesh.primitive,
-                0, 
-                static_cast<int>(floorMesh.vertices.size())
-            };
+            mFloorSubsetEnvelope = {floorMesh.primitive, 0, static_cast<int>(floorMesh.vertices.size())};
 
             const Mesh cubeMesh = makeCubeMesh(0.5f, 0.5f, 0.5f);
 
             mCubeSubset = createCubeSubset2(mGraphicsDevice.get(), cubeMesh);
-            
-            mCubeSubsetEnvelope = { 
-                floorMesh.primitive, 0,
-                static_cast<int>(cubeMesh.vertices.size())
-            };
+
+            mCubeSubsetEnvelope = {floorMesh.primitive, 0, static_cast<int>(cubeMesh.vertices.size())};
 
             mMaterial.renderState.depthTest = true;
             mMaterial.renderState.cullBackFace = true;
@@ -162,7 +142,7 @@ namespace demo {
 
             mRightCubeNode = mSceneNode.createChild();
             mRightCubeNode->setRenderable(&mColoredCubeRenderable);
-            
+
             mEnemyRenderable = {mCubeSubset, mCubeSubsetEnvelope};
             mEnemyNode = mSceneNode.createChild();
             mEnemyNode->setRenderable(&mEnemyRenderable);
@@ -211,24 +191,23 @@ namespace demo {
             mCamera.update(seconds, moveForward, moveBackward, turnLeft, turnRight);
         }
 
-
         void renderSceneNode() {
             const auto aspect = static_cast<float>(s_screenWidth) / static_cast<float>(s_screenHeight);
 
             const auto proj = XE::M4::perspective(mCamera.fov, mCamera.aspectRatio, mCamera.znear, mCamera.zfar);
             const auto view = XE::M4::lookAtRH(mCamera.position, mCamera.lookAt, mCamera.up);
             const auto viewProj = view * proj;
-            
+
             mGraphicsDevice->beginFrame(XE::ClearFlags::All, {0.2f, 0.2f, 0.8f, 1.0f}, 1.0f, 0);
 
             mGraphicsDevice->setProgram(mSimpleProgram);
-            
+
             const XE::UniformMatrix uView = {"uView", XE::DataType::Float32, XE::UniformMatrixShape::R4C4, 1};
-            mGraphicsDevice->applyUniform(&uView, 1, reinterpret_cast<const void*>(view.data()));
-            
+            mGraphicsDevice->applyUniform(&uView, 1, reinterpret_cast<const void *>(view.data()));
+
             mGraphicsDevice->setMaterial(&mMaterial);
             mSceneNode.visit(mGraphicsDevice.get(), viewProj);
-            
+
             mGraphicsDevice->endFrame();
         }
 
@@ -241,16 +220,16 @@ namespace demo {
         float mAngle = 0.0f;
 
         XE::Program *mSimpleProgram = nullptr;
-    
+
         XE::Subset *mAxisSubset = nullptr;
         XE::SubsetEnvelope mAxisSubsetEnvelope;
-        
+
         XE::Subset *mColoredCubeSubset = nullptr;
         XE::SubsetEnvelope mColoredCubeSubsetEnvelope;
 
         XE::Subset *mFloorSubset = nullptr;
         XE::SubsetEnvelope mFloorSubsetEnvelope;
-        
+
         XE::Subset *mCubeSubset = nullptr;
         XE::SubsetEnvelope mCubeSubsetEnvelope;
 
@@ -271,8 +250,7 @@ namespace demo {
         DemoRenderable mEnemyRenderable;
         SceneNode *mEnemyNode = nullptr;
     };
-}
-
+} // namespace demo
 
 int main(int argc, char **argv) {
     demo::DemoApp app;

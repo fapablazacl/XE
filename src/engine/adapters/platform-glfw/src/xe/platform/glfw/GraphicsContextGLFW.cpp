@@ -11,21 +11,11 @@ namespace XE {
         this->descriptor = descriptor;
     }
 
-
     GraphicsContextGLFW::~GraphicsContextGLFW() {}
 
+    GraphicsContext::GetProcAddressGL GraphicsContextGLFW::getProcAddressFunctionGL() const { return (GraphicsContext::GetProcAddressGL)glfwGetProcAddress; }
 
-    GraphicsContext::GetProcAddressGL GraphicsContextGLFW::getProcAddressFunctionGL() const {
-        return (GraphicsContext::GetProcAddressGL)glfwGetProcAddress;
-    }
+    GraphicsContext::Descriptor GraphicsContextGLFW::getDescriptor() const { return descriptor; }
 
-
-    GraphicsContext::Descriptor GraphicsContextGLFW::getDescriptor() const {
-        return descriptor;
-    }
-
-
-    void GraphicsContextGLFW::present() {
-        glfwSwapBuffers(glfwWindow);
-    }
-}
+    void GraphicsContextGLFW::present() { glfwSwapBuffers(glfwWindow); }
+} // namespace XE

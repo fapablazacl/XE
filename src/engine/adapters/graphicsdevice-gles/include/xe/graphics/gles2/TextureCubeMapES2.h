@@ -17,12 +17,12 @@ namespace XE {
         virtual PixelFormat GetFormat() const override {
             return m_format;
         }
-        
+
     public:
         virtual Vector2i GetSize() const = 0;
-        
+
         virtual void SetData(const void *surfaceData, const int mipLevel, TextureCubeMapSide cubeMap, const PixelFormat surfaceFormat, const Recti &area) = 0;
-        
+
         virtual void GetData(void *surfaceData, const int mipLevel, TextureCubeMapSide cubeMap, const PixelFormat surfaceFormat, const Recti &area) const = 0;
 
     private:

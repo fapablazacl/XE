@@ -14,8 +14,8 @@ namespace XE {
 
         virtual ~ImageImpl();
 
-        virtual const void* getPointer() const override;
-        
+        virtual const void *getPointer() const override;
+
         virtual PixelFormat getFormat() const override;
 
         virtual Vector2i getSize() const override;
@@ -29,6 +29,6 @@ namespace XE {
         PixelFormat format = PixelFormat::Unknown;
         Vector2i size = {0, 0};
     };
-}
+} // namespace XE
 
 #endif

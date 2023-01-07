@@ -23,8 +23,7 @@ namespace XE {
         void registerFactory(const std::string &path, std::unique_ptr<StreamFactory> factory);
 
     private:
-    
     };
-}
+} // namespace XE
 
 #endif

@@ -26,9 +26,9 @@ namespace XE {
         virtual MouseStatus getMouseStatus() = 0;
 
         virtual int getControllerCount() = 0;
-        
+
         virtual ControllerStatus getControllerStatus(const int index) = 0;
     };
-}
+} // namespace XE
 
 #endif

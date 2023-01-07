@@ -1,17 +1,15 @@
 
 #include "Shader.h"
 
-#include <iostream>
 #include <d3dcompiler.h>
+#include <iostream>
 
 namespace TestApp {
     using namespace XE;
 
     Shader::Shader() {}
 
-    Shader::~Shader() {
-        this->Shutdown();
-    }
+    Shader::~Shader() { this->Shutdown(); }
 
     bool Shader::Initialize(ID3D11Device *device, HWND hWnd) {
         LPCWSTR vertexShaderPath = L"src/XE.Graphics.D3D11.TestApp/XE/Graphics/D3D11/TestApp/Color.vs";
@@ -20,9 +18,7 @@ namespace TestApp {
         return this->InitializeShader(device, hWnd, vertexShaderPath, pixelShaderPath);
     }
 
-    void Shader::Shutdown() {
-        this->ShutdownShader();
-    }
+    void Shader::Shutdown() { this->ShutdownShader(); }
 
     bool Shader::Render(ID3D11DeviceContext *context, int indexCount, const Matrix4f &world, const Matrix4f &view, const Matrix4f &projection) {
         if (!this->SetShaderParameters(context, world, view, projection)) {
@@ -70,8 +66,8 @@ namespace TestApp {
         if (FAILED(device->CreatePixelShader(pixelShaderBlob->GetBufferPointer(), pixelShaderBlob->GetBufferSize(), nullptr, &pixelShader))) {
             return false;
         }
-        
-        // create the InputLayout class (that specifies the 
+
+        // create the InputLayout class (that specifies the
         D3D11_INPUT_ELEMENT_DESC positionInputElement;
         D3D11_INPUT_ELEMENT_DESC colorInputElement;
 
@@ -93,9 +89,7 @@ namespace TestApp {
 
         const int LAYOUT_COUNT = 2;
 
-        D3D11_INPUT_ELEMENT_DESC polygonLayout[LAYOUT_COUNT] = {
-            positionInputElement, colorInputElement
-        };
+        D3D11_INPUT_ELEMENT_DESC polygonLayout[LAYOUT_COUNT] = {positionInputElement, colorInputElement};
 
         if (FAILED(device->CreateInputLayout(polygonLayout, LAYOUT_COUNT, vertexShaderBlob->GetBufferPointer(), vertexShaderBlob->GetBufferSize(), &layout))) {
             return false;
@@ -148,7 +142,7 @@ namespace TestApp {
     }
 
     void Shader::DisplayShaderErrorMessage(ID3D10Blob *errorMessage, HWND hWnd, LPCWSTR msg) {
-        auto errorStr = static_cast<char*>(errorMessage->GetBufferPointer());
+        auto errorStr = static_cast<char *>(errorMessage->GetBufferPointer());
         auto errorStrSize = errorMessage->GetBufferSize();
 
         std::cout << errorStr << std::endl;
@@ -165,7 +159,7 @@ namespace TestApp {
             return false;
         }
 
-        auto dataPtr = (MatrixBufferType*)mappedResource.pData;
+        auto dataPtr = (MatrixBufferType *)mappedResource.pData;
         dataPtr->world = worldT;
         dataPtr->view = viewT;
         dataPtr->projection = projectionT;
@@ -185,5 +179,4 @@ namespace TestApp {
 
         context->DrawIndexed(indexCount, 0, 0);
     }
-}
-
+} // namespace TestApp

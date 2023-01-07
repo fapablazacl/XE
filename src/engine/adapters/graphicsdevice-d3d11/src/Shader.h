@@ -41,6 +41,6 @@ namespace TestApp {
         ID3D11InputLayout *layout = nullptr;
         ID3D11Buffer *matrixBuffer = nullptr;
     };
-}
+} // namespace TestApp
 
 #endif

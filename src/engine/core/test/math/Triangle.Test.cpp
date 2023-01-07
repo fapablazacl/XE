@@ -1,6 +1,6 @@
 
-#include <xe/math/Triangle.h>
 #include "Common.h"
+#include <xe/math/Triangle.h>
 
 /*
 TEST_CASE("Triangle") {

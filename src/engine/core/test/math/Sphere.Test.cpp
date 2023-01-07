@@ -1,6 +1,6 @@
 
-#include <xe/math/Sphere.h>
 #include "Common.h"
+#include <xe/math/Sphere.h>
 
 /*
 TEST_CASE("Sphere") {

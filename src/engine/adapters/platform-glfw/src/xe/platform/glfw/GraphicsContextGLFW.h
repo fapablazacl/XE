@@ -2,8 +2,8 @@
 #ifndef __XE_GRAPHICS_GRAPHICSCONTEXTGLFW_HPP__
 #define __XE_GRAPHICS_GRAPHICSCONTEXTGLFW_HPP__
 
-#include <xe/graphics/GraphicsContext.h>
 #include <GLFW/glfw3.h>
+#include <xe/graphics/GraphicsContext.h>
 
 namespace XE {
     class GraphicsContextGLFW : public GraphicsContext {
@@ -27,6 +27,6 @@ namespace XE {
         GLFWwindow *glfwWindow = nullptr;
         Descriptor descriptor;
     };
-}
+} // namespace XE
 
 #endif

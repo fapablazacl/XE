@@ -1,11 +1,11 @@
 
-#include <xe/graphics/gl/Texture2DGL.h>
 #include <xe/graphics/gl/Conversion.h>
+#include <xe/graphics/gl/Texture2DGL.h>
 #include <xe/graphics/gl/Util.h>
 
 namespace XE {
     Texture2DGL::Texture2DGL(const PixelFormat format, const Vector2i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void *sourceData)
-            : TextureBaseGL(GL_TEXTURE_2D) {
+        : TextureBaseGL(GL_TEXTURE_2D) {
 
         m_size = size;
         m_format = format;
@@ -31,7 +31,7 @@ namespace XE {
         glTexSubImage2D(GL_TEXTURE_2D, mipLevel, offset.X, offset.Y, size.X, size.Y, formatGL, dataTypeGL, surfaceData);
         glBindTexture(GL_TEXTURE_2D, 0);
     }
-    
+
     void Texture2DGL::getData(void *surfaceData, const int mipLevel, const PixelFormat surfaceFormat, const DataType surfaceDataType) const {
         const GLenum formatGL = convertToGL(surfaceFormat);
         const GLenum dataTypeGL = convertToGL(surfaceDataType);
@@ -40,4 +40,4 @@ namespace XE {
         glGetTexImage(GL_TEXTURE_2D, mipLevel, formatGL, dataTypeGL, surfaceData);
         glBindTexture(GL_TEXTURE_2D, 0);
     }
-}
+} // namespace XE

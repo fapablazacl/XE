@@ -6,35 +6,35 @@ namespace XE {
     class GraphicsDeviceFactory;
 
     /**
-     * @brief Serves 
-     * 
+     * @brief Serves
+     *
      */
     class GraphicsManager {
     public:
         /**
-         * @brief 
-         * 
-         * @param factory 
+         * @brief
+         *
+         * @param factory
          */
         void registerFactory(GraphicsDeviceFactory *factory);
 
         /**
-         * @brief 
-         * 
-         * @param factory 
+         * @brief
+         *
+         * @param factory
          */
         void unregisterFactory(GraphicsDeviceFactory *factory);
 
         /**
          * @brief Create a default graphics device.
-         * 
+         *
          * This device depends on the current platform:
-         * 
+         *
          * For desktop platforms: OpenGL 3
          * For mobile platforms: OpenGL ES 2
-         * 
-         * @return GraphicsDevice* 
+         *
+         * @return GraphicsDevice*
          */
-        GraphicsDevice* createDevice();
+        GraphicsDevice *createDevice();
     };
-}
+} // namespace XE

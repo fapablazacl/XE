@@ -1,7 +1,7 @@
 
-#include <xe/math/Range.h>
-#include <iostream>
 #include "Common.h"
+#include <iostream>
+#include <xe/math/Range.h>
 
 /*
 TEST_CASE("Range should have a valid state when perform correctly after each kind of operation", "[Range]") {
@@ -96,12 +96,12 @@ TEST_CASE("Range overlappting detection methods should perform correctly", "[Ran
             for (float offset = 0.0f; offset < 1.0f; offset += 0.125f) {
                 const float width = 1.0f;
 
-                const XE::Range<float> subject1{ 
+                const XE::Range<float> subject1{
                     (i + 0) * width + offset,
                     (i + 1) * width + offset
                 };
 
-                const XE::Range<float> subject2{ 
+                const XE::Range<float> subject2{
                     (i + 1) * width + offset,
                     (i + 2) * width + offset
                 };

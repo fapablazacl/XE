@@ -7,6 +7,6 @@
 namespace XE {
     typedef Boundary<float, 2> Rectf;
     typedef Boundary<int, 2> Recti;
-}
+} // namespace XE
 
 #endif

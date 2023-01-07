@@ -5,8 +5,4 @@ class Scene;
 
 class AssetManager {
 public:
-    
-    
-    
 };
-

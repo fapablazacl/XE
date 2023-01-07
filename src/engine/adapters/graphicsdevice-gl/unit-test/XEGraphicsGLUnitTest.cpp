@@ -2,10 +2,10 @@
 #include <gtest/gtest.h>
 
 #include <xe/DataType.h>
-#include <xe/graphics/PixelFormat.h>
 #include <xe/graphics/BufferDescriptor.h>
-#include <xe/graphics/Subset.h>
 #include <xe/graphics/Material.h>
+#include <xe/graphics/PixelFormat.h>
+#include <xe/graphics/Subset.h>
 
 #include <xe/graphics/gl/Conversion.h>
 
@@ -74,7 +74,6 @@ TEST(OpenGLConversionTest, FrontFaceOrder) {
     EXPECT_EQ(XE::convertToGL(XE::FrontFaceOrder::CounterClockwise), GL_CCW);
     EXPECT_EQ(XE::convertToGL(XE::FrontFaceOrder::Clockwise), GL_CW);
 }
-
 
 TEST(OpenGLConversionTest, BlendParam) {
     EXPECT_EQ(XE::convertToGL(XE::BlendParam::Zero), GL_ZERO);

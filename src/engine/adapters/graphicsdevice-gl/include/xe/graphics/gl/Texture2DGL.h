@@ -13,15 +13,11 @@ namespace XE {
 
         virtual ~Texture2DGL();
 
-        virtual PixelFormat getFormat() const override {
-            return m_format;
-        }
-        
+        virtual PixelFormat getFormat() const override { return m_format; }
+
     public:
-        virtual Vector2i getSize() const override {
-            return m_size;
-        }
-        
+        virtual Vector2i getSize() const override { return m_size; }
+
         virtual void setData(const void *surfaceData, const int mipLevel, const PixelFormat surfaceFormat, const DataType surfaceDataType, const Recti &area) override;
 
         virtual void getData(void *surfaceData, const int mipLevel, const PixelFormat surfaceFormat, const DataType surfaceDataType) const override;
@@ -30,6 +26,6 @@ namespace XE {
         PixelFormat m_format;
         Vector2i m_size;
     };
-}
+} // namespace XE
 
 #endif

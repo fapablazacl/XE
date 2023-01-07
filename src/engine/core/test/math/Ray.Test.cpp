@@ -1,6 +1,6 @@
 
-#include <xe/math/Ray.h>
 #include "Common.h"
+#include <xe/math/Ray.h>
 
 /*
 TEST_CASE("Ray") {

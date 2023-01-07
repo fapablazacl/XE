@@ -18,8 +18,8 @@ namespace Sandbox {
         virtual bool ShouldClose() const = 0;
 
     public:
-        static std::unique_ptr<Application> create(int argc, char** argv);
+        static std::unique_ptr<Application> create(int argc, char **argv);
     };
-}
+} // namespace Sandbox
 
 #endif

@@ -3,8 +3,8 @@
 #define __XE_IO_FILESTREAM_HPP__
 
 #include "Stream.h"
-#include <string>
 #include <cstdio>
+#include <string>
 
 namespace XE {
     /**
@@ -19,7 +19,7 @@ namespace XE {
         virtual int read(void *buffer, const int size, const int count) override;
 
         virtual int write(const void *buffer, const int size, const int count) override;
-        
+
         virtual bool seek(const int offset, const StreamOffset position) override;
 
         virtual int tell() const override;
@@ -32,6 +32,6 @@ namespace XE {
 
         FILE *m_fileHandle = nullptr;
     };
-}
+} // namespace XE
 
 #endif

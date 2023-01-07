@@ -1,6 +1,4 @@
 
 #include "Common.h"
 
-namespace Sandbox {
-    
-}
+namespace Sandbox {}

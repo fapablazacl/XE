@@ -2,25 +2,19 @@
 #ifndef __XE_GRAPHICS_MATERIAL_HPP__
 #define __XE_GRAPHICS_MATERIAL_HPP__
 
-#include <cstddef>
 #include <array>
+#include <cstddef>
 #include <xe/Predef.h>
 
 namespace XE {
     class Texture;
 
-    enum class TextureFilter {
-        Nearest,
-        Linear
-    };
+    enum class TextureFilter { Nearest, Linear };
 
-    enum class TextureWrap {
-        Repeat,
-        Clamp
-    };
+    enum class TextureWrap { Repeat, Clamp };
 
     struct MaterialLayer {
-        const Texture* texture = nullptr;
+        const Texture *texture = nullptr;
         TextureFilter minFilter = TextureFilter::Nearest;
         TextureFilter magFilter = TextureFilter::Nearest;
         TextureWrap wrapS = TextureWrap::Repeat;
@@ -31,31 +25,15 @@ namespace XE {
     /**
      * @brirf Fill mode for polygon
      */
-    enum class PolygonMode {
-        Point,
-        Line,
-        Fill
-    };
+    enum class PolygonMode { Point, Line, Fill };
 
-    enum class DepthFunc {
-        Never,
-        Less,
-        Equal,
-        LesserEqual,
-        Greater,
-        NotEqual,
-        GreaterEqual,
-        Always
-    };
+    enum class DepthFunc { Never, Less, Equal, LesserEqual, Greater, NotEqual, GreaterEqual, Always };
 
-    enum class FrontFaceOrder {
-        Clockwise,
-        CounterClockwise
-    };
+    enum class FrontFaceOrder { Clockwise, CounterClockwise };
 
     enum class BlendParam {
-        Zero, 
-        One, 
+        Zero,
+        One,
         SourceColor,
         OneMinusSourceColor,
         DestinationColor,
@@ -69,7 +47,7 @@ namespace XE {
         ConstantAlpha,
         OneMinusConstantAlpha
     };
-    
+
     /**
      * @brief Graphics Device current render states
      */
@@ -100,6 +78,6 @@ namespace XE {
         int layerCount = 0;
         MaterialRenderState renderState;
     };
-}
+} // namespace XE
 
 #endif

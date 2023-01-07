@@ -9,6 +9,6 @@ namespace XE {
         Vector2i position;
         Vector2i size;
     };
-}
+} // namespace XE
 
 #endif

@@ -13,28 +13,24 @@ namespace XE {
 
         virtual ~Texture2DArrayGL();
 
-        virtual PixelFormat getFormat() const override {
-            return m_format;
-        }
-        
-    public:
-        virtual Vector2i getSize() const override {
-            return m_size;
-        }
+        virtual PixelFormat getFormat() const override { return m_format; }
 
-        virtual int getCount() const override {
-            return m_count;
-        }
-        
-        virtual void setData(const void *surfaceData, const int mipLevel, const int arrayIndex, const PixelFormat surfaceFormat, const DataType surfaceDataType, const Recti &area, int count) override;
-        
-        virtual void getData(void *surfaceData, const int mipLevel, const int arrayIndex, const PixelFormat surfaceFormat, const DataType surfaceDataType, const Recti &area) const override;
+    public:
+        virtual Vector2i getSize() const override { return m_size; }
+
+        virtual int getCount() const override { return m_count; }
+
+        virtual void setData(const void *surfaceData, const int mipLevel, const int arrayIndex, const PixelFormat surfaceFormat, const DataType surfaceDataType, const Recti &area,
+                             int count) override;
+
+        virtual void getData(void *surfaceData, const int mipLevel, const int arrayIndex, const PixelFormat surfaceFormat, const DataType surfaceDataType,
+                             const Recti &area) const override;
 
     private:
         PixelFormat m_format;
         Vector2i m_size = {0, 0};
         int m_count = 0;
     };
-}
+} // namespace XE
 
 #endif

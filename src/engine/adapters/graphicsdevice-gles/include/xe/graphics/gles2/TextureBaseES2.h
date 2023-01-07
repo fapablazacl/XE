@@ -15,18 +15,14 @@ namespace XE {
         virtual ~TextureBaseES() = 0;
 
     public:
-        GLuint GetID() const {
-            return m_id;
-        }
+        GLuint GetID() const { return m_id; }
 
-        GLenum GetTarget() const {
-            return m_target;
-        }
+        GLenum GetTarget() const { return m_target; }
 
     protected:
         GLuint m_id = 0;
         GLenum m_target;
     };
-}
+} // namespace XE
 
 #endif

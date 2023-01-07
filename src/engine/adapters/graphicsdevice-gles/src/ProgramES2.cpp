@@ -6,7 +6,7 @@
 
 namespace XE {
     ProgramES::ProgramES(const ProgramDescriptor &desc) {
-        for (const auto &source: desc.sources) {
+        for (const auto &source : desc.sources) {
             m_shaders.emplace_back(new ShaderES(source.type, source.text));
         }
 
@@ -24,7 +24,7 @@ namespace XE {
         if (status == GL_FALSE) {
             const GLint logsize = 4096;
             char buffer[logsize] = {};
-                
+
             glGetProgramInfoLog(m_id, logsize, nullptr, buffer);
 
             throw std::runtime_error(buffer);
@@ -39,19 +39,11 @@ namespace XE {
         }
     }
 
-    int ProgramES::getShaderCount() const {
-        return int(m_shaders.size());
-    }
+    int ProgramES::getShaderCount() const { return int(m_shaders.size()); }
 
-    Shader* ProgramES::getShader(const int index) {
-        return m_shaders[index].get();
-    }
+    Shader *ProgramES::getShader(const int index) { return m_shaders[index].get(); }
 
-    int ProgramES::getUniformLoction(const std::string &name) const {
-        return glGetUniformLocation(m_id, name.c_str());
-    }
+    int ProgramES::getUniformLoction(const std::string &name) const { return glGetUniformLocation(m_id, name.c_str()); }
 
-    int ProgramES::getAttributeLocation(const std::string &name) const {
-        return glGetAttribLocation(m_id, name.c_str());
-    }
-}
+    int ProgramES::getAttributeLocation(const std::string &name) const { return glGetAttribLocation(m_id, name.c_str()); }
+} // namespace XE

@@ -1,7 +1,7 @@
 
-#include <stdexcept>
-#include <Windows.h>
 #include "Renderer.h"
+#include <Windows.h>
+#include <stdexcept>
 
 LRESULT CALLBACK WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
     switch (uMsg) {
@@ -23,7 +23,7 @@ BOOL InitWindowClass(const HINSTANCE hInstance, const LPSTR className) {
     wc.hInstance = hInstance;
     wc.lpszClassName = className;
     wc.lpfnWndProc = WindowProc;
-    wc.hbrBackground = (HBRUSH) COLOR_3DFACE;
+    wc.hbrBackground = (HBRUSH)COLOR_3DFACE;
 
     if (::RegisterClass(&wc)) {
         return TRUE;
@@ -32,7 +32,7 @@ BOOL InitWindowClass(const HINSTANCE hInstance, const LPSTR className) {
     }
 }
 
-//int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) {
+// int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) {
 int main() {
     using namespace TestApp;
 
@@ -42,17 +42,12 @@ int main() {
 
     try {
         // instanciar la clase de ventana
-        if (::InitWindowClass (hInstance, className) == FALSE) {
+        if (::InitWindowClass(hInstance, className) == FALSE) {
             throw std::runtime_error("No se pudo crear una clase de ventana");
         }
 
         // crear la ventana
-        HWND hWnd = ::CreateWindow (
-            className, "Direct3D11 01: Triangle", 
-            WS_OVERLAPPEDWINDOW, 
-            CW_USEDEFAULT, CW_USEDEFAULT, 640, 480, 
-            NULL, NULL, hInstance, NULL
-        );
+        HWND hWnd = ::CreateWindow(className, "Direct3D11 01: Triangle", WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, 640, 480, NULL, NULL, hInstance, NULL);
 
         ::ShowWindow(hWnd, SW_SHOW);
 

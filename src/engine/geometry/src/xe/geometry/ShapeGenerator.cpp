@@ -3,4 +3,4 @@
 
 namespace XE {
     ShapeGenerator::~ShapeGenerator() {}
-}
+} // namespace XE

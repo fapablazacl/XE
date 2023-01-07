@@ -33,6 +33,6 @@ namespace TestApp {
         int vertexCount = 0;
         int indexCount = 0;
     };
-}
+} // namespace TestApp
 
 #endif

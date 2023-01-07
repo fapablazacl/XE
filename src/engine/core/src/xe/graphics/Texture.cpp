@@ -2,5 +2,5 @@
 #include <xe/graphics/Texture.h>
 
 namespace XE {
-	Texture::~Texture() {}
-}
+    Texture::~Texture() {}
+} // namespace XE

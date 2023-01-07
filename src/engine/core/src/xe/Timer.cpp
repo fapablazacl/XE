@@ -9,11 +9,11 @@ namespace XE {
         const DWORD dwTickCount = ::GetTickCount();
         return dwTickCount;
     }
-}
+} // namespace XE
 
 #elif defined(__APPLE__)
-#include <mach/mach_time.h>
 #include <cassert>
+#include <mach/mach_time.h>
 
 // Returns monotonic time in nanos, measured from the first time the function
 // is called in the process.
@@ -25,9 +25,7 @@ static uint64_t monotonicTimeNanos() {
             kern_return_t mtiStatus = mach_timebase_info(&tb);
             assert(mtiStatus == KERN_SUCCESS);
         }
-        uint64_t scale(uint64_t i) {
-            return scaleHighPrecision(i - bias, tb.numer, tb.denom);
-        }
+        uint64_t scale(uint64_t i) { return scaleHighPrecision(i - bias, tb.numer, tb.denom); }
         static uint64_t scaleHighPrecision(uint64_t i, uint32_t numer, uint32_t denom) {
             uint64_t high = (i >> 32) * numer;
             uint64_t low = (i & 0xffffffffull) * numer / denom;
@@ -48,7 +46,7 @@ namespace XE {
         const uint64_t nanos = monotonicTimeNanos();
         return nanos / 1000000;
     }
-}
+} // namespace XE
 
 #elif defined(__linux__)
 #include <time.h>
@@ -60,7 +58,7 @@ namespace XE {
 
         return 1000 * ts.tv_sec + ts.tv_nsec / 1000000;
     }
-}
+} // namespace XE
 
 #else
 #error "Unsupported platform"

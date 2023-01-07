@@ -2,91 +2,71 @@
 #ifndef __XE_MATH_BOUNDARY_HPP__
 #define __XE_MATH_BOUNDARY_HPP__
 
-#include <limits>
-#include <cassert>
 #include <array>
+#include <cassert>
+#include <limits>
 
-#include "Vector.h"
 #include "Range.h"
-
+#include "Vector.h"
 
 namespace XE {
     /**
      * @brief N-dimensional boundary class
-     * 
+     *
      * Used as a basis for implementing boundary logic in specific dimensions, like Rect (for 2-space), and Box (for 3-space).
-     * 
+     *
      * @note Consider replacing its implementation based on Vectors onto another more abstract entity
-     * 
-     * @tparam T 
-     * @tparam N 
+     *
+     * @tparam T
+     * @tparam N
      */
-    template<typename T, int N>
-    class Boundary {
+    template <typename T, int N> class Boundary {
     public:
-        static_assert(N == 2 || N ==3, "N template parameter must one of (2, 3)");
+        static_assert(N == 2 || N == 3, "N template parameter must one of (2, 3)");
 
     public:
-        template<int Base, int Exp> 
-        struct Power {
+        template <int Base, int Exp> struct Power {
             enum { Value = Base * Power<Base, Exp - 1>::Value };
         };
-    
-        template<int Base> 
-        struct Power<Base, 0> {
+
+        template <int Base> struct Power<Base, 0> {
             enum { Value = 1 };
         };
 
     public:
-        enum {
-            SideCount = 2 * N
-        };
+        enum { SideCount = 2 * N };
 
         enum { PointCount = Power<2, N>::Value };
 
-        enum {
-            MinEdge = 0,
-            MaxEdge = PointCount - 1
-        };
+        enum { MinEdge = 0, MaxEdge = PointCount - 1 };
 
     public:
         Boundary() {}
 
-        explicit Boundary(const Vector<T, N> &value) 
-            : minEdge(value), maxEdge(value) {}
+        explicit Boundary(const Vector<T, N> &value) : minEdge(value), maxEdge(value) {}
 
-        Boundary(const Vector<T, N> &value1, const Vector<T, N> &value2) : Boundary(value1) {
-            expand(value2);
-        }
+        Boundary(const Vector<T, N> &value1, const Vector<T, N> &value2) : Boundary(value1) { expand(value2); }
 
         void expand(const Vector<T, N> &value) {
             minEdge = minimize(minEdge, value);
             maxEdge = maximize(maxEdge, value);
         }
 
-        void expand(const Boundary<T, N>& other) {
+        void expand(const Boundary<T, N> &other) {
             expand(other.minEdge);
             expand(other.maxEdge);
         }
 
-        Vector<T, N> getMinEdge() const {
-            return minEdge;
-        }
+        Vector<T, N> getMinEdge() const { return minEdge; }
 
-        Vector<T, N> getMaxEdge() const {
-            return maxEdge;
-        }
+        Vector<T, N> getMaxEdge() const { return maxEdge; }
 
-        Vector<T, N> getSize() const {
-            return maxEdge - minEdge;
-        }
+        Vector<T, N> getSize() const { return maxEdge - minEdge; }
 
-        Vector<T, N> getCenter() const {
-            return minEdge + ((maxEdge - minEdge) / T(2));
-        }
+        Vector<T, N> getCenter() const { return minEdge + ((maxEdge - minEdge) / T(2)); }
 
         bool isValid() const {
-            for (int i=0; i<N; i++) {
+            for (int i = 0; i < N; i++) {
                 if (minEdge[i] > maxEdge[i]) {
                     return false;
                 }
@@ -96,14 +76,14 @@ namespace XE {
         }
 
         bool isInside(const Vector<T, N> &point) const {
-            for(int i=0; i<N; ++i) { 
+            for (int i = 0; i < N; ++i) {
                 const T value = point[i];
-        
+
                 if (value < minEdge[i] || value > maxEdge[i]) {
                     return false;
                 }
             }
-    
+
             return true;
         }
 
@@ -122,52 +102,43 @@ namespace XE {
             auto edges = &minEdge;
 
             Vector<T, N> point;
-            for(int i=0; i<N; ++i) {
+            for (int i = 0; i < N; ++i) {
                 const int remainder = pointIndex % 2;
                 pointIndex /= 2;
                 point[i] = edges[remainder][i];
             }
-    
+
             return point;
         }
 
         /**
          * @brief Generate all the Normals in the Boundary
-         * 
+         *
          * @note Only implemented for N=2 and N=3 cases.
-         * 
-         * @return std::array<Vector<T, N>, SideCount> 
+         *
+         * @return std::array<Vector<T, N>, SideCount>
          */
         std::array<Vector<T, N>, SideCount> getNormals() const {
-            if constexpr(N == 2) {
-                return {
-                    Vector2<T>{static_cast<T>(-1), static_cast<T>(0)},
-                    Vector2<T>{static_cast<T>(0), static_cast<T>(-1)},
-                    Vector2<T>{static_cast<T>(1), static_cast<T>(0)},
-                    Vector2<T>{static_cast<T>(0), static_cast<T>(1)}
-                };
+            if constexpr (N == 2) {
+                return {Vector2<T>{static_cast<T>(-1), static_cast<T>(0)}, Vector2<T>{static_cast<T>(0), static_cast<T>(-1)}, Vector2<T>{static_cast<T>(1), static_cast<T>(0)},
+                        Vector2<T>{static_cast<T>(0), static_cast<T>(1)}};
             }
 
-            if constexpr(N == 3) {
-                return {
-                    Vector3<T>{static_cast<T>(-1), static_cast<T>(0), static_cast<T>(0)},
-                    Vector3<T>{static_cast<T>(0), static_cast<T>(-1), static_cast<T>(0)},
-                    Vector3<T>{static_cast<T>(0), static_cast<T>(0), static_cast<T>(-1)},
-                    Vector3<T>{static_cast<T>(1), static_cast<T>(0), static_cast<T>(0)},
-                    Vector3<T>{static_cast<T>(0), static_cast<T>(1), static_cast<T>(0)},
-                    Vector3<T>{static_cast<T>(0), static_cast<T>(0), static_cast<T>(1)}
-                };
+            if constexpr (N == 3) {
+                return {Vector3<T>{static_cast<T>(-1), static_cast<T>(0), static_cast<T>(0)}, Vector3<T>{static_cast<T>(0), static_cast<T>(-1), static_cast<T>(0)},
+                        Vector3<T>{static_cast<T>(0), static_cast<T>(0), static_cast<T>(-1)}, Vector3<T>{static_cast<T>(1), static_cast<T>(0), static_cast<T>(0)},
+                        Vector3<T>{static_cast<T>(0), static_cast<T>(1), static_cast<T>(0)},  Vector3<T>{static_cast<T>(0), static_cast<T>(0), static_cast<T>(1)}};
             }
         }
 
         /**
          * @brief Perform an intersection test between two Boundaries using the Separating Axis Therorem (SAT).
-         * 
-         * @param other 
-         * @return true 
-         * @return false 
+         *
+         * @param other
+         * @return true
+         * @return false
          */
-        bool intersect(const Boundary<T, N>& other) const {
+        bool intersect(const Boundary<T, N> &other) const {
             // axes are the same with both shapes
             const auto axes = getNormals();
 
@@ -175,7 +146,7 @@ namespace XE {
                 const Range<T> proj1 = project(axis);
                 const Range<T> proj2 = other.project(axis);
 
-                if (! proj1.overlap(proj2)) {
+                if (!proj1.overlap(proj2)) {
                     return false;
                 }
             }
@@ -185,8 +156,8 @@ namespace XE {
 
         /**
          * @brief Get all the Edges (vertices) from the Box.
-         * 
-         * @return std::array<Vector<T, N>, PointCount> 
+         *
+         * @return std::array<Vector<T, N>, PointCount>
          */
         std::array<Vector<T, N>, PointCount> getEdges() const {
             std::array<Vector<T, N>, PointCount> result;
@@ -194,24 +165,24 @@ namespace XE {
             for (int i = 0; i < PointCount; i++) {
                 result[i] = getEdge(i);
             }
-            
+
             return result;
         }
 
         /**
          * @brief Perform a Projection from the specified Axis
-         * 
+         *
          * @note Utility method to support the implementation of the Intersect method.
-         * 
-         * @return Projection 
+         *
+         * @return Projection
          */
         Range<T> project(const Vector<T, N> &normal) const {
             const auto edges = getEdges();
 
-            Range<T> range {dot(edges[0], normal)};
+            Range<T> range{dot(edges[0], normal)};
 
-            // compute the range for the rest 
-            for (std::size_t i=1; i<edges.size(); i++) {
+            // compute the range for the rest
+            for (std::size_t i = 1; i < edges.size(); i++) {
                 const T value = dot(edges[i], normal);
 
                 range.expand(value);
@@ -224,6 +195,6 @@ namespace XE {
         Vector<T, N> minEdge;
         Vector<T, N> maxEdge;
     };
-}
+} // namespace XE
 
-#endif 
+#endif

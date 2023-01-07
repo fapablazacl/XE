@@ -18,6 +18,6 @@ namespace XE {
 
         virtual std::vector<int> generateIndices() const = 0;
     };
-}
+} // namespace XE
 
 #endif

@@ -38,10 +38,10 @@ TEST_CASE("XE::Graphics::project function", "[Projection]") {
     }
 
     SECTION("When consideraring a perspective transformation pipeline, with a viewport of (0, 0) - (640, 480)") {
-        const XE::Matrix4f projViewModel = 
-            XE::Matrix4f::perspective(XE::radians(90.0f), 640.0f/480.0f, 0.1f, 100.0f) * 
+        const XE::Matrix4f projViewModel =
+            XE::Matrix4f::perspective(XE::radians(90.0f), 640.0f/480.0f, 0.1f, 100.0f) *
             XE::Matrix4f::lookAtRH({0.0f, 0.0f, -1.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f});
-            
+
         const XE::Viewport viewport = { {0, 0}, {640, 480} };
         REQUIRE(XE::project({0.0f, 0.0f, 0.0f, 1.0f}, projViewModel, viewport).X == 320.0f);
         REQUIRE(XE::project({0.0f, 0.0f, 0.0f, 1.0f}, projViewModel, viewport).Y == 240.0f);

@@ -1,8 +1,8 @@
 //
-//#ifndef __XE_GRAPHICS_VERTEXFORMAT_HPP__
-//#define __XE_GRAPHICS_VERTEXFORMAT_HPP__
+// #ifndef __XE_GRAPHICS_VERTEXFORMAT_HPP__
+// #define __XE_GRAPHICS_VERTEXFORMAT_HPP__
 //
-//namespace XE {
+// namespace XE {
 //    /**
 //     * @brief The Vertex Format specifies the different attributes vertices must have.
 //     */
@@ -12,4 +12,4 @@
 //    };
 //}
 //
-//#endif
+// #endif

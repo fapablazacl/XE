@@ -1,15 +1,14 @@
 
-#include <xe/graphics/gl/SubsetGL.h>
 #include <xe/graphics/gl/BufferGL.h>
 #include <xe/graphics/gl/Conversion.h>
+#include <xe/graphics/gl/SubsetGL.h>
 
 #include <cassert>
 
-
 namespace XE {
     SubsetGL::SubsetGL(const SubsetDescriptor &desc) : descriptor(desc) {
-        for (std::size_t i=0; i<desc.buffers.size(); i++) {
-            auto bufferGL = static_cast<const BufferGL*>(desc.buffers[i]);
+        for (std::size_t i = 0; i < desc.buffers.size(); i++) {
+            auto bufferGL = static_cast<const BufferGL *>(desc.buffers[i]);
             assert(bufferGL);
             buffers.emplace_back(bufferGL);
         }
@@ -18,24 +17,18 @@ namespace XE {
         glGenVertexArrays(1, &id);
         glBindVertexArray(id);
 
-        for (std::size_t i=0; i<desc.attribs.size(); i++) {
+        for (std::size_t i = 0; i < desc.attribs.size(); i++) {
             const SubsetVertexAttrib &attrib = desc.attribs[i];
             const BufferGL *buffer = buffers[attrib.bufferIndex];
 
             glBindBuffer(buffer->getTarget(), buffer->getID());
             glEnableVertexAttribArray(attrib.shaderLocation);
 
-            glVertexAttribPointer(
-                attrib.shaderLocation, 
-                attrib.size, 
-                convertToGL(attrib.type), 
-                convertToGL(attrib.normalized), 
-                static_cast<GLsizei>(attrib.stride),
-                reinterpret_cast<const void*>(attrib.bufferOffset)
-            );
+            glVertexAttribPointer(attrib.shaderLocation, attrib.size, convertToGL(attrib.type), convertToGL(attrib.normalized), static_cast<GLsizei>(attrib.stride),
+                                  reinterpret_cast<const void *>(attrib.bufferOffset));
         }
-        
-        indexBuffer = static_cast<const BufferGL*>(desc.indexBuffer);
+
+        indexBuffer = static_cast<const BufferGL *>(desc.indexBuffer);
 
         if (indexBuffer) {
             glBindBuffer(indexBuffer->getTarget(), indexBuffer->getID());
@@ -44,30 +37,19 @@ namespace XE {
         glBindVertexArray(0);
     }
 
-
     SubsetGL::~SubsetGL() {
         if (id) {
             glDeleteVertexArrays(1, &id);
         }
     }
-        
-    int SubsetGL::getBufferCount() const {
-        return (int)buffers.size();
-    }
 
-    BufferGL* SubsetGL::getBuffer(const int index) {
-        return const_cast<BufferGL*>(buffers[index]);
-    }
+    int SubsetGL::getBufferCount() const { return (int)buffers.size(); }
 
-    BufferGL* SubsetGL::getIndexBuffer() {
-        return const_cast<BufferGL*>(indexBuffer);
-    }
+    BufferGL *SubsetGL::getBuffer(const int index) { return const_cast<BufferGL *>(buffers[index]); }
 
-    const BufferGL* SubsetGL::getBuffer(const int index) const {
-        return buffers[index];
-    }
+    BufferGL *SubsetGL::getIndexBuffer() { return const_cast<BufferGL *>(indexBuffer); }
 
-    const BufferGL* SubsetGL::getIndexBuffer() const {
-        return indexBuffer;
-    }
-}
+    const BufferGL *SubsetGL::getBuffer(const int index) const { return buffers[index]; }
+
+    const BufferGL *SubsetGL::getIndexBuffer() const { return indexBuffer; }
+} // namespace XE

@@ -5,12 +5,11 @@
 #include "Vector.h"
 
 namespace XE {
-    template<typename T>
-    struct Rotation {
+    template <typename T> struct Rotation {
         T angle;
         Vector<T, 3> axis;
     };
 
-}
+} // namespace XE
 
 #endif

@@ -2,10 +2,10 @@
 #include <xe/graphics/png/ImageLoaderPNG.h>
 
 #include <iostream>
-#include <vector>
 #include <lodepng.h>
-#include <xe/io/Stream.h>
+#include <vector>
 #include <xe/graphics/Image.h>
+#include <xe/io/Stream.h>
 
 namespace XE {
     class ImagePNG : public Image {
@@ -18,24 +18,17 @@ namespace XE {
 
         virtual ~ImagePNG() {}
 
-        virtual const void* getPointer() const override {
-            return pointer;
-        }
+        virtual const void *getPointer() const override { return pointer; }
 
-        virtual PixelFormat getFormat() const override {
-            return format;
-        }
+        virtual PixelFormat getFormat() const override { return format; }
 
-        virtual Vector2i getSize() const override {
-            return size;
-        }
+        virtual Vector2i getSize() const override { return size; }
 
     private:
         const void *pointer;
         PixelFormat format;
         Vector2i size;
     };
-
 
     ImageLoaderPNG::~ImageLoaderPNG() {}
 
@@ -47,11 +40,11 @@ namespace XE {
 
         std::uint32_t readed;
         std::uint8_t buffer[bufferLength];
-    
+
         std::vector<std::uint8_t> imageBuffer;
 
-        while ( (readed = inputStream->read(buffer, 1, bufferLength)) > 0) {
-            for (int i=0; i<int(readed); i++) {
+        while ((readed = inputStream->read(buffer, 1, bufferLength)) > 0) {
+            for (int i = 0; i < int(readed); i++) {
                 imageBuffer.push_back(buffer[i]);
             }
         }
@@ -62,7 +55,7 @@ namespace XE {
 
         LodePNGState state = {};
 
-        std::cout << "[INFO] ImageLoaderPNG::load: PNG File has " << imageBuffer.size() << " byte(s)."  << std::endl;
+        std::cout << "[INFO] ImageLoaderPNG::load: PNG File has " << imageBuffer.size() << " byte(s)." << std::endl;
 
         unsigned int error = lodepng_decode(&pixels, &width, &height, &state, imageBuffer.data(), imageBuffer.size());
 
@@ -72,10 +65,6 @@ namespace XE {
             return {};
         }
 
-        return std::make_unique<ImagePNG> (
-            (const void*)pixels, 
-            PixelFormat::R8G8B8A8, 
-            Vector2i(int(width), int(height))
-        );
+        return std::make_unique<ImagePNG>((const void *)pixels, PixelFormat::R8G8B8A8, Vector2i(int(width), int(height)));
     }
-}
+} // namespace XE

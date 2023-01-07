@@ -12,15 +12,15 @@ namespace XE {
         struct Descriptor {
             //! Requested Backend.
             GraphicsBackend backend = GraphicsBackend::Auto;
-            
+
             PixelFormat frameBufferFormat = PixelFormat::R8G8B8A8;
             DepthFormat depthBufferFormat = DepthFormat::D24;
             StencilFormat stencilBufferFormat = StencilFormat::SUnused;
         };
 
     public:
-        using ProcAddressGL = void (*) ();
-        using GetProcAddressGL = ProcAddressGL(*)(const char*);
+        using ProcAddressGL = void (*)();
+        using GetProcAddressGL = ProcAddressGL (*)(const char *);
 
     public:
         virtual ~GraphicsContext() {}
@@ -33,4 +33,4 @@ namespace XE {
 
         virtual Descriptor getDescriptor() const = 0;
     };
-}
+} // namespace XE

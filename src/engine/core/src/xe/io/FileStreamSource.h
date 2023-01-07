@@ -2,8 +2,8 @@
 #ifndef __XE_IO_FILESTREAMSOURCE_HPP__
 #define __XE_IO_FILESTREAMSOURCE_HPP__
 
-#include <string>
 #include <memory>
+#include <string>
 
 #include "StreamSource.h"
 
@@ -20,6 +20,6 @@ namespace XE {
     private:
         std::string directory;
     };
-}
+} // namespace XE
 
 #endif

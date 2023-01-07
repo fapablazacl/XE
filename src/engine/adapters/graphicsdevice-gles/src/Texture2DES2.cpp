@@ -1,11 +1,11 @@
 
-#include <xe/graphics/gles2/Texture2DES2.h>
 #include <xe/graphics/gles2/ConversionES.h>
+#include <xe/graphics/gles2/Texture2DES2.h>
 #include <xe/graphics/gles2/Util.h>
 
 namespace XE {
     Texture2DES::Texture2DES(const PixelFormat format, const Vector2i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void *sourceData)
-            : TextureBaseES(GL_TEXTURE_2D) {
+        : TextureBaseES(GL_TEXTURE_2D) {
 
         m_size = size;
         m_format = format;
@@ -21,9 +21,7 @@ namespace XE {
         XE_GRAPHICS_GL_CHECK_ERROR();
     }
 
-
     Texture2DES::~Texture2DES() {}
-
 
     void Texture2DES::setData(const void *surfaceData, const int mipLevel, const PixelFormat surfaceFormat, const DataType surfaceDataType, const Recti &area) {
         const Vector2i offset = area.getMinEdge();
@@ -37,8 +35,6 @@ namespace XE {
 
         XE_GRAPHICS_GL_CHECK_ERROR();
     }
-    
 
-    void Texture2DES::getData(void *surfaceData, const int mipLevel, const PixelFormat surfaceFormat, const DataType surfaceDataType) const {
-    }
-}
+    void Texture2DES::getData(void *surfaceData, const int mipLevel, const PixelFormat surfaceFormat, const DataType surfaceDataType) const {}
+} // namespace XE

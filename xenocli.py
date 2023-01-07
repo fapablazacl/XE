@@ -19,9 +19,10 @@ class Formatter:
         self._checker = checker
         
     def _run_clang_format(self, source_file_path) -> None:
-        # os.system("clang-format -i {}".format(source_file_path))
-        print("clang-format -i {}".format(source_file_path))
-
+        cmd = "clang-format -i {}".format(source_file_path)
+        print(cmd)
+        os.system(cmd)
+        
     def format(self, folder, exclude) -> None:
         for root, subdirs, files in os.walk(folder):
             if root.find(exclude) != -1:

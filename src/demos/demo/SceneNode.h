@@ -1,14 +1,14 @@
 
-#pragma once 
+#pragma once
 
-#include <xe/math.h>
 #include <functional>
+#include <xe/math.h>
 
 #include "Renderable.h"
 
 class SceneNode;
 
-using SceneNodeVisitor = std::function<void (SceneNode *)>;
+using SceneNodeVisitor = std::function<void(SceneNode *)>;
 
 class SceneNode {
 public:
@@ -16,35 +16,25 @@ public:
 
     ~SceneNode() {}
 
-    SceneNode* getParent() const {
-        return mParent;
-    }
+    SceneNode *getParent() const { return mParent; }
 
-    XE::M4 getTransformation() const {
-        return mTransformation;
-    }
+    XE::M4 getTransformation() const { return mTransformation; }
 
-    void setTransformation(const XE::M4 &transformation) {
-        mTransformation = transformation;
-    }
+    void setTransformation(const XE::M4 &transformation) { mTransformation = transformation; }
 
-    void setRenderable(Renderable *renderable) {
-        mRenderable = renderable;
-    }
+    void setRenderable(Renderable *renderable) { mRenderable = renderable; }
 
-    Renderable* getRenderable() const {
-        return mRenderable;
-    }
+    Renderable *getRenderable() const { return mRenderable; }
 
-    SceneNode* createChild();
+    SceneNode *createChild();
 
     void visit(SceneNodeVisitor visitor);
-    
-    void visit(XE::GraphicsDevice* graphicsDevice, const XE::M4& parentTransformation);
+
+    void visit(XE::GraphicsDevice *graphicsDevice, const XE::M4 &parentTransformation);
 
 private:
     SceneNode *mParent = nullptr;
-    Renderable* mRenderable = nullptr;
+    Renderable *mRenderable = nullptr;
     XE::M4 mTransformation = XE::M4::identity();
     std::vector<std::unique_ptr<SceneNode>> mChildren;
 };

@@ -1,9 +1,8 @@
 
-#include <xe/math/Quaternion.h>
-#include <xe/math/FormatUtils.h>
-#include <xe/math/Common.h>
 #include "Common.h"
-
+#include <xe/math/Common.h>
+#include <xe/math/FormatUtils.h>
+#include <xe/math/Quaternion.h>
 
 /*
 TEST_CASE("Quaternion basic members are initialized properly", "[Quaternion]") {
@@ -111,7 +110,7 @@ TEST_CASE("Quaternion basic arithmetic operators behave correctly", "[Quaternion
         const auto q2 = XE::Quaternion<float>{{0.0f, 1.0f, 0.0f}, 1.0f};
         const auto q3 = XE::Quaternion<float>{{1.0f, 0.0f, 1.0f}, 0.0f};
         const auto q4 = XE::Quaternion<float>{{-1.0f, 0.0f, -1.0f}, 0.0f};
-        
+
         SECTION("addition operator should add their each components together") {
             REQUIRE(q1 + q1 == XE::Quaternion<float>{{2.0f, 0.0f, 2.0f}, 2.0f});
             REQUIRE(q1 + q2 == XE::Quaternion<float>{{1.0f, 1.0f, 1.0f}, 2.0f});
@@ -221,7 +220,7 @@ TEST_CASE("Quaternion basic arithmetic accumulation operators behave correctly",
         auto q2 = XE::Quaternion<float>{{0.0f, 1.0f, 0.0f}, 1.0f};
         auto q3 = XE::Quaternion<float>{{1.0f, 0.0f, 1.0f}, 0.0f};
         auto q4 = XE::Quaternion<float>{{-1.0f, 0.0f, -1.0f}, 0.0f};
-        
+
         SECTION("addition operator should add their each components together") {
             REQUIRE((+q1 += q1) == XE::Quaternion<float>{{2.0f, 0.0f, 2.0f}, 2.0f});
             REQUIRE((+q1 += q2) == XE::Quaternion<float>{{1.0f, 1.0f, 1.0f}, 2.0f});

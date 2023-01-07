@@ -28,6 +28,6 @@ namespace XE {
 
         Vector3f dimensions;
     };
-}
+} // namespace XE
 
 #endif

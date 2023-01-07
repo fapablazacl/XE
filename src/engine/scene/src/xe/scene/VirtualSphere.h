@@ -2,8 +2,8 @@
 #ifndef __XE_SCENE_VIRTUALSPHERE_HPP__
 #define __XE_SCENE_VIRTUALSPHERE_HPP__
 
-#include <xe/math/Vector.h>
 #include <xe/math/Rotation.h>
+#include <xe/math/Vector.h>
 
 namespace XE {
     /**
@@ -15,23 +15,19 @@ namespace XE {
 
         VirtualSphere(const Vector2i &screenSize);
 
-        Vector2i getScreenSize() const {
-            return screenSize;
-        }
+        Vector2i getScreenSize() const { return screenSize; }
 
         void setScreenSize(const Vector2i &value);
 
         Vector3f computePointAt(const Vector2i &screenPosition) const;
 
-        bool operator== (const VirtualSphere &rhs) const;
+        bool operator==(const VirtualSphere &rhs) const;
 
-        bool operator!= (const VirtualSphere &rhs) const {
-            return !(*this == rhs);
-        }
+        bool operator!=(const VirtualSphere &rhs) const { return !(*this == rhs); }
 
     private:
         Vector2i screenSize;
     };
-}
+} // namespace XE
 
 #endif

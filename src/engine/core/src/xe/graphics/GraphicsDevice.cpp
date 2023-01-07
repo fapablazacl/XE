@@ -3,4 +3,4 @@
 
 namespace XE {
     GraphicsDevice::~GraphicsDevice() {}
-}
+} // namespace XE

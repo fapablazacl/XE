@@ -4,6 +4,4 @@
 #include <cassert>
 #include <iostream>
 
-namespace XE {
-    
-}
+namespace XE {}

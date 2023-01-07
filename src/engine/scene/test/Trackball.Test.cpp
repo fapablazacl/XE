@@ -1,6 +1,6 @@
 
-#include <xe/scene/Trackball.h>
 #include <gtest/gtest.h>
+#include <xe/scene/Trackball.h>
 
 TEST(TrackballTest, ConstructorFillsStartCurrentAndEndPoints) {
     EXPECT_EQ(XE::Trackball(XE::Vector2i(640, 480)).getVirtualSphere(), XE::VirtualSphere(XE::Vector2i(640, 480)));
@@ -28,9 +28,8 @@ TEST(TrackballTest, ComputeRotationGeneratesAnEmptyRotationWhenStartAndEndPoints
     EXPECT_EQ(rotation.angle, 0.0);
 }
 
-
 // TODO: These tests must be completed after the Quaternion class is fully tested.
-//TEST(TrackballTest, "should generate a rotation around the Y axis with a horizontal mouse movement, inside the virtual unit trackball") {
+// TEST(TrackballTest, "should generate a rotation around the Y axis with a horizontal mouse movement, inside the virtual unit trackball") {
 //    auto trackball = XE::Trackball{{100, 100}};
 
 //    trackball.beginDrag({50, 50});
@@ -43,8 +42,8 @@ TEST(TrackballTest, ComputeRotationGeneratesAnEmptyRotationWhenStartAndEndPoints
 //    EXPECT_EQ(rotation.angle > 0.0f);
 //}
 
-//TEST(TrackballTest, "should generate a rotation around the X axis with a horizontal mouse movement, inside the virtual unit trackball") {
-//    auto trackball = XE::Trackball{{100, 100}};
+// TEST(TrackballTest, "should generate a rotation around the X axis with a horizontal mouse movement, inside the virtual unit trackball") {
+//     auto trackball = XE::Trackball{{100, 100}};
 
 //    trackball.beginDrag({50, 50});
 //    trackball.drag({50, 55});

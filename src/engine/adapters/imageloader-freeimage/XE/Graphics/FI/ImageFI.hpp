@@ -12,12 +12,12 @@ namespace XE {
     public:
         virtual ~ImageFI();
 
-        virtual void* GetPointer() const = 0;
+        virtual void *GetPointer() const = 0;
 
         virtual PixelFormat GetFormat() const = 0;
 
         virtual Vector2i GetSize() const = 0;
     };
-}
+} // namespace XE
 
 #endif

@@ -23,6 +23,6 @@ namespace XE {
          */
         virtual std::unique_ptr<Image> load(Stream *inputStream) = 0;
     };
-}
+} // namespace XE
 
 #endif

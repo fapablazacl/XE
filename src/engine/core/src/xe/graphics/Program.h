@@ -24,8 +24,8 @@ namespace XE {
 
         virtual int getShaderCount() const = 0;
 
-        virtual Shader* getShader(const int index) = 0;
+        virtual Shader *getShader(const int index) = 0;
     };
-}
+} // namespace XE
 
 #endif

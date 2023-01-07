@@ -18,26 +18,18 @@ namespace XE {
 
         virtual ~BufferGL();
 
-        virtual size_t getSize() const override {
-            return m_size;
-        }
+        virtual size_t getSize() const override { return m_size; }
 
-        virtual void read(void* destination, const size_t size, const size_t offset, const size_t destinationOffset) const override;
+        virtual void read(void *destination, const size_t size, const size_t offset, const size_t destinationOffset) const override;
 
         virtual void write(const void *source, const size_t size, const size_t offset, const size_t sourceOffset) override;
 
     public:
-        GLuint getID() const {
-            return m_id;
-        }
+        GLuint getID() const { return m_id; }
 
-        GLenum getTarget() const {
-            return m_target;
-        }
+        GLenum getTarget() const { return m_target; }
 
-        GLenum getUsage() const {
-            return m_usage;
-        }
+        GLenum getUsage() const { return m_usage; }
 
     private:
         GLuint m_id;
@@ -45,6 +37,6 @@ namespace XE {
         GLenum m_usage;
         size_t m_size;
     };
-}
+} // namespace XE
 
 #endif

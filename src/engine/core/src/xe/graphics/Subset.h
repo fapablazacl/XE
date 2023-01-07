@@ -4,13 +4,13 @@
 
 #include <cstddef>
 #include <map>
-#include <vector>
 #include <memory>
-#include <string>
 #include <optional>
+#include <string>
+#include <vector>
 
-#include <xe/Predef.h>
 #include <xe/DataType.h>
+#include <xe/Predef.h>
 
 namespace XE {
     class Buffer;
@@ -20,15 +20,8 @@ namespace XE {
     /**
      * @brief Geometric Primitive Shape basis for rendering
      */
-    enum class PrimitiveType {
-        PointList,
-        LineList,
-        LineStrip,
-        TriangleStrip,
-        TriangleList,
-        TriangleFan
-    };
-    
+    enum class PrimitiveType { PointList, LineList, LineStrip, TriangleStrip, TriangleList, TriangleFan };
+
     /**
      * @brief Interpretation information for a given subset. Used in rendering operations.
      */
@@ -38,11 +31,11 @@ namespace XE {
 
         //! From wich vertex we will render
         int vertexStart = 0;
-        
+
         //! How many vertices we must use for render
         int vertexCount = 0;
     };
-    
+
     /**
      * @brief Describes a Vertex Attribute for use in the vertex shader
      */
@@ -77,7 +70,7 @@ namespace XE {
         //!
         std::size_t bufferIndex = 0;
 
-        //! 
+        //!
         std::size_t bufferOffset = 0;
     };
 
@@ -85,9 +78,9 @@ namespace XE {
      * @brief Describes a geometry subset.
      */
     struct SubsetDescriptor {
-        std::vector<Buffer*> buffers;
+        std::vector<Buffer *> buffers;
         std::vector<SubsetVertexAttrib> attribs;
-        Buffer* indexBuffer = nullptr;
+        Buffer *indexBuffer = nullptr;
     };
 
     /**
@@ -109,23 +102,23 @@ namespace XE {
         /**
          * @brief Get a mutable pointer to a buffer allocated in GPU memory. This buffer stores geometric data
          */
-        virtual Buffer* getBuffer(const int index) = 0;
+        virtual Buffer *getBuffer(const int index) = 0;
 
         /**
          * @brief Get a mutable pointer to a buffer allocated in GPU memory. This buffer stores indexation data
          */
-        virtual Buffer* getIndexBuffer() = 0;
+        virtual Buffer *getIndexBuffer() = 0;
 
         /**
          * @brief Get a constant pointer to a buffer allocated in GPU memory. This buffer stores geometric data
          */
-        virtual const Buffer* getBuffer(const int index) const = 0;
+        virtual const Buffer *getBuffer(const int index) const = 0;
 
         /**
          * @brief Get a constant pointer to a buffer allocated in GPU memory. This buffer stores indexation data
          */
-        virtual const Buffer* getIndexBuffer() const = 0;
+        virtual const Buffer *getIndexBuffer() const = 0;
     };
-}
+} // namespace XE
 
 #endif

@@ -3,4 +3,4 @@
 
 namespace XE {
     Image::~Image() {}
-}
+} // namespace XE

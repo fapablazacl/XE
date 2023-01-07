@@ -1,19 +1,16 @@
 
 #include "WindowGLFW.h"
 
-#include <memory>
-#include <GLFW/glfw3.h>
-#include "InputManagerGLFW.h"
 #include "GraphicsContextGLFW.h"
+#include "InputManagerGLFW.h"
+#include <GLFW/glfw3.h>
+#include <memory>
 
 #include <iostream>
 #include <map>
 
-
-namespace XE {    
-    void static errorCallback(int error, const char *description) {
-        std::cout << "errorCallback: " << error << ": " << description << std::endl;
-    }
+namespace XE {
+    void static errorCallback(int error, const char *description) { std::cout << "errorCallback: " << error << ": " << description << std::endl; }
 
     static std::map<int, int> mapToHints(const GraphicsContext::Descriptor &descriptor) {
         std::map<int, int> hints;
@@ -30,7 +27,7 @@ namespace XE {
 
         hints[GLFW_CONTEXT_VERSION_MAJOR] = std::get<0>(version);
         hints[GLFW_CONTEXT_VERSION_MINOR] = std::get<1>(version);
-        
+
         hints[GLFW_OPENGL_FORWARD_COMPAT] = GL_TRUE;
         hints[GLFW_OPENGL_PROFILE] = GLFW_OPENGL_CORE_PROFILE;
 
@@ -66,21 +63,16 @@ namespace XE {
             }
 
             std::cout << "[GLFW] Creating Window/Context ..." << std::endl;
-            glfwWindow = glfwCreateWindow (
-                windowSize.X, windowSize.Y, 
-                title.c_str(), 
-                fullScreen ? glfwGetPrimaryMonitor() : nullptr,
-                nullptr
-            );
+            glfwWindow = glfwCreateWindow(windowSize.X, windowSize.Y, title.c_str(), fullScreen ? glfwGetPrimaryMonitor() : nullptr, nullptr);
 
             if (!glfwWindow) {
                 std::string desc;
                 desc.resize(256);
-                
+
                 const int error = glfwGetError((const char **)desc.c_str());
 
                 desc = "Error code " + std::to_string(error) + ": " + desc;
-                
+
                 throw std::runtime_error(desc);
             }
 
@@ -101,7 +93,7 @@ namespace XE {
                 glfwTerminate();
             }
         }
-    
+
         virtual Vector2i getSize() const override {
             int width, height;
 
@@ -110,13 +102,9 @@ namespace XE {
             return {width, height};
         }
 
-        virtual GraphicsContext* getContext() const override {
-            return graphicsContext.get();
-        }
+        virtual GraphicsContext *getContext() const override { return graphicsContext.get(); }
 
-        virtual InputManager* getInputManager() const override {
-            return inputManager.get();
-        }
+        virtual InputManager *getInputManager() const override { return inputManager.get(); }
 
     private:
         GLFWwindow *glfwWindow = nullptr;
@@ -131,11 +119,8 @@ namespace XE {
 
     WindowGLFW::~WindowGLFW() {}
 
-    std::unique_ptr<WindowGLFW> WindowGLFW::create(
-            const GraphicsContext::Descriptor &contextDescriptor, 
-            const std::string &title, 
-            const Vector2i &windowSize, 
-            const bool fullScreen) {
+    std::unique_ptr<WindowGLFW> WindowGLFW::create(const GraphicsContext::Descriptor &contextDescriptor, const std::string &title, const Vector2i &windowSize,
+                                                   const bool fullScreen) {
         return std::make_unique<WindowGLFWImpl>(contextDescriptor, title, windowSize, fullScreen);
     }
-}
+} // namespace XE

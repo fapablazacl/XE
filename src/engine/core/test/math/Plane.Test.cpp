@@ -1,6 +1,6 @@
 
-#include <xe/math/Plane.h>
 #include "Common.h"
+#include <xe/math/Plane.h>
 
 /*
 TEST_CASE("Plane constructors should create planes with specific values", "[Plane]") {
@@ -65,10 +65,10 @@ TEST_CASE("Plane comparison operators must compare planes using each component i
 
     SECTION("operator==() check for equality for all components in the Plane") {
         const TestCase testCases[] = {
-            TestCase{XE::Planef{1.0f, 2.0f, 3.0f, 4.0f}, true}, 
-            TestCase{XE::Planef{-1.0f, 2.0f, 3.0f, 4.0f}, false}, 
-            TestCase{XE::Planef{1.0f, -2.0f, 3.0f, 4.0f}, false}, 
-            TestCase{XE::Planef{1.0f, 2.0f, -3.0f, 4.0f}, false}, 
+            TestCase{XE::Planef{1.0f, 2.0f, 3.0f, 4.0f}, true},
+            TestCase{XE::Planef{-1.0f, 2.0f, 3.0f, 4.0f}, false},
+            TestCase{XE::Planef{1.0f, -2.0f, 3.0f, 4.0f}, false},
+            TestCase{XE::Planef{1.0f, 2.0f, -3.0f, 4.0f}, false},
             TestCase{XE::Planef{1.0f, 2.0f, 3.0f, -4.0f}, false}
         };
 
@@ -79,10 +79,10 @@ TEST_CASE("Plane comparison operators must compare planes using each component i
 
     SECTION("operator!=() check for inequality for all components in the Plane") {
         const TestCase testCases[] = {
-            TestCase{XE::Planef{1.0f, 2.0f, 3.0f, 4.0f}, false}, 
-            TestCase{XE::Planef{-1.0f, 2.0f, 3.0f, 4.0f}, true}, 
-            TestCase{XE::Planef{1.0f, -2.0f, 3.0f, 4.0f}, true}, 
-            TestCase{XE::Planef{1.0f, 2.0f, -3.0f, 4.0f}, true}, 
+            TestCase{XE::Planef{1.0f, 2.0f, 3.0f, 4.0f}, false},
+            TestCase{XE::Planef{-1.0f, 2.0f, 3.0f, 4.0f}, true},
+            TestCase{XE::Planef{1.0f, -2.0f, 3.0f, 4.0f}, true},
+            TestCase{XE::Planef{1.0f, 2.0f, -3.0f, 4.0f}, true},
             TestCase{XE::Planef{1.0f, 2.0f, 3.0f, -4.0f}, true}
         };
 
@@ -141,7 +141,7 @@ TEST_CASE("Plane factory methods should create well-defined planes with normaliz
     }
 
     SECTION("xy() must create a plane with a normal pointing to the Z-axis") {
-        
+
     }
 }
 

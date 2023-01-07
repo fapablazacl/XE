@@ -1,10 +1,9 @@
 
-#include <xe/math/Common.h>
 #include "Common.h"
-
+#include <xe/math/Common.h>
 
 TEST(EqualsTest, WithNoEpsilonComparesExactly) {
-    EXPECT_EQ(XE::equals(1.0f, 1.0f, 0.0f),true);
+    EXPECT_EQ(XE::equals(1.0f, 1.0f, 0.0f), true);
     EXPECT_EQ(XE::equals(1.0f, 1.0f), true);
 }
 

@@ -3,4 +3,4 @@
 
 namespace XE {
     ImageLoader::~ImageLoader() {}
-}
+} // namespace XE
