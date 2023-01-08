@@ -31,6 +31,11 @@ set (XE_VERSION_MINOR 0)
 set (XE_VERSION_REVISION 0)
 set (XE_VERSION "${XE_VERSION_MAJOR}.${XE_VERSION_MINOR}.${XE_VERSION_REVISION}")
 
+if (XE_DEV_UNIT_TEST)
+    include(CTest)
+    enable_testing()
+endif()
+
 if (CMAKE_BUILD_TYPE MATCHES "Debug")
     # this macro is required by Glad.
     add_definitions (-D_DEBUG)
