@@ -56,11 +56,13 @@ elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     set (XE_LDFLAGS_COVERAGE -fprofile-instr-generate)
 
 elseif (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
-    set (XE_CXXFLAGS_WALL /Wall)
+    set (XE_CXXFLAGS_WALL /W4)
     set (XE_CXXFLAGS_WERROR /WX)
     set (XE_CXXFLAGS_COVERAGE )
     set (XE_LDFLAGS_COVERAGE )
 endif()
+
+target_compile_definitions(${target} INTERFACE _CRT_SECURE_NO_WARNINGS)
 
 target_compile_options(${target} INTERFACE ${XE_CXXFLAGS_WALL})
 if (XE_DEV_WARNINGS_AS_ERRORS)

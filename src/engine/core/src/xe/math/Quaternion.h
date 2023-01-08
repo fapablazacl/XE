@@ -9,6 +9,11 @@
 #include <xe/math/Rotation.h>
 #include <xe/math/Vector.h>
 
+#if defined(_MSC_VER)
+#pragma warning(push)
+#pragma warning(disable : 4201)
+#endif
+
 namespace XE {
     template <typename T> struct Quaternion {
         union {
@@ -245,5 +250,9 @@ namespace XE {
 
     template <typename T> Vector<T, 3> transform(const Quaternion<T> &q, const Vector<T, 3> &v) { return (q * Quaternion<T>(v) * Inverse(q)).V; }
 } // namespace XE
+
+#if defined(_MSC_VER)
+#pragma warning(pop)
+#endif
 
 #endif

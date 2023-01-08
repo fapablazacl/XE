@@ -20,7 +20,7 @@ namespace XE {
 
         virtual Vector2i getSize() const override;
 
-        void allocate(const PixelFormat format, const Vector2i &size);
+        void allocate(const PixelFormat newFormat, const Vector2i &newSize);
 
         void free();
 

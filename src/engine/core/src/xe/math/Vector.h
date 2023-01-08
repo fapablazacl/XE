@@ -8,6 +8,11 @@
 #include <cstdint>
 #include <ostream>
 
+#if defined(_MSC_VER)
+#pragma warning(push)
+#pragma warning(disable : 4201)
+#endif
+
 namespace XE {
     template <typename T, int N> struct VectorBase {
         T values[N];
@@ -410,5 +415,9 @@ namespace XE {
 
     template <typename T> using Vector4 = Vector<T, 4>;
 } // namespace XE
+
+#if defined(_MSC_VER)
+#pragma warning(pop)
+#endif
 
 #endif

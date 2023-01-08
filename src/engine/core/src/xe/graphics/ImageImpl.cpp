@@ -15,8 +15,10 @@ namespace XE {
 
     Vector2i ImageImpl::getSize() const { return size; }
 
-    void ImageImpl::allocate(const PixelFormat format, const Vector2i &size) {
+    void ImageImpl::allocate(const PixelFormat newFormat, const Vector2i &newSize) {
         this->free();
+        format = newFormat;
+        size = newSize;
 
         const int pixelByteSize = ComputeStorage(format);
         const int byteSize = size.X * size.Y * pixelByteSize;
