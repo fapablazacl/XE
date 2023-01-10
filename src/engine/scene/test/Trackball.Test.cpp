@@ -28,7 +28,7 @@ TEST(TrackballTest, ComputeRotationGeneratesAnEmptyRotationWhenStartAndEndPoints
     EXPECT_EQ(rotation.angle, 0.0);
 }
 
-// TODO: These tests must be completed after the Quaternion class is fully tested.
+// TODO: These tests should be implemented after the quaternion class is fully unit-tested.
 // TEST(TrackballTest, "should generate a rotation around the Y axis with a horizontal mouse movement, inside the virtual unit trackball") {
 //    auto trackball = XE::Trackball{{100, 100}};
 

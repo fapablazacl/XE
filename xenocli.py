@@ -2,6 +2,7 @@ import subprocess
 import os
 import argparse
 import json
+import platform
 
 class ExtensionChecker:
     def __init__(self) -> None:
@@ -80,7 +81,7 @@ class Coverage:
         profraw_file = os.path.join(parent_path, "default.profraw")
         profdata_file = os.path.join(parent_path, "default.profdata")
 
-        cmd = "xcrun llvm-profdata merge {} --instr --sparse=true -o {}"
+        cmd = self._adjust_llvm_cmd("llvm-profdata merge {} --instr --sparse=true -o {}")
         cmd = cmd.format(profraw_file, profdata_file)
 
         os.system(cmd)
@@ -88,8 +89,10 @@ class Coverage:
         return profdata_file
 
     def _get_data_profile_report(self, executable_test, profdata_file) -> str:
-        cmd = "xcrun llvm-cov report {} -instr-profile={} -arch=x86_64"
+        cmd = self._adjust_llvm_cmd("llvm-cov report {} -instr-profile={} -arch=x86_64")
         cmd = cmd.format(executable_test, profdata_file)
+
+        print(cmd)
 
         result = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, cwd=self.cm_build_dir)
 
@@ -98,6 +101,15 @@ class Coverage:
             content += line.decode()
 
         return content
+
+    def _get_current_os(self):
+        return platform.system()
+
+    def _adjust_llvm_cmd(self, cmd):
+        if self._get_current_os() == "Darwin":
+            return "xcrun " + cmd
+        
+        return cmd
 
 
 def main():
