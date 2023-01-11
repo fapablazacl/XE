@@ -115,6 +115,12 @@ class Coverage:
 
         return cmd
 
+    def _export_coverage_summary_json(self, executable_test, profdata_file, module_path, arch, format):
+        cmd = "llvm-cov export -instr-profile={} {} -arch={} {} -format={} -summary-only"
+        cmd = cmd.format(profdata_file, executable_test, arch, module_path, format)
+
+        return cmd
+
     def _get_current_os(self):
         return platform.system()
 
