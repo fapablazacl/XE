@@ -50,9 +50,13 @@ class Coverage:
 
         for executable_test in executable_tests:
             profile_data_file = self._merge_raw_profile(executable_test)
-            report = self._get_data_profile_report(executable_test, profile_data_file)
+            # report = self._get_data_profile_report(executable_test, profile_data_file)
+            # print(report)
 
-            print(report)
+            cmd = self._get_coverage_show_cmd(executable_test, profile_data_file, "", "coverage")
+            print(cmd)
+            break
+
 
     def _get_ctest_json_info(self):
         cmd = "ctest --show-only=json-v1"
@@ -101,6 +105,15 @@ class Coverage:
             content += line.decode()
 
         return content
+
+    def _get_coverage_show_cmd(self, exxecutable_test, profdata_file, module_path, output_dir):
+        export_format = "html"
+        arch = "x86_64"
+        
+        cmd = "xcrun llvm-cov show {} -instr-profile={} -format={} -show-branches=percent -show-line-counts-or-regions -show-expansions -arch={} {} -output-dir={}"
+        cmd = cmd.format(exxecutable_test, profdata_file, export_format, arch, module_path, output_dir)
+
+        return cmd
 
     def _get_current_os(self):
         return platform.system()
