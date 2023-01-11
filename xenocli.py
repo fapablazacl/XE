@@ -125,6 +125,226 @@ class Coverage:
         return cmd
 
 
+def _parse_coverage_json_export():
+    report = """
+{
+    "data": [
+        {
+            "files": [
+                {
+                    "filename": "/home/Desktop/nativedevcl/XE/src/engine/scene/src/xe/scene/Projection.h",
+                    "summary": {
+                        "branches": {
+                            "count": 4,
+                            "covered": 3,
+                            "notcovered": 1,
+                            "percent": 75
+                        },
+                        "functions": {
+                            "count": 2,
+                            "covered": 2,
+                            "percent": 100
+                        },
+                        "instantiations": {
+                            "count": 2,
+                            "covered": 2,
+                            "percent": 100
+                        },
+                        "lines": {
+                            "count": 19,
+                            "covered": 19,
+                            "percent": 100
+                        },
+                        "regions": {
+                            "count": 6,
+                            "covered": 6,
+                            "notcovered": 0,
+                            "percent": 100
+                        }
+                    }
+                },
+                {
+                    "filename": "/home/Desktop/nativedevcl/XE/src/engine/scene/src/xe/scene/Trackball.cpp",
+                    "summary": {
+                        "branches": {
+                            "count": 2,
+                            "covered": 0,
+                            "notcovered": 2,
+                            "percent": 0
+                        },
+                        "functions": {
+                            "count": 8,
+                            "covered": 6,
+                            "percent": 75
+                        },
+                        "instantiations": {
+                            "count": 8,
+                            "covered": 6,
+                            "percent": 75
+                        },
+                        "lines": {
+                            "count": 20,
+                            "covered": 6,
+                            "percent": 30
+                        },
+                        "regions": {
+                            "count": 11,
+                            "covered": 6,
+                            "notcovered": 5,
+                            "percent": 54.54545454545454
+                        }
+                    }
+                },
+                {
+                    "filename": "/home/Desktop/nativedevcl/XE/src/engine/scene/src/xe/scene/Trackball.h",
+                    "summary": {
+                        "branches": {
+                            "count": 0,
+                            "covered": 0,
+                            "notcovered": 0,
+                            "percent": 0
+                        },
+                        "functions": {
+                            "count": 4,
+                            "covered": 4,
+                            "percent": 100
+                        },
+                        "instantiations": {
+                            "count": 4,
+                            "covered": 4,
+                            "percent": 100
+                        },
+                        "lines": {
+                            "count": 4,
+                            "covered": 4,
+                            "percent": 100
+                        },
+                        "regions": {
+                            "count": 4,
+                            "covered": 4,
+                            "notcovered": 0,
+                            "percent": 100
+                        }
+                    }
+                },
+                {
+                    "filename": "/home/Desktop/nativedevcl/XE/src/engine/scene/src/xe/scene/VirtualSphere.cpp",
+                    "summary": {
+                        "branches": {
+                            "count": 2,
+                            "covered": 0,
+                            "notcovered": 2,
+                            "percent": 0
+                        },
+                        "functions": {
+                            "count": 5,
+                            "covered": 4,
+                            "percent": 80
+                        },
+                        "instantiations": {
+                            "count": 5,
+                            "covered": 4,
+                            "percent": 80
+                        },
+                        "lines": {
+                            "count": 14,
+                            "covered": 4,
+                            "percent": 28.571428571428569
+                        },
+                        "regions": {
+                            "count": 8,
+                            "covered": 4,
+                            "notcovered": 4,
+                            "percent": 50
+                        }
+                    }
+                },
+                {
+                    "filename": "/home/Desktop/nativedevcl/XE/src/engine/scene/src/xe/scene/VirtualSphere.h",
+                    "summary": {
+                        "branches": {
+                            "count": 0,
+                            "covered": 0,
+                            "notcovered": 0,
+                            "percent": 0
+                        },
+                        "functions": {
+                            "count": 2,
+                            "covered": 0,
+                            "percent": 0
+                        },
+                        "instantiations": {
+                            "count": 2,
+                            "covered": 0,
+                            "percent": 0
+                        },
+                        "lines": {
+                            "count": 2,
+                            "covered": 0,
+                            "percent": 0
+                        },
+                        "regions": {
+                            "count": 2,
+                            "covered": 0,
+                            "notcovered": 2,
+                            "percent": 0
+                        }
+                    }
+                }
+            ],
+            "totals": {
+                "branches": {
+                    "count": 8,
+                    "covered": 3,
+                    "notcovered": 5,
+                    "percent": 37.5
+                },
+                "functions": {
+                    "count": 21,
+                    "covered": 16,
+                    "percent": 76.19047619047619
+                },
+                "instantiations": {
+                    "count": 21,
+                    "covered": 16,
+                    "percent": 76.19047619047619
+                },
+                "lines": {
+                    "count": 59,
+                    "covered": 33,
+                    "percent": 55.932203389830505
+                },
+                "regions": {
+                    "count": 31,
+                    "covered": 20,
+                    "notcovered": 11,
+                    "percent": 64.516129032258064
+                }
+            }
+        }
+    ],
+    "type": "llvm.coverage.json.export",
+    "version": "2.0.1"
+}
+"""
+    report = report.strip()
+    lines = report.splitlines()
+
+    for i in range(len(lines)):
+        if i == 0:
+            continue
+
+        line = lines[i]
+        
+        if line.find("----------") != -1:
+            continue
+
+        parts = list(filter(lambda part: part != "", line.split(" ")))
+
+        print(parts)
+
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("command")
@@ -139,4 +359,5 @@ def main():
         coverage.check_coverage()
 
 if __name__=="__main__":
-    main()
+    _parse_coverage_report()
+    # main()
