@@ -86,7 +86,7 @@ jobs:
         run: cd build && ctest --output-on-failure
 
       - name: Check Coverage > 80%
-        run: echo "Add collector"
+        run: ./xbcli coverage
 
   asan:
     runs-on: ubuntu-latest
