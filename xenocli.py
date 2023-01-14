@@ -44,29 +44,86 @@ class Coverage:
     def __init__(self, cm_build_dir) -> None:
         self.cm_build_dir = cm_build_dir
 
+    def show_coverage(self):
+        test_info = self._get_ctest_json_info()
+        executable_tests = self._filter_ctest_tests(test_info)
+
+        for executable_test in executable_tests:
+            module_path = os.curdir
+            profile_data_file = self._merge_raw_profile(executable_test)
+
+            llvm_terminal_report = self._run_command(self._get_data_profile_report_cmd(executable_test, profile_data_file), raise_on_error=True, cwd=self.cm_build_dir)
+            print(llvm_terminal_report)
+
     def check_coverage(self):
         test_info = self._get_ctest_json_info()
         executable_tests = self._filter_ctest_tests(test_info)
 
         for executable_test in executable_tests:
+            module_path = os.curdir
             profile_data_file = self._merge_raw_profile(executable_test)
-            # report = self._get_data_profile_report(executable_test, profile_data_file)
-            # print(report)
+            llvm_json_report = self._run_command(self._export_coverage_summary_json(executable_test, profile_data_file, module_path, "x86_64", "text"), raise_on_error=True)
 
-            cmd = self._get_coverage_show_cmd(executable_test, profile_data_file, "", "coverage")
-            print(cmd)
-            break
+            if not self._check_llvm_coverage_json_export(llvm_json_report, 90):
+                print("Test \"{}\" doesn't pass minimum coverage threshold (90%)".format(executable_test))
+                exit(1)
+
+    def _check_llvm_coverage_json_export(self, report, minimum_coverage):
+        llvm_json_type = "llvm.coverage.json.export"
+
+        report_dict = json.loads(report)
+
+        if "type" not in report_dict or report_dict["type"] != llvm_json_type:
+            raise RuntimeError("Invalid LLVM JSON Document Type")
+
+        for element in report_dict["data"]:
+            for file in element["files"]:
+                for category in ["branches", "functions", "instantiations", "lines", "regions"]:
+                    summary = file["summary"]
+
+                    count = summary[category]["count"]
+                    covered = summary[category]["covered"]
+                    percent = summary[category]["percent"]
+
+                    if percent < minimum_coverage:
+                        return False
+
+        return True
+
+
+    def _run_command(self, cmd, raise_on_error = False, cwd=None):
+        process = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, cwd=cwd)
+
+        stdout = ""
+        for line in process.stdout.readlines():
+            stdout += line.decode()
+
+        if process.stderr is None:
+            stderr = None
+        else:
+            stderr = ""
+            for line in process.stderr.readlines():
+                stderr += line.decode()
+
+        process.communicate()[0]
+
+        exit_code = process.returncode
+
+        if not raise_on_error:
+            return (exit_code, stdout, stderr)
+        else:
+            if exit_code == 0:
+                return stdout
+            
+            raise RuntimeError(stderr)
 
 
     def _get_ctest_json_info(self):
         cmd = "ctest --show-only=json-v1"
-        result = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, cwd=self.cm_build_dir)
 
-        content = ""
-        for line in result.stdout.readlines():
-            content += line.decode()
+        exit_code, stdout, stderr = self._run_command(cmd, cwd=self.cm_build_dir)
 
-        return json.loads(content)
+        return json.loads(stdout)
 
     def _filter_ctest_tests(self, test_info):
         results = []
@@ -88,29 +145,21 @@ class Coverage:
         cmd = self._adjust_llvm_cmd("llvm-profdata merge {} --instr --sparse=true -o {}")
         cmd = cmd.format(profraw_file, profdata_file)
 
-        os.system(cmd)
+        exit_code = os.system(cmd)
 
         return profdata_file
 
-    def _get_data_profile_report(self, executable_test, profdata_file) -> str:
+
+    def _get_data_profile_report_cmd(self, executable_test, profdata_file) -> str:
         cmd = self._adjust_llvm_cmd("llvm-cov report {} -instr-profile={} -arch=x86_64")
         cmd = cmd.format(executable_test, profdata_file)
-
-        print(cmd)
-
-        result = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, cwd=self.cm_build_dir)
-
-        content = ""
-        for line in result.stdout.readlines():
-            content += line.decode()
-
-        return content
+        return cmd
 
     def _get_coverage_show_cmd(self, exxecutable_test, profdata_file, module_path, output_dir):
         export_format = "html"
         arch = "x86_64"
         
-        cmd = "xcrun llvm-cov show {} -instr-profile={} -format={} -show-branches=percent -show-line-counts-or-regions -show-expansions -arch={} {} -output-dir={}"
+        cmd = self._adjust_llvm_cmd("llvm-cov show {} -instr-profile={} -format={} -show-branches=percent -show-line-counts-or-regions -show-expansions -arch={} {} -output-dir={}")
         cmd = cmd.format(exxecutable_test, profdata_file, export_format, arch, module_path, output_dir)
 
         return cmd
@@ -131,226 +180,6 @@ class Coverage:
         return cmd
 
 
-def _parse_coverage_json_export():
-    report = """
-{
-    "data": [
-        {
-            "files": [
-                {
-                    "filename": "/home/Desktop/nativedevcl/XE/src/engine/scene/src/xe/scene/Projection.h",
-                    "summary": {
-                        "branches": {
-                            "count": 4,
-                            "covered": 3,
-                            "notcovered": 1,
-                            "percent": 75
-                        },
-                        "functions": {
-                            "count": 2,
-                            "covered": 2,
-                            "percent": 100
-                        },
-                        "instantiations": {
-                            "count": 2,
-                            "covered": 2,
-                            "percent": 100
-                        },
-                        "lines": {
-                            "count": 19,
-                            "covered": 19,
-                            "percent": 100
-                        },
-                        "regions": {
-                            "count": 6,
-                            "covered": 6,
-                            "notcovered": 0,
-                            "percent": 100
-                        }
-                    }
-                },
-                {
-                    "filename": "/home/Desktop/nativedevcl/XE/src/engine/scene/src/xe/scene/Trackball.cpp",
-                    "summary": {
-                        "branches": {
-                            "count": 2,
-                            "covered": 0,
-                            "notcovered": 2,
-                            "percent": 0
-                        },
-                        "functions": {
-                            "count": 8,
-                            "covered": 6,
-                            "percent": 75
-                        },
-                        "instantiations": {
-                            "count": 8,
-                            "covered": 6,
-                            "percent": 75
-                        },
-                        "lines": {
-                            "count": 20,
-                            "covered": 6,
-                            "percent": 30
-                        },
-                        "regions": {
-                            "count": 11,
-                            "covered": 6,
-                            "notcovered": 5,
-                            "percent": 54.54545454545454
-                        }
-                    }
-                },
-                {
-                    "filename": "/home/Desktop/nativedevcl/XE/src/engine/scene/src/xe/scene/Trackball.h",
-                    "summary": {
-                        "branches": {
-                            "count": 0,
-                            "covered": 0,
-                            "notcovered": 0,
-                            "percent": 0
-                        },
-                        "functions": {
-                            "count": 4,
-                            "covered": 4,
-                            "percent": 100
-                        },
-                        "instantiations": {
-                            "count": 4,
-                            "covered": 4,
-                            "percent": 100
-                        },
-                        "lines": {
-                            "count": 4,
-                            "covered": 4,
-                            "percent": 100
-                        },
-                        "regions": {
-                            "count": 4,
-                            "covered": 4,
-                            "notcovered": 0,
-                            "percent": 100
-                        }
-                    }
-                },
-                {
-                    "filename": "/home/Desktop/nativedevcl/XE/src/engine/scene/src/xe/scene/VirtualSphere.cpp",
-                    "summary": {
-                        "branches": {
-                            "count": 2,
-                            "covered": 0,
-                            "notcovered": 2,
-                            "percent": 0
-                        },
-                        "functions": {
-                            "count": 5,
-                            "covered": 4,
-                            "percent": 80
-                        },
-                        "instantiations": {
-                            "count": 5,
-                            "covered": 4,
-                            "percent": 80
-                        },
-                        "lines": {
-                            "count": 14,
-                            "covered": 4,
-                            "percent": 28.571428571428569
-                        },
-                        "regions": {
-                            "count": 8,
-                            "covered": 4,
-                            "notcovered": 4,
-                            "percent": 50
-                        }
-                    }
-                },
-                {
-                    "filename": "/home/Desktop/nativedevcl/XE/src/engine/scene/src/xe/scene/VirtualSphere.h",
-                    "summary": {
-                        "branches": {
-                            "count": 0,
-                            "covered": 0,
-                            "notcovered": 0,
-                            "percent": 0
-                        },
-                        "functions": {
-                            "count": 2,
-                            "covered": 0,
-                            "percent": 0
-                        },
-                        "instantiations": {
-                            "count": 2,
-                            "covered": 0,
-                            "percent": 0
-                        },
-                        "lines": {
-                            "count": 2,
-                            "covered": 0,
-                            "percent": 0
-                        },
-                        "regions": {
-                            "count": 2,
-                            "covered": 0,
-                            "notcovered": 2,
-                            "percent": 0
-                        }
-                    }
-                }
-            ],
-            "totals": {
-                "branches": {
-                    "count": 8,
-                    "covered": 3,
-                    "notcovered": 5,
-                    "percent": 37.5
-                },
-                "functions": {
-                    "count": 21,
-                    "covered": 16,
-                    "percent": 76.19047619047619
-                },
-                "instantiations": {
-                    "count": 21,
-                    "covered": 16,
-                    "percent": 76.19047619047619
-                },
-                "lines": {
-                    "count": 59,
-                    "covered": 33,
-                    "percent": 55.932203389830505
-                },
-                "regions": {
-                    "count": 31,
-                    "covered": 20,
-                    "notcovered": 11,
-                    "percent": 64.516129032258064
-                }
-            }
-        }
-    ],
-    "type": "llvm.coverage.json.export",
-    "version": "2.0.1"
-}
-"""
-    report = report.strip()
-    lines = report.splitlines()
-
-    for i in range(len(lines)):
-        if i == 0:
-            continue
-
-        line = lines[i]
-        
-        if line.find("----------") != -1:
-            continue
-
-        parts = list(filter(lambda part: part != "", line.split(" ")))
-
-        print(parts)
-
-
-
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("command")
@@ -365,5 +194,4 @@ def main():
         coverage.check_coverage()
 
 if __name__=="__main__":
-    _parse_coverage_report()
-    # main()
+    main()
