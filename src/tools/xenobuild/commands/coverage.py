@@ -1,8 +1,9 @@
 
-import subprocess
 import os
 import json
 import platform
+
+from .util import run_command
 
 class Coverage:
     def __init__(self, cm_build_dir) -> None:
@@ -56,30 +57,7 @@ class Coverage:
 
 
     def _run_command(self, cmd, raise_on_error = False, cwd=None):
-        process = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, cwd=cwd)
-
-        stdout = ""
-        for line in process.stdout.readlines():
-            stdout += line.decode()
-
-        if process.stderr is None:
-            stderr = None
-        else:
-            stderr = ""
-            for line in process.stderr.readlines():
-                stderr += line.decode()
-
-        process.communicate()[0]
-
-        exit_code = process.returncode
-
-        if not raise_on_error:
-            return (exit_code, stdout, stderr)
-        else:
-            if exit_code == 0:
-                return stdout
-            
-            raise RuntimeError(stderr)
+        return run_command(cmd, raise_on_error=raise_on_error, cwd=cwd)
 
 
     def _get_ctest_json_info(self):
