@@ -31,16 +31,16 @@ TEST(ProjectionTest, ProjectFunction) {
     // SECTION("Vectors (with W = 0) should keep pointing in the same direction") {
     const auto projected = XE::project({1.0f, 1.0f, 0.0f, 0.0f}, projViewModel, viewport);
     EXPECT_EQ(projected, XE::Vector4f(640.0f, 480.0f, 0.0f, 0.0f));
+}
 
-    // SECTION("When consideraring a perspective transformation pipeline, with a viewport of (0, 0) - (640, 480)") {
-    {
-        const XE::Matrix4f projViewModel =
-            XE::Matrix4f::perspective(XE::radians(90.0f), 640.0f / 480.0f, 0.1f, 100.0f) * XE::Matrix4f::lookAtRH({0.0f, 0.0f, -1.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f});
+TEST(ProjectionTest, ProjectFunctionPerpective) {
+    const XE::Matrix4f proj = XE::Matrix4f::perspective(XE::radians(90.0f), 640.0f / 480.0f, 0.1f, 100.0f);
+    const XE::Matrix4f view = XE::Matrix4f::lookAtRH({0.0f, 0.0f, -1.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f});
+    const XE::Matrix4f projViewModel = proj * view;
+    const XE::Viewport viewport = {{0, 0}, {640, 480}};
 
-        const XE::Viewport viewport = {{0, 0}, {640, 480}};
-        EXPECT_EQ(XE::project({0.0f, 0.0f, 0.0f, 1.0f}, projViewModel, viewport).X, 320.0f);
-        EXPECT_EQ(XE::project({0.0f, 0.0f, 0.0f, 1.0f}, projViewModel, viewport).Y, 240.0f);
-    }
+    EXPECT_EQ(XE::project({0.0f, 0.0f, 0.0f, 1.0f}, projViewModel, viewport).X, 320.0f);
+    EXPECT_EQ(XE::project({0.0f, 0.0f, 0.0f, 1.0f}, projViewModel, viewport).Y, 240.0f);
 }
 
 TEST(ProjectionTest, UnprojectFunction) {
