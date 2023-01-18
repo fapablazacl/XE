@@ -23,9 +23,17 @@ jobs:
     strategy:
       fail-fast: false
       matrix: 
-        os: [ubuntu-latest, windows-latest, macos-latest]
         cmake-build-type: [Debug, Release]
-    runs-on: ${{ matrix.os }}
+        config:
+        - os: ubuntu-latest
+          generator: Unix Makefiles
+
+        - os: macos-latest
+          cmake-generator: Unix Makefiles
+
+        - os: windows-latest
+          cmake-generator: NMake Makefiles
+    runs-on: ${{ matrix.config.os }}
     steps:
       - name: Checkout Source Code and Submodules
         uses: actions/checkout@v2
@@ -33,7 +41,7 @@ jobs:
           submodules: true
 
       - name: Configure
-        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=${{ matrix.cmake-build-type }} -DXE_DEV_WARNINGS_AS_ERRORS=ON -DXE_DEV_UNIT_TEST=ON 
+        run: cmake -G "${{matrix.config.cmake-generator}}" -S . -B build -DCMAKE_BUILD_TYPE=${{ matrix.cmake-build-type }} -DXE_DEV_WARNINGS_AS_ERRORS=ON -DXE_DEV_UNIT_TEST=ON 
 
       - name: Build
         run: cmake --build build --parallel 4
