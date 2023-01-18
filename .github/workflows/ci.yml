@@ -29,10 +29,10 @@ jobs:
           generator: Unix Makefiles
 
         - os: macos-latest
-          cmake-generator: Unix Makefiles
+          generator: Unix Makefiles
 
         - os: windows-latest
-          cmake-generator: NMake Makefiles
+          generator: NMake Makefiles
     runs-on: ${{ matrix.config.os }}
     steps:
       - name: Checkout Source Code and Submodules
@@ -41,7 +41,7 @@ jobs:
           submodules: true
 
       - name: Configure
-        run: cmake -G "${{matrix.config.cmake-generator}}" -S . -B build -DCMAKE_BUILD_TYPE=${{ matrix.cmake-build-type }} -DXE_DEV_WARNINGS_AS_ERRORS=ON -DXE_DEV_UNIT_TEST=ON 
+        run: cmake -G "${{matrix.config.generator}}" -S . -B build -DCMAKE_BUILD_TYPE=${{ matrix.cmake-build-type }} -DXE_DEV_WARNINGS_AS_ERRORS=ON -DXE_DEV_UNIT_TEST=ON 
 
       - name: Build
         run: cmake --build build --parallel 4
