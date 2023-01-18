@@ -35,8 +35,8 @@ jobs:
 
         - os: windows-latest
           generator: NMake Makefiles
-          prologue: call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
-
+          prologue: Invoke-Environment "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
+          
     runs-on: ${{ matrix.config.os }}
     steps:
       - name: Checkout Source Code and Submodules
