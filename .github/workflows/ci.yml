@@ -43,10 +43,11 @@ jobs:
         uses: actions/checkout@v2
         with:
           submodules: true
+        
+      - uses: ilammy/msvc-dev-cmd@v1
 
       - name: Configure
-        run: |
-          ${{ matrix.config.prologue }}
+        run:
           cmake -G "${{matrix.config.generator}}" -S . -B build -DCMAKE_BUILD_TYPE=${{ matrix.cmake-build-type }} -DXE_DEV_WARNINGS_AS_ERRORS=ON -DXE_DEV_UNIT_TEST=ON 
 
       - name: Build
