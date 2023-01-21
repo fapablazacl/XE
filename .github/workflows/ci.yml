@@ -95,13 +95,13 @@ jobs:
         run: CC=clang CXX=clang++ cmake -S . -B build -DCMAKE_BUILD_TYPE=${{ matrix.cmake-build-type }} -DXE_DEV_WARNINGS_AS_ERRORS=OFF -DXE_DEV_UNIT_TEST=ON -DXE_DEV_INSTRUMENT_COVERAGE=ON
 
       - name: Build
-        run: cmake --build coverage/debug --parallel 4
+        run: cmake --build build --parallel 4
 
       - name: Run unit tests
         run: cd coverage/debug && ctest --output-on-failure
 
       - name: Check Coverage > 80%
-        run: ./xbcli coverage
+        run: ./xbcli coverage --build-config-dir=build
 
   asan:
     runs-on: ubuntu-latest
