@@ -3,7 +3,7 @@ import os
 import json
 import platform
 
-from ....core.util import run_command
+from core.util import run_command
 
 class Coverage:
     def __init__(self, cm_build_dir) -> None:
