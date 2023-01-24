@@ -1,4 +1,5 @@
 
+import os
 import argparse
 
 from core.util import ExtensionChecker
@@ -55,7 +56,23 @@ class CliApp:
         return self.parser.parse_args()
     
     def _open_project(self, path):
-        return None
+        if path is None:
+            path = os.getcwd()
+
+        cmake_project_path = self._get_full_cmake_project_path(path=path)
+
+        if not os.path.isfile(cmake_project_path):
+            raise Exception("Current path doesn't have a CMake Project")
+
+        name = self._get_cmake_project_name(path)
+
+        return XBProject(name=name, path=path)
+    
+    def _get_full_cmake_project_path(self, path):
+        return os.path.join(path, "CMakeLists.txt")
+
+    def _get_cmake_project_name(self, cmake_project_path):
+        return "project01"
 
     def _handle_no_command(self):
         print ("available commands:")
