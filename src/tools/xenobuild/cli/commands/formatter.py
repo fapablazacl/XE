@@ -2,10 +2,10 @@ import os
 
 from core.util import ExtensionChecker
 
-class Formatter:
+class FormatCliCommand:
     @staticmethod
     def create(project):
-        return Formatter(project=project, checker=ExtensionChecker())
+        return FormatCliCommand(project=project, checker=ExtensionChecker())
 
     def __init__(self, project, checker) -> None:
         self._project = project

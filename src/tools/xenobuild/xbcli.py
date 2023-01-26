@@ -4,9 +4,9 @@ import argparse
 
 from core.util import ExtensionChecker
 from core.buildsystem.cmake import CMakeBuildConfig, CMakeProject, CMakeDefinition
-from cli.commands.coverage import Coverage
-from cli.commands.formatter import Formatter
-from cli.commands.test import TestCommand
+from cli.commands.coverage import CoverageCliCommand
+from cli.commands.formatter import FormatCliCommand
+from cli.commands.test import TestCliCommand
 
 class XBProject:
     def __init__(self, name, path):
@@ -25,9 +25,9 @@ class XBProject:
 class CliApp:
     def __init__(self) -> None:
         self._commands = {
-            "format": Formatter,
-            "test": TestCommand,
-            "coverage": Coverage
+            "format": FormatCliCommand,
+            "test": TestCliCommand,
+            "coverage": CoverageCliCommand
         }
 
         self.parser = argparse.ArgumentParser()

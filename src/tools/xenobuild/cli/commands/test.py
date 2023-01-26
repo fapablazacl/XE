@@ -1,10 +1,10 @@
 
 from core.util import run_command
 
-class TestCommand:
+class TestCliCommand:
     @staticmethod
     def create(project):
-        return TestCommand(project=project, cm_build_dir="coverage/debug")
+        return TestCliCommand(project=project, cm_build_dir="coverage/debug")
 
     def __init__(self, project, cm_build_dir) -> None:
         self.project = project

@@ -5,10 +5,10 @@ import platform
 
 from core.util import run_command
 
-class Coverage:
+class CoverageCliCommand:
     @staticmethod
     def create(project):
-        return Coverage(project=project, cm_build_dir="coverage/debug")
+        return CoverageCliCommand(project=project, cm_build_dir="coverage/debug")
 
     def __init__(self, project, cm_build_dir) -> None:
         self.project = project
