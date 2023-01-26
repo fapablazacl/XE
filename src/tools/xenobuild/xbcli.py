@@ -48,7 +48,7 @@ class CliApp:
         
         project = self._open_project(None)
 
-        command_class = self._commands
+        command_class = self._commands[command_name]
         self._handle_command(command_class=command_class, project=project)
 
         return 0

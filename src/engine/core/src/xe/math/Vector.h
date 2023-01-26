@@ -14,7 +14,9 @@
 #endif
 
 namespace XE {
-    template <typename T, int N> struct VectorBase { T values[N]; };
+    template <typename T, int N> struct VectorBase {
+        T values[N];
+    };
 
     template <typename T> struct VectorBase<T, 2> {
         union {
