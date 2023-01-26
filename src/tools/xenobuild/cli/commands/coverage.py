@@ -6,10 +6,18 @@ import platform
 from core.util import run_command
 
 class Coverage:
-    def __init__(self, cm_build_dir) -> None:
+    @staticmethod
+    def create(project):
+        return Coverage(project=project, cm_build_dir="coverage/debug")
+
+    def __init__(self, project, cm_build_dir) -> None:
+        self.project = project
         self.cm_build_dir = cm_build_dir
 
-    def show_coverage(self):
+    def perform(self):
+        self._check_coverage()
+
+    def _show_coverage(self):
         test_info = self._get_ctest_json_info()
         executable_tests = self._filter_ctest_tests(test_info)
 
@@ -20,7 +28,7 @@ class Coverage:
             llvm_terminal_report = self._run_command(self._get_data_profile_report_cmd(executable_test, profile_data_file), raise_on_error=True, cwd=self.cm_build_dir)
             print(llvm_terminal_report)
 
-    def check_coverage(self):
+    def _check_coverage(self):
         test_info = self._get_ctest_json_info()
         executable_tests = self._filter_ctest_tests(test_info)
 

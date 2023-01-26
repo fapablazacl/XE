@@ -2,10 +2,18 @@
 from core.util import run_command
 
 class TestCommand:
-    def __init__(self, cm_build_dir) -> None:
+    @staticmethod
+    def create(project):
+        return TestCommand(project=project, cm_build_dir="coverage/debug")
+
+    def __init__(self, project, cm_build_dir) -> None:
+        self.project = project
         self.cm_build_dir = cm_build_dir
 
-    def test(self):
+    def perform(self):
+        self._test()
+
+    def _test(self):
         cmd = "ctest --output-on-failure"
 
         try:

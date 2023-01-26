@@ -12,7 +12,8 @@ class XBProject:
     def __init__(self, name, path):
         self.name = name
         self.path = path
-        self.cmakeProject = CMakeProject(self.path)
+        self.cmake_project = CMakeProject(self.path)
+
 
     def add_build_configuration(self):
         pass
@@ -81,48 +82,8 @@ class CliApp:
             print(command_name)
 
     def _handle_command(self, command_class, project):
-        command = command_class.create()
-        command.perform(project)
-
-
-"""
-def main():
-    commands = {
-        "format": Formatter,
-        "test": TestCommand,
-        "coverage": Coverage
-    }
-
-    parser = argparse.ArgumentParser()
-    parser.add_argument("command")
-
-    args = parser.parse_args()
-
-    if not args.command:
-        print ("available commands:")
-
-        for command in commands:
-            print(command)
-
-        return 0
-    
-    commandName = args.command
-    Command = commands[commandName]
-
-    command = Command.create()
-
-    if args.command == "format":
-        formatter = Formatter(checker=ExtensionChecker())
-        formatter.format(folder = "src", exclude="dependencies")
-    if args.command == "test":
-        test_cmd = TestCommand(cm_build_dir="coverage/debug")
-        test_cmd.test()
-    elif args.command == "coverage":
-        coverage = Coverage(cm_build_dir="coverage/debug")
-        coverage.check_coverage()
-    else:
-        print("Invalid command \"{}\"".format(args.command))
-"""
+        command = command_class.create(project)
+        command.perform()
 
 if __name__=="__main__":
     ret_code = CliApp().run()
