@@ -22,20 +22,94 @@ class CMakeBuildConfig:
 
 
 class CMakeProject:
-    def __init__(self, sourcePath):
+    def __init__(self, sourcePath, build_prefix):
         self.sourcePath = sourcePath
-    
-    def createDefinition(self, name, value):
+        self._build_prefix = build_prefix
+
+        self._build_type_dict = {
+            "debug": {
+                "type": "Debug",
+                "path": "debug"
+            },
+            "release": {
+                "type": "Release",
+                "path": "release"
+            }
+        }
+
+        self._build_config_dict = {
+            "build": {
+                "path": "build",
+                "definitions": {
+                    "XE_DEV_WARNINGS_AS_ERRORS": True,
+                    "XE_DEV_LINT_CLANG_TIDY" : False,
+                    "XE_DEV_UNIT_TEST" : False,
+                    "XE_DEV_INSTRUMENT_COVERAGE" : False
+                }
+            },
+            "lint": {
+                "path": "lint",
+                "definitions": {
+                    "XE_DEV_WARNINGS_AS_ERRORS": False,
+                    "XE_DEV_LINT_CLANG_TIDY" : True,
+                    "XE_DEV_UNIT_TEST" : False,
+                    "XE_DEV_INSTRUMENT_COVERAGE" : False
+                }
+            },
+            "coverage": {
+                "path": "coverage",
+                "definitions": {
+                    "XE_DEV_WARNINGS_AS_ERRORS": False,
+                    "XE_DEV_LINT_CLANG_TIDY" : False,
+                    "XE_DEV_UNIT_TEST" : True,
+                    "XE_DEV_INSTRUMENT_COVERAGE" : True
+                }
+            }
+        }
+
+    def configure(self, name = None):
+        configurations = [name]
+
+        if name is None:
+            configurations = [x for x in self._build_config_dict.keys()]
+
+        for build_type_key in self._build_type_dict:
+            build_path = self._build_type_dict[build_type_key].path
+            build_type = self._build_type_dict[build_type_key].type
+
+            for config_name in configurations:
+                config = self._build_config_dict[config_name]
+
+                build_config_path = os.path.join(self._build_prefix, build_path, config.path)
+
+                definition_dict = {}
+
+                for key in config.definitions:
+                    value = config.definitions[key]
+
+                    if type(value) == bool:
+                        definition_dict[key] = "ON" if value else "OFF"
+                    else:
+                        definition_dict[key] = value
+
+                self._configure(
+                    buildType=build_type, 
+                    buildPath=build_config_path, 
+                    installPath = None, 
+                    prefixPaths = None, 
+                    definitions = definition_dict)
+
+    def _createDefinition(self, name, value):
         return '-D' + name + '=' + value
 
-    def configure(self, buildType, buildPath, installPath = None, prefixPaths = None, definitions = None):
+    def _configure(self, buildType, buildPath, installPath = None, prefixPaths = None, definitions = None):
         os.system("mkdir -p " + buildPath)
 
         command_parts = [
             'cmake ',
             self.sourcePath, 
             '-G "Unix Makefiles"',
-            '-DCMAKE_OSX_ARCHITECTURES="arm64"',
+            # '-DCMAKE_OSX_ARCHITECTURES="arm64"',
             '-DCMAKE_BUILD_TYPE=' + buildType
         ]
 
@@ -54,8 +128,8 @@ class CMakeProject:
 
         os.system("cd " + buildPath + ' && ' + cmakeCommand)
 
-    def build(self, buildPath):
+    def _build(self, buildPath):
         os.system("cd " + buildPath + ' && ' + "make")
 
-    def install(self, buildPath):
+    def _install(self, buildPath):
         os.system("cd " + buildPath + ' && ' + "make install")

@@ -7,13 +7,16 @@ from core.buildsystem.cmake import CMakeBuildConfig, CMakeProject, CMakeDefiniti
 from cli.commands.coverage import CoverageCliCommand
 from cli.commands.formatter import FormatCliCommand
 from cli.commands.test import TestCliCommand
+from cli.commands.configure import ConfigureCliCommand
 
 class XBProject:
     def __init__(self, name, path):
         self.name = name
         self.path = path
-        self.cmake_project = CMakeProject(self.path)
+        self.cmake_project = CMakeProject(self.path, ".xenobuild/cmake")
 
+    def configure(self, config_name):
+        self.cmake_project.configure(config_name)
 
     def add_build_configuration(self):
         pass
@@ -21,17 +24,19 @@ class XBProject:
     def set_current_build_configuration(self):
         pass
 
-
 class CliApp:
     def __init__(self) -> None:
         self._commands = {
+            "configure": ConfigureCliCommand,
             "format": FormatCliCommand,
             "test": TestCliCommand,
             "coverage": CoverageCliCommand
         }
 
-        self.parser = argparse.ArgumentParser()
-        self.parser.add_argument("command")
+        self.parser = argparse.ArgumentParser(description="Utility Wrapper for Plumbing C/C++ Projects")
+
+        choices = [x for x in self._commands.keys()]
+        self.parser.add_argument("command", choices=choices)
 
     def run(self):
         args = self._parse_args()
