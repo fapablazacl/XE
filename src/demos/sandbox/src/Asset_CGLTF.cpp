@@ -13,6 +13,7 @@
 namespace Sandbox {
     static XE::Matrix4f computeNodeMatrix(const cgltf_node *node);
 
+    /*
     static void visitAttribute(const int indentation, const cgltf_attribute &attrib) { Sandbox::indent(std::cout, indentation) << " visitAttribute: " << attrib.name << std::endl; }
 
     static void visitPrimitive(const int indentation, const cgltf_primitive *primitive) {
@@ -56,6 +57,7 @@ namespace Sandbox {
             visitNode(indentation + 2, node->children[i]);
         }
     }
+    */
 } // namespace Sandbox
 
 namespace Sandbox {
@@ -273,5 +275,5 @@ namespace Sandbox {
         // }
     }
 
-    Scene SceneLoaderGLTF::load(const std::string &filePath) const { return {}; }
+    Scene SceneLoaderGLTF::load(const std::string &) const { return {}; }
 } // namespace Sandbox

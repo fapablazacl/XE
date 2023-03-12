@@ -4,6 +4,7 @@ include_directories("dependencies/cgltf")
 
 set (target "XE.Sandbox")
 set (src 
+	"src/ECS.h"
 	"src/Main.cpp"
 	"src/Assets.cpp"
 	"src/Assets.hpp"
@@ -17,8 +18,6 @@ set (src
 	"src/Asset.h"
 	"src/Asset_CGLTF.cpp"
 	"src/Asset_CGLTF.h"
-	"src/Object.cpp"
-	"src/Object.h"
 	"src/Model.cpp"
 	"src/Model.h"
 	"src/Scene.h"

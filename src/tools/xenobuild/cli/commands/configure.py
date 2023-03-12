@@ -10,4 +10,4 @@ class ConfigureCliCommand:
         self.project = project
 
     def perform(self):
-        self.project.configure()
+        self.project.configure(None)

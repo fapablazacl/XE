@@ -10,3 +10,4 @@ cmake-*
 Testing/*
 local/*
 coverage/*
+.xenobuild/*

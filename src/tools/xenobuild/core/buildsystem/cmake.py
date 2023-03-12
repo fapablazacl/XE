@@ -74,18 +74,18 @@ class CMakeProject:
             configurations = [x for x in self._build_config_dict.keys()]
 
         for build_type_key in self._build_type_dict:
-            build_path = self._build_type_dict[build_type_key].path
-            build_type = self._build_type_dict[build_type_key].type
+            build_path = self._build_type_dict[build_type_key]["path"]
+            build_type = self._build_type_dict[build_type_key]["type"]
 
             for config_name in configurations:
                 config = self._build_config_dict[config_name]
 
-                build_config_path = os.path.join(self._build_prefix, build_path, config.path)
+                build_config_path = os.path.join(self._build_prefix, build_path, config["path"])
 
                 definition_dict = {}
 
-                for key in config.definitions:
-                    value = config.definitions[key]
+                for key in config["definitions"].keys():
+                    value = config["definitions"][key]
 
                     if type(value) == bool:
                         definition_dict[key] = "ON" if value else "OFF"
@@ -121,7 +121,7 @@ class CMakeProject:
 
         if definitions is not None:
             for key in definitions:
-                definition = self.createDefinition(key, definitions[key])
+                definition = self._createDefinition(key, definitions[key])
                 command_parts.append(definition)
 
         cmakeCommand = " ".join(command_parts)

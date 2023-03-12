@@ -10,11 +10,7 @@
 
 int main(int argc, char **argv) {
     try {
-        if (argc < 2) {
-            throw std::runtime_error("Missing 3D model file in command line");
-        }
-
-        auto app = Sandbox::Application::create(argc, argv);
+        auto app = std::make_unique<Sandbox::SandboxApp>(argc, argv);
         app->Initialize();
 
         int lastTime = XE::Timer::getTick();
