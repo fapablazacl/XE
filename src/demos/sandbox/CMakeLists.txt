@@ -19,6 +19,7 @@ set (src
 	"src/Asset_CGLTF.cpp"
 	"src/Asset_CGLTF.h"
 	"src/Scene.h"
+	"src/Components.h"
 	"src/PhysicsSystem.h"
 	"src/PhysicsSystem.cpp"
 )
