@@ -22,6 +22,8 @@ set (src
 	"src/Components.h"
 	"src/PhysicsSystem.h"
 	"src/PhysicsSystem.cpp"
+	"src/RenderingSystem.h"
+	"src/RenderingSystem.cpp"
 )
 
 add_executable (${target} ${src})
