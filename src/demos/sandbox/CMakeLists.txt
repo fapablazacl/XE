@@ -18,9 +18,9 @@ set (src
 	"src/Asset.h"
 	"src/Asset_CGLTF.cpp"
 	"src/Asset_CGLTF.h"
-	"src/Model.cpp"
-	"src/Model.h"
 	"src/Scene.h"
+	"src/PhysicsSystem.h"
+	"src/PhysicsSystem.cpp"
 )
 
 add_executable (${target} ${src})

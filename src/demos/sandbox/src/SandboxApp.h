@@ -14,6 +14,7 @@
 #include <xe/input/Input.h>
 #include <xe/platform/glfw/WindowGLFW.h>
 
+#include "ECS.h"
 #include "Asset_CGLTF.h"
 #include "Assets.h"
 #include "Scene.h"
@@ -39,6 +40,22 @@ namespace Sandbox {
 
     struct GeoObject {
         std::vector<std::pair<XE::Subset *, XE::SubsetEnvelope>> subsets;
+    };
+
+
+    struct Gravity {
+        XE::Vector3f force;
+    };
+
+    struct RigidBody {
+        XE::Vector3f velocity;
+        XE::Vector3f acceleration;
+    };
+
+    struct Transform {
+        XE::Vector3f position;
+        XE::Vector3f rotation;
+        XE::Vector3f scale;
     };
 
     class SandboxApp {
