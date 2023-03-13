@@ -15,7 +15,7 @@
 #include <xe/platform/glfw/WindowGLFW.h>
 
 #include "Asset_CGLTF.h"
-#include "Assets.hpp"
+#include "Assets.h"
 #include "Scene.h"
 
 namespace Sandbox {

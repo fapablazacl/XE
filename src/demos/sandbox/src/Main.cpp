@@ -5,7 +5,7 @@
 #include <string>
 #include <xe/Timer.h>
 
-#include "SandboxApp.hpp"
+#include "SandboxApp.h"
 #include "Scene.h"
 
 int main(int argc, char **argv) {

@@ -1,8 +1,8 @@
 
 
-#include "SandboxApp.hpp"
+#include "SandboxApp.h"
 #include "Asset_CGLTF.h"
-#include "Assets.hpp"
+#include "Assets.h"
 #include "Scene.h"
 
 #include <xe/XE.h>

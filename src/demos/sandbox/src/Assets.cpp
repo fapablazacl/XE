@@ -1,5 +1,5 @@
 
-#include "Assets.hpp"
+#include "Assets.h"
 
 #include <xe/graphics/Subset.h>
 #include <xe/math/Matrix.h>
