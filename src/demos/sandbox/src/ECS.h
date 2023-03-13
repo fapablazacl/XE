@@ -69,7 +69,7 @@ public:
     virtual ~TComponentArray() {}
     
     void insertData(Entity entity, Component component) {
-        assert(entityToIndex[entity] == entityToIndex.end() && "Entity already has the component");
+        assert(entityToIndex.find(entity) == entityToIndex.end() && "Entity already has the component");
         
         const size_t newIndex = size;
         
@@ -82,7 +82,7 @@ public:
     
     
     void removeData(const Entity entity) {
-        assert(entityToIndex[entity] != entityToIndex.end() && "Entity doesn't have the component");
+        assert(entityToIndex.find(entity) != entityToIndex.end() && "Entity doesn't have the component");
         
         const size_t entityIndex = entityToIndex[entity];
         const size_t lastEntityIndex = size - 1;
@@ -182,13 +182,14 @@ public:
 };
 
 
+class Coordinator;
 class SystemManager {
 public:
     template<typename T>
-    std::shared_ptr<T> registerSystem() {
+    std::shared_ptr<T> registerSystem(Coordinator &coordinator) {
         const char *name = typeid(T).name();
         
-        auto system = std::make_shared<T>();
+        auto system = std::make_shared<T>(coordinator);
         
         systems.insert({name, system});
         
@@ -280,7 +281,7 @@ public:
     
     template<typename T>
     std::shared_ptr<T> registerSystem() {
-        return systemManager->registerSystem<T>();
+        return systemManager->registerSystem<T>(*this);
     }
     
     template<typename T>

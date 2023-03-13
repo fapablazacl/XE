@@ -11,7 +11,7 @@
 int main(int argc, char **argv) {
     try {
         auto app = std::make_unique<Sandbox::SandboxApp>(argc, argv);
-        app->Initialize();
+        app->initialize();
 
         int lastTime = XE::Timer::getTick();
 
