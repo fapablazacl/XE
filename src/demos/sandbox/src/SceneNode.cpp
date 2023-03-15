@@ -1,5 +1,6 @@
 
 #include "SceneNode.h"
+#include <xe/graphics/Uniform.h>
 
 SceneNode *SceneNode::createChild() {
     auto child = new SceneNode{this};

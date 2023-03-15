@@ -2,7 +2,7 @@
 #pragma once
 
 #include <functional>
-#include <xe/math.h>
+#include <xe/math/Math.h>
 
 #include "Renderable.h"
 

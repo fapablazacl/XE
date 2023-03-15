@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include <xe/math.h>
+#include <xe/math/Math.h>
 
 struct Camera {
     XE::Vector3f position = {0.0f, 1.5f, 2.5f};

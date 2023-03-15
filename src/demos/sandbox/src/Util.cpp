@@ -198,7 +198,7 @@ namespace demo {
     }
 
     XE::Subset *createSubset(XE::GraphicsDevice *graphicsDevice, const Mesh &mesh) {
-        const XE::BufferDescriptor bufferDesc{XE::BufferType::Vertex, XE::BufferUsage::Read, XE::BufferAccess::Static, static_cast<int>(sizeof(Vertex) * mesh.vertices.size()),
+        const XE::BufferDescriptor bufferDesc{XE::BufferType::Vertex, XE::BufferUsage::Read, XE::BufferAccess::Static, static_cast<size_t>(sizeof(Vertex) * mesh.vertices.size()),
                                               reinterpret_cast<const void *>(mesh.vertices.data())};
 
         XE::Buffer *vertexBuffer = graphicsDevice->createBuffer(bufferDesc);
@@ -207,7 +207,7 @@ namespace demo {
 
         if (mesh.indices.size() > 0) {
             const XE::BufferDescriptor indexBufferDesc{XE::BufferType::Index, XE::BufferUsage::Read, XE::BufferAccess::Static,
-                                                       static_cast<int>(sizeof(uint32_t) * mesh.indices.size()), reinterpret_cast<const void *>(mesh.indices.data())};
+                                                       static_cast<size_t>(sizeof(uint32_t) * mesh.indices.size()), reinterpret_cast<const void *>(mesh.indices.data())};
 
             indexBuffer = graphicsDevice->createBuffer(indexBufferDesc);
         }
@@ -223,7 +223,7 @@ namespace demo {
     }
 
     XE::Subset *createCubeSubset2(XE::GraphicsDevice *graphicsDevice, const Mesh &mesh) {
-        const XE::BufferDescriptor bufferDesc{XE::BufferType::Vertex, XE::BufferUsage::Read, XE::BufferAccess::Static, static_cast<int>(sizeof(Vertex) * mesh.vertices.size()),
+        const XE::BufferDescriptor bufferDesc{XE::BufferType::Vertex, XE::BufferUsage::Read, XE::BufferAccess::Static, static_cast<size_t>(sizeof(Vertex) * mesh.vertices.size()),
                                               reinterpret_cast<const void *>(mesh.vertices.data())};
 
         XE::Buffer *vertexBuffer = graphicsDevice->createBuffer(bufferDesc);

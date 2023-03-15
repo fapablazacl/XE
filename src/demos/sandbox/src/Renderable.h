@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include <xe/graphics.h>
+#include <xe/graphics/GraphicsDevice.h>
 
 class Renderable {
 public:

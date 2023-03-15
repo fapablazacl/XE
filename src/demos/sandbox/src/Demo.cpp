@@ -4,12 +4,11 @@
 
 #include <xe/Timer.h>
 #include <xe/XE.h>
-#include <xe/graphics.h>
-#include <xe/graphics/gl/GLFW/WindowGLFW.h>
-#include <xe/graphics/gl/GraphicsDeviceGL.h>
-#include <xe/graphics/gles2/GraphicsDeviceES2.h>
-#include <xe/input.h>
-#include <xe/math.h>
+#include <xe/graphics/Graphics.h>
+#include <xe/platform/glfw/WindowGLFW.h>
+#include <xe/graphics/GL.h>
+#include <xe/input/Input.h>
+#include <xe/math/Math.h>
 
 #include <functional>
 #include <map>
@@ -41,7 +40,7 @@ namespace demo {
     public:
         DemoApp() {}
 
-        int run(int argc, char **argv) {
+        int run(int , char **) {
             const XE::GraphicsBackend backend = XE::GraphicsBackend::GL_41;
 
             initialize(backend);
@@ -72,9 +71,9 @@ namespace demo {
 
             if (backend == XE::GraphicsBackend::GL_41) {
                 mGraphicsDevice = std::make_unique<XE::GraphicsDeviceGL>(mWindow->getContext());
-            } else {
-                mGraphicsDevice = std::make_unique<XE::GraphicsDeviceES2>(mWindow->getContext());
             }
+
+            assert(mGraphicsDevice);
 
             mInputManager = mWindow->getInputManager();
 
@@ -192,7 +191,7 @@ namespace demo {
         }
 
         void renderSceneNode() {
-            const auto aspect = static_cast<float>(s_screenWidth) / static_cast<float>(s_screenHeight);
+            // const auto aspect = static_cast<float>(s_screenWidth) / static_cast<float>(s_screenHeight);
 
             const auto proj = XE::M4::perspective(mCamera.fov, mCamera.aspectRatio, mCamera.znear, mCamera.zfar);
             const auto view = XE::M4::lookAtRH(mCamera.position, mCamera.lookAt, mCamera.up);
