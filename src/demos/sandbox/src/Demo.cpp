@@ -251,8 +251,3 @@ namespace demo {
         SceneNode *mEnemyNode = nullptr;
     };
 } // namespace demo
-
-int main(int argc, char **argv) {
-    demo::DemoApp app;
-    app.run(argc, argv);
-}

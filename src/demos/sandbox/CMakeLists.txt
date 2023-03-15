@@ -24,6 +24,16 @@ set (src
 	"src/PhysicsSystem.cpp"
 	"src/RenderingSystem.h"
 	"src/RenderingSystem.cpp"
+	"src/Camera.cpp" 
+	"src/Camera.h" 
+	"src/Demo.cpp"
+	"src/Platform.cpp"
+	"src/Platform.h"
+	"src/Renderable.h"
+	"src/SceneNode.cpp"
+	"src/SceneNode.h"
+	"src/Util.cpp"
+	"src/Util.h" 
 )
 
 add_executable (${target} ${src})
