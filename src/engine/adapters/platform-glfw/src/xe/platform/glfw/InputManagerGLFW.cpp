@@ -172,10 +172,10 @@ namespace XE {
         return 0;
     }
 
-    ControllerStatus InputManagerGLFW::getControllerStatus(const int index) {
+    ControllerStatus InputManagerGLFW::getControllerStatus(const int ) {
         // TODO: Add implementation code
         assert(false);
-        assert(index == 0);
+        // assert(index == 0);
         return {};
     }
 } // namespace XE
