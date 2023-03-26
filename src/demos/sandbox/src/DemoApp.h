@@ -17,25 +17,13 @@
 
 #include "Camera.h"
 #include "Common.h"
+#include "DemoRenderable.h"
 #include "Renderable.h"
 #include "SceneNode.h"
 #include "Util.h"
 
 const int s_screenWidth = 1200;
 const int s_screenHeight = 800;
-
-class DemoRenderable : public Renderable {
-public:
-   DemoRenderable() {}
-
-   DemoRenderable(XE::Subset *subset, const XE::SubsetEnvelope &subsetEnvelope) : mSubset(subset), mSubsetEnvelope(subsetEnvelope) {}
-
-   void render(XE::GraphicsDevice *graphicsDevice) override { graphicsDevice->draw(mSubset, &mSubsetEnvelope, 1); }
-
-private:
-   XE::Subset *mSubset = nullptr;
-   XE::SubsetEnvelope mSubsetEnvelope;
-};
 
 namespace demo {
    class DemoApp {
