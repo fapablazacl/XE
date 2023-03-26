@@ -22,13 +22,13 @@ set (src
 	"src/RenderingSystem.cpp"
 	"src/Camera.cpp" 
 	"src/Camera.h" 
-	"src/Demo.cpp"
+	"src/DemoApp.cpp"
 	"src/Renderable.h"
 	"src/SceneNode.cpp"
 	"src/SceneNode.h"
 	"src/Util.cpp"
 	"src/Util.h"
-		src/FPSCounter.cpp src/FPSCounter.h)
+		src/FPSCounter.cpp src/FPSCounter.h src/DemoApp.h)
 
 add_executable (${target} ${src})
 
