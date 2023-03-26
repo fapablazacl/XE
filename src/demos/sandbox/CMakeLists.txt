@@ -5,7 +5,7 @@ include_directories("dependencies/cgltf")
 set (target "XE.Sandbox")
 set (src 
 	"src/ECS.h"
-	"src/Main.cpp"
+	"src/sandbox_main.cpp"
 	"src/Assets.cpp"
 	"src/Assets.h"
 	"src/SandboxApp.cpp"
@@ -27,8 +27,8 @@ set (src
 	"src/SceneNode.cpp"
 	"src/SceneNode.h"
 	"src/Util.cpp"
-	"src/Util.h" 
-)
+	"src/Util.h"
+		src/FPSCounter.cpp src/FPSCounter.h)
 
 add_executable (${target} ${src})
 
