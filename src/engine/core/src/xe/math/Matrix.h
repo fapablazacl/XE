@@ -35,6 +35,11 @@ namespace XE {
     public:
         Matrix() {}
 
+        explicit Matrix(const T *values) {
+            assert(values);
+            std::memcpy(data(), values, R * C * sizeof(T));
+        }
+
         explicit Matrix(const Vector<T, R * C> &v) {
             T *values = data();
 

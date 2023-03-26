@@ -10,6 +10,7 @@
 #include <xe/graphics/Graphics.h>
 #include <xe/math/Math.h>
 
+//! Compute the offset from an object's base address, in bytes, for an specific field in a given type
 #define OFFSETOF(type, field) reinterpret_cast<unsigned long long>(&(((type *)0)->field))
 
 namespace demo {
