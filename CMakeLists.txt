@@ -10,7 +10,6 @@ option (XE_PLUGIN_ES2           "Include OpenGL ES 2 support" OFF)
 option (XE_PLUGIN_GL_GLFW       "Include GLFW-based Window and Context creation support (requires 'XE_PLUGIN_GL')" OFF)
 option (XE_PLUGIN_VULKAN        "Include Vulkan support" OFF)
 
-option (XE_EXAMPLE_DEMO         "Include example program that shows a tech demo" OFF)
 option (XE_EXAMPLE_SANDBOX      "Include example program that is used for various development activities" OFF)
 
 # options suited for development
