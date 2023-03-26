@@ -8,9 +8,9 @@ class DemoRenderable : public Renderable {
 public:
     DemoRenderable() {}
 
-    DemoRenderable(XE::Subset *subset, const XE::SubsetEnvelope &subsetEnvelope) : mSubset(subset), mSubsetEnvelope(subsetEnvelope) {}
+    DemoRenderable(XE::Subset *subset, const XE::SubsetEnvelope &subsetEnvelope);
 
-    void render(XE::GraphicsDevice *graphicsDevice) override { graphicsDevice->draw(mSubset, &mSubsetEnvelope, 1); }
+    void render(XE::GraphicsDevice *graphicsDevice) override;
 
 private:
     XE::Subset *mSubset = nullptr;
