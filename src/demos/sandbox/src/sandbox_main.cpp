@@ -18,14 +18,14 @@ int main(int argc, char **argv) {
 
         int lastTime = XE::Timer::getTick();
 
-        while (!app->ShouldClose()) {
+        while (!app->shouldClose()) {
             int current = XE::Timer::getTick() - lastTime;
             float seconds = static_cast<float>(current) / 1000.0f;
 
             lastTime = XE::Timer::getTick();
 
-            app->Update(seconds);
-            app->Render();
+            app->update(seconds);
+            app->render();
 
             if (fpsCounter.frame()) {
                 std::cout << "FPS: " << fpsCounter.getFPS() << std::endl;

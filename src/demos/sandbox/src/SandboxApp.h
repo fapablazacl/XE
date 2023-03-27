@@ -14,11 +14,11 @@ namespace Sandbox {
 
         void initialize();
 
-        void Update(const float seconds);
+        void update(const float seconds);
 
-        void Render();
+        void render();
 
-        bool ShouldClose() const;
+        bool shouldClose() const;
 
     private:
         bool running = true;

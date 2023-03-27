@@ -43,14 +43,14 @@ namespace Sandbox {
         }
     }
 
-    void SandboxApp::Update(const float seconds) {
+    void SandboxApp::update(const float seconds) {
         physicsSystem->update(seconds);
     }
 
-    void SandboxApp::Render() {
+    void SandboxApp::render() {
         ++frames;
     }
 
-    bool SandboxApp::ShouldClose() const { return !(running && frames < maxFrames); }
+    bool SandboxApp::shouldClose() const { return !(running && frames < maxFrames); }
 
 } // namespace Sandbox
