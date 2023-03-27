@@ -6,6 +6,7 @@
 #define XE_COMPONENTMANAGER_H
 
 #include "ComponentArray.h"
+#include <memory>
 
 
 class ComponentManager {

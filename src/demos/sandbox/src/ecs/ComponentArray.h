@@ -8,6 +8,7 @@
 #include "CommonECS.h"
 #include <unordered_map>
 #include <array>
+#include <cassert>
 
 
 class IComponentArray {
