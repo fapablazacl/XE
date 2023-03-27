@@ -28,7 +28,7 @@ set (src
 	"src/SceneNode.h"
 	"src/Util.cpp"
 	"src/Util.h"
-		src/FPSCounter.cpp src/FPSCounter.h src/DemoApp.h src/DemoRenderable.cpp src/DemoRenderable.h)
+		src/FPSCounter.cpp src/FPSCounter.h src/DemoApp.h src/DemoRenderable.cpp src/DemoRenderable.h ../../engine/core/src/xe/Flags.h src/MessageBus.cpp src/MessageBus.h)
 
 add_executable (${target} ${src})
 

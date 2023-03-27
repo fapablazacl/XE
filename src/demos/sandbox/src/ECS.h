@@ -8,6 +8,7 @@
 #include <unordered_map>
 #include <memory>
 #include <set>
+#include <vector>
 
 using Entity = uint32_t;                    //! The Entity Identifier
 const Entity MAX_ENTITIES = Entity{5000};   //! Max amount of entities supported
@@ -174,13 +175,20 @@ private:
     ComponentType nextComponentType{};
 };
 
-
-
+struct Message;
+class MessageBus;
 class System {
 public:
-    std::set<Entity> entities;
-};
+    explicit System(MessageBus &messageBus) : messageBus{messageBus} {}
 
+    virtual void handleMessage(const Message &message) = 0;
+
+public:
+    std::set<Entity> entities;
+
+private:
+    MessageBus &messageBus;
+};
 
 class Coordinator;
 class SystemManager {
