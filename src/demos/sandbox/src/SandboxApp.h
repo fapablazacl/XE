@@ -4,8 +4,8 @@
 
 #include <memory>
 
-#include "ECS.h"
 #include "PhysicsSystem.h"
+#include "ecs/ECS.h"
 
 namespace Sandbox {
     class SandboxApp {

@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include "ECS.h"
+#include "ecs/ECS.h"
 
 class PhysicsSystem : public System {
 public:

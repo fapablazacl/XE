@@ -39,5 +39,4 @@ private:
     std::vector<System*> systems;
 };
 
-
 #endif // XE_MESSAGEBUS_H
