@@ -4,6 +4,12 @@
 
 PhysicsSystem::PhysicsSystem(Coordinator &coordinator) : coordinator{coordinator} {}
 
+void PhysicsSystem::handleMessage(const Message &message) {
+    if (message.type == Message::SYSTEM_UPDATE) {
+        update(message.dt);
+    }
+}
+
 void PhysicsSystem::update(const float dt) {
     for (Entity const &entity : entities) {
         auto& rigidBody = coordinator.getComponent<RigidBody>(entity);

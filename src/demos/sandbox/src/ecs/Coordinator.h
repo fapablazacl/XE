@@ -8,6 +8,7 @@
 #include "EntityManager.h"
 #include "ComponentManager.h"
 #include "SystemManager.h"
+#include "MessageBus.h"
 
 #include <memory>
 
@@ -17,6 +18,7 @@ public:
         entityManager = std::make_shared<EntityManager>();
         componentManager = std::make_shared<ComponentManager>();
         systemManager = std::make_shared<SystemManager>();
+        messageBus = std::make_shared<MessageBus>();
     }
 
     Entity createEntity() {
@@ -70,6 +72,7 @@ private:
     std::shared_ptr<EntityManager> entityManager;
     std::shared_ptr<ComponentManager> componentManager;
     std::shared_ptr<SystemManager> systemManager;
+    std::shared_ptr<MessageBus> messageBus;
 };
 
 #endif // XE_COORDINATOR_H

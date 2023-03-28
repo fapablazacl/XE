@@ -8,9 +8,14 @@
 #include <vector>
 
 struct Message {
+    //! The specific message type
     enum {
-        GAME_EXIT
+        GAME_EXIT,
+        SYSTEM_UPDATE
     } type;
+
+    //! Delta time for the current frame
+    float dt = 0.0f;
 };
 
 enum class MessageBusPostMessageOptions {

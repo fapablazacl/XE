@@ -12,15 +12,12 @@ struct Message;
 class MessageBus;
 class System {
 public:
-    explicit System(MessageBus &messageBus) : messageBus{messageBus} {}
-
     virtual void handleMessage(const Message &message) = 0;
+
+    virtual ~System() {};
 
 public:
     std::set<Entity> entities;
-
-private:
-    MessageBus &messageBus;
 };
 
 #endif // XE_SYSTEM_H
