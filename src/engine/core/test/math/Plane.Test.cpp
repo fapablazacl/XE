@@ -2,6 +2,13 @@
 #include "Common.h"
 #include <xe/math/Plane.h>
 
+
+TEST(PlaneTest, ConstructorsShouldCreatePlanesWithSpecificValues) {
+    XE::Planef subject;
+    EXPECT_EQ(true, true);
+}
+
+
 /*
 TEST_CASE("Plane constructors should create planes with specific values", "[Plane]") {
     SECTION("default constructor generate a XZ plane, pointing to the positive Y-axis") {

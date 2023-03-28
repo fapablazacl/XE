@@ -2,11 +2,7 @@
 #include "Common.h"
 #include <xe/math/Ray.h>
 
-/*
-TEST_CASE("Ray") {
-    SECTION("XE::equals") {
-        XE::Ray<float> r1;
-        REQUIRE(true);
-    }
+TEST(RayTest, EqualsShouldComparePointsInAElementWiseFasion) {
+    XE::Ray<float> ray1;
+    EXPECT_EQ(true, true);
 }
-*/

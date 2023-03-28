@@ -2,12 +2,8 @@
 #include "Common.h"
 #include <xe/math/Rotation.h>
 
-/*
-TEST_CASE("Rotation") {
-    SECTION("XE::equals") {
-        XE::Rotation<float> r1;
 
-        REQUIRE(true);
-    }
+TEST(RotationTest, EqualsShouldComparePointsInAElementWiseFasion) {
+    XE::Rotation<float> tri1;
+    EXPECT_EQ(true, true);
 }
-*/

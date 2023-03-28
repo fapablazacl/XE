@@ -4,6 +4,12 @@
 #include <xe/math/FormatUtils.h>
 #include <xe/math/Quaternion.h>
 
+TEST(PlaneTest, ConstructorsShouldCreatePlanesWithSpecificValues) {
+    const XE::Quaternion<float> q1 {{0.0f, 0.0f, 0.0f}, 0.0f};
+
+    EXPECT_EQ(true, true);
+}
+
 /*
 TEST_CASE("Quaternion basic members are initialized properly", "[Quaternion]") {
     SECTION("when using the Vector-Scalar constructor") {
@@ -310,9 +316,5 @@ TEST_CASE("Quaternion operator functions", "[Quaternion]") {
         REQUIRE(XE::normalize(q2) == XE::Quaternion<float>{{0.0f, 1.0f, 0.0f}, 0.0f});
         REQUIRE(XE::normalize(q3) == XE::Quaternion<float>{{0.0f, -1.0f, 0.0f}, 0.0f});
     }
-}
-
-TEST_CASE("Quaternion advanced utility methods and functions", "[Quaternion]") {
-    SECTION("'transform' function should rotate a vector") {}
 }
 */

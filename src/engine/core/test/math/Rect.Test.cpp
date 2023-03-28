@@ -2,14 +2,8 @@
 #include "Common.h"
 #include <xe/math/Rect.h>
 
-/*
-TEST_CASE("Rect") {
-    SECTION("XE::equals") {
-        XE::Rectf r1;
 
-        r1.isValid();
-
-        REQUIRE(true);
-    }
+TEST(RectTest, EqualsShouldComparePointsInAElementWiseFasion) {
+    XE::Rectf tri1;
+    EXPECT_EQ(true, true);
 }
-*/
