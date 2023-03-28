@@ -4,7 +4,7 @@
 #include <xe/math/FormatUtils.h>
 #include <xe/math/Quaternion.h>
 
-TEST(PlaneTest, ConstructorsShouldCreatePlanesWithSpecificValues) {
+TEST(QuaternionTest, ConstructorsShouldCreatePlanesWithSpecificValues) {
     const XE::Quaternion<float> q1 {{0.0f, 0.0f, 0.0f}, 0.0f};
 
     EXPECT_EQ(true, true);
