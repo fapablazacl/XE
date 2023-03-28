@@ -9,6 +9,7 @@
 #include <iomanip>
 #include <ostream>
 
+#include "Common.h"
 #include "Vector.h"
 
 namespace XE {
@@ -394,7 +395,7 @@ namespace XE {
         const T *rhs_values = other.data();
 
         for (int i = 0; i < R * C; i++) {
-            if (values[i] != rhs_values[i]) {
+            if (! equals(values[i], rhs_values[i]) ) {
                 return false;
             }
         }
@@ -403,16 +404,7 @@ namespace XE {
     }
 
     template <typename T, int R, int C> bool Matrix<T, R, C>::operator!=(const Matrix<T, R, C> &other) const {
-        const T *values = data();
-        const T *rhs_values = other.data();
-
-        for (int i = 0; i < R * C; i++) {
-            if (values[i] == rhs_values[i]) {
-                return false;
-            }
-        }
-
-        return true;
+        return ! (*this == other);
     }
 
     template <typename T, int R, int C> Matrix<T, R, C> Matrix<T, R, C>::operator+(const Matrix<T, R, C> &rhs) const {

@@ -13,8 +13,14 @@
 #include <string>
 
 namespace XE {
-    //! Perform a safe comparison between two floating point using a reference 'epsilon'
-    template <typename T> bool equals(const T a, const T b, const T epsilon = std::numeric_limits<T>::epsilon()) { return std::abs(a - b) <= epsilon; }
+    template<typename T>
+    inline const T DEFAULT_EPSILON = T{0.00001};
+
+    //! Perform a safe comparison between two floating point using the default reference "infinitesimal" epsilon
+    template <typename T> bool equals(const T a, const T b) { return std::abs(a - b) <= DEFAULT_EPSILON<T>; }
+
+    //! Perform a safe comparison between two floating point using a reference "infinitesimal" epsilon
+    template <typename T> bool equals(const T a, const T b, const T epsilon) { return std::abs(a - b) <= epsilon; }
 
     //! Variable Template that contains the PI value
     template <typename T> inline const T pi = static_cast<T>(3.141592653589793238);

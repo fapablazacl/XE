@@ -6,13 +6,16 @@
 #include <cmath>
 #include <cstdint>
 
-#include <xe/math/Rotation.h>
-#include <xe/math/Vector.h>
+#include "Common.h"
+#include "Rotation.h"
+#include "Vector.h"
 
+/*
 #if defined(_MSC_VER)
 #pragma warning(push)
 #pragma warning(disable : 4201)
 #endif
+ */
 
 namespace XE {
     template <typename T> struct Quaternion {
@@ -27,11 +30,9 @@ namespace XE {
 
         Quaternion() {}
 
-        Quaternion(const T value) {
-            V.X = value;
-            V.Y = value;
-            V.Z = value;
-            W = value;
+        explicit Quaternion(const T w) {
+            V.X = V.Y = V.Z = T(0);
+            W = w;
         }
 
         explicit Quaternion(const T *values) {
@@ -194,7 +195,7 @@ namespace XE {
 
         bool operator==(const Quaternion<T> &rhs) const {
             for (int i = 0; i < 4; i++) {
-                if (this->data[i] != rhs.data[i]) {
+                if (! equals(data[i], rhs.data[i])) {
                     return false;
                 }
             }
@@ -251,8 +252,10 @@ namespace XE {
     template <typename T> Vector<T, 3> transform(const Quaternion<T> &q, const Vector<T, 3> &v) { return (q * Quaternion<T>(v) * Inverse(q)).V; }
 } // namespace XE
 
+/*
 #if defined(_MSC_VER)
 #pragma warning(pop)
 #endif
+*/
 
 #endif
