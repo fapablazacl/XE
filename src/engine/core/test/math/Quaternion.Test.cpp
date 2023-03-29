@@ -7,46 +7,55 @@
 TEST(QuaternionTest, VectorScalarConstructorInitializesTheVectorAndScalarPart) {
     const auto q2 = XE::Quaternion<float>{{0.0f, 1.0f, 0.0f}, 1.0f};
 
-    EXPECT_EQ(q2.V.X, 0.0f);
-    EXPECT_EQ(q2.V.Y, 1.0f);
-    EXPECT_EQ(q2.V.Z, 0.0f);
-    EXPECT_EQ(q2.W, 1.0f);
+    EXPECT_FLOAT_EQ(q2.V.X, 0.0f);
+    EXPECT_FLOAT_EQ(q2.V.Y, 1.0f);
+    EXPECT_FLOAT_EQ(q2.V.Z, 0.0f);
+    EXPECT_FLOAT_EQ(q2.W, 1.0f);
 }
 
 TEST(QuaternionTest, FourScalarConstructorInitializesTheVectorAndScalarPart) {
     const auto q = XE::Quaternion<float>{0.0f, 1.0f, 0.0f, 1.0f};
 
-    EXPECT_EQ(q.V.X, 0.0f);
-    EXPECT_EQ(q.V.Y, 1.0f);
-    EXPECT_EQ(q.V.Z, 0.0f);
-    EXPECT_EQ(q.W, 1.0f);
+    EXPECT_FLOAT_EQ(q.V.X, 0.0f);
+    EXPECT_FLOAT_EQ(q.V.Y, 1.0f);
+    EXPECT_FLOAT_EQ(q.V.Z, 0.0f);
+    EXPECT_FLOAT_EQ(q.W, 1.0f);
 }
 
 TEST(QuaternionTest, OneScalarConstructorInitializesTheScalarPart) {
     const auto q2 = XE::Quaternion<float>{1.0f};
 
-    EXPECT_EQ(q2.V.X, 0.0f);
-    EXPECT_EQ(q2.V.Y, 0.0f);
-    EXPECT_EQ(q2.V.Z, 0.0f);
-    EXPECT_EQ(q2.W, 1.0f);
+    EXPECT_FLOAT_EQ(q2.V.X, 0.0f);
+    EXPECT_FLOAT_EQ(q2.V.Y, 0.0f);
+    EXPECT_FLOAT_EQ(q2.V.Z, 0.0f);
+    EXPECT_FLOAT_EQ(q2.W, 1.0f);
 }
 
-TEST(QuaternionTest, VectorConstructorConstructorInitializesTheVectorPart) {
+TEST(QuaternionTest, Vector3ConstructorConstructorInitializesTheVectorPart) {
     const auto q = XE::Quaternion<float>{{0.0f, 1.0f, 0.0f}};
 
-    EXPECT_EQ(q.V.X, 0.0f);
-    EXPECT_EQ(q.V.Y, 1.0f);
-    EXPECT_EQ(q.V.Z, 0.0f);
-    EXPECT_EQ(q.W, 0.0f);
+    EXPECT_FLOAT_EQ(q.V.X, 0.0f);
+    EXPECT_FLOAT_EQ(q.V.Y, 1.0f);
+    EXPECT_FLOAT_EQ(q.V.Z, 0.0f);
+    EXPECT_FLOAT_EQ(q.W, 0.0f);
+}
+
+TEST(QuaternionTest, Vector4ConstructorConstructorInitializesTheVectorPart) {
+    const auto q = XE::Quaternion<float>{{0.0f, 1.0f, 0.0f}, 10.0f};
+
+    EXPECT_FLOAT_EQ(q.V.X, 0.0f);
+    EXPECT_FLOAT_EQ(q.V.Y, 1.0f);
+    EXPECT_FLOAT_EQ(q.V.Z, 0.0f);
+    EXPECT_FLOAT_EQ(q.W, 10.0f);
 }
 
 TEST(QuaternionTest, ThreeScalarConstructorInitializesTheVectorPart) {
     const auto q = XE::Quaternion<float>{0.0f, 1.0f, 0.0f};
 
-    EXPECT_EQ(q.V.X, 0.0f);
-    EXPECT_EQ(q.V.Y, 1.0f);
-    EXPECT_EQ(q.V.Z, 0.0f);
-    EXPECT_EQ(q.W, 0.0f);
+    EXPECT_FLOAT_EQ(q.V.X, 0.0f);
+    EXPECT_FLOAT_EQ(q.V.Y, 1.0f);
+    EXPECT_FLOAT_EQ(q.V.Z, 0.0f);
+    EXPECT_FLOAT_EQ(q.W, 0.0f);
 }
 
 TEST(QuaternionTest, PointerConstructorInitializesTheVectorAndScalarPart) {
@@ -56,19 +65,19 @@ TEST(QuaternionTest, PointerConstructorInitializesTheVectorAndScalarPart) {
 
     const auto q = XE::Quaternion<float>{values};
 
-    EXPECT_EQ(q.V.X, 4.0f);
-    EXPECT_EQ(q.V.Y, 2.0f);
-    EXPECT_EQ(q.V.Z, 3.0f);
-    EXPECT_EQ(q.W, 1.0f);
+    EXPECT_FLOAT_EQ(q.V.X, 4.0f);
+    EXPECT_FLOAT_EQ(q.V.Y, 2.0f);
+    EXPECT_FLOAT_EQ(q.V.Z, 3.0f);
+    EXPECT_FLOAT_EQ(q.W, 1.0f);
 }
 
 TEST(QuaternionTest, CopyConstructorInitializesTheVectorAndScalarPart) {
     const auto q = XE::Quaternion<float>{XE::Quaternion<float>{1.0f, 2.0f, 3.0f, 1.0f}};
 
-    EXPECT_EQ(q.V.X, 1.0f);
-    EXPECT_EQ(q.V.Y, 2.0f);
-    EXPECT_EQ(q.V.Z, 3.0f);
-    EXPECT_EQ(q.W, 1.0f);
+    EXPECT_FLOAT_EQ(q.V.X, 1.0f);
+    EXPECT_FLOAT_EQ(q.V.Y, 2.0f);
+    EXPECT_FLOAT_EQ(q.V.Z, 3.0f);
+    EXPECT_FLOAT_EQ(q.W, 1.0f);
 }
 
 TEST(QuaternionTest, EqualityOperatorDoesElementWiseComparisonViaFPTolerance) {
@@ -112,6 +121,19 @@ TEST(QuaternionTest, IdentityQuaternionFactoryMethodInitializesScalarPartToOne) 
     EXPECT_EQ(q.V.Y, 0.0f);
     EXPECT_EQ(q.V.Z, 0.0f);
     EXPECT_EQ(q.W, 1.0f);
+}
+
+TEST(QuaternionTest, RotationQuaternionFactoryMethodInitializesNormalizedQuaternionWithHalfAngleCosine) {
+    const float radians = XE::pi<float>;
+    const XE::Vector3f axis {0.0f, 1.0f, 0.0f};
+
+    const auto subject = XE::Quaternion<float>::createRotation(axis, radians);
+    const auto correct = XE::normalize(XE::Quaternion<float>{ axis, std::cos(radians * 0.5f)});
+
+    EXPECT_EQ(subject.V.X, correct.V.X);
+    EXPECT_EQ(subject.V.Y, correct.V.Y);
+    EXPECT_EQ(subject.V.Z, correct.V.Z);
+    EXPECT_EQ(subject.W, correct.W);
 }
 
 TEST(QuaternionTest, DotShouldComputeThwSumOfProductsElementWise) {
@@ -336,10 +358,21 @@ TEST(QuaternionTest, ConjugateShouldReturnNegatedVectorPart) {
 
 TEST(QuaternionTest, InverseShouldComputeAnNormalizedCongujatedQuaternion) {
     const auto q1 = XE::Quaternion<float>{{3.0f, 4.0f, 5.0f}, 0.0f};
-    const auto qinverse = XE::inverse(q1);
+    const auto inverse = XE::inverse(q1);
 
-    EXPECT_FLOAT_EQ(qinverse.V.X, -3.0f / 50.0f);
-    EXPECT_FLOAT_EQ(qinverse.V.Y, -4.0f / 50.0f);
-    EXPECT_FLOAT_EQ(qinverse.V.Z, -5.0f / 50.0f);
-    EXPECT_FLOAT_EQ(qinverse.W, 0.0f);
+    EXPECT_FLOAT_EQ(inverse.V.X, -3.0f / 50.0f);
+    EXPECT_FLOAT_EQ(inverse.V.Y, -4.0f / 50.0f);
+    EXPECT_FLOAT_EQ(inverse.V.Z, -5.0f / 50.0f);
+    EXPECT_FLOAT_EQ(inverse.W, 0.0f);
+}
+
+
+TEST(QuaternionTest, TransformShouldRotatePointVector) {
+    const auto rotation= XE::Quaternion<float>::createRotation({0.0f, 1.0f, 0.0f}, 90.0f);
+    const auto point = XE::Vector3f{1.0f, 0.0f, 0.0f};
+    const auto result = XE::transform(rotation, point);
+
+    EXPECT_FLOAT_EQ(result.X, 0.0f);
+    EXPECT_FLOAT_EQ(result.Y, 0.0f);
+    EXPECT_FLOAT_EQ(result.Z, 1.0f);
 }

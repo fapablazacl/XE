@@ -209,7 +209,7 @@ namespace XE {
 
         static Quaternion<T> createIdentity() { return Quaternion<T>({T(0), T(0), T(0)}, T(1)); }
 
-        static Quaternion<T> createRotation(const T radians, const Vector<T, 3> &axis) {
+        static Quaternion<T> createRotation(const Vector<T, 3> &axis, const T radians) {
             auto q = Quaternion<T>(axis, std::cos(radians / T(2)));
 
             return normalize(q);
@@ -249,7 +249,7 @@ namespace XE {
      */
     template <typename T> Quaternion<T> normalize(const Quaternion<T> &q) { return q / norm(q); }
 
-    template <typename T> Vector<T, 3> transform(const Quaternion<T> &q, const Vector<T, 3> &v) { return (q * Quaternion<T>(v) * Inverse(q)).V; }
+    template <typename T> Vector<T, 3> transform(const Quaternion<T> &q, const Vector<T, 3> &v) { return (q * Quaternion<T>(v) * inverse(q)).V; }
 } // namespace XE
 
 /*
