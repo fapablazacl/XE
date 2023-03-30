@@ -85,14 +85,12 @@ namespace XE {
         }
 
         constexpr const T& operator[](const size_t index) const {
-            assert(index >= 0);
             assert(index < 4);
 
             return values[index];
         }
 
         constexpr T& operator[](const size_t index) {
-            assert(index >= 0);
             assert(index < 4);
 
             return values[index];
