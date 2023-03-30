@@ -254,17 +254,17 @@ namespace XE {
     template <typename T> Vector<T, 3> transform(const Quaternion<T> &q, const Vector<T, 3> &v) { return (q * Quaternion<T>(v) * inverse(q)).V; }
 
     template<typename T>
-    Quaternion<T> qidentity() {
+    Quaternion<T> quatId() {
         return Quaternion<T>({T(0), T(0), T(0)}, T(1));
     }
 
     template<typename T>
-    Quaternion<T> qzero() {
+    Quaternion<T> quatZero() {
         return Quaternion<T>({T(0), T(0), T(0)}, T(0));
     }
 
     template<typename T>
-    Quaternion<T> qrotationrh(const Vector<T, 3> &axis, const T radians) {
+    Quaternion<T> quatRotationRH(const Vector<T, 3> &axis, const T radians) {
         assert(equals(norm(axis), T{1}) && "Axis should be normalized");
 
         const T angle = T{0.5} * radians;
@@ -273,7 +273,7 @@ namespace XE {
     }
 
     template<typename T>
-    Quaternion<T> qrotationlh(const Vector<T, 3> &axis, const T radians) {
+    Quaternion<T> quatRotationLH(const Vector<T, 3> &axis, const T radians) {
         assert(equals(norm(axis), T{1}) && "Axis should be normalized");
 
         const T angle = T{0.5} * radians;
@@ -282,7 +282,7 @@ namespace XE {
     }
 
     template<typename T>
-    Quaternion<T> qrotation(const Vector<T, 3> &v1, const Vector<T, 3> &v2) {
+    Quaternion<T> quatRotationRH(const Vector<T, 3> &v1, const Vector<T, 3> &v2) {
         auto v = cross(v1, v2);
         auto w = std::sqrt(dot(v1, v1) * dot(v2, v2)) + dot(v1, v2);
 

@@ -144,7 +144,7 @@ TEST(QuaternionTest, InequalityOperatorDoesElementWiseComparisonViaFPTolerance) 
 }
 
 TEST(QuaternionTest, ZeroQuaternionFactoryMethodInitializesScalarAndVectorPartToZeroes) {
-    const auto q = XE::qzero<float>();
+    const auto q = XE::quatZero<float>();
 
     EXPECT_FLOAT_EQ(q.V.X, 0.0f);
     EXPECT_FLOAT_EQ(q.V.Y, 0.0f);
@@ -153,7 +153,7 @@ TEST(QuaternionTest, ZeroQuaternionFactoryMethodInitializesScalarAndVectorPartTo
 }
 
 TEST(QuaternionTest, IdentityQuaternionFactoryMethodInitializesScalarPartToOne) {
-    const auto q = XE::qidentity<float>();
+    const auto q = XE::quatId<float>();
 
     EXPECT_FLOAT_EQ(q.V.X, 0.0f);
     EXPECT_FLOAT_EQ(q.V.Y, 0.0f);
@@ -165,7 +165,7 @@ TEST(QuaternionTest, RotationRHQuaternionFactoryMethodInitializesNormalizedQuate
     const float radians = XE::pi<float>;
     const XE::Vector3f axis {0.0f, 1.0f, 0.0f};
 
-    const auto subject = XE::qrotationrh<float>(axis, radians);
+    const auto subject = XE::quatRotationRH<float>(axis, radians);
     const auto correct = XE::normalize(XE::Quaternion<float>{ axis * std::sin(radians * 0.5f), std::cos(radians * 0.5f)});
 
     EXPECT_FLOAT_EQ(XE::norm(subject), 1.0f);
@@ -179,7 +179,7 @@ TEST(QuaternionTest, RotationLHQuaternionFactoryMethodInitializesNormalizedQuate
     const float radians = XE::pi<float>;
     const XE::Vector3f axis {0.0f, 1.0f, 0.0f};
 
-    const auto subject = XE::qrotationlh<float>(axis, radians);
+    const auto subject = XE::quatRotationLH<float>(axis, radians);
     const auto correct = XE::normalize(XE::Quaternion<float>{ axis * std::sin(radians * 0.5f), std::cos(radians * 0.5f)});
 
     EXPECT_FLOAT_EQ(subject.V.X, -correct.V.X);
@@ -312,7 +312,7 @@ TEST(QuaternionTest, MultiplyShouldCombineTwoQuaternions) {
 TEST(QuaternionTest, MultiplyByIdentityQShouldNotHaveAnyAffect) {
     const auto q1 = XE::Quaternion<float>(1.0f, 0.0f, 1.0f, 1.0f);
     const auto q2 = XE::Quaternion<float>(0.0f, 1.0f, 0.0f, 1.0f);
-    const auto qi = XE::qidentity<float>();
+    const auto qi = XE::quatId<float>();
 
     EXPECT_EQ(q1 * qi, q1);
     EXPECT_EQ(q2 * qi, q2);
@@ -321,7 +321,7 @@ TEST(QuaternionTest, MultiplyByIdentityQShouldNotHaveAnyAffect) {
 TEST(QuaternionTest, MultiplyByZeroQShouldCollapseAnyQuaternionToZero) {
     const auto q1 = XE::Quaternion<float>(1.0f, 0.0f, 1.0f, 1.0f);
     const auto q2 = XE::Quaternion<float>(0.0f, 1.0f, 0.0f, 1.0f);
-    const auto qz = XE::qzero<float>();
+    const auto qz = XE::quatZero<float>();
 
     EXPECT_EQ(q1 * qz, qz);
     EXPECT_EQ(q2 * qz, qz);
@@ -330,7 +330,7 @@ TEST(QuaternionTest, MultiplyByZeroQShouldCollapseAnyQuaternionToZero) {
 TEST(QuaternionTest, DivideByIdentityShouldNotAffectAnyQuaternion) {
     const auto q1 = XE::Quaternion<float>(1.0f, 0.0f, 1.0f, 1.0f);
     const auto q2 = XE::Quaternion<float>(0.0f, 1.0f, 0.0f, 1.0f);
-    const auto qi = XE::qidentity<float>();
+    const auto qi = XE::quatId<float>();
 
     EXPECT_EQ(q1 / qi, q1);
     EXPECT_EQ(q2 / qi, q2);
@@ -339,7 +339,7 @@ TEST(QuaternionTest, DivideByIdentityShouldNotAffectAnyQuaternion) {
 TEST(QuaternionTest, DivideByZeroShouldCollapseAnyQuaternionToNaNValues) {
     const auto q1 = XE::Quaternion<float>(1.0f, 0.0f, 1.0f, 1.0f);
     const auto q2 = XE::Quaternion<float>(0.0f, 1.0f, 0.0f, 1.0f);
-    const auto qz = XE::qzero<float>();
+    const auto qz = XE::quatZero<float>();
 
     const auto r1 = q1 / qz;
     const auto r2 = q2 / qz;
@@ -445,7 +445,7 @@ TEST(QuaternionTest, InverseShouldComputeAnNormalizedCongujatedQuaternion) {
 
 
 TEST(QuaternionTest, TransformShouldRotatePointVector) {
-    const auto rotation= XE::qrotationrh<float>({0.0f, 1.0f, 0.0f}, XE::pi<float> * 0.5);
+    const auto rotation= XE::quatRotationRH<float>({0.0f, 1.0f, 0.0f}, XE::pi<float> * 0.5);
     const auto point = XE::Vector3f{1.0f, 0.0f, 0.0f};
     const auto result = XE::transform(rotation, point);
 
