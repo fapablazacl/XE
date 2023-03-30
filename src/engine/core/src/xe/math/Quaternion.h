@@ -10,13 +10,6 @@
 #include "Rotation.h"
 #include "Vector.h"
 
-/*
-#if defined(_MSC_VER)
-#pragma warning(push)
-#pragma warning(disable : 4201)
-#endif
- */
-
 namespace XE {
     template <typename T> struct Quaternion {
         union {
@@ -25,7 +18,7 @@ namespace XE {
                 T W;
             };
 
-            T data[4];
+            T values[4];
         };
 
         Quaternion() {}
@@ -39,7 +32,7 @@ namespace XE {
             assert(values);
 
             for (int i = 0; i < 4; i++) {
-                data[i] = values[i];
+                this->values[i] = values[i];
             }
         }
 
@@ -83,11 +76,26 @@ namespace XE {
             return 4;
         }
 
-        constexpr T& operator[](const size_t index) const {
+        T* data() {
+            return &values[0];
+        }
+
+        const T* data() const {
+            return &values[0];
+        }
+
+        constexpr const T& operator[](const size_t index) const {
             assert(index >= 0);
             assert(index < 4);
 
-            return data[index];
+            return values[index];
+        }
+
+        constexpr T& operator[](const size_t index) {
+            assert(index >= 0);
+            assert(index < 4);
+
+            return values[index];
         }
 
         explicit operator Rotation<T>() const {
@@ -106,7 +114,7 @@ namespace XE {
             Quaternion<T> result;
 
             for (int i = 0; i < 4; i++) {
-                result.data[i] = this->data[i] + rhs.data[i];
+                result.values[i] = this->values[i] + rhs.values[i];
             }
 
             return result;
@@ -116,7 +124,7 @@ namespace XE {
             Quaternion<T> result;
 
             for (int i = 0; i < 4; i++) {
-                result.data[i] = this->data[i] - rhs.data[i];
+                result.values[i] = this->values[i] - rhs.values[i];
             }
 
             return result;
@@ -126,7 +134,7 @@ namespace XE {
             Quaternion<T> result;
 
             for (int i = 0; i < 4; i++) {
-                result.data[i] = -this->data[i];
+                result.values[i] = -this->values[i];
             }
 
             return result;
@@ -142,7 +150,7 @@ namespace XE {
             Quaternion<T> result;
 
             for (int i = 0; i < 4; i++) {
-                result.data[i] = this->data[i] * s;
+                result.values[i] = this->values[i] * s;
             }
 
             return result;
@@ -152,7 +160,7 @@ namespace XE {
             Quaternion<T> result;
 
             for (int i = 0; i < 4; i++) {
-                result.data[i] = this->data[i] / s;
+                result.values[i] = this->values[i] / s;
             }
 
             return result;
@@ -162,7 +170,7 @@ namespace XE {
 
         Quaternion<T> &operator+=(const Quaternion<T> &rhs) {
             for (int i = 0; i < 4; i++) {
-                this->data[i] += rhs.data[i];
+                this->values[i] += rhs.values[i];
             }
 
             return *this;
@@ -170,7 +178,7 @@ namespace XE {
 
         Quaternion<T> &operator-=(const Quaternion<T> &rhs) {
             for (int i = 0; i < 4; i++) {
-                this->data[i] -= rhs.data[i];
+                this->values[i] -= rhs.values[i];
             }
 
             return *this;
@@ -190,7 +198,7 @@ namespace XE {
 
         Quaternion<T> &operator*=(const T s) {
             for (int i = 0; i < 4; i++) {
-                this->data[i] *= s;
+                this->values[i] *= s;
             }
 
             return *this;
@@ -198,7 +206,7 @@ namespace XE {
 
         Quaternion<T> &operator/=(const T s) {
             for (int i = 0; i < 4; i++) {
-                this->data[i] /= s;
+                this->values[i] /= s;
             }
 
             return *this;
@@ -206,7 +214,7 @@ namespace XE {
 
         bool operator==(const Quaternion<T> &rhs) const {
             for (int i = 0; i < 4; i++) {
-                if (! equals(data[i], rhs.data[i])) {
+                if (! equals(values[i], rhs.values[i])) {
                     return false;
                 }
             }
@@ -225,7 +233,7 @@ namespace XE {
         T sum = T(0);
 
         for (int i = 0; i < 4; i++) {
-            sum += q1.data[i] * q2.data[i];
+            sum += q1.values[i] * q2.values[i];
         }
 
         return sum;
@@ -270,7 +278,7 @@ namespace XE {
 
         const T angle = T{0.5} * radians;
 
-        return Quaternion<T>(std::sin(angle) * -axis, std::cos(angle));
+        return Quaternion<T>(-std::sin(angle) * axis, std::cos(angle));
     }
 
     template<typename T>
@@ -281,11 +289,5 @@ namespace XE {
         return normalize(Quaternion<T>(v, w));
     }
 } // namespace XE
-
-/*
-#if defined(_MSC_VER)
-#pragma warning(pop)
-#endif
-*/
 
 #endif

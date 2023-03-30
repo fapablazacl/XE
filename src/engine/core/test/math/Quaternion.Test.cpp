@@ -1,7 +1,6 @@
 
 #include "Common.h"
 #include <xe/math/Common.h>
-#include <xe/math/FormatUtils.h>
 #include <xe/math/Quaternion.h>
 
 TEST(QuaternionTest, VectorScalarConstructorInitializesTheVectorAndScalarPart) {
@@ -41,7 +40,8 @@ TEST(QuaternionTest, Vector3ConstructorConstructorInitializesTheVectorPart) {
 }
 
 TEST(QuaternionTest, Vector4ConstructorConstructorInitializesTheVectorPart) {
-    const auto q = XE::Quaternion<float>{{0.0f, 1.0f, 0.0f}, 10.0f};
+    const auto v = XE::Vector4f{0.0f, 1.0f, 0.0f, 10.0f};
+    const auto q = XE::Quaternion<float>{v};
 
     EXPECT_FLOAT_EQ(q.V.X, 0.0f);
     EXPECT_FLOAT_EQ(q.V.Y, 1.0f);
@@ -79,6 +79,44 @@ TEST(QuaternionTest, CopyConstructorInitializesTheVectorAndScalarPart) {
     EXPECT_FLOAT_EQ(q.V.Z, 3.0f);
     EXPECT_FLOAT_EQ(q.W, 1.0f);
 }
+
+
+
+
+TEST(QuaternionTest, DataShouldReturnAPointerToTheFirstElement) {
+    const auto quat = XE::Quaternion<float>{0.0f, 1.0f, 2.0f, 3.0f};
+    const float *data = quat.data();
+
+    EXPECT_EQ(data[0], 0.0f);
+    EXPECT_EQ(data[1], 1.0f);
+    EXPECT_EQ(data[2], 2.0f);
+    EXPECT_EQ(data[3], 3.0f);
+}
+
+
+TEST(QuaternionTest, SizeAlwaysReturnsFour) {
+    const auto quat = XE::Quaternion<float>{0.0f, 1.0f, 2.0f, 3.0f};
+    EXPECT_EQ(quat.size(), 4);
+}
+
+
+TEST(QuaternionTest, OperatorBracketsShouldEnableAccessToEachElement) {
+    auto quat = XE::Quaternion<float>{0.0f, 1.0f, 2.0f, 3.0f};
+    EXPECT_EQ(quat[0], 0.0f);
+    EXPECT_EQ(quat[1], 1.0f);
+    EXPECT_EQ(quat[2], 2.0f);
+    EXPECT_EQ(quat[3], 3.0f);
+
+    quat[3] = 10.0f;
+    EXPECT_EQ(quat[3], 10.0f);
+
+    const auto quat2 = XE::Quaternion<float>{10.0f, -1.0f, -2.0f, -3.0f};
+    EXPECT_EQ(quat2[0], 10.0f);
+    EXPECT_EQ(quat2[1], -1.0f);
+    EXPECT_EQ(quat2[2], -2.0f);
+    EXPECT_EQ(quat2[3], -3.0f);
+}
+
 
 TEST(QuaternionTest, EqualityOperatorDoesElementWiseComparisonViaFPTolerance) {
     const auto qa_1 = XE::Quaternion<float>{{1.0f, 2.0f, 3.0f}, 1.0f};
