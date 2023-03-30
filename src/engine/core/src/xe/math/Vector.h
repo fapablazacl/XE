@@ -10,7 +10,7 @@
 
 #if defined(_MSC_VER)
 #pragma warning(push)
-#pragma warning(disable : 4201)
+#pragma warning(disable : 4201) // non-standard extension used: nameless struct/union
 #endif
 
 namespace XE {

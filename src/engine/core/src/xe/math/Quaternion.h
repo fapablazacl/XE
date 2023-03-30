@@ -10,6 +10,13 @@
 #include "Rotation.h"
 #include "Vector.h"
 
+
+#if defined(_MSC_VER)
+#pragma warning(push)
+#pragma warning(disable : 4201) // non-standard extension used: nameless struct/union
+#endif
+
+
 namespace XE {
     template <typename T> struct Quaternion {
         union {
@@ -287,5 +294,9 @@ namespace XE {
         return normalize(Quaternion<T>(v, w));
     }
 } // namespace XE
+
+#if defined(_MSC_VER)
+#pragma warning(pop)
+#endif
 
 #endif
