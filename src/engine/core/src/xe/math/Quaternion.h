@@ -285,14 +285,6 @@ namespace XE {
 
         return Quaternion<T>(-std::sin(angle) * axis, std::cos(angle));
     }
-
-    template<typename T>
-    Quaternion<T> quatRotationRH(const Vector<T, 3> &v1, const Vector<T, 3> &v2) {
-        auto v = cross(v1, v2);
-        auto w = std::sqrt(dot(v1, v1) * dot(v2, v2)) + dot(v1, v2);
-
-        return normalize(Quaternion<T>(v, w));
-    }
 } // namespace XE
 
 #if defined(_MSC_VER)
