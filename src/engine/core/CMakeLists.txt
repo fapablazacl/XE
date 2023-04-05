@@ -93,7 +93,7 @@ set (sources
 	"src/xe/io/MemoryStream.cpp"
 	"src/xe/io/Stream.cpp"
 	"src/xe/io/StreamSource.cpp"
-        src/xe/math/Quaternion.cpp)
+        src/xe/math/Quaternion.cpp src/xe/math/Vector.cpp)
 
 add_library (${target} ${sources})
 
