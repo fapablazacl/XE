@@ -243,11 +243,19 @@ namespace XE {
         }
 
         static auto translate(const TVector<T, R> &displace) {
-            auto result = TMatrix<T, R, C>();
+            if constexpr (R == 4) {
+                auto result = TMatrix<T, R, C>();
 
-            result.setColumn(R - 1, displace);
+                result.setColumn(R - 1, displace);
 
-            return result;
+                return result;
+            }
+        }
+
+        static auto translate(const TVector<T, R - 1> &displace) {
+            if constexpr (R == 4) {
+                return translate(TVector<T, R>{displace, T(1)});
+            }
         }
 
         static auto rotateX(const T radians) {
@@ -591,16 +599,27 @@ namespace XE {
     }
 
     template <typename T, int R, int C> TMatrix<T, R, C> adjoint(const TMatrix<T, R, C> &matrix) {
-        TMatrix<T, R, C> result;
+        if constexpr (C == 2 && R == 2) {
+            TMatrix<T, R, C> result;
 
-        for (int i = 0; i < R; ++i) {
-            for (int j = 0; j < C; ++j) {
-                const T factor = ((i + j) % 2 == 1) ? static_cast<T>(1) : static_cast<T>(-1);
-                result(i, j) = factor * determinant(matrix.getSubMatrix(i, j));
+            result(0, 0) = matrix(1, 1);
+            result(0, 1) = -matrix(0, 1);
+            result(1, 0) = -matrix(1, 0);
+            result(1, 1) = matrix(0, 0);
+
+            return result;
+        } else {
+            TMatrix<T, R, C> result;
+
+            for (int i = 0; i < R; ++i) {
+                for (int j = 0; j < C; ++j) {
+                    const T factor = ((i + j) % 2 == 1) ? static_cast<T>(1) : static_cast<T>(-1);
+                    result(i, j) = factor * determinant(matrix.getSubMatrix(i, j));
+                }
             }
-        }
 
-        return result;
+            return result;
+        }
     }
 
     template <typename T, int R, int C> std::ostream &operator<<(std::ostream &os, const XE::TMatrix<T, R, C> &m) {
