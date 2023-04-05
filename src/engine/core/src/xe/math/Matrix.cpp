@@ -2,7 +2,7 @@
 #include "Matrix.h"
 
 namespace XE {
-    template struct Matrix<float, 2, 2>;
-    template struct Matrix<float, 3, 3>;
-    template struct Matrix<float, 4, 4>;
+    template struct TMatrix<float, 2, 2>;
+    template struct TMatrix<float, 3, 3>;
+    template struct TMatrix<float, 4, 4>;
 }

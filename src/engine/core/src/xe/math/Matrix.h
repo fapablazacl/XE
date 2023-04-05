@@ -13,35 +13,35 @@
 #include "Vector.h"
 
 namespace XE {
-    template <typename T, int R, int C> struct Matrix;
+    template <typename T, int R, int C> struct TMatrix;
 
-    template <typename T, int R, int C> Matrix<T, R, C> transpose(const Matrix<T, R, C> &m);
+    template <typename T, int R, int C> TMatrix<T, R, C> transpose(const TMatrix<T, R, C> &m);
 
-    template <typename T, int R, int C> Matrix<T, R, C> inverse(const Matrix<T, R, C> &m);
+    template <typename T, int R, int C> TMatrix<T, R, C> inverse(const TMatrix<T, R, C> &m);
 
-    template <typename T, int R, int C> Matrix<T, R, C> inverse(const Matrix<T, R, C> &m, const T abs);
+    template <typename T, int R, int C> TMatrix<T, R, C> inverse(const TMatrix<T, R, C> &m, const T abs);
 
-    template <typename T, int R, int C> Matrix<T, R, C> adjoint(const Matrix<T, R, C> &matrix);
+    template <typename T, int R, int C> TMatrix<T, R, C> adjoint(const TMatrix<T, R, C> &matrix);
 
-    template <typename T, int R, int C> T determinant(const Matrix<T, R, C> &m);
+    template <typename T, int R, int C> T determinant(const TMatrix<T, R, C> &m);
 
     /**
      * @brief NxM matrix struct, in column-major order.
      */
-    template <typename T, int R, int C> struct Matrix {
+    template <typename T, int R, int C> struct TMatrix {
     private:
         //! row-column accessor
         T element[R][C] = {};
 
     public:
-        Matrix() {}
+        TMatrix() {}
 
-        explicit Matrix(const T *values) {
+        explicit TMatrix(const T *values) {
             assert(values);
             std::memcpy(data(), values, R * C * sizeof(T));
         }
 
-        explicit Matrix(const TVector<T, R * C> &v) {
+        explicit TMatrix(const TVector<T, R * C> &v) {
             T *values = data();
 
             for (int i = 0; i < R * C; i++) {
@@ -49,35 +49,35 @@ namespace XE {
             }
         }
 
-        bool operator==(const Matrix<T, R, C> &other) const;
+        bool operator==(const TMatrix<T, R, C> &other) const;
 
-        bool operator!=(const Matrix<T, R, C> &other) const;
+        bool operator!=(const TMatrix<T, R, C> &other) const;
 
-        Matrix<T, R, C> operator+() const;
+        TMatrix<T, R, C> operator+() const;
 
-        Matrix<T, R, C> operator+(const Matrix<T, R, C> &rhs) const;
+        TMatrix<T, R, C> operator+(const TMatrix<T, R, C> &rhs) const;
 
-        Matrix<T, R, C> operator-() const;
+        TMatrix<T, R, C> operator-() const;
 
-        Matrix<T, R, C> operator-(const Matrix<T, R, C> &rhs) const;
+        TMatrix<T, R, C> operator-(const TMatrix<T, R, C> &rhs) const;
 
-        template <int R2, int C2> Matrix<T, R, C2> operator*(const Matrix<T, R2, C2> &rhs) const;
+        template <int R2, int C2> TMatrix<T, R, C2> operator*(const TMatrix<T, R2, C2> &rhs) const;
 
-        Matrix<T, R, C> operator/(const Matrix<T, R, C> &rhs) const;
+        TMatrix<T, R, C> operator/(const TMatrix<T, R, C> &rhs) const;
 
-        Matrix<T, R, C> operator*(const T s) const;
+        TMatrix<T, R, C> operator*(const T s) const;
 
-        Matrix<T, R, C> operator/(const T s) const;
+        TMatrix<T, R, C> operator/(const T s) const;
 
-        Matrix<T, R, C> &operator+=(const Matrix<T, R, C> &rhs);
+        TMatrix<T, R, C> &operator+=(const TMatrix<T, R, C> &rhs);
 
-        Matrix<T, R, C> &operator-=(const Matrix<T, R, C> &rhs);
+        TMatrix<T, R, C> &operator-=(const TMatrix<T, R, C> &rhs);
 
-        Matrix<T, R, C> &operator*=(const Matrix<T, R, C> &rhs);
+        TMatrix<T, R, C> &operator*=(const TMatrix<T, R, C> &rhs);
 
         TVector<T, R> operator*(const TVector<T, R> &v) const;
 
-        inline friend Matrix<T, R, C> operator*(const T s, const Matrix<T, R, C> &m) { return m * s; }
+        inline friend TMatrix<T, R, C> operator*(const T s, const TMatrix<T, R, C> &m) { return m * s; }
 
         T &operator()(const int i, const int j) {
             assert(i >= 0);
@@ -123,7 +123,7 @@ namespace XE {
             return result;
         }
 
-        Matrix<T, R, C> &setRow(const int i, const TVector<T, C> &v) {
+        TMatrix<T, R, C> &setRow(const int i, const TVector<T, C> &v) {
             for (int j = 0; j < C; j++) {
                 (*this)(i, j) = v[j];
             }
@@ -131,7 +131,7 @@ namespace XE {
             return *this;
         }
 
-        Matrix<T, R, C> &setColumn(const int j, const TVector<T, R> &v) {
+        TMatrix<T, R, C> &setColumn(const int j, const TVector<T, R> &v) {
             for (int i = 0; i < R; i++) {
                 (*this)(i, j) = v[i];
             }
@@ -147,7 +147,7 @@ namespace XE {
                 assert(column >= 0);
                 assert(column < C);
 
-                Matrix<T, R - 1, C - 1> result;
+                TMatrix<T, R - 1, C - 1> result;
 
                 int ii = 0, jj = 0;
 
@@ -179,7 +179,7 @@ namespace XE {
 
     public:
         static auto columns(const std::array<TVector<T, R>, C> &columns) {
-            Matrix<T, R, C> result;
+            TMatrix<T, R, C> result;
 
             for (int i = 0; i < R; i++) {
                 for (int j = 0; j < C; j++) {
@@ -191,7 +191,7 @@ namespace XE {
         }
 
         static auto rows(const std::array<TVector<T, C>, R> &rows) {
-            Matrix<T, R, C> result;
+            TMatrix<T, R, C> result;
 
             for (int i = 0; i < R; i++) {
                 for (int j = 0; j < C; j++) {
@@ -206,7 +206,7 @@ namespace XE {
          * @brief Build a matrix initialized with zeroes.
          */
         static auto zero() {
-            Matrix<T, R, C> result;
+            TMatrix<T, R, C> result;
 
             for (int j = 0; j < C; ++j) {
                 for (int i = 0; i < R; ++i) {
@@ -222,7 +222,7 @@ namespace XE {
          */
         static auto identity() {
             if constexpr (R == C) {
-                auto result = Matrix<T, R, C>::zero();
+                auto result = TMatrix<T, R, C>();
 
                 for (int i = 0; i < R; ++i) {
                     result(i, i) = static_cast<T>(1);
@@ -233,7 +233,7 @@ namespace XE {
         }
 
         static auto scale(const TVector<T, R> &scale) {
-            auto result = Matrix<T, R, C>::identity();
+            auto result = TMatrix<T, R, C>();
 
             for (int i = 0; i < R; ++i) {
                 result(i, i) = scale[i];
@@ -243,17 +243,15 @@ namespace XE {
         }
 
         static auto translate(const TVector<T, R> &displace) {
-            auto result = Matrix<T, R, C>::identity();
+            auto result = TMatrix<T, R, C>();
 
             result.setColumn(R - 1, displace);
 
             return result;
         }
 
-        static auto translate(const TVector<T, R - 1> &displacement) { return Matrix<T, R, C>::translate({displacement, static_cast<T>(1)}); }
-
         static auto rotateX(const T radians) {
-            auto result = Matrix<T, R, C>::identity();
+            auto result = TMatrix<T, R, C>();
 
             const T cos = std::cos(radians);
             const T sin = std::sin(radians);
@@ -268,7 +266,7 @@ namespace XE {
         }
 
         static auto rotateY(const T radians) {
-            auto result = Matrix<T, R, C>::identity();
+            auto result = TMatrix<T, R, C>();
 
             const T cos = std::cos(radians);
             const T sin = std::sin(radians);
@@ -282,7 +280,7 @@ namespace XE {
         }
 
         static auto rotateZ(const T radians) {
-            auto result = Matrix<T, R, C>::identity();
+            auto result = TMatrix<T, R, C>();
 
             const T cos = std::cos(radians);
             const T sin = std::sin(radians);
@@ -303,7 +301,7 @@ namespace XE {
                 assert(!std::isnan(rads));
                 assert(!std::isinf(rads));
 
-                const auto I = Matrix<T, 3, 3>::identity();
+                const auto I = TMatrix<T, 3, 3>::identity();
 
                 const T cos = std::cos(rads);
                 const T sin = std::sin(rads);
@@ -314,12 +312,12 @@ namespace XE {
                 const auto c2 = TVector<T, 3>{V.Z, static_cast<T>(0), -V.X};
                 const auto c3 = TVector<T, 3>{-V.Y, V.X, static_cast<T>(0)};
 
-                const auto matS = Matrix<T, 3, 3>::columns({c1, c2, c3});
+                const auto matS = TMatrix<T, 3, 3>::columns({c1, c2, c3});
 
-                const auto matUUT = Matrix<T, 3, 1>{V} * Matrix<T, 1, 3>{V};
+                const auto matUUT = TMatrix<T, 3, 1>{V} * TMatrix<T, 1, 3>{V};
                 const auto tempResult = matUUT + cos * (I - matUUT) + sin * matS;
 
-                auto result = Matrix<T, R, C>::identity();
+                auto result = TMatrix<T, R, C>();
 
                 for (int i = 0; i < 3; ++i) {
                     for (int j = 0; j < 3; ++j) {
@@ -337,7 +335,7 @@ namespace XE {
                 const auto xaxis = normalize(cross(zaxis, up));
                 const auto yaxis = cross(xaxis, zaxis);
 
-                return Matrix<T, 4, 4>::rows({
+                return TMatrix<T, 4, 4>::rows({
                     TVector<T, 4>{xaxis.X, xaxis.Y, xaxis.Z, -dot(xaxis, eye)},
                     TVector<T, 4>{yaxis.X, yaxis.Y, yaxis.Z, -dot(yaxis, eye)},
                     TVector<T, 4>{-zaxis.X, -zaxis.Y, -zaxis.Z, -dot(zaxis, eye)},
@@ -358,7 +356,7 @@ namespace XE {
                 const T zdiff = znear - zfar;
                 const T a = aspect;
 
-                return Matrix<T, 4, 4>::rows({TVector<T, 4>{f / a, T(0), T(0), T(0)}, TVector<T, 4>{T(0), f, T(0), T(0)},
+                return TMatrix<T, 4, 4>::rows({TVector<T, 4>{f / a, T(0), T(0), T(0)}, TVector<T, 4>{T(0), f, T(0), T(0)},
                                               TVector<T, 4>{T(0), T(0), (zfar + znear) / zdiff, (T(2) * zfar * znear) / zdiff}, TVector<T, 4>{T(0), T(0), T(-1), T(0)}});
             }
         }
@@ -367,7 +365,7 @@ namespace XE {
             if constexpr (C == 4 && R == 4) {
                 const auto diff = pmax - pmin;
 
-                auto result = Matrix<T, 4, 4>::identity();
+                auto result = TMatrix<T, 4, 4>::identity();
 
                 result(0, 0) = static_cast<T>(2) / diff.X;
                 result(1, 1) = static_cast<T>(2) / diff.Y;
@@ -383,18 +381,18 @@ namespace XE {
         }
     };
 
-    extern template struct Matrix<float, 2, 2>;
-    extern template struct Matrix<float, 3, 3>;
-    extern template struct Matrix<float, 4, 4>;
+    extern template struct TMatrix<float, 2, 2>;
+    extern template struct TMatrix<float, 3, 3>;
+    extern template struct TMatrix<float, 4, 4>;
 
-    typedef Matrix<float, 2, 2> Matrix2f;
-    typedef Matrix<float, 3, 3> Matrix3f;
-    typedef Matrix<float, 4, 4> Matrix4f;
+    typedef TMatrix<float, 2, 2> Matrix2f;
+    typedef TMatrix<float, 3, 3> Matrix3f;
+    typedef TMatrix<float, 4, 4> Matrix4f;
 
-    using M3 = Matrix<float, 3, 3>;
-    using M4 = Matrix<float, 4, 4>;
+    using M3 = TMatrix<float, 3, 3>;
+    using M4 = TMatrix<float, 4, 4>;
 
-    template <typename T, int R, int C> bool Matrix<T, R, C>::operator==(const Matrix<T, R, C> &other) const {
+    template <typename T, int R, int C> bool TMatrix<T, R, C>::operator==(const TMatrix<T, R, C> &other) const {
         const T *values = data();
         const T *rhs_values = other.data();
 
@@ -407,12 +405,12 @@ namespace XE {
         return true;
     }
 
-    template <typename T, int R, int C> bool Matrix<T, R, C>::operator!=(const Matrix<T, R, C> &other) const {
+    template <typename T, int R, int C> bool TMatrix<T, R, C>::operator!=(const TMatrix<T, R, C> &other) const {
         return ! (*this == other);
     }
 
-    template <typename T, int R, int C> Matrix<T, R, C> Matrix<T, R, C>::operator+(const Matrix<T, R, C> &rhs) const {
-        Matrix<T, R, C> result;
+    template <typename T, int R, int C> TMatrix<T, R, C> TMatrix<T, R, C>::operator+(const TMatrix<T, R, C> &rhs) const {
+        TMatrix<T, R, C> result;
 
         T *result_values = result.data();
 
@@ -426,8 +424,8 @@ namespace XE {
         return result;
     }
 
-    template <typename T, int R, int C> Matrix<T, R, C> Matrix<T, R, C>::operator-() const {
-        Matrix<T, R, C> result;
+    template <typename T, int R, int C> TMatrix<T, R, C> TMatrix<T, R, C>::operator-() const {
+        TMatrix<T, R, C> result;
         T *result_values = result.data();
 
         const T *lhs_values = data();
@@ -439,10 +437,10 @@ namespace XE {
         return result;
     }
 
-    template <typename T, int R, int C> Matrix<T, R, C> Matrix<T, R, C>::operator+() const { return *this; }
+    template <typename T, int R, int C> TMatrix<T, R, C> TMatrix<T, R, C>::operator+() const { return *this; }
 
-    template <typename T, int R, int C> Matrix<T, R, C> Matrix<T, R, C>::operator-(const Matrix<T, R, C> &rhs) const {
-        Matrix<T, R, C> result;
+    template <typename T, int R, int C> TMatrix<T, R, C> TMatrix<T, R, C>::operator-(const TMatrix<T, R, C> &rhs) const {
+        TMatrix<T, R, C> result;
 
         T *result_values = result.data();
 
@@ -456,11 +454,11 @@ namespace XE {
         return result;
     }
 
-    template <typename T, int R, int C> template <int R2, int C2> Matrix<T, R, C2> Matrix<T, R, C>::operator*(const Matrix<T, R2, C2> &rhs) const {
+    template <typename T, int R, int C> template <int R2, int C2> TMatrix<T, R, C2> TMatrix<T, R, C>::operator*(const TMatrix<T, R2, C2> &rhs) const {
         static_assert(R == C2);
         static_assert(C == R2);
 
-        Matrix<T, R, C2> result;
+        TMatrix<T, R, C2> result;
 
         for (int i = 0; i < R; i++) {
             for (int j = 0; j < C2; j++) {
@@ -476,10 +474,10 @@ namespace XE {
         return result;
     }
 
-    template <typename T, int R, int C> Matrix<T, R, C> Matrix<T, R, C>::operator/(const Matrix<T, R, C> &rhs) const { return *this * inverse(rhs); }
+    template <typename T, int R, int C> TMatrix<T, R, C> TMatrix<T, R, C>::operator/(const TMatrix<T, R, C> &rhs) const { return *this * inverse(rhs); }
 
-    template <typename T, int R, int C> Matrix<T, R, C> Matrix<T, R, C>::operator*(const T s) const {
-        Matrix<T, R, C> result;
+    template <typename T, int R, int C> TMatrix<T, R, C> TMatrix<T, R, C>::operator*(const T s) const {
+        TMatrix<T, R, C> result;
 
         T *result_values = result.data();
         const T *values = data();
@@ -491,8 +489,8 @@ namespace XE {
         return result;
     }
 
-    template <typename T, int R, int C> Matrix<T, R, C> Matrix<T, R, C>::operator/(const T s) const {
-        Matrix<T, R, C> result;
+    template <typename T, int R, int C> TMatrix<T, R, C> TMatrix<T, R, C>::operator/(const T s) const {
+        TMatrix<T, R, C> result;
 
         T *result_values = result.data();
         const T *values = data();
@@ -504,7 +502,7 @@ namespace XE {
         return result;
     }
 
-    template <typename T, int R, int C> Matrix<T, R, C> &Matrix<T, R, C>::operator+=(const Matrix<T, R, C> &rhs) {
+    template <typename T, int R, int C> TMatrix<T, R, C> &TMatrix<T, R, C>::operator+=(const TMatrix<T, R, C> &rhs) {
         const T *rhs_values = rhs.data();
         T *values = data();
 
@@ -515,7 +513,7 @@ namespace XE {
         return *this;
     }
 
-    template <typename T, int R, int C> Matrix<T, R, C> &Matrix<T, R, C>::operator-=(const Matrix<T, R, C> &rhs) {
+    template <typename T, int R, int C> TMatrix<T, R, C> &TMatrix<T, R, C>::operator-=(const TMatrix<T, R, C> &rhs) {
         const T *rhs_values = rhs.data();
         T *values = data();
 
@@ -526,13 +524,13 @@ namespace XE {
         return *this;
     }
 
-    template <typename T, int R, int C> Matrix<T, R, C> &Matrix<T, R, C>::operator*=(const Matrix<T, R, C> &rhs) {
+    template <typename T, int R, int C> TMatrix<T, R, C> &TMatrix<T, R, C>::operator*=(const TMatrix<T, R, C> &rhs) {
         *this = *this * rhs;
 
         return *this;
     }
 
-    template <typename T, int R, int C> TVector<T, R> Matrix<T, R, C>::operator*(const TVector<T, R> &v) const {
+    template <typename T, int R, int C> TVector<T, R> TMatrix<T, R, C>::operator*(const TVector<T, R> &v) const {
         TVector<T, R> result;
 
         for (int row = 0; row < R; row++) {
@@ -542,7 +540,7 @@ namespace XE {
         return result;
     }
 
-    template <typename T, int R, int C> TVector<T, C> operator*(const TVector<T, C> &v, const Matrix<T, R, C> &m) {
+    template <typename T, int R, int C> TVector<T, C> operator*(const TVector<T, C> &v, const TMatrix<T, R, C> &m) {
         TVector<T, C> result;
 
         for (int col = 0; col < C; col++) {
@@ -552,8 +550,8 @@ namespace XE {
         return result;
     }
 
-    template <typename T, int R, int C> Matrix<T, R, C> transpose(const Matrix<T, R, C> &m) {
-        Matrix<T, C, R> result;
+    template <typename T, int R, int C> TMatrix<T, R, C> transpose(const TMatrix<T, R, C> &m) {
+        TMatrix<T, C, R> result;
 
         for (int i = 0; i < R; i++) {
             for (int j = 0; j < C; j++) {
@@ -564,11 +562,11 @@ namespace XE {
         return result;
     }
 
-    template <typename T, int R, int C> Matrix<T, R, C> inverse(const Matrix<T, R, C> &m) { return transpose(adjoint(m)) / determinant(m); }
+    template <typename T, int R, int C> TMatrix<T, R, C> inverse(const TMatrix<T, R, C> &m) { return transpose(adjoint(m)) / determinant(m); }
 
-    template <typename T, int R, int C> Matrix<T, R, C> inverse(const Matrix<T, R, C> &m, const T det) { return transpose(adjoint(m)) / det; }
+    template <typename T, int R, int C> TMatrix<T, R, C> inverse(const TMatrix<T, R, C> &m, const T det) { return transpose(adjoint(m)) / det; }
 
-    template <typename T, int R, int C> T determinant(const Matrix<T, R, C> &m) {
+    template <typename T, int R, int C> T determinant(const TMatrix<T, R, C> &m) {
         if constexpr (R == C && R > 0) {
             if constexpr (R == 1) {
                 return m(0, 0);
@@ -592,8 +590,8 @@ namespace XE {
         }
     }
 
-    template <typename T, int R, int C> Matrix<T, R, C> adjoint(const Matrix<T, R, C> &matrix) {
-        Matrix<T, R, C> result;
+    template <typename T, int R, int C> TMatrix<T, R, C> adjoint(const TMatrix<T, R, C> &matrix) {
+        TMatrix<T, R, C> result;
 
         for (int i = 0; i < R; ++i) {
             for (int j = 0; j < C; ++j) {
@@ -605,8 +603,8 @@ namespace XE {
         return result;
     }
 
-    template <typename T, int R, int C> std::ostream &operator<<(std::ostream &os, const XE::Matrix<T, R, C> &m) {
-        os << "XE::Matrix<" << typeid(T).name() << ", " << R << ", " << C << "> {" << std::endl;
+    template <typename T, int R, int C> std::ostream &operator<<(std::ostream &os, const XE::TMatrix<T, R, C> &m) {
+        os << "XE::TMatrix<" << typeid(T).name() << ", " << R << ", " << C << "> {" << std::endl;
 
         for (int i = 0; i < R; ++i) {
             os << "  ";
