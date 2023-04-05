@@ -25,14 +25,14 @@ namespace XE {
 
         explicit Plane(const T a, const T b, const T c, const T d) : a(a), b(b), c(c), d(d) {}
 
-        explicit Plane(const Vector3<T> &n, const T d) : a(n.X), b(n.Y), c(n.Z), d(d) {}
+        explicit Plane(const TVector3<T> &n, const T d) : a(n.X), b(n.Y), c(n.Z), d(d) {}
 
         /**
          * @brief Returns the current normal vector
          *
-         * @return Vector3<T>
+         * @return TVector3<T>
          */
-        Vector3<T> normal() const { return {a, b, c}; }
+        TVector3<T> normal() const { return {a, b, c}; }
 
         /**
          * @brief Evaluate the point coordinates in the scalar Plane equation.
@@ -48,7 +48,7 @@ namespace XE {
          * @param point The point to evaluate in 3-space.
          * @return T
          */
-        T evaluate(const Vector3<T> &point) const { return dot(normal(), point) - d; }
+        T evaluate(const TVector3<T> &point) const { return dot(normal(), point) - d; }
 
         bool operator==(const Plane<T> &rhs) const { return (a == rhs.a && b == rhs.b && c == rhs.c && d == rhs.d); }
 
@@ -77,7 +77,7 @@ namespace XE {
          * @param point
          * @return PlaneSide
          */
-        PlaneSide test(const Vector3<T> &point) const {
+        PlaneSide test(const TVector3<T> &point) const {
             const T det = evaluate(point);
 
             if (det < T(0)) {
@@ -111,7 +111,7 @@ namespace XE {
          * @param position
          * @return Plane<T>
          */
-        static Plane<T> vectorial(const Vector3<T> &normal, const Vector3<T> &position) { return Plane<T>{normalize(normal), dot(position, normal)}; }
+        static Plane<T> vectorial(const TVector3<T> &normal, const TVector3<T> &position) { return Plane<T>{normalize(normal), dot(position, normal)}; }
 
         /**
          * @brief Initializes a plane from three points
@@ -121,7 +121,7 @@ namespace XE {
          * @param p3
          * @return Plane<T>
          */
-        static Plane<T> triangle(const Vector3<T> &p1, const Vector3<T> &p2, const Vector3<T> &p3) {
+        static Plane<T> triangle(const TVector3<T> &p1, const TVector3<T> &p2, const TVector3<T> &p3) {
             const auto normal = normalize(cross(p2 - p1, p3 - p1));
             const auto position = (p1 + p2 + p3) * (T(1) / T(3));
 
@@ -155,7 +155,7 @@ namespace XE {
          * @param position
          * @return Plane<T>
          */
-        static Plane<T> yz(const Vector3<T> &position) { return Plane<T>{T(1), T(0), T(0), position.x}; }
+        static Plane<T> yz(const TVector3<T> &position) { return Plane<T>{T(1), T(0), T(0), position.x}; }
 
         /**
          * @brief Creates a Plane aligned at the XZ-Plane, at the specified position
@@ -163,7 +163,7 @@ namespace XE {
          * @param position
          * @return Plane<T>
          */
-        static Plane<T> xz(const Vector3<T> &position) { return Plane<T>{T(0), T(1), T(0), position.y}; }
+        static Plane<T> xz(const TVector3<T> &position) { return Plane<T>{T(0), T(1), T(0), position.y}; }
 
         /**
          * @brief Creates a Plane aligned at the XY-Plane, at the specified position
@@ -171,7 +171,7 @@ namespace XE {
          * @param position
          * @return Plane<T>
          */
-        static Plane<T> xy(const Vector3<T> &position) { return Plane<T>{T(0), T(0), T(1), position.z}; }
+        static Plane<T> xy(const TVector3<T> &position) { return Plane<T>{T(0), T(0), T(1), position.z}; }
     };
 
     /**
@@ -198,7 +198,7 @@ namespace XE {
      * @return T The computed t scalar factor
      */
     template <typename T> T test(const Plane<T> &plane, const Ray<T> &ray) {
-        const Vector3<T> n = plane.normal();
+        const TVector3<T> n = plane.normal();
         const T num = plane.d - dot(ray.point, n);
         const T dem = dot(ray.direction, n);
 

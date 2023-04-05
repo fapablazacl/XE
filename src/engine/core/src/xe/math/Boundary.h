@@ -120,14 +120,14 @@ namespace XE {
          */
         std::array<TVector<T, N>, SideCount> getNormals() const {
             if constexpr (N == 2) {
-                return {Vector2<T>{static_cast<T>(-1), static_cast<T>(0)}, Vector2<T>{static_cast<T>(0), static_cast<T>(-1)}, Vector2<T>{static_cast<T>(1), static_cast<T>(0)},
-                        Vector2<T>{static_cast<T>(0), static_cast<T>(1)}};
+                return {TVector2<T>{static_cast<T>(-1), static_cast<T>(0)}, TVector2<T>{static_cast<T>(0), static_cast<T>(-1)}, TVector2<T>{static_cast<T>(1), static_cast<T>(0)},
+                        TVector2<T>{static_cast<T>(0), static_cast<T>(1)}};
             }
 
             if constexpr (N == 3) {
-                return {Vector3<T>{static_cast<T>(-1), static_cast<T>(0), static_cast<T>(0)}, Vector3<T>{static_cast<T>(0), static_cast<T>(-1), static_cast<T>(0)},
-                        Vector3<T>{static_cast<T>(0), static_cast<T>(0), static_cast<T>(-1)}, Vector3<T>{static_cast<T>(1), static_cast<T>(0), static_cast<T>(0)},
-                        Vector3<T>{static_cast<T>(0), static_cast<T>(1), static_cast<T>(0)},  Vector3<T>{static_cast<T>(0), static_cast<T>(0), static_cast<T>(1)}};
+                return {TVector3<T>{static_cast<T>(-1), static_cast<T>(0), static_cast<T>(0)}, TVector3<T>{static_cast<T>(0), static_cast<T>(-1), static_cast<T>(0)},
+                        TVector3<T>{static_cast<T>(0), static_cast<T>(0), static_cast<T>(-1)}, TVector3<T>{static_cast<T>(1), static_cast<T>(0), static_cast<T>(0)},
+                        TVector3<T>{static_cast<T>(0), static_cast<T>(1), static_cast<T>(0)},  TVector3<T>{static_cast<T>(0), static_cast<T>(0), static_cast<T>(1)}};
             }
         }
 

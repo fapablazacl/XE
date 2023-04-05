@@ -399,22 +399,33 @@ namespace XE {
         return os;
     }
 
+    template <typename T> using TVector2 = TVector<T, 2>;
+    template <typename T> using TVector3 = TVector<T, 3>;
+    template <typename T> using TVector4 = TVector<T, 4>;
 
-    typedef TVector<std::int32_t, 2> Vector2i;
-    typedef TVector<std::int32_t, 3> Vector3i;
-    typedef TVector<std::int32_t, 4> Vector4i;
+    using Vector2i = TVector2<std::int32_t>;
+    using Vector3i = TVector3<std::int32_t>;
+    using Vector4i = TVector4<std::int32_t>;
 
-    typedef TVector<float, 2> Vector2f;
-    typedef TVector<float, 3> Vector3f;
-    typedef TVector<float, 4> Vector4f;
+    using Vector2f = TVector2<float>;
+    using Vector3f = TVector3<float>;
+    using Vector4f = TVector4<float>;
 
-    typedef TVector<double, 2> Vector2d;
-    typedef TVector<double, 3> Vector3d;
-    typedef TVector<double, 4> Vector4d;
+    using Vector2d = TVector2<double>;
+    using Vector3d = TVector3<double>;
+    using Vector4d = TVector4<double>;
 
-    template <typename T> using Vector2 = TVector<T, 2>;
-    template <typename T> using Vector3 = TVector<T, 3>;
-    template <typename T> using Vector4 = TVector<T, 4>;
+    extern template struct TVector<std::int32_t, 2>;
+    extern template struct TVector<std::int32_t, 3>;
+    extern template struct TVector<std::int32_t, 4>;
+
+    extern template struct TVector<float, 2>;
+    extern template struct TVector<float, 3>;
+    extern template struct TVector<float, 4>;
+
+    extern template struct TVector<double, 2>;
+    extern template struct TVector<double, 3>;
+    extern template struct TVector<double, 4>;
 } // namespace XE
 
 #if defined(_MSC_VER)
