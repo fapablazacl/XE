@@ -294,7 +294,6 @@ namespace XE {
     }
 
     using Quat = TQuaternion<float>;
-
     extern template struct TQuaternion<float>;
 } // namespace XE
 
