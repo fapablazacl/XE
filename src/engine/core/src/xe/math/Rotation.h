@@ -7,7 +7,7 @@
 namespace XE {
     template <typename T> struct Rotation {
         T angle;
-        Vector<T, 3> axis;
+        TVector<T, 3> axis;
     };
 
 } // namespace XE

@@ -41,7 +41,7 @@ namespace XE {
             std::memcpy(data(), values, R * C * sizeof(T));
         }
 
-        explicit Matrix(const Vector<T, R * C> &v) {
+        explicit Matrix(const TVector<T, R * C> &v) {
             T *values = data();
 
             for (int i = 0; i < R * C; i++) {
@@ -75,7 +75,7 @@ namespace XE {
 
         Matrix<T, R, C> &operator*=(const Matrix<T, R, C> &rhs);
 
-        Vector<T, R> operator*(const Vector<T, R> &v) const;
+        TVector<T, R> operator*(const TVector<T, R> &v) const;
 
         inline friend Matrix<T, R, C> operator*(const T s, const Matrix<T, R, C> &m) { return m * s; }
 
@@ -97,11 +97,11 @@ namespace XE {
             return element[i][j];
         }
 
-        Vector<T, C> getRow(const int i) const {
+        TVector<T, C> getRow(const int i) const {
             assert(i >= 0);
             assert(i < R);
 
-            Vector<T, C> result;
+            TVector<T, C> result;
 
             for (int j = 0; j < C; j++) {
                 result.values[j] = (*this)(i, j);
@@ -110,11 +110,11 @@ namespace XE {
             return result;
         }
 
-        Vector<T, R> getColumn(const int j) const {
+        TVector<T, R> getColumn(const int j) const {
             assert(j >= 0);
             assert(j < C);
 
-            Vector<T, R> result;
+            TVector<T, R> result;
 
             for (int i = 0; i < R; i++) {
                 result.values[i] = (*this)(i, j);
@@ -123,7 +123,7 @@ namespace XE {
             return result;
         }
 
-        Matrix<T, R, C> &setRow(const int i, const Vector<T, C> &v) {
+        Matrix<T, R, C> &setRow(const int i, const TVector<T, C> &v) {
             for (int j = 0; j < C; j++) {
                 (*this)(i, j) = v[j];
             }
@@ -131,7 +131,7 @@ namespace XE {
             return *this;
         }
 
-        Matrix<T, R, C> &setColumn(const int j, const Vector<T, R> &v) {
+        Matrix<T, R, C> &setColumn(const int j, const TVector<T, R> &v) {
             for (int i = 0; i < R; i++) {
                 (*this)(i, j) = v[i];
             }
@@ -178,7 +178,7 @@ namespace XE {
         const T *data() const { return &element[0][0]; }
 
     public:
-        static auto columns(const std::array<Vector<T, R>, C> &columns) {
+        static auto columns(const std::array<TVector<T, R>, C> &columns) {
             Matrix<T, R, C> result;
 
             for (int i = 0; i < R; i++) {
@@ -190,7 +190,7 @@ namespace XE {
             return result;
         }
 
-        static auto rows(const std::array<Vector<T, C>, R> &rows) {
+        static auto rows(const std::array<TVector<T, C>, R> &rows) {
             Matrix<T, R, C> result;
 
             for (int i = 0; i < R; i++) {
@@ -232,7 +232,7 @@ namespace XE {
             }
         }
 
-        static auto scale(const Vector<T, R> &scale) {
+        static auto scale(const TVector<T, R> &scale) {
             auto result = Matrix<T, R, C>::identity();
 
             for (int i = 0; i < R; ++i) {
@@ -242,7 +242,7 @@ namespace XE {
             return result;
         }
 
-        static auto translate(const Vector<T, R> &displace) {
+        static auto translate(const TVector<T, R> &displace) {
             auto result = Matrix<T, R, C>::identity();
 
             result.setColumn(R - 1, displace);
@@ -250,7 +250,7 @@ namespace XE {
             return result;
         }
 
-        static auto translate(const Vector<T, R - 1> &displacement) { return Matrix<T, R, C>::translate({displacement, static_cast<T>(1)}); }
+        static auto translate(const TVector<T, R - 1> &displacement) { return Matrix<T, R, C>::translate({displacement, static_cast<T>(1)}); }
 
         static auto rotateX(const T radians) {
             auto result = Matrix<T, R, C>::identity();
@@ -298,7 +298,7 @@ namespace XE {
         /**
          * @brief Build a arbitrary rotation matrix
          */
-        static auto rotate(const T rads, const Vector<T, 3> &axis) {
+        static auto rotate(const T rads, const TVector<T, 3> &axis) {
             if constexpr ((C >= 3 && C <= 4) && (R >= 3 && R <= 4)) {
                 assert(!std::isnan(rads));
                 assert(!std::isinf(rads));
@@ -308,11 +308,11 @@ namespace XE {
                 const T cos = std::cos(rads);
                 const T sin = std::sin(rads);
 
-                Vector<T, 3> V = normalize(axis);
+                TVector<T, 3> V = normalize(axis);
 
-                const auto c1 = Vector<T, 3>{static_cast<T>(0), -V.Z, V.Y};
-                const auto c2 = Vector<T, 3>{V.Z, static_cast<T>(0), -V.X};
-                const auto c3 = Vector<T, 3>{-V.Y, V.X, static_cast<T>(0)};
+                const auto c1 = TVector<T, 3>{static_cast<T>(0), -V.Z, V.Y};
+                const auto c2 = TVector<T, 3>{V.Z, static_cast<T>(0), -V.X};
+                const auto c3 = TVector<T, 3>{-V.Y, V.X, static_cast<T>(0)};
 
                 const auto matS = Matrix<T, 3, 3>::columns({c1, c2, c3});
 
@@ -331,17 +331,17 @@ namespace XE {
             }
         }
 
-        static auto lookAtRH(const Vector<T, 3> &eye, const Vector<T, 3> &at, const Vector<T, 3> &up) {
+        static auto lookAtRH(const TVector<T, 3> &eye, const TVector<T, 3> &at, const TVector<T, 3> &up) {
             if constexpr (C == 4 && R == 4) {
                 const auto zaxis = normalize(at - eye);
                 const auto xaxis = normalize(cross(zaxis, up));
                 const auto yaxis = cross(xaxis, zaxis);
 
                 return Matrix<T, 4, 4>::rows({
-                    Vector<T, 4>{xaxis.X, xaxis.Y, xaxis.Z, -dot(xaxis, eye)},
-                    Vector<T, 4>{yaxis.X, yaxis.Y, yaxis.Z, -dot(yaxis, eye)},
-                    Vector<T, 4>{-zaxis.X, -zaxis.Y, -zaxis.Z, -dot(zaxis, eye)},
-                    Vector<T, 4>{T(0), T(0), T(0), T(1)},
+                    TVector<T, 4>{xaxis.X, xaxis.Y, xaxis.Z, -dot(xaxis, eye)},
+                    TVector<T, 4>{yaxis.X, yaxis.Y, yaxis.Z, -dot(yaxis, eye)},
+                    TVector<T, 4>{-zaxis.X, -zaxis.Y, -zaxis.Z, -dot(zaxis, eye)},
+                    TVector<T, 4>{T(0), T(0), T(0), T(1)},
                 });
             }
         }
@@ -358,12 +358,12 @@ namespace XE {
                 const T zdiff = znear - zfar;
                 const T a = aspect;
 
-                return Matrix<T, 4, 4>::rows({Vector<T, 4>{f / a, T(0), T(0), T(0)}, Vector<T, 4>{T(0), f, T(0), T(0)},
-                                              Vector<T, 4>{T(0), T(0), (zfar + znear) / zdiff, (T(2) * zfar * znear) / zdiff}, Vector<T, 4>{T(0), T(0), T(-1), T(0)}});
+                return Matrix<T, 4, 4>::rows({TVector<T, 4>{f / a, T(0), T(0), T(0)}, TVector<T, 4>{T(0), f, T(0), T(0)},
+                                              TVector<T, 4>{T(0), T(0), (zfar + znear) / zdiff, (T(2) * zfar * znear) / zdiff}, TVector<T, 4>{T(0), T(0), T(-1), T(0)}});
             }
         }
 
-        static auto orthographic(const Vector<T, 3> &pmin, const Vector<T, 3> &pmax) {
+        static auto orthographic(const TVector<T, 3> &pmin, const TVector<T, 3> &pmax) {
             if constexpr (C == 4 && R == 4) {
                 const auto diff = pmax - pmin;
 
@@ -528,8 +528,8 @@ namespace XE {
         return *this;
     }
 
-    template <typename T, int R, int C> Vector<T, R> Matrix<T, R, C>::operator*(const Vector<T, R> &v) const {
-        Vector<T, R> result;
+    template <typename T, int R, int C> TVector<T, R> Matrix<T, R, C>::operator*(const TVector<T, R> &v) const {
+        TVector<T, R> result;
 
         for (int row = 0; row < R; row++) {
             result[row] = dot(getRow(row), v);
@@ -538,8 +538,8 @@ namespace XE {
         return result;
     }
 
-    template <typename T, int R, int C> Vector<T, C> operator*(const Vector<T, C> &v, const Matrix<T, R, C> &m) {
-        Vector<T, C> result;
+    template <typename T, int R, int C> TVector<T, C> operator*(const TVector<T, C> &v, const Matrix<T, R, C> &m) {
+        TVector<T, C> result;
 
         for (int col = 0; col < C; col++) {
             result[col] = dot(m.getColumn(col), v);

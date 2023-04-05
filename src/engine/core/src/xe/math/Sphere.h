@@ -12,7 +12,7 @@ namespace XE {
      * @brief Sphere in the 3-space
      */
     template <typename T> struct Sphere {
-        Vector<T, 3> center;
+        TVector<T, 3> center;
         T radius = static_cast<T>(1);
 
         Sphere() : center({static_cast<T>(0), static_cast<T>(0), static_cast<T>(0)}), radius(static_cast<T>(1)) {}
@@ -25,7 +25,7 @@ namespace XE {
         /**
          * @brief Initializes a Sphere from the given center and radius
          */
-        Sphere(const Vector<T, 3> &center, T radius) : center(center), radius(radius) { assert(radius >= static_cast<T>(0)); }
+        Sphere(const TVector<T, 3> &center, T radius) : center(center), radius(radius) { assert(radius >= static_cast<T>(0)); }
     };
 
     template <typename T> struct Ray;
@@ -34,14 +34,14 @@ namespace XE {
      * @brief Test for collisions between a Sphere and a Ray
      */
     template <typename T> T test(const Sphere<T> &sphere, const Ray<T> &ray) {
-        const Vector<T, 3> &r0 = ray.position;
-        const Vector<T, 3> &d = ray.direction;
+        const TVector<T, 3> &r0 = ray.position;
+        const TVector<T, 3> &d = ray.direction;
 
-        const Vector<T, 3> &c = sphere.center;
+        const TVector<T, 3> &c = sphere.center;
         const T r = sphere.radius;
         const T r_2 = r * r;
 
-        const Vector<T, 3> r0_sub_c = r0 - c;
+        const TVector<T, 3> r0_sub_c = r0 - c;
         const T r0_c_2 = norm2(r0_sub_c);
 
         const T B = T(2) * dot(d, r0_sub_c);

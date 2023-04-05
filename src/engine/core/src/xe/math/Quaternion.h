@@ -23,7 +23,7 @@ namespace XE {
     template <typename T> struct TQuaternion {
         union {
             struct {
-                Vector<T, 3> V;
+                TVector<T, 3> V;
                 T W;
             };
 
@@ -54,7 +54,7 @@ namespace XE {
             W = w;
         }
 
-        explicit TQuaternion(const Vector<T, 3> &v) {
+        explicit TQuaternion(const TVector<T, 3> &v) {
             V = v;
             W = T(0);
         }
@@ -66,12 +66,12 @@ namespace XE {
             W = T(0);
         }
 
-        TQuaternion(const Vector<T, 3> &v, T w) {
+        TQuaternion(const TVector<T, 3> &v, T w) {
             V = v;
             W = w;
         }
 
-        explicit TQuaternion(const Vector<T, 4> &v) {
+        explicit TQuaternion(const TVector<T, 4> &v) {
             V.X = v.X;
             V.Y = v.Y;
             V.Z = v.Z;
@@ -124,7 +124,7 @@ namespace XE {
             }
         }
 
-        explicit operator Vector<T, 4>() const { return {V.X, V.Y, V.Z, W}; }
+        explicit operator TVector<T, 4>() const { return {V.X, V.Y, V.Z, W}; }
 
         TQuaternion<T> operator+(const TQuaternion<T> &rhs) const {
             TQuaternion<T> result;
@@ -267,7 +267,7 @@ namespace XE {
      */
     template <typename T> TQuaternion<T> normalize(const TQuaternion<T> &q) { return q / norm(q); }
 
-    template <typename T> Vector<T, 3> transform(const TQuaternion<T> &q, const Vector<T, 3> &v) { return (q * TQuaternion<T>(v) * inverse(q)).V; }
+    template <typename T> TVector<T, 3> transform(const TQuaternion<T> &q, const TVector<T, 3> &v) { return (q * TQuaternion<T>(v) * inverse(q)).V; }
 
     template<typename T> TQuaternion<T> quatId() {
         return TQuaternion<T>({T(0), T(0), T(0)}, T(1));
@@ -277,7 +277,7 @@ namespace XE {
         return TQuaternion<T>({T(0), T(0), T(0)}, T(0));
     }
 
-    template<typename T> TQuaternion<T> quatRotationRH(const Vector<T, 3> &axis, const T radians) {
+    template<typename T> TQuaternion<T> quatRotationRH(const TVector<T, 3> &axis, const T radians) {
         assert(equals(norm(axis), T{1}) && "Axis should be normalized");
 
         const T angle = T{0.5} * radians;
@@ -285,7 +285,7 @@ namespace XE {
         return TQuaternion<T>(std::sin(angle) * axis, std::cos(angle));
     }
 
-    template<typename T> TQuaternion<T> quatRotationLH(const Vector<T, 3> &axis, const T radians) {
+    template<typename T> TQuaternion<T> quatRotationLH(const TVector<T, 3> &axis, const T radians) {
         assert(equals(norm(axis), T{1}) && "Axis should be normalized");
 
         const T angle = T{0.5} * radians;

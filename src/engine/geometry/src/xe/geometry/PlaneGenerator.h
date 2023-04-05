@@ -19,7 +19,7 @@ namespace XE {
     // TODO: Add control parameter for the Face Vertex Ordering
     template <typename T> class PlaneGenerator {
     public:
-        PlaneGenerator(const Vector2i &division, const Vector<T, 2> &size, const Plane<T> &plane) {
+        PlaneGenerator(const Vector2i &division, const TVector<T, 2> &size, const Plane<T> &plane) {
             assert(division.X > 0);
             assert(division.Y > 0);
             assert(size.X > 0.0f);
@@ -34,7 +34,7 @@ namespace XE {
         }
 
     public:
-        void generate(Vector<T, 3> *coordinates, Vector<T, 3> *normals, Vector<T, 2> *textureCoordinates) const {
+        void generate(TVector<T, 3> *coordinates, TVector<T, 3> *normals, TVector<T, 2> *textureCoordinates) const {
             const int slices = division.X;
             const int stacks = division.Y;
 
@@ -93,11 +93,11 @@ namespace XE {
         int getIndexCount() const { return indexCount; }
 
     private:
-        Vector<T, 3> computeCoordinate(const T ti, const T tj) const { return {lerp(T(-0.5), T(0.5), tj), lerp(T(0.5), T(-0.5), ti), T(0.0)}; }
+        TVector<T, 3> computeCoordinate(const T ti, const T tj) const { return {lerp(T(-0.5), T(0.5), tj), lerp(T(0.5), T(-0.5), ti), T(0.0)}; }
 
-        Vector<T, 3> computeNormal(const T ti, const T tj) const { return {T(0), T(0), T(-1)}; }
+        TVector<T, 3> computeNormal(const T ti, const T tj) const { return {T(0), T(0), T(-1)}; }
 
-        Vector<T, 2> computeTextureCoordinate(const T ti, const T tj) const { return {lerp(T(0), T(1), tj), lerp(T(1), T(0), ti)}; }
+        TVector<T, 2> computeTextureCoordinate(const T ti, const T tj) const { return {lerp(T(0), T(1), tj), lerp(T(1), T(0), ti)}; }
 
         int computeVertexCount() const {
             const int slices = division.X;
@@ -115,7 +115,7 @@ namespace XE {
 
     private:
         Vector2i division;
-        Vector<T, 2> size;
+        TVector<T, 2> size;
         Plane<T> plane;
 
         int vertexCount;

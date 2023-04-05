@@ -10,14 +10,14 @@ namespace XE {
      * @brief Ray with normalized direction in the 3-space
      */
     template <typename T> struct Ray {
-        Vector<T, 3> position;
-        Vector<T, 3> direction;
+        TVector<T, 3> position;
+        TVector<T, 3> direction;
 
         /**
          * @brief Computes the point of the ray at 't' distance from the starting point, to the
          * direction of the ray.
          */
-        Vector<T, 3> pointAt(const T t) const { return position + t * direction; }
+        TVector<T, 3> pointAt(const T t) const { return position + t * direction; }
 
         /**
          * @brief Initializes the ray, positioned around the origin and aiming to the positive Z-axis.

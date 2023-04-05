@@ -7,21 +7,21 @@
 
 namespace XE {
     template <typename T> struct Triangle {
-        Vector<T, 3> P1;
-        Vector<T, 3> P2;
-        Vector<T, 3> P3;
+        TVector<T, 3> P1;
+        TVector<T, 3> P2;
+        TVector<T, 3> P3;
 
         Triangle() {}
 
-        Triangle(const Vector<T, 3> &p1, const Vector<T, 3> &p2, const Vector<T, 3> &p3) {
+        Triangle(const TVector<T, 3> &p1, const TVector<T, 3> &p2, const TVector<T, 3> &p3) {
             P1 = p1;
             P2 = p2;
             P3 = p3;
         }
 
-        Vector<T, 3> computeNormal() const { return normalize(computeNormalUnnormalized()); }
+        TVector<T, 3> computeNormal() const { return normalize(computeNormalUnnormalized()); }
 
-        Vector<T, 3> computeNormalUnnormalized() const { return cross((P2 - P1), P3 - P1); }
+        TVector<T, 3> computeNormalUnnormalized() const { return cross((P2 - P1), P3 - P1); }
     };
 
     /*

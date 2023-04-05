@@ -45,11 +45,12 @@ using XE::SubsetEnvelope;
 using XE::Texture2D;
 using XE::Uniform;
 using XE::UniformMatrix;
-using XE::Vector;
+using XE::UniformMatrix;
 using XE::Vector2i;
 using XE::Vector3f;
 using XE::Vector4f;
 using XE::WindowGLFW;
+using XE::TVector;
 
 namespace Sandbox {
     void Camera::update(const float seconds, const bool moveForward, const bool moveBackward, const bool turnLeft, const bool turnRight) {
@@ -175,11 +176,11 @@ namespace Sandbox {
         const PixelFormat sourceFormat = PixelFormat::R8G8B8A8;
         const DataType sourceDataType = DataType::UInt8;
 
-        std::vector<Vector<std::uint8_t, 4>> pixels;
+        std::vector<TVector<std::uint8_t, 4>> pixels;
 
         pixels.resize(width * height);
 
-        for (Vector<std::uint8_t, 4> &pixel : pixels) {
+        for (TVector<std::uint8_t, 4> &pixel : pixels) {
             pixel = (color * Vector4f{255.0f}).cast<std::uint8_t>();
         }
 

@@ -26,7 +26,7 @@ namespace XE {
         virtual PixelFormat getFormat() const = 0;
 
         /**
-         * @brief Get the image dimensions as a 2D Integer Vector, in pixels.
+         * @brief Get the image dimensions as a 2D Integer TVector, in pixels.
          */
         virtual Vector2i getSize() const = 0;
     };

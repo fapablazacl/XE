@@ -43,11 +43,11 @@ namespace XE {
     public:
         Boundary() {}
 
-        explicit Boundary(const Vector<T, N> &value) : minEdge(value), maxEdge(value) {}
+        explicit Boundary(const TVector<T, N> &value) : minEdge(value), maxEdge(value) {}
 
-        Boundary(const Vector<T, N> &value1, const Vector<T, N> &value2) : Boundary(value1) { expand(value2); }
+        Boundary(const TVector<T, N> &value1, const TVector<T, N> &value2) : Boundary(value1) { expand(value2); }
 
-        void expand(const Vector<T, N> &value) {
+        void expand(const TVector<T, N> &value) {
             minEdge = minimize(minEdge, value);
             maxEdge = maximize(maxEdge, value);
         }
@@ -57,13 +57,13 @@ namespace XE {
             expand(other.maxEdge);
         }
 
-        Vector<T, N> getMinEdge() const { return minEdge; }
+        TVector<T, N> getMinEdge() const { return minEdge; }
 
-        Vector<T, N> getMaxEdge() const { return maxEdge; }
+        TVector<T, N> getMaxEdge() const { return maxEdge; }
 
-        Vector<T, N> getSize() const { return maxEdge - minEdge; }
+        TVector<T, N> getSize() const { return maxEdge - minEdge; }
 
-        Vector<T, N> getCenter() const { return minEdge + ((maxEdge - minEdge) / T(2)); }
+        TVector<T, N> getCenter() const { return minEdge + ((maxEdge - minEdge) / T(2)); }
 
         bool isValid() const {
             for (int i = 0; i < N; i++) {
@@ -75,7 +75,7 @@ namespace XE {
             return true;
         }
 
-        bool isInside(const Vector<T, N> &point) const {
+        bool isInside(const TVector<T, N> &point) const {
             for (int i = 0; i < N; ++i) {
                 const T value = point[i];
 
@@ -87,7 +87,7 @@ namespace XE {
             return true;
         }
 
-        Vector<T, N> getEdge(int pointIndex) const {
+        TVector<T, N> getEdge(int pointIndex) const {
             assert(pointIndex >= MinEdge);
             assert(pointIndex <= MaxEdge);
 
@@ -101,7 +101,7 @@ namespace XE {
 
             auto edges = &minEdge;
 
-            Vector<T, N> point;
+            TVector<T, N> point;
             for (int i = 0; i < N; ++i) {
                 const int remainder = pointIndex % 2;
                 pointIndex /= 2;
@@ -116,9 +116,9 @@ namespace XE {
          *
          * @note Only implemented for N=2 and N=3 cases.
          *
-         * @return std::array<Vector<T, N>, SideCount>
+         * @return std::array<TVector<T, N>, SideCount>
          */
-        std::array<Vector<T, N>, SideCount> getNormals() const {
+        std::array<TVector<T, N>, SideCount> getNormals() const {
             if constexpr (N == 2) {
                 return {Vector2<T>{static_cast<T>(-1), static_cast<T>(0)}, Vector2<T>{static_cast<T>(0), static_cast<T>(-1)}, Vector2<T>{static_cast<T>(1), static_cast<T>(0)},
                         Vector2<T>{static_cast<T>(0), static_cast<T>(1)}};
@@ -157,10 +157,10 @@ namespace XE {
         /**
          * @brief Get all the Edges (vertices) from the Box.
          *
-         * @return std::array<Vector<T, N>, PointCount>
+         * @return std::array<TVector<T, N>, PointCount>
          */
-        std::array<Vector<T, N>, PointCount> getEdges() const {
-            std::array<Vector<T, N>, PointCount> result;
+        std::array<TVector<T, N>, PointCount> getEdges() const {
+            std::array<TVector<T, N>, PointCount> result;
 
             for (int i = 0; i < PointCount; i++) {
                 result[i] = getEdge(i);
@@ -176,7 +176,7 @@ namespace XE {
          *
          * @return Projection
          */
-        Range<T> project(const Vector<T, N> &normal) const {
+        Range<T> project(const TVector<T, N> &normal) const {
             const auto edges = getEdges();
 
             Range<T> range{dot(edges[0], normal)};
@@ -192,8 +192,8 @@ namespace XE {
         }
 
     private:
-        Vector<T, N> minEdge;
-        Vector<T, N> maxEdge;
+        TVector<T, N> minEdge;
+        TVector<T, N> maxEdge;
     };
 } // namespace XE
 
