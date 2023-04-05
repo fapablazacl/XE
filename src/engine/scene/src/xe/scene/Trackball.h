@@ -32,9 +32,9 @@ namespace XE {
         VirtualSphere getVirtualSphere() const { return vsphere; }
 
     private:
-        Vector2f scalePosition(const Vector2i &position) const;
+        Vector2 scalePosition(const Vector2i &position) const;
 
-        Vector3f computeSpherePosition(const Vector2f &normalizedPosition) const;
+        Vector3 computeSpherePosition(const Vector2 &normalizedPosition) const;
 
     private:
         VirtualSphere vsphere;

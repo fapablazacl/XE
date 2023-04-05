@@ -160,7 +160,7 @@ namespace XE {
         glBindVertexArray(0);
     }
 
-    void GraphicsDeviceGL::beginFrame(const ClearFlags flags, const Vector4f &color, const float depth, const int stencil) {
+    void GraphicsDeviceGL::beginFrame(const ClearFlags flags, const Vector4 &color, const float depth, const int stencil) {
         GLenum clearFlagsGL = 0;
 
         if (flags & ClearFlags::Color) {

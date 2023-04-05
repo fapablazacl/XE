@@ -119,13 +119,13 @@ namespace XE {
 
         void setState(const ControllerButton button, const BinaryState state);
 
-        Vector2f getState(const ControllerJoystick joystick) const;
+        Vector2 getState(const ControllerJoystick joystick) const;
 
-        void setState(const ControllerJoystick joystick, const Vector2f &state);
+        void setState(const ControllerJoystick joystick, const Vector2 &state);
 
     private:
         BinaryState m_buttons[static_cast<int>(ControllerButton::Max)];
-        Vector2f m_joysticks[static_cast<int>(ControllerJoystick::Max)];
+        Vector2 m_joysticks[static_cast<int>(ControllerJoystick::Max)];
     };
 } // namespace XE
 

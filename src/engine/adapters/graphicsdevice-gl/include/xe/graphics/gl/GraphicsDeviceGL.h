@@ -43,7 +43,7 @@ namespace XE {
 
         void applyUniform(const Uniform *uniform, const size_t count, const void *data) override;
 
-        void beginFrame(const ClearFlags flags, const Vector4f &color, const float depth, const int stencil) override;
+        void beginFrame(const ClearFlags flags, const Vector4 &color, const float depth, const int stencil) override;
 
         void draw(const Subset *subset, const SubsetEnvelope *envelopes, const size_t envelopeCount) override;
 

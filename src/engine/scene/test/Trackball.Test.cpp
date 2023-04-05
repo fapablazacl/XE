@@ -38,7 +38,7 @@ TEST(TrackballTest, ComputeRotationGeneratesAnEmptyRotationWhenStartAndEndPoints
 
 //    auto rotation = trackball.computeRotation();
 
-//    EXPECT_EQ(rotation.axis, XE::Vector3f{0.0f, 1.0f, 0.0f});
+//    EXPECT_EQ(rotation.axis, XE::Vector3{0.0f, 1.0f, 0.0f});
 //    EXPECT_EQ(rotation.angle > 0.0f);
 //}
 
@@ -51,6 +51,6 @@ TEST(TrackballTest, ComputeRotationGeneratesAnEmptyRotationWhenStartAndEndPoints
 
 //    auto rotation = trackball.computeRotation();
 
-//    EXPECT_EQ(rotation.axis, XE::Vector3f{1.0f, 0.0f, 0.0f});
+//    EXPECT_EQ(rotation.axis, XE::Vector3{1.0f, 0.0f, 0.0f});
 //    EXPECT_EQ(rotation.angle > 0.0f);
 //}

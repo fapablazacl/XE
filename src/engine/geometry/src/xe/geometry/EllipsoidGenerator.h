@@ -10,15 +10,15 @@
 namespace XE {
     class EllipsoidGenerator : public ShapeGenerator {
     public:
-        EllipsoidGenerator(const int slices, const int stacks, const Vector3f &dimensions);
+        EllipsoidGenerator(const int slices, const int stacks, const Vector3 &dimensions);
 
         virtual ~EllipsoidGenerator();
 
-        virtual std::vector<Vector3f> generateVertexCoordinates() const override;
+        virtual std::vector<Vector3> generateVertexCoordinates() const override;
 
-        virtual std::vector<Vector3f> generateVertexNormals() const override;
+        virtual std::vector<Vector3> generateVertexNormals() const override;
 
-        virtual std::vector<Vector2f> generateVertexTexCoords() const override;
+        virtual std::vector<Vector2> generateVertexTexCoords() const override;
 
         virtual std::vector<int> generateIndices() const override;
 
@@ -26,7 +26,7 @@ namespace XE {
         int slices = 0;
         int stacks = 0;
 
-        Vector3f dimensions;
+        Vector3 dimensions;
     };
 } // namespace XE
 

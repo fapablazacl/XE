@@ -13,28 +13,28 @@ namespace XE {
      */
     class BoxGenerator : public ShapeGenerator {
     public:
-        BoxGenerator(const Vector3i &division, const Vector3f &size);
+        BoxGenerator(const Vector3i &division, const Vector3 &size);
 
         virtual ~BoxGenerator();
 
-        virtual std::vector<Vector3f> generateVertexCoordinates() const override;
+        virtual std::vector<Vector3> generateVertexCoordinates() const override;
 
-        virtual std::vector<Vector3f> generateVertexNormals() const override;
+        virtual std::vector<Vector3> generateVertexNormals() const override;
 
-        virtual std::vector<Vector2f> generateVertexTexCoords() const override;
+        virtual std::vector<Vector2> generateVertexTexCoords() const override;
 
         virtual std::vector<int> generateIndices() const override;
 
     private:
-        std::vector<Vector3f> generateBaseCoords() const;
+        std::vector<Vector3> generateBaseCoords() const;
 
-        std::vector<Vector3f> generateBaseNormals() const;
+        std::vector<Vector3> generateBaseNormals() const;
 
-        std::vector<Vector2f> generateBaseTexCoords() const;
+        std::vector<Vector2> generateBaseTexCoords() const;
 
     private:
         Vector3i division;
-        Vector3f size;
+        Vector3 size;
     };
 } // namespace XE
 

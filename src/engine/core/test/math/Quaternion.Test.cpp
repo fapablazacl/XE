@@ -40,7 +40,7 @@ TEST(QuaternionTest, Vector3ConstructorConstructorInitializesTheVectorPart) {
 }
 
 TEST(QuaternionTest, Vector4ConstructorConstructorInitializesTheVectorPart) {
-    const auto v = XE::Vector4f{0.0f, 1.0f, 0.0f, 10.0f};
+    const auto v = XE::Vector4{0.0f, 1.0f, 0.0f, 10.0f};
     const auto q = XE::Quat{v};
 
     EXPECT_FLOAT_EQ(q.V.X, 0.0f);
@@ -163,7 +163,7 @@ TEST(QuaternionTest, IdentityQuaternionFactoryMethodInitializesScalarPartToOne) 
 
 TEST(QuaternionTest, RotationRHQuaternionFactoryMethodInitializesNormalizedQuaternionWithHalfAngleCosine) {
     const float radians = XE::pi<float>;
-    const XE::Vector3f axis {0.0f, 1.0f, 0.0f};
+    const XE::Vector3 axis {0.0f, 1.0f, 0.0f};
 
     const auto subject = XE::quatRotationRH<float>(axis, radians);
     const auto correct = XE::normalize(XE::Quat{ axis * std::sin(radians * 0.5f), std::cos(radians * 0.5f)});
@@ -177,7 +177,7 @@ TEST(QuaternionTest, RotationRHQuaternionFactoryMethodInitializesNormalizedQuate
 
 TEST(QuaternionTest, RotationLHQuaternionFactoryMethodInitializesNormalizedQuaternionWithHalfAngleCosine) {
     const float radians = XE::pi<float>;
-    const XE::Vector3f axis {0.0f, 1.0f, 0.0f};
+    const XE::Vector3 axis {0.0f, 1.0f, 0.0f};
 
     const auto subject = XE::quatRotationLH<float>(axis, radians);
     const auto correct = XE::normalize(XE::Quat{ axis * std::sin(radians * 0.5f), std::cos(radians * 0.5f)});
@@ -446,7 +446,7 @@ TEST(QuaternionTest, InverseShouldComputeAnNormalizedCongujatedQuaternion) {
 
 TEST(QuaternionTest, TransformShouldRotatePointVector) {
     const auto rotation= XE::quatRotationRH<float>({0.0f, 1.0f, 0.0f}, XE::pi<float> * 0.5);
-    const auto point = XE::Vector3f{1.0f, 0.0f, 0.0f};
+    const auto point = XE::Vector3{1.0f, 0.0f, 0.0f};
     const auto result = XE::transform(rotation, point);
 
     EXPECT_FLOAT_EQ(result.X, 0.0f);

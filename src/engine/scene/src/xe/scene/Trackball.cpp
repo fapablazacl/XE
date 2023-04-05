@@ -14,21 +14,21 @@ namespace XE {
 
     Rotation<float> Trackball::computeRotation() const { return {0.0f, {0.0f, 0.0f, 0.0f}}; }
 
-    Vector2f Trackball::scalePosition(const Vector2i &position) const {
+    Vector2 Trackball::scalePosition(const Vector2i &position) const {
         // map position to the [-1, 1]^2 range domain
-        const Vector2f position_f = position;
-        const Vector2f size_f = vsphere.getScreenSize();
-        const Vector2f mappedPosition = (position_f / (0.5f * size_f)) - Vector2f{1.0f};
+        const Vector2 position_f = position;
+        const Vector2 size_f = vsphere.getScreenSize();
+        const Vector2 mappedPosition = (position_f / (0.5f * size_f)) - Vector2{1.0f};
 
         return mappedPosition;
     }
 
-    Vector3f Trackball::computeSpherePosition(const Vector2f &scaledPosition) const {
+    Vector3 Trackball::computeSpherePosition(const Vector2 &scaledPosition) const {
         const auto sp = scaledPosition;
         const auto sp_length_squared = norm2(sp);
 
         if (sp_length_squared > 1.0f) {
-            return normalize(Vector3f{sp, 0.0f});
+            return normalize(Vector3{sp, 0.0f});
         }
 
         return {sp, std::sqrt(1.0f - sp_length_squared)};

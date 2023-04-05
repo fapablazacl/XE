@@ -20,7 +20,7 @@ namespace demo {
     Mesh makeIndexedCubeMesh(const float width, const float height, const float depth) {
         Mesh mesh;
 
-        const XE::Vector3f n = {0.0f, 0.0f, 1.0};
+        const XE::Vector3 n = {0.0f, 0.0f, 1.0};
 
         const std::vector<Vertex> vertices = {
             {{-0.5f * width, -0.5f * height, 0.5f * depth}, n, {1.0f, 0.0f, 0.0f, 1.0f}},  {{0.5f * width, -0.5f * height, 0.5f * depth}, n, {0.0f, 1.0f, 0.0f, 1.0f}},
@@ -48,9 +48,9 @@ namespace demo {
                 p3 = vertices[indices[i + 1]];
             }
 
-            const XE::Vector3f edge1 = p2.coord - p1.coord;
-            const XE::Vector3f edge2 = p3.coord - p1.coord;
-            const XE::Vector3f normal = XE::normalize(XE::cross(edge1, edge2));
+            const XE::Vector3 edge1 = p2.coord - p1.coord;
+            const XE::Vector3 edge2 = p3.coord - p1.coord;
+            const XE::Vector3 normal = XE::normalize(XE::cross(edge1, edge2));
 
             p1.normal = normal;
             p2.normal = normal;
@@ -67,7 +67,7 @@ namespace demo {
     }
 
     Mesh makeAxisMesh(const float width, const float height, const float depth) {
-        const XE::Vector3f n = {0.0f, 1.0f, 0.0};
+        const XE::Vector3 n = {0.0f, 1.0f, 0.0};
 
         Mesh mesh;
 
@@ -82,7 +82,7 @@ namespace demo {
     }
 
     Mesh makeColoredCubeMesh(const float width, const float height, const float depth) {
-        const XE::Vector3f n = {0.0f, 0.0f, 1.0};
+        const XE::Vector3 n = {0.0f, 0.0f, 1.0};
 
         Mesh mesh;
 
@@ -112,9 +112,9 @@ namespace demo {
                 p3 = vertices[indices[i + 2]];
             }
 
-            const XE::Vector3f edge1 = p2.coord - p1.coord;
-            const XE::Vector3f edge2 = p3.coord - p1.coord;
-            const XE::Vector3f normal = XE::normalize(XE::cross(edge1, edge2));
+            const XE::Vector3 edge1 = p2.coord - p1.coord;
+            const XE::Vector3 edge2 = p3.coord - p1.coord;
+            const XE::Vector3 normal = XE::normalize(XE::cross(edge1, edge2));
 
             p1.normal = normal;
             p2.normal = normal;
@@ -131,7 +131,7 @@ namespace demo {
     }
 
     Mesh makeCubeMesh(const float width, const float height, const float depth) {
-        const XE::Vector3f n = {0.0f, 1.0f, 0.0};
+        const XE::Vector3 n = {0.0f, 1.0f, 0.0};
 
         Mesh mesh;
 
@@ -161,9 +161,9 @@ namespace demo {
                 p3 = vertices[indices[i + 2]];
             }
 
-            const XE::Vector3f edge1 = p2.coord - p1.coord;
-            const XE::Vector3f edge2 = p3.coord - p1.coord;
-            const XE::Vector3f normal = XE::normalize(XE::cross(edge1, edge2));
+            const XE::Vector3 edge1 = p2.coord - p1.coord;
+            const XE::Vector3 edge2 = p3.coord - p1.coord;
+            const XE::Vector3 normal = XE::normalize(XE::cross(edge1, edge2));
 
             p1.normal = normal;
             p2.normal = normal;
@@ -242,15 +242,15 @@ namespace demo {
     Mesh makeGridMesh(const float tileSize, const int tilesInX, const int tilesInZ) {
         const float half = tileSize * 0.5f;
 
-        const XE::Vector3f normal = {0.0f, 0.0f, 1.0};
+        const XE::Vector3 normal = {0.0f, 0.0f, 1.0};
 
-        const XE::Vector4f white = {0.8f, 0.8f, 0.8f, 1.0f};
-        const XE::Vector4f black = {0.2f, 0.2f, 0.2f, 1.0f};
+        const XE::Vector4 white = {0.8f, 0.8f, 0.8f, 1.0f};
+        const XE::Vector4 black = {0.2f, 0.2f, 0.2f, 1.0f};
 
-        const XE::Vector3f p1 = {-half, 0.0f, -half};
-        const XE::Vector3f p2 = {half, 0.0f, -half};
-        const XE::Vector3f p3 = {-half, 0.0f, half};
-        const XE::Vector3f p4 = {half, 0.0f, half};
+        const XE::Vector3 p1 = {-half, 0.0f, -half};
+        const XE::Vector3 p2 = {half, 0.0f, -half};
+        const XE::Vector3 p3 = {-half, 0.0f, half};
+        const XE::Vector3 p4 = {half, 0.0f, half};
 
         Mesh mesh;
 
@@ -258,7 +258,7 @@ namespace demo {
 
         for (int i = 0; i < tilesInX; i++) {
             for (int k = 0; k < tilesInZ; k++) {
-                const XE::Vector3f centroid = {i * tileSize - half * tilesInX, 0.0f, k * tileSize - half * tilesInZ};
+                const XE::Vector3 centroid = {i * tileSize - half * tilesInX, 0.0f, k * tileSize - half * tilesInZ};
 
                 const auto color = colorSide ? white : black;
 
@@ -270,13 +270,13 @@ namespace demo {
                 mesh.vertices.push_back({p4 + centroid, normal, color});
                 mesh.vertices.push_back({p3 + centroid, normal, color});
 
-                const XE::Vector3f p1 = mesh.vertices[mesh.vertices.size() - 3].coord;
-                const XE::Vector3f p2 = mesh.vertices[mesh.vertices.size() - 2].coord;
-                const XE::Vector3f p3 = mesh.vertices[mesh.vertices.size() - 1].coord;
+                const XE::Vector3 p1 = mesh.vertices[mesh.vertices.size() - 3].coord;
+                const XE::Vector3 p2 = mesh.vertices[mesh.vertices.size() - 2].coord;
+                const XE::Vector3 p3 = mesh.vertices[mesh.vertices.size() - 1].coord;
 
-                const XE::Vector3f edge1 = p2 - p1;
-                const XE::Vector3f edge2 = p3 - p1;
-                const XE::Vector3f normal = XE::normalize(XE::cross(edge1, edge2));
+                const XE::Vector3 edge1 = p2 - p1;
+                const XE::Vector3 edge2 = p3 - p1;
+                const XE::Vector3 normal = XE::normalize(XE::cross(edge1, edge2));
 
                 for (int ii = 0; ii < 6; ii++) {
                     mesh.vertices[mesh.vertices.size() - ii - 1].normal = normal;

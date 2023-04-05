@@ -47,8 +47,8 @@ using XE::Uniform;
 using XE::UniformMatrix;
 using XE::UniformMatrix;
 using XE::Vector2i;
-using XE::Vector3f;
-using XE::Vector4f;
+using XE::Vector3;
+using XE::Vector4;
 using XE::WindowGLFW;
 using XE::TVector;
 
@@ -63,9 +63,9 @@ namespace Sandbox {
             turnSpeed = XE::radians(turnSpeedPerSecond * seconds);
         }
 
-        const auto cdt = Matrix4f::rotate(turnSpeed, up) * Vector4f(cameraDirection, 0.0f);
+        const auto cdt = Matrix4f::rotate(turnSpeed, up) * Vector4(cameraDirection, 0.0f);
 
-        lookAt = position + Vector3f{cdt.X, cdt.Y, cdt.Z} * norm(cameraDirection);
+        lookAt = position + Vector3{cdt.X, cdt.Y, cdt.Z} * norm(cameraDirection);
 
         // camera movement
         const auto cameraSpeed = moveSpeedPerSecond * seconds;
@@ -169,7 +169,7 @@ namespace Sandbox {
         m_graphicsDevice->applyUniform(&matrixLayout, 1, (const void *)&modelViewProj);
     }
 
-    Texture2D *RenderingSystem::createColorTexture(const int width, const int height, const Vector4f &color) {
+    Texture2D *RenderingSystem::createColorTexture(const int width, const int height, const Vector4 &color) {
         const PixelFormat format = PixelFormat::R8G8B8A8;
         const Vector2i size = Vector2i{width, height};
 
@@ -181,7 +181,7 @@ namespace Sandbox {
         pixels.resize(width * height);
 
         for (TVector<std::uint8_t, 4> &pixel : pixels) {
-            pixel = (color * Vector4f{255.0f}).cast<std::uint8_t>();
+            pixel = (color * Vector4{255.0f}).cast<std::uint8_t>();
         }
 
         return m_graphicsDevice->createTexture2D(format, size, sourceFormat, sourceDataType, pixels.data());
@@ -299,22 +299,22 @@ namespace Sandbox {
 
     std::pair<Subset *, SubsetEnvelope> RenderingSystem::createSubset(const MeshPrimitive &meshPrimitive) {
         // create the vertex buffer
-        BufferDescriptor coordBufferDescriptor = {BufferType::Vertex, BufferUsage::Copy, BufferAccess::Static, meshPrimitive.coords.size() * sizeof(Vector3f),
+        BufferDescriptor coordBufferDescriptor = {BufferType::Vertex, BufferUsage::Copy, BufferAccess::Static, meshPrimitive.coords.size() * sizeof(Vector3),
                                                     (const void *)meshPrimitive.coords.data()};
 
         XE::Buffer *coordBuffer = m_graphicsDevice->createBuffer(coordBufferDescriptor);
 
-        BufferDescriptor colorBufferDescriptor = {BufferType::Vertex, BufferUsage::Copy, BufferAccess::Static, meshPrimitive.colors.size() * sizeof(Vector4f),
+        BufferDescriptor colorBufferDescriptor = {BufferType::Vertex, BufferUsage::Copy, BufferAccess::Static, meshPrimitive.colors.size() * sizeof(Vector4),
                                                     (const void *)meshPrimitive.colors.data()};
 
         XE::Buffer *colorBuffer = m_graphicsDevice->createBuffer(colorBufferDescriptor);
 
-        BufferDescriptor normalBufferDescriptor = {BufferType::Vertex, BufferUsage::Copy, BufferAccess::Static, meshPrimitive.normals.size() * sizeof(Vector3f),
+        BufferDescriptor normalBufferDescriptor = {BufferType::Vertex, BufferUsage::Copy, BufferAccess::Static, meshPrimitive.normals.size() * sizeof(Vector3),
                                                     (const void *)meshPrimitive.normals.data()};
 
         XE::Buffer *normalBuffer = m_graphicsDevice->createBuffer(normalBufferDescriptor);
 
-        BufferDescriptor texCoordBufferDescriptor = {BufferType::Vertex, BufferUsage::Copy, BufferAccess::Static, meshPrimitive.texCoords.size() * sizeof(Vector3f),
+        BufferDescriptor texCoordBufferDescriptor = {BufferType::Vertex, BufferUsage::Copy, BufferAccess::Static, meshPrimitive.texCoords.size() * sizeof(Vector3),
                                                         (const void *)meshPrimitive.texCoords.data()};
 
         XE::Buffer *texCoordBuffer = m_graphicsDevice->createBuffer(texCoordBufferDescriptor);

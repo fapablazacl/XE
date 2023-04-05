@@ -33,12 +33,12 @@ namespace Sandbox {
         for (Entity &entity : entities) {
             entity = coordinator.createEntity();
 
-            coordinator.addComponent(entity, Gravity{XE::Vector3f{0.0f, randGravity(randomEngine), 0.0f}});
-            coordinator.addComponent(entity, RigidBody{XE::Vector3f{0.0f, 0.0f, 0.0f}, XE::Vector3f{0.0f, 0.0f, 0.0f}});
+            coordinator.addComponent(entity, Gravity{XE::Vector3{0.0f, randGravity(randomEngine), 0.0f}});
+            coordinator.addComponent(entity, RigidBody{XE::Vector3{0.0f, 0.0f, 0.0f}, XE::Vector3{0.0f, 0.0f, 0.0f}});
             coordinator.addComponent(entity, Transform{
-                XE::Vector3f{randPosition(randomEngine), randPosition(randomEngine), randPosition(randomEngine)},
-                XE::Vector3f{randRotation(randomEngine), randRotation(randomEngine), randRotation(randomEngine)},
-                XE::Vector3f{scale, scale, scale}
+                XE::Vector3{randPosition(randomEngine), randPosition(randomEngine), randPosition(randomEngine)},
+                XE::Vector3{randRotation(randomEngine), randRotation(randomEngine), randRotation(randomEngine)},
+                XE::Vector3{scale, scale, scale}
             });
         }
     }

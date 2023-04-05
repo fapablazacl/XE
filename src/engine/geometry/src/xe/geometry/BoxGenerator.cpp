@@ -5,18 +5,18 @@
 namespace XE {
     const int faceCount = 6;
 
-    BoxGenerator::BoxGenerator(const Vector3i &division, const Vector3f &size) {
+    BoxGenerator::BoxGenerator(const Vector3i &division, const Vector3 &size) {
         this->division = division;
         this->size = size;
     }
 
     BoxGenerator::~BoxGenerator() {}
 
-    std::vector<Vector3f> BoxGenerator::generateVertexCoordinates() const { return {}; }
+    std::vector<Vector3> BoxGenerator::generateVertexCoordinates() const { return {}; }
 
-    std::vector<Vector3f> BoxGenerator::generateVertexNormals() const { return {}; }
+    std::vector<Vector3> BoxGenerator::generateVertexNormals() const { return {}; }
 
-    std::vector<Vector2f> BoxGenerator::generateVertexTexCoords() const { return {}; }
+    std::vector<Vector2> BoxGenerator::generateVertexTexCoords() const { return {}; }
 
     std::vector<int> BoxGenerator::generateIndices() const {
         const int slices = division.X;
@@ -56,10 +56,10 @@ namespace XE {
     //! TODO: Replace with a quaternion object
     struct Rotation {
                 float angle = 0.0f;
-                Vector3f axis = {0.0f, 0.0f, 0.0f};
+                Vector3 axis = {0.0f, 0.0f, 0.0f};
 
                 Rotation() {}
-                Rotation(float angle_, const Vector3f &axis_) : angle(angle_), axis(axis_) {}
+                Rotation(float angle_, const Vector3 &axis_) : angle(angle_), axis(axis_) {}
         };
 
     MeshSubsetGeneratorBox::MeshSubsetGeneratorBox(GraphicsDriver *driver) : MeshSubsetGenerator(driver) {}
@@ -92,9 +92,9 @@ namespace XE {
         const float right = 0.5f;
 
                 // generate primary vertex data
-                std::vector<xe::Vector4f> positions;
-                std::vector<xe::Vector4f> normals;
-                std::vector<xe::Vector4f> texCoords;
+                std::vector<xe::Vector4> positions;
+                std::vector<xe::Vector4> normals;
+                std::vector<xe::Vector4> texCoords;
 
         for (int i=0; i<params.slices + 1; i++) {
             float ti = static_cast<float>(i) / static_cast<float>(params.slices);
@@ -103,7 +103,7 @@ namespace XE {
                 float tj = static_cast<float>(j) / static_cast<float>(params.stacks);
 
                                 // generate position
-                                xe::Vector4f position (
+                                xe::Vector4 position (
                     xe::lerp(-0.5f, 0.5f, tj),
                     xe::lerp(0.5f, -0.5f, ti),
                     -0.5f, 1.0f
@@ -113,12 +113,12 @@ namespace XE {
 
                                 // generate normal
                                 if (params.format->hasAttrib(VertexAttrib::Normal)) {
-                                        normals.push_back(xe::Vector4f(0.0f, 0.0f, -1.0f, 0.0f));
+                                        normals.push_back(xe::Vector4(0.0f, 0.0f, -1.0f, 0.0f));
                                 }
 
                                 // generate texture coords
                                 if (params.format->hasAttrib(VertexAttrib::TexCoord)) {
-                                        xe::Vector4f texCoord (
+                                        xe::Vector4 texCoord (
                                                 xe::lerp( 0.0f, 1.0f, tj),
                                                 xe::lerp( 1.0f, 0.0f, ti),
                                                 0.0f, 1.0f
@@ -133,7 +133,7 @@ namespace XE {
 
                 struct Rotation {
                         float angle;
-                        Vector3f axis;
+                        Vector3 axis;
                 };
 
                 // Generate the rest of the cube using the first face
@@ -155,8 +155,8 @@ namespace XE {
 
                         for (int j=0; j<POINTS_PER_FACE_COUNT; j++) {
 
-                                const Vector4f vertexPosition = transform(rotationMatrix, positions[j]);
-                                const Vector4f vertexNormal	= transform(rotationMatrix, normals[j]);
+                                const Vector4 vertexPosition = transform(rotationMatrix, positions[j]);
+                                const Vector4 vertexNormal	= transform(rotationMatrix, normals[j]);
 
                                 const int vertexIndex = i*POINTS_PER_FACE_COUNT + j;
 
@@ -165,7 +165,7 @@ namespace XE {
                                 array.setValue(vertexIndex, VertexAttrib::TexCoord, texCoords[j]);
 
 #if defined(EXENG_DEBUG)
-                                xe::Vector4f testPosition, testNormal, testTexCoord;
+                                xe::Vector4 testPosition, testNormal, testTexCoord;
                                 array.getAttribValue(vertexIndex, VertexAttrib::Position, &testPosition);
                                 array.getAttribValue(vertexIndex, VertexAttrib::Normal, &testNormal);
                                 array.getAttribValue(vertexIndex, VertexAttrib::TexCoord, &testTexCoord);

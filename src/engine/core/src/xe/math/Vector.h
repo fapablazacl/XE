@@ -407,9 +407,9 @@ namespace XE {
     using Vector3i = TVector3<std::int32_t>;
     using Vector4i = TVector4<std::int32_t>;
 
-    using Vector2f = TVector2<float>;
-    using Vector3f = TVector3<float>;
-    using Vector4f = TVector4<float>;
+    using Vector2 = TVector2<float>;
+    using Vector3 = TVector3<float>;
+    using Vector4 = TVector4<float>;
 
     using Vector2d = TVector2<double>;
     using Vector3d = TVector3<double>;

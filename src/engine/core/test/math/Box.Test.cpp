@@ -7,24 +7,24 @@
 TEST(BoxTest, DefaultConstructorZeroesEdges) {
     XE::Boxf box;
 
-    EXPECT_EQ(box.getMinEdge(), XE::Vector3f(0.0f, 0.0f, 0.0f));
-    EXPECT_EQ(box.getMaxEdge(), XE::Vector3f(0.0f, 0.0f, 0.0f));
+    EXPECT_EQ(box.getMinEdge(), XE::Vector3(0.0f, 0.0f, 0.0f));
+    EXPECT_EQ(box.getMaxEdge(), XE::Vector3(0.0f, 0.0f, 0.0f));
     EXPECT_EQ(box.isValid(), true);
 }
 
 TEST(BoxTest, ConstructorFromOneVectorInitializeEdges) {
     XE::Boxf box{{1.0f, 2.0f, 3.0f}};
 
-    EXPECT_EQ(box.getMinEdge(), XE::Vector3f(1.0f, 2.0f, 3.0f));
-    EXPECT_EQ(box.getMaxEdge(), XE::Vector3f(1.0f, 2.0f, 3.0f));
+    EXPECT_EQ(box.getMinEdge(), XE::Vector3(1.0f, 2.0f, 3.0f));
+    EXPECT_EQ(box.getMaxEdge(), XE::Vector3(1.0f, 2.0f, 3.0f));
     EXPECT_EQ(box.isValid(), true);
 }
 
 TEST(BoxTest, ConstructorFromTwoVectorsInitalizeEdges) {
     XE::Boxf box{{1.0f, 2.0f, -3.0f}, {-1.0f, 8.0f, 3.0f}};
 
-    EXPECT_EQ(box.getMinEdge(), XE::Vector3f(-1.0f, 2.0f, -3.0f));
-    EXPECT_EQ(box.getMaxEdge(), XE::Vector3f(1.0f, 8.0f, 3.0f));
+    EXPECT_EQ(box.getMinEdge(), XE::Vector3(-1.0f, 2.0f, -3.0f));
+    EXPECT_EQ(box.getMaxEdge(), XE::Vector3(1.0f, 8.0f, 3.0f));
     EXPECT_EQ(box.isValid(), true);
 }
 
@@ -45,17 +45,17 @@ TEST_CASE("Box's attributes change based on values supplied via constructors and
         SECTION("getEdge() should generate the all the points from the different scalar components of the inner min and max edges") {
             box = {{-1.0f, -1.0f, -1.0f}, {1.0f, 1.0f, 1.0f}};
 
-            REQUIRE(box.getEdge(0) == XE::Vector3f{-1.0f, -1.0f, -1.0f});
-            REQUIRE(box.getEdge(1) == XE::Vector3f{1.0f, -1.0f, -1.0f});
+            REQUIRE(box.getEdge(0) == XE::Vector3{-1.0f, -1.0f, -1.0f});
+            REQUIRE(box.getEdge(1) == XE::Vector3{1.0f, -1.0f, -1.0f});
 
-            REQUIRE(box.getEdge(2) == XE::Vector3f{-1.0f, 1.0f, -1.0f});
-            REQUIRE(box.getEdge(3) == XE::Vector3f{1.0f, 1.0f, -1.0f});
+            REQUIRE(box.getEdge(2) == XE::Vector3{-1.0f, 1.0f, -1.0f});
+            REQUIRE(box.getEdge(3) == XE::Vector3{1.0f, 1.0f, -1.0f});
 
-            REQUIRE(box.getEdge(4) == XE::Vector3f{-1.0f, -1.0f, 1.0f});
-            REQUIRE(box.getEdge(5) == XE::Vector3f{1.0f, -1.0f, 1.0f});
+            REQUIRE(box.getEdge(4) == XE::Vector3{-1.0f, -1.0f, 1.0f});
+            REQUIRE(box.getEdge(5) == XE::Vector3{1.0f, -1.0f, 1.0f});
 
-            REQUIRE(box.getEdge(6) == XE::Vector3f{-1.0f, 1.0f, 1.0f});
-            REQUIRE(box.getEdge(7) == XE::Vector3f{1.0f, 1.0f, 1.0f});
+            REQUIRE(box.getEdge(6) == XE::Vector3{-1.0f, 1.0f, 1.0f});
+            REQUIRE(box.getEdge(7) == XE::Vector3{1.0f, 1.0f, 1.0f});
         }
     }
 
@@ -73,34 +73,34 @@ TEST_CASE("Box's attributes change based on values supplied via constructors and
     }
 
     SECTION("getSize() should return a vector with the computed size") {
-        REQUIRE(box.getSize() == XE::Vector3f{2.0f, 6.0f, 6.0f});
+        REQUIRE(box.getSize() == XE::Vector3{2.0f, 6.0f, 6.0f});
     }
 
     SECTION("getCenter() should return a vector with the computed center of the Box") {
-        REQUIRE(box.getCenter() == XE::Vector3f{0.0f, 5.0f, 0.0f});
+        REQUIRE(box.getCenter() == XE::Vector3{0.0f, 5.0f, 0.0f});
     }
 
     SECTION("expand() should not mutate the state when using it with a point inside the Box") {
         box.expand(box.getCenter());
 
-        REQUIRE(box.getSize() == XE::Vector3f{2.0f, 6.0f, 6.0f});
-        REQUIRE(box.getCenter() == XE::Vector3f{0.0f, 5.0f, 0.0f});
+        REQUIRE(box.getSize() == XE::Vector3{2.0f, 6.0f, 6.0f});
+        REQUIRE(box.getCenter() == XE::Vector3{0.0f, 5.0f, 0.0f});
     }
 
     SECTION("expand() should not mutate the state when using it with a point-like Box inside the Box") {
         box.expand(XE::Boxf{box.getCenter()});
 
-        REQUIRE(box.getSize() == XE::Vector3f{2.0f, 6.0f, 6.0f});
-        REQUIRE(box.getCenter() == XE::Vector3f{0.0f, 5.0f, 0.0f});
+        REQUIRE(box.getSize() == XE::Vector3{2.0f, 6.0f, 6.0f});
+        REQUIRE(box.getCenter() == XE::Vector3{0.0f, 5.0f, 0.0f});
     }
 
     SECTION("expand() should mutate the state when using it with a point outside the Box") {
         const auto prevCenter = box.getCenter();
         const auto prevSize = box.getSize();
 
-        box.expand(XE::Vector3f{-10.0f, -10.0f, -10.0f});
+        box.expand(XE::Vector3{-10.0f, -10.0f, -10.0f});
 
-        REQUIRE(box.getMinEdge() == XE::Vector3f{-10.0f, -10.0f, -10.0f});
+        REQUIRE(box.getMinEdge() == XE::Vector3{-10.0f, -10.0f, -10.0f});
         REQUIRE(box.getCenter() != prevCenter);
         REQUIRE(box.getSize() != prevSize);
     }
@@ -147,7 +147,7 @@ TEST_CASE("Boxes can be tested against a Point and another Boxes", "[Box]") {
         SECTION("intesects when using a box with equal volume, but displaced using half times the size in each dimension") {
             const auto size = box.getSize();
 
-            const XE::Vector3f displacements[] = {
+            const XE::Vector3 displacements[] = {
                 {0.5f * size.X, 0.0f, 0.0f},
                 {0.0f, 0.5f * size.Y, 0.0f},
                 {0.0f, 0.0f, 0.5f * size.Z},
@@ -170,7 +170,7 @@ TEST_CASE("Boxes can be tested against a Point and another Boxes", "[Box]") {
         SECTION("should intersect when using a box with equal volume, but displaced using the Subject nearly the size in each dimension") {
             const auto size = box.getSize();
 
-            const XE::Vector3f displacements[] = {
+            const XE::Vector3 displacements[] = {
                 {0.99f * size.X, 0.0f, 0.0f},
                 {0.0f, 0.99f * size.Y, 0.0f},
                 {0.0f, 0.0f, 0.99f * size.Z},
@@ -193,7 +193,7 @@ TEST_CASE("Boxes can be tested against a Point and another Boxes", "[Box]") {
         SECTION("should not intersect when using a box with equal volume, but displaced using the Subject size in each dimension") {
             const auto size = box.getSize();
 
-            const XE::Vector3f displacements[] = {
+            const XE::Vector3 displacements[] = {
                 {size.X, 0.0f, 0.0f},
                 {0.0f, size.Y, 0.0f},
                 {0.0f, 0.0f, size.Z},
@@ -216,7 +216,7 @@ TEST_CASE("Boxes can be tested against a Point and another Boxes", "[Box]") {
         SECTION("not intesects when using a box with equal volume, but displaced using two and half times the size in each dimension") {
             const auto size = box.getSize();
 
-            const XE::Vector3f displacements[] = {
+            const XE::Vector3 displacements[] = {
                 {2.5f * size.X, 0.0f, 0.0f},
                 {0.0f, 2.5f * size.Y, 0.0f},
                 {0.0f, 0.0f, 2.5f * size.Z},

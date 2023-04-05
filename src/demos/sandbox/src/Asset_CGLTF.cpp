@@ -107,7 +107,7 @@ namespace Sandbox {
                 cgltf_size offset = 0;
 
                 for (cgltf_size j = 0; j < accessor->count; j++) {
-                    const XE::Vector3f *elementData = (const XE::Vector3f *)((uint8_t *)buffer->data + bufferView->offset + accessor->offset + offset);
+                    const XE::Vector3 *elementData = (const XE::Vector3 *)((uint8_t *)buffer->data + bufferView->offset + accessor->offset + offset);
 
                     meshPrimitive.coords.push_back(*elementData);
 
@@ -117,7 +117,7 @@ namespace Sandbox {
                 cgltf_size offset = 0;
 
                 for (cgltf_size j = 0; j < accessor->count; j++) {
-                    const XE::Vector3f *elementData = (const XE::Vector3f *)((uint8_t *)buffer->data + bufferView->offset + accessor->offset + offset);
+                    const XE::Vector3 *elementData = (const XE::Vector3 *)((uint8_t *)buffer->data + bufferView->offset + accessor->offset + offset);
 
                     meshPrimitive.normals.push_back(*elementData);
 
@@ -128,7 +128,7 @@ namespace Sandbox {
                 cgltf_size offset = 0;
 
                 for (cgltf_size j = 0; j < accessor->count; j++) {
-                    const XE::Vector2f *elementData = (const XE::Vector2f *)((uint8_t *)buffer->data + bufferView->offset + accessor->offset + offset);
+                    const XE::Vector2 *elementData = (const XE::Vector2 *)((uint8_t *)buffer->data + bufferView->offset + accessor->offset + offset);
 
                     meshPrimitive.texCoords.push_back(*elementData);
 
@@ -214,7 +214,7 @@ namespace Sandbox {
         } else {
             if (node->has_translation) {
                 // TODO: Untested translation
-                const auto t = XE::Vector3f{node->translation};
+                const auto t = XE::Vector3{node->translation};
                 nodeMatrix *= XE::Matrix4f::translate(t);
             }
 
@@ -227,7 +227,7 @@ namespace Sandbox {
                 const float inv_denom = 1.0f / std::sqrt(1.0f - q.W * q.W);
 
                 if (radians > 0.0f) {
-                    const XE::Vector3f axis = q.V * inv_denom;
+                    const XE::Vector3 axis = q.V * inv_denom;
 
                     nodeMatrix *= XE::Matrix4f::rotate(radians, axis);
                 }
@@ -235,7 +235,7 @@ namespace Sandbox {
 
             if (node->has_scale) {
                 // TODO: Untested scale
-                const auto s = XE::Vector3f{node->scale};
+                const auto s = XE::Vector3{node->scale};
                 nodeMatrix *= XE::Matrix4f::scale({s, 1.0f});
             }
         }

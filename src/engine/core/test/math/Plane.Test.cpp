@@ -102,8 +102,8 @@ TEST_CASE("Plane comparison operators must compare planes using each component i
 TEST_CASE("Plane factory methods should create well-defined planes with normalized normals. All the resulting normals have one-length (normalized)", "[Plane]") {
     SECTION("vectorial() must create a scalar plane form from a vectorial plane form (with a normal and a position).") {
         struct VectorialInput {
-            XE::Vector3f normal;
-            XE::Vector3f position;
+            XE::Vector3 normal;
+            XE::Vector3 position;
         };
 
         struct VectorialTestCase {
@@ -113,27 +113,27 @@ TEST_CASE("Plane factory methods should create well-defined planes with normaliz
 
         const VectorialTestCase testCases[] = {
             {
-                VectorialInput{XE::Vector3f{1.0f, 0.0f, 0.0f}, XE::Vector3f{0.0f, 0.0f, 0.0f}},
+                VectorialInput{XE::Vector3{1.0f, 0.0f, 0.0f}, XE::Vector3{0.0f, 0.0f, 0.0f}},
                 XE::Planef{1.0f, 0.0f, 0.0f, 0.0f}
             },
             {
-                VectorialInput{XE::Vector3f{0.0f, 1.0f, 0.0f}, XE::Vector3f{0.0f, 0.0f, 0.0f}},
+                VectorialInput{XE::Vector3{0.0f, 1.0f, 0.0f}, XE::Vector3{0.0f, 0.0f, 0.0f}},
                 XE::Planef{0.0f, 1.0f, 0.0f, 0.0f}
             },
             {
-                VectorialInput{XE::Vector3f{0.0f, 0.0f, 1.0f}, XE::Vector3f{0.0f, 0.0f, 0.0f}},
+                VectorialInput{XE::Vector3{0.0f, 0.0f, 1.0f}, XE::Vector3{0.0f, 0.0f, 0.0f}},
                 XE::Planef{0.0f, 0.0f, 1.0f, 0.0f}
             },
             {
-                VectorialInput{XE::Vector3f{1.0f, 0.0f, 0.0f}, XE::Vector3f{1.0f, 1.0f, 1.0f}},
+                VectorialInput{XE::Vector3{1.0f, 0.0f, 0.0f}, XE::Vector3{1.0f, 1.0f, 1.0f}},
                 XE::Planef{1.0f, 0.0f, 0.0f, 1.0f}
             },
             {
-                VectorialInput{XE::Vector3f{0.0f, 1.0f, 0.0f}, XE::Vector3f{1.0f, 1.0f, 1.0f}},
+                VectorialInput{XE::Vector3{0.0f, 1.0f, 0.0f}, XE::Vector3{1.0f, 1.0f, 1.0f}},
                 XE::Planef{0.0f, 1.0f, 0.0f, 1.0f}
             },
             {
-                VectorialInput{XE::Vector3f{0.0f, 0.0f, 1.0f}, XE::Vector3f{1.0f, 1.0f, 1.0f}},
+                VectorialInput{XE::Vector3{0.0f, 0.0f, 1.0f}, XE::Vector3{1.0f, 1.0f, 1.0f}},
                 XE::Planef{0.0f, 0.0f, 1.0f, 1.0f}
             },
         };

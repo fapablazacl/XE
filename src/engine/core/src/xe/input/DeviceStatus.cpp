@@ -18,7 +18,7 @@ namespace XE {
 
     void ControllerStatus::setState(const ControllerButton button, const BinaryState state) { m_buttons[static_cast<int>(button)] = state; }
 
-    Vector2f ControllerStatus::getState(const ControllerJoystick joystick) const { return m_joysticks[static_cast<int>(joystick)]; }
+    Vector2 ControllerStatus::getState(const ControllerJoystick joystick) const { return m_joysticks[static_cast<int>(joystick)]; }
 
-    void ControllerStatus::setState(const ControllerJoystick joystick, const Vector2f &state) { m_joysticks[static_cast<int>(joystick)] = state; }
+    void ControllerStatus::setState(const ControllerJoystick joystick, const Vector2 &state) { m_joysticks[static_cast<int>(joystick)] = state; }
 } // namespace XE

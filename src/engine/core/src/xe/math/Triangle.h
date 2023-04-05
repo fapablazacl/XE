@@ -39,14 +39,14 @@ namespace XE {
 
             // Comprobar si el punto de interseccion pertenece al triangulo o no, usando
             // coordenadas baricentricas
-            Vector3f r0=ray.getPointAt(info.distance);
-            Vector3f p=ray.getPoint(), q=r0;
-            Vector3f a=tri.p1, b=tri.p2, c=tri.p3;
+            Vector3 r0=ray.getPointAt(info.distance);
+            Vector3 p=ray.getPoint(), q=r0;
+            Vector3 a=tri.p1, b=tri.p2, c=tri.p3;
 
-            Vector3f pq = (q - p);
-            Vector3f pa = (a - p);
-            Vector3f pb = (b - p);
-            Vector3f pc = (c - p);
+            Vector3 pq = (q - p);
+            Vector3 pa = (a - p);
+            Vector3 pb = (b - p);
+            Vector3 pc = (c - p);
 
             float u, v, w;
             u = pq.triple(pc, pb);

@@ -4,9 +4,9 @@
 #include <xe/math/Math.h>
 
 struct Camera {
-    XE::Vector3f position = {0.0f, 1.5f, 2.5f};
-    XE::Vector3f lookAt = {0.0f, 1.5f, 0.0f};
-    XE::Vector3f up = {0.0f, 1.0f, 0.0f};
+    XE::Vector3 position = {0.0f, 1.5f, 2.5f};
+    XE::Vector3 lookAt = {0.0f, 1.5f, 0.0f};
+    XE::Vector3 up = {0.0f, 1.0f, 0.0f};
 
     float fov = XE::radians(60.0f);
     float aspectRatio = 1.33333f;

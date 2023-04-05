@@ -7,18 +7,18 @@
 
 #include <iostream>
 
-using XE::Vector2f;
-using XE::Vector3f;
-using XE::Vector4f;
+using XE::Vector2;
+using XE::Vector3;
+using XE::Vector4;
 
 namespace Sandbox {
-    static std::vector<Vector3f> coordData = {{-1.5f, 1.5f, 0.0f}, {1.5f, 1.5f, 0.0f}, {-1.5f, -1.5f, 0.0f}, {1.5f, -1.5f, 0.0f}};
+    static std::vector<Vector3> coordData = {{-1.5f, 1.5f, 0.0f}, {1.5f, 1.5f, 0.0f}, {-1.5f, -1.5f, 0.0f}, {1.5f, -1.5f, 0.0f}};
 
-    static std::vector<Vector4f> colorData = {{1.0f, 1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f, 1.0f}};
+    static std::vector<Vector4> colorData = {{1.0f, 1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f, 1.0f}};
 
-    static std::vector<Vector3f> normalData = {{0.0f, 0.0f, 1.0f}, {0.0f, 0.0f, 1.0f}, {0.0f, 0.0f, 1.0f}, {0.0f, 0.0f, 1.0f}};
+    static std::vector<Vector3> normalData = {{0.0f, 0.0f, 1.0f}, {0.0f, 0.0f, 1.0f}, {0.0f, 0.0f, 1.0f}, {0.0f, 0.0f, 1.0f}};
 
-    static std::vector<Vector2f> texCoordData = {{0.0f, 1.0f}, {1.0f, 1.0f}, {0.0f, 0.0f}, {1.0f, 0.0f}};
+    static std::vector<Vector2> texCoordData = {{0.0f, 1.0f}, {1.0f, 1.0f}, {0.0f, 0.0f}, {1.0f, 0.0f}};
 
     static std::vector<int> indexData = {0, 1, 2, 3};
 

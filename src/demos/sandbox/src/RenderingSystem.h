@@ -21,9 +21,9 @@
 namespace Sandbox {
     class Camera {
     public:
-        XE::Vector3f position = {0.0f, 0.0f, 15.0f};
-        XE::Vector3f lookAt = {0.0f, 0.0f, 0.0f};
-        XE::Vector3f up = {0.0f, 1.0f, 0.0f};
+        XE::Vector3 position = {0.0f, 0.0f, 15.0f};
+        XE::Vector3 lookAt = {0.0f, 0.0f, 0.0f};
+        XE::Vector3 up = {0.0f, 1.0f, 0.0f};
 
         float fov = XE::radians(60.0f);
         float aspectRatio = 640.0f / 480.0f;
@@ -61,7 +61,7 @@ namespace Sandbox {
 
         void renderMatrices(const XE::Matrix4f &);
 
-        XE::Texture2D *createColorTexture(const int width, const int height, const XE::Vector4f &color);
+        XE::Texture2D *createColorTexture(const int width, const int height, const XE::Vector4 &color);
 
         XE::Texture2D *createFileTexture(const std::string &filePath);
 

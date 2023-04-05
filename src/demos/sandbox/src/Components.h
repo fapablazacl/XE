@@ -4,16 +4,16 @@
 #pragma once
 
 struct Gravity {
-    XE::Vector3f force;
+    XE::Vector3 force;
 };
 
 struct RigidBody {
-    XE::Vector3f velocity;
-    XE::Vector3f acceleration;
+    XE::Vector3 velocity;
+    XE::Vector3 acceleration;
 };
 
 struct Transform {
-    XE::Vector3f position;
-    XE::Vector3f rotation;
-    XE::Vector3f scale;
+    XE::Vector3 position;
+    XE::Vector3 rotation;
+    XE::Vector3 scale;
 };

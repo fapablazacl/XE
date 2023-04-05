@@ -15,13 +15,13 @@
 
 namespace demo {
     struct Vertex {
-        XE::Vector3f coord;
-        XE::Vector3f normal;
-        XE::Vector4f color;
+        XE::Vector3 coord;
+        XE::Vector3 normal;
+        XE::Vector4 color;
 
         Vertex() {}
 
-        Vertex(XE::Vector3f coord, XE::Vector3f normal, XE::Vector4f color) : coord(coord), normal(normal), color(color) {}
+        Vertex(XE::Vector3 coord, XE::Vector3 normal, XE::Vector4 color) : coord(coord), normal(normal), color(color) {}
     };
 
     struct Mesh {
@@ -38,10 +38,10 @@ namespace Sandbox {
     struct MeshPrimitive {
         const Material *material = nullptr;
         XE::PrimitiveType type = XE::PrimitiveType::PointList;
-        std::vector<XE::Vector3f> coords;
-        std::vector<XE::Vector3f> normals;
-        std::vector<XE::Vector4f> colors;
-        std::vector<XE::Vector2f> texCoords;
+        std::vector<XE::Vector3> coords;
+        std::vector<XE::Vector3> normals;
+        std::vector<XE::Vector4> colors;
+        std::vector<XE::Vector2> texCoords;
         std::vector<int> indices;
 
         XE::SubsetEnvelope getEnvelope() const {

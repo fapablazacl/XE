@@ -89,9 +89,9 @@ namespace XE {
 
         virtual void draw(const Subset *subset, const SubsetEnvelope *envelopes, const std::size_t envelopeCount) = 0;
 
-        void beginFrame(const ClearFlags flags, const Vector4f &color) { beginFrame(flags, color, 1.0f, 0); }
+        void beginFrame(const ClearFlags flags, const Vector4 &color) { beginFrame(flags, color, 1.0f, 0); }
 
-        virtual void beginFrame(const ClearFlags flags, const Vector4f &color, const float depth, const int stencil) = 0;
+        virtual void beginFrame(const ClearFlags flags, const Vector4 &color, const float depth, const int stencil) = 0;
 
         virtual void endFrame() = 0;
     };

@@ -19,7 +19,7 @@ namespace XE {
 
         void setScreenSize(const Vector2i &value);
 
-        Vector3f computePointAt(const Vector2i &screenPosition) const;
+        Vector3 computePointAt(const Vector2i &screenPosition) const;
 
         bool operator==(const VirtualSphere &rhs) const;
 
