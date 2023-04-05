@@ -383,6 +383,10 @@ namespace XE {
         }
     };
 
+    extern template struct Matrix<float, 2, 2>;
+    extern template struct Matrix<float, 3, 3>;
+    extern template struct Matrix<float, 4, 4>;
+
     typedef Matrix<float, 2, 2> Matrix2f;
     typedef Matrix<float, 3, 3> Matrix3f;
     typedef Matrix<float, 4, 4> Matrix4f;
