@@ -19,7 +19,7 @@ namespace Sandbox {
         Scene load(const std::string &filePath) const override;
     };
 
-    using SceneNodeCallback = std::function<void(const XE::Matrix4f &transform, const std::string &meshName)>;
+    using SceneNodeCallback = std::function<void(const XE::Matrix4 &transform, const std::string &meshName)>;
 
     class Asset_CGLTF {
     public:
@@ -36,7 +36,7 @@ namespace Sandbox {
         std::vector<Mesh> getMeshes() const;
 
     private:
-        void visitNode(const XE::Matrix4f &matrix, const cgltf_node *node);
+        void visitNode(const XE::Matrix4 &matrix, const cgltf_node *node);
 
         void visitScene(const cgltf_scene *scene);
 

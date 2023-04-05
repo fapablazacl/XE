@@ -59,7 +59,7 @@ namespace Sandbox {
 
         void renderObjects();
 
-        void renderMatrices(const XE::Matrix4f &);
+        void renderMatrices(const XE::Matrix4 &);
 
         XE::Texture2D *createColorTexture(const int width, const int height, const XE::Vector4 &color);
 

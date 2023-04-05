@@ -393,12 +393,9 @@ namespace XE {
     extern template struct TMatrix<float, 3, 3>;
     extern template struct TMatrix<float, 4, 4>;
 
-    typedef TMatrix<float, 2, 2> Matrix2f;
-    typedef TMatrix<float, 3, 3> Matrix3f;
-    typedef TMatrix<float, 4, 4> Matrix4f;
-
-    using M3 = TMatrix<float, 3, 3>;
-    using M4 = TMatrix<float, 4, 4>;
+    using Matrix2 = TMatrix<float, 2, 2>;
+    using Matrix3 = TMatrix<float, 3, 3>;
+    using Matrix4 = TMatrix<float, 4, 4>;
 
     template <typename T, int R, int C> bool TMatrix<T, R, C>::operator==(const TMatrix<T, R, C> &other) const {
         const T *values = data();

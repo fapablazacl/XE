@@ -18,10 +18,10 @@ void SceneNode::visit(SceneNodeVisitor visitor) {
     }
 }
 
-void SceneNode::visit(XE::GraphicsDevice *graphicsDevice, const XE::M4 &parentTransformation) {
+void SceneNode::visit(XE::GraphicsDevice *graphicsDevice, const XE::Matrix4 &parentTransformation) {
     assert(graphicsDevice);
 
-    const XE::M4 current = mTransformation * parentTransformation;
+    const XE::Matrix4 current = mTransformation * parentTransformation;
 
     if (mRenderable) {
         const XE::UniformMatrix uProjModelView = {"uProjViewModel", XE::DataType::Float32, XE::UniformMatrixShape::R4C4, 1};

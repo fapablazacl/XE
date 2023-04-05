@@ -34,7 +34,7 @@ using XE::ImageLoaderPNG;
 using XE::InputManager;
 using XE::KeyboardStatus;
 using XE::KeyCode;
-using XE::Matrix4f;
+using XE::Matrix4;
 using XE::PixelFormat;
 using XE::Program;
 using XE::ProgramDescriptor;
@@ -63,7 +63,7 @@ namespace Sandbox {
             turnSpeed = XE::radians(turnSpeedPerSecond * seconds);
         }
 
-        const auto cdt = Matrix4f::rotate(turnSpeed, up) * Vector4(cameraDirection, 0.0f);
+        const auto cdt = Matrix4::rotate(turnSpeed, up) * Vector4(cameraDirection, 0.0f);
 
         lookAt = position + Vector3{cdt.X, cdt.Y, cdt.Z} * norm(cameraDirection);
 
@@ -141,7 +141,7 @@ namespace Sandbox {
     bool RenderingSystem::ShouldClose() const { return m_shouldClose; }
 
     void RenderingSystem::renderScene() {
-        mAssetGLTF.visitDefaultScene([this](const XE::Matrix4f &matrix, const std::string &objectName) {
+        mAssetGLTF.visitDefaultScene([this](const XE::Matrix4 &matrix, const std::string &objectName) {
             renderMatrices(matrix);
 
             const GeoObject &object = mObjectsByNameMap[objectName];
@@ -160,11 +160,11 @@ namespace Sandbox {
         }
     }
 
-    void RenderingSystem::renderMatrices(const XE::Matrix4f &) {
+    void RenderingSystem::renderMatrices(const XE::Matrix4 &) {
         const XE::UniformMatrix matrixLayout = {"m_mvp", XE::DataType::Float32, XE::UniformMatrixShape::R4C4, 1};
 
-        const Matrix4f modelViewProj = XE::transpose<float, 4, 4>(Matrix4f::perspective(mCamera.fov, mCamera.aspectRatio, mCamera.znear, mCamera.zfar) *
-                                                                    Matrix4f::lookAtRH(mCamera.position, mCamera.lookAt, mCamera.up));
+        const Matrix4 modelViewProj = XE::transpose<float, 4, 4>(Matrix4::perspective(mCamera.fov, mCamera.aspectRatio, mCamera.znear, mCamera.zfar) *
+                                                                 Matrix4::lookAtRH(mCamera.position, mCamera.lookAt, mCamera.up));
 
         m_graphicsDevice->applyUniform(&matrixLayout, 1, (const void *)&modelViewProj);
     }

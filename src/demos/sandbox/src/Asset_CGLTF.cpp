@@ -11,7 +11,7 @@
 #include "Common.h"
 
 namespace Sandbox {
-    static XE::Matrix4f computeNodeMatrix(const cgltf_node *node);
+    static XE::Matrix4 computeNodeMatrix(const cgltf_node *node);
 
     /*
     static void visitAttribute(const int indentation, const cgltf_attribute &attrib) { Sandbox::indent(std::cout, indentation) << " visitAttribute: " << attrib.name << std::endl; }
@@ -43,7 +43,7 @@ namespace Sandbox {
 
         Sandbox::indent(std::cout, indentation) << "visitNode: " << node->name << std::endl;
 
-        // const XE::Matrix4f nodeMatrix = computeNodeMatrix(node);
+        // const XE::Matrix4 nodeMatrix = computeNodeMatrix(node);
 
         if (node->mesh) {
             visitMesh(indentation + 2, node->mesh);
@@ -204,10 +204,10 @@ namespace Sandbox {
         return meshes;
     }
 
-    static XE::Matrix4f computeNodeMatrix(const cgltf_node *node) {
+    static XE::Matrix4 computeNodeMatrix(const cgltf_node *node) {
         assert(node);
 
-        auto nodeMatrix = XE::M4::identity();
+        auto nodeMatrix = XE::Matrix4::identity();
 
         if (node->has_matrix == 1) {
             nodeMatrix = Sandbox::makeMatrix(node->matrix);
@@ -215,7 +215,7 @@ namespace Sandbox {
             if (node->has_translation) {
                 // TODO: Untested translation
                 const auto t = XE::Vector3{node->translation};
-                nodeMatrix *= XE::Matrix4f::translate(t);
+                nodeMatrix *= XE::Matrix4::translate(t);
             }
 
             if (node->has_rotation) {
@@ -229,24 +229,24 @@ namespace Sandbox {
                 if (radians > 0.0f) {
                     const XE::Vector3 axis = q.V * inv_denom;
 
-                    nodeMatrix *= XE::Matrix4f::rotate(radians, axis);
+                    nodeMatrix *= XE::Matrix4::rotate(radians, axis);
                 }
             }
 
             if (node->has_scale) {
                 // TODO: Untested scale
                 const auto s = XE::Vector3{node->scale};
-                nodeMatrix *= XE::Matrix4f::scale({s, 1.0f});
+                nodeMatrix *= XE::Matrix4::scale({s, 1.0f});
             }
         }
 
         return nodeMatrix;
     }
 
-    void Asset_CGLTF::visitNode(const XE::Matrix4f &matrix, const cgltf_node *node) {
+    void Asset_CGLTF::visitNode(const XE::Matrix4 &matrix, const cgltf_node *node) {
         assert(node);
 
-        const XE::Matrix4f nodeMatrix = matrix * computeNodeMatrix(node);
+        const XE::Matrix4 nodeMatrix = matrix * computeNodeMatrix(node);
 
         if (node->mesh) {
             mCallback(nodeMatrix, node->mesh->name);
@@ -262,7 +262,7 @@ namespace Sandbox {
     }
 
     void Asset_CGLTF::visitScene(const cgltf_scene *scene) {
-        auto transformMatrix = XE::M4::identity();
+        auto transformMatrix = XE::Matrix4::identity();
 
         for (cgltf_size i = 0; i < scene->nodes_count; i++) {
             visitNode(transformMatrix, scene->nodes[i]);

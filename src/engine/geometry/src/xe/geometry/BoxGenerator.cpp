@@ -151,7 +151,7 @@ namespace XE {
             const float angle = rotation[i].angle;
             const auto axis = rotation[i].axis;
 
-                        const Matrix4f rotationMatrix = rotate(angle, axis);
+                        const Matrix4 rotationMatrix = rotate(angle, axis);
 
                         for (int j=0; j<POINTS_PER_FACE_COUNT; j++) {
 

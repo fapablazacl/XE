@@ -103,7 +103,7 @@ namespace demo {
         mEnemyRenderable = {mCubeSubset, mCubeSubsetEnvelope};
         mEnemyNode = mSceneNode.createChild();
         mEnemyNode->setRenderable(&mEnemyRenderable);
-        mEnemyNode->setTransformation(XE::M4::translate({0.0f, 0.2501f, 0.0f}));
+        mEnemyNode->setTransformation(XE::Matrix4::translate({0.0f, 0.2501f, 0.0f}));
     }
     void DemoApp::mainLoop() {
         int lastTime = XE::Timer::getTick();
@@ -129,12 +129,12 @@ namespace demo {
         // update animations
         mAngle += XE::radians(60.0f * seconds);
 
-        const XE::M4 rotY1 = XE::M4::rotateY(mAngle);
-        const XE::M4 rotX1 = XE::M4::rotateX(mAngle);
-        const XE::M4 rotY2 = XE::M4::rotate(mAngle, {0.0f, 1.0f, 0.0f});
-        const XE::M4 rotX2 = XE::M4::rotate(mAngle, {1.0f, 0.0f, 0.0f});
-        mLeftCubeNode->setTransformation(rotY1 * rotX1 * XE::M4::translate({-1.25f, 0.5f, 0.0f}));
-        mRightCubeNode->setTransformation(rotY2 * rotX2 * XE::M4::translate({1.25f, 0.5f, 0.0f}));
+        const XE::Matrix4 rotY1 = XE::Matrix4::rotateY(mAngle);
+        const XE::Matrix4 rotX1 = XE::Matrix4::rotateX(mAngle);
+        const XE::Matrix4 rotY2 = XE::Matrix4::rotate(mAngle, {0.0f, 1.0f, 0.0f});
+        const XE::Matrix4 rotX2 = XE::Matrix4::rotate(mAngle, {1.0f, 0.0f, 0.0f});
+        mLeftCubeNode->setTransformation(rotY1 * rotX1 * XE::Matrix4::translate({-1.25f, 0.5f, 0.0f}));
+        mRightCubeNode->setTransformation(rotY2 * rotX2 * XE::Matrix4::translate({1.25f, 0.5f, 0.0f}));
 
         // update camera position
         const bool moveForward = keyboardStatus.isPressed(XE::KeyCode::KeyUp);
@@ -148,8 +148,8 @@ namespace demo {
     void DemoApp::renderSceneNode() {
         // const auto aspect = static_cast<float>(s_screenWidth) / static_cast<float>(s_screenHeight);
 
-        const auto proj = XE::M4::perspective(mCamera.fov, mCamera.aspectRatio, mCamera.znear, mCamera.zfar);
-        const auto view = XE::M4::lookAtRH(mCamera.position, mCamera.lookAt, mCamera.up);
+        const auto proj = XE::Matrix4::perspective(mCamera.fov, mCamera.aspectRatio, mCamera.znear, mCamera.zfar);
+        const auto view = XE::Matrix4::lookAtRH(mCamera.position, mCamera.lookAt, mCamera.up);
         const auto viewProj = view * proj;
 
         mGraphicsDevice->beginFrame(XE::ClearFlags::All, {0.2f, 0.2f, 0.8f, 1.0f}, 1.0f, 0);

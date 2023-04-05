@@ -60,7 +60,7 @@ namespace Sandbox {
 
     struct SceneNode {
         std::string name;
-        XE::Matrix4f localMatrix = XE::Matrix4f::identity();
+        XE::Matrix4 localMatrix = XE::Matrix4::identity();
         std::vector<SceneNode> children;
 
         std::string meshName;
@@ -85,10 +85,10 @@ namespace Sandbox {
         return os;
     }
 
-    inline XE::Matrix4f makeMatrix(const float *data) {
+    inline XE::Matrix4 makeMatrix(const float *data) {
         assert(data);
 
-        XE::Matrix4f matrix;
+        XE::Matrix4 matrix;
 
         std::memcpy(matrix.data(), data, 16 * sizeof(float));
 

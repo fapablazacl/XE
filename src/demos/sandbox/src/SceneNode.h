@@ -18,9 +18,9 @@ public:
 
     SceneNode *getParent() const { return mParent; }
 
-    XE::M4 getTransformation() const { return mTransformation; }
+    XE::Matrix4 getTransformation() const { return mTransformation; }
 
-    void setTransformation(const XE::M4 &transformation) { mTransformation = transformation; }
+    void setTransformation(const XE::Matrix4 &transformation) { mTransformation = transformation; }
 
     void setRenderable(Renderable *renderable) { mRenderable = renderable; }
 
@@ -30,11 +30,11 @@ public:
 
     void visit(SceneNodeVisitor visitor);
 
-    void visit(XE::GraphicsDevice *graphicsDevice, const XE::M4 &parentTransformation);
+    void visit(XE::GraphicsDevice *graphicsDevice, const XE::Matrix4 &parentTransformation);
 
 private:
     SceneNode *mParent = nullptr;
     Renderable *mRenderable = nullptr;
-    XE::M4 mTransformation = XE::M4::identity();
+    XE::Matrix4 mTransformation = XE::Matrix4::identity();
     std::vector<std::unique_ptr<SceneNode>> mChildren;
 };
