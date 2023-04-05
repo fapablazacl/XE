@@ -28,7 +28,9 @@ namespace XE {
             T values[4];
         };
 
-        Quaternion() {}
+        Quaternion() {
+            V.X = V.Y = V.Z = W = T(0);
+        }
 
         explicit Quaternion(const T w) {
             V.X = V.Y = V.Z = T(0);
