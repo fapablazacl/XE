@@ -221,7 +221,7 @@ namespace Sandbox {
             if (node->has_rotation) {
                 // TODO: Untested rotation
                 // TODO: Add missing cases for angle = 0 and = 180º.
-                const auto q = XE::Quaternion<float>{node->rotation};
+                const auto q = XE::TQuaternion<float>{node->rotation};
 
                 const float radians = std::acos(q.W);
                 const float inv_denom = 1.0f / std::sqrt(1.0f - q.W * q.W);

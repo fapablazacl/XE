@@ -18,7 +18,7 @@
 
 
 namespace XE {
-    template <typename T> struct Quaternion {
+    template <typename T> struct TQuaternion {
         union {
             struct {
                 Vector<T, 3> V;
@@ -28,16 +28,16 @@ namespace XE {
             T values[4];
         };
 
-        Quaternion() {
+        TQuaternion() {
             V.X = V.Y = V.Z = W = T(0);
         }
 
-        explicit Quaternion(const T w) {
+        explicit TQuaternion(const T w) {
             V.X = V.Y = V.Z = T(0);
             W = w;
         }
 
-        explicit Quaternion(const T *values) {
+        explicit TQuaternion(const T *values) {
             assert(values);
 
             for (int i = 0; i < 4; i++) {
@@ -45,38 +45,38 @@ namespace XE {
             }
         }
 
-        Quaternion(const T x, const T y, const T z, const T w) {
+        TQuaternion(const T x, const T y, const T z, const T w) {
             V.X = x;
             V.Y = y;
             V.Z = z;
             W = w;
         }
 
-        explicit Quaternion(const Vector<T, 3> &v) {
+        explicit TQuaternion(const Vector<T, 3> &v) {
             V = v;
             W = T(0);
         }
 
-        explicit Quaternion(const T x, const T y, const T z) {
+        explicit TQuaternion(const T x, const T y, const T z) {
             V.X = x;
             V.Y = y;
             V.Z = z;
             W = T(0);
         }
 
-        Quaternion(const Vector<T, 3> &v, T w) {
+        TQuaternion(const Vector<T, 3> &v, T w) {
             V = v;
             W = w;
         }
 
-        explicit Quaternion(const Vector<T, 4> &v) {
+        explicit TQuaternion(const Vector<T, 4> &v) {
             V.X = v.X;
             V.Y = v.Y;
             V.Z = v.Z;
             W = v.W;
         }
 
-        Quaternion(const Quaternion<T> &other) {
+        TQuaternion(const TQuaternion<T> &other) {
             V = other.V;
             W = other.W;
         }
@@ -117,8 +117,8 @@ namespace XE {
 
         explicit operator Vector<T, 4>() const { return {V.X, V.Y, V.Z, V.W}; }
 
-        Quaternion<T> operator+(const Quaternion<T> &rhs) const {
-            Quaternion<T> result;
+        TQuaternion<T> operator+(const TQuaternion<T> &rhs) const {
+            TQuaternion<T> result;
 
             for (int i = 0; i < 4; i++) {
                 result.values[i] = this->values[i] + rhs.values[i];
@@ -127,8 +127,8 @@ namespace XE {
             return result;
         }
 
-        Quaternion<T> operator-(const Quaternion<T> &rhs) const {
-            Quaternion<T> result;
+        TQuaternion<T> operator-(const TQuaternion<T> &rhs) const {
+            TQuaternion<T> result;
 
             for (int i = 0; i < 4; i++) {
                 result.values[i] = this->values[i] - rhs.values[i];
@@ -137,8 +137,8 @@ namespace XE {
             return result;
         }
 
-        Quaternion<T> operator-() const {
-            Quaternion<T> result;
+        TQuaternion<T> operator-() const {
+            TQuaternion<T> result;
 
             for (int i = 0; i < 4; i++) {
                 result.values[i] = -this->values[i];
@@ -147,14 +147,14 @@ namespace XE {
             return result;
         }
 
-        Quaternion<T> operator+() const { return *this; }
+        TQuaternion<T> operator+() const { return *this; }
 
-        Quaternion<T> operator*(const Quaternion<T> &rhs) const { return {cross(V, rhs.V) + rhs.V * W + V * rhs.W, W * rhs.W - dot(V, rhs.V)}; }
+        TQuaternion<T> operator*(const TQuaternion<T> &rhs) const { return {cross(V, rhs.V) + rhs.V * W + V * rhs.W, W * rhs.W - dot(V, rhs.V)}; }
 
-        Quaternion<T> operator/(const Quaternion<T> &rhs) const { return (*this) * inverse(rhs); }
+        TQuaternion<T> operator/(const TQuaternion<T> &rhs) const { return (*this) * inverse(rhs); }
 
-        Quaternion<T> operator*(const T s) const {
-            Quaternion<T> result;
+        TQuaternion<T> operator*(const T s) const {
+            TQuaternion<T> result;
 
             for (int i = 0; i < 4; i++) {
                 result.values[i] = this->values[i] * s;
@@ -163,8 +163,8 @@ namespace XE {
             return result;
         }
 
-        Quaternion<T> operator/(const T s) const {
-            Quaternion<T> result;
+        TQuaternion<T> operator/(const T s) const {
+            TQuaternion<T> result;
 
             for (int i = 0; i < 4; i++) {
                 result.values[i] = this->values[i] / s;
@@ -173,9 +173,9 @@ namespace XE {
             return result;
         }
 
-        friend Quaternion<T> operator*(const T s, const Quaternion<T> &q) { return q * s; }
+        friend TQuaternion<T> operator*(const T s, const TQuaternion<T> &q) { return q * s; }
 
-        Quaternion<T> &operator+=(const Quaternion<T> &rhs) {
+        TQuaternion<T> &operator+=(const TQuaternion<T> &rhs) {
             for (int i = 0; i < 4; i++) {
                 this->values[i] += rhs.values[i];
             }
@@ -183,7 +183,7 @@ namespace XE {
             return *this;
         }
 
-        Quaternion<T> &operator-=(const Quaternion<T> &rhs) {
+        TQuaternion<T> &operator-=(const TQuaternion<T> &rhs) {
             for (int i = 0; i < 4; i++) {
                 this->values[i] -= rhs.values[i];
             }
@@ -191,19 +191,19 @@ namespace XE {
             return *this;
         }
 
-        Quaternion<T> &operator*=(const Quaternion<T> &rhs) {
+        TQuaternion<T> &operator*=(const TQuaternion<T> &rhs) {
             *this = *this * rhs;
 
             return *this;
         }
 
-        Quaternion<T> &operator/=(const Quaternion<T> &rhs) {
+        TQuaternion<T> &operator/=(const TQuaternion<T> &rhs) {
             *this = *this / rhs;
 
             return *this;
         }
 
-        Quaternion<T> &operator*=(const T s) {
+        TQuaternion<T> &operator*=(const T s) {
             for (int i = 0; i < 4; i++) {
                 this->values[i] *= s;
             }
@@ -211,7 +211,7 @@ namespace XE {
             return *this;
         }
 
-        Quaternion<T> &operator/=(const T s) {
+        TQuaternion<T> &operator/=(const T s) {
             for (int i = 0; i < 4; i++) {
                 this->values[i] /= s;
             }
@@ -219,7 +219,7 @@ namespace XE {
             return *this;
         }
 
-        bool operator==(const Quaternion<T> &rhs) const {
+        bool operator==(const TQuaternion<T> &rhs) const {
             for (int i = 0; i < 4; i++) {
                 if (! equals(values[i], rhs.values[i])) {
                     return false;
@@ -229,14 +229,14 @@ namespace XE {
             return true;
         }
 
-        bool operator!=(const Quaternion<T> &rhs) const { return !(*this == rhs); }
+        bool operator!=(const TQuaternion<T> &rhs) const { return !(*this == rhs); }
     };
 
-    template <typename T> Quaternion<T> conjugate(const Quaternion<T> &q) { return {-q.V, q.W}; }
+    template <typename T> TQuaternion<T> conjugate(const TQuaternion<T> &q) { return {-q.V, q.W}; }
 
-    template <typename T> Quaternion<T> inverse(const Quaternion<T> &q) { return conjugate(q) / norm2(q); }
+    template <typename T> TQuaternion<T> inverse(const TQuaternion<T> &q) { return conjugate(q) / norm2(q); }
 
-    template <typename T> T dot(const Quaternion<T> &q1, const Quaternion<T> &q2) {
+    template <typename T> T dot(const TQuaternion<T> &q1, const TQuaternion<T> &q2) {
         T sum = T(0);
 
         for (int i = 0; i < 4; i++) {
@@ -246,54 +246,49 @@ namespace XE {
         return sum;
     }
 
-    template <typename T> T norm2(const Quaternion<T> &q) { return dot(q, q); }
+    template <typename T> T norm2(const TQuaternion<T> &q) { return dot(q, q); }
 
     /**
      * @brief Compute the magnitude, module or length (AKA Absolute Value) for a given Quaternion.
      */
-    template <typename T> T norm(const Quaternion<T> &q) { return static_cast<T>(std::sqrt(norm2(q))); }
+    template <typename T> T norm(const TQuaternion<T> &q) { return static_cast<T>(std::sqrt(norm2(q))); }
 
     /**
      * @brief Compute a Quaternion with a unit magnitude (1)
      */
-    template <typename T> Quaternion<T> normalize(const Quaternion<T> &q) { return q / norm(q); }
+    template <typename T> TQuaternion<T> normalize(const TQuaternion<T> &q) { return q / norm(q); }
 
-    template <typename T> Vector<T, 3> transform(const Quaternion<T> &q, const Vector<T, 3> &v) { return (q * Quaternion<T>(v) * inverse(q)).V; }
+    template <typename T> Vector<T, 3> transform(const TQuaternion<T> &q, const Vector<T, 3> &v) { return (q * TQuaternion<T>(v) * inverse(q)).V; }
 
-    template<typename T>
-    Quaternion<T> quatId() {
-        return Quaternion<T>({T(0), T(0), T(0)}, T(1));
+    template<typename T> TQuaternion<T> quatId() {
+        return TQuaternion<T>({T(0), T(0), T(0)}, T(1));
     }
 
-    template<typename T>
-    Quaternion<T> quatZero() {
-        return Quaternion<T>({T(0), T(0), T(0)}, T(0));
+    template<typename T> TQuaternion<T> quatZero() {
+        return TQuaternion<T>({T(0), T(0), T(0)}, T(0));
     }
 
-    template<typename T>
-    Quaternion<T> quatRotationRH(const Vector<T, 3> &axis, const T radians) {
+    template<typename T> TQuaternion<T> quatRotationRH(const Vector<T, 3> &axis, const T radians) {
         assert(equals(norm(axis), T{1}) && "Axis should be normalized");
 
         const T angle = T{0.5} * radians;
 
-        return Quaternion<T>(std::sin(angle) * axis, std::cos(angle));
+        return TQuaternion<T>(std::sin(angle) * axis, std::cos(angle));
     }
 
-    template<typename T>
-    Quaternion<T> quatRotationLH(const Vector<T, 3> &axis, const T radians) {
+    template<typename T> TQuaternion<T> quatRotationLH(const Vector<T, 3> &axis, const T radians) {
         assert(equals(norm(axis), T{1}) && "Axis should be normalized");
 
         const T angle = T{0.5} * radians;
 
-        return Quaternion<T>(-std::sin(angle) * axis, std::cos(angle));
+        return TQuaternion<T>(-std::sin(angle) * axis, std::cos(angle));
     }
 
-    template<typename T>
-    Quaternion<T> quatRotationRH(const Vector<T, 3> &v1, const Vector<T, 3> &v2) {
+    template<typename T> TQuaternion<T> quatRotationRH(const Vector<T, 3> &v1, const Vector<T, 3> &v2) {
         auto v = cross(v1, v2);
         auto w = std::sqrt(dot(v1, v1) * dot(v2, v2)) + dot(v1, v2);
 
-        return normalize(Quaternion<T>(v, w));
+        return normalize(TQuaternion<T>(v, w));
     }
 } // namespace XE
 
