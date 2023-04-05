@@ -1,4 +1,6 @@
 
+#pragma once
+
 #ifndef __XE_MATH_VECTOR_HPP__
 #define __XE_MATH_VECTOR_HPP__
 

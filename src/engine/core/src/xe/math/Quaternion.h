@@ -1,4 +1,6 @@
 
+#pragma once
+
 #ifndef __XE_MATH_QUATERNION_HPP__
 #define __XE_MATH_QUATERNION_HPP__
 
@@ -81,7 +83,14 @@ namespace XE {
             W = other.W;
         }
 
-        constexpr size_t size() const {
+        TQuaternion<T>& operator=(const TQuaternion<T> &other) {
+            V = other.V;
+            W = other.W;
+
+            return *this;
+        }
+
+        [[nodiscard]] constexpr size_t size() const {
             return 4;
         }
 
@@ -89,7 +98,7 @@ namespace XE {
             return &values[0];
         }
 
-        const T* data() const {
+        [[nodiscard]] const T* data() const {
             return &values[0];
         }
 
@@ -115,7 +124,7 @@ namespace XE {
             }
         }
 
-        explicit operator Vector<T, 4>() const { return {V.X, V.Y, V.Z, V.W}; }
+        explicit operator Vector<T, 4>() const { return {V.X, V.Y, V.Z, W}; }
 
         TQuaternion<T> operator+(const TQuaternion<T> &rhs) const {
             TQuaternion<T> result;
@@ -284,12 +293,9 @@ namespace XE {
         return TQuaternion<T>(-std::sin(angle) * axis, std::cos(angle));
     }
 
-    template<typename T> TQuaternion<T> quatRotationRH(const Vector<T, 3> &v1, const Vector<T, 3> &v2) {
-        auto v = cross(v1, v2);
-        auto w = std::sqrt(dot(v1, v1) * dot(v2, v2)) + dot(v1, v2);
+    using Quat = TQuaternion<float>;
 
-        return normalize(TQuaternion<T>(v, w));
-    }
+    extern template struct TQuaternion<float>;
 } // namespace XE
 
 #if defined(_MSC_VER)
