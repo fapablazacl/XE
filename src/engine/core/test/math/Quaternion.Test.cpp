@@ -4,7 +4,7 @@
 #include <xe/math/Quaternion.h>
 
 TEST(QuaternionTest, VectorScalarConstructorInitializesTheVectorAndScalarPart) {
-    const auto q2 = XE::TQuaternion<float>{{0.0f, 1.0f, 0.0f}, 1.0f};
+    const auto q2 = XE::Quat{{0.0f, 1.0f, 0.0f}, 1.0f};
 
     EXPECT_FLOAT_EQ(q2.V.X, 0.0f);
     EXPECT_FLOAT_EQ(q2.V.Y, 1.0f);
@@ -13,7 +13,7 @@ TEST(QuaternionTest, VectorScalarConstructorInitializesTheVectorAndScalarPart) {
 }
 
 TEST(QuaternionTest, FourScalarConstructorInitializesTheVectorAndScalarPart) {
-    const auto q = XE::TQuaternion<float>{0.0f, 1.0f, 0.0f, 1.0f};
+    const auto q = XE::Quat{0.0f, 1.0f, 0.0f, 1.0f};
 
     EXPECT_FLOAT_EQ(q.V.X, 0.0f);
     EXPECT_FLOAT_EQ(q.V.Y, 1.0f);
@@ -22,7 +22,7 @@ TEST(QuaternionTest, FourScalarConstructorInitializesTheVectorAndScalarPart) {
 }
 
 TEST(QuaternionTest, OneScalarConstructorInitializesTheScalarPart) {
-    const auto q2 = XE::TQuaternion<float>{1.0f};
+    const auto q2 = XE::Quat{1.0f};
 
     EXPECT_FLOAT_EQ(q2.V.X, 0.0f);
     EXPECT_FLOAT_EQ(q2.V.Y, 0.0f);
@@ -31,7 +31,7 @@ TEST(QuaternionTest, OneScalarConstructorInitializesTheScalarPart) {
 }
 
 TEST(QuaternionTest, Vector3ConstructorConstructorInitializesTheVectorPart) {
-    const auto q = XE::TQuaternion<float>{{0.0f, 1.0f, 0.0f}};
+    const auto q = XE::Quat{{0.0f, 1.0f, 0.0f}};
 
     EXPECT_FLOAT_EQ(q.V.X, 0.0f);
     EXPECT_FLOAT_EQ(q.V.Y, 1.0f);
@@ -41,7 +41,7 @@ TEST(QuaternionTest, Vector3ConstructorConstructorInitializesTheVectorPart) {
 
 TEST(QuaternionTest, Vector4ConstructorConstructorInitializesTheVectorPart) {
     const auto v = XE::Vector4f{0.0f, 1.0f, 0.0f, 10.0f};
-    const auto q = XE::TQuaternion<float>{v};
+    const auto q = XE::Quat{v};
 
     EXPECT_FLOAT_EQ(q.V.X, 0.0f);
     EXPECT_FLOAT_EQ(q.V.Y, 1.0f);
@@ -50,7 +50,7 @@ TEST(QuaternionTest, Vector4ConstructorConstructorInitializesTheVectorPart) {
 }
 
 TEST(QuaternionTest, ThreeScalarConstructorInitializesTheVectorPart) {
-    const auto q = XE::TQuaternion<float>{0.0f, 1.0f, 0.0f};
+    const auto q = XE::Quat{0.0f, 1.0f, 0.0f};
 
     EXPECT_FLOAT_EQ(q.V.X, 0.0f);
     EXPECT_FLOAT_EQ(q.V.Y, 1.0f);
@@ -63,7 +63,7 @@ TEST(QuaternionTest, PointerConstructorInitializesTheVectorAndScalarPart) {
         4.0f, 2.0f, 3.0f, 1.0f
     };
 
-    const auto q = XE::TQuaternion<float>{values};
+    const auto q = XE::Quat{values};
 
     EXPECT_FLOAT_EQ(q.V.X, 4.0f);
     EXPECT_FLOAT_EQ(q.V.Y, 2.0f);
@@ -72,7 +72,7 @@ TEST(QuaternionTest, PointerConstructorInitializesTheVectorAndScalarPart) {
 }
 
 TEST(QuaternionTest, CopyConstructorInitializesTheVectorAndScalarPart) {
-    const auto q = XE::TQuaternion<float>{XE::TQuaternion<float>{1.0f, 2.0f, 3.0f, 1.0f}};
+    const auto q = XE::Quat{XE::Quat{1.0f, 2.0f, 3.0f, 1.0f}};
 
     EXPECT_FLOAT_EQ(q.V.X, 1.0f);
     EXPECT_FLOAT_EQ(q.V.Y, 2.0f);
@@ -84,7 +84,7 @@ TEST(QuaternionTest, CopyConstructorInitializesTheVectorAndScalarPart) {
 
 
 TEST(QuaternionTest, DataShouldReturnAPointerToTheFirstElement) {
-    const auto quat = XE::TQuaternion<float>{0.0f, 1.0f, 2.0f, 3.0f};
+    const auto quat = XE::Quat{0.0f, 1.0f, 2.0f, 3.0f};
     const float *data = quat.data();
 
     EXPECT_EQ(data[0], 0.0f);
@@ -95,13 +95,13 @@ TEST(QuaternionTest, DataShouldReturnAPointerToTheFirstElement) {
 
 
 TEST(QuaternionTest, SizeAlwaysReturnsFour) {
-    const auto quat = XE::TQuaternion<float>{0.0f, 1.0f, 2.0f, 3.0f};
+    const auto quat = XE::Quat{0.0f, 1.0f, 2.0f, 3.0f};
     EXPECT_EQ(quat.size(), 4);
 }
 
 
 TEST(QuaternionTest, OperatorBracketsShouldEnableAccessToEachElement) {
-    auto quat = XE::TQuaternion<float>{0.0f, 1.0f, 2.0f, 3.0f};
+    auto quat = XE::Quat{0.0f, 1.0f, 2.0f, 3.0f};
     EXPECT_EQ(quat[0], 0.0f);
     EXPECT_EQ(quat[1], 1.0f);
     EXPECT_EQ(quat[2], 2.0f);
@@ -110,7 +110,7 @@ TEST(QuaternionTest, OperatorBracketsShouldEnableAccessToEachElement) {
     quat[3] = 10.0f;
     EXPECT_EQ(quat[3], 10.0f);
 
-    const auto quat2 = XE::TQuaternion<float>{10.0f, -1.0f, -2.0f, -3.0f};
+    const auto quat2 = XE::Quat{10.0f, -1.0f, -2.0f, -3.0f};
     EXPECT_EQ(quat2[0], 10.0f);
     EXPECT_EQ(quat2[1], -1.0f);
     EXPECT_EQ(quat2[2], -2.0f);
@@ -119,10 +119,10 @@ TEST(QuaternionTest, OperatorBracketsShouldEnableAccessToEachElement) {
 
 
 TEST(QuaternionTest, EqualityOperatorDoesElementWiseComparisonViaFPTolerance) {
-    const auto qa_1 = XE::TQuaternion<float>{{1.0f, 2.0f, 3.0f}, 1.0f};
-    const auto qa_2 = XE::TQuaternion<float>{1.0f, 2.0f, 3.0f, 1.0f};
-    const auto qb_1 = XE::TQuaternion<float>{{1.0f, 2.0f, 3.0f}};
-    const auto qb_2 = XE::TQuaternion<float>{1.0f, 2.0f, 3.0f};
+    const auto qa_1 = XE::Quat{{1.0f, 2.0f, 3.0f}, 1.0f};
+    const auto qa_2 = XE::Quat{1.0f, 2.0f, 3.0f, 1.0f};
+    const auto qb_1 = XE::Quat{{1.0f, 2.0f, 3.0f}};
+    const auto qb_2 = XE::Quat{1.0f, 2.0f, 3.0f};
 
     EXPECT_EQ(qa_1, qa_2);
     EXPECT_EQ(qb_1, qb_2);
@@ -131,10 +131,10 @@ TEST(QuaternionTest, EqualityOperatorDoesElementWiseComparisonViaFPTolerance) {
 }
 
 TEST(QuaternionTest, InequalityOperatorDoesElementWiseComparisonViaFPTolerance) {
-    const auto qa_1 = XE::TQuaternion<float>{{1.0f, 2.0f, 3.0f}, 1.0f};
-    const auto qa_2 = XE::TQuaternion<float>{1.0f, 2.0f, 3.0f, 1.0f};
-    const auto qb_1 = XE::TQuaternion<float>{{1.0f, 2.0f, 3.0f}};
-    const auto qb_2 = XE::TQuaternion<float>{1.0f, 2.0f, 3.0f};
+    const auto qa_1 = XE::Quat{{1.0f, 2.0f, 3.0f}, 1.0f};
+    const auto qa_2 = XE::Quat{1.0f, 2.0f, 3.0f, 1.0f};
+    const auto qb_1 = XE::Quat{{1.0f, 2.0f, 3.0f}};
+    const auto qb_2 = XE::Quat{1.0f, 2.0f, 3.0f};
 
     EXPECT_NE(qa_1, qb_2);
     EXPECT_NE(qa_2, qb_1);
@@ -166,7 +166,7 @@ TEST(QuaternionTest, RotationRHQuaternionFactoryMethodInitializesNormalizedQuate
     const XE::Vector3f axis {0.0f, 1.0f, 0.0f};
 
     const auto subject = XE::quatRotationRH<float>(axis, radians);
-    const auto correct = XE::normalize(XE::TQuaternion<float>{ axis * std::sin(radians * 0.5f), std::cos(radians * 0.5f)});
+    const auto correct = XE::normalize(XE::Quat{ axis * std::sin(radians * 0.5f), std::cos(radians * 0.5f)});
 
     EXPECT_FLOAT_EQ(XE::norm(subject), 1.0f);
     EXPECT_FLOAT_EQ(subject.V.X, correct.V.X);
@@ -180,7 +180,7 @@ TEST(QuaternionTest, RotationLHQuaternionFactoryMethodInitializesNormalizedQuate
     const XE::Vector3f axis {0.0f, 1.0f, 0.0f};
 
     const auto subject = XE::quatRotationLH<float>(axis, radians);
-    const auto correct = XE::normalize(XE::TQuaternion<float>{ axis * std::sin(radians * 0.5f), std::cos(radians * 0.5f)});
+    const auto correct = XE::normalize(XE::Quat{ axis * std::sin(radians * 0.5f), std::cos(radians * 0.5f)});
 
     EXPECT_FLOAT_EQ(subject.V.X, -correct.V.X);
     EXPECT_FLOAT_EQ(subject.V.Y, -correct.V.Y);
@@ -189,25 +189,25 @@ TEST(QuaternionTest, RotationLHQuaternionFactoryMethodInitializesNormalizedQuate
 }
 
 TEST(QuaternionTest, DotShouldComputeThwSumOfProductsElementWise) {
-    const XE::TQuaternion<float> v1 = {2.0f, 8.0f, 32.0f, 0.0f};
-    const XE::TQuaternion<float> v2 = {1.0f, 2.0f, 4.0f, 0.0f};
+    const XE::Quat v1 = {2.0f, 8.0f, 32.0f, 0.0f};
+    const XE::Quat v2 = {1.0f, 2.0f, 4.0f, 0.0f};
 
     EXPECT_FLOAT_EQ(dot(v1, v2), 146.0f);
     EXPECT_FLOAT_EQ(dot(v2, v1), 146.0f);
 }
 
 TEST(QuaternionTest, Norm2ShouldComputeTheMagnitudeSquared) {
-    const auto q = XE::TQuaternion<float>{2.0f, 3.0f, 4.0f, 5.0f};
+    const auto q = XE::Quat{2.0f, 3.0f, 4.0f, 5.0f};
     EXPECT_EQ(norm2(q), 54.0f);
 }
 
 TEST(QuaternionTest, NormShouldComputeTheMagnitude) {
-    const auto q = XE::TQuaternion<float>{0.0f, 3.0f, 0.0f, 4.0f};
+    const auto q = XE::Quat{0.0f, 3.0f, 0.0f, 4.0f};
     EXPECT_EQ(norm(q), 5.0f);
 }
 
 TEST(QuaternionTest, ConjugateShouldNegateTheVectorPart) {
-    const auto q4 = XE::conjugate(XE::TQuaternion<float>{{-1.0f, 1.0f, -1.0f}, 1.0f});
+    const auto q4 = XE::conjugate(XE::Quat{{-1.0f, 1.0f, -1.0f}, 1.0f});
 
     EXPECT_EQ(q4.V.X, 1.0f);
     EXPECT_EQ(q4.V.Y, -1.0f);
@@ -216,19 +216,19 @@ TEST(QuaternionTest, ConjugateShouldNegateTheVectorPart) {
 }
 
 TEST(QuaternionTest, NormalizeShouldScaleAQuaternionToTheUnitLength) {
-    const auto q1 = XE::normalize(XE::TQuaternion<float>{{1.0f, 1.0f, 1.0f}, 1.0f});
+    const auto q1 = XE::normalize(XE::Quat{{1.0f, 1.0f, 1.0f}, 1.0f});
     EXPECT_EQ(q1.V.X, 0.5f);
     EXPECT_EQ(q1.V.Y, 0.5f);
     EXPECT_EQ(q1.V.Z, 0.5f);
     EXPECT_EQ(q1.W, 0.5f);
 
-    const auto q2 = XE::normalize(XE::TQuaternion<float>{{0.0f, 4.0f, 0.0f}, 0.0f});
+    const auto q2 = XE::normalize(XE::Quat{{0.0f, 4.0f, 0.0f}, 0.0f});
     EXPECT_EQ(q2.V.X, 0.0f);
     EXPECT_EQ(q2.V.Y, 1.0f);
     EXPECT_EQ(q2.V.Z, 0.0f);
     EXPECT_EQ(q2.W, 0.0f);
 
-    const auto q3 = XE::normalize(XE::TQuaternion<float>{{0.0f, -1.0f, 0.0f}, 0.0f});
+    const auto q3 = XE::normalize(XE::Quat{{0.0f, -1.0f, 0.0f}, 0.0f});
     EXPECT_EQ(q3.V.X, 0.0f);
     EXPECT_EQ(q3.V.Y, -1.0f);
     EXPECT_EQ(q3.V.Z, 0.0f);
@@ -236,65 +236,65 @@ TEST(QuaternionTest, NormalizeShouldScaleAQuaternionToTheUnitLength) {
 }
 
 TEST(QuaternionTest, AdditionOperatorShouldAddTheirEachComponentsTogether) {
-    const auto q1 = XE::TQuaternion<float>(1.0f, 0.0f, 1.0f, 1.0f);
-    const auto q2 = XE::TQuaternion<float>(0.0f, 1.0f, 0.0f, 1.0f);
+    const auto q1 = XE::Quat(1.0f, 0.0f, 1.0f, 1.0f);
+    const auto q2 = XE::Quat(0.0f, 1.0f, 0.0f, 1.0f);
 
-    EXPECT_EQ(q1 + q1, XE::TQuaternion<float>(2.0f, 0.0f, 2.0f, 2.0f));
-    EXPECT_EQ(q1 + q2, XE::TQuaternion<float>(1.0f, 1.0f, 1.0f, 2.0f));
+    EXPECT_EQ(q1 + q1, XE::Quat(2.0f, 0.0f, 2.0f, 2.0f));
+    EXPECT_EQ(q1 + q2, XE::Quat(1.0f, 1.0f, 1.0f, 2.0f));
 }
 
 TEST(QuaternionTest, SubtractionOperatorShouldSubtractEachComponentTogether) {
-    const auto q1 = XE::TQuaternion<float>(1.0f, 0.0f, 1.0f, 1.0f);
-    const auto q2 = XE::TQuaternion<float>(0.0f, 1.0f, 0.0f, 1.0f);
+    const auto q1 = XE::Quat(1.0f, 0.0f, 1.0f, 1.0f);
+    const auto q2 = XE::Quat(0.0f, 1.0f, 0.0f, 1.0f);
 
-    EXPECT_EQ(q1 - q1, XE::TQuaternion<float>(0.0f, 0.0f, 0.0f, 0.0f));
-    EXPECT_EQ(q1 - q2, XE::TQuaternion<float>(1.0f, -1.0f, 1.0f, 0.0f));
+    EXPECT_EQ(q1 - q1, XE::Quat(0.0f, 0.0f, 0.0f, 0.0f));
+    EXPECT_EQ(q1 - q2, XE::Quat(1.0f, -1.0f, 1.0f, 0.0f));
 }
 
 TEST(QuaternionTest, NegationOperatorShouldInvertEachComponent) {
-    const auto q1 = XE::TQuaternion<float>(1.0f, 0.0f, 1.0f, 1.0f);
-    const auto q2 = XE::TQuaternion<float>(0.0f, 1.0f, 0.0f, 1.0f);
+    const auto q1 = XE::Quat(1.0f, 0.0f, 1.0f, 1.0f);
+    const auto q2 = XE::Quat(0.0f, 1.0f, 0.0f, 1.0f);
 
-    EXPECT_EQ(-q1, XE::TQuaternion<float>(-1.0f, -0.0f, -1.0f, -1.0f));
-    EXPECT_EQ(-q2, XE::TQuaternion<float>(0.0f, -1.0f, 0.0f, -1.0f));
+    EXPECT_EQ(-q1, XE::Quat(-1.0f, -0.0f, -1.0f, -1.0f));
+    EXPECT_EQ(-q2, XE::Quat(0.0f, -1.0f, 0.0f, -1.0f));
 }
 
 TEST(QuaternionTest, PlusOperatorShouldModifyNoComponents) {
-    const auto q1 = XE::TQuaternion<float>(1.0f, 0.0f, 1.0f, 1.0f);
-    const auto q2 = XE::TQuaternion<float>(0.0f, 1.0f, 0.0f, 1.0f);
+    const auto q1 = XE::Quat(1.0f, 0.0f, 1.0f, 1.0f);
+    const auto q2 = XE::Quat(0.0f, 1.0f, 0.0f, 1.0f);
 
-    EXPECT_EQ(+q1, XE::TQuaternion<float>(1.0f, 0.0f, 1.0f, 1.0f));
-    EXPECT_EQ(+q2, XE::TQuaternion<float>(0.0f, 1.0f, 0.0f, 1.0f));
+    EXPECT_EQ(+q1, XE::Quat(1.0f, 0.0f, 1.0f, 1.0f));
+    EXPECT_EQ(+q2, XE::Quat(0.0f, 1.0f, 0.0f, 1.0f));
 }
 
 TEST(QuaternionTest, MultiplyByScalarOperatorMultiplyEachComponent) {
-    const auto q1 = XE::TQuaternion<float>(1.0f, 0.0f, 1.0f, 1.0f);
-    const auto q2 = XE::TQuaternion<float>(0.0f, 1.0f, 0.0f, 1.0f);
+    const auto q1 = XE::Quat(1.0f, 0.0f, 1.0f, 1.0f);
+    const auto q2 = XE::Quat(0.0f, 1.0f, 0.0f, 1.0f);
 
-    EXPECT_EQ(q1 * 1.0f, XE::TQuaternion<float>(1.0f, 0.0f, 1.0f, 1.0f));
-    EXPECT_EQ(q2 * 0.0f, XE::TQuaternion<float>(0.0f, 0.0f, 0.0f, 0.0f));
+    EXPECT_EQ(q1 * 1.0f, XE::Quat(1.0f, 0.0f, 1.0f, 1.0f));
+    EXPECT_EQ(q2 * 0.0f, XE::Quat(0.0f, 0.0f, 0.0f, 0.0f));
 }
 
 TEST(QuaternionTest, ScalarByQuaternionOperatorMultiplyEachComponent) {
-    const auto q1 = XE::TQuaternion<float>(1.0f, 0.0f, 1.0f, 1.0f);
-    const auto q2 = XE::TQuaternion<float>(0.0f, 1.0f, 0.0f, 1.0f);
+    const auto q1 = XE::Quat(1.0f, 0.0f, 1.0f, 1.0f);
+    const auto q2 = XE::Quat(0.0f, 1.0f, 0.0f, 1.0f);
 
-    EXPECT_EQ(1.0f * q1, XE::TQuaternion<float>(1.0f, 0.0f, 1.0f, 1.0f));
-    EXPECT_EQ(0.0f * q2, XE::TQuaternion<float>(0.0f, 0.0f, 0.0f, 0.0f));
+    EXPECT_EQ(1.0f * q1, XE::Quat(1.0f, 0.0f, 1.0f, 1.0f));
+    EXPECT_EQ(0.0f * q2, XE::Quat(0.0f, 0.0f, 0.0f, 0.0f));
 }
 
 TEST(QuaternionTest, DivideByScalarOperatorMultiplyEachComponent) {
-    const auto q1 = XE::TQuaternion<float>(1.0f, 0.0f, 1.0f, 1.0f);
-    const auto q2 = XE::TQuaternion<float>(0.0f, 1.0f, 0.0f, 1.0f);
+    const auto q1 = XE::Quat(1.0f, 0.0f, 1.0f, 1.0f);
+    const auto q2 = XE::Quat(0.0f, 1.0f, 0.0f, 1.0f);
 
-    EXPECT_EQ(q1 / 1.0f, XE::TQuaternion<float>(1.0f, 0.0f, 1.0f, 1.0f));
-    EXPECT_EQ(q2 / 0.5f, XE::TQuaternion<float>(0.0f, 2.0f, 0.0f, 2.0f));
+    EXPECT_EQ(q1 / 1.0f, XE::Quat(1.0f, 0.0f, 1.0f, 1.0f));
+    EXPECT_EQ(q2 / 0.5f, XE::Quat(0.0f, 2.0f, 0.0f, 2.0f));
 }
 
 
 TEST(QuaternionTest, MultiplyShouldCombineTwoQuaternions) {
-    const auto q1 = XE::TQuaternion<float>(1.0f, 0.0f, 0.0f, 1.0f);
-    const auto q2 = XE::TQuaternion<float>(0.0f, 1.0f, 0.0f, 1.0f);
+    const auto q1 = XE::Quat(1.0f, 0.0f, 0.0f, 1.0f);
+    const auto q2 = XE::Quat(0.0f, 1.0f, 0.0f, 1.0f);
 
     const auto r1 = q1 * q2;
     EXPECT_FLOAT_EQ(r1.V.X, 1.0f);
@@ -310,8 +310,8 @@ TEST(QuaternionTest, MultiplyShouldCombineTwoQuaternions) {
 }
 
 TEST(QuaternionTest, MultiplyByIdentityQShouldNotHaveAnyAffect) {
-    const auto q1 = XE::TQuaternion<float>(1.0f, 0.0f, 1.0f, 1.0f);
-    const auto q2 = XE::TQuaternion<float>(0.0f, 1.0f, 0.0f, 1.0f);
+    const auto q1 = XE::Quat(1.0f, 0.0f, 1.0f, 1.0f);
+    const auto q2 = XE::Quat(0.0f, 1.0f, 0.0f, 1.0f);
     const auto qi = XE::quatId<float>();
 
     EXPECT_EQ(q1 * qi, q1);
@@ -319,8 +319,8 @@ TEST(QuaternionTest, MultiplyByIdentityQShouldNotHaveAnyAffect) {
 }
 
 TEST(QuaternionTest, MultiplyByZeroQShouldCollapseAnyQuaternionToZero) {
-    const auto q1 = XE::TQuaternion<float>(1.0f, 0.0f, 1.0f, 1.0f);
-    const auto q2 = XE::TQuaternion<float>(0.0f, 1.0f, 0.0f, 1.0f);
+    const auto q1 = XE::Quat(1.0f, 0.0f, 1.0f, 1.0f);
+    const auto q2 = XE::Quat(0.0f, 1.0f, 0.0f, 1.0f);
     const auto qz = XE::quatZero<float>();
 
     EXPECT_EQ(q1 * qz, qz);
@@ -328,8 +328,8 @@ TEST(QuaternionTest, MultiplyByZeroQShouldCollapseAnyQuaternionToZero) {
 }
 
 TEST(QuaternionTest, DivideByIdentityShouldNotAffectAnyQuaternion) {
-    const auto q1 = XE::TQuaternion<float>(1.0f, 0.0f, 1.0f, 1.0f);
-    const auto q2 = XE::TQuaternion<float>(0.0f, 1.0f, 0.0f, 1.0f);
+    const auto q1 = XE::Quat(1.0f, 0.0f, 1.0f, 1.0f);
+    const auto q2 = XE::Quat(0.0f, 1.0f, 0.0f, 1.0f);
     const auto qi = XE::quatId<float>();
 
     EXPECT_EQ(q1 / qi, q1);
@@ -337,8 +337,8 @@ TEST(QuaternionTest, DivideByIdentityShouldNotAffectAnyQuaternion) {
 }
 
 TEST(QuaternionTest, DivideByZeroShouldCollapseAnyQuaternionToNaNValues) {
-    const auto q1 = XE::TQuaternion<float>(1.0f, 0.0f, 1.0f, 1.0f);
-    const auto q2 = XE::TQuaternion<float>(0.0f, 1.0f, 0.0f, 1.0f);
+    const auto q1 = XE::Quat(1.0f, 0.0f, 1.0f, 1.0f);
+    const auto q2 = XE::Quat(0.0f, 1.0f, 0.0f, 1.0f);
     const auto qz = XE::quatZero<float>();
 
     const auto r1 = q1 / qz;
@@ -357,7 +357,7 @@ TEST(QuaternionTest, DivideByZeroShouldCollapseAnyQuaternionToNaNValues) {
 
 
 TEST(QuaternionTest, AddAndAssignOperatorShouldAddTheirEachComponentsTogether) {
-    XE::TQuaternion<float> q1{{1.0f, 0.0f, 1.0f}, 1.0f};
+    XE::Quat q1{{1.0f, 0.0f, 1.0f}, 1.0f};
     q1 += q1;
 
     EXPECT_FLOAT_EQ(q1.V.X, 2.0f);
@@ -367,8 +367,8 @@ TEST(QuaternionTest, AddAndAssignOperatorShouldAddTheirEachComponentsTogether) {
 }
 
 TEST(QuaternionTest, SubtractractAndAssignOperatorShouldSubtractEachComponentTogether) {
-    XE::TQuaternion<float> q1{{1.0f, 0.0f, 1.0f}, 1.0f};
-    q1 -= XE::TQuaternion<float>(0.0f, 1.0f, 0.0f, 1.0f);
+    XE::Quat q1{{1.0f, 0.0f, 1.0f}, 1.0f};
+    q1 -= XE::Quat(0.0f, 1.0f, 0.0f, 1.0f);
 
     EXPECT_FLOAT_EQ(q1.V.X, 1.0f);
     EXPECT_FLOAT_EQ(q1.V.Y, -1.0f);
@@ -377,7 +377,7 @@ TEST(QuaternionTest, SubtractractAndAssignOperatorShouldSubtractEachComponentTog
 }
 
 TEST(QuaternionTest, MultiplyAndAssignByScalarOperatorMultiplyEachComponent) {
-    XE::TQuaternion<float> q1{{1.0f, 0.0f, 1.0f}, 1.0f};
+    XE::Quat q1{{1.0f, 0.0f, 1.0f}, 1.0f};
 
     q1 *= 3.0f;
 
@@ -389,7 +389,7 @@ TEST(QuaternionTest, MultiplyAndAssignByScalarOperatorMultiplyEachComponent) {
 
 
 TEST(QuaternionTest, DivideAndAssignByScalarOperatorMultiplyEachComponent) {
-    XE::TQuaternion<float> q1{{1.0f, 0.0f, 1.0f}, 1.0f};
+    XE::Quat q1{{1.0f, 0.0f, 1.0f}, 1.0f};
 
     q1 /= 1.0f;
 
@@ -401,21 +401,21 @@ TEST(QuaternionTest, DivideAndAssignByScalarOperatorMultiplyEachComponent) {
 
 
 TEST(QuaternionTest, Norm2ShouldComputeSquaredMagnitude) {
-    const auto q = XE::TQuaternion<float>{3.0f, 4.0f, 5.0f, 0.0f};
+    const auto q = XE::Quat{3.0f, 4.0f, 5.0f, 0.0f};
 
     EXPECT_FLOAT_EQ(XE::norm2(q), 50.0f);
 }
 
 
 TEST(QuaternionTest, NormShouldComputeMagnitude) {
-    const auto q = XE::TQuaternion<float>{3.0f, 4.0f, 5.0f, 0.0f};
+    const auto q = XE::Quat{3.0f, 4.0f, 5.0f, 0.0f};
 
     EXPECT_FLOAT_EQ(XE::norm(q), 7.071067812f);
 }
 
 
 TEST(QuaternionTest, ConjugateShouldReturnNegatedVectorPart) {
-    const auto q = XE::TQuaternion<float>{3.0f, 4.0f, 5.0f, 1.0f};
+    const auto q = XE::Quat{3.0f, 4.0f, 5.0f, 1.0f};
     const auto conjugate = XE::conjugate(q);
 
     EXPECT_FLOAT_EQ(conjugate.V.X, -3.0f);
@@ -426,7 +426,7 @@ TEST(QuaternionTest, ConjugateShouldReturnNegatedVectorPart) {
 
 
 TEST(QuaternionTest, NormalizeShouldReturnUnitLengthQuaternion) {
-    const auto q = XE::TQuaternion<float>{3.0f, 4.0f, 5.0f, 0.0f};
+    const auto q = XE::Quat{3.0f, 4.0f, 5.0f, 0.0f};
     const auto normalized = XE::normalize(q);
 
     EXPECT_FLOAT_EQ(XE::norm(normalized), 1.0f);
@@ -434,7 +434,7 @@ TEST(QuaternionTest, NormalizeShouldReturnUnitLengthQuaternion) {
 
 
 TEST(QuaternionTest, InverseShouldComputeAnNormalizedCongujatedQuaternion) {
-    const auto q1 = XE::TQuaternion<float>{{3.0f, 4.0f, 5.0f}, 0.0f};
+    const auto q1 = XE::Quat{{3.0f, 4.0f, 5.0f}, 0.0f};
     const auto inverse = XE::inverse(q1);
 
     EXPECT_FLOAT_EQ(inverse.V.X, -3.0f / 50.0f);
