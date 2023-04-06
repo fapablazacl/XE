@@ -289,19 +289,15 @@ namespace XE {
             return result;
         }
 
-        static auto translate(const TVector<T, R> &displace) {
-            if constexpr (R == 4) {
-                auto result = TMatrix<T, R, C>();
+        static auto translate(const TVector<T, R - 1> &displace) {
+            if constexpr (R == C) {
+                auto result = TMatrix<T, R, C>::identity();
 
-                result.setColumn(R - 1, displace);
+                for (int i = 0; i < R - 1; i++) {
+                    result[i][C - 1] = displace[i];
+                }
 
                 return result;
-            }
-        }
-
-        static auto translate(const TVector<T, R - 1> &displace) {
-            if constexpr (R == 4) {
-                return translate(TVector<T, R>{displace, T(1)});
             }
         }
 
@@ -592,7 +588,7 @@ namespace XE {
         return result;
     }
 
-    template <typename T, int R, int C> TVector<T, C> operator*(const TVector<T, C> &v, const TMatrix<T, R, C> &m) {
+    template <typename T, int R, int C> [[deprecated("As the TMatrix struct is row-major, vector-matrix multiplication by the left doesn't have meaning")]] TVector<T, C> operator*(const TVector<T, C> &v, const TMatrix<T, R, C> &m) {
         TVector<T, C> result;
 
         for (int col = 0; col < C; col++) {

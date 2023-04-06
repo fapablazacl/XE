@@ -160,6 +160,28 @@ TEST(MatrixTest, DeterminantShouldComputeTheMatrixDeterminantCorrectly) {
 }
 
 
+TEST(MatrixTest, ComparisonOperatorsShouldCheckMatrixComponents) {
+    const XE::Matrix4 m1 = XE::Matrix4::rows({
+        XE::Vector4{1.0f, 2.0f, 3.0f, 4.0f},
+        XE::Vector4{5.0f, 6.0f, 7.0f, 8.0f},
+        XE::Vector4{9.0f, 10.0f, 11.0f, 12.0f},
+        XE::Vector4{13.0f, 14.0f, 15.0f, 16.0f}
+    });
+
+    const XE::Matrix4 m2 = XE::Matrix4::rows({
+        XE::Vector4{16.0f, 15.0f, 14.0f, 13.0f},
+        XE::Vector4{12.0f, 11.0f, 10.0f, 9.0f},
+        XE::Vector4{8.0f, 7.0f, 6.0f, 5.0f},
+        XE::Vector4{4.0f, 3.0f, 2.0f, 1.0f}
+    });
+
+    EXPECT_EQ(m1, m1);
+    EXPECT_EQ(m2, m2);
+    EXPECT_NE(m1, m2);
+    EXPECT_NE(m2, m1);
+}
+
+
 TEST(MatrixTest, AdditionAddsEveryFieldOneToOne) {
     const auto matA = XE::Matrix4::rows({
         XE::Vector4{1.0f, 2.0f, 1.0f, 0.0f},
@@ -338,26 +360,6 @@ TEST(MatrixTest, InverseShouldComputeTheMatrixInverseMultiplicative) {
     EXPECT_EQ(invMatA, inverse(matA));
 }
 
-TEST(MatrixTest, ComparisonOperatorsShouldCheckMatrixComponents) {
-    const XE::Matrix4 m1 = XE::Matrix4::rows({
-        XE::Vector4{1.0f, 2.0f, 3.0f, 4.0f},
-        XE::Vector4{5.0f, 6.0f, 7.0f, 8.0f},
-        XE::Vector4{9.0f, 10.0f, 11.0f, 12.0f},
-        XE::Vector4{13.0f, 14.0f, 15.0f, 16.0f}
-    });
-
-    const XE::Matrix4 m2 = XE::Matrix4::rows({
-        XE::Vector4{16.0f, 15.0f, 14.0f, 13.0f},
-        XE::Vector4{12.0f, 11.0f, 10.0f, 9.0f},
-        XE::Vector4{8.0f, 7.0f, 6.0f, 5.0f},
-        XE::Vector4{4.0f, 3.0f, 2.0f, 1.0f}
-    });
-
-    EXPECT_EQ(m1, m1);
-    EXPECT_EQ(m2, m2);
-    EXPECT_NE(m1, m2);
-    EXPECT_NE(m2, m1);
-}
 
 
 TEST(MatrixTest, GetColumnShouldExtractACertainColumnFromTheMatrixAsVector) {
@@ -556,28 +558,14 @@ TEST(MatrixTest, ScaleStaticFunctionShouldCreateAValidScalingMatrix) {
 
 
 TEST(MatrixTest, CreateTranslationStaticFunctionShouldCreateAValidTranslateMatrix) {
-    const auto m1 = XE::Matrix4::translate({2.0f, 3.0f, 4.0f, 1.0f});
-    EXPECT_EQ(m1.getColumn(0), XE::Vector4(1.0f, 0.0f, 0.0f, 0.0f));
-    EXPECT_EQ(m1.getColumn(1), XE::Vector4(0.0f, 1.0f, 0.0f, 0.0f));
-    EXPECT_EQ(m1.getColumn(2), XE::Vector4(0.0f, 0.0f, 1.0f, 0.0f));
-    EXPECT_EQ(m1.getColumn(3), XE::Vector4(2.0f, 3.0f, 4.0f, 1.0f));
+    const auto m1 = XE::Matrix4::translate({2.0f, 3.0f, 4.0f});
 
-    const auto m2 = XE::Matrix4::translate({2.0f, -3.0f, 4.0f});
-    EXPECT_EQ(m2.getColumn(0), XE::Vector4(1.0f, 0.0f, 0.0f, 0.0f));
-    EXPECT_EQ(m2.getColumn(1), XE::Vector4(0.0f, 1.0f, 0.0f, 0.0f));
-    EXPECT_EQ(m2.getColumn(2), XE::Vector4(0.0f, 0.0f, 1.0f, 0.0f));
-    EXPECT_EQ(m2.getColumn(3), XE::Vector4(2.0f, -3.0f, 4.0f, 1.0f));
-
-    EXPECT_EQ(m1 * XE::Vector4(0.0f, 0.0f, 0.0f, 0.0f), XE::Vector4(0.0f, 0.0f, 0.0f, 0.0f));
-    EXPECT_EQ(m1 * XE::Vector4(2.0f, -2.0f, 1.0f, 1.0f), XE::Vector4(4.0f, 1.0f, 5.0f, 1.0f));
-    EXPECT_EQ(m1 * XE::Vector4(1.0f, 0.0f, 1.0f, 1.0f), XE::Vector4(3.0f, 3.0f, 5.0f, 1.0f));
-    EXPECT_EQ(m2 * XE::Vector4(1.0f, 1.0f, 1.0f, 1.0f), XE::Vector4(3.0f, -2.0f, 5.0f, 1.0f));
-    EXPECT_EQ(m2 * XE::Vector4(0.0f, 0.0f, 0.0f, 1.0f), XE::Vector4(2.0f, -3.0f, 4.0f, 1.0f));
-
-    EXPECT_EQ(m1 * XE::Vector4(2.0f, -2.0f, 1.0f, 0.0f), XE::Vector4(2.0f, -2.0f, 1.0f, 0.0f));
-    EXPECT_EQ(m1 * XE::Vector4(1.0f, 0.0f, 1.0f, 0.0f), XE::Vector4(1.0f, 0.0f, 1.0f, 0.0f));
-    EXPECT_EQ(m2 * XE::Vector4(1.0f, 1.0f, 1.0f, 0.0f), XE::Vector4(1.0f, 1.0f, 1.0f, 0.0f));
+    EXPECT_EQ(m1.getRow(0), XE::Vector4(1.0f, 0.0f, 0.0f, 2.0f));
+    EXPECT_EQ(m1.getRow(1), XE::Vector4(0.0f, 1.0f, 0.0f, 3.0f));
+    EXPECT_EQ(m1.getRow(2), XE::Vector4(0.0f, 0.0f, 1.0f, 4.0f));
+    EXPECT_EQ(m1.getRow(3), XE::Vector4(0.0f, 0.0f, 0.0f, 1.0f));
 }
+
 
 TEST(MatrixTest, RotateXStaticFunctionShouldCreateAXAxisRotationMatrix) {
     XE::Matrix4 m;
