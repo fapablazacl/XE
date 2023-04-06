@@ -1,5 +1,5 @@
 
-#include "Common.h"
+#include "GoogleTestCommon.h"
 #include <iostream>
 #include <xe/math/Range.h>
 

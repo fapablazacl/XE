@@ -1,5 +1,5 @@
 
-#include "Common.h"
+#include "GoogleTestCommon.h"
 
 #include <xe/math/Common.h>
 #include <xe/math/Matrix.h>

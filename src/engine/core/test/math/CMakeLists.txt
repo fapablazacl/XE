@@ -1,6 +1,9 @@
 set (test_target "XE.Math.Test")
 
-set (test_sources 
+set (test_headers "GoogleTestCommon.h")
+
+set (test_sources
+        ${test_headers}
     "Box.Test.cpp"
     "Common.Test.cpp"
     "Ellipsoid.Test.cpp"
@@ -16,8 +19,6 @@ set (test_sources
     "Triangle.Test.cpp"
     "Vector.Test.cpp"
 )
-
-set (test_headers "Common.h" ${headers})
 
 add_executable(${test_target} ${test_sources})
 target_link_libraries(${test_target} XE.Core XE.Interface gtest gmock)

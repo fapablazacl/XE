@@ -1,5 +1,5 @@
 
-#include "Common.h"
+#include "GoogleTestCommon.h"
 #include <sstream>
 #include <xe/math/Ellipsoid.h>
 

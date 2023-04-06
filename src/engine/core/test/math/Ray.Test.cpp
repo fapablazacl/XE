@@ -1,5 +1,5 @@
 
-#include "Common.h"
+#include "GoogleTestCommon.h"
 #include <xe/math/Ray.h>
 
 TEST(RayTest, EqualsShouldComparePointsInAElementWiseFasion) {
