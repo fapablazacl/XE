@@ -154,13 +154,50 @@ TEST(MatrixTest, DeterminantShouldComputeTheMatrixDeterminantCorrectly) {
     });
 
     // matrix determinant
-    EXPECT_EQ(XE::determinant(XE::Matrix4::zero()), 0.0f);
-    EXPECT_EQ(XE::determinant(XE::Matrix4::identity()), 1.0f);
-    EXPECT_EQ(XE::determinant(matA), -32.0f);
+    EXPECT_FLOAT_EQ(XE::determinant(XE::Matrix4::zero()), 0.0f);
+    EXPECT_FLOAT_EQ(XE::determinant(XE::Matrix4::identity()), 1.0f);
+    EXPECT_FLOAT_EQ(XE::determinant(matA), -32.0f);
 }
 
-// TODO: Refactor each operator into its own test case
-TEST(MatrixTest, ArithmeticOperatorsShouldBehaveAccordingToTheirCorrespondingMathematicalDefinitions) {
+
+TEST(MatrixTest, AdditionAddsEveryFieldOneToOne) {
+    const auto matA = XE::Matrix4::rows({
+        XE::Vector4{1.0f, 2.0f, 1.0f, 0.0f},
+        XE::Vector4{2.0f, 1.0f, -3.0f, -1.0f},
+        XE::Vector4{-3.0f, 2.0f, 1.0f, 0.0f},
+        XE::Vector4{2.0f, -1.0f, 0.0f, -1.0f}
+    });
+
+    const auto matB = XE::Matrix4::rows({
+        XE::Vector4{-3.0f, 1.0f, 5.0f, 1.0f},
+        XE::Vector4{1.0f, 2.0f, -1.0f, 1.0f},
+        XE::Vector4{1.0f, 2.0f, 1.0f, -2.0f},
+        XE::Vector4{1.0f, -1.0f, -3.0f, -1.0f}
+    });
+
+    const auto matAddResult = XE::Matrix4::rows({
+        XE::Vector4{-2.0f,  3.0f,  6.0f,  1.0f},
+        XE::Vector4{ 3.0f,  3.0f, -4.0f,  0.0f},
+        XE::Vector4{-2.0f,  4.0f,  2.0f, -2.0f},
+        XE::Vector4{ 3.0f, -2.0f, -3.0f, -2.0f}
+    });
+
+    // addition
+    EXPECT_EQ(matA, +matA);
+    EXPECT_EQ(matB, +matB);
+
+    EXPECT_EQ(matA + XE::Matrix4::zero(), matA);
+    EXPECT_EQ(matB + XE::Matrix4::zero(), matB);
+
+    EXPECT_EQ(matAddResult, matA + matB);
+    EXPECT_EQ(matAddResult, matB + matA);
+
+    EXPECT_EQ(matAddResult, ((+matA) += matB));
+    EXPECT_EQ(matAddResult, ((+matB) += matA));
+}
+
+
+TEST(MatrixTest, SubtractionSubtractsEveryFieldOneToOne) {
     const auto matA = XE::Matrix4::rows({
         XE::Vector4{1.0f, 2.0f, 1.0f, 0.0f},
         XE::Vector4{2.0f, 1.0f, -3.0f, -1.0f},
@@ -182,40 +219,12 @@ TEST(MatrixTest, ArithmeticOperatorsShouldBehaveAccordingToTheirCorrespondingMat
         XE::Vector4{1.0f, -1.0f, -3.0f, -1.0f}
     });
 
-    const auto matAddResult = XE::Matrix4::rows({
-        XE::Vector4{-2.0f,  3.0f,  6.0f,  1.0f},
-        XE::Vector4{ 3.0f,  3.0f, -4.0f,  0.0f},
-        XE::Vector4{-2.0f,  4.0f,  2.0f, -2.0f},
-        XE::Vector4{ 3.0f, -2.0f, -3.0f, -2.0f}
-    });
-
     const auto matSubResult = XE::Matrix4::rows({
         XE::Vector4{ 4.0f,  1.0f, -4.0f, -1.0f},
         XE::Vector4{ 1.0f, -1.0f, -2.0f, -2.0f},
         XE::Vector4{-4.0f,  0.0f,  0.0f,  2.0f},
         XE::Vector4{ 1.0f,  0.0f,  3.0f,  0.0f}
     });
-
-    const XE::Matrix4 matMulResult = XE::Matrix4::rows({
-        XE::Vector4{  0.0f,  7.0f,  4.0f,   1.0f},
-        XE::Vector4{ -9.0f, -1.0f,  9.0f,  10.0f},
-        XE::Vector4{ 12.0f,  3.0f, -16.0f, -3.0f},
-        XE::Vector4{ -8.0f,  1.0f,  14.0f,  2.0f}
-    });
-
-
-    // addition
-    EXPECT_EQ(matA, +matA);
-    EXPECT_EQ(matB, +matB);
-
-    EXPECT_EQ(matA + XE::Matrix4::zero(), matA);
-    EXPECT_EQ(matB + XE::Matrix4::zero(), matB);
-
-    EXPECT_EQ(matAddResult, matA + matB);
-    EXPECT_EQ(matAddResult, matB + matA);
-
-    EXPECT_EQ(matAddResult, ((+matA) += matB));
-    EXPECT_EQ(matAddResult, ((+matB) += matA));
 
     // subtraction
     EXPECT_EQ(matNegA, -matA);
@@ -230,12 +239,46 @@ TEST(MatrixTest, ArithmeticOperatorsShouldBehaveAccordingToTheirCorrespondingMat
 
     EXPECT_EQ(matSubResult, ((+matA) -= matB));
     EXPECT_EQ(-matSubResult, ((+matB) -= matA));
+}
+
+
+TEST(MatrixTest, ScalarMultiplicationMultipliesEveryFieldWithAnScalar) {
+    const auto matA = XE::Matrix4::rows({
+        XE::Vector4{1.0f, 2.0f, 1.0f, 0.0f},
+        XE::Vector4{2.0f, 1.0f, -3.0f, -1.0f},
+        XE::Vector4{-3.0f, 2.0f, 1.0f, 0.0f},
+        XE::Vector4{2.0f, -1.0f, 0.0f, -1.0f}
+    });
 
     // scalar multiplication
     EXPECT_EQ(matA * -1.0f, -matA);
     EXPECT_EQ(matA * -1.0f, -1.0f * matA);
     EXPECT_EQ(matA * 1.0f, matA);
     EXPECT_EQ(matA * 1.0f, 1.0f * matA);
+}
+
+
+TEST(MatrixTest, MatrixMultiplicationPerformsADotProductBetweenRowAndColumnsForEachResultField) {
+    const auto matA = XE::Matrix4::rows({
+        XE::Vector4{1.0f, 2.0f, 1.0f, 0.0f},
+        XE::Vector4{2.0f, 1.0f, -3.0f, -1.0f},
+        XE::Vector4{-3.0f, 2.0f, 1.0f, 0.0f},
+        XE::Vector4{2.0f, -1.0f, 0.0f, -1.0f}
+    });
+
+    const auto matB = XE::Matrix4::rows({
+        XE::Vector4{-3.0f, 1.0f, 5.0f, 1.0f},
+        XE::Vector4{1.0f, 2.0f, -1.0f, 1.0f},
+        XE::Vector4{1.0f, 2.0f, 1.0f, -2.0f},
+        XE::Vector4{1.0f, -1.0f, -3.0f, -1.0f}
+    });
+
+    const XE::Matrix4 matMulResult = XE::Matrix4::rows({
+        XE::Vector4{  0.0f,  7.0f,  4.0f,   1.0f},
+        XE::Vector4{ -9.0f, -1.0f,  9.0f,  10.0f},
+        XE::Vector4{ 12.0f,  3.0f, -16.0f, -3.0f},
+        XE::Vector4{ -8.0f,  1.0f,  14.0f,  2.0f}
+    });
 
     // matrix multiplication
     EXPECT_EQ(XE::Matrix4::zero(), XE::Matrix4::zero() * XE::Matrix4::zero());
