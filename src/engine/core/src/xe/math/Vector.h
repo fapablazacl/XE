@@ -18,6 +18,17 @@
 namespace XE {
     template <typename T, int N> struct VectorBase {
         T values[N];
+
+        VectorBase() {}
+
+        VectorBase(std::initializer_list<T> il) {
+            assert(il.size() == N);
+
+            int i = 0;
+            for (const T value : il) {
+                values[i++] = value;
+            }
+        }
     };
 
     template <typename T> struct VectorBase<T, 2> {

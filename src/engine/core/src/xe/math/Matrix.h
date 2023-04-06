@@ -25,20 +25,51 @@ namespace XE {
 
     template <typename T, int R, int C> T determinant(const TMatrix<T, R, C> &m);
 
+    enum class MatrixOrder {
+        RowMajor,
+        ColumnMajor
+    };
+
     /**
      * @brief NxM matrix struct, in column-major order.
      */
     template <typename T, int R, int C> struct TMatrix {
     private:
         //! row-column accessor
-        T element[R][C] = {};
+        union {
+            T element[R][C];
+            TVector<T, C> v[R];
+        };
 
     public:
-        TMatrix() {}
+        TMatrix() {
+            for (int i = 0; i < R; i++) {
+                v[i] = TVector<T, C>{};
+            }
+        }
 
-        explicit TMatrix(const T *values) {
+        explicit TMatrix(const T *const values) {
             assert(values);
             std::memcpy(data(), values, R * C * sizeof(T));
+        }
+
+        explicit TMatrix(const std::initializer_list<T> il) {
+            assert(il.size() == R * C);
+
+            T *values = data();
+
+            for (const T value : il) {
+                *values = value;
+                values++;
+            }
+        }
+
+        explicit TMatrix(const std::array<TVector<T, C>, R> &rows) {
+            for (int i = 0; i < R; i++) {
+                for (int j = 0; j < C; j++) {
+                    v[i] = rows[i];
+                }
+            }
         }
 
         explicit TMatrix(const TVector<T, R * C> &v) {
@@ -47,6 +78,10 @@ namespace XE {
             for (int i = 0; i < R * C; i++) {
                 values[i] = v.values[i];
             }
+        }
+
+        constexpr MatrixOrder order() const {
+            return MatrixOrder::RowMajor;
         }
 
         bool operator==(const TMatrix<T, R, C> &other) const;
@@ -78,6 +113,18 @@ namespace XE {
         TVector<T, R> operator*(const TVector<T, R> &v) const;
 
         inline friend TMatrix<T, R, C> operator*(const T s, const TMatrix<T, R, C> &m) { return m * s; }
+
+        const TVector<T, C>& operator[] (const size_t i) const {
+            assert(i < R);
+
+            return v[i];
+        }
+
+        TVector<T, C>& operator[] (const size_t i) {
+            assert(i < R);
+
+            return v[i];
+        }
 
         T &operator()(const int i, const int j) {
             assert(i >= 0);

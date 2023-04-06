@@ -6,31 +6,144 @@
 #include <xe/math/Vector.h>
 
 
+TEST(MatrixTest, DefaultConstructorShouldInitializeToZeroes) {
+    XE::Matrix4 mat;
+
+    for (int i = 0; i < 16; i++) {
+        EXPECT_EQ(mat.data()[i], 0.0f);
+    }
+}
+
+
+TEST(MatrixTest, PointerConstructorShouldInterpretMatrixAsRowMajor) {
+    float values[] = {
+        1.0f, 2.0f, 3.0f, 4.0,
+        5.0f, 6.0f, 7.0f, 8.0f,
+        9.0f, 10.0f, 11.0f, 12.0f,
+        13.0f, 14.0f, 15.0f, 16.0f
+    };
+
+    XE::Matrix4 mat{values};
+
+    EXPECT_EQ(mat.data()[0], 1.0f);
+    EXPECT_EQ(mat.data()[1], 2.0f);
+    EXPECT_EQ(mat.data()[2], 3.0f);
+    EXPECT_EQ(mat.data()[3], 4.0f);
+    EXPECT_EQ(mat.data()[4], 5.0f);
+    EXPECT_EQ(mat.data()[5], 6.0f);
+    EXPECT_EQ(mat.data()[6], 7.0f);
+    EXPECT_EQ(mat.data()[7], 8.0f);
+    EXPECT_EQ(mat.data()[8], 9.0f);
+    EXPECT_EQ(mat.data()[9], 10.0f);
+    EXPECT_EQ(mat.data()[10], 11.0f);
+    EXPECT_EQ(mat.data()[11], 12.0f);
+    EXPECT_EQ(mat.data()[12], 13.0f);
+    EXPECT_EQ(mat.data()[13], 14.0f);
+    EXPECT_EQ(mat.data()[14], 15.0f);
+    EXPECT_EQ(mat.data()[15], 16.0f);
+}
+
+
+TEST(MatrixTest, AccessOperatorReturnsRowsAsVectorsReferences) {
+    float values[] = {
+        1.0f, 2.0f, 3.0f, 4.0,
+        5.0f, 6.0f, 7.0f, 8.0f,
+        9.0f, 10.0f, 11.0f, 12.0f,
+        13.0f, 14.0f, 15.0f, 16.0f
+    };
+
+    XE::Matrix4 mat{values};
+
+    EXPECT_EQ(mat[0], XE::Vector4(1.0f, 2.0f, 3.0f, 4.0));
+    EXPECT_EQ(mat[1], XE::Vector4(5.0f, 6.0f, 7.0f, 8.0f));
+    EXPECT_EQ(mat[2], XE::Vector4(9.0f, 10.0f, 11.0f, 12.0f));
+    EXPECT_EQ(mat[3], XE::Vector4(13.0f, 14.0f, 15.0f, 16.0));
+}
+
+
+TEST(MatrixTest, InitializerListConstructorInterpretsThemAsMatrixRows) {
+    XE::Matrix4 mat{1.0f, 2.0f, 3.0f, 4.0,
+                    5.0f, 6.0f, 7.0f, 8.0f,
+                    9.0f, 10.0f, 11.0f, 12.0f,
+                    13.0f, 14.0f, 15.0f, 16.0f};
+
+    EXPECT_EQ(mat[0], XE::Vector4(1.0f, 2.0f, 3.0f, 4.0));
+    EXPECT_EQ(mat[1], XE::Vector4(5.0f, 6.0f, 7.0f, 8.0f));
+    EXPECT_EQ(mat[2], XE::Vector4(9.0f, 10.0f, 11.0f, 12.0f));
+    EXPECT_EQ(mat[3], XE::Vector4(13.0f, 14.0f, 15.0f, 16.0));
+}
+
+
+TEST(MatrixTest, VectorConstructorOrderElementsInRowMajorOrder) {
+    XE::Matrix4 mat{XE::TVector<float, 16>{1.0f, 2.0f, 3.0f, 4.0,
+                    5.0f, 6.0f, 7.0f, 8.0f,
+                    9.0f, 10.0f, 11.0f, 12.0f,
+                    13.0f, 14.0f, 15.0f, 16.0f}};
+
+    EXPECT_EQ(mat[0], XE::Vector4(1.0f, 2.0f, 3.0f, 4.0));
+    EXPECT_EQ(mat[1], XE::Vector4(5.0f, 6.0f, 7.0f, 8.0f));
+    EXPECT_EQ(mat[2], XE::Vector4(9.0f, 10.0f, 11.0f, 12.0f));
+    EXPECT_EQ(mat[3], XE::Vector4(13.0f, 14.0f, 15.0f, 16.0));
+}
+
+
 TEST(MatrixTest, ShouldHaveRowMajorOrder) {
-    const auto matA = XE::Matrix4::rows({
-        XE::Vector4{1.0f, 2.0f, 1.0f, 0.0f},
-        XE::Vector4{2.0f, 1.0f, -3.0f, -1.0f},
-        XE::Vector4{-3.0f, 2.0f, 1.0f, 0.0f},
-        XE::Vector4{2.0f, -1.0f, 0.0f, -1.0f}
+    const XE::Matrix4 mat{};
+    EXPECT_EQ(mat.order(), XE::MatrixOrder::RowMajor);
+}
+
+
+TEST(MatrixTest, ConstructorShouldSetupTheMatrixComponentsCorrectlyForTwoDimensions) {
+    const auto m = XE::Matrix2::rows({
+        XE::Vector2{1.0f, 2.0f},
+        XE::Vector2{3.0f, 4.0f}
     });
 
-    EXPECT_EQ(matA.data()[0], 1.0f);
-    EXPECT_EQ(matA.data()[1], 2.0f);
-    EXPECT_EQ(matA.data()[2], 1.0f);
-    EXPECT_EQ(matA.data()[3], 0.0f);
-    EXPECT_EQ(matA.data()[4], 2.0f);
-    EXPECT_EQ(matA.data()[5], 1.0f);
-    EXPECT_EQ(matA.data()[6], -3.0f);
-    EXPECT_EQ(matA.data()[7], -1.0f);
-    EXPECT_EQ(matA.data()[8], -3.0f);
-    EXPECT_EQ(matA.data()[9], 2.0f);
-    EXPECT_EQ(matA.data()[10], 1.0f);
-    EXPECT_EQ(matA.data()[11], 0.0f);
-    EXPECT_EQ(matA.data()[12], 2.0f);
-    EXPECT_EQ(matA.data()[13], -1.0f);
-    EXPECT_EQ(matA.data()[14], 0.0f);
-    EXPECT_EQ(matA.data()[15], -1.0f);
+    EXPECT_EQ(m(0, 0), 1.0f); EXPECT_EQ(m(0, 1), 2.0f);
+    EXPECT_EQ(m(1, 0), 3.0f); EXPECT_EQ(m(1, 1), 4.0f);
 }
+
+
+TEST(MatrixTest, ConstructorShouldSetupTheMatrixComponentsCorrectlyForThreeDimensions) {
+    const XE::Matrix3 m = XE::Matrix3::rows({
+        XE::Vector3{1.0f, 2.0f, 3.0f},
+        XE::Vector3{4.0f, 5.0f, 6.0f},
+        XE::Vector3{7.0f, 8.0f, 9.0f}
+    });
+
+    EXPECT_EQ(m(0, 0), 1.0f); EXPECT_EQ(m(0, 1), 2.0f); EXPECT_EQ(m(0, 2), 3.0f);
+    EXPECT_EQ(m(1, 0), 4.0f); EXPECT_EQ(m(1, 1), 5.0f); EXPECT_EQ(m(1, 2), 6.0f);
+    EXPECT_EQ(m(2, 0), 7.0f); EXPECT_EQ(m(2, 1), 8.0f); EXPECT_EQ(m(2, 2), 9.0f);
+}
+
+TEST(MatrixTest, ConstructorShouldSetupTheMatrixComponentsCorrectlyForFourDimensions) {
+    const auto m = XE::Matrix4::rows({
+        XE::Vector4{1.0f, 2.0f, 3.0f, 4.0f},
+        XE::Vector4{5.0f, 6.0f, 7.0f, 8.0f},
+        XE::Vector4{9.0f, 10.0f, 11.0f, 12.0f},
+        XE::Vector4{13.0f, 14.0f, 15.0f, 16.0f}
+    });
+
+    EXPECT_EQ(m(0, 0), 1.0f); EXPECT_EQ(m(0, 1), 2.0f); EXPECT_EQ(m(0, 2), 3.0f); EXPECT_EQ(m(0, 3), 4.0f);
+    EXPECT_EQ(m(1, 0), 5.0f); EXPECT_EQ(m(1, 1), 6.0f); EXPECT_EQ(m(1, 2), 7.0f); EXPECT_EQ(m(1, 3), 8.0f);
+    EXPECT_EQ(m(2, 0), 9.0f); EXPECT_EQ(m(2, 1), 10.0f); EXPECT_EQ(m(2, 2), 11.0f); EXPECT_EQ(m(2, 3), 12.0f);
+    EXPECT_EQ(m(3, 0), 13.0f); EXPECT_EQ(m(3, 1), 14.0f); EXPECT_EQ(m(3, 2), 15.0f); EXPECT_EQ(m(3, 3), 16.0f);
+}
+
+TEST(MatrixTest, ConstructorShouldSetupTheMatrixComponentsCorrectlyForFourDimensionsRowVector) {
+    const auto m = XE::Matrix4::rows({
+        XE::Vector4{1.0f, 2.0f, 3.0f, 4.0f},
+        XE::Vector4{5.0f, 6.0f, 7.0f, 8.0f},
+        XE::Vector4{9.0f, 10.0f, 11.0f, 12.0f},
+        XE::Vector4{13.0f, 14.0f, 15.0f, 16.0f}
+    });
+
+    EXPECT_EQ(m(0, 0), 1.0f); EXPECT_EQ(m(0, 1), 2.0f); EXPECT_EQ(m(0, 2), 3.0f); EXPECT_EQ(m(0, 3), 4.0f);
+    EXPECT_EQ(m(1, 0), 5.0f); EXPECT_EQ(m(1, 1), 6.0f); EXPECT_EQ(m(1, 2), 7.0f); EXPECT_EQ(m(1, 3), 8.0f);
+    EXPECT_EQ(m(2, 0), 9.0f); EXPECT_EQ(m(2, 1), 10.0f); EXPECT_EQ(m(2, 2), 11.0f); EXPECT_EQ(m(2, 3), 12.0f);
+    EXPECT_EQ(m(3, 0), 13.0f); EXPECT_EQ(m(3, 1), 14.0f); EXPECT_EQ(m(3, 2), 15.0f); EXPECT_EQ(m(3, 3), 16.0f);
+}
+
 
 TEST(MatrixTest, DeterminantShouldComputeTheMatrixDeterminantCorrectly) {
     const auto matA = XE::Matrix4::rows({
@@ -181,59 +294,6 @@ TEST(MatrixTest, InverseShouldComputeTheMatrixInverseMultiplicative) {
     EXPECT_EQ(invMatA, inverse(matA, detMatA));
     EXPECT_EQ(invMatA, inverse(matA));
 }
-
-
-TEST(MatrixTest, ConstructorShouldSetupTheMatrixComponentsCorrectlyForTwoDimensions) {
-    const auto m = XE::Matrix2::rows({
-        XE::Vector2{1.0f, 2.0f},
-        XE::Vector2{3.0f, 4.0f}
-    });
-
-    EXPECT_EQ(m(0, 0), 1.0f); EXPECT_EQ(m(0, 1), 2.0f);
-    EXPECT_EQ(m(1, 0), 3.0f); EXPECT_EQ(m(1, 1), 4.0f);
-}
-
-
-TEST(MatrixTest, ConstructorShouldSetupTheMatrixComponentsCorrectlyForThreeDimensions) {
-    const XE::Matrix3 m = XE::Matrix3::rows({
-        XE::Vector3{1.0f, 2.0f, 3.0f},
-        XE::Vector3{4.0f, 5.0f, 6.0f},
-        XE::Vector3{7.0f, 8.0f, 9.0f}
-    });
-
-    EXPECT_EQ(m(0, 0), 1.0f); EXPECT_EQ(m(0, 1), 2.0f); EXPECT_EQ(m(0, 2), 3.0f);
-    EXPECT_EQ(m(1, 0), 4.0f); EXPECT_EQ(m(1, 1), 5.0f); EXPECT_EQ(m(1, 2), 6.0f);
-    EXPECT_EQ(m(2, 0), 7.0f); EXPECT_EQ(m(2, 1), 8.0f); EXPECT_EQ(m(2, 2), 9.0f);
-}
-
-TEST(MatrixTest, ConstructorShouldSetupTheMatrixComponentsCorrectlyForFourDimensions) {
-    const auto m = XE::Matrix4::rows({
-        XE::Vector4{1.0f, 2.0f, 3.0f, 4.0f},
-        XE::Vector4{5.0f, 6.0f, 7.0f, 8.0f},
-        XE::Vector4{9.0f, 10.0f, 11.0f, 12.0f},
-        XE::Vector4{13.0f, 14.0f, 15.0f, 16.0f}
-    });
-
-    EXPECT_EQ(m(0, 0), 1.0f); EXPECT_EQ(m(0, 1), 2.0f); EXPECT_EQ(m(0, 2), 3.0f); EXPECT_EQ(m(0, 3), 4.0f);
-    EXPECT_EQ(m(1, 0), 5.0f); EXPECT_EQ(m(1, 1), 6.0f); EXPECT_EQ(m(1, 2), 7.0f); EXPECT_EQ(m(1, 3), 8.0f);
-    EXPECT_EQ(m(2, 0), 9.0f); EXPECT_EQ(m(2, 1), 10.0f); EXPECT_EQ(m(2, 2), 11.0f); EXPECT_EQ(m(2, 3), 12.0f);
-    EXPECT_EQ(m(3, 0), 13.0f); EXPECT_EQ(m(3, 1), 14.0f); EXPECT_EQ(m(3, 2), 15.0f); EXPECT_EQ(m(3, 3), 16.0f);
-}
-
-TEST(MatrixTest, ConstructorShouldSetupTheMatrixComponentsCorrectlyForFourDimensionsRowVector) {
-    const auto m = XE::Matrix4::rows({
-        XE::Vector4{1.0f, 2.0f, 3.0f, 4.0f},
-        XE::Vector4{5.0f, 6.0f, 7.0f, 8.0f},
-        XE::Vector4{9.0f, 10.0f, 11.0f, 12.0f},
-        XE::Vector4{13.0f, 14.0f, 15.0f, 16.0f}
-    });
-
-    EXPECT_EQ(m(0, 0), 1.0f); EXPECT_EQ(m(0, 1), 2.0f); EXPECT_EQ(m(0, 2), 3.0f); EXPECT_EQ(m(0, 3), 4.0f);
-    EXPECT_EQ(m(1, 0), 5.0f); EXPECT_EQ(m(1, 1), 6.0f); EXPECT_EQ(m(1, 2), 7.0f); EXPECT_EQ(m(1, 3), 8.0f);
-    EXPECT_EQ(m(2, 0), 9.0f); EXPECT_EQ(m(2, 1), 10.0f); EXPECT_EQ(m(2, 2), 11.0f); EXPECT_EQ(m(2, 3), 12.0f);
-    EXPECT_EQ(m(3, 0), 13.0f); EXPECT_EQ(m(3, 1), 14.0f); EXPECT_EQ(m(3, 2), 15.0f); EXPECT_EQ(m(3, 3), 16.0f);
-}
-
 
 TEST(MatrixTest, ComparisonOperatorsShouldCheckMatrixComponents) {
     const XE::Matrix4 m1 = XE::Matrix4::rows({
