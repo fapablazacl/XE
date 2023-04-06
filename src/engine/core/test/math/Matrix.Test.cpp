@@ -62,15 +62,13 @@ TEST(MatrixTest, AccessOperatorReturnsRowsAsVectorsReferences) {
 
 
 TEST(MatrixTest, InitializerListConstructorInterpretsThemAsMatrixRows) {
-    XE::Matrix4 mat{1.0f, 2.0f, 3.0f, 4.0,
-                    5.0f, 6.0f, 7.0f, 8.0f,
-                    9.0f, 10.0f, 11.0f, 12.0f,
-                    13.0f, 14.0f, 15.0f, 16.0f};
+    XE::Matrix3 mat{1.0f, 2.0f, 3.0f,
+                    4.0, 5.0f, 6.0f,
+                    7.0f, 8.0f, 9.0f};
 
-    EXPECT_EQ(mat[0], XE::Vector4(1.0f, 2.0f, 3.0f, 4.0));
-    EXPECT_EQ(mat[1], XE::Vector4(5.0f, 6.0f, 7.0f, 8.0f));
-    EXPECT_EQ(mat[2], XE::Vector4(9.0f, 10.0f, 11.0f, 12.0f));
-    EXPECT_EQ(mat[3], XE::Vector4(13.0f, 14.0f, 15.0f, 16.0));
+    EXPECT_EQ(mat[0][0], 1.0f); EXPECT_EQ(mat[0][1], 2.0f); EXPECT_EQ(mat[0][2], 3.0f);
+    EXPECT_EQ(mat[1][0], 4.0f); EXPECT_EQ(mat[1][1], 5.0f); EXPECT_EQ(mat[1][2], 6.0f);
+    EXPECT_EQ(mat[2][0], 7.0f); EXPECT_EQ(mat[2][1], 8.0f); EXPECT_EQ(mat[2][2], 9.0f);
 }
 
 
