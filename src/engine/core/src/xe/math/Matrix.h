@@ -72,11 +72,11 @@ namespace XE {
             }
         }
 
-        explicit TMatrix(const TVector<T, R * C> &v) {
+        explicit TMatrix(const TVector<T, R * C> &vector) {
             T *values = data();
 
             for (int i = 0; i < R * C; i++) {
-                values[i] = v.values[i];
+                values[i] = vector.values[i];
             }
         }
 
@@ -170,17 +170,17 @@ namespace XE {
             return result;
         }
 
-        TMatrix<T, R, C> &setRow(const int i, const TVector<T, C> &v) {
+        TMatrix<T, R, C> &setRow(const int i, const TVector<T, C> &r) {
             for (int j = 0; j < C; j++) {
-                (*this)(i, j) = v[j];
+                (*this)(i, j) = r[j];
             }
 
             return *this;
         }
 
-        TMatrix<T, R, C> &setColumn(const int j, const TVector<T, R> &v) {
+        TMatrix<T, R, C> &setColumn(const int j, const TVector<T, R> &c) {
             for (int i = 0; i < R; i++) {
-                (*this)(i, j) = v[i];
+                (*this)(i, j) = c[i];
             }
 
             return *this;
@@ -676,11 +676,11 @@ namespace XE {
         return *this;
     }
 
-    template <typename T, int R, int C> TVector<T, R> TMatrix<T, R, C>::operator*(const TVector<T, R> &v) const {
+    template <typename T, int R, int C> TVector<T, R> TMatrix<T, R, C>::operator*(const TVector<T, R> &c) const {
         TVector<T, R> result;
 
         for (int row = 0; row < R; row++) {
-            result[row] = dot(getRow(row), v);
+            result[row] = dot(getRow(row), c);
         }
 
         return result;
