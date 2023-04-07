@@ -163,8 +163,9 @@ namespace Sandbox {
     void RenderingSystem::renderMatrices(const XE::Matrix4 &) {
         const XE::UniformMatrix matrixLayout = {"m_mvp", XE::DataType::Float32, XE::UniformMatrixShape::R4C4, 1};
 
-        const Matrix4 modelViewProj = XE::transpose<float, 4, 4>(XE::mat4Perspective(mCamera.fov, mCamera.aspectRatio, mCamera.znear, mCamera.zfar) *
-                                                                 XE::mat4LookAtRH(mCamera.position, mCamera.lookAt, mCamera.up));
+        const Matrix4 proj = XE::mat4Perspective(mCamera.fov, mCamera.aspectRatio, mCamera.znear, mCamera.zfar);
+        const Matrix4 view = XE::mat4LookAtRH(mCamera.position, mCamera.lookAt, mCamera.up);
+        const Matrix4 modelViewProj = XE::transpose(proj * view);
 
         m_graphicsDevice->applyUniform(&matrixLayout, 1, (const void *)&modelViewProj);
     }

@@ -698,6 +698,10 @@ namespace XE {
         return result;
     }
 
+    template <typename T, int N> TMatrix<T, N, N> transpose(const TMatrix<T, N, N> &m) {
+        return transpose<T, N, N>(m);
+    }
+
     template <typename T, int R, int C> TMatrix<T, R, C> inverse(const TMatrix<T, R, C> &m) { return transpose(adjoint(m)) / determinant(m); }
 
     template <typename T, int R, int C> TMatrix<T, R, C> inverse(const TMatrix<T, R, C> &m, const T det) { return transpose(adjoint(m)) / det; }
