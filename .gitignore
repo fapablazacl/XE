@@ -1,5 +1,5 @@
 x64/*
-build/*
+build
 .vscode/*
 .DS_Store
 .build/*

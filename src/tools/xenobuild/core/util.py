@@ -37,5 +37,8 @@ def run_command(cmd, raise_on_error = False, cwd=None):
     else:
         if exit_code == 0:
             return stdout
-        
+
+        print("Command failed with error:")
+        print(cmd)
+
         raise RuntimeError(exit_code)

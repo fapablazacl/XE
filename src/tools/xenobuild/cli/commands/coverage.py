@@ -36,6 +36,7 @@ class CoverageCliCommand:
             print(llvm_terminal_report)
 
     def _check_coverage(self):
+        arch = self._get_current_machine()
         test_info = self._get_ctest_json_info()
         executable_tests = self._filter_ctest_tests(test_info)
 
@@ -43,7 +44,7 @@ class CoverageCliCommand:
             module_path = os.curdir
             profile_data_file = self._merge_raw_profile(executable_test)
             llvm_json_report = self._run_command(
-                self._export_coverage_summary_json(executable_test, profile_data_file, module_path, "x86_64", "text"),
+                self._export_coverage_summary_json(executable_test, profile_data_file, module_path, arch, "text"),
                 raise_on_error=True)
 
             if self.enableCheck and not self._check_llvm_coverage_json_export(llvm_json_report, 90):
@@ -106,29 +107,35 @@ class CoverageCliCommand:
 
         return profdata_file
 
-    def _get_data_profile_report_cmd(self, executable_test, profdata_file) -> str:
-        cmd = self._adjust_llvm_cmd("llvm-cov report {} -instr-profile={} -arch=x86_64")
-        cmd = cmd.format(executable_test, profdata_file)
+    def _get_data_profile_report_cmd(self, executable_test, profdata_file, arch="x86_64") -> str:
+        cmd = self._adjust_llvm_cmd("llvm-cov report {} -instr-profile={} -arch={}")
+        cmd = cmd.format(executable_test, profdata_file, arch)
         return cmd
 
-    def _get_coverage_show_cmd(self, exxecutable_test, profdata_file, module_path, output_dir):
+    def _get_coverage_show_cmd(self, exxecutable_test, profdata_file, module_path, output_dir, arch="x86_64"):
         export_format = "html"
-        arch = "x86_64"
 
-        cmd = self._adjust_llvm_cmd(
-            "llvm-cov show {} -instr-profile={} -format={} -show-branches=percent -show-line-counts-or-regions -show-expansions -arch={} {} -output-dir={}")
+        cmd = "llvm-cov show {} -instr-profile={} -format={} -show-branches=percent -show-line-counts-or-regions -show-expansions -arch={} {} -output-dir={}"
+        cmd = self._adjust_llvm_cmd(cmd)
         cmd = cmd.format(exxecutable_test, profdata_file, export_format, arch, module_path, output_dir)
 
         return cmd
 
     def _export_coverage_summary_json(self, executable_test, profdata_file, module_path, arch, format):
         cmd = "llvm-cov export -instr-profile={} {} -arch={} {} -format={} -summary-only"
+        cmd = self._adjust_llvm_cmd(cmd)
         cmd = cmd.format(profdata_file, executable_test, arch, module_path, format)
 
         return cmd
 
     def _get_current_os(self):
         return platform.system()
+
+    def _get_current_machine(self):
+        if platform.machine() == "arm64":
+            return "arm64"
+
+        return "x86_64"
 
     def _adjust_llvm_cmd(self, cmd):
         if self._get_current_os() == "Darwin":
