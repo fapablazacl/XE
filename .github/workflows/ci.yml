@@ -98,10 +98,10 @@ jobs:
         run: cmake --build build --parallel 4
 
       - name: Run unit tests
-        run: cd coverage/debug && ctest --output-on-failure
+        run: cd build && ctest --output-on-failure
 
-      - name: Check Coverage > 80%
-        run: ./xbcli coverage --build-config-dir=build
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v3
 
   asan:
     runs-on: ubuntu-latest
