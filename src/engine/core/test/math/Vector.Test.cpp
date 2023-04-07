@@ -106,18 +106,18 @@ TEST(VectorTest, DotProductShouldComputeASumOfProductsOfEachComponent) {
     const XE::Vector3 v1 = {2.0f, 8.0f, 32.0f};
     const XE::Vector3 v2 = {1.0f, 2.0f, 4.0f};
 
-    EXPECT_EQ(dot(XE::Vector3(1.0f, 1.0f, 1.0f), v1), 42.0f);
-    EXPECT_EQ(dot(XE::Vector3(1.0f, 1.0f, 1.0f), v2), 7.0f);
-    EXPECT_EQ(dot(XE::Vector3(0.0f), v1), 0.0f);
-    EXPECT_EQ(dot(XE::Vector3(0.0f), v2), 0.0f);
+    EXPECT_FLOAT_EQ(dot(XE::Vector3(1.0f, 1.0f, 1.0f), v1), 42.0f);
+    EXPECT_FLOAT_EQ(dot(XE::Vector3(1.0f, 1.0f, 1.0f), v2), 7.0f);
+    EXPECT_FLOAT_EQ(dot(XE::Vector3(0.0f), v1), 0.0f);
+    EXPECT_FLOAT_EQ(dot(XE::Vector3(0.0f), v2), 0.0f);
 
-    EXPECT_EQ(dot(v1, XE::Vector3(1.0f, 1.0f, 1.0f)), 42.0f);
-    EXPECT_EQ(dot(v2, XE::Vector3(1.0f, 1.0f, 1.0f)), 7.0f);
-    EXPECT_EQ(dot(v1, XE::Vector3(0.0f)), 0.0f);
-    EXPECT_EQ(dot(v2, XE::Vector3(0.0f)), 0.0f);
+    EXPECT_FLOAT_EQ(dot(v1, XE::Vector3(1.0f, 1.0f, 1.0f)), 42.0f);
+    EXPECT_FLOAT_EQ(dot(v2, XE::Vector3(1.0f, 1.0f, 1.0f)), 7.0f);
+    EXPECT_FLOAT_EQ(dot(v1, XE::Vector3(0.0f)), 0.0f);
+    EXPECT_FLOAT_EQ(dot(v2, XE::Vector3(0.0f)), 0.0f);
 
-    EXPECT_EQ(dot(v1, v2), 146.0f);
-    EXPECT_EQ(dot(v2, v1), 146.0f);
+    EXPECT_FLOAT_EQ(dot(v1, v2), 146.0f);
+    EXPECT_FLOAT_EQ(dot(v2, v1), 146.0f);
 }
 
 TEST(VectorTest, ThreeDimensionalCrossProductShouldPerformCorrectlyForUnitVectors) {
@@ -194,9 +194,9 @@ TEST(VectorTest, Norm2FunctionShouldReturnAnSquaredVectorLength) {
     const XE::Vector3 v2 = {1.3f, -1.6f, 0.0f};
     const XE::Vector3 v3 = {-0.3f, 2.0f, 2.0f};
 
-    EXPECT_EQ(norm2(v1), 1.0f + 4.0f + 1.6f*1.6f);
-    EXPECT_EQ(norm2(v2), 1.3f*1.3f + 1.6f*1.6f);
-    EXPECT_EQ(norm2(v3), 0.3f*0.3f + 4.0f + 4.0f);
+    EXPECT_FLOAT_EQ(norm2(v1), 1.0f + 4.0f + 1.6f*1.6f);
+    EXPECT_FLOAT_EQ(norm2(v2), 1.3f*1.3f + 1.6f*1.6f);
+    EXPECT_FLOAT_EQ(norm2(v3), 0.3f*0.3f + 4.0f + 4.0f);
 }
 
 TEST(VectorTest, NormFunctionShouldReturnTheVectorLength) {
@@ -204,7 +204,7 @@ TEST(VectorTest, NormFunctionShouldReturnTheVectorLength) {
     const XE::Vector3 v2 = {4.0f, 2.0f, 4.0f};
     const XE::Vector3 v3 = {1.0f, 1.0f, 1.0f};
 
-    EXPECT_EQ(norm(v1), 0.0f);
-    EXPECT_EQ(norm(v2), 6.0f);
-    EXPECT_EQ(norm(v3), std::sqrt(3.0f));
+    EXPECT_FLOAT_EQ(norm(v1), 0.0f);
+    EXPECT_FLOAT_EQ(norm(v2), 6.0f);
+    EXPECT_FLOAT_EQ(norm(v3), std::sqrt(3.0f));
 }
