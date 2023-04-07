@@ -711,7 +711,7 @@ TEST(MatrixTest, createPerspectiveShouldCreateAPerspectiveTransformationMatrix) 
 
 
 TEST(MatrixTest, CreateOrthographicShouldCreateAOrthographicTransformationMatrix) {
-    const auto m1 = XE::Matrix4::orthographic({-1.0f, -1.0f, -1.0f}, {1.0f, 1.0f, 1.0f});
+    const auto m1 = XE::mat4Ortho({-1.0f, -1.0f, -1.0f}, {1.0f, 1.0f, 1.0f});
     EXPECT_EQ(m1, XE::Matrix4::rows ({
         XE::Vector4(1.0f, 0.0f, 0.0f, 0.0f),
         XE::Vector4(0.0f, 1.0f, 0.0f, 0.0f),
@@ -719,7 +719,7 @@ TEST(MatrixTest, CreateOrthographicShouldCreateAOrthographicTransformationMatrix
         XE::Vector4(0.0f, 0.0f, 0.0f, 1.0f),
     }));
 
-    const auto m2 = XE::Matrix4::orthographic({-2.0f, -2.0f, -2.0f}, {2.0f, 2.0f, 2.0f});
+    const auto m2 = XE::mat4Ortho({-2.0f, -2.0f, -2.0f}, {2.0f, 2.0f, 2.0f});
     EXPECT_EQ(m2, XE::Matrix4::rows ({
         XE::Vector4(0.5f, 0.0f, 0.0f, 0.0f),
         XE::Vector4(0.0f, 0.5f, 0.0f, 0.0f),
@@ -727,7 +727,7 @@ TEST(MatrixTest, CreateOrthographicShouldCreateAOrthographicTransformationMatrix
         XE::Vector4(0.0f, 0.0f, 0.0f, 1.0f),
     }));
 
-    const auto m3 = XE::Matrix4::orthographic({-0.5f, -1.5f, 0.0f}, {2.5f, 3.5f, 100.0f});
+    const auto m3 = XE::mat4Ortho({-0.5f, -1.5f, 0.0f}, {2.5f, 3.5f, 100.0f});
     EXPECT_EQ(m3, XE::Matrix4::rows ({
         XE::Vector4(0.666666687f, 0.000000000f, 0.000000000f, -0.666666687f),
         XE::Vector4(0.000000000f, 0.400000006f, 0.000000000f, -0.400000006f),
@@ -735,7 +735,7 @@ TEST(MatrixTest, CreateOrthographicShouldCreateAOrthographicTransformationMatrix
         XE::Vector4(0.000000000f, 0.000000000f, 0.000000000f, 1.000000000f)
     }));
 
-    const auto m4 = XE::Matrix4::orthographic({-0.5f, -1.5f, 100.0f}, {2.5f, 3.5f, -50.0f});
+    const auto m4 = XE::mat4Ortho({-0.5f, -1.5f, 100.0f}, {2.5f, 3.5f, -50.0f});
     EXPECT_EQ(m4, XE::Matrix4::rows({
         XE::Vector4(0.666666687f, 0.000000000f, 0.000000000f, -0.666666687f),
         XE::Vector4(0.000000000f, 0.400000006f, 0.000000000f, -0.400000006f),

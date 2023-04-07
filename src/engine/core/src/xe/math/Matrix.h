@@ -263,46 +263,82 @@ namespace XE {
 
             return result;
         }
+    };
 
-        /**
-         * @brief Build a identity matrix. Must be square.
-         */
-        static auto identity() {
-            if constexpr (R == C) {
-                auto result = TMatrix<T, R, C>();
+    template<typename T = float, int N>
+    auto matIdentity() {
+        constexpr auto R = N;
+        constexpr auto C = N;
 
-                for (int i = 0; i < R; ++i) {
-                    result(i, i) = static_cast<T>(1);
-                }
+        auto result = TMatrix<T, R, C>();
 
-                return result;
-            }
+        for (int i = 0; i < R; ++i) {
+            result(i, i) = static_cast<T>(1);
         }
 
-        static auto scale(const TVector<T, R> &scale) {
-            auto result = TMatrix<T, R, C>();
+        return result;
+    }
 
-            for (int i = 0; i < R; ++i) {
-                result(i, i) = scale[i];
-            }
+    template<typename T = float>
+    auto mat3Identity() {
+        return matIdentity<3, T>();
+    }
 
-            return result;
+    template<typename T = float>
+    auto mat4Identity() {
+        return matIdentity<4, T>();
+    }
+
+    template<typename T, int N>
+    auto matScaling(const TVector<T, N> &scale) {
+        constexpr auto R = N;
+        constexpr auto C = N;
+
+        auto result = TMatrix<T, R, C>();
+
+        for (int i = 0; i < R; ++i) {
+            result(i, i) = scale[i];
         }
 
-        static auto translate(const TVector<T, R - 1> &displace) {
-            if constexpr (R == C) {
-                auto result = TMatrix<T, R, C>::identity();
+        return result;
+    }
 
-                for (int i = 0; i < R - 1; i++) {
-                    result[i][C - 1] = displace[i];
-                }
+    template<typename T = float>
+    auto mat3Scaling() {
+        return matScaling<3, T>();
+    }
 
-                return result;
-            }
+    template<typename T = float>
+    auto mat4Scaling() {
+        return matScaling<4, T>();
+    }
+
+    template<typename T, int N>
+    auto matTranslation(const TVector<T, N - 1> &displace) {
+        constexpr auto R = N;
+        constexpr auto C = N;
+
+        auto result = matIdentity<T, N>();
+
+        for (int i = 0; i < R - 1; i++) {
+            result[i][C - 1] = displace[i];
         }
 
-        static auto rotateX(const T radians) {
-            auto result = TMatrix<T, R, C>::identity();
+        return result;
+    }
+
+    template<typename T = float>
+    auto mat4Translation(const TVector<T, 3> &displace) {
+        return matTranslation<4, T>(displace);
+    }
+
+    template<typename T, int N>
+    auto matRotationX(const T radians) {
+        if (N == 3 || N == 4) {
+            constexpr auto R = N;
+            constexpr auto C = N;
+
+            auto result = matIdentity<T, N>();
 
             const T cos = std::cos(radians);
             const T sin = std::sin(radians);
@@ -315,9 +351,25 @@ namespace XE {
 
             return result;
         }
+    }
 
-        static auto rotateY(const T radians) {
-            auto result = TMatrix<T, R, C>::identity();
+    template<typename T = float>
+    auto mat3RotationX(const T radians) {
+        return matRotationX<T, 3>(radians);
+    }
+
+    template<typename T = float>
+    auto mat4RotationX(const T radians) {
+        return matRotationX<T, 4>(radians);
+    }
+
+    template<typename T, int N>
+    auto matRotationY(const T radians) {
+        if (N == 3 || N == 4) {
+            constexpr auto R = N;
+            constexpr auto C = N;
+
+            auto result = matIdentity<T, N>();
 
             const T cos = std::cos(radians);
             const T sin = std::sin(radians);
@@ -329,9 +381,25 @@ namespace XE {
 
             return result;
         }
+    }
 
-        static auto rotateZ(const T radians) {
-            auto result = TMatrix<T, R, C>::identity();
+    template<typename T = float>
+    auto mat3RotationY(const T radians) {
+        return matRotationY<T, 3>(radians);
+    }
+
+    template<typename T = float>
+    auto mat4RotationY(const T radians) {
+        return matRotationY<T, 4>(radians);
+    }
+
+    template<typename T, int N>
+    auto matRotationZ(const T radians) {
+        if (N == 2 || N == 3 || N == 4) {
+            constexpr auto R = N;
+            constexpr auto C = N;
+
+            auto result = matIdentity<T, N>();
 
             const T cos = std::cos(radians);
             const T sin = std::sin(radians);
@@ -343,94 +411,121 @@ namespace XE {
 
             return result;
         }
+    }
 
-        /**
-         * @brief Build a arbitrary rotation matrix
-         */
-        static auto rotate(const T rads, const TVector<T, 3> &axis) {
-            if constexpr ((C >= 3 && C <= 4) && (R >= 3 && R <= 4)) {
-                assert(!std::isnan(rads));
-                assert(!std::isinf(rads));
+    template<typename T = float>
+    auto mat2Rotation(const T radians) {
+        return matRotationZ<T, 2>(radians);
+    }
 
-                const auto I = TMatrix<T, 3, 3>::identity();
+    template<typename T = float>
+    auto mat3RotationZ(const T radians) {
+        return matRotationZ<T, 3>(radians);
+    }
 
-                const T cos = std::cos(rads);
-                const T sin = std::sin(rads);
+    template<typename T = float>
+    auto mat4RotationZ(const T radians) {
+        return matRotationZ<T, 4>(radians);
+    }
 
-                TVector<T, 3> V = normalize(axis);
+    template<typename T, int N>
+    static auto matRotation(const T rads, const TVector<T, 3> &axis) {
+        if (N == 3 || N == 4) {
+            assert(!std::isnan(rads));
+            assert(!std::isinf(rads));
 
-                const auto c1 = TVector<T, 3>{static_cast<T>(0), -V.Z, V.Y};
-                const auto c2 = TVector<T, 3>{V.Z, static_cast<T>(0), -V.X};
-                const auto c3 = TVector<T, 3>{-V.Y, V.X, static_cast<T>(0)};
+            const auto I = TMatrix<T, 3, 3>::identity();
 
-                const auto matS = TMatrix<T, 3, 3>::columns({c1, c2, c3});
+            const T cos = std::cos(rads);
+            const T sin = std::sin(rads);
 
-                const auto matUUT = TMatrix<T, 3, 1>{V} * TMatrix<T, 1, 3>{V};
-                const auto tempResult = matUUT + cos * (I - matUUT) + sin * matS;
+            TVector<T, 3> V = normalize(axis);
 
-                auto result = TMatrix<T, R, C>::identity();
+            const auto c1 = TVector<T, 3>{static_cast<T>(0), -V.Z, V.Y};
+            const auto c2 = TVector<T, 3>{V.Z, static_cast<T>(0), -V.X};
+            const auto c3 = TVector<T, 3>{-V.Y, V.X, static_cast<T>(0)};
 
-                for (int i = 0; i < 3; ++i) {
-                    for (int j = 0; j < 3; ++j) {
-                        result(i, j) = tempResult(i, j);
-                    }
+            const auto matS = TMatrix<T, 3, 3>::columns({c1, c2, c3});
+
+            const auto matUUT = TMatrix<T, 3, 1>{V} * TMatrix<T, 1, 3>{V};
+            const auto tempResult = matUUT + cos * (I - matUUT) + sin * matS;
+
+            auto result = TMatrix<T, 4, 4>::identity();
+
+            for (int i = 0; i < 3; ++i) {
+                for (int j = 0; j < 3; ++j) {
+                    result(i, j) = tempResult(i, j);
                 }
-
-                return XE::transpose(result);
             }
+
+            return XE::transpose(result);
         }
+    }
 
-        static auto lookAtRH(const TVector<T, 3> &eye, const TVector<T, 3> &at, const TVector<T, 3> &up) {
-            if constexpr (C == 4 && R == 4) {
-                const auto zaxis = normalize(at - eye);
-                const auto xaxis = normalize(cross(zaxis, up));
-                const auto yaxis = cross(xaxis, zaxis);
+    template<typename T = float>
+    auto mat3Rotation(const T rads, const TVector<T, 3> &axis) {
+        return matRotation<T, 3>(rads, axis);
+    }
 
-                return TMatrix<T, 4, 4>::rows({
-                    TVector<T, 4>{xaxis.X, xaxis.Y, xaxis.Z, -dot(xaxis, eye)},
-                    TVector<T, 4>{yaxis.X, yaxis.Y, yaxis.Z, -dot(yaxis, eye)},
-                    TVector<T, 4>{-zaxis.X, -zaxis.Y, -zaxis.Z, -dot(zaxis, eye)},
-                    TVector<T, 4>{T(0), T(0), T(0), T(1)},
-                });
-            }
-        }
+    template<typename T = float>
+    auto mat4Rotation(const T rads, const TVector<T, 3> &axis) {
+        return matRotation<T, 4>(rads, axis);
+    }
 
-        static auto perspective(const T fov_radians, const T aspect, const T znear, const T zfar) {
-            if constexpr (C == 4 && R == 4) {
-                assert(fov_radians > T(0));
-                assert(aspect > T(0));
-                assert(znear > T(0));
-                assert(zfar > znear);
+    template<typename T = float>
+    auto mat4LookAtRH(const TVector<T, 3> &eye, const TVector<T, 3> &at, const TVector<T, 3> &up) {
+        const auto zaxis = normalize(at - eye);
+        const auto xaxis = normalize(cross(zaxis, up));
+        const auto yaxis = cross(xaxis, zaxis);
 
-                const T half_fov = fov_radians / T(2);
-                const T f = T(1) / std::tan(half_fov);
-                const T zdiff = znear - zfar;
-                const T a = aspect;
+        return TMatrix<T, 4, 4>::rows({
+            TVector<T, 4>{xaxis.X, xaxis.Y, xaxis.Z, -dot(xaxis, eye)},
+            TVector<T, 4>{yaxis.X, yaxis.Y, yaxis.Z, -dot(yaxis, eye)},
+            TVector<T, 4>{-zaxis.X, -zaxis.Y, -zaxis.Z, -dot(zaxis, eye)},
+            TVector<T, 4>{T(0), T(0), T(0), T(1)},
+        });
+    }
 
-                return TMatrix<T, 4, 4>::rows({TVector<T, 4>{f / a, T(0), T(0), T(0)}, TVector<T, 4>{T(0), f, T(0), T(0)},
-                                              TVector<T, 4>{T(0), T(0), (zfar + znear) / zdiff, (T(2) * zfar * znear) / zdiff}, TVector<T, 4>{T(0), T(0), T(-1), T(0)}});
-            }
-        }
+    template<typename T = float>
+    auto mat4Perspective(const T fov_radians, const T aspect, const T znear, const T zfar) {
+        assert(fov_radians > T(0));
+        assert(aspect > T(0));
+        assert(znear > T(0));
+        assert(zfar > znear);
 
-        static auto orthographic(const TVector<T, 3> &pmin, const TVector<T, 3> &pmax) {
-            if constexpr (C == 4 && R == 4) {
-                const auto diff = pmax - pmin;
+        const T half_fov = fov_radians / T(2);
+        const T f = T(1) / std::tan(half_fov);
+        const T zdiff = znear - zfar;
+        const T a = aspect;
 
-                auto result = TMatrix<T, 4, 4>::identity();
+        auto result = TMatrix<T, 4, 4>{};
+        result[0] = TVector<T, 4>{f / a, T(0), T(0), T(0)};
+        result[1] = TVector<T, 4>{T(0), f, T(0), T(0)};
+        result[2] = TVector<T, 4>{T(0), T(0), (zfar + znear) / zdiff, (T(2) * zfar * znear) / zdiff};
+        result[3] = TVector<T, 4>{T(0), T(0), T(-1), T(0)};
 
-                result(0, 0) = static_cast<T>(2) / diff.X;
-                result(1, 1) = static_cast<T>(2) / diff.Y;
-                result(2, 2) = static_cast<T>(-2) / diff.Z;
-                result(3, 3) = static_cast<T>(1);
+        return result;
+    }
 
-                result(0, 3) = -(pmax.X + pmin.X) / diff.X;
-                result(1, 3) = -(pmax.Y + pmin.Y) / diff.Y;
-                result(2, 3) = -(pmax.Z + pmin.Z) / diff.Z;
+    template<typename T = float>
+    auto mat4Ortho(const TVector<T, 3> &pmin, const TVector<T, 3> &pmax) {
+        constexpr auto two = static_cast<T>(2);
+        constexpr auto one = static_cast<T>(1);
+        const auto diff = pmax - pmin;
 
-                return result;
-            }
-        }
-    };
+        auto result = TMatrix<T, 4, 4>::identity();
+
+        result(0, 0) = two / diff.X;
+        result(1, 1) = two / diff.Y;
+        result(2, 2) = -two / diff.Z;
+        result(3, 3) = one;
+
+        result(0, 3) = -(pmax.X + pmin.X) / diff.X;
+        result(1, 3) = -(pmax.Y + pmin.Y) / diff.Y;
+        result(2, 3) = -(pmax.Z + pmin.Z) / diff.Z;
+
+        return result;
+    }
 
     extern template struct TMatrix<float, 2, 2>;
     extern template struct TMatrix<float, 3, 3>;
