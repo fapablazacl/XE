@@ -86,6 +86,9 @@ jobs:
       matrix: 
         cmake-build-type: [Debug, Release]
     steps:
+      - name: Install clang-tidy
+        run: sudo apt-get update && sudo apt-get install llvm
+
       - name: Checkout Source Code and Submodules
         uses: actions/checkout@v2
         with:
