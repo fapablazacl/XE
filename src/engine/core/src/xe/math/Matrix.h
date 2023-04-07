@@ -302,7 +302,7 @@ namespace XE {
         }
 
         static auto rotateX(const T radians) {
-            auto result = TMatrix<T, R, C>();
+            auto result = TMatrix<T, R, C>::identity();
 
             const T cos = std::cos(radians);
             const T sin = std::sin(radians);
@@ -317,7 +317,7 @@ namespace XE {
         }
 
         static auto rotateY(const T radians) {
-            auto result = TMatrix<T, R, C>();
+            auto result = TMatrix<T, R, C>::identity();
 
             const T cos = std::cos(radians);
             const T sin = std::sin(radians);
@@ -331,7 +331,7 @@ namespace XE {
         }
 
         static auto rotateZ(const T radians) {
-            auto result = TMatrix<T, R, C>();
+            auto result = TMatrix<T, R, C>::identity();
 
             const T cos = std::cos(radians);
             const T sin = std::sin(radians);
@@ -368,7 +368,7 @@ namespace XE {
                 const auto matUUT = TMatrix<T, 3, 1>{V} * TMatrix<T, 1, 3>{V};
                 const auto tempResult = matUUT + cos * (I - matUUT) + sin * matS;
 
-                auto result = TMatrix<T, R, C>();
+                auto result = TMatrix<T, R, C>::identity();
 
                 for (int i = 0; i < 3; ++i) {
                     for (int j = 0; j < 3; ++j) {
@@ -583,16 +583,6 @@ namespace XE {
 
         for (int row = 0; row < R; row++) {
             result[row] = dot(getRow(row), v);
-        }
-
-        return result;
-    }
-
-    template <typename T, int R, int C> [[deprecated("As the TMatrix struct is row-major, vector-matrix multiplication by the left doesn't have meaning")]] TVector<T, C> operator*(const TVector<T, C> &v, const TMatrix<T, R, C> &m) {
-        TVector<T, C> result;
-
-        for (int col = 0; col < C; col++) {
-            result[col] = dot(m.getColumn(col), v);
         }
 
         return result;

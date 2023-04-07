@@ -460,19 +460,6 @@ TEST(MatrixTest, MatrixVectorMultiplyOperationShouldTransformTheVectorByTheRight
 }
 
 
-TEST(MatrixTest, VectorMatrixMultiplyOperationShouldTransformTheVectorByTheLeft) {
-    const auto m = XE::Matrix3::rows({
-        XE::Vector3{1.0f, -1.0f, 1.0f},
-        XE::Vector3{-1.0f, 1.0f, -1.0f},
-        XE::Vector3{1.0f, 0.0f, 1.0f}
-    });
-
-    EXPECT_EQ(XE::Vector3(0.0f, 0.0f, 0.0f) * m, XE::Vector3(0.0f, 0.0f, 0.0f));
-    EXPECT_EQ(XE::Vector3(1.0f, 1.0f, 1.0f) * m , XE::Vector3(1.0f, 0.0f, 1.0f));
-    EXPECT_EQ(XE::Vector3(-1.0f, -1.0f, -1.0f) * m , XE::Vector3(-1.0f, 0.0f, -1.0f));
-}
-
-
 TEST(MatrixTest, ZeroStaticFunctionShouldCreateAValidZeroMatrix) {
     EXPECT_EQ(XE::Matrix4::zero(), XE::Matrix4::rows({
         XE::Vector4(0.0f, 0.0f, 0.0f, 0.0f),
