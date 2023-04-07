@@ -346,7 +346,7 @@ namespace XE {
 
     template<typename T, int N>
     auto matRotationX(const T radians) {
-        if (N == 3 || N == 4) {
+        if constexpr (N == 3 || N == 4) {
             auto result = matIdentity<T, N>();
 
             const T cos = std::cos(radians);
@@ -374,7 +374,7 @@ namespace XE {
 
     template<typename T, int N>
     auto matRotationY(const T radians) {
-        if (N == 3 || N == 4) {
+        if constexpr (N == 3 || N == 4) {
             auto result = matIdentity<T, N>();
 
             const T cos = std::cos(radians);
@@ -401,7 +401,7 @@ namespace XE {
 
     template<typename T, int N>
     auto matRotationZ(const T radians) {
-        if (N == 2 || N == 3 || N == 4) {
+        if constexpr (N == 2 || N == 3 || N == 4) {
             auto result = matIdentity<T, N>();
 
             const T cos = std::cos(radians);
@@ -433,7 +433,7 @@ namespace XE {
 
     template<typename T, int N>
     static auto matRotation(const T rads, const TVector<T, 3> &axis) {
-        if (N == 3 || N == 4) {
+        if constexpr (N == 3 || N == 4) {
             assert(!std::isnan(rads));
             assert(!std::isinf(rads));
 
