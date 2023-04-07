@@ -1,4 +1,3 @@
-
 import os
 import argparse
 
@@ -8,6 +7,7 @@ from cli.commands.coverage import CoverageCliCommand
 from cli.commands.formatter import FormatCliCommand
 from cli.commands.test import TestCliCommand
 from cli.commands.configure import ConfigureCliCommand
+
 
 class XBProject:
     def __init__(self, name, path):
@@ -23,6 +23,7 @@ class XBProject:
 
     def set_current_build_configuration(self):
         pass
+
 
 class CliApp:
     def __init__(self) -> None:
@@ -46,21 +47,21 @@ class CliApp:
         if command_name is None:
             self._handle_no_command()
             return 0
-        
+
         if command_name not in self._commands:
             print("Unknown command \"{}\"".format(args.command))
             return 1
-        
+
         project = self._open_project(None)
 
         command_class = self._commands[command_name]
         self._handle_command(command_class=command_class, project=project)
 
         return 0
-        
+
     def _parse_args(self):
         return self.parser.parse_args()
-    
+
     def _open_project(self, path):
         if path is None:
             path = os.getcwd()
@@ -73,7 +74,7 @@ class CliApp:
         name = self._get_cmake_project_name(path)
 
         return XBProject(name=name, path=path)
-    
+
     def _get_full_cmake_project_path(self, path):
         return os.path.join(path, "CMakeLists.txt")
 
@@ -81,7 +82,7 @@ class CliApp:
         return "project01"
 
     def _handle_no_command(self):
-        print ("available commands:")
+        print("available commands:")
 
         for command_name in self._commands:
             print(command_name)
@@ -90,6 +91,7 @@ class CliApp:
         command = command_class.create(project)
         command.perform()
 
-if __name__=="__main__":
+
+if __name__ == "__main__":
     ret_code = CliApp().run()
     exit(ret_code)

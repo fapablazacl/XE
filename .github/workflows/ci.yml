@@ -100,6 +100,9 @@ jobs:
       - name: Run unit tests
         run: cd build && ctest --output-on-failure
 
+      - name: Generate Coverage Information
+        run: XB_BUILD_DIR=build ./xbcli coverage
+
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v3
 

@@ -11,3 +11,4 @@ Testing/*
 local/*
 coverage/*
 .xenobuild/*
+venv

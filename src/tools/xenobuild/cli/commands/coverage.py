@@ -1,14 +1,18 @@
-
 import os
 import json
 import platform
 
 from core.util import run_command
 
+
 class CoverageCliCommand:
     @staticmethod
-    def create(project):
-        return CoverageCliCommand(project=project, cm_build_dir="coverage/debug")
+    def create(project, build_dir="coverage/debug"):
+        if os.getenv('XB_BUILD_DIR') is not None:
+            build_dir = os.getenv('XB_BUILD_DIR')
+            print("Using build directory from env variable XB_BUILD_DIR: " + build_dir)
+
+        return CoverageCliCommand(project=project, cm_build_dir=build_dir)
 
     def __init__(self, project, cm_build_dir) -> None:
         self.project = project
@@ -25,7 +29,9 @@ class CoverageCliCommand:
             module_path = os.curdir
             profile_data_file = self._merge_raw_profile(executable_test)
 
-            llvm_terminal_report = self._run_command(self._get_data_profile_report_cmd(executable_test, profile_data_file), raise_on_error=True, cwd=self.cm_build_dir)
+            llvm_terminal_report = self._run_command(
+                self._get_data_profile_report_cmd(executable_test, profile_data_file), raise_on_error=True,
+                cwd=self.cm_build_dir)
             print(llvm_terminal_report)
 
     def _check_coverage(self):
@@ -35,7 +41,9 @@ class CoverageCliCommand:
         for executable_test in executable_tests:
             module_path = os.curdir
             profile_data_file = self._merge_raw_profile(executable_test)
-            llvm_json_report = self._run_command(self._export_coverage_summary_json(executable_test, profile_data_file, module_path, "x86_64", "text"), raise_on_error=True)
+            llvm_json_report = self._run_command(
+                self._export_coverage_summary_json(executable_test, profile_data_file, module_path, "x86_64", "text"),
+                raise_on_error=True)
 
             if not self._check_llvm_coverage_json_export(llvm_json_report, 90):
                 print("Test \"{}\" doesn't pass minimum coverage threshold (90%)".format(executable_test))
@@ -63,10 +71,8 @@ class CoverageCliCommand:
 
         return True
 
-
-    def _run_command(self, cmd, raise_on_error = False, cwd=None):
+    def _run_command(self, cmd, raise_on_error=False, cwd=None):
         return run_command(cmd, raise_on_error=raise_on_error, cwd=cwd)
-
 
     def _get_ctest_json_info(self):
         cmd = "ctest --show-only=json-v1"
@@ -99,7 +105,6 @@ class CoverageCliCommand:
 
         return profdata_file
 
-
     def _get_data_profile_report_cmd(self, executable_test, profdata_file) -> str:
         cmd = self._adjust_llvm_cmd("llvm-cov report {} -instr-profile={} -arch=x86_64")
         cmd = cmd.format(executable_test, profdata_file)
@@ -108,8 +113,9 @@ class CoverageCliCommand:
     def _get_coverage_show_cmd(self, exxecutable_test, profdata_file, module_path, output_dir):
         export_format = "html"
         arch = "x86_64"
-        
-        cmd = self._adjust_llvm_cmd("llvm-cov show {} -instr-profile={} -format={} -show-branches=percent -show-line-counts-or-regions -show-expansions -arch={} {} -output-dir={}")
+
+        cmd = self._adjust_llvm_cmd(
+            "llvm-cov show {} -instr-profile={} -format={} -show-branches=percent -show-line-counts-or-regions -show-expansions -arch={} {} -output-dir={}")
         cmd = cmd.format(exxecutable_test, profdata_file, export_format, arch, module_path, output_dir)
 
         return cmd
@@ -126,5 +132,5 @@ class CoverageCliCommand:
     def _adjust_llvm_cmd(self, cmd):
         if self._get_current_os() == "Darwin":
             return "xcrun " + cmd
-        
+
         return cmd
