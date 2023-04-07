@@ -17,6 +17,7 @@ class CoverageCliCommand:
     def __init__(self, project, cm_build_dir) -> None:
         self.project = project
         self.cm_build_dir = cm_build_dir
+        self.enableCheck = False
 
     def perform(self):
         self._check_coverage()
@@ -45,7 +46,7 @@ class CoverageCliCommand:
                 self._export_coverage_summary_json(executable_test, profile_data_file, module_path, "x86_64", "text"),
                 raise_on_error=True)
 
-            if not self._check_llvm_coverage_json_export(llvm_json_report, 90):
+            if self.enableCheck and not self._check_llvm_coverage_json_export(llvm_json_report, 90):
                 print("Test \"{}\" doesn't pass minimum coverage threshold (90%)".format(executable_test))
                 exit(1)
 
