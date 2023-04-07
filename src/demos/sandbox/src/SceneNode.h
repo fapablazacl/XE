@@ -35,6 +35,6 @@ public:
 private:
     SceneNode *mParent = nullptr;
     Renderable *mRenderable = nullptr;
-    XE::Matrix4 mTransformation = XE::Matrix4::identity();
+    XE::Matrix4 mTransformation = XE::mat4Identity();
     std::vector<std::unique_ptr<SceneNode>> mChildren;
 };

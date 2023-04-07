@@ -7,7 +7,7 @@
 
 TEST(ProjectionTest, ProjectFunction) {
     // When considering a default transformation pipeline, with a viewport of (0, 0) - (640, 480)
-    const XE::Matrix4 projViewModel = XE::Matrix4::identity();
+    const XE::Matrix4 projViewModel = XE::mat4Identity();
     const XE::Viewport viewport = {{0, 0}, {640, 480}};
 
     // SECTION("Points placed into the XY plane at Z = 0 should map directly inside the Viewport") {
@@ -34,8 +34,8 @@ TEST(ProjectionTest, ProjectFunction) {
 }
 
 TEST(ProjectionTest, ProjectFunctionPerpective) {
-    const XE::Matrix4 proj = XE::Matrix4::perspective(XE::radians(90.0f), 640.0f / 480.0f, 0.1f, 100.0f);
-    const XE::Matrix4 view = XE::Matrix4::lookAtRH({0.0f, 0.0f, -1.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f});
+    const XE::Matrix4 proj = XE::mat4Perspective(XE::radians(90.0f), 640.0f / 480.0f, 0.1f, 100.0f);
+    const XE::Matrix4 view = XE::mat4LookAtRH({0.0f, 0.0f, -1.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f});
     const XE::Matrix4 projViewModel = proj * view;
     const XE::Viewport viewport = {{0, 0}, {640, 480}};
 
@@ -45,7 +45,7 @@ TEST(ProjectionTest, ProjectFunctionPerpective) {
 
 TEST(ProjectionTest, UnprojectFunction) {
     // SECTION("When considering a default transformation pipeline, with a viewport of (0, 0) - (640, 480)") {
-    const XE::Matrix4 projViewModel = XE::Matrix4::identity();
+    const XE::Matrix4 projViewModel = XE::mat4Identity();
     const XE::Viewport viewport = {{0, 0}, {640, 480}};
 
     // SECTION("Points placed inside the screen are in the [-1, 1]^2 domain") {

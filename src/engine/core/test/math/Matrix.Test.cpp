@@ -153,7 +153,7 @@ TEST(MatrixTest, DeterminantShouldComputeTheMatrixDeterminantCorrectly) {
 
     // matrix determinant
     EXPECT_FLOAT_EQ(XE::determinant(XE::Matrix4::zero()), 0.0f);
-    EXPECT_FLOAT_EQ(XE::determinant(XE::Matrix4::identity()), 1.0f);
+    EXPECT_FLOAT_EQ(XE::determinant(XE::mat4Identity()), 1.0f);
     EXPECT_FLOAT_EQ(XE::determinant(matA), -32.0f);
 }
 
@@ -302,11 +302,11 @@ TEST(MatrixTest, MatrixMultiplicationPerformsADotProductBetweenRowAndColumnsForE
 
     // matrix multiplication
     EXPECT_EQ(XE::Matrix4::zero(), XE::Matrix4::zero() * XE::Matrix4::zero());
-    EXPECT_EQ(XE::Matrix4::zero(), XE::Matrix4::identity() * XE::Matrix4::zero());
-    EXPECT_EQ(XE::Matrix4::identity(), XE::Matrix4::identity() * XE::Matrix4::identity());
+    EXPECT_EQ(XE::Matrix4::zero(), XE::mat4Identity() * XE::Matrix4::zero());
+    EXPECT_EQ(XE::mat4Identity(), XE::mat4Identity() * XE::mat4Identity());
 
-    EXPECT_EQ(matA, matA * XE::Matrix4::identity());
-    EXPECT_EQ(matA, XE::Matrix4::identity() * matA);
+    EXPECT_EQ(matA, matA * XE::mat4Identity());
+    EXPECT_EQ(matA, XE::mat4Identity() * matA);
 
     EXPECT_EQ(matMulResult, matA * matB);
     EXPECT_EQ(matMulResult, ((+matA) *= matB));
@@ -314,7 +314,7 @@ TEST(MatrixTest, MatrixMultiplicationPerformsADotProductBetweenRowAndColumnsForE
 
 
 TEST(MatrixTest, TransposeShouldSwapRowsAndColumns) {
-    const auto mi = XE::Matrix4::identity();
+    const auto mi = XE::mat4Identity();
     const auto m0 = XE::Matrix4::zero();
 
     EXPECT_EQ(mi, transpose(mi));
@@ -350,7 +350,7 @@ TEST(MatrixTest, InverseShouldComputeTheMatrixInverseMultiplicative) {
         XE::Vector4{2.0f, -1.0f, 0.0f, -1.0f}
     });
 
-    auto mi = XE::Matrix4::identity();
+    auto mi = XE::mat4Identity();
     auto detMatA = -32.0f;
 
     EXPECT_EQ(mi, inverse(mi));
@@ -488,25 +488,25 @@ TEST(MatrixTest, ZeroStaticFunctionShouldCreateAValidZeroMatrix) {
 }
 
 TEST(MatrixTest, IdentityStaticFunctionShouldCreateAValidIdentityMatrix) {
-    EXPECT_EQ(XE::Matrix4::identity(), XE::Matrix4::rows({
+    EXPECT_EQ(XE::mat4Identity(), XE::Matrix4::rows({
         XE::Vector4(1.0f, 0.0f, 0.0f, 0.0f),
         XE::Vector4(0.0f, 1.0f, 0.0f, 0.0f),
         XE::Vector4(0.0f, 0.0f, 1.0f, 0.0f),
         XE::Vector4(0.0f, 0.0f, 0.0f, 1.0f)
     }));
 
-    EXPECT_EQ(XE::Matrix3::identity(), XE::Matrix3::rows({
+    EXPECT_EQ(XE::mat3Identity(), XE::Matrix3::rows({
         XE::Vector3(1.0f, 0.0f, 0.0f),
         XE::Vector3(0.0f, 1.0f, 0.0f),
         XE::Vector3(0.0f, 0.0f, 1.0f)
     }));
 
-    EXPECT_EQ(XE::Matrix2::identity(), XE::Matrix2::rows({
+    EXPECT_EQ(XE::mat2Identity(), XE::Matrix2::rows({
         XE::Vector2(1.0f, 0.0f),
         XE::Vector2(0.0f, 1.0f)
     }));
 
-    const auto mid = XE::Matrix4::identity();
+    const auto mid = XE::mat4Identity();
     EXPECT_EQ(mid * XE::Vector4(0.0f, 0.0f, 0.0f, 0.0f), XE::Vector4(0.0f, 0.0f, 0.0f, 0.0f));
     EXPECT_EQ(mid * XE::Vector4(1.0f, 0.0f, 0.0f, 0.0f), XE::Vector4(1.0f, 0.0f, 0.0f, 0.0f));
     EXPECT_EQ(mid * XE::Vector4(0.0f, 1.0f, 0.0f, 0.0f), XE::Vector4(0.0f, 1.0f, 0.0f, 0.0f));
@@ -515,25 +515,25 @@ TEST(MatrixTest, IdentityStaticFunctionShouldCreateAValidIdentityMatrix) {
 }
 
 TEST(MatrixTest, ScaleStaticFunctionShouldCreateAValidScalingMatrix) {
-    EXPECT_EQ(XE::Matrix4::scale({1.0f, 2.0f, 3.0f, 4.0f}), XE::Matrix4::rows({
+    EXPECT_EQ(XE::mat4Scaling({1.0f, 2.0f, 3.0f, 4.0f}), XE::Matrix4::rows({
         XE::Vector4(1.0f, 0.0f, 0.0f, 0.0f),
         XE::Vector4(0.0f, 2.0f, 0.0f, 0.0f),
         XE::Vector4(0.0f, 0.0f, 3.0f, 0.0f),
         XE::Vector4(0.0f, 0.0f, 0.0f, 4.0f)
     }));
 
-    EXPECT_EQ(XE::Matrix3::scale({1.0f, 2.0f, 3.0f}), XE::Matrix3::rows({
+    EXPECT_EQ(XE::mat3Scaling({1.0f, 2.0f, 3.0f}), XE::Matrix3::rows({
         XE::Vector3(1.0f, 0.0f, 0.0f),
         XE::Vector3(0.0f, 2.0f, 0.0f),
         XE::Vector3(0.0f, 0.0f, 3.0f)
     }));
 
-    EXPECT_EQ(XE::Matrix2::scale({1.0f, 2.0f}), XE::Matrix2::rows({
+    EXPECT_EQ(XE::mat2Scaling({1.0f, 2.0f}), XE::Matrix2::rows({
         XE::Vector2(1.0f, 0.0f),
         XE::Vector2(0.0f, 2.0f)
     }));
 
-    const auto m_s1 = XE::Matrix4::scale({1.0f, 2.0f, 3.0f, 1.0f});
+    const auto m_s1 = XE::mat4Scaling({1.0f, 2.0f, 3.0f, 1.0f});
     EXPECT_EQ(m_s1 * XE::Vector4(0.0f, 0.0f, 0.0f, 0.0f), XE::Vector4(0.0f, 0.0f, 0.0f, 0.0f));
     EXPECT_EQ(m_s1 * XE::Vector4(1.0f, 0.0f, 0.0f, 0.0f), XE::Vector4(1.0f, 0.0f, 0.0f, 0.0f));
     EXPECT_EQ(m_s1 * XE::Vector4(0.0f, 1.0f, 0.0f, 0.0f), XE::Vector4(0.0f, 2.0f, 0.0f, 0.0f));
@@ -543,7 +543,7 @@ TEST(MatrixTest, ScaleStaticFunctionShouldCreateAValidScalingMatrix) {
 
 
 TEST(MatrixTest, CreateTranslationStaticFunctionShouldCreateAValidTranslateMatrix) {
-    const auto m1 = XE::Matrix4::translate({2.0f, 3.0f, 4.0f});
+    const auto m1 = XE::mat4Translation({2.0f, 3.0f, 4.0f});
 
     EXPECT_EQ(m1.getRow(0), XE::Vector4(1.0f, 0.0f, 0.0f, 2.0f));
     EXPECT_EQ(m1.getRow(1), XE::Vector4(0.0f, 1.0f, 0.0f, 3.0f));
@@ -556,7 +556,7 @@ TEST(MatrixTest, RotateXStaticFunctionShouldCreateAXAxisRotationMatrix) {
     XE::Matrix4 m;
     float sin, cos;
 
-    m = XE::Matrix4::rotateX(0.0f);
+    m = XE::mat4RotationX(0.0f);
     sin = std::sin(0.0f);
     cos = std::cos(0.0f);
     EXPECT_EQ(m.getRow(0), XE::Vector4(1.0f, 0.0f, 0.0f, 0.0f));
@@ -564,7 +564,7 @@ TEST(MatrixTest, RotateXStaticFunctionShouldCreateAXAxisRotationMatrix) {
     EXPECT_EQ(m.getRow(2), XE::Vector4(0.0f, 0.0f, 1.0f, 0.0f));
     EXPECT_EQ(m.getRow(3), XE::Vector4(0.0f, 0.0f, 0.0f, 1.0f));
 
-    m = XE::Matrix4::rotateX(XE::pi<float>);
+    m = XE::mat4RotationX(XE::pi<float>);
     sin = std::sin(XE::pi<float>);
     cos = std::cos(XE::pi<float>);
     EXPECT_EQ(m.getRow(0), XE::Vector4(1.0f, 0.0f, 0.0f, 0.0f));
@@ -572,7 +572,7 @@ TEST(MatrixTest, RotateXStaticFunctionShouldCreateAXAxisRotationMatrix) {
     EXPECT_EQ(m.getRow(2), XE::Vector4(0.0f, sin, cos, 0.0f));
     EXPECT_EQ(m.getRow(3), XE::Vector4(0.0f, 0.0f, 0.0f, 1.0f));
 
-    m = XE::Matrix4::rotateX(2.0f * XE::pi<float>);
+    m = XE::mat4RotationX(2.0f * XE::pi<float>);
     sin = std::sin(2.0f * XE::pi<float>);
     cos = std::cos(2.0f * XE::pi<float>);
     EXPECT_EQ(m.getRow(0), XE::Vector4(1.0f, 0.0f, 0.0f, 0.0f));
@@ -585,7 +585,7 @@ TEST(MatrixTest, RotateYStaticFunctionShouldCreateAWellConstructedRotationMatrix
     XE::Matrix4 m;
     float sin, cos;
 
-    m = XE::Matrix4::rotateY(0.0f);
+    m = XE::mat4RotationY(0.0f);
     sin = std::sin(0.0f);
     cos = std::cos(0.0f);
     EXPECT_EQ(m.getRow(0), XE::Vector4(1.0f, 0.0f, 0.0f, 0.0f));
@@ -593,7 +593,7 @@ TEST(MatrixTest, RotateYStaticFunctionShouldCreateAWellConstructedRotationMatrix
     EXPECT_EQ(m.getRow(2), XE::Vector4(0.0f, 0.0f, 1.0f, 0.0f));
     EXPECT_EQ(m.getRow(3), XE::Vector4(0.0f, 0.0f, 0.0f, 1.0f));
 
-    m = XE::Matrix4::rotateY(XE::pi<float>);
+    m = XE::mat4RotationY(XE::pi<float>);
     sin = std::sin(XE::pi<float>);
     cos = std::cos(XE::pi<float>);
     EXPECT_EQ(m.getRow(0), XE::Vector4(cos,  0.0f, sin,  0.0f));
@@ -601,7 +601,7 @@ TEST(MatrixTest, RotateYStaticFunctionShouldCreateAWellConstructedRotationMatrix
     EXPECT_EQ(m.getRow(2), XE::Vector4(-sin,  0.0f,  cos,  0.0f));
     EXPECT_EQ(m.getRow(3), XE::Vector4(0.0f, 0.0f,  0.0f, 1.0f));
 
-    m = XE::Matrix4::rotateY(2.0f * XE::pi<float>);
+    m = XE::mat4RotationY(2.0f * XE::pi<float>);
     sin = std::sin(2.0f * XE::pi<float>);
     cos = std::cos(2.0f * XE::pi<float>);
     EXPECT_EQ(m.getRow(0), XE::Vector4(cos,  0.0f, sin,  0.0f));
@@ -614,7 +614,7 @@ TEST(MatrixTest, RotateZStaticFunctionShouldCreateAWellConstructedRotationMatrix
     XE::Matrix4 m;
     float sin, cos;
 
-    m = XE::Matrix4::rotateZ(0.0f);
+    m = XE::mat4RotationZ(0.0f);
     sin = std::sin(0.0f);
     cos = std::cos(0.0f);
     EXPECT_EQ(m.getRow(0), XE::Vector4(1.0f, 0.0f, 0.0f, 0.0f));
@@ -622,7 +622,7 @@ TEST(MatrixTest, RotateZStaticFunctionShouldCreateAWellConstructedRotationMatrix
     EXPECT_EQ(m.getRow(2), XE::Vector4(0.0f, 0.0f, 1.0f, 0.0f));
     EXPECT_EQ(m.getRow(3), XE::Vector4(0.0f, 0.0f, 0.0f, 1.0f));
 
-    m = XE::Matrix4::rotateZ(XE::pi<float>);
+    m = XE::mat4RotationZ(XE::pi<float>);
     sin = std::sin(XE::pi<float>);
     cos = std::cos(XE::pi<float>);
     EXPECT_EQ(m.getRow(0), XE::Vector4(cos, -sin, 0.0f,  0.0f));
@@ -630,7 +630,7 @@ TEST(MatrixTest, RotateZStaticFunctionShouldCreateAWellConstructedRotationMatrix
     EXPECT_EQ(m.getRow(2), XE::Vector4(0.0f,  0.0f,  1.0f,  0.0f));
     EXPECT_EQ(m.getRow(3), XE::Vector4(0.0f, 0.0f,  0.0f, 1.0f));
 
-    m = XE::Matrix4::rotateZ(2.0f * XE::pi<float>);
+    m = XE::mat4RotationZ(2.0f * XE::pi<float>);
     sin = std::sin(2.0f * XE::pi<float>);
     cos = std::cos(2.0f * XE::pi<float>);
     EXPECT_EQ(m.getRow(0), XE::Vector4(cos, -sin, 0.0f,  0.0f));
@@ -641,38 +641,38 @@ TEST(MatrixTest, RotateZStaticFunctionShouldCreateAWellConstructedRotationMatrix
 
 
 TEST(MatrixTest, RotateWithFixedAxisShouldMatchTheCorrespondingRotateXYZStaticMethods) {
-    EXPECT_EQ(XE::Matrix4::rotate(0.0f, XE::Vector3(0.0f, 1.0f, 0.0f)), XE::Matrix4::identity());
-    EXPECT_EQ(XE::Matrix4::rotate(0.0f, XE::Vector3(0.0f, 0.0f, 1.0f)), XE::Matrix4::identity());
-    EXPECT_EQ(XE::Matrix4::rotate(0.0f, XE::Vector3(-1.0f, 0.0f, 0.0f)), XE::Matrix4::identity());
-    EXPECT_EQ(XE::Matrix4::rotate(0.0f, XE::Vector3(0.0f, -1.0f, 0.0f)), XE::Matrix4::identity());
-    EXPECT_EQ(XE::Matrix4::rotate(0.0f, XE::Vector3(0.0f, 0.0f, -1.0f)), XE::Matrix4::identity());
+    EXPECT_EQ(XE::mat4Rotation(0.0f, XE::Vector3(0.0f, 1.0f, 0.0f)), XE::mat4Identity());
+    EXPECT_EQ(XE::mat4Rotation(0.0f, XE::Vector3(0.0f, 0.0f, 1.0f)), XE::mat4Identity());
+    EXPECT_EQ(XE::mat4Rotation(0.0f, XE::Vector3(-1.0f, 0.0f, 0.0f)), XE::mat4Identity());
+    EXPECT_EQ(XE::mat4Rotation(0.0f, XE::Vector3(0.0f, -1.0f, 0.0f)), XE::mat4Identity());
+    EXPECT_EQ(XE::mat4Rotation(0.0f, XE::Vector3(0.0f, 0.0f, -1.0f)), XE::mat4Identity());
 
-    EXPECT_EQ(XE::Matrix4::rotate(0.0f * XE::pi<float>, XE::Vector3(1.0f, 0.0f, 0.0f)), XE::Matrix4::rotateX(0.0f * XE::pi<float>));
-    EXPECT_EQ(XE::Matrix4::rotate(0.5f * XE::pi<float>, XE::Vector3(1.0f, 0.0f, 0.0f)), XE::Matrix4::rotateX(0.5f * XE::pi<float>));
-    EXPECT_EQ(XE::Matrix4::rotate(1.0f * XE::pi<float>, XE::Vector3(1.0f, 0.0f, 0.0f)), XE::Matrix4::rotateX(1.0f * XE::pi<float>));
-    EXPECT_EQ(XE::Matrix4::rotate(1.5f * XE::pi<float>, XE::Vector3(1.0f, 0.0f, 0.0f)), XE::Matrix4::rotateX(1.5f * XE::pi<float>));
-    EXPECT_EQ(XE::Matrix4::rotate(2.0f * XE::pi<float>, XE::Vector3(1.0f, 0.0f, 0.0f)), XE::Matrix4::rotateX(2.0f * XE::pi<float>));
+    EXPECT_EQ(XE::mat4Rotation(0.0f * XE::pi<float>, XE::Vector3(1.0f, 0.0f, 0.0f)), XE::mat4RotationX(0.0f * XE::pi<float>));
+    EXPECT_EQ(XE::mat4Rotation(0.5f * XE::pi<float>, XE::Vector3(1.0f, 0.0f, 0.0f)), XE::mat4RotationX(0.5f * XE::pi<float>));
+    EXPECT_EQ(XE::mat4Rotation(1.0f * XE::pi<float>, XE::Vector3(1.0f, 0.0f, 0.0f)), XE::mat4RotationX(1.0f * XE::pi<float>));
+    EXPECT_EQ(XE::mat4Rotation(1.5f * XE::pi<float>, XE::Vector3(1.0f, 0.0f, 0.0f)), XE::mat4RotationX(1.5f * XE::pi<float>));
+    EXPECT_EQ(XE::mat4Rotation(2.0f * XE::pi<float>, XE::Vector3(1.0f, 0.0f, 0.0f)), XE::mat4RotationX(2.0f * XE::pi<float>));
 
-    EXPECT_EQ(XE::Matrix4::rotate(0.0f * XE::pi<float>, XE::Vector3(0.0f, 1.0f, 0.0f)), XE::Matrix4::rotateY(0.0f * XE::pi<float>));
-    EXPECT_EQ(XE::Matrix4::rotate(0.5f * XE::pi<float>, XE::Vector3(0.0f, 1.0f, 0.0f)), XE::Matrix4::rotateY(0.5f * XE::pi<float>));
-    EXPECT_EQ(XE::Matrix4::rotate(1.0f * XE::pi<float>, XE::Vector3(0.0f, 1.0f, 0.0f)), XE::Matrix4::rotateY(1.0f * XE::pi<float>));
-    EXPECT_EQ(XE::Matrix4::rotate(1.5f * XE::pi<float>, XE::Vector3(0.0f, 1.0f, 0.0f)), XE::Matrix4::rotateY(1.5f * XE::pi<float>));
-    EXPECT_EQ(XE::Matrix4::rotate(2.0f * XE::pi<float>, XE::Vector3(0.0f, 1.0f, 0.0f)), XE::Matrix4::rotateY(2.0f * XE::pi<float>));
+    EXPECT_EQ(XE::mat4Rotation(0.0f * XE::pi<float>, XE::Vector3(0.0f, 1.0f, 0.0f)), XE::mat4RotationY(0.0f * XE::pi<float>));
+    EXPECT_EQ(XE::mat4Rotation(0.5f * XE::pi<float>, XE::Vector3(0.0f, 1.0f, 0.0f)), XE::mat4RotationY(0.5f * XE::pi<float>));
+    EXPECT_EQ(XE::mat4Rotation(1.0f * XE::pi<float>, XE::Vector3(0.0f, 1.0f, 0.0f)), XE::mat4RotationY(1.0f * XE::pi<float>));
+    EXPECT_EQ(XE::mat4Rotation(1.5f * XE::pi<float>, XE::Vector3(0.0f, 1.0f, 0.0f)), XE::mat4RotationY(1.5f * XE::pi<float>));
+    EXPECT_EQ(XE::mat4Rotation(2.0f * XE::pi<float>, XE::Vector3(0.0f, 1.0f, 0.0f)), XE::mat4RotationY(2.0f * XE::pi<float>));
 
-    EXPECT_EQ(XE::Matrix4::rotate(0.0f * XE::pi<float>, XE::Vector3(0.0f, 0.0f, 1.0f)), XE::Matrix4::rotateZ(0.0f * XE::pi<float>));
-    EXPECT_EQ(XE::Matrix4::rotate(0.5f * XE::pi<float>, XE::Vector3(0.0f, 0.0f, 1.0f)), XE::Matrix4::rotateZ(0.5f * XE::pi<float>));
-    EXPECT_EQ(XE::Matrix4::rotate(1.0f * XE::pi<float>, XE::Vector3(0.0f, 0.0f, 1.0f)), XE::Matrix4::rotateZ(1.0f * XE::pi<float>));
-    EXPECT_EQ(XE::Matrix4::rotate(1.5f * XE::pi<float>, XE::Vector3(0.0f, 0.0f, 1.0f)), XE::Matrix4::rotateZ(1.5f * XE::pi<float>));
-    EXPECT_EQ(XE::Matrix4::rotate(2.0f * XE::pi<float>, XE::Vector3(0.0f, 0.0f, 1.0f)), XE::Matrix4::rotateZ(2.0f * XE::pi<float>));
+    EXPECT_EQ(XE::mat4Rotation(0.0f * XE::pi<float>, XE::Vector3(0.0f, 0.0f, 1.0f)), XE::mat4RotationZ(0.0f * XE::pi<float>));
+    EXPECT_EQ(XE::mat4Rotation(0.5f * XE::pi<float>, XE::Vector3(0.0f, 0.0f, 1.0f)), XE::mat4RotationZ(0.5f * XE::pi<float>));
+    EXPECT_EQ(XE::mat4Rotation(1.0f * XE::pi<float>, XE::Vector3(0.0f, 0.0f, 1.0f)), XE::mat4RotationZ(1.0f * XE::pi<float>));
+    EXPECT_EQ(XE::mat4Rotation(1.5f * XE::pi<float>, XE::Vector3(0.0f, 0.0f, 1.0f)), XE::mat4RotationZ(1.5f * XE::pi<float>));
+    EXPECT_EQ(XE::mat4Rotation(2.0f * XE::pi<float>, XE::Vector3(0.0f, 0.0f, 1.0f)), XE::mat4RotationZ(2.0f * XE::pi<float>));
 }
 
 TEST(MatrixTest, LookAtRHShouldCreateATransformThatSimulatesAStandardLookAtCamera_WithCenterAtThOriginLookingAtTheZAxisAndYOrientation_ShouldGenerateAnIdentityMatrix) {
-    const auto lookAt = XE::Matrix4::lookAtRH({0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, -1.0f}, {0.0f, 1.0f, 0.0f});
-    EXPECT_EQ(lookAt, XE::Matrix4::identity());
+    const auto lookAt = XE::mat4LookAtRH({0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, -1.0f}, {0.0f, 1.0f, 0.0f});
+    EXPECT_EQ(lookAt, XE::mat4Identity());
 }
 
 TEST(MatrixTest, LookAtRHShouldCreateATransformThatSimulatesAStandardLookAtCamera_WithCenterAtTheOrigin_LookingAtTheZAxisAndYOrientation_ShouldGenerateAnPseudoIdentityMatrixWithSomeNegativeUnitAxis) {
-    const auto lookAt = XE::Matrix4::lookAtRH({0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f, 0.0f});
+    const auto lookAt = XE::mat4LookAtRH({0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f, 0.0f});
 
     EXPECT_EQ(lookAt, XE::Matrix4::rows({
         XE::Vector4( -1.0f, 0.0f, 0.0f, 0.0f ),
@@ -683,16 +683,16 @@ TEST(MatrixTest, LookAtRHShouldCreateATransformThatSimulatesAStandardLookAtCamer
 }
 
 TEST(MatrixTest, LookAtRHShouldCreateATransformThatSimulatesAStandardLookAtCamera_WithCenterAtTheMinus10ZLookingAtTheZAxisAndYOrientationShouldGenerateATranslationMatrix) {
-    const auto lookAt1 = XE::Matrix4::lookAtRH({0.0f, 0.0f, 10.0f}, {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f, 0.0f});
-    EXPECT_EQ(lookAt1, XE::Matrix4::translate(XE::Vector3(0.0f, 0.0f, 10.0f)));
+    const auto lookAt1 = XE::mat4LookAtRH({0.0f, 0.0f, 10.0f}, {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f, 0.0f});
+    EXPECT_EQ(lookAt1, XE::mat4Translation(XE::Vector3(0.0f, 0.0f, 10.0f)));
 
-    const auto lookAt2 = XE::Matrix4::lookAtRH({0.0f, 0.0f, 10.0f}, {0.0f, 0.0f, -1.0f}, {0.0f, 1.0f, 0.0f});
-    EXPECT_EQ(lookAt2, XE::Matrix4::translate(XE::Vector3(0.0f, 0.0f, 10.0f)));
+    const auto lookAt2 = XE::mat4LookAtRH({0.0f, 0.0f, 10.0f}, {0.0f, 0.0f, -1.0f}, {0.0f, 1.0f, 0.0f});
+    EXPECT_EQ(lookAt2, XE::mat4Translation(XE::Vector3(0.0f, 0.0f, 10.0f)));
 }
 
 
 TEST(MatrixTest, createPerspectiveShouldCreateAPerspectiveTransformationMatrix) {
-    const auto m1 = XE::Matrix4::perspective(XE::radians(60.0f), (320.0f/240.0f), 0.1f, 100.0f);
+    const auto m1 = XE::mat4Perspective(XE::radians(60.0f), (320.0f/240.0f), 0.1f, 100.0f);
     EXPECT_EQ(m1, XE::Matrix4::rows ({
         XE::Vector4(1.299038170f, 0.000000000f, 0.000000000f, 0.000000000f),
         XE::Vector4(0.000000000f, 1.73205090f, 0.000000000f, 0.000000000f),
@@ -700,7 +700,7 @@ TEST(MatrixTest, createPerspectiveShouldCreateAPerspectiveTransformationMatrix) 
         XE::Vector4(0.000000000f, 0.000000000f, -1.000000000f, 0.000000000f)
     }));
 
-    const auto m2 = XE::Matrix4::perspective(XE::radians(120.0f), 1.33333f, 0.1f, 100.0f);
+    const auto m2 = XE::mat4Perspective(XE::radians(120.0f), 1.33333f, 0.1f, 100.0f);
     EXPECT_EQ(m2, XE::Matrix4::rows({
         XE::Vector4(0.433013767f, 0.000000000f, 0.000000000f, 0.000000000f),
         XE::Vector4(0.000000000f, 0.577350259f, 0.000000000f, 0.000000000f),
