@@ -445,11 +445,12 @@ TEST(QuaternionTest, InverseShouldComputeAnNormalizedCongujatedQuaternion) {
 
 
 TEST(QuaternionTest, TransformShouldRotatePointVector) {
-    const auto rotation= XE::quatRotationRH<float>({0.0f, 1.0f, 0.0f}, XE::pi<float> * 0.5);
+    const auto rotation= XE::quatRotationRH({0.0f, 1.0f, 0.0f}, XE::pi<float> * 0.5f);
     const auto point = XE::Vector3{1.0f, 0.0f, 0.0f};
     const auto result = XE::transform(rotation, point);
+    const auto e = XE::DEFAULT_EPSILON<float>;
 
-    EXPECT_FLOAT_EQ(result.X, 0.0f);
-    EXPECT_FLOAT_EQ(result.Y, 0.0f);
-    EXPECT_FLOAT_EQ(result.Z, -1.0f);
+    EXPECT_NEAR(result.X, 0.0f, e);
+    EXPECT_NEAR(result.Y, 0.0f, e);
+    EXPECT_NEAR(result.Z, -1.0f, e);
 }

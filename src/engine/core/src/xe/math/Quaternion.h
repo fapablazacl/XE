@@ -158,7 +158,16 @@ namespace XE {
 
         TQuaternion<T> operator+() const { return *this; }
 
-        TQuaternion<T> operator*(const TQuaternion<T> &rhs) const { return {cross(V, rhs.V) + rhs.V * W + V * rhs.W, W * rhs.W - dot(V, rhs.V)}; }
+        TQuaternion<T> operator*(const TQuaternion<T> &rhs) const {
+            const auto v1 = cross(V, rhs.V);
+            const auto v2 = rhs.V * W;
+            const auto v3 = V * rhs.W;
+            const auto v = v1 + v2 + v3;
+
+            const auto w = W * rhs.W - dot(V, rhs.V);
+
+            return {v, w};
+        }
 
         TQuaternion<T> operator/(const TQuaternion<T> &rhs) const { return (*this) * inverse(rhs); }
 
@@ -241,11 +250,13 @@ namespace XE {
         bool operator!=(const TQuaternion<T> &rhs) const { return !(*this == rhs); }
     };
 
-    template <typename T> TQuaternion<T> conjugate(const TQuaternion<T> &q) { return {-q.V, q.W}; }
+    template <typename T = float> TQuaternion<T> conjugate(const TQuaternion<T> &q) { return {-q.V, q.W}; }
 
-    template <typename T> TQuaternion<T> inverse(const TQuaternion<T> &q) { return conjugate(q) / norm2(q); }
+    template <typename T = float> TQuaternion<T> inverse(const TQuaternion<T> &q) {
+        return conjugate(q) / norm2(q);
+    }
 
-    template <typename T> T dot(const TQuaternion<T> &q1, const TQuaternion<T> &q2) {
+    template <typename T = float> T dot(const TQuaternion<T> &q1, const TQuaternion<T> &q2) {
         T sum = T(0);
 
         for (int i = 0; i < 4; i++) {
@@ -255,37 +266,44 @@ namespace XE {
         return sum;
     }
 
-    template <typename T> T norm2(const TQuaternion<T> &q) { return dot(q, q); }
+    template <typename T = float> T norm2(const TQuaternion<T> &q) { return dot(q, q); }
 
     /**
      * @brief Compute the magnitude, module or length (AKA Absolute Value) for a given Quaternion.
      */
-    template <typename T> T norm(const TQuaternion<T> &q) { return static_cast<T>(std::sqrt(norm2(q))); }
+    template <typename T = float> T norm(const TQuaternion<T> &q) { return static_cast<T>(std::sqrt(norm2(q))); }
 
     /**
      * @brief Compute a Quaternion with a unit magnitude (1)
      */
-    template <typename T> TQuaternion<T> normalize(const TQuaternion<T> &q) { return q / norm(q); }
+    template <typename T = float> TQuaternion<T> normalize(const TQuaternion<T> &q) { return q / norm(q); }
 
-    template <typename T> TVector<T, 3> transform(const TQuaternion<T> &q, const TVector<T, 3> &v) { return (q * TQuaternion<T>(v) * inverse(q)).V; }
+    template <typename T = float> TVector<T, 3> transform(const TQuaternion<T> &q, const TVector<T, 3> &v) {
+        const auto inv_q = inverse(q);
+        const auto q1 = q * TQuaternion<T>(v);
+        const auto final_q = q1 * inv_q;
 
-    template<typename T> TQuaternion<T> quatId() {
+        return final_q.V;
+    }
+
+    template<typename T = float> TQuaternion<T> quatId() {
         return TQuaternion<T>({T(0), T(0), T(0)}, T(1));
     }
 
-    template<typename T> TQuaternion<T> quatZero() {
+    template<typename T = float> TQuaternion<T> quatZero() {
         return TQuaternion<T>({T(0), T(0), T(0)}, T(0));
     }
 
-    template<typename T> TQuaternion<T> quatRotationRH(const TVector<T, 3> &axis, const T radians) {
+    template<typename T = float> TQuaternion<T> quatRotationRH(const TVector<T, 3> &axis, const T radians) {
         assert(equals(norm(axis), T{1}) && "Axis should be normalized");
-
         const T angle = T{0.5} * radians;
+        const T sin = std::sin(angle);
+        const T cos = std::cos(angle);
 
-        return TQuaternion<T>(std::sin(angle) * axis, std::cos(angle));
+        return TQuaternion<T>(sin * axis, cos);
     }
 
-    template<typename T> TQuaternion<T> quatRotationLH(const TVector<T, 3> &axis, const T radians) {
+    template<typename T = float> TQuaternion<T> quatRotationLH(const TVector<T, 3> &axis, const T radians) {
         assert(equals(norm(axis), T{1}) && "Axis should be normalized");
 
         const T angle = T{0.5} * radians;
