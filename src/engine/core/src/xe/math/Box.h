@@ -5,7 +5,7 @@
 #include "Boundary.h"
 
 namespace XE {
-    //! Bounding box in 3-space. It's a Boundary speciallization
+    //! Bounding box in 3-space. It's a Boundary specialization
     template <typename T> using Box = Boundary<T, 3>;
 
     //! Bounding Box in 3-space, with floating-point values
