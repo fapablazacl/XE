@@ -14,7 +14,7 @@ class System {
 public:
     virtual void handleMessage(const Message &message) = 0;
 
-    virtual ~System() {};
+    virtual ~System(){};
 
 public:
     std::set<Entity> entities;

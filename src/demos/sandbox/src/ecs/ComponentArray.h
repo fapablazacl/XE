@@ -6,10 +6,9 @@
 #define XE_COMPONENTARRAY_H
 
 #include "CommonECS.h"
-#include <unordered_map>
 #include <array>
 #include <cassert>
-
+#include <unordered_map>
 
 class IComponentArray {
 public:
@@ -18,9 +17,7 @@ public:
     virtual void entityDestroyed(const Entity entity) = 0;
 };
 
-
-template<typename Component>
-class TComponentArray : public IComponentArray {
+template <typename Component> class TComponentArray : public IComponentArray {
 public:
     virtual ~TComponentArray() {}
 
@@ -35,7 +32,6 @@ public:
 
         ++size;
     }
-
 
     void removeData(const Entity entity) {
         assert(entityToIndex.find(entity) != entityToIndex.end() && "Entity doesn't have the component");
@@ -57,13 +53,9 @@ public:
         --size;
     }
 
-    Component& getData(const Entity entity) {
-        return components[entity];
-    }
+    Component &getData(const Entity entity) { return components[entity]; }
 
-    void entityDestroyed(const Entity entity) override {
-        removeData(entity);
-    }
+    void entityDestroyed(const Entity entity) override { removeData(entity); }
 
 private:
     std::array<Component, MAX_ENTITIES> components;

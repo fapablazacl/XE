@@ -13,8 +13,7 @@
 #include <string>
 
 namespace XE {
-    template<typename T>
-    inline const T DEFAULT_EPSILON = T{0.000001};
+    template <typename T> inline const T DEFAULT_EPSILON = T{0.000001};
 
     //! Perform a safe comparison between two floating point using the default reference "infinitesimal" epsilon
     template <typename T> bool equals(const T a, const T b) { return std::abs(a - b) <= DEFAULT_EPSILON<T>; }

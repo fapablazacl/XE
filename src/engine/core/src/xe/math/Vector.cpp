@@ -13,4 +13,4 @@ namespace XE {
     template struct TVector<double, 2>;
     template struct TVector<double, 3>;
     template struct TVector<double, 4>;
-}
+} // namespace XE

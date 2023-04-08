@@ -31,7 +31,7 @@ namespace XE {
      */
     template <typename T> TVector<T, 4> unproject(const TVector<T, 4> &screen, const TMatrix<T, 4, 4> &invProjViewModel, const Viewport &viewport) {
         const auto clip = TVector<T, 4>{(screen.X - viewport.position.X) / (T(0.5) * viewport.size.X) - T(1.0),
-                                       (screen.Y - viewport.position.Y) / (T(0.5) * viewport.size.Y) - T(1.0), screen.Z, screen.W};
+                                        (screen.Y - viewport.position.Y) / (T(0.5) * viewport.size.Y) - T(1.0), screen.Z, screen.W};
 
         auto world = invProjViewModel * clip;
 

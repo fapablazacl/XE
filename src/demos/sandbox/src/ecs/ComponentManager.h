@@ -8,11 +8,9 @@
 #include "ComponentArray.h"
 #include <memory>
 
-
 class ComponentManager {
 public:
-    template<typename T>
-    void registerComponent() {
+    template <typename T> void registerComponent() {
         const char *typeName = typeid(T).name();
 
         componentTypes.insert({typeName, nextComponentType});
@@ -21,8 +19,7 @@ public:
         ++nextComponentType;
     }
 
-    template<typename T>
-    ComponentType getComponentType() const {
+    template <typename T> ComponentType getComponentType() const {
         const char *typeName = typeid(T).name();
         const auto pos = componentTypes.find(typeName);
 
@@ -31,32 +28,22 @@ public:
         return pos->second;
     }
 
-    template<typename T>
-    void addComponent(const Entity entity, T component) {
-        getComponentArray<T>()->insertData(entity, component);
-    }
+    template <typename T> void addComponent(const Entity entity, T component) { getComponentArray<T>()->insertData(entity, component); }
 
-    template<typename T>
-    void removeComponent(const Entity entity) {
-        getComponentArray<T>()->removeData(entity);
-    }
+    template <typename T> void removeComponent(const Entity entity) { getComponentArray<T>()->removeData(entity); }
 
-    template<typename T>
-    T& getComponent(const Entity entity) {
-        return getComponentArray<T>()->getData(entity);
-    }
+    template <typename T> T &getComponent(const Entity entity) { return getComponentArray<T>()->getData(entity); }
 
     void entityDestroyed(Entity entity) {
-        for (auto const& pair : componentArrays) {
-            auto const& component = pair.second;
+        for (auto const &pair : componentArrays) {
+            auto const &component = pair.second;
             component->entityDestroyed(entity);
         }
     }
 
 private:
-    template<typename T>
-    std::shared_ptr<TComponentArray<T>> getComponentArray() {
-        const char* typeName = typeid(T).name();
+    template <typename T> std::shared_ptr<TComponentArray<T>> getComponentArray() {
+        const char *typeName = typeid(T).name();
         return std::static_pointer_cast<TComponentArray<T>>(componentArrays[typeName]);
     }
 
@@ -65,6 +52,5 @@ private:
     std::unordered_map<const char *, std::shared_ptr<IComponentArray>> componentArrays;
     ComponentType nextComponentType{};
 };
-
 
 #endif // XE_COMPONENTMANAGER_H

@@ -8,8 +8,8 @@
 #include <bitset>
 #include <cstdint>
 
-using Entity = uint32_t;                    //! The Entity Identifier
-const Entity MAX_ENTITIES = Entity{5000};   //! Max amount of entities supported
+using Entity = uint32_t;                  //! The Entity Identifier
+const Entity MAX_ENTITIES = Entity{5000}; //! Max amount of entities supported
 
 using ComponentType = std::uint32_t;
 const ComponentType MAX_COMPONENTS = 32;

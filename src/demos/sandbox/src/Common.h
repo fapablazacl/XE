@@ -31,7 +31,6 @@ namespace demo {
     };
 } // namespace demo
 
-
 namespace Sandbox {
     struct Material {};
 
@@ -95,5 +94,4 @@ namespace Sandbox {
         return matrix;
     }
 
-    
 } // namespace Sandbox

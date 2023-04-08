@@ -11,9 +11,7 @@ public:
     //! must be called once per frame
     bool frame();
 
-    int getFPS() const {
-        return fps;
-    }
+    int getFPS() const { return fps; }
 
 private:
     int lastTime = XE::Timer::getTick();

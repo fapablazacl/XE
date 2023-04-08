@@ -164,4 +164,4 @@ namespace demo {
 
         mGraphicsDevice->endFrame();
     }
-}
+} // namespace demo

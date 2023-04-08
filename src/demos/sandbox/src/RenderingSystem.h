@@ -1,5 +1,5 @@
 
-#pragma once 
+#pragma once
 
 #include <memory>
 #include <string>
@@ -8,9 +8,9 @@
 #include <xe/graphics/GL.h>
 #include <xe/graphics/Graphics.h>
 #include <xe/graphics/PNG.h>
-#include <xe/math/Math.h>
-#include <xe/io/IO.h>
 #include <xe/input/Input.h>
+#include <xe/io/IO.h>
+#include <xe/math/Math.h>
 #include <xe/platform/glfw/WindowGLFW.h>
 
 #include "Asset_CGLTF.h"
@@ -31,7 +31,7 @@ namespace Sandbox {
         float zfar = 1000.0f;
 
         void update(const float seconds, const bool moveForward, const bool moveBackward, const bool turnLeft, const bool turnRight);
-        
+
     private:
         const float turnSpeedPerSecond = 1.25f;
         const float moveSpeedPerSecond = 0.025f;
@@ -40,7 +40,6 @@ namespace Sandbox {
     struct GeoObject {
         std::vector<std::pair<XE::Subset *, XE::SubsetEnvelope>> subsets;
     };
-
 
     class RenderingSystem {
     public:

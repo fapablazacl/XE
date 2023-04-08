@@ -11,8 +11,7 @@ bool FPSCounter::frame() {
         currentFrames++;
 
         return false;
-    }
-    else {
+    } else {
         fps = currentFrames;
         currentFrames = 0;
         lastTime = XE::Timer::getTick();

@@ -6,9 +6,7 @@
 
 #include "ECS.h"
 
-void MessageBus::registerSystem(System &system) {
-    systems.push_back(&system);
-}
+void MessageBus::registerSystem(System &system) { systems.push_back(&system); }
 void MessageBus::postMessage(const Message &message, const MessageBusPostMessageOptions options) {
     switch (options) {
     case MessageBusPostMessageOptions::Async:

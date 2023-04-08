@@ -9,19 +9,13 @@
 
 struct Message {
     //! The specific message type
-    enum {
-        GAME_EXIT,
-        SYSTEM_UPDATE
-    } type;
+    enum { GAME_EXIT, SYSTEM_UPDATE } type;
 
     //! Delta time for the current frame
     float dt = 0.0f;
 };
 
-enum class MessageBusPostMessageOptions {
-    Async,
-    Sync
-};
+enum class MessageBusPostMessageOptions { Async, Sync };
 
 class System;
 class MessageBus {
@@ -41,7 +35,7 @@ private:
 
 private:
     std::vector<Message> messages;
-    std::vector<System*> systems;
+    std::vector<System *> systems;
 };
 
 #endif // XE_MESSAGEBUS_H

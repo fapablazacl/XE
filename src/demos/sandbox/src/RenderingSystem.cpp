@@ -43,14 +43,13 @@ using XE::ShaderType;
 using XE::Subset;
 using XE::SubsetEnvelope;
 using XE::Texture2D;
+using XE::TVector;
 using XE::Uniform;
-using XE::UniformMatrix;
 using XE::UniformMatrix;
 using XE::Vector2i;
 using XE::Vector3;
 using XE::Vector4;
 using XE::WindowGLFW;
-using XE::TVector;
 
 namespace Sandbox {
     void Camera::update(const float seconds, const bool moveForward, const bool moveBackward, const bool turnLeft, const bool turnRight) {
@@ -301,28 +300,28 @@ namespace Sandbox {
     std::pair<Subset *, SubsetEnvelope> RenderingSystem::createSubset(const MeshPrimitive &meshPrimitive) {
         // create the vertex buffer
         BufferDescriptor coordBufferDescriptor = {BufferType::Vertex, BufferUsage::Copy, BufferAccess::Static, meshPrimitive.coords.size() * sizeof(Vector3),
-                                                    (const void *)meshPrimitive.coords.data()};
+                                                  (const void *)meshPrimitive.coords.data()};
 
         XE::Buffer *coordBuffer = m_graphicsDevice->createBuffer(coordBufferDescriptor);
 
         BufferDescriptor colorBufferDescriptor = {BufferType::Vertex, BufferUsage::Copy, BufferAccess::Static, meshPrimitive.colors.size() * sizeof(Vector4),
-                                                    (const void *)meshPrimitive.colors.data()};
+                                                  (const void *)meshPrimitive.colors.data()};
 
         XE::Buffer *colorBuffer = m_graphicsDevice->createBuffer(colorBufferDescriptor);
 
         BufferDescriptor normalBufferDescriptor = {BufferType::Vertex, BufferUsage::Copy, BufferAccess::Static, meshPrimitive.normals.size() * sizeof(Vector3),
-                                                    (const void *)meshPrimitive.normals.data()};
+                                                   (const void *)meshPrimitive.normals.data()};
 
         XE::Buffer *normalBuffer = m_graphicsDevice->createBuffer(normalBufferDescriptor);
 
         BufferDescriptor texCoordBufferDescriptor = {BufferType::Vertex, BufferUsage::Copy, BufferAccess::Static, meshPrimitive.texCoords.size() * sizeof(Vector3),
-                                                        (const void *)meshPrimitive.texCoords.data()};
+                                                     (const void *)meshPrimitive.texCoords.data()};
 
         XE::Buffer *texCoordBuffer = m_graphicsDevice->createBuffer(texCoordBufferDescriptor);
 
         // create the index buffer
         BufferDescriptor indexBufferDescriptor = {BufferType::Index, BufferUsage::Copy, BufferAccess::Static, meshPrimitive.indices.size() * sizeof(int),
-                                                    (const void *)meshPrimitive.indices.data()};
+                                                  (const void *)meshPrimitive.indices.data()};
 
         XE::Buffer *indexBuffer = m_graphicsDevice->createBuffer(indexBufferDescriptor);
 

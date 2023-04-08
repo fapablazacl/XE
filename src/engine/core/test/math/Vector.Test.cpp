@@ -5,7 +5,6 @@
 #include <xe/math/FormatUtils.h>
 #include <xe/math/Vector.h>
 
-
 TEST(VectorTest, ConstructorShouldSetupTheVectorComponentsCorrectly) {
     const XE::Vector3 v = {1.0f, 2.0f, 3.0f};
 
@@ -37,8 +36,8 @@ TEST(VectorTest, ComparisonOperatorsShouldCheckVectorComponentsForEqualityAndIne
 }
 
 TEST(VectorTest, OperatorPlusShouldAddComponentWise) {
-    const XE::Vector3 v1 {1.0f, -2.0f, 3.0f};
-    const XE::Vector3 v2 {-2.0f, -1.0f, -2.0f};
+    const XE::Vector3 v1{1.0f, -2.0f, 3.0f};
+    const XE::Vector3 v2{-2.0f, -1.0f, -2.0f};
 
     EXPECT_EQ((v2 + v1), XE::Vector3(-1.0f, -3.0f, 1.0f));
     EXPECT_EQ((v1 + v2), XE::Vector3(-1.0f, -3.0f, 1.0f));
@@ -49,8 +48,8 @@ TEST(VectorTest, OperatorPlusShouldAddComponentWise) {
 }
 
 TEST(VectorTest, OperatorMinusShouldSubtractComponentWise) {
-    const XE::Vector3 v1 {1.0f, -2.0f, 3.0f};
-    const XE::Vector3 v2 {-2.0f, -1.0f, -2.0f};
+    const XE::Vector3 v1{1.0f, -2.0f, 3.0f};
+    const XE::Vector3 v2{-2.0f, -1.0f, -2.0f};
 
     EXPECT_EQ((v2 - v1), XE::Vector3(-3.0f, 1.0f, -5.0f));
     EXPECT_EQ((v1 - v2), XE::Vector3(3.0f, -1.0f, 5.0f));
@@ -91,8 +90,8 @@ TEST(VectorTest, OperatorMulShouldMultiplyComponentWise) {
 }
 
 TEST(VectorTest, OperatorDivShouldDivideComponentWise) {
-    const XE::Vector3 v1 {2.0f, 8.0f, 32.0f};
-    const XE::Vector3 v2 {1.0f, 2.0f, 4.0f};
+    const XE::Vector3 v1{2.0f, 8.0f, 32.0f};
+    const XE::Vector3 v2{1.0f, 2.0f, 4.0f};
 
     EXPECT_EQ((v1 / v2), XE::Vector3(2.0f, 4.0f, 8.0f));
     EXPECT_EQ((v1 / 2.0f), XE::Vector3(1.0f, 4.0f, 16.0f));
@@ -194,9 +193,9 @@ TEST(VectorTest, Norm2FunctionShouldReturnAnSquaredVectorLength) {
     const XE::Vector3 v2 = {1.3f, -1.6f, 0.0f};
     const XE::Vector3 v3 = {-0.3f, 2.0f, 2.0f};
 
-    EXPECT_FLOAT_EQ(norm2(v1), 1.0f + 4.0f + 1.6f*1.6f);
-    EXPECT_FLOAT_EQ(norm2(v2), 1.3f*1.3f + 1.6f*1.6f);
-    EXPECT_FLOAT_EQ(norm2(v3), 0.3f*0.3f + 4.0f + 4.0f);
+    EXPECT_FLOAT_EQ(norm2(v1), 1.0f + 4.0f + 1.6f * 1.6f);
+    EXPECT_FLOAT_EQ(norm2(v2), 1.3f * 1.3f + 1.6f * 1.6f);
+    EXPECT_FLOAT_EQ(norm2(v3), 0.3f * 0.3f + 4.0f + 4.0f);
 }
 
 TEST(VectorTest, NormFunctionShouldReturnTheVectorLength) {

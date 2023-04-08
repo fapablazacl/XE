@@ -12,12 +12,10 @@
 #include "Rotation.h"
 #include "Vector.h"
 
-
 #if defined(_MSC_VER)
 #pragma warning(push)
 #pragma warning(disable : 4201) // non-standard extension used: nameless struct/union
 #endif
-
 
 namespace XE {
     template <typename T> struct TQuaternion {
@@ -30,9 +28,7 @@ namespace XE {
             T values[4];
         };
 
-        TQuaternion() {
-            V.X = V.Y = V.Z = W = T(0);
-        }
+        TQuaternion() { V.X = V.Y = V.Z = W = T(0); }
 
         explicit TQuaternion(const T w) {
             V.X = V.Y = V.Z = T(0);
@@ -83,32 +79,26 @@ namespace XE {
             W = other.W;
         }
 
-        TQuaternion<T>& operator=(const TQuaternion<T> &other) {
+        TQuaternion<T> &operator=(const TQuaternion<T> &other) {
             V = other.V;
             W = other.W;
 
             return *this;
         }
 
-        [[nodiscard]] constexpr size_t size() const {
-            return 4;
-        }
+        [[nodiscard]] constexpr size_t size() const { return 4; }
 
-        T* data() {
-            return &values[0];
-        }
+        T *data() { return &values[0]; }
 
-        [[nodiscard]] const T* data() const {
-            return &values[0];
-        }
+        [[nodiscard]] const T *data() const { return &values[0]; }
 
-        constexpr const T& operator[](const size_t index) const {
+        constexpr const T &operator[](const size_t index) const {
             assert(index < 4);
 
             return values[index];
         }
 
-        constexpr T& operator[](const size_t index) {
+        constexpr T &operator[](const size_t index) {
             assert(index < 4);
 
             return values[index];
@@ -239,7 +229,7 @@ namespace XE {
 
         bool operator==(const TQuaternion<T> &rhs) const {
             for (int i = 0; i < 4; i++) {
-                if (! equals(values[i], rhs.values[i])) {
+                if (!equals(values[i], rhs.values[i])) {
                     return false;
                 }
             }
@@ -252,9 +242,7 @@ namespace XE {
 
     template <typename T = float> TQuaternion<T> conjugate(const TQuaternion<T> &q) { return {-q.V, q.W}; }
 
-    template <typename T = float> TQuaternion<T> inverse(const TQuaternion<T> &q) {
-        return conjugate(q) / norm2(q);
-    }
+    template <typename T = float> TQuaternion<T> inverse(const TQuaternion<T> &q) { return conjugate(q) / norm2(q); }
 
     template <typename T = float> T dot(const TQuaternion<T> &q1, const TQuaternion<T> &q2) {
         T sum = T(0);
@@ -286,15 +274,11 @@ namespace XE {
         return final_q.V;
     }
 
-    template<typename T = float> TQuaternion<T> quatId() {
-        return TQuaternion<T>({T(0), T(0), T(0)}, T(1));
-    }
+    template <typename T = float> TQuaternion<T> quatId() { return TQuaternion<T>({T(0), T(0), T(0)}, T(1)); }
 
-    template<typename T = float> TQuaternion<T> quatZero() {
-        return TQuaternion<T>({T(0), T(0), T(0)}, T(0));
-    }
+    template <typename T = float> TQuaternion<T> quatZero() { return TQuaternion<T>({T(0), T(0), T(0)}, T(0)); }
 
-    template<typename T = float> TQuaternion<T> quatRotationRH(const TVector<T, 3> &axis, const T radians) {
+    template <typename T = float> TQuaternion<T> quatRotationRH(const TVector<T, 3> &axis, const T radians) {
         assert(equals(norm(axis), T{1}) && "Axis should be normalized");
         const T angle = T{0.5} * radians;
         const T sin = std::sin(angle);
@@ -303,7 +287,7 @@ namespace XE {
         return TQuaternion<T>(sin * axis, cos);
     }
 
-    template<typename T = float> TQuaternion<T> quatRotationLH(const TVector<T, 3> &axis, const T radians) {
+    template <typename T = float> TQuaternion<T> quatRotationLH(const TVector<T, 3> &axis, const T radians) {
         assert(equals(norm(axis), T{1}) && "Axis should be normalized");
 
         const T angle = T{0.5} * radians;

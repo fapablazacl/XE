@@ -5,10 +5,10 @@
 #ifndef XE_COORDINATOR_H
 #define XE_COORDINATOR_H
 
-#include "EntityManager.h"
 #include "ComponentManager.h"
-#include "SystemManager.h"
+#include "EntityManager.h"
 #include "MessageBus.h"
+#include "SystemManager.h"
 
 #include <memory>
 
@@ -21,9 +21,7 @@ public:
         messageBus = std::make_shared<MessageBus>();
     }
 
-    Entity createEntity() {
-        return entityManager->createEntity();
-    }
+    Entity createEntity() { return entityManager->createEntity(); }
 
     void destroyEntity(Entity entity) {
         entityManager->destroyEntity(entity);
@@ -31,13 +29,9 @@ public:
         systemManager->entityDestroyed(entity);
     }
 
-    template<typename T>
-    void registerComponent() {
-        componentManager->registerComponent<T>();
-    }
+    template <typename T> void registerComponent() { componentManager->registerComponent<T>(); }
 
-    template<typename T>
-    void addComponent(Entity entity, T component) {
+    template <typename T> void addComponent(Entity entity, T component) {
         componentManager->addComponent(entity, component);
 
         Signature signature = entityManager->getSignature(entity);
@@ -48,25 +42,13 @@ public:
         systemManager->entitySignatureChanged(entity, signature);
     }
 
-    template<typename T>
-    T& getComponent(Entity entity) {
-        return componentManager->getComponent<T>(entity);
-    }
+    template <typename T> T &getComponent(Entity entity) { return componentManager->getComponent<T>(entity); }
 
-    template<typename T>
-    ComponentType getComponentType() {
-        return componentManager->getComponentType<T>();
-    }
+    template <typename T> ComponentType getComponentType() { return componentManager->getComponentType<T>(); }
 
-    template<typename T>
-    std::shared_ptr<T> registerSystem() {
-        return systemManager->registerSystem<T>(*this);
-    }
+    template <typename T> std::shared_ptr<T> registerSystem() { return systemManager->registerSystem<T>(*this); }
 
-    template<typename T>
-    void setSystemSignature(const Signature signature) {
-        systemManager->setSignature<T>(signature);
-    }
+    template <typename T> void setSystemSignature(const Signature signature) { systemManager->setSignature<T>(signature); }
 
 private:
     std::shared_ptr<EntityManager> entityManager;

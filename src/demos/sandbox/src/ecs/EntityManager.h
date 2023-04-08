@@ -6,8 +6,8 @@
 #define XE_ENTITYMANAGER_H
 
 #include "CommonECS.h"
-#include <queue>
 #include <array>
+#include <queue>
 
 class EntityManager {
 public:
@@ -32,19 +32,14 @@ public:
         --livingEntities;
     }
 
-    void setSignature(const Entity entity, Signature signature) {
-        signatures[entity] = signature;
-    }
+    void setSignature(const Entity entity, Signature signature) { signatures[entity] = signature; }
 
-    Signature getSignature(const Entity entity) const {
-        return signatures[entity];
-    }
+    Signature getSignature(const Entity entity) const { return signatures[entity]; }
 
 private:
     std::queue<Entity> availableEntities;
     std::array<Signature, MAX_ENTITIES> signatures;
     uint32_t livingEntities = 0;
 };
-
 
 #endif // XE_ENTITYMANAGER_H

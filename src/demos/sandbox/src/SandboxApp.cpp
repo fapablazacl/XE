@@ -6,7 +6,7 @@
 #include <random>
 
 namespace Sandbox {
-    SandboxApp::SandboxApp(int , char **) {}
+    SandboxApp::SandboxApp(int, char **) {}
 
     void SandboxApp::initialize() {
         coordinator.registerComponent<Gravity>();
@@ -35,21 +35,15 @@ namespace Sandbox {
 
             coordinator.addComponent(entity, Gravity{XE::Vector3{0.0f, randGravity(randomEngine), 0.0f}});
             coordinator.addComponent(entity, RigidBody{XE::Vector3{0.0f, 0.0f, 0.0f}, XE::Vector3{0.0f, 0.0f, 0.0f}});
-            coordinator.addComponent(entity, Transform{
-                XE::Vector3{randPosition(randomEngine), randPosition(randomEngine), randPosition(randomEngine)},
-                XE::Vector3{randRotation(randomEngine), randRotation(randomEngine), randRotation(randomEngine)},
-                XE::Vector3{scale, scale, scale}
-            });
+            coordinator.addComponent(entity,
+                                     Transform{XE::Vector3{randPosition(randomEngine), randPosition(randomEngine), randPosition(randomEngine)},
+                                               XE::Vector3{randRotation(randomEngine), randRotation(randomEngine), randRotation(randomEngine)}, XE::Vector3{scale, scale, scale}});
         }
     }
 
-    void SandboxApp::update(const float seconds) {
-        physicsSystem->update(seconds);
-    }
+    void SandboxApp::update(const float seconds) { physicsSystem->update(seconds); }
 
-    void SandboxApp::render() {
-        ++frames;
-    }
+    void SandboxApp::render() { ++frames; }
 
     bool SandboxApp::shouldClose() const { return !(running && frames < maxFrames); }
 
