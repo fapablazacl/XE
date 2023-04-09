@@ -1,6 +1,6 @@
 
+#include "xe/math/Triangle.h"
 #include "GoogleTestCommon.h"
-#include <xe/math/Triangle.h>
 
 TEST(TriangleTest, EqualsShouldComparePointsInAElementWiseFasion) {
     XE::Triangle<float> tri1;

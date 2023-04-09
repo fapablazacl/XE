@@ -45,20 +45,6 @@ set (headers
     "src/xe/io/MemoryStream.h"
     "src/xe/io/Stream.h"
     "src/xe/io/StreamSource.h"
-
-	"src/xe/math/Math.h"
-    "src/xe/math/Common.h"
-    "src/xe/math/Vector.h"
-    "src/xe/math/Matrix.h"
-    "src/xe/math/Quaternion.h"
-    "src/xe/math/Boundary.h"
-    "src/xe/math/Box.h"
-    "src/xe/math/Plane.h"
-    "src/xe/math/Ray.h"
-    "src/xe/math/Rect.h"
-    "src/xe/math/Sphere.h"
-    "src/xe/math/Triangle.h"
-    "src/xe/math/Ellipsoid.h"
 )
 
 set (sources
@@ -93,7 +79,7 @@ set (sources
 	"src/xe/io/MemoryStream.cpp"
 	"src/xe/io/Stream.cpp"
 	"src/xe/io/StreamSource.cpp"
-        src/xe/math/Quaternion.cpp src/xe/math/Vector.cpp src/xe/math/Matrix.cpp)
+)
 
 add_library (${target} ${sources})
 
@@ -102,8 +88,6 @@ if (XE_DEV_PRECOMPILED_HEADERS)
 endif()
 
 target_include_directories(${target} PUBLIC "src/")
-target_link_libraries(${target} PRIVATE XE.Interface)
-
-if (XE_DEV_UNIT_TEST)
-	add_subdirectory("test/math")
-endif()
+target_link_libraries(${target}
+		PUBLIC XE.Math
+		PRIVATE XE.Interface)

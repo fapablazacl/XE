@@ -1,6 +1,6 @@
 
+#include "xe/math/Rect.h"
 #include "GoogleTestCommon.h"
-#include <xe/math/Rect.h>
 
 TEST(RectTest, EqualsShouldComparePointsInAElementWiseFasion) {
     XE::Rectf tri1;

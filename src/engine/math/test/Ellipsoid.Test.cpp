@@ -1,7 +1,7 @@
 
+#include "xe/math/Ellipsoid.h"
 #include "GoogleTestCommon.h"
 #include <sstream>
-#include <xe/math/Ellipsoid.h>
 
 TEST(EllipsoidTest, DefaultConstructorInitializesAtTheOriginAndWithRadiousOne) {
     XE::Ellipsoid<float> e1;

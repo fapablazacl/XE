@@ -1,6 +1,6 @@
 
+#include "xe/math/Rotation.h"
 #include "GoogleTestCommon.h"
-#include <xe/math/Rotation.h>
 
 TEST(RotationTest, EqualsShouldComparePointsInAElementWiseFasion) {
     XE::Rotation<float> tri1;

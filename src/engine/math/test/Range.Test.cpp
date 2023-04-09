@@ -1,7 +1,7 @@
 
+#include "xe/math/Range.h"
 #include "GoogleTestCommon.h"
 #include <iostream>
-#include <xe/math/Range.h>
 
 TEST(RangeTest, DefaultConstructorShouldLetTheRangeWithValues0And1) {
     XE::Range<float> subject;

@@ -1,6 +1,6 @@
 
+#include "xe/math/Sphere.h"
 #include "GoogleTestCommon.h"
-#include <xe/math/Sphere.h>
 
 TEST(SphereTest, EqualsShouldComparePointsInAElementWiseFasion) {
     XE::Sphere<float> tri1;

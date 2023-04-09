@@ -1,5 +1,5 @@
 
-#include "Matrix.h"
+#include "../include/xe/math/Matrix.h"
 
 namespace XE {
     template struct TMatrix<float, 2, 2>;

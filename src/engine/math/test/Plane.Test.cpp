@@ -1,6 +1,6 @@
 
+#include "xe/math/Plane.h"
 #include "GoogleTestCommon.h"
-#include <xe/math/Plane.h>
 
 TEST(PlaneTest, ConstructorsShouldCreatePlanesWithSpecificValues) {
     XE::Planef subject;

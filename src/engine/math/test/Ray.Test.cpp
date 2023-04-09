@@ -1,6 +1,6 @@
 
+#include "xe/math/Ray.h"
 #include "GoogleTestCommon.h"
-#include <xe/math/Ray.h>
 
 TEST(RayTest, EqualsShouldComparePointsInAElementWiseFasion) {
     XE::Ray<float> ray1;

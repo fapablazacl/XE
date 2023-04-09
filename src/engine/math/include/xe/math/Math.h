@@ -6,7 +6,6 @@
 #include "Box.h"
 #include "Common.h"
 #include "Ellipsoid.h"
-#include "FormatUtils.h"
 #include "Matrix.h"
 #include "Plane.h"
 #include "Quaternion.h"

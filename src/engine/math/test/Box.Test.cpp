@@ -1,8 +1,8 @@
 
+#include "xe/math/Box.h"
 #include "GoogleTestCommon.h"
 #include <iostream>
 #include <sstream>
-#include <xe/math/Box.h>
 
 TEST(BoxTest, DefaultConstructorZeroesEdges) {
     XE::Boxf box;

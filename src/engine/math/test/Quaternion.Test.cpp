@@ -1,7 +1,7 @@
 
+#include "xe/math/Quaternion.h"
 #include "GoogleTestCommon.h"
-#include <xe/math/Common.h>
-#include <xe/math/Quaternion.h>
+#include "xe/math/Common.h"
 
 TEST(QuaternionTest, VectorScalarConstructorInitializesTheVectorAndScalarPart) {
     const auto q2 = XE::Quat{{0.0f, 1.0f, 0.0f}, 1.0f};

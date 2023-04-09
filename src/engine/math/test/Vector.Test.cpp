@@ -1,9 +1,8 @@
 
 #include "GoogleTestCommon.h"
 
+#include "xe/math/Vector.h"
 #include <sstream>
-#include <xe/math/FormatUtils.h>
-#include <xe/math/Vector.h>
 
 TEST(VectorTest, ConstructorShouldSetupTheVectorComponentsCorrectly) {
     const XE::Vector3 v = {1.0f, 2.0f, 3.0f};
