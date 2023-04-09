@@ -16,13 +16,14 @@ set (headers
         "include/xe/math/Sphere.h"
         "include/xe/math/Triangle.h"
         "include/xe/math/Ellipsoid.h"
+        "include/xe/math/VectorExpr.h"
 )
 
 set (sources
         ${headers}
         src/Quaternion.cpp
         src/Vector.cpp
-        src/Matrix.cpp src/Box.cpp src/Plane.cpp src/Range.cpp src/Ray.cpp src/Rect.cpp src/Ellipsoid.cpp src/Sphere.cpp src/Triangle.cpp)
+        src/Matrix.cpp src/Box.cpp src/Plane.cpp src/Range.cpp src/Ray.cpp src/Rect.cpp src/Ellipsoid.cpp src/Sphere.cpp src/Triangle.cpp )
 
 add_library (${target} ${sources})
 
