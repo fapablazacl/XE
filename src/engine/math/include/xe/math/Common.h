@@ -1,6 +1,6 @@
 /**
  * @file Common.hpp
- * @brief Common utility defitions and functions
+ * @brief Common utility definitions and functions
  */
 
 #ifndef __XE_MATH_COMMON_HPP__

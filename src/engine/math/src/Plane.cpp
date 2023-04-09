@@ -2,6 +2,6 @@
 #include <xe/math/Plane.h>
 
 namespace XE {
-    template struct Plane<float>;
-    template struct Plane<double>;
+    template struct TPlane<float>;
+    template struct TPlane<double>;
 } // namespace XE

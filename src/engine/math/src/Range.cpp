@@ -2,7 +2,7 @@
 #include <xe/math/Range.h>
 
 namespace XE {
-    template struct Range<float>;
-    template struct Range<double>;
-    template struct Range<int>;
+    template struct TRange<float>;
+    template struct TRange<double>;
+    template struct TRange<int>;
 } // namespace XE

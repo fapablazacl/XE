@@ -6,14 +6,14 @@
 #include <array>
 
 namespace XE {
-    template <typename T> struct Triangle {
+    template <typename T> struct TTriangle {
         TVector<T, 3> P1;
         TVector<T, 3> P2;
         TVector<T, 3> P3;
 
-        Triangle() {}
+        TTriangle() {}
 
-        Triangle(const TVector<T, 3> &p1, const TVector<T, 3> &p2, const TVector<T, 3> &p3) {
+        TTriangle(const TVector<T, 3> &p1, const TVector<T, 3> &p2, const TVector<T, 3> &p3) {
             P1 = p1;
             P2 = p2;
             P3 = p3;
@@ -24,8 +24,11 @@ namespace XE {
         TVector<T, 3> computeNormalUnnormalized() const { return cross((P2 - P1), P3 - P1); }
     };
 
-    extern template struct Triangle<float>;
-    extern template struct Triangle<double>;
+    using Triangle = TTriangle<float>;
+    using Triangled = TTriangle<double>;
+
+    extern template struct TTriangle<float>;
+    extern template struct TTriangle<double>;
 
     /*
     template<typename Vector>

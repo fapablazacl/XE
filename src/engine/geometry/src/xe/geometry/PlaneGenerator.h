@@ -19,7 +19,7 @@ namespace XE {
     // TODO: Add control parameter for the Face Vertex Ordering
     template <typename T> class PlaneGenerator {
     public:
-        PlaneGenerator(const Vector2i &division, const TVector<T, 2> &size, const Plane<T> &plane) {
+        PlaneGenerator(const Vector2i &division, const TVector<T, 2> &size, const TPlane<T> &plane) {
             assert(division.X > 0);
             assert(division.Y > 0);
             assert(size.X > 0.0f);
@@ -116,7 +116,7 @@ namespace XE {
     private:
         Vector2i division;
         TVector<T, 2> size;
-        Plane<T> plane;
+        TPlane<T> plane;
 
         int vertexCount;
         int indexCount;

@@ -296,7 +296,10 @@ namespace XE {
     }
 
     using Quat = TQuaternion<float>;
+    using Quatd = TQuaternion<double>;
+
     extern template struct TQuaternion<float>;
+    extern template struct TQuaternion<double>;
 } // namespace XE
 
 #if defined(_MSC_VER)

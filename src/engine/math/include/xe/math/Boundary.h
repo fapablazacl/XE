@@ -20,7 +20,7 @@ namespace XE {
      * @tparam T
      * @tparam N
      */
-    template <typename T, int N> class Boundary {
+    template <typename T, int N> class TBoundary {
     public:
         static_assert(N == 2 || N == 3, "N template parameter must one of (2, 3)");
 
@@ -41,18 +41,18 @@ namespace XE {
         enum { MinEdge = 0, MaxEdge = PointCount - 1 };
 
     public:
-        Boundary() {}
+        TBoundary() {}
 
-        explicit Boundary(const TVector<T, N> &value) : minEdge(value), maxEdge(value) {}
+        explicit TBoundary(const TVector<T, N> &value) : minEdge(value), maxEdge(value) {}
 
-        Boundary(const TVector<T, N> &value1, const TVector<T, N> &value2) : Boundary(value1) { expand(value2); }
+        TBoundary(const TVector<T, N> &value1, const TVector<T, N> &value2) : TBoundary(value1) { expand(value2); }
 
         void expand(const TVector<T, N> &value) {
             minEdge = minimize(minEdge, value);
             maxEdge = maximize(maxEdge, value);
         }
 
-        void expand(const Boundary<T, N> &other) {
+        void expand(const TBoundary<T, N> &other) {
             expand(other.minEdge);
             expand(other.maxEdge);
         }
@@ -138,13 +138,13 @@ namespace XE {
          * @return true
          * @return false
          */
-        bool intersect(const Boundary<T, N> &other) const {
+        bool intersect(const TBoundary<T, N> &other) const {
             // axes are the same with both shapes
             const auto axes = getNormals();
 
             for (const auto &axis : axes) {
-                const Range<T> proj1 = project(axis);
-                const Range<T> proj2 = other.project(axis);
+                const TRange<T> proj1 = project(axis);
+                const TRange<T> proj2 = other.project(axis);
 
                 if (!proj1.overlap(proj2)) {
                     return false;
@@ -176,10 +176,10 @@ namespace XE {
          *
          * @return Projection
          */
-        Range<T> project(const TVector<T, N> &normal) const {
+        TRange<T> project(const TVector<T, N> &normal) const {
             const auto edges = getEdges();
 
-            Range<T> range{dot(edges[0], normal)};
+            TRange<T> range{dot(edges[0], normal)};
 
             // compute the range for the rest
             for (std::size_t i = 1; i < edges.size(); i++) {

@@ -3,6 +3,6 @@
 #include "GoogleTestCommon.h"
 
 TEST(SphereTest, EqualsShouldComparePointsInAElementWiseFasion) {
-    XE::Sphere<float> tri1;
+    XE::TSphere<float> tri1;
     EXPECT_EQ(true, true);
 }

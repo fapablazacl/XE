@@ -5,7 +5,7 @@
 #include <sstream>
 
 TEST(BoxTest, DefaultConstructorZeroesEdges) {
-    XE::Boxf box;
+    XE::Box box;
 
     EXPECT_EQ(box.getMinEdge(), XE::Vector3(0.0f, 0.0f, 0.0f));
     EXPECT_EQ(box.getMaxEdge(), XE::Vector3(0.0f, 0.0f, 0.0f));
@@ -13,7 +13,7 @@ TEST(BoxTest, DefaultConstructorZeroesEdges) {
 }
 
 TEST(BoxTest, ConstructorFromOneVectorInitializeEdges) {
-    XE::Boxf box{{1.0f, 2.0f, 3.0f}};
+    XE::Box box{{1.0f, 2.0f, 3.0f}};
 
     EXPECT_EQ(box.getMinEdge(), XE::Vector3(1.0f, 2.0f, 3.0f));
     EXPECT_EQ(box.getMaxEdge(), XE::Vector3(1.0f, 2.0f, 3.0f));
@@ -21,7 +21,7 @@ TEST(BoxTest, ConstructorFromOneVectorInitializeEdges) {
 }
 
 TEST(BoxTest, ConstructorFromTwoVectorsInitalizeEdges) {
-    XE::Boxf box{{1.0f, 2.0f, -3.0f}, {-1.0f, 8.0f, 3.0f}};
+    XE::Box box{{1.0f, 2.0f, -3.0f}, {-1.0f, 8.0f, 3.0f}};
 
     EXPECT_EQ(box.getMinEdge(), XE::Vector3(-1.0f, 2.0f, -3.0f));
     EXPECT_EQ(box.getMaxEdge(), XE::Vector3(1.0f, 8.0f, 3.0f));
@@ -30,16 +30,16 @@ TEST(BoxTest, ConstructorFromTwoVectorsInitalizeEdges) {
 
 /*
 TEST_CASE("Box's attributes change based on values supplied via constructors and mutator methods", "[Box]") {
-    XE::Boxf box {{1.0f, 2.0f, -3.0f}, {-1.0f, 8.0f, 3.0f}};
+    XE::Box box {{1.0f, 2.0f, -3.0f}, {-1.0f, 8.0f, 3.0f}};
 
     SECTION("getEdge() supplied map a integer index into a specific edge.") {
-        REQUIRE(XE::Boxf::MinEdge >= 0);
-        REQUIRE(XE::Boxf::MaxEdge >= 0);
-        REQUIRE(XE::Boxf::MinEdge < XE::Boxf::MaxEdge);
+        REQUIRE(XE::Box::MinEdge >= 0);
+        REQUIRE(XE::Box::MaxEdge >= 0);
+        REQUIRE(XE::Box::MinEdge < XE::Box::MaxEdge);
 
         SECTION("getMinEdge() and getMaxEdge() should match the corresponding getEdge() values") {
-            REQUIRE(box.getMinEdge() == box.getEdge(XE::Boxf::MinEdge));
-            REQUIRE(box.getMaxEdge() == box.getEdge(XE::Boxf::MaxEdge));
+            REQUIRE(box.getMinEdge() == box.getEdge(XE::Box::MinEdge));
+            REQUIRE(box.getMaxEdge() == box.getEdge(XE::Box::MaxEdge));
         }
 
         SECTION("getEdge() should generate the all the points from the different scalar components of the inner min and max edges") {
@@ -59,10 +59,10 @@ TEST_CASE("Box's attributes change based on values supplied via constructors and
         }
     }
 
-    SECTION("getEdge() supplied with an index between (XE::Boxf::MinEdge - XE::Boxf::MaxEdge) should return a point different to the Box's minEdge and maxEdge points") {
-        int i = XE::Boxf::MinEdge + 1;
+    SECTION("getEdge() supplied with an index between (XE::Box::MinEdge - XE::Box::MaxEdge) should return a point different to the Box's minEdge and maxEdge points") {
+        int i = XE::Box::MinEdge + 1;
 
-        while (i < XE::Boxf::MaxEdge) {
+        while (i < XE::Box::MaxEdge) {
             const auto edge = box.getEdge(i);
 
             REQUIRE(edge != box.getMinEdge());
@@ -88,7 +88,7 @@ TEST_CASE("Box's attributes change based on values supplied via constructors and
     }
 
     SECTION("expand() should not mutate the state when using it with a point-like Box inside the Box") {
-        box.expand(XE::Boxf{box.getCenter()});
+        box.expand(XE::Box{box.getCenter()});
 
         REQUIRE(box.getSize() == XE::Vector3{2.0f, 6.0f, 6.0f});
         REQUIRE(box.getCenter() == XE::Vector3{0.0f, 5.0f, 0.0f});
@@ -108,7 +108,7 @@ TEST_CASE("Box's attributes change based on values supplied via constructors and
 
 
 TEST_CASE("Boxes can be tested against a Point and another Boxes", "[Box]") {
-    XE::Boxf box {{-1.0f, -1.0f, -1.0f}, {1.0f, 1.0f, 1.0f}};
+    XE::Box box {{-1.0f, -1.0f, -1.0f}, {1.0f, 1.0f, 1.0f}};
 
     SECTION("isInside() should check if a point is inside or outside") {
         REQUIRE(box.isInside({0.0f, 0.0f, 0.0f}));
@@ -125,7 +125,7 @@ TEST_CASE("Boxes can be tested against a Point and another Boxes", "[Box]") {
     }
 
     SECTION("isInside() should be True with all the getEdge() points") {
-        for (int i=XE::Boxf::MinEdge; i<=XE::Boxf::MaxEdge; i++) {
+        for (int i=XE::Box::MinEdge; i<=XE::Box::MaxEdge; i++) {
             REQUIRE(box.isInside(box.getEdge(i)));
         }
     }
@@ -133,12 +133,12 @@ TEST_CASE("Boxes can be tested against a Point and another Boxes", "[Box]") {
     SECTION("intersect() should check if two boxes make an intersction or not") {
         SECTION("intersects with itself or an equivalent Box ") {
             REQUIRE(box.intersect(box));
-            REQUIRE(box.intersect(XE::Boxf{{-1.0f, -1.0f, -1.0f}, {1.0f, 1.0f, 1.0f}}));
-            REQUIRE(XE::Boxf{{-1.0f, -1.0f, -1.0f}, {1.0f, 1.0f, 1.0f}}.intersect(box));
+            REQUIRE(box.intersect(XE::Box{{-1.0f, -1.0f, -1.0f}, {1.0f, 1.0f, 1.0f}}));
+            REQUIRE(XE::Box{{-1.0f, -1.0f, -1.0f}, {1.0f, 1.0f, 1.0f}}.intersect(box));
         }
 
         SECTION("intesects between a sub/super box (within)") {
-            const XE::Boxf within{{-0.5f, -0.5f, -0.5f}, {0.5f, 0.5f, 0.5f}};
+            const XE::Box within{{-0.5f, -0.5f, -0.5f}, {0.5f, 0.5f, 0.5f}};
 
             REQUIRE(box.intersect(within));
             REQUIRE(within.intersect(box));
@@ -157,7 +157,7 @@ TEST_CASE("Boxes can be tested against a Point and another Boxes", "[Box]") {
             };
 
             for (const auto &displacement : displacements) {
-                const auto displaced = XE::Boxf{
+                const auto displaced = XE::Box{
                     box.getMinEdge() + displacement,
                     box.getMaxEdge() + displacement
                 };
@@ -180,7 +180,7 @@ TEST_CASE("Boxes can be tested against a Point and another Boxes", "[Box]") {
             };
 
             for (const auto &displacement : displacements) {
-                const auto displaced = XE::Boxf{
+                const auto displaced = XE::Box{
                     box.getMinEdge() + displacement,
                     box.getMaxEdge() + displacement
                 };
@@ -203,7 +203,7 @@ TEST_CASE("Boxes can be tested against a Point and another Boxes", "[Box]") {
             };
 
             for (const auto &displacement : displacements) {
-                const auto displaced = XE::Boxf{
+                const auto displaced = XE::Box{
                     box.getMinEdge() + displacement,
                     box.getMaxEdge() + displacement
                 };
@@ -226,7 +226,7 @@ TEST_CASE("Boxes can be tested against a Point and another Boxes", "[Box]") {
             };
 
             for (const auto &displacement : displacements) {
-                const auto displaced = XE::Boxf{
+                const auto displaced = XE::Box{
                     box.getMinEdge() + displacement,
                     box.getMaxEdge() + displacement
                 };
@@ -240,7 +240,7 @@ TEST_CASE("Boxes can be tested against a Point and another Boxes", "[Box]") {
 
 
 TEST_CASE("Box's can be serialized to an ostream", "[Box]") {
-    XE::Boxf box {{-1.0f, -1.0f, -1.0f}, {1.0f, 1.0f, 1.0f}};
+    XE::Box box {{-1.0f, -1.0f, -1.0f}, {1.0f, 1.0f, 1.0f}};
 
     SECTION("operator<<() should create an unique string representation") {
         std::stringstream ss;
@@ -253,7 +253,7 @@ TEST_CASE("Box's can be serialized to an ostream", "[Box]") {
     }
 
     SECTION("operator<<() should create an unique string representation from different boxes") {
-        XE::Boxf box1 {{0.0f, 0.0f, 0.0f}, {10.0f, 10.0f, 10.0f}};
+        XE::Box box1 {{0.0f, 0.0f, 0.0f}, {10.0f, 10.0f, 10.0f}};
 
         std::stringstream ss;
         ss << box;

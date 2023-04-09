@@ -3,6 +3,6 @@
 #include "GoogleTestCommon.h"
 
 TEST(TriangleTest, EqualsShouldComparePointsInAElementWiseFasion) {
-    XE::Triangle<float> tri1;
+    XE::TTriangle<float> tri1;
     EXPECT_EQ(true, true);
 }

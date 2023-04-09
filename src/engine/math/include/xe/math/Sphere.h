@@ -11,32 +11,35 @@ namespace XE {
     /**
      * @brief Sphere in the 3-space
      */
-    template <typename T> struct Sphere {
+    template <typename T> struct TSphere {
         TVector<T, 3> center;
         T radius = static_cast<T>(1);
 
-        Sphere() : center({static_cast<T>(0), static_cast<T>(0), static_cast<T>(0)}), radius(static_cast<T>(1)) {}
+        TSphere() : center({static_cast<T>(0), static_cast<T>(0), static_cast<T>(0)}), radius(static_cast<T>(1)) {}
 
         /**
          * @brief Initializes a sphere in the origin with the specified radius
          */
-        explicit Sphere(T radius) : radius(radius) { assert(radius >= static_cast<T>(0)); }
+        explicit TSphere(T radius) : radius(radius) { assert(radius >= static_cast<T>(0)); }
 
         /**
          * @brief Initializes a Sphere from the given center and radius
          */
-        Sphere(const TVector<T, 3> &center, T radius) : center(center), radius(radius) { assert(radius >= static_cast<T>(0)); }
+        TSphere(const TVector<T, 3> &center, T radius) : center(center), radius(radius) { assert(radius >= static_cast<T>(0)); }
     };
 
-    extern template struct Sphere<float>;
-    extern template struct Sphere<double>;
+    using Sphere = TSphere<float>;
+    using Sphered = TSphere<double>;
+
+    extern template struct TSphere<float>;
+    extern template struct TSphere<double>;
 
     template <typename T> struct Ray;
 
     /**
      * @brief Test for collisions between a Sphere and a Ray
      */
-    template <typename T> T test(const Sphere<T> &sphere, const Ray<T> &ray) {
+    template <typename T> T test(const TSphere<T> &sphere, const Ray<T> &ray) {
         const TVector<T, 3> &r0 = ray.position;
         const TVector<T, 3> &d = ray.direction;
 

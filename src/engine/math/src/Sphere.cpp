@@ -2,6 +2,6 @@
 #include <xe/math/Sphere.h>
 
 namespace XE {
-    template struct Sphere<float>;
-    template struct Sphere<double>;
+    template struct TSphere<float>;
+    template struct TSphere<double>;
 } // namespace XE
