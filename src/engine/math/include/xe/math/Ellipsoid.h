@@ -30,6 +30,9 @@ namespace XE {
 
         return os;
     }
+
+    extern template struct Ellipsoid<float>;
+    extern template struct Ellipsoid<double>;
 } // namespace XE
 
 #endif

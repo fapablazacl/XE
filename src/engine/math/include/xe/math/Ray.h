@@ -27,6 +27,9 @@ namespace XE {
             direction = {T(0.0), T(0.0), T(1.0)};
         }
     };
+
+    extern template struct Ray<float>;
+    extern template struct Ray<double>;
 } // namespace XE
 
 #endif

@@ -22,7 +22,7 @@ set (sources
         ${headers}
         src/Quaternion.cpp
         src/Vector.cpp
-        src/Matrix.cpp)
+        src/Matrix.cpp src/Box.cpp src/Plane.cpp src/Range.cpp src/Ray.cpp src/Rect.cpp src/Ellipsoid.cpp src/Sphere.cpp src/Triangle.cpp)
 
 add_library (${target} ${sources})
 

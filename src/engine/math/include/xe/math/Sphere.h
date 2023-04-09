@@ -28,6 +28,9 @@ namespace XE {
         Sphere(const TVector<T, 3> &center, T radius) : center(center), radius(radius) { assert(radius >= static_cast<T>(0)); }
     };
 
+    extern template struct Sphere<float>;
+    extern template struct Sphere<double>;
+
     template <typename T> struct Ray;
 
     /**

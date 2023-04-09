@@ -155,7 +155,7 @@ namespace XE {
          * @param position
          * @return Plane<T>
          */
-        static Plane<T> yz(const TVector3<T> &position) { return Plane<T>{T(1), T(0), T(0), position.x}; }
+        static Plane<T> yz(const TVector3<T> &position) { return Plane<T>{T(1), T(0), T(0), position.X}; }
 
         /**
          * @brief Creates a Plane aligned at the XZ-Plane, at the specified position
@@ -163,7 +163,7 @@ namespace XE {
          * @param position
          * @return Plane<T>
          */
-        static Plane<T> xz(const TVector3<T> &position) { return Plane<T>{T(0), T(1), T(0), position.y}; }
+        static Plane<T> xz(const TVector3<T> &position) { return Plane<T>{T(0), T(1), T(0), position.Y}; }
 
         /**
          * @brief Creates a Plane aligned at the XY-Plane, at the specified position
@@ -171,7 +171,7 @@ namespace XE {
          * @param position
          * @return Plane<T>
          */
-        static Plane<T> xy(const TVector3<T> &position) { return Plane<T>{T(0), T(0), T(1), position.z}; }
+        static Plane<T> xy(const TVector3<T> &position) { return Plane<T>{T(0), T(0), T(1), position.Z}; }
     };
 
     /**
@@ -224,6 +224,9 @@ namespace XE {
 
         return os;
     }
+
+    extern template struct Plane<float>;
+    extern template struct Plane<double>;
 } // namespace XE
 
 #endif

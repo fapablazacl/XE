@@ -24,6 +24,9 @@ namespace XE {
         TVector<T, 3> computeNormalUnnormalized() const { return cross((P2 - P1), P3 - P1); }
     };
 
+    extern template struct Triangle<float>;
+    extern template struct Triangle<double>;
+
     /*
     template<typename Vector>
     bool Triangle<Vector>::hit(const Ray& ray, IntersectInfo *info=nullptr) const {

@@ -5,6 +5,10 @@
 #include "Boundary.h"
 
 namespace XE {
+    extern template class Boundary<float, 3>;
+    extern template class Boundary<double, 3>;
+    extern template class Boundary<int, 3>;
+
     //! Bounding box in 3-space. It's a Boundary specialization
     template <typename T> using Box = Boundary<T, 3>;
 

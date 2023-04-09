@@ -65,4 +65,8 @@ namespace XE {
 
         return os;
     }
+
+    extern template struct Range<float>;
+    extern template struct Range<double>;
+    extern template struct Range<int>;
 } // namespace XE
