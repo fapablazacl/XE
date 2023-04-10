@@ -111,8 +111,7 @@ namespace XE {
      * @param position
      * @return Plane<T>
      */
-    template<typename T = float>
-    TPlane<T> planeVectorial(const TVector3<T> &normal, const TVector3<T> &position) { return TPlane<T>{normalize(normal), dot(position, normal)}; }
+    template <typename T = float> TPlane<T> planeVectorial(const TVector3<T> &normal, const TVector3<T> &position) { return TPlane<T>{normalize(normal), dot(position, normal)}; }
 
     /**
      * @brief Initializes a plane from three points
@@ -122,8 +121,7 @@ namespace XE {
      * @param p3
      * @return Plane<T>
      */
-    template<typename T = float>
-    TPlane<T> planeTriangle(const TVector3<T> &p1, const TVector3<T> &p2, const TVector3<T> &p3) {
+    template <typename T = float> TPlane<T> planeTriangle(const TVector3<T> &p1, const TVector3<T> &p2, const TVector3<T> &p3) {
         const auto normal = normalize(cross(p2 - p1, p3 - p1));
         const auto position = (p1 + p2 + p3) * (T(1) / T(3));
 
@@ -135,24 +133,21 @@ namespace XE {
      *
      * @return Plane<T>
      */
-    template<typename T = float>
-    TPlane<T> planeYZ() { return TPlane<T>{T(1), T(0), T(0), T(0)}; }
+    template <typename T = float> TPlane<T> planeYZ() { return TPlane<T>{T(1), T(0), T(0), T(0)}; }
 
     /**
      * @brief Creates a Plane aligned at the XZ-Plane
      *
      * @return Plane<T>
      */
-    template<typename T = float>
-    TPlane<T> planeXZ() { return TPlane<T>{T(0), T(1), T(0), T(0)}; }
+    template <typename T = float> TPlane<T> planeXZ() { return TPlane<T>{T(0), T(1), T(0), T(0)}; }
 
     /**
      * @brief Creates a Plane aligned at the XY-Plane
      *
      * @return Plane<T>
      */
-    template<typename T = float>
-    TPlane<T> planeXY() { return TPlane<T>{T(0), T(0), T(1), T(0)}; }
+    template <typename T = float> TPlane<T> planeXY() { return TPlane<T>{T(0), T(0), T(1), T(0)}; }
 
     /**
      * @brief Creates a Plane aligned at the YZ-Plane, at the specified position
@@ -160,8 +155,7 @@ namespace XE {
      * @param position
      * @return Plane<T>
      */
-    template<typename T = float>
-    TPlane<T> planeYZ(const TVector3<T> &position) { return TPlane<T>{T(1), T(0), T(0), position.X}; }
+    template <typename T = float> TPlane<T> planeYZ(const TVector3<T> &position) { return TPlane<T>{T(1), T(0), T(0), position.X}; }
 
     /**
      * @brief Creates a Plane aligned at the XZ-Plane, at the specified position
@@ -169,8 +163,7 @@ namespace XE {
      * @param position
      * @return Plane<T>
      */
-    template<typename T = float>
-    TPlane<T> planeXZ(const TVector3<T> &position) { return TPlane<T>{T(0), T(1), T(0), position.Y}; }
+    template <typename T = float> TPlane<T> planeXZ(const TVector3<T> &position) { return TPlane<T>{T(0), T(1), T(0), position.Y}; }
 
     /**
      * @brief Creates a Plane aligned at the XY-Plane, at the specified position
@@ -178,8 +171,7 @@ namespace XE {
      * @param position
      * @return Plane<T>
      */
-    template<typename T = float>
-    TPlane<T> planeXY(const TVector3<T> &position) { return TPlane<T>{T(0), T(0), T(1), position.Z}; }
+    template <typename T = float> TPlane<T> planeXY(const TVector3<T> &position) { return TPlane<T>{T(0), T(0), T(1), position.Z}; }
 
     /**
      * @brief Returns a inverted Plane, with the Normal part negated.
