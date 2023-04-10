@@ -73,17 +73,13 @@ namespace XE {
         T operator()(const T value) const { return value; }
     };
 
-    template <typename VectorExpr> auto operator+(VectorExpr expression) {
-        return VectorUnaryExpr<VectorExpr, identity<typename VectorExpr::vector_type::type>>(expression);
-    }
+    template <typename VectorExpr> auto operator+(VectorExpr expression) { return VectorUnaryExpr<VectorExpr, identity<typename VectorExpr::vector_type::type>>(expression); }
 
     template <typename T> struct negate {
         T operator()(const T value) const { return -value; }
     };
 
-    template <typename VectorExpr> auto operator-(VectorExpr expression) {
-        return VectorUnaryExpr<VectorExpr, negate<typename VectorExpr::vector_type::type>>(expression);
-    }
+    template <typename VectorExpr> auto operator-(VectorExpr expression) { return VectorUnaryExpr<VectorExpr, negate<typename VectorExpr::vector_type::type>>(expression); }
 
     template <typename VectorExprLeft, typename VectorExprRight> auto operator+(VectorExprLeft left, VectorExprRight right) {
         return VectorBinaryExpr<VectorExprLeft, VectorExprRight, std::plus<typename VectorExprLeft::vector_type::type>>(left, right);

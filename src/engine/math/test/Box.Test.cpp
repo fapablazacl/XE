@@ -28,9 +28,8 @@ TEST(BoxTest, ConstructorFromTwoVectorsInitalizeEdges) {
     EXPECT_EQ(box.isValid(), true);
 }
 
-
 TEST(BoxTest, MinAndMaxEdge) {
-    XE::Box box {{1.0f, 2.0f, -3.0f}, {-1.0f, 8.0f, 3.0f}};
+    XE::Box box{{1.0f, 2.0f, -3.0f}, {-1.0f, 8.0f, 3.0f}};
 
     EXPECT_GE(XE::Box::MinEdge, 0.0f);
     EXPECT_GE(XE::Box::MaxEdge, 0.0f);
@@ -38,14 +37,14 @@ TEST(BoxTest, MinAndMaxEdge) {
 }
 
 TEST(BoxTest, getMinEdgeAndGetMaxEdgeMatchesGetEdgeValues) {
-    XE::Box box {{1.0f, 2.0f, -3.0f}, {-1.0f, 8.0f, 3.0f}};
+    XE::Box box{{1.0f, 2.0f, -3.0f}, {-1.0f, 8.0f, 3.0f}};
 
     EXPECT_EQ(box.getMinEdge(), box.getEdge(XE::Box::MinEdge));
     EXPECT_EQ(box.getMaxEdge(), box.getEdge(XE::Box::MaxEdge));
 }
 
 TEST(BoxTest, getEdgeShouldGetASpecificPointFromTheBox) {
-    XE::Box box {{1.0f, 2.0f, -3.0f}, {-1.0f, 8.0f, 3.0f}};
+    XE::Box box{{1.0f, 2.0f, -3.0f}, {-1.0f, 8.0f, 3.0f}};
 
     box = {{-1.0f, -1.0f, -1.0f}, {1.0f, 1.0f, 1.0f}};
 
@@ -63,17 +62,17 @@ TEST(BoxTest, getEdgeShouldGetASpecificPointFromTheBox) {
 }
 
 TEST(BoxTest, getSizeReturnsAVectorWithTheComputedSize) {
-    XE::Box box {{1.0f, 2.0f, -3.0f}, {-1.0f, 8.0f, 3.0f}};
+    XE::Box box{{1.0f, 2.0f, -3.0f}, {-1.0f, 8.0f, 3.0f}};
     EXPECT_EQ(box.getSize(), XE::Vector3(2.0f, 6.0f, 6.0f));
 }
 
 TEST(BoxTest, getCenterReturnsAVectorWithTheAverageBetweenMinAndMaxEdges) {
-    XE::Box box {{1.0f, 2.0f, -3.0f}, {-1.0f, 8.0f, 3.0f}};
+    XE::Box box{{1.0f, 2.0f, -3.0f}, {-1.0f, 8.0f, 3.0f}};
     EXPECT_EQ(box.getCenter(), XE::Vector3(0.0f, 5.0f, 0.0f));
 }
 
 TEST(BoxTest, expandDoesNotChangesTheBoxWhenUsingAPointInsideOfIt) {
-    XE::Box box {{1.0f, 2.0f, -3.0f}, {-1.0f, 8.0f, 3.0f}};
+    XE::Box box{{1.0f, 2.0f, -3.0f}, {-1.0f, 8.0f, 3.0f}};
 
     box.expand(box.getCenter());
 
@@ -82,7 +81,7 @@ TEST(BoxTest, expandDoesNotChangesTheBoxWhenUsingAPointInsideOfIt) {
 }
 
 TEST(BoxTest, expandDoesNotChangesTheBoxWhenUsingAPointLikeBoxInsideOfIt) {
-    XE::Box box {{1.0f, 2.0f, -3.0f}, {-1.0f, 8.0f, 3.0f}};
+    XE::Box box{{1.0f, 2.0f, -3.0f}, {-1.0f, 8.0f, 3.0f}};
 
     box.expand(XE::Box{box.getCenter()});
 
@@ -91,7 +90,7 @@ TEST(BoxTest, expandDoesNotChangesTheBoxWhenUsingAPointLikeBoxInsideOfIt) {
 }
 
 TEST(BoxTest, expandIncreasesTheBoxWhenUsingAPointInsideOf) {
-    XE::Box box {{1.0f, 2.0f, -3.0f}, {-1.0f, 8.0f, 3.0f}};
+    XE::Box box{{1.0f, 2.0f, -3.0f}, {-1.0f, 8.0f, 3.0f}};
 
     const auto prevCenter = box.getCenter();
     const auto prevSize = box.getSize();
@@ -103,9 +102,8 @@ TEST(BoxTest, expandIncreasesTheBoxWhenUsingAPointInsideOf) {
     EXPECT_NE(box.getSize(), prevSize);
 }
 
-
 TEST(BoxTest, isInsideChecksIfAPointBetweenTheMinAndMaxEdges) {
-    XE::Box box {{-1.0f, -1.0f, -1.0f}, {1.0f, 1.0f, 1.0f}};
+    XE::Box box{{-1.0f, -1.0f, -1.0f}, {1.0f, 1.0f, 1.0f}};
 
     EXPECT_TRUE(box.isInside({0.0f, 0.0f, 0.0f}));
     EXPECT_TRUE(box.isInside({1.0f, 0.0f, 0.0f}));
@@ -119,14 +117,13 @@ TEST(BoxTest, isInsideChecksIfAPointBetweenTheMinAndMaxEdges) {
     EXPECT_FALSE(box.isInside({0.0f, 10.0f, 0.0f}));
     EXPECT_FALSE(box.isInside({0.0f, 0.0f, 10.0f}));
 
-    for (int i=XE::Box::MinEdge; i<=XE::Box::MaxEdge; i++) {
+    for (int i = XE::Box::MinEdge; i <= XE::Box::MaxEdge; i++) {
         EXPECT_TRUE(box.isInside(box.getEdge(i)));
     }
 }
 
-
 TEST(BoxTest, intersectsChecksIfThereIsAnOverlappingBetweenTwoBoxes) {
-    XE::Box box {{-1.0f, -1.0f, -1.0f}, {1.0f, 1.0f, 1.0f}};
+    XE::Box box{{-1.0f, -1.0f, -1.0f}, {1.0f, 1.0f, 1.0f}};
     XE::Box box2 = XE::Box{{-1.0f, -1.0f, -1.0f}, {1.0f, 1.0f, 1.0f}};
 
     EXPECT_TRUE(box.intersect(box));
@@ -139,24 +136,17 @@ TEST(BoxTest, intersectsChecksIfThereIsAnOverlappingBetweenTwoBoxes) {
 }
 
 TEST(BoxTest, intersectsChecksIfThereIsAnOverlappingWithAHalfSizedBox) {
-    XE::Box box {{-1.0f, -1.0f, -1.0f}, {1.0f, 1.0f, 1.0f}};
+    XE::Box box{{-1.0f, -1.0f, -1.0f}, {1.0f, 1.0f, 1.0f}};
 
     const auto size = box.getSize();
 
     const XE::Vector3 displacements[] = {
-        {0.5f * size.X, 0.0f, 0.0f},
-        {0.0f, 0.5f * size.Y, 0.0f},
-        {0.0f, 0.0f, 0.5f * size.Z},
-        {-0.5f * size.X, 0.0f, 0.0f},
-        {0.0f, -0.5f * size.Y, 0.0f},
-        {0.0f, 0.0f, -0.5f * size.Z},
+        {0.5f * size.X, 0.0f, 0.0f},  {0.0f, 0.5f * size.Y, 0.0f},  {0.0f, 0.0f, 0.5f * size.Z},
+        {-0.5f * size.X, 0.0f, 0.0f}, {0.0f, -0.5f * size.Y, 0.0f}, {0.0f, 0.0f, -0.5f * size.Z},
     };
 
     for (const auto &displacement : displacements) {
-        const auto displaced = XE::Box{
-            box.getMinEdge() + displacement,
-            box.getMaxEdge() + displacement
-        };
+        const auto displaced = XE::Box{box.getMinEdge() + displacement, box.getMaxEdge() + displacement};
 
         EXPECT_TRUE(box.intersect(displaced));
         EXPECT_TRUE(displaced.intersect(box));
@@ -164,24 +154,17 @@ TEST(BoxTest, intersectsChecksIfThereIsAnOverlappingWithAHalfSizedBox) {
 }
 
 TEST(BoxTest, intersectsChecksIfThereIsAnOverlappingBetweenTwoBoxesWithANearlyPosition) {
-    XE::Box box {{-1.0f, -1.0f, -1.0f}, {1.0f, 1.0f, 1.0f}};
+    XE::Box box{{-1.0f, -1.0f, -1.0f}, {1.0f, 1.0f, 1.0f}};
 
     const auto size = box.getSize();
 
     const XE::Vector3 displacements[] = {
-        {0.99f * size.X, 0.0f, 0.0f},
-        {0.0f, 0.99f * size.Y, 0.0f},
-        {0.0f, 0.0f, 0.99f * size.Z},
-        {-0.99f * size.X, 0.0f, 0.0f},
-        {0.0f, -0.99f * size.Y, 0.0f},
-        {0.0f, 0.0f, -0.99f * size.Z},
+        {0.99f * size.X, 0.0f, 0.0f},  {0.0f, 0.99f * size.Y, 0.0f},  {0.0f, 0.0f, 0.99f * size.Z},
+        {-0.99f * size.X, 0.0f, 0.0f}, {0.0f, -0.99f * size.Y, 0.0f}, {0.0f, 0.0f, -0.99f * size.Z},
     };
 
     for (const auto &displacement : displacements) {
-        const auto displaced = XE::Box{
-            box.getMinEdge() + displacement,
-            box.getMaxEdge() + displacement
-        };
+        const auto displaced = XE::Box{box.getMinEdge() + displacement, box.getMaxEdge() + displacement};
 
         EXPECT_TRUE(box.intersect(displaced));
         EXPECT_TRUE(displaced.intersect(box));
@@ -189,23 +172,15 @@ TEST(BoxTest, intersectsChecksIfThereIsAnOverlappingBetweenTwoBoxesWithANearlyPo
 }
 
 TEST(BoxTest, intersectsChecksIfThereIsAnOverlappingBetweenTwoBoxesWithExactSizeApart) {
-    XE::Box box {{-1.0f, -1.0f, -1.0f}, {1.0f, 1.0f, 1.0f}};
+    XE::Box box{{-1.0f, -1.0f, -1.0f}, {1.0f, 1.0f, 1.0f}};
     const auto size = box.getSize();
 
     const XE::Vector3 displacements[] = {
-        {size.X, 0.0f, 0.0f},
-        {0.0f, size.Y, 0.0f},
-        {0.0f, 0.0f, size.Z},
-        {-size.X, 0.0f, 0.0f},
-        {0.0f, -size.Y, 0.0f},
-        {0.0f, 0.0f, -size.Z},
+        {size.X, 0.0f, 0.0f}, {0.0f, size.Y, 0.0f}, {0.0f, 0.0f, size.Z}, {-size.X, 0.0f, 0.0f}, {0.0f, -size.Y, 0.0f}, {0.0f, 0.0f, -size.Z},
     };
 
     for (const auto &displacement : displacements) {
-        const auto displaced = XE::Box{
-            box.getMinEdge() + displacement,
-            box.getMaxEdge() + displacement
-        };
+        const auto displaced = XE::Box{box.getMinEdge() + displacement, box.getMaxEdge() + displacement};
 
         EXPECT_FALSE(box.intersect(displaced));
         EXPECT_FALSE(displaced.intersect(box));
@@ -213,34 +188,26 @@ TEST(BoxTest, intersectsChecksIfThereIsAnOverlappingBetweenTwoBoxesWithExactSize
 }
 
 TEST(BoxTest, intersectsChecksIfThereIsAnOverlappingBetweenTwoBoxesDisplacesTwoAndAHalfOfTheFirstBoxsize) {
-    XE::Box box {{-1.0f, -1.0f, -1.0f}, {1.0f, 1.0f, 1.0f}};
+    XE::Box box{{-1.0f, -1.0f, -1.0f}, {1.0f, 1.0f, 1.0f}};
     const auto size = box.getSize();
 
     const XE::Vector3 displacements[] = {
-        {2.5f * size.X, 0.0f, 0.0f},
-        {0.0f, 2.5f * size.Y, 0.0f},
-        {0.0f, 0.0f, 2.5f * size.Z},
-        {-2.5f * size.X, 0.0f, 0.0f},
-        {0.0f, -2.5f * size.Y, 0.0f},
-        {0.0f, 0.0f, -2.5f * size.Z},
+        {2.5f * size.X, 0.0f, 0.0f},  {0.0f, 2.5f * size.Y, 0.0f},  {0.0f, 0.0f, 2.5f * size.Z},
+        {-2.5f * size.X, 0.0f, 0.0f}, {0.0f, -2.5f * size.Y, 0.0f}, {0.0f, 0.0f, -2.5f * size.Z},
     };
 
     for (const auto &displacement : displacements) {
-        const auto displaced = XE::Box{
-            box.getMinEdge() + displacement,
-            box.getMaxEdge() + displacement
-        };
+        const auto displaced = XE::Box{box.getMinEdge() + displacement, box.getMaxEdge() + displacement};
 
         EXPECT_FALSE(displaced.intersect(box));
         EXPECT_FALSE(box.intersect(displaced));
     }
 }
 
-
 TEST(BoxTest, operatorLessLessShouldCreateAnUniqueStringRepresentationFromDifferentBoxes) {
-    XE::Box box {{-1.0f, -1.0f, -1.0f}, {1.0f, 1.0f, 1.0f}};
+    XE::Box box{{-1.0f, -1.0f, -1.0f}, {1.0f, 1.0f, 1.0f}};
 
-    XE::Box box1 {{0.0f, 0.0f, 0.0f}, {10.0f, 10.0f, 10.0f}};
+    XE::Box box1{{0.0f, 0.0f, 0.0f}, {10.0f, 10.0f, 10.0f}};
 
     std::stringstream ss;
     ss << box;
