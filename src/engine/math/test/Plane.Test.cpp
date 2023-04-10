@@ -103,7 +103,7 @@ TEST(PlaneTest, VectorialFactoryMethodGeneratesAPlaneFromASpecificPointAndANorma
 
     for (const auto &testCase : testCases) {
         const auto &input = testCase.input;
-        const auto output = XE::Plane::vectorial(input.normal, input.position);
+        const auto output = XE::planeVectorial(input.normal, input.position);
 
         EXPECT_EQ(testCase.output, output);
         EXPECT_EQ(XE::norm2(output.normal()), 1.0f);
@@ -121,10 +121,10 @@ TEST(PlaneTest, SerializationGeneratesANonEmptyString) {
 
 TEST(PlaneTest, SerializationGeneratesDiffrentStringsForDifferentPlanes) {
     std::stringstream ss1;
-    ss1 << XE::Plane::xy();
+    ss1 << XE::planeXY();
 
     std::stringstream ss2;
-    ss2 << XE::Plane::yz();
+    ss2 << XE::planeYZ();
 
     EXPECT_NE(ss1.str(), ss2.str());
 }
