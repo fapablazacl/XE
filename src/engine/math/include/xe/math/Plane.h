@@ -205,12 +205,6 @@ namespace XE {
         return num / dem;
     }
 
-    //! Plane specialization with the float data type
-    using Planef = TPlane<float>;
-
-    //! Plane specialization with the double data type
-    using Planed = TPlane<double>;
-
     /**
      * @brief Serializes a Plane using the supplied ostream
      */
@@ -228,7 +222,10 @@ namespace XE {
     extern template struct TPlane<float>;
     extern template struct TPlane<double>;
 
+    //! Plane specialization with the float data type
     using Plane = TPlane<float>;
+
+    //! Plane specialization with the double data type
     using Planed = TPlane<double>;
 } // namespace XE
 
