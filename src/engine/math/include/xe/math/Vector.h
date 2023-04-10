@@ -220,9 +220,9 @@ namespace XE {
 
     template <typename T> T cross(const TVector<T, 2> &v1, const TVector<T, 2> &v2) { return v1.X * v2.Y - v1.Y * v2.X; }
 
-    template <typename T> TVector<T, 3> triple_cross(const TVector<T, 3> &v1, const TVector<T, 3> &v2, const TVector<T, 3> &v3) { return cross(cross(v1, v2), v3); }
+    template <typename T> TVector<T, 3> cross(const TVector<T, 3> &v1, const TVector<T, 3> &v2, const TVector<T, 3> &v3) { return cross(cross(v1, v2), v3); }
 
-    template <typename T> T triple_dot(const TVector<T, 3> &v1, const TVector<T, 3> &v2, const TVector<T, 3> &v3) { return dot(cross(v1, v2), v3); }
+    template <typename T> T dot(const TVector<T, 3> &v1, const TVector<T, 3> &v2, const TVector<T, 3> &v3) { return dot(cross(v1, v2), v3); }
 
     template <typename T, int N> T norm(const TVector<T, N> &v) { return static_cast<T>(std::sqrt(dot(v, v))); }
 
