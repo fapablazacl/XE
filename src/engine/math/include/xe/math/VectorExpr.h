@@ -6,6 +6,8 @@
 #ifndef _XE_MATH_VECTOREXPR_HPP__
 #define _XE_MATH_VECTOREXPR_HPP__
 
+#warning "This is an experimental header file. Although it contains usable code, it is incomplete, unstable, and has not been tested yet. Use at your own risk"
+
 #include <cmath>
 #include <functional>
 
