@@ -13,22 +13,22 @@ namespace XE {
     /**
      * @brief Computes the sum of all
      */
-    template <typename VectorExpression> auto sum(VectorExpression expression) {
+    template <typename VectorExpr> auto sum(VectorExpr expression) {
         auto result = expression[0];
 
-        for (int i = 1; i < VectorExpression::vector_type::size; i++) {
+        for (int i = 1; i < VectorExpr::vector_type::size; i++) {
             result += expression[i];
         }
 
         return result;
     }
 
-    template <typename VectorExpressionLeft, typename VectorExpressionRight> auto dot(VectorExpressionLeft v1, VectorExpressionRight v2) { return sum(v1 * v2); }
+    template <typename VectorExprLeft, typename VectorExprRight> auto dot(VectorExprLeft v1, VectorExprRight v2) { return sum(v1 * v2); }
 
     /*
-    template<typename VectorExpressionLeft, typename VectorExpressionRight>
-    auto cross(VectorExpressionLeft v1, VectorExpressionRight v2) {
-        constexpr int size = VectorExpressionLeft::vector_type::size;
+    template<typename VectorExprLeft, typename VectorExprRight>
+    auto cross(VectorExprLeft v1, VectorExprRight v2) {
+        constexpr int size = VectorExprLeft::vector_type::size;
 
         if constexpr (size == 3) {
             return
@@ -36,36 +36,36 @@ namespace XE {
     }
     */
 
-    template <typename VectorExpression> auto norm2(VectorExpression v) { return sum(v * v); }
+    template <typename VectorExpr> auto norm2(VectorExpr v) { return sum(v * v); }
 
-    template <typename VectorExpression> auto norm(VectorExpression v) { return std::sqrt(norm2(v)); }
+    template <typename VectorExpr> auto norm(VectorExpr v) { return std::sqrt(norm2(v)); }
 
-    template <typename VectorExpressionLeft, typename VectorExpressionRight, typename BinaryOperator> class VectorBinaryExpression {
+    template <typename VectorExprLeft, typename VectorExprRight, typename BinaryOperator> class VectorBinaryExpr {
     public:
-        typedef typename VectorExpressionLeft::vector_type vector_type;
+        typedef typename VectorExprLeft::vector_type vector_type;
 
     public:
-        VectorBinaryExpression(VectorExpressionLeft left, VectorExpressionRight right) : m_left(left), m_right(right) {}
+        VectorBinaryExpr(VectorExprLeft left, VectorExprRight right) : m_left(left), m_right(right) {}
 
         auto operator[](const int i) const { return m_operator(m_left[i], m_right[i]); }
 
     private:
-        VectorExpressionLeft m_left;
-        VectorExpressionRight m_right;
+        VectorExprLeft m_left;
+        VectorExprRight m_right;
         BinaryOperator m_operator = BinaryOperator();
     };
 
-    template <typename VectorExpression, typename UnaryOperator> class VectorUnaryExpression {
+    template <typename VectorExpr, typename UnaryOperator> class VectorUnaryExpr {
     public:
-        typedef typename VectorExpression::vector_type vector_type;
+        typedef typename VectorExpr::vector_type vector_type;
 
     public:
-        VectorUnaryExpression(VectorExpression vector) : m_vector(vector) {}
+        VectorUnaryExpr(VectorExpr vector) : m_vector(vector) {}
 
         auto operator[](const int i) const { return m_operator(m_vector[i]); }
 
     private:
-        VectorExpression m_vector;
+        VectorExpr m_vector;
         UnaryOperator m_operator = UnaryOperator();
     };
 
@@ -73,32 +73,32 @@ namespace XE {
         T operator()(const T value) const { return value; }
     };
 
-    template <typename VectorExpression> auto operator+(VectorExpression expression) {
-        return VectorUnaryExpression<VectorExpression, identity<typename VectorExpression::vector_type::type>>(expression);
+    template <typename VectorExpr> auto operator+(VectorExpr expression) {
+        return VectorUnaryExpr<VectorExpr, identity<typename VectorExpr::vector_type::type>>(expression);
     }
 
     template <typename T> struct negate {
         T operator()(const T value) const { return -value; }
     };
 
-    template <typename VectorExpression> auto operator-(VectorExpression expression) {
-        return VectorUnaryExpression<VectorExpression, negate<typename VectorExpression::vector_type::type>>(expression);
+    template <typename VectorExpr> auto operator-(VectorExpr expression) {
+        return VectorUnaryExpr<VectorExpr, negate<typename VectorExpr::vector_type::type>>(expression);
     }
 
-    template <typename VectorExpressionLeft, typename VectorExpressionRight> auto operator+(VectorExpressionLeft left, VectorExpressionRight right) {
-        return VectorBinaryExpression<VectorExpressionLeft, VectorExpressionRight, std::plus<typename VectorExpressionLeft::vector_type::type>>(left, right);
+    template <typename VectorExprLeft, typename VectorExprRight> auto operator+(VectorExprLeft left, VectorExprRight right) {
+        return VectorBinaryExpr<VectorExprLeft, VectorExprRight, std::plus<typename VectorExprLeft::vector_type::type>>(left, right);
     }
 
-    template <typename VectorExpressionLeft, typename VectorExpressionRight> auto operator-(VectorExpressionLeft left, VectorExpressionRight right) {
-        return VectorBinaryExpression<VectorExpressionLeft, VectorExpressionRight, std::minus<typename VectorExpressionLeft::vector_type::type>>(left, right);
+    template <typename VectorExprLeft, typename VectorExprRight> auto operator-(VectorExprLeft left, VectorExprRight right) {
+        return VectorBinaryExpr<VectorExprLeft, VectorExprRight, std::minus<typename VectorExprLeft::vector_type::type>>(left, right);
     }
 
-    template <typename VectorExpressionLeft, typename VectorExpressionRight> auto operator*(VectorExpressionLeft left, VectorExpressionRight right) {
-        return VectorBinaryExpression<VectorExpressionLeft, VectorExpressionRight, std::multiplies<typename VectorExpressionLeft::vector_type::type>>(left, right);
+    template <typename VectorExprLeft, typename VectorExprRight> auto operator*(VectorExprLeft left, VectorExprRight right) {
+        return VectorBinaryExpr<VectorExprLeft, VectorExprRight, std::multiplies<typename VectorExprLeft::vector_type::type>>(left, right);
     }
 
-    template <typename VectorExpressionLeft, typename VectorExpressionRight> auto operator/(VectorExpressionLeft left, VectorExpressionRight right) {
-        return VectorBinaryExpression<VectorExpressionLeft, VectorExpressionRight, std::divides<typename VectorExpressionLeft::vector_type::type>>(left, right);
+    template <typename VectorExprLeft, typename VectorExprRight> auto operator/(VectorExprLeft left, VectorExprRight right) {
+        return VectorBinaryExpr<VectorExprLeft, VectorExprRight, std::divides<typename VectorExprLeft::vector_type::type>>(left, right);
     }
 } // namespace XE
 
