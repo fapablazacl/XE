@@ -2,7 +2,6 @@
 #include "xe/math/Plane.h"
 #include "GoogleTestCommon.h"
 
-
 TEST(PlaneTest, DefaultConstructorMakesXZPlanePointingPlusYAxis) {
     XE::Plane subject;
 
@@ -24,7 +23,7 @@ TEST(PlaneTest, FourParamConstructorMakesAPlaneWithSpecificEquationTerms) {
 TEST(PlaneTest, ConstDataRetunsAPointerToInternalArray) {
     const XE::Plane subject{1.0f, 2.0f, 3.0f, 4.0f};
 
-    const float* values = subject.data();
+    const float *values = subject.data();
 
     EXPECT_EQ(values[0], subject.a);
     EXPECT_EQ(values[1], subject.b);
@@ -40,7 +39,7 @@ TEST(PlaneTest, ConstDataRetunsAPointerToInternalArray) {
 TEST(PlaneTest, DataRetunsAPointerToInternalArray) {
     XE::Plane subject{1.0f, 2.0f, 3.0f, 4.0f};
 
-    const float* values = subject.data();
+    const float *values = subject.data();
 
     EXPECT_EQ(values[0], subject.a);
     EXPECT_EQ(values[1], subject.b);
@@ -54,20 +53,16 @@ TEST(PlaneTest, DataRetunsAPointerToInternalArray) {
 }
 
 struct TestCase {
-   XE::Plane input{};
-   bool output{false};
+    XE::Plane input{};
+    bool output{false};
 };
 
 TEST(PlaneTest, EqualityOperatorChecksForEqualityForEachTerm) {
     XE::Plane subject{1.0f, 2.0f, 3.0f, 4.0f};
 
-    const TestCase testCases[] = {
-        TestCase{XE::Plane{1.0f, 2.0f, 3.0f, 4.0f}, true},
-        TestCase{XE::Plane{-1.0f, 2.0f, 3.0f, 4.0f}, false},
-        TestCase{XE::Plane{1.0f, -2.0f, 3.0f, 4.0f}, false},
-        TestCase{XE::Plane{1.0f, 2.0f, -3.0f, 4.0f}, false},
-        TestCase{XE::Plane{1.0f, 2.0f, 3.0f, -4.0f}, false}
-    };
+    const TestCase testCases[] = {TestCase{XE::Plane{1.0f, 2.0f, 3.0f, 4.0f}, true}, TestCase{XE::Plane{-1.0f, 2.0f, 3.0f, 4.0f}, false},
+                                  TestCase{XE::Plane{1.0f, -2.0f, 3.0f, 4.0f}, false}, TestCase{XE::Plane{1.0f, 2.0f, -3.0f, 4.0f}, false},
+                                  TestCase{XE::Plane{1.0f, 2.0f, 3.0f, -4.0f}, false}};
 
     for (const auto &testCase : testCases) {
         EXPECT_EQ(testCase.output, subject.operator==(testCase.input));
@@ -77,13 +72,9 @@ TEST(PlaneTest, EqualityOperatorChecksForEqualityForEachTerm) {
 TEST(PlaneTest, InequalityOperatorChecksForEqualityForEachTerm) {
     XE::Plane subject{1.0f, 2.0f, 3.0f, 4.0f};
 
-    const TestCase testCases[] = {
-        TestCase{XE::Plane{1.0f, 2.0f, 3.0f, 4.0f}, false},
-        TestCase{XE::Plane{-1.0f, 2.0f, 3.0f, 4.0f}, true},
-        TestCase{XE::Plane{1.0f, -2.0f, 3.0f, 4.0f}, true},
-        TestCase{XE::Plane{1.0f, 2.0f, -3.0f, 4.0f}, true},
-        TestCase{XE::Plane{1.0f, 2.0f, 3.0f, -4.0f}, true}
-    };
+    const TestCase testCases[] = {TestCase{XE::Plane{1.0f, 2.0f, 3.0f, 4.0f}, false}, TestCase{XE::Plane{-1.0f, 2.0f, 3.0f, 4.0f}, true},
+                                  TestCase{XE::Plane{1.0f, -2.0f, 3.0f, 4.0f}, true}, TestCase{XE::Plane{1.0f, 2.0f, -3.0f, 4.0f}, true},
+                                  TestCase{XE::Plane{1.0f, 2.0f, 3.0f, -4.0f}, true}};
 
     for (const auto &testCase : testCases) {
         EXPECT_EQ(testCase.output, subject.operator!=(testCase.input));
@@ -102,30 +93,12 @@ TEST(PlaneTest, VectorialFactoryMethodGeneratesAPlaneFromASpecificPointAndANorma
     };
 
     const VectorialTestCase testCases[] = {
-        {
-            VectorialInput{XE::Vector3{1.0f, 0.0f, 0.0f}, XE::Vector3{0.0f, 0.0f, 0.0f}},
-            XE::Plane{1.0f, 0.0f, 0.0f, 0.0f}
-        },
-        {
-            VectorialInput{XE::Vector3{0.0f, 1.0f, 0.0f}, XE::Vector3{0.0f, 0.0f, 0.0f}},
-            XE::Plane{0.0f, 1.0f, 0.0f, 0.0f}
-        },
-        {
-            VectorialInput{XE::Vector3{0.0f, 0.0f, 1.0f}, XE::Vector3{0.0f, 0.0f, 0.0f}},
-            XE::Plane{0.0f, 0.0f, 1.0f, 0.0f}
-        },
-        {
-            VectorialInput{XE::Vector3{1.0f, 0.0f, 0.0f}, XE::Vector3{1.0f, 1.0f, 1.0f}},
-            XE::Plane{1.0f, 0.0f, 0.0f, 1.0f}
-        },
-        {
-            VectorialInput{XE::Vector3{0.0f, 1.0f, 0.0f}, XE::Vector3{1.0f, 1.0f, 1.0f}},
-            XE::Plane{0.0f, 1.0f, 0.0f, 1.0f}
-        },
-        {
-            VectorialInput{XE::Vector3{0.0f, 0.0f, 1.0f}, XE::Vector3{1.0f, 1.0f, 1.0f}},
-            XE::Plane{0.0f, 0.0f, 1.0f, 1.0f}
-        },
+        {VectorialInput{XE::Vector3{1.0f, 0.0f, 0.0f}, XE::Vector3{0.0f, 0.0f, 0.0f}}, XE::Plane{1.0f, 0.0f, 0.0f, 0.0f}},
+        {VectorialInput{XE::Vector3{0.0f, 1.0f, 0.0f}, XE::Vector3{0.0f, 0.0f, 0.0f}}, XE::Plane{0.0f, 1.0f, 0.0f, 0.0f}},
+        {VectorialInput{XE::Vector3{0.0f, 0.0f, 1.0f}, XE::Vector3{0.0f, 0.0f, 0.0f}}, XE::Plane{0.0f, 0.0f, 1.0f, 0.0f}},
+        {VectorialInput{XE::Vector3{1.0f, 0.0f, 0.0f}, XE::Vector3{1.0f, 1.0f, 1.0f}}, XE::Plane{1.0f, 0.0f, 0.0f, 1.0f}},
+        {VectorialInput{XE::Vector3{0.0f, 1.0f, 0.0f}, XE::Vector3{1.0f, 1.0f, 1.0f}}, XE::Plane{0.0f, 1.0f, 0.0f, 1.0f}},
+        {VectorialInput{XE::Vector3{0.0f, 0.0f, 1.0f}, XE::Vector3{1.0f, 1.0f, 1.0f}}, XE::Plane{0.0f, 0.0f, 1.0f, 1.0f}},
     };
 
     for (const auto &testCase : testCases) {
@@ -136,7 +109,6 @@ TEST(PlaneTest, VectorialFactoryMethodGeneratesAPlaneFromASpecificPointAndANorma
         EXPECT_EQ(XE::norm2(output.normal()), 1.0f);
     }
 }
-
 
 TEST(PlaneTest, SerializationGeneratesANonEmptyString) {
     XE::Plane subject;
