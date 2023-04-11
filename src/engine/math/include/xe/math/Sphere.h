@@ -34,12 +34,12 @@ namespace XE {
     extern template struct TSphere<float>;
     extern template struct TSphere<double>;
 
-    template <typename T> struct Ray;
+    template <typename T> struct TRay;
 
     /**
      * @brief Test for collisions between a Sphere and a Ray
      */
-    template <typename T> T test(const TSphere<T> &sphere, const Ray<T> &ray) {
+    template <typename T> T test(const TSphere<T> &sphere, const TRay<T> &ray) {
         const TVector<T, 3> &r0 = ray.position;
         const TVector<T, 3> &d = ray.direction;
 

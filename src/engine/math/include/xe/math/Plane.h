@@ -182,7 +182,7 @@ namespace XE {
      */
     template <typename T> TPlane<T> invert(const TPlane<T> &plane) { return {-plane.a, -plane.b, -plane.c, plane.d}; }
 
-    template <typename T> struct Ray;
+    template <typename T> struct TRay;
 
     /**
      * @brief Test for collisions between a Plane and a Ray
@@ -196,7 +196,7 @@ namespace XE {
      * @todo Missing the validation when there is no intersection between the Plane and the Ray
      * @return T The computed t scalar factor
      */
-    template <typename T> T test(const TPlane<T> &plane, const Ray<T> &ray) {
+    template <typename T> T test(const TPlane<T> &plane, const TRay<T> &ray) {
         const TVector3<T> n = plane.normal();
         const T num = plane.d - dot(ray.point, n);
         const T dem = dot(ray.direction, n);

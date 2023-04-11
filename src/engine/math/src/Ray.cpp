@@ -2,6 +2,6 @@
 #include <xe/math/Ray.h>
 
 namespace XE {
-    template struct Ray<float>;
-    template struct Ray<double>;
+    template struct TRay<float>;
+    template struct TRay<double>;
 } // namespace XE

@@ -9,7 +9,7 @@ namespace XE {
     /**
      * @brief Ray with normalized direction in the 3-space
      */
-    template <typename T> struct Ray {
+    template <typename T> struct TRay {
         TVector<T, 3> position;
         TVector<T, 3> direction;
 
@@ -22,14 +22,17 @@ namespace XE {
         /**
          * @brief Initializes the ray, positioned around the origin and aiming to the positive Z-axis.
          */
-        Ray() {
+        TRay() {
             position = {T(0.0), T(0.0), T(0.0)};
             direction = {T(0.0), T(0.0), T(1.0)};
         }
     };
 
-    extern template struct Ray<float>;
-    extern template struct Ray<double>;
+    using Ray = TRay<float>;
+    using Rayd = TRay<double>;
+
+    extern template struct TRay<float>;
+    extern template struct TRay<double>;
 } // namespace XE
 
 #endif

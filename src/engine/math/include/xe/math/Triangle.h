@@ -3,6 +3,8 @@
 #define __XE_MATH_TRIANGLE_HPP__
 
 #include "Vector.h"
+#include "Plane.h"
+#include "Ray.h"
 #include <array>
 
 namespace XE {
@@ -31,13 +33,11 @@ namespace XE {
     extern template struct TTriangle<double>;
 
     /*
-    template<typename Vector>
-    bool Triangle<Vector>::hit(const Ray& ray, IntersectInfo *info=nullptr) const {
-
+    template<typename T=float>
+    TVector3<T> hit(const TTriangle<T> &tri, const TRay<T>& ray) {
         // Generar un plano con los tres puntos
-        auto plane = Plane();
+        auto plane = planeTriangle<T>(tri.P1, tri.P2, tri.P3);
 
-        plane.set(tri.p1, tri.p2, tri.p3);
         if (plane.intersect(ray, &info) == true) {
             if (info.distance <= 0.0) {
                 continue;
@@ -62,23 +62,9 @@ namespace XE {
             // Detectar si existe colision, sin importar como esten ordenados los triangulos
             bool isBackSide = (u > 0.0f && v > 0.0f && w > 0.0f);
             bool isFrontSide = (u < 0.0f && v < 0.0f && w < 0.0f);
-
-            if (isBackSide == true || isFrontSide == true) {
-                if (intersectInfo != nullptr){
-                    intersectInfo->intersect = true;
-                    intersectInfo->distance = info.distance;
-                    intersectInfo->materialPtr = meshPart.getMaterial();
-                    intersectInfo->normal = tri.getNormal();
-                }
-
-                return true;
-            } else {
-                //! TODO: Comprobar mediante un epsilon
-                return false;
-            }
         }
     }
-    */
+     */
 } // namespace XE
 
 #endif
