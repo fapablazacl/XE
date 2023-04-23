@@ -29,7 +29,7 @@ namespace XE {
     void BufferGL::read(void *destination, const size_t size, const size_t offset, const size_t destinationOffset) const {
         assert(destination);
 
-        const int finalSize = size ? size : m_size;
+        const size_t finalSize = size ? size : m_size;
         const auto ptr = reinterpret_cast<std::byte *>(destination);
 
         glBindBuffer(m_target, m_id);
@@ -40,7 +40,7 @@ namespace XE {
     void BufferGL::write(const void *source, const size_t size, const size_t offset, const size_t sourceOffset) {
         assert(source);
 
-        const int finalSize = size ? size : m_size;
+        const size_t finalSize = size ? size : m_size;
         const auto ptr = reinterpret_cast<const std::byte *>(source);
 
         glBindBuffer(m_target, m_id);

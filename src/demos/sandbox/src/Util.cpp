@@ -270,16 +270,16 @@ namespace demo {
                 mesh.vertices.push_back({p4 + centroid, normal, color});
                 mesh.vertices.push_back({p3 + centroid, normal, color});
 
-                const XE::Vector3 p1 = mesh.vertices[mesh.vertices.size() - 3].coord;
-                const XE::Vector3 p2 = mesh.vertices[mesh.vertices.size() - 2].coord;
-                const XE::Vector3 p3 = mesh.vertices[mesh.vertices.size() - 1].coord;
+                const XE::Vector3 pp1 = mesh.vertices[mesh.vertices.size() - 3].coord;
+                const XE::Vector3 pp2 = mesh.vertices[mesh.vertices.size() - 2].coord;
+                const XE::Vector3 pp3 = mesh.vertices[mesh.vertices.size() - 1].coord;
 
-                const XE::Vector3 edge1 = p2 - p1;
-                const XE::Vector3 edge2 = p3 - p1;
-                const XE::Vector3 normal = XE::normalize(XE::cross(edge1, edge2));
+                const XE::Vector3 edge1 = pp2 - pp1;
+                const XE::Vector3 edge2 = pp3 - pp1;
+                const XE::Vector3 nnormal = XE::normalize(XE::cross(edge1, edge2));
 
                 for (int ii = 0; ii < 6; ii++) {
-                    mesh.vertices[mesh.vertices.size() - ii - 1].normal = normal;
+                    mesh.vertices[mesh.vertices.size() - ii - 1].normal = nnormal;
                 }
 
                 colorSide = !colorSide;
