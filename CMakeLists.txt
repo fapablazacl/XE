@@ -14,6 +14,7 @@ option (XE_EXAMPLE_SANDBOX      "Include example program that is used for variou
 
 # options suited for development
 option (XE_DEV_UNIT_TEST            "Enable unit test suite" ON)
+option (XE_DEV_BENCHMARK_TEST       "Enable benchmark tests" OFF)
 option (XE_DEV_WARNINGS_AS_ERRORS   "Marks all warnings as errors" OFF)
 option (XE_DEV_INSTRUMENT_COVERAGE  "Intrument code for code coverage reporting during unit tests" OFF)
 option (XE_DEV_PRECOMPILED_HEADERS  "Enable precompiled headers for internal libraries, to improve build times" OFF)
