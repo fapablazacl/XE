@@ -41,9 +41,11 @@ namespace Sandbox {
         std::vector<std::pair<XE::Subset *, XE::SubsetEnvelope>> subsets;
     };
 
-    class RenderingSystem {
+    class RenderingSystem : public System {
     public:
-        explicit RenderingSystem(int argc, char **argv);
+        explicit RenderingSystem(Coordinator &coordinator);
+
+        void handleMessage(const Message &message) override;
 
         void Initialize();
 
@@ -77,6 +79,8 @@ namespace Sandbox {
         std::pair<XE::Subset *, XE::SubsetEnvelope> createSubset(const MeshPrimitive &meshPrimitive);
 
     private:
+        Coordinator &coordinator;
+
         SceneDescription sceneDescription;
 
         std::unique_ptr<XE::WindowGLFW> m_window;

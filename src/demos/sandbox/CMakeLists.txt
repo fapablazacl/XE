@@ -28,7 +28,7 @@ set (src
 	"src/SceneNode.h"
 	"src/Util.cpp"
 	"src/Util.h"
-		src/FPSCounter.cpp src/FPSCounter.h src/DemoApp.h src/DemoRenderable.cpp src/DemoRenderable.h ../../engine/core/src/xe/Flags.h src/ecs/MessageBus.cpp src/ecs/MessageBus.h src/ecs/EntityManager.cpp src/ecs/EntityManager.h src/ecs/ComponentArray.cpp src/ecs/ComponentArray.h src/ecs/ComponentManager.cpp src/ecs/ComponentManager.h src/ecs/System.cpp src/ecs/System.h src/ecs/SystemManager.cpp src/ecs/SystemManager.h src/ecs/Coordinator.cpp src/ecs/Coordinator.h src/ecs/CommonECS.h)
+		src/FPSCounter.cpp src/FPSCounter.h src/DemoApp.h src/DemoRenderable.cpp src/DemoRenderable.h ../../engine/core/src/xe/Flags.h src/ecs/MessageBus.cpp src/ecs/MessageBus.h src/ecs/EntityManager.cpp src/ecs/EntityManager.h src/ecs/ComponentArray.cpp src/ecs/ComponentArray.h src/ecs/ComponentManager.cpp src/ecs/ComponentManager.h src/ecs/System.cpp src/ecs/System.h src/ecs/SystemManager.cpp src/ecs/SystemManager.h src/ecs/Coordinator.cpp src/ecs/Coordinator.h src/ecs/CommonECS.h src/InputSystem.cpp src/InputSystem.h)
 
 add_executable (${target} ${src})
 

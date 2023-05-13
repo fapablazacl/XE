@@ -5,6 +5,8 @@
 #include <memory>
 
 #include "PhysicsSystem.h"
+#include "RenderingSystem.h"
+#include "InputSystem.h"
 #include "ecs/ECS.h"
 
 namespace Sandbox {
@@ -21,11 +23,18 @@ namespace Sandbox {
         bool shouldClose() const;
 
     private:
+        void initializeECS();
+
+        void createParticles();
+
+    private:
         bool running = true;
         int frames = 0;
         const int maxFrames = 10000;
         Coordinator coordinator;
         std::shared_ptr<PhysicsSystem> physicsSystem;
+        std::shared_ptr<RenderingSystem> renderingSystem;
+        std::shared_ptr<InputSystem> inputSystem;
     };
 } // namespace Sandbox
 

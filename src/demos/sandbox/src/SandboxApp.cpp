@@ -9,17 +9,32 @@ namespace Sandbox {
     SandboxApp::SandboxApp(int, char **) {}
 
     void SandboxApp::initialize() {
+        initializeECS();
+        createParticles();
+    }
+
+    void SandboxApp::update(const float seconds) { physicsSystem->update(seconds); }
+
+    void SandboxApp::render() { ++frames; }
+
+    bool SandboxApp::shouldClose() const { return !(running && frames < maxFrames); }
+
+    void SandboxApp::initializeECS() {
         coordinator.registerComponent<Gravity>();
         coordinator.registerComponent<RigidBody>();
         coordinator.registerComponent<Transform>();
 
         physicsSystem = coordinator.registerSystem<PhysicsSystem>();
+        renderingSystem = coordinator.registerSystem<RenderingSystem>();
+        inputSystem = coordinator.registerSystem<InputSystem>();
 
         Signature signature;
         signature.set(coordinator.getComponentType<Gravity>(), true);
         signature.set(coordinator.getComponentType<RigidBody>(), true);
         signature.set(coordinator.getComponentType<Transform>(), true);
+    }
 
+    void SandboxApp::createParticles() {
         std::vector<Entity> entities(MAX_ENTITIES);
 
         std::default_random_engine randomEngine;
@@ -40,11 +55,5 @@ namespace Sandbox {
                                                XE::Vector3{randRotation(randomEngine), randRotation(randomEngine), randRotation(randomEngine)}, XE::Vector3{scale, scale, scale}});
         }
     }
-
-    void SandboxApp::update(const float seconds) { physicsSystem->update(seconds); }
-
-    void SandboxApp::render() { ++frames; }
-
-    bool SandboxApp::shouldClose() const { return !(running && frames < maxFrames); }
 
 } // namespace Sandbox

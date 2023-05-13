@@ -13,7 +13,7 @@ layout(location = 2) in vec4 vsColor;
 out vec4 fsColor;
 
 void main() {
-    // compute fragment position
+    // compute vertex position
     gl_Position = vec4(vsCoord, 1.0) * uProjViewModel;
 
     // compute diffuse color component

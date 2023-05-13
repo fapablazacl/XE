@@ -80,7 +80,13 @@ namespace Sandbox {
         }
     }
 
-    RenderingSystem::RenderingSystem(int argc, char **argv) { sceneDescription = createSceneDescription(argc, argv); }
+
+    RenderingSystem::RenderingSystem(Coordinator &coordinator) : coordinator(coordinator) {
+        sceneDescription = {{
+            SceneModel("assets/models/cube.fbx")
+        }};
+    }
+
 
     void RenderingSystem::Initialize() {
         std::cout << "Initializing Engine ..." << std::endl;
@@ -334,5 +340,11 @@ namespace Sandbox {
         subsetDescriptor.buffers = {coordBuffer, colorBuffer, normalBuffer, texCoordBuffer};
 
         return {m_graphicsDevice->createSubset(subsetDescriptor), meshPrimitive.getEnvelope()};
+    }
+
+    void RenderingSystem::handleMessage(const Message &message) {
+        if (message.type == Message::SYSTEM_UPDATE) {
+            // TODO: Perform rendering?
+        }
     }
 } // namespace Sandbox
