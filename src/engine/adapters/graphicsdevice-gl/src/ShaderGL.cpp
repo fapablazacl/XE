@@ -16,7 +16,7 @@ namespace XE {
 
         m_id = glCreateShader(m_typeGL);
 
-        auto glsl = static_cast<const GLchar *const>(source.c_str());
+        const GLchar *const glsl = source.c_str();
         auto size = static_cast<GLsizei>(source.size());
         glShaderSource(m_id, 1, &glsl, &size);
         glCompileShader(m_id);

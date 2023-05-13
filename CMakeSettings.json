@@ -1,0 +1,90 @@
+﻿{
+  "configurations": [
+    {
+      "name": "x64-Debug",
+      "generator": "Ninja",
+      "configurationType": "Debug",
+      "inheritEnvironments": [ "msvc_x64_x64" ],
+      "buildRoot": "${projectDir}\\out\\build\\${name}",
+      "installRoot": "${projectDir}\\out\\install\\${name}",
+      "cmakeCommandArgs": "",
+      "buildCommandArgs": "",
+      "ctestCommandArgs": "",
+      "variables": [
+        {
+          "name": "XE_DEV_UNIT_TEST",
+          "value": "true",
+          "type": "BOOL"
+        },
+        {
+          "name": "XE_PLUGIN_GL_GLFW",
+          "value": "True",
+          "type": "BOOL"
+        },
+        {
+          "name": "XE_PLUGIN_GL",
+          "value": "True",
+          "type": "BOOL"
+        },
+        {
+          "name": "XE_PLUGIN_PNG",
+          "value": "True",
+          "type": "BOOL"
+        },
+        {
+          "name": "XE_EXAMPLE_SANDBOX",
+          "value": "True",
+          "type": "BOOL"
+        },
+        {
+          "name": "XE_DEV_WARNINGS_AS_ERRORS",
+          "value": "True",
+          "type": "BOOL"
+        },
+        {
+          "name": "XE_DEV_PRECOMPILED_HEADERS",
+          "value": "True",
+          "type": "BOOL"
+        }
+      ]
+    },
+    {
+      "name": "x64-Release",
+      "generator": "Ninja",
+      "configurationType": "Release",
+      "buildRoot": "${projectDir}\\out\\build\\${name}",
+      "installRoot": "${projectDir}\\out\\install\\${name}",
+      "cmakeCommandArgs": "",
+      "buildCommandArgs": "",
+      "ctestCommandArgs": "",
+      "inheritEnvironments": [ "msvc_x64_x64" ],
+      "variables": [
+        {
+          "name": "XE_PLUGIN_PNG",
+          "value": "True",
+          "type": "BOOL"
+        },
+        {
+          "name": "XE_PLUGIN_GL",
+          "value": "True",
+          "type": "BOOL"
+        },
+        {
+          "name": "XE_PLUGIN_GL_GLFW",
+          "value": "True",
+          "type": "BOOL"
+        },
+        {
+          "name": "XE_EXAMPLE_SANDBOX",
+          "value": "True",
+          "type": "BOOL"
+        },
+        {
+          "name": "XE_DEV_PRECOMPILED_HEADERS",
+          "value": "True",
+          "type": "BOOL"
+        }
+      ]
+    }
+  ]
+}

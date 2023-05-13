@@ -9,7 +9,7 @@
 #if defined(_MSC_VER)
 #pragma message ( "This is an experimental header file. Although it contains usable code, it is incomplete, unstable, and has not been tested yet. Use at your own risk" )
 #else
-#warning "This is an experimental header file. Although it contains usable code, it is incomplete, unstable, and has not been tested yet. Use at your own risk"
+#pragma message "This is an experimental header file. Although it contains usable code, it is incomplete, unstable, and has not been tested yet. Use at your own risk"
 #endif
 
 #include <cmath>

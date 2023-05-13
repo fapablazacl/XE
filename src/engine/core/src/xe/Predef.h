@@ -10,7 +10,7 @@
 #define XE_API
 
 //! detect target OS
-#if defined(_WINDOWS)
+#if defined(_WINDOWS) || defined(__MINGW32__)
 #define XE_OS_WINDOWS
 #elif defined(__linux__)
 #define XE_OS_LINUX

@@ -1,7 +1,7 @@
 
 #include <xe/Timer.h>
 
-#if defined(_WINDOWS)
+#if defined(XE_OS_WINDOWS)
 #include <Windows.h>
 
 namespace XE {
