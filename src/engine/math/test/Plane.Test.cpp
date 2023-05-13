@@ -110,6 +110,45 @@ TEST(PlaneTest, VectorialFactoryMethodGeneratesAPlaneFromASpecificPointAndANorma
     }
 }
 
+
+TEST(PlaneTest, EvaluateReturnsTheResultScalarOfEvaluatingPointAgainstThePlaneEquation) {
+    using XE::Plane;
+
+    Plane plane{-1.0f, 2.0f, -3.0f, 1.0f};
+
+    EXPECT_EQ(plane.evaluate({0.0f, 0.0f, 0.0f}), -1.0f);
+    EXPECT_EQ(plane.evaluate({1.0f, 1.0f, 1.0f}), -3.0f);
+    EXPECT_EQ(plane.evaluate({-1.0f, 0.0f, 0.0f}), 0.0f);
+    EXPECT_EQ(plane.evaluate({-1.0f, 1.0f, 0.0f}), 2.0f);
+}
+
+
+
+TEST(PlaneTest, IntersectChecksIfTwoPlanesIntersect) {
+    using XE::Plane;
+
+    Plane plane1{1.0f, 0.0f, 0.0f, 1.0f};
+    Plane plane2{0.0f, 1.0f, 0.0f, 1.0f};
+    Plane plane3{0.0f, 0.0f, 1.0f, 1.0f};
+
+    EXPECT_TRUE(plane1.intersect(plane2));
+    EXPECT_TRUE(plane2.intersect(plane3));
+    EXPECT_TRUE(plane3.intersect(plane1));
+}
+
+
+TEST(PlaneTest, TestChecksHowAPointRelatesToAPlane) {
+    using XE::Plane;
+    using XE::PlaneSide;
+
+    Plane plane{0.0f, 1.0f, 0.0f, 1.0f};
+
+    EXPECT_EQ(plane.test({0.0f, 2.0f, 0.0f}), PlaneSide::Front);
+    EXPECT_EQ(plane.test({0.0f, -2.0f, 0.0f}), PlaneSide::Back);
+    EXPECT_EQ(plane.test({0.0f, 1.0f, 0.0f}), PlaneSide::Inside);
+}
+
+
 TEST(PlaneTest, SerializationGeneratesANonEmptyString) {
     XE::Plane subject;
 
