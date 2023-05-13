@@ -37,3 +37,7 @@ target_link_libraries(${target} PRIVATE XE.Interface)
 if (XE_DEV_UNIT_TEST)
     add_subdirectory("test")
 endif()
+
+if (XE_DEV_BENCHMARK_TEST)
+    add_subdirectory("benchmark-test")
+endif()
