@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Build Utility Tool for XE, on Unix platforms.
-# Pending rewrite in C++.
+# Pending rewrite in Python, for rapid prototyping.
 # Supports Debug and Release build, using GCC and CLANG compilers.
 # Tested on:
 #   ArchLinux, with Zen Kernel.
@@ -104,17 +104,9 @@ CATCH2_BUILD_DIR="$BUILD_PREFIX/$TOOLCHAIN/Catch2/$BUILD_TYPE"
 CATCH2_SOURCE_DIR="$SOURCE_PREFIX/Catch2"
 CATCH2_INSTALL_PREFIX="$INSTALL_PREFIX/$TOOLCHAIN/Catch2"
 
-GLADES_BUILD_DIR="$BUILD_PREFIX/$TOOLCHAIN/glades2/$BUILD_TYPE"
-GLADES_SOURCE_DIR="$SOURCE_PREFIX/glades2"
-GLADES_INSTALL_PREFIX="$INSTALL_PREFIX/$TOOLCHAIN/glades2"
-
 GLFW3_BUILD_DIR="$BUILD_PREFIX/$TOOLCHAIN/glfw/$BUILD_TYPE"
 GLFW3_SOURCE_DIR="$SOURCE_PREFIX/glfw"
 GLFW3_INSTALL_PREFIX="$INSTALL_PREFIX/$TOOLCHAIN/glfw"
-
-GLBINDING_BUILD_DIR="$BUILD_PREFIX/$TOOLCHAIN/glbinding/$BUILD_TYPE"
-GLBINDING_SOURCE_DIR="$SOURCE_PREFIX/glbinding"
-GLBINDING_INSTALL_PREFIX="$INSTALL_PREFIX/$TOOLCHAIN/glbinding"
 
 install_dependencies(){
     # build catch
@@ -133,18 +125,6 @@ install_dependencies(){
     cmake --build $CATCH2_BUILD_DIR
     cmake --install $CATCH2_BUILD_DIR
 
-    # build glades2
-    cmake \
-        -B$GLADES_BUILD_DIR \
-        -S$GLADES_SOURCE_DIR \
-        -G "Unix Makefiles"  \
-        -DCMAKE_OSX_ARCHITECTURES="x86_64;arm64" \
-        -DCMAKE_BUILD_TYPE=$CMAKE_BUILD_TYPE \
-        -DCMAKE_INSTALL_PREFIX=$GLADES_INSTALL_PREFIX
-
-    cmake --build $GLADES_BUILD_DIR
-    cmake --install $GLADES_BUILD_DIR
-
     # build glfw
     cmake \
         -B$GLFW3_BUILD_DIR \
@@ -160,21 +140,6 @@ install_dependencies(){
 
     cmake --build $GLFW3_BUILD_DIR
     cmake --install $GLFW3_BUILD_DIR
-
-    # build glbinding
-    cmake \
-        -B$GLBINDING_BUILD_DIR \
-        -S$GLBINDING_SOURCE_DIR \
-        -G "Unix Makefiles"  \
-        -DCMAKE_OSX_ARCHITECTURES="x86_64;arm64" \
-        -DCMAKE_BUILD_TYPE=$CMAKE_BUILD_TYPE \
-        -DCMAKE_INSTALL_PREFIX=$GLBINDING_INSTALL_PREFIX \
-        -DOPTION_BUILD_EXAMPLES=OFF \
-        -DOPTION_BUILD_TOOLS=OFF \
-        -DBUILD_SHARED_LIBS=OFF
-
-    cmake --build $GLBINDING_BUILD_DIR
-    cmake --install $GLBINDING_BUILD_DIR
 }
 
 
@@ -189,8 +154,6 @@ configure(){
         -DCMAKE_BUILD_TYPE=$CMAKE_BUILD_TYPE \
         -DXE_PLUGIN_GL=ON -DXE_PLUGIN_ES2=ON -DXE_PLUGIN_GL_GLFW=ON -DXE_UNIT_TEST=ON \
         -Dglfw3_DIR="$GLFW3_INSTALL_PREFIX/lib/cmake/glfw3" \
-        -Dglbinding_DIR="$GLBINDING_INSTALL_PREFIX" \
-        -Dglades2_DIR="$GLADES_INSTALL_PREFIX/lib/cmake/glades2" \
         -DCatch2_DIR="$CATCH2_INSTALL_PREFIX/lib/cmake/Catch2"
 }
 
@@ -207,13 +170,15 @@ coverage_gen(){
 
     # generate profile data from profile raw information
     xcrun llvm-profdata merge $PROFRAW --instr --sparse=true -o $PROFDATA
+    # xcrun llvm-profdata merge build/src/engine/scene/default.profraw --instr --sparse=true -o build/src/engine/scene/default.profdata 
 
     # show coverage report for reporting pipeline purposes
     xcrun llvm-cov report $EXECUTABLE -instr-profile=$PROFDATA  -arch=arm64 "$MODULEPATH/include"
+    # xcrun llvm-cov report build/src/engine/scene/XE.Scene.Test -instr-profile=build/src/engine/scene/default.profdata -arch=x86_64
 
     # export detailed coverage information, for visualization in dashboard-like tool
     #xcrun llvm-cov show -format=html -instr-profile=$PROFDATA $EXECUTABLE -show-line-counts-or-regions --show-branches=count --show-expansions -arch=arm64 "$MODULEPATH/include" "$MODULEPATH/src" -output-dir=$OUTPATH
-    xcrun llvm-cov show $EXECUTABLE -instr-profile=$PROFDATA -format=html -show-branches=percent -show-line-counts-or-regions -show-expansions -arch=arm64 "$MODULEPATH/include" -output-dir=$OUTPATH
+    xcrun llvm-cov show build/src/engine/scene/XE.Scene.Test -instr-profile=$PROFDATA -format=html -show-branches=percent -show-line-counts-or-regions -show-expansions -arch=arm64 "$MODULEPATH/include" -output-dir=$OUTPATH
 }
 
 coverage(){

@@ -1,18 +1,18 @@
 [submodule "dep/lodepng"]
-	path = dependencies/lodepng
+	path = src/engine/adapters/imageloader-lodepng/dependencies/lodepng
 	url = https://github.com/lvandeve/lodepng.git
 [submodule "dep/cgltf"]
-	path = dependencies/cgltf
+	path = src/demos/sandbox/dependencies/cgltf
 	url = https://github.com/jkuhlmann/cgltf.git
 [submodule "dep/glfw"]
-	path = dependencies/glfw
+	path = src/engine/adapters/platform-glfw/dependencies/glfw
 	url = https://github.com/glfw/glfw.git
 [submodule "dep/Catch2"]
-	path = dependencies/Catch2
+	path = src/engine/dependencies/Catch2
 	url = https://github.com/catchorg/Catch2.git
-[submodule "dep/glades2"]
-	path = dependencies/glades2
-	url = git@github.com:fapablazacl/glades2.git
-[submodule "dep/glbinding"]
-	path = dependencies/glbinding
-	url = https://github.com/cginternals/glbinding.git
+[submodule "src/engine/dependencies/googletest"]
+	path = src/engine/dependencies/googletest
+	url = https://github.com/google/googletest.git
+[submodule "src/engine/dependencies/benchmark"]
+	path = src/engine/dependencies/benchmark
+	url = https://github.com/google/benchmark.git

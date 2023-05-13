@@ -1,5 +1,5 @@
 
-cmake_minimum_required (VERSION 3.10)
+cmake_minimum_required (VERSION 3.16)
 
 project (XE)
 
@@ -10,26 +10,31 @@ option (XE_PLUGIN_ES2           "Include OpenGL ES 2 support" OFF)
 option (XE_PLUGIN_GL_GLFW       "Include GLFW-based Window and Context creation support (requires 'XE_PLUGIN_GL')" OFF)
 option (XE_PLUGIN_VULKAN        "Include Vulkan support" OFF)
 
-option (XE_EXAMPLE_QT5RENDERING "Include example program that shows rendering to a Qt5 widget" OFF)
-option (XE_EXAMPLE_DEMO         "Include example program that shows a tech demo" OFF)
 option (XE_EXAMPLE_SANDBOX      "Include example program that is used for various development activities" OFF)
-option (XE_UNIT_TEST            "Include unit-test suite" OFF)
 
-set (CMAKE_CXX_STANDARD 17)
-set (CMAKE_CXX_STANDARD_REQUIRED ON)
-set (CMAKE_CXX_EXTENSIONS OFF)
+# options suited for development
+option (XE_DEV_UNIT_TEST            "Enable unit test suite" ON)
+option (XE_DEV_BENCHMARK_TEST       "Enable benchmark tests" OFF)
+option (XE_DEV_WARNINGS_AS_ERRORS   "Marks all warnings as errors" OFF)
+option (XE_DEV_INSTRUMENT_COVERAGE  "Intrument code for code coverage reporting during unit tests" OFF)
+option (XE_DEV_PRECOMPILED_HEADERS  "Enable precompiled headers for internal libraries, to improve build times" OFF)
+option (XE_DEV_LINT_CLANG_TIDY      "Enable linting checks with clang-tidy" OFF)
+option (XE_DEV_IWYU                 "Enable include checks with iwyu" OFF)
 
-# Unit-Test required dependencies
-if (XE_UNIT_TEST)
-    include(CTest)
-    find_package(Catch2 REQUIRED)
-endif()
+set (CMAKE_CXX_STANDARD             17)
+set (CMAKE_CXX_STANDARD_REQUIRED    ON)
+set (CMAKE_CXX_EXTENSIONS           OFF)
 
 # TODO: Configure the version numbering mechanism
-set (XE_VERSION_MAJOR 0)
+set (XE_VERSION_MAJOR 1)
 set (XE_VERSION_MINOR 0)
 set (XE_VERSION_REVISION 0)
 set (XE_VERSION "${XE_VERSION_MAJOR}.${XE_VERSION_MINOR}.${XE_VERSION_REVISION}")
+
+if (XE_DEV_UNIT_TEST)
+    include(CTest)
+    enable_testing()
+endif()
 
 if (CMAKE_BUILD_TYPE MATCHES "Debug")
     # this macro is required by Glad.
@@ -40,66 +45,45 @@ add_definitions (-DXE_VERSION_MAJOR=${XE_VERSION_MAJOR})
 add_definitions (-DXE_VERSION_MINOR=${XE_VERSION_MINOR})
 add_definitions (-DXE_VERSION_REVISION=${XE_VERSION_REVISION})
 
-add_subdirectory ("src/XE.Core")
-add_subdirectory ("src/XE.Graphics")
-add_subdirectory ("src/XE.Scene")
-add_subdirectory ("src/XE.Input")
-add_subdirectory ("src/XE.Math")
-add_subdirectory ("src/XE.IO")
-add_subdirectory ("src/XE.Geometry")
+set (target XE.Interface)
+add_library(${target} INTERFACE)
 
-# CGLTF dependency
-include_directories("dep/cgltf")
+if (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+    set (XE_CXXFLAGS_WALL -Wall -Wextra)
+    set (XE_CXXFLAGS_WERROR -Werror)
+    set (XE_CXXFLAGS_COVERAGE -fprofile-arcs -ftest-coverage)
+    set (XE_LDFLAGS_COVERAGE )
 
-#========================================================
-# PLUGINS SECTION
-#========================================================
+elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    set (XE_CXXFLAGS_WALL -Wall -Wextra)
+    set (XE_CXXFLAGS_WERROR -Werror)
+    set (XE_CXXFLAGS_COVERAGE -fprofile-instr-generate -fcoverage-mapping)
+    set (XE_LDFLAGS_COVERAGE -fprofile-instr-generate)
 
-# include LodePNG image
-if (XE_PLUGIN_PNG)
-    add_library("lodepng" 
-        "dep/lodepng/lodepng.h"
-        "dep/lodepng/lodepng.cpp"
-    )
-
-    target_include_directories("lodepng" PUBLIC "dep/lodepng")
-
-    add_subdirectory("src/XE.Graphics.PNG")
-endif ()
-
-if (XE_PLUGIN_DIRECT3D11)
-    add_subdirectory ("src/XE.Graphics.D3D11.TestApp")
-endif ()
-
-# include glfw
-if (XE_PLUGIN_GL OR XE_PLUGIN_ES2 OR XE_PLUGIN_VULKAN) 
-    find_package(glfw3 REQUIRED)
-endif ()
-
-if (XE_PLUGIN_GL)
-    add_subdirectory ("src/XE.Graphics.GL")
-endif ()
-
-if (XE_PLUGIN_GL_GLFW)
-    add_subdirectory("src/XE.Graphics.GL.GLFW")
+elseif (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+    set (XE_CXXFLAGS_WALL /W4)
+    set (XE_CXXFLAGS_WERROR /WX)
+    set (XE_CXXFLAGS_COVERAGE )
+    set (XE_LDFLAGS_COVERAGE )
 endif()
 
-if (XE_PLUGIN_ES2)
-    add_subdirectory ("src/XE.Graphics.ES2")
+target_compile_definitions(${target} INTERFACE _CRT_SECURE_NO_WARNINGS)
+
+target_compile_options(${target} INTERFACE ${XE_CXXFLAGS_WALL})
+if (XE_DEV_WARNINGS_AS_ERRORS)
+    target_compile_options(${target} INTERFACE ${XE_CXXFLAGS_WERROR})
+endif()
+if (XE_DEV_INSTRUMENT_COVERAGE)
+    target_compile_options(${target} INTERFACE ${XE_CXXFLAGS_COVERAGE})
+    target_link_options(${target} INTERFACE ${XE_LDFLAGS_COVERAGE})
+endif() 
+
+if (XE_DEV_LINT_CLANG_TIDY)
+    set_target_properties(${target} PROPERTIES CMAKE_CXX_CLANG_TIDY "clang-tidy")
 endif()
 
-if (XE_PLUGIN_VULKAN)
-    add_subdirectory ("src/XE.Graphics.Vk.TestApp")
-endif ()
-
-
-#========================================================
-# EXAMPLES SECTION
-#========================================================
-if (XE_EXAMPLE_SANDBOX)
-    add_subdirectory("examples/XE.Sandbox")
+if (XE_DEV_IWYU)
+    set_target_properties(${target} PROPERTIES CMAKE_CXX_INCLUDE_WHAT_YOU_USE "iwyu")
 endif()
 
-if (XE_EXAMPLE_QT5RENDERING)
-    add_subdirectory("examples/Qt5Rendering")
-endif()
+add_subdirectory ("src")

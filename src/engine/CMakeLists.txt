@@ -1,0 +1,6 @@
+add_subdirectory ("dependencies")
+add_subdirectory ("core")
+add_subdirectory ("math")
+add_subdirectory ("adapters")
+add_subdirectory ("scene")
+add_subdirectory ("geometry")

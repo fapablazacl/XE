@@ -1,0 +1,66 @@
+
+scene:
+  name: simple-scene
+  resource:
+    - shader:
+      name: simple
+      module:
+      - type: vertex
+        src: shaders/simple/vertex.glsl
+      - type: fragment
+        src: shaders/simple/fragment.glsl
+    - mesh:
+      name: box
+      box:
+        position: [0.0, 0.0, 0.0]
+        size: [0.5, 0.5, 0.5]
+    - mesh:
+      name: spaceship_corridorhallway
+      src: models/spaceship_corridorhallway/scene.gltf
+  node:
+    name: root
+    node:
+    - name: light-01
+      light:
+        type: directional
+        direction: [0.0, 0.0, -1.0]
+        color: 
+          diffuse: [0.8, 0.2, 0.2, 1.0]
+    - name: light-02
+      light:
+        type: point
+        position: [0.0, 2.0, 0.0]
+        range: 4.0
+        color: 
+          diffuse: [0.2, 0.8, 0.2, 1.0]
+    - name: light-03
+      light:
+        type: spot
+        position: [0.0, 2.0, 2.0]
+        direction: [0.0, -1.0, -1.0]
+        color: 
+          diffuse: [0.2, 0.2, 0.8, 1.0]
+    - name: camera
+      camera:
+        viewport:
+          position: [0.0, 0.0]
+          size: [1.0, 1.0]
+        lookat:
+          position: [0.0, 0.0, -1.0]
+          lookat: [0.0, 0.0, 0.0]
+          up: [0.0, 1.0, 0.0]
+        perspective:
+          fov: 60.0 
+          aspect: auto
+          znear: 0.1
+          zfar: 100.0
+    - name: box-01
+      geometry:
+        mesh: box
+    - name: spaceship_corridorhallway
+      transformation:
+        - rotation-y: 90.0
+        - translation: [1.0, 0.0, 0.0]
+        - rotation-y: -90.0
+      geometry:
+        mesh: spaceship_corridorhallway
