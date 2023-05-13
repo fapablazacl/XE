@@ -10,3 +10,6 @@
 [submodule "src/engine/dependencies/benchmark"]
 	path = src/engine/dependencies/benchmark
 	url = https://github.com/google/benchmark.git
+[submodule "src/engine/plugins/imageloader-lodepng/dependencies/lodepng"]
+	path = src/engine/plugins/imageloader-lodepng/dependencies/lodepng
+	url = https://github.com/lvandeve/lodepng.git
