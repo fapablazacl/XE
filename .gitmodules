@@ -13,3 +13,7 @@
 [submodule "src/engine/plugins/imageloader-lodepng/dependencies/lodepng"]
 	path = src/engine/plugins/imageloader-lodepng/dependencies/lodepng
 	url = https://github.com/lvandeve/lodepng.git
+[submodule "src/engine/plugins/platform-glfw/dependencies/glfw"]
+	path = src/engine/plugins/platform-glfw/dependencies/glfw
+	url = https://github.com/glfw/glfw.git
+
