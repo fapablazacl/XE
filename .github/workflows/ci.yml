@@ -56,7 +56,7 @@ jobs:
       - name: Run unit tests
         run: cd build && ctest --output-on-failure
 
-  lint:
+  clang-tidy:
     needs: build
     strategy:
       fail-fast: false
@@ -77,6 +77,31 @@ jobs:
 
       - name: Build
         run: cmake --build build --parallel 4
+
+  sonar-scanner:
+    needs: build
+    runs-on: ubuntu-latest
+    env:
+      BUILD_WRAPPER_OUT_DIR: build_wrapper_output_directory # Directory where build-wrapper output will be placed
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+
+      - name: Configure
+        run: CC=clang CXX=clang++ cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DXE_DEV_WARNINGS_AS_ERRORS=OFF -DXE_DEV_UNIT_TEST=OFF -DXE_DEV_LINT_CLANG_TIDY=ON
+
+      - name: Install sonar-scanner and build-wrapper
+        uses: SonarSource/sonarcloud-github-c-cpp@v1
+      - name: Run build-wrapper
+        run: |
+          build-wrapper-linux-x86-64 --out-dir ${{ env.BUILD_WRAPPER_OUT_DIR }} cmake --build build --parallel 4
+      - name: Run sonar-scanner
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: |
+          sonar-scanner --define sonar.cfamily.build-wrapper-output="${{ env.BUILD_WRAPPER_OUT_DIR }}"
 
   coverage:
     runs-on: ubuntu-latest
