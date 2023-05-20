@@ -56,7 +56,7 @@ jobs:
       - name: Run unit tests
         run: cd build && ctest --output-on-failure
 
-  clang-tidy:
+  lint:
     needs: build
     strategy:
       fail-fast: false
