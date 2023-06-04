@@ -16,7 +16,6 @@
 #include "Asset_CGLTF.h"
 #include "Assets.h"
 #include "Scene.h"
-#include "ecs/ECS.h"
 
 namespace Sandbox {
     class Camera {

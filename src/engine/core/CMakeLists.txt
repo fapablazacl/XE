@@ -8,7 +8,7 @@ set (headers
 	"src/xe/DataType.h"
 	"src/xe/Core.h"
 	"src/xe/Timer.h"
-
+	"src/xe/FPSCounter.h"
 	"src/xe/graphics/Graphics.h"
 	"src/xe/graphics/IWindow.h"
 	"src/xe/graphics/GraphicsAPI.h" 
@@ -54,6 +54,7 @@ set (sources
     "src/xe/DataType.cpp"
 	"src/xe/Core.cpp"
 	"src/xe/Timer.cpp"
+		"src/xe/FPSCounter.cpp"
 
 	"src/xe/graphics/IWindow.cpp"	
 	"src/xe/graphics/GraphicsDevice.cpp"

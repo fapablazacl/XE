@@ -5,9 +5,9 @@
 #include <string>
 #include <xe/Timer.h>
 
-#include "FPSCounter.h"
 #include "SandboxApp.h"
 #include "Scene.h"
+#include "xe/FPSCounter.h"
 
 int main(int argc, char **argv) {
     try {

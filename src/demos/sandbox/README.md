@@ -1,4 +1,3 @@
 
-#Sandbox Project
-
-Used to test all the engine APIs (mathematical, graphics, audio, etc).
+# Alien Invasions
+Just a very simple game, Inspired by Space Invaders 
