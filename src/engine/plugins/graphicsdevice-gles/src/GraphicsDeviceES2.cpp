@@ -165,7 +165,7 @@ namespace XE {
         XE_GRAPHICS_GL_CHECK_ERROR();
     }
 
-    void GraphicsDeviceES2::beginFrame(const ClearFlags flags, const Vector4f &color, const float, const int stencil) {
+    void GraphicsDeviceES2::beginFrame(const ClearFlags flags, const Vector4 &color, const float, const int stencil) {
         const GLenum clearFlagsGL = (flags & ClearFlags::Color ? GL_COLOR_BUFFER_BIT : 0) | (flags & ClearFlags::Depth ? GL_DEPTH_BUFFER_BIT : 0) |
                                     (flags & ClearFlags::Stencil ? GL_STENCIL_BUFFER_BIT : 0);
 
