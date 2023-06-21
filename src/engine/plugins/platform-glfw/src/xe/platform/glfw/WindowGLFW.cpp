@@ -94,7 +94,7 @@ namespace XE {
             }
         }
 
-        virtual Vector2i getSize() const override {
+        virtual Vector2i getSizeInPixels() const override {
             int width, height;
 
             glfwGetWindowSize(glfwWindow, &width, &height);

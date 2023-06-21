@@ -16,7 +16,7 @@ namespace XE {
         /**
          * @brief Get the current size of the Window, in Pixels, where the X and Y fields correspond to the Width and Height of the Window, respectively
          */
-        virtual Vector2i getSize() const = 0;
+        virtual Vector2i getSizeInPixels() const = 0;
 
         virtual void setTitle(const std::string& title) = 0;
     };

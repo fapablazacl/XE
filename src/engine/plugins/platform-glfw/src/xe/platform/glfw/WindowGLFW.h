@@ -17,7 +17,7 @@ namespace XE {
     public:
         virtual ~WindowGLFW();
 
-        virtual Vector2i getSize() const = 0;
+        virtual Vector2i getSizeInPixels() const = 0;
 
         virtual GraphicsContext *getContext() const = 0;
 
