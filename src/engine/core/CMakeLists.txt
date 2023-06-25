@@ -47,6 +47,9 @@ set (headers
     "src/xe/io/StreamSource.h"
 
 	"src/xe/FPSCounter.h"
+
+	"src/xe/BasicApplication.h"
+	"src/xe/MessageBus.h" 
 )
 
 set (sources
@@ -82,6 +85,8 @@ set (sources
 	"src/xe/io/Stream.cpp"
 	"src/xe/io/StreamSource.cpp"
 	"src/xe/FPSCounter.cpp"
+	"src/xe/BasicApplication.cpp"
+	"src/xe/MessageBus.cpp"
 )
 
 add_library (${target} ${sources})
