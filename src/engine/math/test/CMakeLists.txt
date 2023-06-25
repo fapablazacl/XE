@@ -3,7 +3,7 @@ set (test_target "XE.Math.Test")
 set (test_headers "GoogleTestCommon.h")
 
 set (test_sources
-        ${test_headers}
+    ${test_headers}
     "Box.Test.cpp"
     "Common.Test.cpp"
     "Ellipsoid.Test.cpp"
@@ -21,7 +21,7 @@ set (test_sources
 )
 
 add_executable(${test_target} ${test_sources})
-target_link_libraries(${test_target} XE.Core XE.Interface gtest gmock)
+target_link_libraries(${test_target} XE.Core XE.Interface GTest::gtest GTest::gmock)
 
 # NOTE: The test name must have the same name as the command name
 add_test(NAME ${test_target} COMMAND ${test_target})

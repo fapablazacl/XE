@@ -24,7 +24,7 @@ if (XE_DEV_UNIT_TEST)
     )
 
     add_executable(${test_target} ${test_sources})
-    target_link_libraries(${test_target} gtest XE.Scene XE.Interface)
+    target_link_libraries(${test_target} GTest::gtest XE.Scene XE.Interface)
 
     # NOTE: The test name must have the same name as the command name
     add_test(NAME ${test_target} COMMAND ${test_target})

@@ -1,13 +1,6 @@
 
-# lodepng 
-add_library("lodepng" 
-    "dependencies/lodepng/lodepng.h"
-    "dependencies/lodepng/lodepng.cpp"
-)
+find_package(lodepng CONFIG REQUIRED)
 
-target_include_directories("lodepng" PUBLIC "dependencies/lodepng")
-
-# actual plugin
 set (target "XE.Graphics.PNG")
 set (sources 
     "include/xe/graphics/png/ImageLoaderPNG.h"
@@ -20,6 +13,6 @@ add_library(${target} ${sources})
 target_include_directories(${target} PUBLIC "include/")
 target_link_libraries(${target} 
     PUBLIC XE.Core 
-    PUBLIC lodepng
+    PRIVATE lodepng
     PRIVATE XE.Interface
 )
