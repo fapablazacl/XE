@@ -13,3 +13,4 @@ coverage/*
 .xenobuild/*
 venv
 .vs
+build/*

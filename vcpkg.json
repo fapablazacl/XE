@@ -1,0 +1,13 @@
+{
+  "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
+  "name": "xe",
+  "description": "XE is a framework, written in C++17 for building high-performance and cross-platform multimedia applications.",
+  "version": "1.0.0",
+  "dependencies": [
+    "gtest",
+    "benchmark",
+    "lodepng",
+    "glfw3",
+    "cgltf"
+  ]
+}
