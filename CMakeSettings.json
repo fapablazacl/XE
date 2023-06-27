@@ -47,7 +47,7 @@
           "type": "BOOL"
         }
       ],
-      "cmakeToolchain": "D:\\Development\\vcpkg\\scripts\\buildsystems\\vcpkg.cmake"
+      "cmakeToolchain": "${env.VCPKG_ROOT}\\scripts\\buildsystems\\vcpkg.cmake"
     },
     {
       "name": "x64-Release",
@@ -86,7 +86,7 @@
           "type": "BOOL"
         }
       ],
-      "cmakeToolchain": "D:\\Development\\vcpkg\\scripts\\buildsystems\\vcpkg.cmake"
+      "cmakeToolchain": "${env.VCPKG_ROOT}\\vcpkg\\scripts\\buildsystems\\vcpkg.cmake"
     }
   ]
 }
