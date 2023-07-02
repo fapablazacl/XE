@@ -34,6 +34,7 @@ set (XE_VERSION "${XE_VERSION_MAJOR}.${XE_VERSION_MINOR}.${XE_VERSION_REVISION}"
 if (XE_DEV_UNIT_TEST)
     include(CTest)
     enable_testing()
+    find_package(GTest CONFIG REQUIRED)
 endif()
 
 if (CMAKE_BUILD_TYPE MATCHES "Debug")

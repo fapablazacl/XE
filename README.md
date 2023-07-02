@@ -15,3 +15,7 @@ XE is a framework, written in C++17 for building high-performance and cross-plat
 * Visual C++
 * GCC
 * clang 
+
+## Building
+XE uses CMake as it build system generator, and vcpkg for dependency management.
+    cmake -B build -S . -DCMAKE_TOOLCHAIN_FILE=D:\src\vcpkg\scripts\buildsystems\vcpkg.cmake -G "Visual Studio 17 2022"

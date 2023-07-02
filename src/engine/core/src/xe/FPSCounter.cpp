@@ -4,18 +4,20 @@
 
 #include "FPSCounter.h"
 
-bool FPSCounter::frame() {
-    const int milliseconds = XE::Timer::getTick() - lastTime;
+namespace XE {
+    bool FPSCounter::frame() {
+        const int milliseconds = XE::Timer::getTick() - lastTime;
 
-    if (milliseconds < 1000) {
-        currentFrames++;
+        if (milliseconds < 1000) {
+            currentFrames++;
 
-        return false;
-    } else {
-        fps = currentFrames;
-        currentFrames = 0;
-        lastTime = XE::Timer::getTick();
+            return false;
+        } else {
+            fps = currentFrames;
+            currentFrames = 0;
+            lastTime = XE::Timer::getTick();
 
-        return true;
+            return true;
+        }
     }
 }

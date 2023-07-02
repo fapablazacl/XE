@@ -13,9 +13,9 @@ InputSystem::~InputSystem() {}
 
 void InputSystem::handleMessage(const Message &message) {
     if (message.type == Message::SYSTEM_UPDATE) {
-        inputManager->poll();
+        mInputManager->poll();
 
-        const auto status = inputManager->getKeyboardStatus();
+        const auto status = mInputManager->getKeyboardStatus();
 
         if (status.isPressed(XE::KeyCode::KeyEsc)) {
             // TODO: Post game exit action
@@ -27,5 +27,5 @@ void InputSystem::handleMessage(const Message &message) {
 void InputSystem::setup(XE::InputManager *inputManager) {
     assert(inputManager);
 
-    this->inputManager = inputManager;
+    this->mInputManager = inputManager;
 }

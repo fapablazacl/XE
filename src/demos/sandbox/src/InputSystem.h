@@ -22,7 +22,7 @@ public:
 private:
     Coordinator &coordinator;
 
-    XE::InputManager *inputManager;
+    XE::InputManager *mInputManager = nullptr;
 };
 
 #endif // XE_INPUTSYSTEM_H

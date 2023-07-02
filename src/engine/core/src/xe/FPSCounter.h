@@ -4,19 +4,21 @@
 #ifndef XE_FPSCOUNTER_H
 #define XE_FPSCOUNTER_H
 
-#include "xe/Timer.h"
+#include "Timer.h"
 
-class FPSCounter {
-public:
-    //! must be called once per frame
-    bool frame();
+namespace XE {
+    class FPSCounter {
+    public:
+        //! must be called once per frame
+        bool frame();
 
-    int getFPS() const { return fps; }
+        int getFPS() const { return fps; }
 
-private:
-    int lastTime = XE::Timer::getTick();
-    int currentFrames = 0;
-    int fps = 0;
-};
+    private:
+        int lastTime = XE::Timer::getTick();
+        int currentFrames = 0;
+        int fps = 0;
+    };
+}
 
 #endif // XE_FPSCOUNTER_H

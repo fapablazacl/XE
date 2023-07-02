@@ -10,7 +10,7 @@
 #include <map>
 
 namespace XE {
-    void static errorCallback(int error, const char *description) { std::cout << "errorCallback: " << error << ": " << description << std::endl; }
+    void static errorCallback(int error, const char *description) { std::cout << "GLFW errorCallback: " << error << ": " << description << std::endl; }
 
     static std::map<int, int> mapToHints(const GraphicsContext::Descriptor &descriptor) {
         std::map<int, int> hints;
@@ -94,12 +94,16 @@ namespace XE {
             }
         }
 
-        virtual Vector2i getSize() const override {
+        virtual Vector2i getSizeInPixels() const override {
             int width, height;
 
             glfwGetWindowSize(glfwWindow, &width, &height);
 
             return {width, height};
+        }
+
+        void setTitle(const std::string &title) override {
+            ::glfwSetWindowTitle(glfwWindow, title.c_str());
         }
 
         virtual GraphicsContext *getContext() const override { return graphicsContext.get(); }

@@ -1,6 +1,6 @@
 
 # CGLTF dependency
-include_directories("dependencies/cgltf")
+find_path(CGLTF_INCLUDE_DIRS "cgltf.h")
 
 set (target "XE.Sandbox")
 set (src
@@ -30,4 +30,5 @@ set (src
 
 add_executable (${target} ${src})
 
+target_include_directories(${target} PRIVATE ${CGLTF_INCLUDE_DIRS})
 target_link_libraries (${target} XE.Interface XE.Core XE.Graphics.GL XE.Platform.GLFW XE.Graphics.PNG)
