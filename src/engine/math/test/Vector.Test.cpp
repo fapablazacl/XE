@@ -4,6 +4,14 @@
 #include "xe/math/Vector.h"
 #include <sstream>
 
+TEST(VectorTest, DefaultConstructorShouldInitializeToZeroes) {
+    const XE::Vector3 v;
+
+    EXPECT_EQ(v.X, 0.0f);
+    EXPECT_EQ(v.Y, 0.0f);
+    EXPECT_EQ(v.Z, 0.0f);
+}
+
 TEST(VectorTest, ConstructorShouldSetupTheVectorComponentsCorrectly) {
     const XE::Vector3 v = {1.0f, 2.0f, 3.0f};
 
@@ -18,6 +26,36 @@ TEST(VectorTest, ConstructorShouldSetupTheVectorComponentsCorrectly) {
     EXPECT_EQ(v[0], 1.0f);
     EXPECT_EQ(v[1], 2.0f);
     EXPECT_EQ(v[2], 3.0f);
+}
+
+TEST(VectorTest, ConstructorFromPointerShouldSetupTheVectorComponentsCorrectly) {
+    const float data[] = {1.0f, 2.0f, 3.0};
+    const XE::Vector3 v{data};
+
+    EXPECT_EQ(v.X, 1.0f);
+    EXPECT_EQ(v.Y, 2.0f);
+    EXPECT_EQ(v.Z, 3.0f);
+}
+
+TEST(VectorTest, DataMethodShouldReturnAnAddressToTheFirstComponent) {
+    XE::Vector3 varv;
+    EXPECT_NE(varv.data(), nullptr);
+    EXPECT_EQ(varv.data(), &varv.values[0]);
+}
+
+TEST(VectorTest, ConstDataMethodShouldReturnAnAddressToTheFirstComponent) {
+    const XE::Vector3 constv;
+    EXPECT_NE(constv.data(), nullptr);
+    EXPECT_EQ(constv.data(), &constv.values[0]);
+}
+
+TEST(VectorTest, CastMethodShouldConvertUnderlyingType) {
+    const XE::Vector3 vf{1.0f, 2.0f, 3.0f};
+    const auto vd = vf.cast<double>();
+
+    EXPECT_EQ(vd.X, 1.0);
+    EXPECT_EQ(vd.Y, 2.0);
+    EXPECT_EQ(vd.Z, 3.0);
 }
 
 TEST(VectorTest, ComparisonOperatorsShouldCheckVectorComponentsForEqualityAndInequality) {
@@ -86,6 +124,26 @@ TEST(VectorTest, OperatorMulShouldMultiplyComponentWise) {
 
     EXPECT_EQ((XE::Vector3(1.0f) *= v1), v1);
     EXPECT_EQ((XE::Vector3(1.0f) *= v2), v2);
+}
+
+TEST(VectorTest, OperatorMulAndAssignByScalarShouldMultiplyComponentWise) {
+    XE::Vector3 v1 = {1.0f, -2.0f, 3.0f};
+
+    v1 *= -1.0f;
+
+    EXPECT_EQ(v1.X, -1.0f);
+    EXPECT_EQ(v1.Y, 2.0f);
+    EXPECT_EQ(v1.Z, -3.0f);
+}
+
+TEST(VectorTest, OperatorDivAndAssignByScalarShouldMultiplyComponentWise) {
+    XE::Vector3 v1 = {2.0f, -2.0f, 4.0f};
+
+    v1 /= 2.0f;
+
+    EXPECT_EQ(v1.X, 1.0f);
+    EXPECT_EQ(v1.Y, -1.0f);
+    EXPECT_EQ(v1.Z, 2.0f);
 }
 
 TEST(VectorTest, OperatorDivShouldDivideComponentWise) {
