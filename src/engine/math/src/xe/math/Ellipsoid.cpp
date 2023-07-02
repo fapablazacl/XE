@@ -1,5 +1,5 @@
 
-#include <xe/math/Ellipsoid.h>
+#include "Ellipsoid.h"
 
 namespace XE {
     template struct TEllipsoid<float>;

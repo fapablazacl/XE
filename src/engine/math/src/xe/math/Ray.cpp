@@ -1,5 +1,5 @@
 
-#include <xe/math/Ray.h>
+#include "Ray.h"
 
 namespace XE {
     template struct TRay<float>;

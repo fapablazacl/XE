@@ -1,5 +1,5 @@
 
-#include "../include/xe/math/Quaternion.h"
+#include "Quaternion.h"
 
 namespace XE {
     template struct TQuaternion<float>;

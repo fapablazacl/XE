@@ -1,5 +1,5 @@
 
-#include <xe/math/Triangle.h>
+#include "Triangle.h"
 
 namespace XE {
     template struct TTriangle<float>;

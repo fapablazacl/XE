@@ -1,5 +1,5 @@
 
-#include <xe/math/Sphere.h>
+#include "Sphere.h"
 
 namespace XE {
     template struct TSphere<float>;

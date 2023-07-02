@@ -1,5 +1,5 @@
 
-#include "../include/xe/math/Vector.h"
+#include "Vector.h"
 
 namespace XE {
     template struct TVector<std::int32_t, 2>;
