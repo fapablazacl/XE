@@ -5,4 +5,3 @@
 #include "FileStreamSource.h"
 #include "MemoryStream.h"
 #include "StreamSource.h"
-#include "StreamSourceImpl.h"
