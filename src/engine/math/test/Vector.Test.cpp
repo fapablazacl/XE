@@ -228,6 +228,16 @@ TEST(VectorTest, TripleDotProductChangesSignFromParameterSwapping) {
 }
 
 
+TEST(VectorTest, TwoDimensionalCrossProductShouldReturnCrossVectorLength) {
+    const XE::Vector2 v1 = {2.0f, 0.0f};
+    const XE::Vector2 v2 = {0.0f, 2.0f};
+    const XE::Vector2 v3 = {0.0f, -1.0f};
+
+    EXPECT_EQ(cross(v1, v2), 4.0f);
+    EXPECT_EQ(cross(v1, v3), -2.0f);
+}
+
+
 TEST(VectorTest, ThreeDimensionalCrossProductShouldPerformCorrectlyForUnitVectors) {
     const XE::Vector3 v1 = {1.0f, 0.0f, 0.0f};
     const XE::Vector3 v2 = {0.0f, 1.0f, 0.0f};
