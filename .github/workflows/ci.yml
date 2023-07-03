@@ -27,18 +27,18 @@ jobs:
         config:
         - os: ubuntu-latest
           generator: Unix Makefiles
-          prologue: sudo apt-get update && sudo apt-get install libx11-dev libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libgl-dev
+          prologue: sudo apt-get update && sudo apt-get install libx11-dev libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libgl-dev xorg-dev libglu1-mesa-dev pkg-config
           vcpkgCMakeToolchainFile: "/usr/local/share/vcpkg/scripts/buildsystems/vcpkg.cmake"
 
         - os: macos-latest
           generator: Unix Makefiles
           prologue: ""
-          vcpkgCMakeToolchainFile: ""
+          vcpkgCMakeToolchainFile: "/usr/local/share/vcpkg/scripts/buildsystems/vcpkg.cmake"
 
         - os: windows-latest
           generator: NMake Makefiles
           prologue: .\Invoke-Environment.ps1 "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
-          vcpkgCMakeToolchainFile: ""
+          vcpkgCMakeToolchainFile: "C:\vcpkg\scripts\buildsystems\vcpkg.cmake"
           
     runs-on: ${{ matrix.config.os }}
     steps:
