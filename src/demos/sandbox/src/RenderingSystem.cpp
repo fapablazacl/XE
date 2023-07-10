@@ -235,8 +235,10 @@ namespace Sandbox {
 
     void RenderingSystem::initializeShaders() {
         // setup program shader
-        const ProgramDescriptor programDescriptor = {
-            {{ShaderType::Vertex, loadTextFile("media/shaders/simple/vertex.glsl")}, {ShaderType::Fragment, loadTextFile("media/shaders/simple/fragment.glsl")}}};
+        const ProgramDescriptor programDescriptor = {{
+            {ShaderType::Vertex, loadTextFile("assets/shaders/gl4/gl4-main.vert")},
+            {ShaderType::Fragment, loadTextFile("assets/shaders/gl4/gl4-main.frag")}
+        }};
 
         m_program = m_graphicsDevice->createProgram(programDescriptor);
 

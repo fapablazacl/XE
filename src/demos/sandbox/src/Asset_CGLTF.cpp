@@ -171,6 +171,22 @@ namespace Sandbox {
         }
     }
 
+    static std::string to_string(cgltf_result result) {
+        switch (result) {
+        case cgltf_result_data_too_short: return "cgltf_result_data_too_short";
+        case cgltf_result_unknown_format: return "cgltf_result_unknown_format";
+        case cgltf_result_invalid_json: return "cgltf_result_invalid_json";
+        case cgltf_result_invalid_gltf: return "cgltf_result_invalid_gltf";
+        case cgltf_result_invalid_options: return "cgltf_result_invalid_options";
+        case cgltf_result_file_not_found: return "cgltf_result_file_not_found";
+        case cgltf_result_io_error: return "cgltf_result_io_error";
+        case cgltf_result_out_of_memory: return "cgltf_result_out_of_memory";
+        case cgltf_result_legacy_gltf: return "cgltf_result_legacy_gltf";
+        case cgltf_result_success: return "cgltf_result_success";
+        }
+    }
+
+
     void Asset_CGLTF::load(const std::string &filePath) {
         cgltf_options options = {};
 
@@ -181,6 +197,9 @@ namespace Sandbox {
         if (result == cgltf_result_success) {
             // load the binary data
             cgltf_load_buffers(&options, mData, filePath.c_str());
+        }
+        else {
+            throw std::runtime_error("CGLTF: Couldn't load file '" + filePath + "'. Error code: " + to_string(result));
         }
     }
 
