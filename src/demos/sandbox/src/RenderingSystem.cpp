@@ -287,6 +287,8 @@ namespace Sandbox {
     }
 
     std::map<std::string, GeoObject> RenderingSystem::loadGeoObject(const std::string &sceneFilePath) {
+        mLogger->log("Loading scene model '" + sceneFilePath + "' ...");
+
         std::map<std::string, GeoObject> objectsByName;
 
         mAssetGLTF.load(sceneFilePath);
