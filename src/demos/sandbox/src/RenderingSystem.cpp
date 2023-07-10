@@ -81,7 +81,9 @@ namespace Sandbox {
     }
 
 
-    RenderingSystem::RenderingSystem(Coordinator &coordinator) : coordinator(coordinator) {
+    RenderingSystem::RenderingSystem(ILogger *logger) {
+        mLogger = logger;
+
         sceneDescription = {{
             SceneModel("assets/models/cube.fbx")
         }};
@@ -89,17 +91,20 @@ namespace Sandbox {
 
 
     void RenderingSystem::Initialize() {
-        std::cout << "Initializing Engine ..." << std::endl;
+        mLogger->log("Initializing");
 
         GraphicsContext::Descriptor descriptor;
         descriptor.backend = XE::GraphicsBackend::GL_41;
 
+
         m_window = WindowGLFW::create(descriptor, "XE.SandboxApp", {1024, 768}, false);
+        mLogger->log("Created GLFW Window");
 
         m_graphicsDevice = std::make_unique<GraphicsDeviceGL>(m_window->getContext());
+        mLogger->log("Created GraphicsDevice");
+
         m_inputManager = m_window->getInputManager();
 
-        std::cout << "Loading assets ..." << std::endl;
         m_streamSource = std::make_unique<FileStreamSource>(".");
 
         initializeShaders();
@@ -202,15 +207,14 @@ namespace Sandbox {
             return it->second;
         }
 
-        std::cout << "SandboxApp::CreateFileTexture: Loading texture from file " << filePath << " ..." << std::endl;
-
         auto stream = m_streamSource->open(filePath);
-
         auto imagePtr = m_imageLoaderPNG.load(stream.get());
 
         Texture2D *texture = m_graphicsDevice->createTexture2D(PixelFormat::R8G8B8A8, imagePtr->getSize(), imagePtr->getFormat(), DataType::UInt8, imagePtr->getPointer());
 
         mTexturesByName.insert({filePath, texture});
+
+        mLogger->log("Loaded texture map '" + filePath + "'");
 
         return texture;
     }
@@ -230,13 +234,13 @@ namespace Sandbox {
     }
 
     void RenderingSystem::initializeShaders() {
-        std::cout << "Loading shaders" << std::endl;
-
         // setup program shader
         const ProgramDescriptor programDescriptor = {
             {{ShaderType::Vertex, loadTextFile("media/shaders/simple/vertex.glsl")}, {ShaderType::Fragment, loadTextFile("media/shaders/simple/fragment.glsl")}}};
 
         m_program = m_graphicsDevice->createProgram(programDescriptor);
+
+        mLogger->log("Created shader program");
     }
 
     std::string RenderingSystem::loadTextFile(const std::string &path) const {
@@ -244,7 +248,7 @@ namespace Sandbox {
         fs.open(path.c_str(), std::ios_base::in);
 
         if (!fs.is_open()) {
-            throw std::runtime_error("Shared source file wasn't found");
+            throw std::runtime_error("Couldn't load text file '" + path + "'. Check that the file exists.");
         }
 
         std::string content;
@@ -260,6 +264,8 @@ namespace Sandbox {
             }
         }
 
+        mLogger->log("Loaded text file content " + path);
+
         return content;
     }
 
@@ -271,12 +277,9 @@ namespace Sandbox {
 
         const std::string filePath = sceneDescription.models[0].filePath;
 
-        std::cout << "Loading " << filePath << " model" << std::endl;
-
         mObjectsByNameMap = loadGeoObject(filePath);
 
         m_texture = createFileTexture("media/materials/Tiles_Azulejos_004_SD/Tiles_Azulejos_004_COLOR.png");
-
         m_material = std::make_unique<XE::Material>();
         m_material->layers[0].texture = m_texture;
         m_material->layerCount = 1;
@@ -299,6 +302,8 @@ namespace Sandbox {
 
             objectsByName[mesh.name] = std::move(geoObject);
         }
+
+        mLogger->log("Loaded scene model '" + sceneFilePath + "'");
 
         return objectsByName;
     }
@@ -340,11 +345,5 @@ namespace Sandbox {
         subsetDescriptor.buffers = {coordBuffer, colorBuffer, normalBuffer, texCoordBuffer};
 
         return {m_graphicsDevice->createSubset(subsetDescriptor), meshPrimitive.getEnvelope()};
-    }
-
-    void RenderingSystem::handleMessage(const Message &message) {
-        if (message.type == Message::SYSTEM_UPDATE) {
-            // TODO: Perform rendering?
-        }
     }
 } // namespace Sandbox

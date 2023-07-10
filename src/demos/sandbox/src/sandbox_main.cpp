@@ -1,17 +1,14 @@
 
 #include <array>
 #include <iostream>
-#include <map>
-#include <string>
 #include <xe/Timer.h>
 
 #include "SandboxApp.h"
-#include "Scene.h"
-#include "xe/FPSCounter.h"
+#include <xe/FPSCounter.h>
 
 int main(int argc, char **argv) {
     try {
-        FPSCounter fpsCounter;
+        XE::FPSCounter fpsCounter;
 
         auto app = std::make_unique<Sandbox::SandboxApp>(argc, argv);
         app->initialize();
@@ -32,8 +29,12 @@ int main(int argc, char **argv) {
             }
         }
     } catch (const std::exception &exp) {
-        std::cout << exp.what() << std::endl;
+        std::cerr << "Unmanaged exception caught" << std::endl;
+        std::cerr << "    type: \"" << typeid(exp).name() << "\"" << std::endl;
+        std::cerr << "    message: \"" << exp.what() << "\"" << std::endl;
+
+        return EXIT_FAILURE;
     }
 
-    return 0;
+    return EXIT_SUCCESS;
 }

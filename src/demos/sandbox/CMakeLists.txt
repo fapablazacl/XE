@@ -14,10 +14,7 @@ set (src
 	"src/Asset_CGLTF.cpp"
 	"src/Asset_CGLTF.h"
 	"src/Scene.h"
-	"src/Components.h"
-	"src/PhysicsSystem.h"
-	"src/PhysicsSystem.cpp"
-	"src/RenderingSystem.h"
+		"src/RenderingSystem.h"
 	"src/RenderingSystem.cpp"
 	"src/Camera.cpp" 
 	"src/Camera.h" 
@@ -26,7 +23,8 @@ set (src
 	"src/SceneNode.cpp"
 	"src/SceneNode.h"
 	"src/Util.cpp"
-	"src/Util.h" src/DemoApp.h src/DemoRenderable.cpp src/DemoRenderable.h)
+	"src/Util.h"
+		src/DemoApp.h src/DemoRenderable.cpp src/DemoRenderable.h src/Logger.cpp src/Logger.h)
 
 add_executable (${target} ${src})
 

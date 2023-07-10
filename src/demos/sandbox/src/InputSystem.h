@@ -1,27 +1,23 @@
 
+#pragma once
+
 #ifndef XE_INPUTSYSTEM_H
 #define XE_INPUTSYSTEM_H
-
-#include "ecs/ECS.h"
 
 namespace XE {
     class InputManager;
 }
 
-class InputSystem : public System {
+class InputSystem {
 public:
-    explicit InputSystem(Coordinator &coordinator);
+    explicit InputSystem();
 
-    ~InputSystem() override;
-
-    void handleMessage(const Message &message) override;
+    ~InputSystem();
 
 public:
     void setup(XE::InputManager *inputManager);
 
 private:
-    Coordinator &coordinator;
-
     XE::InputManager *mInputManager = nullptr;
 };
 

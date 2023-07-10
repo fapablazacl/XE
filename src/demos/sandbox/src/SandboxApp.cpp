@@ -1,59 +1,25 @@
 
 
 #include "SandboxApp.h"
-#include "Components.h"
-
-#include <random>
 
 namespace Sandbox {
-    SandboxApp::SandboxApp(int, char **) {}
+    SandboxApp::SandboxApp(int, char **) {
+        renderingSystem = std::make_shared<RenderingSystem>(&renderingSystemLogger);
+    }
 
     void SandboxApp::initialize() {
-        initializeECS();
-        createParticles();
+        renderingSystem->Initialize();
     }
 
-    void SandboxApp::update(const float seconds) { physicsSystem->update(seconds); }
-
-    void SandboxApp::render() { ++frames; }
-
-    bool SandboxApp::shouldClose() const { return !(running && frames < maxFrames); }
-
-    void SandboxApp::initializeECS() {
-        coordinator.registerComponent<Gravity>();
-        coordinator.registerComponent<RigidBody>();
-        coordinator.registerComponent<Transform>();
-
-        physicsSystem = coordinator.registerSystem<PhysicsSystem>();
-        renderingSystem = coordinator.registerSystem<RenderingSystem>();
-        inputSystem = coordinator.registerSystem<InputSystem>();
-
-        Signature signature;
-        signature.set(coordinator.getComponentType<Gravity>(), true);
-        signature.set(coordinator.getComponentType<RigidBody>(), true);
-        signature.set(coordinator.getComponentType<Transform>(), true);
+    void SandboxApp::update(const float seconds) {
+        renderingSystem->Update(seconds);
     }
 
-    void SandboxApp::createParticles() {
-        std::vector<Entity> entities(MAX_ENTITIES);
-
-        std::default_random_engine randomEngine;
-        std::uniform_real_distribution<float> randPosition(-100.0f, 100.0f);
-        std::uniform_real_distribution<float> randRotation(0.0f, 3.0);
-        std::uniform_real_distribution<float> randScale(3.0f, 5.0f);
-        std::uniform_real_distribution<float> randGravity(-10.0f, -1.0f);
-
-        const float scale = randScale(randomEngine);
-
-        for (Entity &entity : entities) {
-            entity = coordinator.createEntity();
-
-            coordinator.addComponent(entity, Gravity{XE::Vector3{0.0f, randGravity(randomEngine), 0.0f}});
-            coordinator.addComponent(entity, RigidBody{XE::Vector3{0.0f, 0.0f, 0.0f}, XE::Vector3{0.0f, 0.0f, 0.0f}});
-            coordinator.addComponent(entity,
-                                     Transform{XE::Vector3{randPosition(randomEngine), randPosition(randomEngine), randPosition(randomEngine)},
-                                               XE::Vector3{randRotation(randomEngine), randRotation(randomEngine), randRotation(randomEngine)}, XE::Vector3{scale, scale, scale}});
-        }
+    void SandboxApp::render() {
+        renderingSystem->Render();
     }
 
+    bool SandboxApp::shouldClose() const {
+        return renderingSystem->ShouldClose();
+    }
 } // namespace Sandbox

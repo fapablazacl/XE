@@ -16,6 +16,7 @@
 #include "Asset_CGLTF.h"
 #include "Assets.h"
 #include "Scene.h"
+#include "Logger.h"
 
 namespace Sandbox {
     class Camera {
@@ -40,11 +41,9 @@ namespace Sandbox {
         std::vector<std::pair<XE::Subset *, XE::SubsetEnvelope>> subsets;
     };
 
-    class RenderingSystem : public System {
+    class RenderingSystem {
     public:
-        explicit RenderingSystem(Coordinator &coordinator);
-
-        void handleMessage(const Message &message) override;
+        explicit RenderingSystem(ILogger *logger);
 
         void Initialize();
 
@@ -78,7 +77,7 @@ namespace Sandbox {
         std::pair<XE::Subset *, XE::SubsetEnvelope> createSubset(const MeshPrimitive &meshPrimitive);
 
     private:
-        Coordinator &coordinator;
+        ILogger *mLogger = nullptr;
 
         SceneDescription sceneDescription;
 
