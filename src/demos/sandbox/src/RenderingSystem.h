@@ -41,6 +41,10 @@ namespace Sandbox {
         std::vector<std::pair<XE::Subset *, XE::SubsetEnvelope>> subsets;
     };
 
+    struct LoadObjectParams {
+        std::string meshName;
+    };
+
     class RenderingSystem {
     public:
         explicit RenderingSystem(ILogger *logger);
@@ -74,6 +78,8 @@ namespace Sandbox {
 
         std::map<std::string, GeoObject> loadGeoObject(const std::string &sceneFilePath);
 
+        GeoObject loadObject(const std::string &sceneFilePath, const LoadObjectParams &params);
+
         std::pair<XE::Subset *, XE::SubsetEnvelope> createSubset(const MeshPrimitive &meshPrimitive);
 
     private:
@@ -91,9 +97,6 @@ namespace Sandbox {
         std::map<std::string, XE::Texture2D *> mTexturesByName;
 
         Asset_CGLTF mAssetGLTF;
-
-        std::unique_ptr<XE::Material> m_material;
-        XE::Texture2D *m_texture = nullptr;
 
         std::unique_ptr<XE::FileStreamSource> m_streamSource;
 

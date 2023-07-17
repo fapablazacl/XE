@@ -183,6 +183,7 @@ namespace Sandbox {
         case cgltf_result_out_of_memory: return "cgltf_result_out_of_memory";
         case cgltf_result_legacy_gltf: return "cgltf_result_legacy_gltf";
         case cgltf_result_success: return "cgltf_result_success";
+        default: return "unknown enum" + std::to_string(result);
         }
     }
 

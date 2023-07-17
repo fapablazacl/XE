@@ -2,6 +2,7 @@
 #pragma once
 
 #include <tuple>
+#include <set>
 
 #include "GraphicsAPI.h"
 #include "PixelFormat.h"

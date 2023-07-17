@@ -21,7 +21,9 @@ namespace XE {
             break;
         }
 
-        assert(m_fileHandle);
+        if (!m_fileHandle) {
+            throw std::runtime_error("Couldn't open file \"" + fileName + "\".");
+        }
     }
 
     FileStream::~FileStream() {}

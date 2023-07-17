@@ -85,7 +85,7 @@ namespace Sandbox {
         mLogger = logger;
 
         sceneDescription = {{
-            SceneModel("assets/models/cube.fbx")
+            SceneModel(std::string(XE_SANDBOX_ROOT_PATH) + "/assets/models/textured-cube.glb")
         }};
     }
 
@@ -136,12 +136,6 @@ namespace Sandbox {
     void RenderingSystem::Render() {
         m_graphicsDevice->beginFrame(ClearFlags::All, {0.2f, 0.2f, 0.8f, 1.0f}, 1.0f, 0);
         m_graphicsDevice->setProgram(m_program);
-
-        Uniform textureUniform = {"texture0", DataType::Int32, XE::UniformDimension::D1, 1};
-        int textureUnit = 0;
-
-        m_graphicsDevice->applyUniform(&textureUniform, 1, reinterpret_cast<void *>(&textureUnit));
-        m_graphicsDevice->setMaterial(m_material.get());
 
         renderScene();
 
@@ -236,8 +230,8 @@ namespace Sandbox {
     void RenderingSystem::initializeShaders() {
         // setup program shader
         const ProgramDescriptor programDescriptor = {{
-            {ShaderType::Vertex, loadTextFile("assets/shaders/gl4/gl4-main.vert")},
-            {ShaderType::Fragment, loadTextFile("assets/shaders/gl4/gl4-main.frag")}
+            {ShaderType::Vertex, loadTextFile(std::string(XE_SANDBOX_ROOT_PATH) + "/assets/shaders/gl4/gl4-main.vert")},
+            {ShaderType::Fragment, loadTextFile(std::string(XE_SANDBOX_ROOT_PATH) + "/assets/shaders/gl4/gl4-main.frag")}
         }};
 
         m_program = m_graphicsDevice->createProgram(programDescriptor);
@@ -280,13 +274,37 @@ namespace Sandbox {
         const std::string filePath = sceneDescription.models[0].filePath;
 
         mObjectsByNameMap = loadGeoObject(filePath);
-
-        m_texture = createFileTexture("media/materials/Tiles_Azulejos_004_SD/Tiles_Azulejos_004_COLOR.png");
-        m_material = std::make_unique<XE::Material>();
-        m_material->layers[0].texture = m_texture;
-        m_material->layerCount = 1;
-        m_material->renderState.depthTest = true;
     }
+
+
+    GeoObject RenderingSystem::loadObject(const std::string& sceneFilePath, const LoadObjectParams& params) {
+        mLogger->log("Loading mesh " + params.meshName + " from GLTF scene " + sceneFilePath);
+
+        std::map<std::string, GeoObject> objectsByName;
+
+        mAssetGLTF.load(sceneFilePath);
+
+        auto meshes = mAssetGLTF.getMeshes();
+
+        for (const auto &mesh : meshes) {
+            if (mesh.name != params.meshName) {
+                continue;
+            }
+
+            GeoObject geoObject = {};
+
+            for (const auto &primitive : mesh.primitives) {
+                geoObject.subsets.push_back(createSubset(primitive));
+            }
+
+            objectsByName[mesh.name] = std::move(geoObject);
+        }
+
+        mLogger->log("Loaded scene model '" + sceneFilePath + "'");
+
+        return objectsByName[params.meshName];
+    }
+
 
     std::map<std::string, GeoObject> RenderingSystem::loadGeoObject(const std::string &sceneFilePath) {
         mLogger->log("Loading scene model '" + sceneFilePath + "' ...");

@@ -40,18 +40,19 @@ namespace demo {
 
         mSimpleProgram = createSimpleProgram(backend);
     }
+
     XE::Program *DemoApp::createSimpleProgram(const XE::GraphicsBackend backend) {
         if (backend == XE::GraphicsBackend::GL_41) {
-            const std::string simpleVS = loadTextFile("shaders/gl4/gl4-main.vert");
-            const std::string simpleFS = loadTextFile("shaders/gl4/gl4-main.frag");
+            const std::string simpleVS = loadTextFile(std::string(XE_SANDBOX_ROOT_PATH) + "/shaders/gl4/gl4-main.vert");
+            const std::string simpleFS = loadTextFile(std::string(XE_SANDBOX_ROOT_PATH) + "/shaders/gl4/gl4-main.frag");
 
             XE::ProgramDescriptor desc = makeSimpleProgramDesc(simpleVS, simpleFS);
             XE::Program *program = mGraphicsDevice->createProgram(desc);
 
             return program;
         } else {
-            const std::string simpleVS = loadTextFile("shaders/es/es-main.vert");
-            const std::string simpleFS = loadTextFile("shaders/es/es-main.frag");
+            const std::string simpleVS = loadTextFile(std::string(XE_SANDBOX_ROOT_PATH) + "/shaders/es/es-main.vert");
+            const std::string simpleFS = loadTextFile(std::string(XE_SANDBOX_ROOT_PATH) + "/shaders/es/es-main.frag");
 
             XE::ProgramDescriptor desc = makeSimpleProgramDesc(simpleVS, simpleFS);
             XE::Program *program = mGraphicsDevice->createProgram(desc);
