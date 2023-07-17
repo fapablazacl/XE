@@ -45,6 +45,11 @@
           "name": "XE_DEV_PRECOMPILED_HEADERS",
           "value": "True",
           "type": "BOOL"
+        },
+        {
+          "name": "XE_PLUGIN_DIRECT3D11",
+          "value": "False",
+          "type": "BOOL"
         }
       ],
       "cmakeToolchain": "${env.VCPKG_ROOT}\\scripts\\buildsystems\\vcpkg.cmake"
