@@ -1,6 +1,7 @@
 
 
 #include "RenderingSystem.h"
+#include "AssetManager.h"
 #include "Asset_CGLTF.h"
 #include "Assets.h"
 #include "Scene.h"
@@ -81,8 +82,12 @@ namespace Sandbox {
     }
 
 
-    RenderingSystem::RenderingSystem(ILogger *logger) {
+    RenderingSystem::RenderingSystem(ILogger *logger, AssetManager *assetManager) {
+        assert(logger);
+        assert(assetManager);
+
         mLogger = logger;
+        mAssetManager = assetManager;
 
         sceneDescription = {{
             SceneModel(std::string(XE_SANDBOX_ROOT_PATH) + "/assets/models/textured-cube.glb")
@@ -230,14 +235,15 @@ namespace Sandbox {
     void RenderingSystem::initializeShaders() {
         // setup program shader
         const ProgramDescriptor programDescriptor = {{
-            {ShaderType::Vertex, loadTextFile(std::string(XE_SANDBOX_ROOT_PATH) + "/assets/shaders/gl4/gl4-main.vert")},
-            {ShaderType::Fragment, loadTextFile(std::string(XE_SANDBOX_ROOT_PATH) + "/assets/shaders/gl4/gl4-main.frag")}
+            {ShaderType::Vertex, mAssetManager->loadString(ASSET_SHADER_MAIN_VERT).value()},
+            {ShaderType::Fragment, mAssetManager->loadString(ASSET_SHADER_MAIN_FRAG).value()}
         }};
 
         m_program = m_graphicsDevice->createProgram(programDescriptor);
 
         mLogger->log("Created shader program");
     }
+
 
     std::string RenderingSystem::loadTextFile(const std::string &path) const {
         std::fstream fs;

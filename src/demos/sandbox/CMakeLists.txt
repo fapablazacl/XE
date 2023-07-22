@@ -24,9 +24,15 @@ set (src
 	"src/SceneNode.h"
 	"src/Util.cpp"
 	"src/Util.h"
-		src/DemoApp.h src/DemoRenderable.cpp src/DemoRenderable.h src/Logger.cpp src/Logger.h)
+	"src/AssetManager.h"
+	"src/AssetManager.cpp"
+	"src/DemoApp.h" 
+	"src/DemoRenderable.cpp" 
+	"src/DemoRenderable.h" 
+	"src/Logger.cpp" 
+	"src/Logger.h")
 
-add_executable (${target} ${src})
+add_executable (${target} ${src} )
 
 get_filename_component(PARENT_DIR "${CMAKE_CURRENT_LIST_DIR}" DIRECTORY)
 target_compile_definitions(${target} PRIVATE XE_SANDBOX_ROOT_PATH="${PARENT_DIR}/sandbox")

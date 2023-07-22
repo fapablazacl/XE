@@ -6,7 +6,9 @@
 
 #include "RenderingSystem.h"
 #include "InputSystem.h"
+#include "AssetManager.h"
 #include "Logger.h"
+
 
 namespace Sandbox {
     class SandboxApp {
@@ -22,6 +24,9 @@ namespace Sandbox {
         bool shouldClose() const;
 
     private:
+        std::shared_ptr<AssetManager> mAssetManager;
+        Logger mAssetManagerLogger{"AssetManager"};
+
         std::shared_ptr<RenderingSystem> renderingSystem;
         Logger renderingSystemLogger{"RenderingSystem"};
 

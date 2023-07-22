@@ -18,7 +18,14 @@
 #include "Scene.h"
 #include "Logger.h"
 
+namespace XE {
+    class AssetManager;
+}
+
+
 namespace Sandbox {
+    using namespace XE;
+
     class Camera {
     public:
         XE::Vector3 position = {0.0f, 0.0f, 15.0f};
@@ -47,7 +54,7 @@ namespace Sandbox {
 
     class RenderingSystem {
     public:
-        explicit RenderingSystem(ILogger *logger);
+        explicit RenderingSystem(ILogger *logger, AssetManager *assetManager);
 
         void Initialize();
 
@@ -84,6 +91,7 @@ namespace Sandbox {
 
     private:
         ILogger *mLogger = nullptr;
+        AssetManager* mAssetManager;
 
         SceneDescription sceneDescription;
 
