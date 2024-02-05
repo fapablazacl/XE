@@ -49,6 +49,9 @@ jobs:
         
       - uses: ilammy/msvc-dev-cmd@v1
 
+      - name: Prepare local vcpkg package registry
+        run: ./vcpkg/bootstrap-vcpkg.sh
+
       - name: Configure
         run:
           cmake -DCMAKE_TOOLCHAIN_FILE="${{matrix.config.vcpkgCMakeToolchainFile}}" -G "${{matrix.config.generator}}" -S . -B build -DCMAKE_BUILD_TYPE=${{ matrix.cmake-build-type }} -DXE_DEV_WARNINGS_AS_ERRORS=ON -DXE_DEV_UNIT_TEST=ON
