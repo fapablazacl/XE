@@ -27,18 +27,12 @@ jobs:
         config:
         - os: ubuntu-22.04
           generator: Unix Makefiles
-          prologue: sudo apt-get update && sudo apt-get install -y libx11-dev libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libgl-dev xorg-dev libglu1-mesa-dev pkg-config ninja-build libwayland-dev libxkbcommon-dev wayland-protocols extra-cmake-modules make
-          vcpkgCMakeToolchainFile: "vcpkg/scripts/buildsystems/vcpkg.cmake"
 
         - os: macos-12
           generator: Unix Makefiles
-          prologue: ""
-          vcpkgCMakeToolchainFile: "vcpkg/scripts/buildsystems/vcpkg.cmake"
 
         - os: windows-2022
           generator: NMake Makefiles
-          prologue: .\Invoke-Environment.ps1 "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
-          vcpkgCMakeToolchainFile: "vcpkg\\scripts\\buildsystems\\vcpkg.cmake"
           
     runs-on: ${{ matrix.config.os }}
     steps:
@@ -60,9 +54,8 @@ jobs:
         run: ./vcpkg/bootstrap-vcpkg.sh
 
       - name: Configure
-        continue-on-error: true
         run:
-          cmake -DCMAKE_TOOLCHAIN_FILE="${{matrix.config.vcpkgCMakeToolchainFile}}" -G "${{matrix.config.generator}}" -S . -B build -DCMAKE_BUILD_TYPE=${{ matrix.cmake-build-type }} -DXE_DEV_WARNINGS_AS_ERRORS=ON -DXE_DEV_UNIT_TEST=ON
+          cmake -DCMAKE_TOOLCHAIN_FILE="vcpkg/scripts/buildsystems/vcpkg.cmake" -G "${{matrix.config.generator}}" -S . -B build -DCMAKE_BUILD_TYPE=${{ matrix.cmake-build-type }} -DXE_DEV_WARNINGS_AS_ERRORS=ON -DXE_DEV_UNIT_TEST=ON
 
       - name: Build
         run: cmake --build build --parallel 4
@@ -87,7 +80,7 @@ jobs:
           submodules: true
 
       - name: Configure
-        run: CC=clang CXX=clang++ cmake -S . -B build -DCMAKE_BUILD_TYPE=${{ matrix.cmake-build-type }} -DXE_DEV_WARNINGS_AS_ERRORS=OFF -DXE_DEV_UNIT_TEST=OFF -DXE_DEV_LINT_CLANG_TIDY=ON
+        run: CC=clang CXX=clang++ cmake -S . -B build -DCMAKE_BUILD_TYPE=${{ matrix.cmake-build-type }} -DXE_DEV_WARNINGS_AS_ERRORS=OFF -DXE_DEV_UNIT_TEST=ON -DXE_DEV_LINT_CLANG_TIDY=ON
 
       - name: Build
         run: cmake --build build --parallel 4
