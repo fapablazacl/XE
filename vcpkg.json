@@ -3,18 +3,11 @@
   "name": "xe",
   "description": "XE is a framework, written in C++17 for building high-performance and cross-platform multimedia applications.",
   "version": "1.0.0",
-  "builtin-baseline": "53bef8994c541b6561884a8395ea35715ece75db",
   "dependencies": [
     "gtest",
     "benchmark",
     "lodepng",
-    {
-      "name": "glfw3",
-      "version>=": "3.3.8"
-    },
+    "glfw3",
     "cgltf"
-  ],
-  "overrides": [
-    { "name": "glfw3", "version": "3.3.8"}
   ]
 }
