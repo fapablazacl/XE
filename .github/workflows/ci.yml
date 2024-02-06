@@ -59,8 +59,6 @@ jobs:
 
       - name: Debug Logs
         run: |
-          cat /home/runner/work/XE/XE/vcpkg/buildtrees/glfw3/config-x64-linux-dbg-CMakeCache.txt.log
-          cat /home/runner/work/XE/XE/vcpkg/buildtrees/glfw3/config-x64-linux-rel-CMakeCache.txt.log
           cat /home/runner/work/XE/XE/vcpkg/buildtrees/glfw3/config-x64-linux-out.log
 
       - name: Build
