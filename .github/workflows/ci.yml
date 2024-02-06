@@ -73,6 +73,13 @@ jobs:
     steps:
       - name: Install clang-tidy
         run: sudo apt-get update && sudo apt-get install clang-tidy
+      
+      - name: Install System Dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get upgrade
+          sudo apt-get update 
+          sudo apt-get install -y libx11-dev libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libgl-dev xorg-dev libglu1-mesa-dev pkg-config ninja-build libwayland-dev libxkbcommon-dev wayland-protocols extra-cmake-modules make
 
       - name: Checkout Source Code and Submodules
         uses: actions/checkout@v3
@@ -80,7 +87,7 @@ jobs:
           submodules: true
 
       - name: Configure
-        run: CC=clang CXX=clang++ cmake -S . -B build -DCMAKE_BUILD_TYPE=${{ matrix.cmake-build-type }} -DXE_DEV_WARNINGS_AS_ERRORS=OFF -DXE_DEV_UNIT_TEST=ON -DXE_DEV_LINT_CLANG_TIDY=ON
+        run: CC=clang CXX=clang++ cmake -DCMAKE_TOOLCHAIN_FILE="vcpkg/scripts/buildsystems/vcpkg.cmake" -S . -B build -DCMAKE_BUILD_TYPE=${{ matrix.cmake-build-type }} -DXE_DEV_WARNINGS_AS_ERRORS=OFF -DXE_DEV_UNIT_TEST=ON -DXE_DEV_LINT_CLANG_TIDY=ON
 
       - name: Build
         run: cmake --build build --parallel 4
@@ -90,13 +97,20 @@ jobs:
     runs-on: ubuntu-latest
     env:
       BUILD_WRAPPER_OUT_DIR: build_wrapper_output_directory # Directory where build-wrapper output will be placed
-    steps:
+    steps:      
+      - name: Install System Dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get upgrade
+          sudo apt-get update 
+          sudo apt-get install -y libx11-dev libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libgl-dev xorg-dev libglu1-mesa-dev pkg-config ninja-build libwayland-dev libxkbcommon-dev wayland-protocols extra-cmake-modules make
+
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
 
       - name: Configure
-        run: CC=clang CXX=clang++ cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DXE_DEV_WARNINGS_AS_ERRORS=OFF -DXE_DEV_UNIT_TEST=OFF -DXE_DEV_LINT_CLANG_TIDY=ON
+        run: CC=clang CXX=clang++ cmake -DCMAKE_TOOLCHAIN_FILE="vcpkg/scripts/buildsystems/vcpkg.cmake" -S . -B build -DCMAKE_BUILD_TYPE=Debug -DXE_DEV_WARNINGS_AS_ERRORS=OFF -DXE_DEV_UNIT_TEST=OFF -DXE_DEV_LINT_CLANG_TIDY=ON
 
       - name: Install sonar-scanner and build-wrapper
         uses: SonarSource/sonarcloud-github-c-cpp@v1
@@ -118,8 +132,15 @@ jobs:
       matrix: 
         cmake-build-type: [Debug, Release]
     steps:
-      - name: Install clang-tidy
+      - name: Install llvm
         run: sudo apt-get update && sudo apt-get install llvm
+      
+      - name: Install System Dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get upgrade
+          sudo apt-get update 
+          sudo apt-get install -y libx11-dev libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libgl-dev xorg-dev libglu1-mesa-dev pkg-config ninja-build libwayland-dev libxkbcommon-dev wayland-protocols extra-cmake-modules make
 
       - name: Checkout Source Code and Submodules
         uses: actions/checkout@v3
@@ -127,7 +148,7 @@ jobs:
           submodules: true
 
       - name: Configure
-        run: CC=clang CXX=clang++ cmake -S . -B build -DCMAKE_BUILD_TYPE=${{ matrix.cmake-build-type }} -DXE_DEV_WARNINGS_AS_ERRORS=OFF -DXE_DEV_UNIT_TEST=ON -DXE_DEV_INSTRUMENT_COVERAGE=ON
+        run: CC=clang CXX=clang++ cmake -DCMAKE_TOOLCHAIN_FILE="vcpkg/scripts/buildsystems/vcpkg.cmake" -S . -B build -DCMAKE_BUILD_TYPE=${{ matrix.cmake-build-type }} -DXE_DEV_WARNINGS_AS_ERRORS=OFF -DXE_DEV_UNIT_TEST=ON -DXE_DEV_INSTRUMENT_COVERAGE=ON
 
       - name: Build
         run: cmake --build build --parallel 4
