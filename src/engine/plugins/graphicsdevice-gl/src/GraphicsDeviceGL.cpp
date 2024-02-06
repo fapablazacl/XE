@@ -24,9 +24,8 @@
 namespace XE {
     static std::string hexstr(const GLenum value) {
         std::string str;
-
         str.resize(16, ' ');
-        std::sprintf(str.data(), "%x", value);
+        std::snprintf(str.data(), str.size(), "%x", value);
 
         return str;
     }
