@@ -27,7 +27,7 @@ jobs:
         config:
         - os: ubuntu-22.04
           generator: Unix Makefiles
-          prologue: sudo apt-get update && sudo apt-get install libx11-dev libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libgl-dev xorg-dev libglu1-mesa-dev pkg-config
+          prologue: sudo apt-get update && sudo apt-get install -y libx11-dev libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libgl-dev xorg-dev libglu1-mesa-dev pkg-config ninja-build
           vcpkgCMakeToolchainFile: "vcpkg/scripts/buildsystems/vcpkg.cmake"
 
         - os: macos-12
