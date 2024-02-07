@@ -14,4 +14,3 @@ coverage/*
 venv
 .vs
 build/*
-vcpkg/
