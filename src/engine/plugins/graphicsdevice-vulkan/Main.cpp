@@ -27,8 +27,8 @@
 #include <vector>
 
 struct Vertex {
-    XE::Vector2f pos;
-    XE::Vector3f color;
+    XE::Vector2 pos;
+    XE::Vector3 color;
 
     static vk::VertexInputBindingDescription createBindingDescription() {
         vk::VertexInputBindingDescription desc;

@@ -20,7 +20,7 @@ namespace TestApp {
 
     void Shader::Shutdown() { this->ShutdownShader(); }
 
-    bool Shader::Render(ID3D11DeviceContext *context, int indexCount, const Matrix4f &world, const Matrix4f &view, const Matrix4f &projection) {
+    bool Shader::Render(ID3D11DeviceContext *context, int indexCount, const Matrix4 &world, const Matrix4 &view, const Matrix4 &projection) {
         if (!this->SetShaderParameters(context, world, view, projection)) {
             return false;
         }
@@ -141,19 +141,19 @@ namespace TestApp {
         }
     }
 
-    void Shader::DisplayShaderErrorMessage(ID3D10Blob *errorMessage, HWND hWnd, LPCWSTR msg) {
+    void Shader::DisplayShaderErrorMessage(ID3D10Blob *errorMessage, HWND /*hWnd*/, LPCWSTR /*msg*/) {
         auto errorStr = static_cast<char *>(errorMessage->GetBufferPointer());
-        auto errorStrSize = errorMessage->GetBufferSize();
+        // auto errorStrSize = errorMessage->GetBufferSize();
 
         std::cout << errorStr << std::endl;
     }
 
-    bool Shader::SetShaderParameters(ID3D11DeviceContext *context, const Matrix4f &world, const Matrix4f &view, const Matrix4f &projection) {
+    bool Shader::SetShaderParameters(ID3D11DeviceContext *context, const Matrix4 &world, const Matrix4 &view, const Matrix4 &projection) {
         D3D11_MAPPED_SUBRESOURCE mappedResource;
 
-        const Matrix4f worldT = Transpose(world);
-        const Matrix4f viewT = Transpose(view);
-        const Matrix4f projectionT = Transpose(projection);
+        const Matrix4 worldT = transpose(world);
+        const Matrix4 viewT = transpose(view);
+        const Matrix4 projectionT = transpose(projection);
 
         if (FAILED(context->Map(matrixBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource))) {
             return false;

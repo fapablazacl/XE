@@ -6,6 +6,8 @@
 #include <xe/math/Matrix.h>
 
 namespace TestApp {
+    using namespace XE;
+
     class Shader {
     public:
         Shader();
@@ -16,7 +18,7 @@ namespace TestApp {
 
         void Shutdown();
 
-        bool Render(ID3D11DeviceContext *context, int indexCount, const Matrix4f &world, const Matrix4f &view, const Matrix4f &projection);
+        bool Render(ID3D11DeviceContext *context, int indexCount, const Matrix4 &world, const Matrix4 &view, const Matrix4 &projection);
 
     private:
         bool InitializeShader(ID3D11Device *device, HWND hWnd, LPCWSTR vertexShaderSrc, LPCWSTR pixelShaderSrc);
@@ -25,15 +27,15 @@ namespace TestApp {
 
         void DisplayShaderErrorMessage(ID3D10Blob *blob, HWND hWnd, LPCWSTR msg);
 
-        bool SetShaderParameters(ID3D11DeviceContext *context, const Matrix4f &world, const Matrix4f &view, const Matrix4f &projection);
+        bool SetShaderParameters(ID3D11DeviceContext *context, const Matrix4 &world, const Matrix4 &view, const Matrix4 &projection);
 
         void RenderShader(ID3D11DeviceContext *context, int indexCount);
 
     private:
         struct MatrixBufferType {
-            Matrix4f world;
-            Matrix4f view;
-            Matrix4f projection;
+            Matrix4 world;
+            Matrix4 view;
+            Matrix4 projection;
         };
 
         ID3D11VertexShader *vertexShader = nullptr;

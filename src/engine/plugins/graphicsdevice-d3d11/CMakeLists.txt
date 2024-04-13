@@ -15,4 +15,4 @@ set (sources
 
 add_executable(${target} ${sources})
 
-target_link_libraries(${target} d3d11 d3dcompiler XE.Math)
+target_link_libraries(${target} d3d11 d3dcompiler XE.Interface XE.Core XE.Math)
