@@ -506,7 +506,7 @@ private:
 
         const auto queueProperties = physicalDevice.getQueueFamilyProperties();
 
-        for (size_t i = 0; i < queueProperties.size(); i++) {
+        for (uint32_t i = 0; i < static_cast<uint32_t>(queueProperties.size()); i++) {
             const auto &props = queueProperties[i];
 
             // grab the family index for graphics
@@ -516,7 +516,7 @@ private:
 
             // check if the current queue has presentation capabilities
             vk::Bool32 presentationSuport = VK_FALSE;
-            vk::Result result = physicalDevice.getSurfaceSupportKHR(i, surface, &presentationSuport);
+            const vk::Result result = physicalDevice.getSurfaceSupportKHR(i, surface, &presentationSuport);
 
             if (result == vk::Result::eSuccess && presentationSuport == VK_TRUE) {
                 indices.presentFamily = i;
@@ -717,7 +717,7 @@ private:
         // reference all the description states, created earlier in this method
 
         // shader stages used
-        pipelineInfo.stageCount = shaderStages.size();
+        pipelineInfo.stageCount = static_cast<uint32_t>(shaderStages.size());
         pipelineInfo.pStages = shaderStages.data();
 
         pipelineInfo.pVertexInputState = &vertexInputInfo;
@@ -955,14 +955,14 @@ private:
         const auto waitResult = mDevice.waitForFences(1, &mInFlightFence, VK_TRUE, UINT64_MAX);
 
         if (waitResult != vk::Result::eSuccess) {
-            vk::throwResultException(waitResult, "Fence Wait operation failed.");
+            vk::detail::throwResultException(waitResult, "Fence Wait operation failed.");
         }
 
         // reset the frame-rendering fence
         const auto resetResult = mDevice.resetFences(1, &mInFlightFence);
 
         if (resetResult != vk::Result::eSuccess) {
-            vk::throwResultException(resetResult, "Fence Reset operation failed.");
+            vk::detail::throwResultException(resetResult, "Fence Reset operation failed.");
         }
 
         // image index, in the mSwapchainImage member array
@@ -971,7 +971,7 @@ private:
         // acquire an image from the swapchain
         const auto acquireResult = mDevice.acquireNextImageKHR(mSwapchain, UINT64_MAX, mImageAvailableSemaphore, nullptr, &imageIndex);
         if (acquireResult != vk::Result::eSuccess) {
-            vk::throwResultException(acquireResult, "Acquire image from the swapchain operation failed.");
+            vk::detail::throwResultException(acquireResult, "Acquire image from the swapchain operation failed.");
         }
 
         assert(imageIndex < mSwapchainFramebuffers.size());
@@ -1003,7 +1003,7 @@ private:
 
         const auto resultSubmit = mGraphicsQueue.submit(1, &submitInfo, mInFlightFence);
         if (resultSubmit != vk::Result::eSuccess) {
-            vk::throwResultException(resetResult, "Graphics queue submit operation failed.");
+            vk::detail::throwResultException(resetResult, "Graphics queue submit operation failed.");
         }
 
         // presentation info
@@ -1025,7 +1025,7 @@ private:
 
         const vk::Result presentResult = mPresentationQueue.presentKHR(presentInfo);
         if (presentResult != vk::Result::eSuccess) {
-            vk::throwResultException(resetResult, "Graphics queue submit operation failed.");
+            vk::detail::throwResultException(resetResult, "Graphics queue submit operation failed.");
         }
     }
 };
