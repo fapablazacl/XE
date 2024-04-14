@@ -234,7 +234,8 @@ static std::vector<char> readFile(const std::string &filename) {
     std::ifstream fs{filename.c_str(), std::ios::ate | std::ios::binary};
 
     if (!fs.is_open()) {
-        throw std::runtime_error("failed to open file " + filename);
+        std::cerr << "failed to open file " << filename << std::endl;
+        throw std::exception();
     }
 
     const auto fileSize = fs.tellg();
@@ -627,9 +628,14 @@ private:
         return imageViews;
     }
 
+    std::vector<char> loadBinaryFile(const std::string &filename) const {
+        const std::string path = XE_MEDIA_PATH + filename;
+        return readFile(path);
+    }
+
     vk::Pipeline createGraphicsPipeline(vk::Device &device, const vk::Extent2D &swapchainExtent, const vk::PipelineLayout &pipelineLayout, const vk::RenderPass &renderPass) const {
-        vk::ShaderModule vertModule = createShaderModule(device, readFile("media/shaders/triangle/vert.spv"));
-        vk::ShaderModule fragModule = createShaderModule(device, readFile("media/shaders/triangle/frag.spv"));
+        vk::ShaderModule vertModule = createShaderModule(device, loadBinaryFile("/shaders/triangle/vert.spv"));
+        vk::ShaderModule fragModule = createShaderModule(device, loadBinaryFile("/shaders/triangle/frag.spv"));
 
         vk::PipelineShaderStageCreateInfo vertexShaderStageInfo;
         vertexShaderStageInfo.stage = vk::ShaderStageFlagBits::eVertex;

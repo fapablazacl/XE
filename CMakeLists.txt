@@ -31,6 +31,8 @@ set (XE_VERSION_MINOR 0)
 set (XE_VERSION_REVISION 0)
 set (XE_VERSION "${XE_VERSION_MAJOR}.${XE_VERSION_MINOR}.${XE_VERSION_REVISION}")
 
+add_definitions(-DXE_MEDIA_PATH="${CMAKE_CURRENT_LIST_DIR}/media")
+
 if (XE_DEV_UNIT_TEST)
     include(CTest)
     enable_testing()
