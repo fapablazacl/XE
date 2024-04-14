@@ -1,7 +1,6 @@
 
 find_package(glfw3 CONFIG REQUIRED)
 
-
 set (target XE.Platform.GLFW)
 
 set (headers

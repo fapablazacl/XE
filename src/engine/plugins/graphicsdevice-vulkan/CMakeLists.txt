@@ -1,4 +1,5 @@
 
+find_package(glfw3 CONFIG REQUIRED)
 find_package (Vulkan REQUIRED)
 
 set (target "XE.Graphics.Vulkan.TestApp")
@@ -10,7 +11,8 @@ target_include_directories(${target} PRIVATE ${Vulkan_INCLUDE_DIRS})
 target_link_libraries(
   ${target} 
   PUBLIC XE.Core 
+  PUBLIC XE.Math
   PUBLIC ${Vulkan_LIBRARIES} 
-  PUBLIC glfw 
+  PUBLIC glfw
   PRIVATE XE.Interface
 )

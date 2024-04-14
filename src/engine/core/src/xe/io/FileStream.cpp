@@ -1,6 +1,6 @@
 
-#include <cassert>
 #include <xe/io/FileStream.h>
+#include <stdexcept>
 
 namespace XE {
     FileStream::FileStream(const std::string &fileName, const StreamFlags flags) {

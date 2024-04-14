@@ -3,11 +3,11 @@ cmake_minimum_required (VERSION 3.16)
 
 project (XE)
 
-option (XE_PLUGIN_PNG           "Include PNG image support via LodePNG" OFF)
+option (XE_PLUGIN_PNG           "Include PNG image support via LodePNG" ON)
 option (XE_PLUGIN_DIRECT3D11    "Include Direct3D 11 support" OFF)
-option (XE_PLUGIN_GL            "Include OpenGL 3+ support" OFF)
+option (XE_PLUGIN_GL            "Include OpenGL 3+ support" ON)
 option (XE_PLUGIN_ES2           "Include OpenGL ES 2 support" OFF)
-option (XE_PLUGIN_GL_GLFW       "Include GLFW-based Window and Context creation support (requires 'XE_PLUGIN_GL')" OFF)
+option (XE_PLUGIN_GL_GLFW       "Include GLFW-based Window and Context creation support (requires 'XE_PLUGIN_GL')" ON)
 option (XE_PLUGIN_VULKAN        "Include Vulkan support" OFF)
 
 option (XE_EXAMPLE_SANDBOX      "Include example program that is used for various development activities" OFF)
@@ -30,6 +30,8 @@ set (XE_VERSION_MAJOR 1)
 set (XE_VERSION_MINOR 0)
 set (XE_VERSION_REVISION 0)
 set (XE_VERSION "${XE_VERSION_MAJOR}.${XE_VERSION_MINOR}.${XE_VERSION_REVISION}")
+
+add_definitions(-DXE_MEDIA_PATH="${CMAKE_CURRENT_LIST_DIR}/media")
 
 if (XE_DEV_UNIT_TEST)
     include(CTest)

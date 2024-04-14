@@ -6,8 +6,8 @@ namespace TestApp {
     using namespace XE;
 
     struct VertexType {
-        Vector3f position;
-        Vector4f color;
+        Vector3 position;
+        Vector4 color;
     };
 
     Mesh::Mesh() {}
