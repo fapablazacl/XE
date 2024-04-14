@@ -3,7 +3,7 @@ find_package(glfw3 CONFIG REQUIRED)
 find_package (Vulkan REQUIRED)
 
 set (target "XE.Graphics.Vulkan.TestApp")
-set (src "Main.cpp")
+set (src Main.cpp HostPlatform.h HostPlatform.cpp VulkanRenderer.h VulkanRenderer.cpp)
 
 add_executable(${target} ${src})
 

@@ -1,4 +1,7 @@
 
+// Vulkan coding learning exercises from: https://vulkan-tutorial.com/
+
+
 #include <xe/Predef.h>
 #include <xe/math/Vector.h>
 
@@ -44,8 +47,6 @@ struct Vertex {
 
         return desc;
     }
-
-    static std::vector<vk::VertexInputAttributeDescription> createAttributeDescription() {}
 };
 
 const std::vector<Vertex> vertices{{{0.0f, -0.5f}, {1.0f, 0.0f, 0.0f}}, {{0.5f, 0.5f}, {0.0f, 1.0f, 0.0f}}, {{-0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}}};
@@ -208,7 +209,7 @@ struct SwapChainSupportDetails {
 static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT /*severity*/, VkDebugUtilsMessageTypeFlagsEXT /*type*/,
                                                     const VkDebugUtilsMessengerCallbackDataEXT *pCallbackData, void * /*pUserData*/) {
 
-    std::cout << pCallbackData->pMessage << std::endl;
+    std::cout << pCallbackData->pMessage << std::endl << std::endl;
 
     return VK_FALSE;
 }
@@ -650,12 +651,31 @@ private:
         // configured shader stages
         const std::vector<vk::PipelineShaderStageCreateInfo> shaderStages{vertexShaderStageInfo, fragmentShaderStageInfo};
 
+        // vertex binding description
+        vk::VertexInputBindingDescription vertexBindingDesc = Vertex::createBindingDescription();
+
+        // vertex attribute description
+        std::array<vk::VertexInputAttributeDescription, 2> vertexAttributeDescs;
+
+        // vertex position
+        vertexAttributeDescs[0].binding = 0;
+        vertexAttributeDescs[0].location = 0;
+        vertexAttributeDescs[0].format = vk::Format::eR32G32Sfloat;
+        vertexAttributeDescs[0].offset = offsetof(Vertex, pos);
+
+        // vertex color
+        vertexAttributeDescs[1].binding = 0;
+        vertexAttributeDescs[1].location = 1;
+        vertexAttributeDescs[1].format = vk::Format::eR32G32B32Sfloat;
+        vertexAttributeDescs[1].offset = offsetof(Vertex, color);
+
         // vertex layout
         vk::PipelineVertexInputStateCreateInfo vertexInputInfo;
-        vertexInputInfo.vertexBindingDescriptionCount = 0;
-        vertexInputInfo.pVertexBindingDescriptions = nullptr;
-        vertexInputInfo.vertexAttributeDescriptionCount = 0;
-        vertexInputInfo.pVertexAttributeDescriptions = nullptr;
+        vertexInputInfo.vertexBindingDescriptionCount = 1;
+        vertexInputInfo.pVertexBindingDescriptions = &vertexBindingDesc;
+
+        vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(vertexAttributeDescs.size());
+        vertexInputInfo.pVertexAttributeDescriptions = vertexAttributeDescs.data();
 
         // primitive used to draw
         vk::PipelineInputAssemblyStateCreateInfo inputAssemblyInfo;
@@ -956,6 +976,10 @@ private:
         return device.createFence(info);
     }
 
+    void initializeVertexBuffer() {
+        
+    }
+
     void drawFrame() const {
         // first, wait for the previous frame to render
         const auto waitResult = mDevice.waitForFences(1, &mInFlightFence, VK_TRUE, UINT64_MAX);
@@ -1040,7 +1064,7 @@ int main() {
     const uint32_t SCREEN_WIDTH = 1024;
     const uint32_t SCREEN_HEIGHT = 768;
 
-    HostPlatform platform{"", SCREEN_WIDTH, SCREEN_HEIGHT, HostPlatformFlagBits::Debug};
+    HostPlatform platform{"Test", SCREEN_WIDTH, SCREEN_HEIGHT, HostPlatformFlagBits::Debug};
     VulkanRenderer renderer{platform};
 
     renderer.initialize();
