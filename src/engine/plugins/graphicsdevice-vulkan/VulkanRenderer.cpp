@@ -137,6 +137,11 @@ void VulkanRenderer::initialize() {
         mSwapchainFramebuffers.push_back(createFramebuffer(mDevice, imageView, mRenderPass, mSwapchainExtent));
     }
 
+    mVertexBuffer = createVertexBuffer();
+    mVertexBufferMemory = createBufferMemory(mVertexBuffer);
+
+    fillVertexBufferMemory(mVertexBufferMemory);
+
     mCommandPool = createCommandPool(mDevice, mFamilies.graphicsFamily.value());
     mCommandBuffer = allocateCommandBuffer(mDevice, mCommandPool);
 
@@ -754,10 +759,16 @@ void VulkanRenderer::recordCommandBuffer(const vk::CommandBuffer &commandBuffer,
 
     vk::CommandBufferBeginInfo beginInfo;
 
-    // implicitlt, resets the command buffer
+    // implicitily, resets the command buffer
     commandBuffer.begin(beginInfo);
     commandBuffer.beginRenderPass(createRenderPassBeginInfo(framebuffer, clearColor, renderPass, swapchainExtent), vk::SubpassContents::eInline);
     commandBuffer.bindPipeline(vk::PipelineBindPoint::eGraphics, graphicsPipeline);
+
+    // bind the vertex buffer
+    const vk::Buffer vertexBuffers[] = { mVertexBuffer };
+    const vk::DeviceSize offsets[] = { 0 };
+    commandBuffer.bindVertexBuffers(0, 1, vertexBuffers, offsets);
+
     commandBuffer.draw(3, 1, 0, 0);
     commandBuffer.endRenderPass();
     commandBuffer.end();
@@ -850,6 +861,68 @@ void VulkanRenderer::drawFrame() const {
     }
 }
 
-void VulkanRenderer::initializeVertexBuffer() {
-    
+
+vk::Buffer VulkanRenderer::createVertexBuffer() {
+    // create the buffer object
+    vk::BufferCreateInfo bufferInfo {};
+
+    bufferInfo.size = sizeof(vertices[0]) * vertices.size();    // size of the buffer, in bytes
+    bufferInfo.usage = vk::BufferUsageFlagBits::eVertexBuffer;  // buffer will be used for vertex data 
+    bufferInfo.sharingMode = vk::SharingMode::eExclusive;   // buffer will be used exclusively (owned) by the graphics queue
+
+    return mDevice.createBuffer(bufferInfo);
+}
+
+
+vk::DeviceMemory VulkanRenderer::createBufferMemory(vk::Buffer& buffer) {
+    // get the memory requirements for the vertex buffer
+    vk::MemoryRequirements memoryRequirements = mDevice.getBufferMemoryRequirements(buffer);
+
+    const auto memoryTypeBits = memoryRequirements.memoryTypeBits;
+    const auto memoryPropertyFlags = vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent;
+    const auto memoryTypeOpt = findMemoryType(memoryTypeBits, memoryPropertyFlags);
+
+    if (! memoryTypeOpt.has_value()) {
+        std::cerr << "Can't find a suitable memory type for the vertex buffer." << std::endl;
+        throw std::exception();
+    }
+
+    // allocate the buffer memory, as needed by the above memory requirements for the buffer
+    vk::MemoryAllocateInfo allocInfo{};
+    allocInfo.allocationSize = memoryRequirements.size;
+    allocInfo.memoryTypeIndex = memoryTypeOpt.value();
+
+    const auto deviceMemory = mDevice.allocateMemory(allocInfo, nullptr);
+
+    mDevice.bindBufferMemory(buffer, deviceMemory, 0);
+
+    return deviceMemory;
+}
+
+
+std::optional<uint32_t> VulkanRenderer::findMemoryType(uint32_t typeFilter, vk::MemoryPropertyFlags propertyFlags) const {
+    // query the available memory types in the physical device
+    const vk::PhysicalDeviceMemoryProperties properties = mPhysicalDevice.getMemoryProperties();
+
+    // vk::PhysicalDeviceMemoryProperties has two fields: types and heaps
+    // heaps are memory regions (RAM, VRAM or a combination of two)
+    for (uint32_t i = 0; i < properties.memoryTypeCount; i++) {
+
+        // filter for the specified typeFilter
+        const bool matchTypeFilter = typeFilter & (i << 1);
+        const bool matchPropertyFlags = (properties.memoryTypes[i].propertyFlags & propertyFlags) == propertyFlags;
+
+        if (matchTypeFilter && matchPropertyFlags) {
+            return i;
+        }
+    }
+
+    return {};
+}
+
+
+void VulkanRenderer::fillVertexBufferMemory(vk::DeviceMemory &vertexBufferMemory) const {
+    void* data = mDevice.mapMemory(vertexBufferMemory, 0, VK_WHOLE_SIZE);
+    std::memcpy(data, vertices.data(), sizeof(vertices[0]) * vertices.size());
+    mDevice.unmapMemory(vertexBufferMemory);
 }

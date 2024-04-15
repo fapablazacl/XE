@@ -113,7 +113,13 @@ private:
     //! pending
     vk::Fence mInFlightFence;
 
-private:
+    // buffer that holds vertex information
+    vk::Buffer mVertexBuffer;
+
+    // memory that holds the vertex buffer data
+    vk::DeviceMemory mVertexBufferMemory;
+
+
     vk::ApplicationInfo createAppInfo() const;
 
     std::vector<const char*> getRequiredExtensions() const;
@@ -174,7 +180,15 @@ private:
 
     vk::Fence createFence(const vk::Device& device) const;
 
-    void initializeVertexBuffer();
-
     void drawFrame() const;
+    
+    vk::Buffer createVertexBuffer();
+
+    vk::DeviceMemory createBufferMemory(vk::Buffer& buffer);
+
+    void fillVertexBufferMemory(vk::DeviceMemory &vertexBufferMemory) const;
+
+    // find a suitable GPU memory type for assign a portion of GPU memory for the buffer
+    // this allows better control and performance
+    std::optional<uint32_t> findMemoryType(uint32_t typeFilter, vk::MemoryPropertyFlags propertyFlags) const;
 };
