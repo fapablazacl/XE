@@ -182,13 +182,12 @@ private:
 
     void drawFrame() const;
     
-    vk::Buffer createVertexBuffer();
-
-    vk::DeviceMemory createBufferMemory(vk::Buffer& buffer);
-
-    void fillVertexBufferMemory(vk::DeviceMemory &vertexBufferMemory) const;
+    void createVertexBuffer();
 
     // find a suitable GPU memory type for assign a portion of GPU memory for the buffer
     // this allows better control and performance
     std::optional<uint32_t> findMemoryType(uint32_t typeFilter, vk::MemoryPropertyFlags propertyFlags) const;
+
+    // creates both a buffer and a buffer memory object, based on supplied specs
+    std::tuple<vk::Buffer, vk::DeviceMemory> createBuffer(const vk::DeviceSize size, const vk::BufferUsageFlags usage, vk::MemoryPropertyFlags properties) const;
 };

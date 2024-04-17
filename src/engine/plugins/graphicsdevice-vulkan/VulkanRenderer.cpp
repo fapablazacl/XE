@@ -137,10 +137,7 @@ void VulkanRenderer::initialize() {
         mSwapchainFramebuffers.push_back(createFramebuffer(mDevice, imageView, mRenderPass, mSwapchainExtent));
     }
 
-    mVertexBuffer = createVertexBuffer();
-    mVertexBufferMemory = createBufferMemory(mVertexBuffer);
-
-    fillVertexBufferMemory(mVertexBufferMemory);
+    createVertexBuffer();
 
     mCommandPool = createCommandPool(mDevice, mFamilies.graphicsFamily.value());
     mCommandBuffer = allocateCommandBuffer(mDevice, mCommandPool);
@@ -158,8 +155,6 @@ void VulkanRenderer::renderLoop() {
         drawFrame();
     }
 }
-
-
 
 vk::ApplicationInfo VulkanRenderer::createAppInfo() const {
     // Identifica a la aplicacion / motor en uso, para que pueda ser (potencialmente)
@@ -255,6 +250,8 @@ void VulkanRenderer::showPhysicalDeviceInformation(const vk::PhysicalDevice &dev
               << "\"" << properties.deviceType << "\"" << std::endl;
     std::cout << "  driverVersion: "
               << "\"" << properties.driverVersion << "\"" << std::endl;
+
+    std::cout << std::endl;
 }
 
 std::vector<vk::DeviceQueueCreateInfo> VulkanRenderer::mapQueueCreateInfo(const QueryFamilyIndices &indices) const {
@@ -862,43 +859,20 @@ void VulkanRenderer::drawFrame() const {
 }
 
 
-vk::Buffer VulkanRenderer::createVertexBuffer() {
-    // create the buffer object
-    vk::BufferCreateInfo bufferInfo {};
+void VulkanRenderer::createVertexBuffer() {
+    const vk::DeviceSize bufferSize = sizeof(vertices[0]) * vertices.size();
+    const auto bufferUsage = vk::BufferUsageFlagBits::eVertexBuffer;
+    const auto memoryProperties = vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent;
 
-    bufferInfo.size = sizeof(vertices[0]) * vertices.size();    // size of the buffer, in bytes
-    bufferInfo.usage = vk::BufferUsageFlagBits::eVertexBuffer;  // buffer will be used for vertex data 
-    bufferInfo.sharingMode = vk::SharingMode::eExclusive;   // buffer will be used exclusively (owned) by the graphics queue
+    auto [buffer, bufferMemory] = createBuffer(bufferSize, bufferUsage, memoryProperties);
 
-    return mDevice.createBuffer(bufferInfo);
+    void* data = mDevice.mapMemory(bufferMemory, 0, VK_WHOLE_SIZE);
+    std::memcpy(data, vertices.data(), sizeof(vertices[0]) * vertices.size());
+    mDevice.unmapMemory(bufferMemory);
+
+    mVertexBuffer = buffer;
+    mVertexBufferMemory = bufferMemory;
 }
-
-
-vk::DeviceMemory VulkanRenderer::createBufferMemory(vk::Buffer& buffer) {
-    // get the memory requirements for the vertex buffer
-    vk::MemoryRequirements memoryRequirements = mDevice.getBufferMemoryRequirements(buffer);
-
-    const auto memoryTypeBits = memoryRequirements.memoryTypeBits;
-    const auto memoryPropertyFlags = vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent;
-    const auto memoryTypeOpt = findMemoryType(memoryTypeBits, memoryPropertyFlags);
-
-    if (! memoryTypeOpt.has_value()) {
-        std::cerr << "Can't find a suitable memory type for the vertex buffer." << std::endl;
-        throw std::exception();
-    }
-
-    // allocate the buffer memory, as needed by the above memory requirements for the buffer
-    vk::MemoryAllocateInfo allocInfo{};
-    allocInfo.allocationSize = memoryRequirements.size;
-    allocInfo.memoryTypeIndex = memoryTypeOpt.value();
-
-    const auto deviceMemory = mDevice.allocateMemory(allocInfo, nullptr);
-
-    mDevice.bindBufferMemory(buffer, deviceMemory, 0);
-
-    return deviceMemory;
-}
-
 
 std::optional<uint32_t> VulkanRenderer::findMemoryType(uint32_t typeFilter, vk::MemoryPropertyFlags propertyFlags) const {
     // query the available memory types in the physical device
@@ -921,8 +895,28 @@ std::optional<uint32_t> VulkanRenderer::findMemoryType(uint32_t typeFilter, vk::
 }
 
 
-void VulkanRenderer::fillVertexBufferMemory(vk::DeviceMemory &vertexBufferMemory) const {
-    void* data = mDevice.mapMemory(vertexBufferMemory, 0, VK_WHOLE_SIZE);
-    std::memcpy(data, vertices.data(), sizeof(vertices[0]) * vertices.size());
-    mDevice.unmapMemory(vertexBufferMemory);
+std::tuple<vk::Buffer, vk::DeviceMemory> VulkanRenderer::createBuffer(const vk::DeviceSize size, const vk::BufferUsageFlags usage, vk::MemoryPropertyFlags properties) const {
+    vk::BufferCreateInfo bufferInfo {};
+    bufferInfo.size = size;
+    bufferInfo.usage = usage;
+
+    // access to any range or image subresource of the object will be exclusive to an unique family at a time
+    // this may be more performant than a concurrent sharing mode
+    bufferInfo.sharingMode = vk::SharingMode::eExclusive;
+
+    auto buffer = mDevice.createBuffer(bufferInfo);
+
+    // retrieve the memory requirements for the buffer
+    auto requirements = mDevice.getBufferMemoryRequirements(buffer);
+
+    // allocate the memory
+    vk::MemoryAllocateInfo allocInfo {};
+    allocInfo.allocationSize = requirements.size;
+    allocInfo.memoryTypeIndex = findMemoryType(requirements.memoryTypeBits, properties).value();
+
+    auto memory = mDevice.allocateMemory(allocInfo);
+
+    mDevice.bindBufferMemory(buffer, memory, 0);
+
+    return { buffer, memory };
 }
