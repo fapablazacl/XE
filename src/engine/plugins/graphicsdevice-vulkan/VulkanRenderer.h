@@ -119,6 +119,8 @@ private:
     // memory that holds the vertex buffer data
     vk::DeviceMemory mVertexBufferMemory;
 
+    vk::Buffer mIndexBuffer;
+    vk::DeviceMemory mIndexBufferMemory;
 
     vk::ApplicationInfo createAppInfo() const;
 
@@ -183,6 +185,8 @@ private:
     void drawFrame() const;
     
     void createVertexBuffer();
+
+    void createIndexBuffer();
 
     // find a suitable GPU memory type for assign a portion of GPU memory for the buffer
     // this allows better control and performance

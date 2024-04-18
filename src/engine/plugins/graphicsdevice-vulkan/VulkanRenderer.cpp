@@ -9,7 +9,16 @@
 #include <stdexcept>
 
 
-const std::vector<Vertex> vertices{{{0.0f, -0.5f}, {1.0f, 0.0f, 0.0f}}, {{0.5f, 0.5f}, {0.0f, 1.0f, 0.0f}}, {{-0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}}};
+const std::vector<Vertex> vertices{
+    {{-0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}},
+    {{0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}},
+    {{0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}},
+    {{-0.5f, 0.5f}, {0.0f, 0.0f, 0.0f}}
+};
+
+const std::vector<uint16_t>  indices{
+    0, 1, 2, 2, 3, 0
+};
 
 static std::ostream &operator<<(std::ostream &os, const vk::PhysicalDeviceType deviceType) {
     switch (deviceType) {
@@ -141,6 +150,7 @@ void VulkanRenderer::initialize() {
     mCommandBuffer = allocateCommandBuffer(mDevice, mCommandPool);
     
     createVertexBuffer();
+    createIndexBuffer();
 
     mImageAvailableSemaphore = mDevice.createSemaphore({});
     mRenderFinishedSemaphore = mDevice.createSemaphore({});
@@ -254,12 +264,12 @@ void VulkanRenderer::showPhysicalDeviceInformation(const vk::PhysicalDevice &dev
     std::cout << std::endl;
 }
 
-std::vector<vk::DeviceQueueCreateInfo> VulkanRenderer::mapQueueCreateInfo(const QueryFamilyIndices &indices) const {
+std::vector<vk::DeviceQueueCreateInfo> VulkanRenderer::mapQueueCreateInfo(const QueryFamilyIndices &familyIndices) const {
     const float priority = 1.0f;
 
     std::vector<vk::DeviceQueueCreateInfo> infos;
 
-    for (const uint32_t familyIndex : indices.uniques()) {
+    for (const uint32_t familyIndex : familyIndices.uniques()) {
         vk::DeviceQueueCreateInfo info;
 
         info.queueFamilyIndex = familyIndex;
@@ -272,8 +282,8 @@ std::vector<vk::DeviceQueueCreateInfo> VulkanRenderer::mapQueueCreateInfo(const 
     return infos;
 }
 
-vk::Device VulkanRenderer::createDevice(const vk::PhysicalDevice &physicalDevice, const QueryFamilyIndices &indices) const {
-    const std::vector<vk::DeviceQueueCreateInfo> queueInfos = mapQueueCreateInfo(indices);
+vk::Device VulkanRenderer::createDevice(const vk::PhysicalDevice &physicalDevice, const QueryFamilyIndices &familyIndices) const {
+    const std::vector<vk::DeviceQueueCreateInfo> queueInfos = mapQueueCreateInfo(familyIndices);
 
     vk::DeviceCreateInfo info;
 
@@ -301,7 +311,7 @@ vk::Device VulkanRenderer::createDevice(const vk::PhysicalDevice &physicalDevice
 }
 
 QueryFamilyIndices VulkanRenderer::identifyQueueFamilies(const vk::PhysicalDevice &physicalDevice, const vk::SurfaceKHR &surface) const {
-    QueryFamilyIndices indices;
+    QueryFamilyIndices familyIndices;
 
     const auto queueProperties = physicalDevice.getQueueFamilyProperties();
 
@@ -310,7 +320,7 @@ QueryFamilyIndices VulkanRenderer::identifyQueueFamilies(const vk::PhysicalDevic
 
         // grab the family index for graphics
         if (props.queueFlags & vk::QueueFlagBits::eGraphics) {
-            indices.graphicsFamily = i;
+            familyIndices.graphicsFamily = i;
         }
 
         // check if the current queue has presentation capabilities
@@ -318,16 +328,16 @@ QueryFamilyIndices VulkanRenderer::identifyQueueFamilies(const vk::PhysicalDevic
         const vk::Result result = physicalDevice.getSurfaceSupportKHR(i, surface, &presentationSuport);
 
         if (result == vk::Result::eSuccess && presentationSuport == VK_TRUE) {
-            indices.presentFamily = i;
+            familyIndices.presentFamily = i;
         }
     }
 
-    return indices;
+    return familyIndices;
 }
 
 vk::SwapchainKHR VulkanRenderer::createSwapchain(const vk::Device &device, const vk::SurfaceKHR &surface, const vk::SurfaceFormatKHR &swapchainFormat, const vk::Extent2D &swapchainExtent,
                                  const vk::PresentModeKHR presentMode, const uint32_t imageCount, const vk::SurfaceTransformFlagBitsKHR preTransform,
-                                 const QueryFamilyIndices &indices) const {
+                                 const QueryFamilyIndices &familyIndices) const {
     vk::SwapchainCreateInfoKHR info = {};
     info.surface = surface;
     info.minImageCount = imageCount;
@@ -337,8 +347,8 @@ vk::SwapchainKHR VulkanRenderer::createSwapchain(const vk::Device &device, const
     info.imageArrayLayers = 1;
     info.imageUsage = vk::ImageUsageFlagBits::eColorAttachment;
 
-    if (indices.graphicsFamily != indices.presentFamily) {
-        const uint32_t queueFamilyIndices[] = {indices.graphicsFamily.value(), indices.presentFamily.value()};
+    if (familyIndices.graphicsFamily != familyIndices.presentFamily) {
+        const uint32_t queueFamilyIndices[] = {familyIndices.graphicsFamily.value(), familyIndices.presentFamily.value()};
 
         info.imageSharingMode = vk::SharingMode::eConcurrent;
         info.queueFamilyIndexCount = 2;
@@ -766,7 +776,13 @@ void VulkanRenderer::recordCommandBuffer(const vk::CommandBuffer &commandBuffer,
     const vk::DeviceSize offsets[] = { 0 };
     commandBuffer.bindVertexBuffers(0, 1, vertexBuffers, offsets);
 
-    commandBuffer.draw(3, 1, 0, 0);
+    // bind the index buffer
+    commandBuffer.bindIndexBuffer(mIndexBuffer, 0, vk::IndexType::eUint16);
+
+    // render 
+    // commandBuffer.draw(3, 1, 0, 0);
+    commandBuffer.drawIndexed(static_cast<uint32_t>(indices.size()), 1, 0, 0, 0);
+    
     commandBuffer.endRenderPass();
     commandBuffer.end();
 }
@@ -963,4 +979,26 @@ void VulkanRenderer::copyBuffer(vk::Buffer srcBuffer, vk::Buffer dstBuffer, cons
     mGraphicsQueue.waitIdle();
 
     mDevice.freeCommandBuffers(mCommandPool, commandBuffer);
+}
+
+
+void VulkanRenderer::createIndexBuffer() {
+    const vk::DeviceSize size = indices.size() * sizeof(indices[0]);
+    const auto stagingUsageFlags = vk::BufferUsageFlagBits::eTransferSrc;
+    const auto stagingMemoryProperties = vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent;
+
+    auto [stagingBuffer, stagingBufferMemory] = createBuffer(size, stagingUsageFlags, stagingMemoryProperties);
+
+    void* data = mDevice.mapMemory(stagingBufferMemory, 0, size);
+    std::memcpy(data, indices.data(), size);
+    mDevice.unmapMemory(stagingBufferMemory);
+
+    const auto usageFlags = vk::BufferUsageFlagBits::eIndexBuffer | vk::BufferUsageFlagBits::eTransferDst;
+    const auto memoryProperties = vk::MemoryPropertyFlagBits::eDeviceLocal;
+    std::tie(mIndexBuffer, mIndexBufferMemory) = createBuffer(size, usageFlags, memoryProperties);
+
+    copyBuffer(stagingBuffer, mIndexBuffer, size);
+
+    mDevice.destroyBuffer(stagingBuffer);
+    mDevice.freeMemory(stagingBufferMemory);
 }
