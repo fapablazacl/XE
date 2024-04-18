@@ -137,10 +137,10 @@ void VulkanRenderer::initialize() {
         mSwapchainFramebuffers.push_back(createFramebuffer(mDevice, imageView, mRenderPass, mSwapchainExtent));
     }
 
-    createVertexBuffer();
-
     mCommandPool = createCommandPool(mDevice, mFamilies.graphicsFamily.value());
     mCommandBuffer = allocateCommandBuffer(mDevice, mCommandPool);
+    
+    createVertexBuffer();
 
     mImageAvailableSemaphore = mDevice.createSemaphore({});
     mRenderFinishedSemaphore = mDevice.createSemaphore({});
@@ -861,17 +861,27 @@ void VulkanRenderer::drawFrame() const {
 
 void VulkanRenderer::createVertexBuffer() {
     const vk::DeviceSize bufferSize = sizeof(vertices[0]) * vertices.size();
-    const auto bufferUsage = vk::BufferUsageFlagBits::eVertexBuffer;
-    const auto memoryProperties = vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent;
 
-    auto [buffer, bufferMemory] = createBuffer(bufferSize, bufferUsage, memoryProperties);
+    // the staging buffer will be visible for the host
+    const auto stagingBufferUsage = vk::BufferUsageFlagBits::eTransferSrc;
+    const auto stagingMemoryProperties = vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent;
+    auto [stagingBuffer, stagingBufferMemory] = createBuffer(bufferSize, stagingBufferUsage, stagingMemoryProperties);
 
-    void* data = mDevice.mapMemory(bufferMemory, 0, VK_WHOLE_SIZE);
+    // copy the vertex data to the staging buffer
+    void* data = mDevice.mapMemory(stagingBufferMemory, 0, VK_WHOLE_SIZE);
     std::memcpy(data, vertices.data(), sizeof(vertices[0]) * vertices.size());
-    mDevice.unmapMemory(bufferMemory);
+    mDevice.unmapMemory(stagingBufferMemory);
 
-    mVertexBuffer = buffer;
-    mVertexBufferMemory = bufferMemory;
+    // create the vertex buffer and its memory
+    const auto bufferUsage = vk::BufferUsageFlagBits::eVertexBuffer | vk::BufferUsageFlagBits::eTransferDst;
+    const auto bufferMemory = vk::MemoryPropertyFlagBits::eDeviceLocal;
+
+    std::tie(mVertexBuffer, mVertexBufferMemory) = createBuffer(bufferSize, bufferUsage, bufferMemory);
+
+    copyBuffer(stagingBuffer, mVertexBuffer, bufferSize);
+
+    mDevice.destroyBuffer(stagingBuffer);
+    mDevice.freeMemory(stagingBufferMemory);
 }
 
 std::optional<uint32_t> VulkanRenderer::findMemoryType(uint32_t typeFilter, vk::MemoryPropertyFlags propertyFlags) const {
@@ -919,4 +929,38 @@ std::tuple<vk::Buffer, vk::DeviceMemory> VulkanRenderer::createBuffer(const vk::
     mDevice.bindBufferMemory(buffer, memory, 0);
 
     return { buffer, memory };
+}
+
+
+void VulkanRenderer::copyBuffer(vk::Buffer srcBuffer, vk::Buffer dstBuffer, const vk::DeviceSize size) {
+    vk::CommandBufferAllocateInfo allocInfo {};
+
+    allocInfo.level = vk::CommandBufferLevel::ePrimary; // will be executed directly by a command queue
+    allocInfo.commandPool = mCommandPool;
+    allocInfo.commandBufferCount = 1;
+
+    const auto commandBuffers = mDevice.allocateCommandBuffers(allocInfo);
+    const auto &commandBuffer = commandBuffers[0];
+
+    vk::CommandBufferBeginInfo beginInfo {};
+    beginInfo.flags = vk::CommandBufferUsageFlagBits::eOneTimeSubmit;
+
+    commandBuffer.begin(beginInfo);
+    const auto regions = std::array<vk::BufferCopy, 1>{ vk::BufferCopy{ 0, 0, size } };
+    commandBuffer.copyBuffer(srcBuffer, dstBuffer, regions);
+    commandBuffer.end();
+
+    // submit the command buffer for immediate execution
+    vk::SubmitInfo submitInfo {};
+    submitInfo.commandBufferCount = 1;
+    submitInfo.pCommandBuffers = &commandBuffer;
+
+    const auto result = mGraphicsQueue.submit(1, &submitInfo, VK_NULL_HANDLE);
+    if (result != vk::Result::eSuccess) {
+        throw std::runtime_error("Failed to submit copy buffer command buffer.");
+    }
+
+    mGraphicsQueue.waitIdle();
+
+    mDevice.freeCommandBuffers(mCommandPool, commandBuffer);
 }

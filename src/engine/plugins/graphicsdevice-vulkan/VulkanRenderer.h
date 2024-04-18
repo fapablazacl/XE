@@ -190,4 +190,7 @@ private:
 
     // creates both a buffer and a buffer memory object, based on supplied specs
     std::tuple<vk::Buffer, vk::DeviceMemory> createBuffer(const vk::DeviceSize size, const vk::BufferUsageFlags usage, vk::MemoryPropertyFlags properties) const;
+
+    // copy data between two buffers
+    void copyBuffer(vk::Buffer srcBuffer, vk::Buffer dstBuffer, const vk::DeviceSize size);
 };
