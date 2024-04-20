@@ -138,6 +138,7 @@ void VulkanRenderer::initialize() {
     mSwapchainImages = mDevice.getSwapchainImagesKHR(mSwapchain);
     mSwapchainImageViews = createSwapchainImageViews(mDevice, mSwapchainFormat, mSwapchainImages);
 
+    createDescriptorSetLayout();
     mPipelineLayout = createPipelineLayout(mDevice);
     mRenderPass = createRenderPass(mDevice, mSwapchainFormat.format);
     mGraphicsPipeline = createGraphicsPipeline(mDevice, mSwapchainExtent, mPipelineLayout, mRenderPass);
@@ -592,7 +593,8 @@ vk::PipelineLayout VulkanRenderer::createPipelineLayout(const vk::Device &device
     // pipeline layout
     // used for passing values to the uniforms found in the current shader program
     vk::PipelineLayoutCreateInfo info;
-    info.setLayoutCount = 0;
+    info.setLayoutCount = 1;
+    info.pSetLayouts = &mDescriptorSetLayout;
 
     return device.createPipelineLayout(info);
 }
@@ -1001,4 +1003,26 @@ void VulkanRenderer::createIndexBuffer() {
 
     mDevice.destroyBuffer(stagingBuffer);
     mDevice.freeMemory(stagingBufferMemory);
+}
+
+
+void VulkanRenderer::createDescriptorSetLayout() {
+    vk::DescriptorSetLayoutBinding layout {};
+
+    // binding location. must match the one indicated in the shader
+    layout.binding = 0;
+
+    // the descriptor will just an unique uniform buffer 
+    layout.descriptorType = vk::DescriptorType::eUniformBuffer;
+    layout.descriptorCount = 1;
+
+    // this descriptor will apply at the vertex shader stage
+    layout.stageFlags = vk::ShaderStageFlagBits::eVertex;
+
+
+    vk::DescriptorSetLayoutCreateInfo info{};
+    info.bindingCount = 1;
+    info.pBindings = &layout;
+
+    mDescriptorSetLayout = mDevice.createDescriptorSetLayout(info);
 }

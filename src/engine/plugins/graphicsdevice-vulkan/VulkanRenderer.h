@@ -3,6 +3,7 @@
 
 #include <xe/Predef.h>
 #include <xe/math/Vector.h>
+#include <xe/math/Matrix.h>
 
 #if defined(_MSC_VER)
 #pragma warning(push, 0)
@@ -70,6 +71,12 @@ struct SwapchainDetail {
     std::vector<vk::PresentModeKHR> surfacePresentModes;
 };
 
+struct UniformBufferObject {
+    XE::Matrix4 model;
+    XE::Matrix4 view;
+    XE::Matrix4 proj;
+};
+
 class HostPlatform;
 class VulkanRenderer {
 public:
@@ -97,6 +104,7 @@ private:
     vk::Extent2D mSwapchainExtent;
     vk::SurfaceFormatKHR mSwapchainFormat;
     vk::RenderPass mRenderPass;
+    vk::DescriptorSetLayout mDescriptorSetLayout;
     vk::PipelineLayout mPipelineLayout;
     vk::Pipeline mGraphicsPipeline;
     std::vector<vk::Framebuffer> mSwapchainFramebuffers;
@@ -197,4 +205,6 @@ private:
 
     // copy data between two buffers
     void copyBuffer(vk::Buffer srcBuffer, vk::Buffer dstBuffer, const vk::DeviceSize size);
+
+    void createDescriptorSetLayout();
 };
