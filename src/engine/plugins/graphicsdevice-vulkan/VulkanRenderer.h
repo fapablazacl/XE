@@ -130,6 +130,10 @@ private:
     vk::Buffer mIndexBuffer;
     vk::DeviceMemory mIndexBufferMemory;
 
+    std::vector<vk::Buffer> mUniformBuffers;
+    std::vector<vk::DeviceMemory> mUniformBuffersMemory;
+    std::vector<void*> mUniformBuffersMapped;
+
     vk::ApplicationInfo createAppInfo() const;
 
     std::vector<const char*> getRequiredExtensions() const;
@@ -207,4 +211,8 @@ private:
     void copyBuffer(vk::Buffer srcBuffer, vk::Buffer dstBuffer, const vk::DeviceSize size);
 
     void createDescriptorSetLayout();
+
+    void createUniformBuffers();
+
+    void updateUniformBuffer(const uint32_t currentImage);
 };

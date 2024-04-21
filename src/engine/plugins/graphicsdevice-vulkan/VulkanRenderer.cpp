@@ -7,7 +7,9 @@
 #include <functional>
 #include <iostream>
 #include <stdexcept>
+#include <chrono>
 
+constexpr int MAX_SIZES_IN_FLIGHT = 2;
 
 const std::vector<Vertex> vertices{
     {{-0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}},
@@ -152,6 +154,7 @@ void VulkanRenderer::initialize() {
     
     createVertexBuffer();
     createIndexBuffer();
+    createUniformBuffers();
 
     mImageAvailableSemaphore = mDevice.createSemaphore({});
     mRenderFinishedSemaphore = mDevice.createSemaphore({});
@@ -1025,4 +1028,41 @@ void VulkanRenderer::createDescriptorSetLayout() {
     info.pBindings = &layout;
 
     mDescriptorSetLayout = mDevice.createDescriptorSetLayout(info);
+}
+
+void VulkanRenderer::createUniformBuffers() {
+    const vk::DeviceSize size = sizeof(UniformBufferObject);
+
+    mUniformBuffers.resize(MAX_SIZES_IN_FLIGHT);
+    mUniformBuffersMemory.resize(MAX_SIZES_IN_FLIGHT);
+    mUniformBuffersMapped.resize(MAX_SIZES_IN_FLIGHT);
+
+    const auto flags = vk::BufferUsageFlagBits::eUniformBuffer;
+    const auto properties = vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent;
+
+    for (int i = 0; i < MAX_SIZES_IN_FLIGHT; i++) {
+        std::tie(mUniformBuffers[i], mUniformBuffersMemory[i]) = createBuffer(size, flags, properties);
+
+        mUniformBuffersMapped[i] = mDevice.mapMemory(mUniformBuffersMemory[i], 0, size);
+    }
+}
+
+
+void VulkanRenderer::updateUniformBuffer(const uint32_t currentImage) {
+    static auto startTime = std::chrono::high_resolution_clock::now();
+    const auto currentTime = std::chrono::high_resolution_clock::now();
+    const auto diff = currentTime - startTime;
+
+    float time = std::chrono::duration<float, std::chrono::seconds::period>(diff).count();
+
+    UniformBufferObject ubo {};
+
+    ubo.model = XE::mat4RotationZ(time * XE::radians(90.0f));
+    ubo.view = XE::mat4LookAtRH({ 2.0f, 2.0f, 2.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 1.0f });
+
+    const auto aspectRatio = static_cast<float>(mSwapchainExtent.width) / static_cast<float>(mSwapchainExtent.height);
+    ubo.proj = XE::mat4Perspective(XE::radians(45.0f), aspectRatio, 0.1f, 10.0f);
+    ubo.proj[1][1] *= -1;
+
+    std::memcpy(mUniformBuffersMapped[currentImage], &ubo, sizeof(ubo));
 }
