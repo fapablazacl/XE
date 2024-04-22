@@ -1,6 +1,8 @@
 
 #include "HostPlatform.h"
 
+#include <xe/Predef.h>
+#include <iostream>
 
 HostPlatform::HostPlatform(const std::string &title, const uint32_t screenWidth, const uint32_t screenHeight, const HostPlatformFlagBits flags)
     : mScreenWidth(screenWidth), mScreenHeight(screenHeight), mFlags(flags) {
@@ -37,12 +39,20 @@ std::vector<const char *> HostPlatform::enumerateRequiredInstanceExtensions() co
         result.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
     }
 
+    // SDK 1.3.216 for macOS now requires the enablement of the VK_KHR_portability_enumeration instance extension
+#if defined(XE_OS_MACOS) || defined(XE_OS_IOS)
+    result.push_back(VK_KHR_PORTABILITY_ENUMERATION_EXTENSION_NAME);
+#endif
+
+    std::cout << "These " << result.size() << " extensions are required:" << std::endl;
+    std::for_each(result.begin(), result.end(), std::puts);
+
     return result;
 }
 
 std::vector<const char *> HostPlatform::enumerateRequiredDeviceExtensions() const {
     return {
-        // this extensions provides all the objects required for swapchains
+        // these extensions provide all the objects required for swapchains
         VK_KHR_SWAPCHAIN_EXTENSION_NAME,
 
         // required for platforms where Vulkan isn't supported directly by the OS

@@ -227,15 +227,28 @@ vk::DebugUtilsMessengerEXT VulkanRenderer::createDebugMessenger(vk::Instance ins
 }
 
 vk::Instance VulkanRenderer::createInstance(const std::vector<const char *> &extensions, const std::vector<const char *> &validationLayers) const {
+
+    std::cout << "Creating Vulkan instance with these specified features" << std::endl;
+
+    std::cout << std::endl << "Extensions:" << std::endl;
+    std::for_each(extensions.begin(), extensions.end(), std::puts);
+
+    std::cout << std::endl << "Validation Layers:" << std::endl;
+    std::for_each(validationLayers.begin(), validationLayers.end(), std::puts);
+
     const vk::ApplicationInfo appInfo = createAppInfo();
 
     // crear la instancia con una seria de extensiones / capas de validacion requeridas
-    vk::InstanceCreateInfo info;
+    vk::InstanceCreateInfo info {};
     info.setPApplicationInfo(&appInfo);
     // establecer que requerimos layers referentes a la validacion del uso de la API
     info.setPEnabledLayerNames(validationLayers);
     // establecer las extensiones requeridas por GLFW
     info.setPEnabledExtensionNames(extensions);
+
+#if defined(XE_OS_MACOS) || defined(XE_OS_IOS)
+    info.flags = vk::InstanceCreateFlagBits::eEnumeratePortabilityKHR;
+#endif
 
     return vk::createInstance(info);
 }

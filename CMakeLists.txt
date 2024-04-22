@@ -25,7 +25,7 @@ set (CMAKE_CXX_STANDARD             17)
 set (CMAKE_CXX_STANDARD_REQUIRED    ON)
 set (CMAKE_CXX_EXTENSIONS           OFF)
 
-# TODO: Configure the version numbering mechanism
+# TODO: Configure the version numbering mechanism externally
 set (XE_VERSION_MAJOR 1)
 set (XE_VERSION_MINOR 0)
 set (XE_VERSION_REVISION 0)
