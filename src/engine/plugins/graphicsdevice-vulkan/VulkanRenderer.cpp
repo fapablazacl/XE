@@ -141,6 +141,9 @@ void VulkanRenderer::initialize() {
     mSwapchainImageViews = createSwapchainImageViews(mDevice, mSwapchainFormat, mSwapchainImages);
 
     createDescriptorSetLayout();
+    createDescriptorPool();
+    createDescriptorSets();
+
     mPipelineLayout = createPipelineLayout(mDevice);
     mRenderPass = createRenderPass(mDevice, mSwapchainFormat.format);
     mGraphicsPipeline = createGraphicsPipeline(mDevice, mSwapchainExtent, mPipelineLayout, mRenderPass);
@@ -155,6 +158,8 @@ void VulkanRenderer::initialize() {
     createVertexBuffer();
     createIndexBuffer();
     createUniformBuffers();
+
+    configureDescriptors();
 
     mImageAvailableSemaphore = mDevice.createSemaphore({});
     mRenderFinishedSemaphore = mDevice.createSemaphore({});
@@ -182,7 +187,7 @@ vk::ApplicationInfo VulkanRenderer::createAppInfo() const {
 
     // La version de la API de vulkan a usar.
     // Se deberia detectar previamente la maxima version de vulkan soportada por el driver.
-    appInfo.apiVersion = VK_API_VERSION_1_0;
+    appInfo.apiVersion = VK_API_VERSION_1_1;
 
     return appInfo;
 }
@@ -1078,4 +1083,50 @@ void VulkanRenderer::updateUniformBuffer(const uint32_t currentImage) {
     ubo.proj[1][1] *= -1;
 
     std::memcpy(mUniformBuffersMapped[currentImage], &ubo, sizeof(ubo));
+}
+
+
+void VulkanRenderer::createDescriptorPool() {
+    vk::DescriptorPoolSize poolSize {};
+    poolSize.type = vk::DescriptorType::eUniformBuffer;
+    poolSize.descriptorCount = static_cast<uint32_t> (MAX_SIZES_IN_FLIGHT);
+
+    vk::DescriptorPoolCreateInfo poolCreateInfo;
+    poolCreateInfo.poolSizeCount = 1;
+    poolCreateInfo.pPoolSizes = &poolSize;
+    poolCreateInfo.maxSets = static_cast<uint32_t> (MAX_SIZES_IN_FLIGHT);
+
+    mDescriptorPool = mDevice.createDescriptorPool(poolCreateInfo);
+}
+
+void VulkanRenderer::createDescriptorSets() {
+    std::vector<vk::DescriptorSetLayout> layouts(MAX_SIZES_IN_FLIGHT, mDescriptorSetLayout);
+
+    vk::DescriptorSetAllocateInfo allocInfo {};
+    allocInfo.descriptorPool = mDescriptorPool;                                     // we will allocate from mDescriptorPool
+    allocInfo.descriptorSetCount = static_cast<uint32_t> (MAX_SIZES_IN_FLIGHT);
+    allocInfo.pSetLayouts = layouts.data();
+
+    mDescriptorSets = mDevice.allocateDescriptorSets(allocInfo);
+}
+
+void VulkanRenderer::configureDescriptors() {
+    for (size_t i = 0; i < MAX_SIZES_IN_FLIGHT; i++) {
+        vk::DescriptorBufferInfo bufferInfo {};
+        bufferInfo.buffer = mUniformBuffers[i];
+        bufferInfo.offset = 0;
+        bufferInfo.range = sizeof(UniformBufferObject);
+
+        vk::WriteDescriptorSet descriptorWrite {};
+        descriptorWrite.dstSet = mDescriptorSets[i];
+        descriptorWrite.dstBinding = 0;
+        descriptorWrite.dstArrayElement = 0;
+        descriptorWrite.descriptorType = vk::DescriptorType::eUniformBuffer;
+        descriptorWrite.descriptorCount = 1;
+        descriptorWrite.pBufferInfo = &bufferInfo;
+        descriptorWrite.pImageInfo = nullptr;
+        descriptorWrite.pTexelBufferView = nullptr;
+
+        mDevice.updateDescriptorSets(1, &descriptorWrite, 0, nullptr);
+    }
 }

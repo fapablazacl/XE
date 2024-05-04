@@ -134,6 +134,9 @@ private:
     std::vector<vk::DeviceMemory> mUniformBuffersMemory;
     std::vector<void*> mUniformBuffersMapped;
 
+    vk::DescriptorPool mDescriptorPool;
+    std::vector<vk::DescriptorSet> mDescriptorSets;
+
     vk::ApplicationInfo createAppInfo() const;
 
     std::vector<const char*> getRequiredExtensions() const;
@@ -215,4 +218,10 @@ private:
     void createUniformBuffers();
 
     void updateUniformBuffer(const uint32_t currentImage);
+
+    // descriptor sets must be created from a pool (like the command buffers)
+    void createDescriptorPool();
+
+    void createDescriptorSets();
+    void configureDescriptors();
 };
