@@ -9,7 +9,7 @@
 #include <stdexcept>
 #include <chrono>
 
-constexpr int MAX_SIZES_IN_FLIGHT = 2;
+constexpr int MAX_FRAMES_IN_FLIGHT = 2;
 
 const std::vector<Vertex> vertices{
     {{-0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}},
@@ -140,13 +140,11 @@ void VulkanRenderer::initialize() {
     mSwapchainImages = mDevice.getSwapchainImagesKHR(mSwapchain);
     mSwapchainImageViews = createSwapchainImageViews(mDevice, mSwapchainFormat, mSwapchainImages);
 
-    createDescriptorSetLayout();
-    createDescriptorPool();
-    createDescriptorSets();
-
-    mPipelineLayout = createPipelineLayout(mDevice);
     mRenderPass = createRenderPass(mDevice, mSwapchainFormat.format);
-    mGraphicsPipeline = createGraphicsPipeline(mDevice, mSwapchainExtent, mPipelineLayout, mRenderPass);
+
+    mDescriptorSetLayout = createDescriptorSetLayout();
+    mPipelineLayout = createPipelineLayout(mDescriptorSetLayout);
+    mGraphicsPipeline = createGraphicsPipeline(mSwapchainExtent, mPipelineLayout, mRenderPass);
 
     for (const vk::ImageView &imageView : mSwapchainImageViews) {
         mSwapchainFramebuffers.push_back(createFramebuffer(mDevice, imageView, mRenderPass, mSwapchainExtent));
@@ -158,8 +156,8 @@ void VulkanRenderer::initialize() {
     createVertexBuffer();
     createIndexBuffer();
     createUniformBuffers();
-
-    configureDescriptors();
+    createDescriptorPool();
+    createDescriptorSets();
 
     mImageAvailableSemaphore = mDevice.createSemaphore({});
     mRenderFinishedSemaphore = mDevice.createSemaphore({});
@@ -463,9 +461,9 @@ std::vector<char> VulkanRenderer::loadBinaryFile(const std::string &filename) co
     return readFile(path);
 }
 
-vk::Pipeline VulkanRenderer::createGraphicsPipeline(vk::Device &device, const vk::Extent2D &swapchainExtent, const vk::PipelineLayout &pipelineLayout, const vk::RenderPass &renderPass) const {
-    vk::ShaderModule vertModule = createShaderModule(device, loadBinaryFile("/shaders/triangle/vert.spv"));
-    vk::ShaderModule fragModule = createShaderModule(device, loadBinaryFile("/shaders/triangle/frag.spv"));
+vk::Pipeline VulkanRenderer::createGraphicsPipeline(const vk::Extent2D &swapchainExtent, const vk::PipelineLayout &pipelineLayout, const vk::RenderPass &renderPass) {
+    vk::ShaderModule vertModule = createShaderModule(mDevice, loadBinaryFile("/shaders/triangle/vert.spv"));
+    vk::ShaderModule fragModule = createShaderModule(mDevice, loadBinaryFile("/shaders/triangle/frag.spv"));
 
     vk::PipelineShaderStageCreateInfo vertexShaderStageInfo;
     vertexShaderStageInfo.stage = vk::ShaderStageFlagBits::eVertex;
@@ -539,7 +537,7 @@ vk::Pipeline VulkanRenderer::createGraphicsPipeline(vk::Device &device, const vk
     rasterizationStateInfo.polygonMode = vk::PolygonMode::eFill;
     rasterizationStateInfo.lineWidth = 1.0f;
     rasterizationStateInfo.cullMode = vk::CullModeFlagBits::eBack;
-    rasterizationStateInfo.frontFace = vk::FrontFace::eClockwise;
+    rasterizationStateInfo.frontFace = vk::FrontFace::eCounterClockwise;
     rasterizationStateInfo.depthBiasEnable = VK_FALSE;
 
     // multisampling
@@ -558,16 +556,7 @@ vk::Pipeline VulkanRenderer::createGraphicsPipeline(vk::Device &device, const vk
     colorBlendStateInfo.attachmentCount = 1;
     colorBlendStateInfo.pAttachments = &colorBlendAttachment;
 
-    // dynamic state specification
-    //        const std::vector<vk::DynamicState> dynamicStates = {
-    //            vk::DynamicState::eViewport, vk::DynamicState::eLineWidth
-    //        };
-    //
-    //        vk::PipelineDynamicStateCreateInfo dynamicStateInfo;
-    //        dynamicStateInfo.dynamicStateCount = dynamicStates.size();
-    //        dynamicStateInfo.pDynamicStates = dynamicStates.data();
-
-    vk::GraphicsPipelineCreateInfo pipelineInfo;
+    vk::GraphicsPipelineCreateInfo pipelineInfo {};
 
     // reference all the description states, created earlier in this method
 
@@ -592,7 +581,7 @@ vk::Pipeline VulkanRenderer::createGraphicsPipeline(vk::Device &device, const vk
     // the index of the sub pass within the sub pass that will be used
     pipelineInfo.subpass = 0;
 
-    auto pipelineResult = device.createGraphicsPipeline({}, pipelineInfo);
+    auto pipelineResult = mDevice.createGraphicsPipeline({}, pipelineInfo);
 
     if (pipelineResult.result != vk::Result::eSuccess) {
         throw std::runtime_error("Can't create a GraphicsPipeline with those parameters.");
@@ -610,14 +599,14 @@ vk::ShaderModule VulkanRenderer::createShaderModule(const vk::Device &device, co
     return device.createShaderModule(info);
 }
 
-vk::PipelineLayout VulkanRenderer::createPipelineLayout(const vk::Device &device) const {
+vk::PipelineLayout VulkanRenderer::createPipelineLayout(const vk::DescriptorSetLayout &descriptorSetLayout) {
     // pipeline layout
     // used for passing values to the uniforms found in the current shader program
     vk::PipelineLayoutCreateInfo info;
     info.setLayoutCount = 1;
-    info.pSetLayouts = &mDescriptorSetLayout;
+    info.pSetLayouts = &descriptorSetLayout;
 
-    return device.createPipelineLayout(info);
+    return mDevice.createPipelineLayout(info);
 }
 
 vk::RenderPass VulkanRenderer::createRenderPass(const vk::Device &device, const vk::Format &swapchainFormat) const {
@@ -804,6 +793,7 @@ void VulkanRenderer::recordCommandBuffer(const vk::CommandBuffer &commandBuffer,
 
     // render 
     // commandBuffer.draw(3, 1, 0, 0);
+    commandBuffer.bindDescriptorSets(vk::PipelineBindPoint::eGraphics, mPipelineLayout, 0, 1, &mDescriptorSets[imageIndex], 0, nullptr);
     commandBuffer.drawIndexed(static_cast<uint32_t>(indices.size()), 1, 0, 0, 0);
     
     commandBuffer.endRenderPass();
@@ -818,7 +808,7 @@ vk::Fence VulkanRenderer::createFence(const vk::Device &device) const {
     return device.createFence(info);
 }
 
-void VulkanRenderer::drawFrame() const {
+void VulkanRenderer::drawFrame() {
     // first, wait for the previous frame to render
     const auto waitResult = mDevice.waitForFences(1, &mInFlightFence, VK_TRUE, UINT64_MAX);
 
@@ -833,9 +823,6 @@ void VulkanRenderer::drawFrame() const {
         vk::detail::throwResultException(resetResult, "Fence Reset operation failed.");
     }
 
-    // image index, in the mSwapchainImage member array
-    uint32_t imageIndex;
-
     // acquire an image from the swapchain
     const auto acquireResult = mDevice.acquireNextImageKHR(mSwapchain, UINT64_MAX, mImageAvailableSemaphore, nullptr, &imageIndex);
     if (acquireResult != vk::Result::eSuccess) {
@@ -843,6 +830,8 @@ void VulkanRenderer::drawFrame() const {
     }
 
     assert(imageIndex < mSwapchainFramebuffers.size());
+
+    updateUniformBuffer(imageIndex);
 
     // record the necesary commands render the frame
     mCommandBuffer.reset();
@@ -1026,47 +1015,50 @@ void VulkanRenderer::createIndexBuffer() {
     mDevice.freeMemory(stagingBufferMemory);
 }
 
-
-void VulkanRenderer::createDescriptorSetLayout() {
+vk::DescriptorSetLayout VulkanRenderer::createDescriptorSetLayout() {
     vk::DescriptorSetLayoutBinding layout {};
 
     // binding location. must match the one indicated in the shader
     layout.binding = 0;
 
-    // the descriptor will just an unique uniform buffer 
+    // the descriptor will just an unique uniform buffer
+    // this uniform buffer will hold the matrix mvp pack
     layout.descriptorType = vk::DescriptorType::eUniformBuffer;
     layout.descriptorCount = 1;
 
     // this descriptor will apply at the vertex shader stage
     layout.stageFlags = vk::ShaderStageFlagBits::eVertex;
 
+    vk::DescriptorSetLayoutCreateInfo descriptorSetLayoutInfo{};
+    descriptorSetLayoutInfo.bindingCount = 1;
+    descriptorSetLayoutInfo.pBindings = &layout;
 
-    vk::DescriptorSetLayoutCreateInfo info{};
-    info.bindingCount = 1;
-    info.pBindings = &layout;
-
-    mDescriptorSetLayout = mDevice.createDescriptorSetLayout(info);
+    return mDevice.createDescriptorSetLayout(descriptorSetLayoutInfo);
 }
 
 void VulkanRenderer::createUniformBuffers() {
     const vk::DeviceSize size = sizeof(UniformBufferObject);
 
-    mUniformBuffers.resize(MAX_SIZES_IN_FLIGHT);
-    mUniformBuffersMemory.resize(MAX_SIZES_IN_FLIGHT);
-    mUniformBuffersMapped.resize(MAX_SIZES_IN_FLIGHT);
+    mUniformBuffers.resize(MAX_FRAMES_IN_FLIGHT);
+    mUniformBuffersMemory.resize(MAX_FRAMES_IN_FLIGHT);
+    mUniformBuffersMapped.resize(MAX_FRAMES_IN_FLIGHT);
 
     const auto flags = vk::BufferUsageFlagBits::eUniformBuffer;
     const auto properties = vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent;
 
-    for (int i = 0; i < MAX_SIZES_IN_FLIGHT; i++) {
+    for (int i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
         std::tie(mUniformBuffers[i], mUniformBuffersMemory[i]) = createBuffer(size, flags, properties);
 
         mUniformBuffersMapped[i] = mDevice.mapMemory(mUniformBuffersMemory[i], 0, size);
     }
+
+    assert(!mUniformBuffers.empty());
 }
 
 
 void VulkanRenderer::updateUniformBuffer(const uint32_t currentImage) {
+    assert(currentImage < MAX_FRAMES_IN_FLIGHT);
+
     static auto startTime = std::chrono::high_resolution_clock::now();
     const auto currentTime = std::chrono::high_resolution_clock::now();
     const auto diff = currentTime - startTime;
@@ -1082,6 +1074,7 @@ void VulkanRenderer::updateUniformBuffer(const uint32_t currentImage) {
     ubo.proj = XE::mat4Perspective(XE::radians(45.0f), aspectRatio, 0.1f, 10.0f);
     ubo.proj[1][1] *= -1;
 
+    assert(mUniformBuffersMapped[currentImage] != nullptr);
     std::memcpy(mUniformBuffersMapped[currentImage], &ubo, sizeof(ubo));
 }
 
@@ -1089,33 +1082,35 @@ void VulkanRenderer::updateUniformBuffer(const uint32_t currentImage) {
 void VulkanRenderer::createDescriptorPool() {
     vk::DescriptorPoolSize poolSize {};
     poolSize.type = vk::DescriptorType::eUniformBuffer;
-    poolSize.descriptorCount = static_cast<uint32_t> (MAX_SIZES_IN_FLIGHT);
+    poolSize.descriptorCount = static_cast<uint32_t> (MAX_FRAMES_IN_FLIGHT);
 
-    vk::DescriptorPoolCreateInfo poolCreateInfo;
+    vk::DescriptorPoolCreateInfo poolCreateInfo {};
     poolCreateInfo.poolSizeCount = 1;
     poolCreateInfo.pPoolSizes = &poolSize;
-    poolCreateInfo.maxSets = static_cast<uint32_t> (MAX_SIZES_IN_FLIGHT);
+    poolCreateInfo.maxSets = static_cast<uint32_t> (MAX_FRAMES_IN_FLIGHT);
 
     mDescriptorPool = mDevice.createDescriptorPool(poolCreateInfo);
 }
 
 void VulkanRenderer::createDescriptorSets() {
-    std::vector<vk::DescriptorSetLayout> layouts(MAX_SIZES_IN_FLIGHT, mDescriptorSetLayout);
+    assert(!mUniformBuffers.empty());
+
+    std::vector<vk::DescriptorSetLayout> layouts(MAX_FRAMES_IN_FLIGHT, mDescriptorSetLayout);
 
     vk::DescriptorSetAllocateInfo allocInfo {};
     allocInfo.descriptorPool = mDescriptorPool;                                     // we will allocate from mDescriptorPool
-    allocInfo.descriptorSetCount = static_cast<uint32_t> (MAX_SIZES_IN_FLIGHT);
+    allocInfo.descriptorSetCount = static_cast<uint32_t> (MAX_FRAMES_IN_FLIGHT);
     allocInfo.pSetLayouts = layouts.data();
 
     mDescriptorSets = mDevice.allocateDescriptorSets(allocInfo);
-}
+    assert(mDescriptorSets.size() == MAX_FRAMES_IN_FLIGHT);
+    assert(mDescriptorSets[0]);
 
-void VulkanRenderer::configureDescriptors() {
-    for (size_t i = 0; i < MAX_SIZES_IN_FLIGHT; i++) {
-        vk::DescriptorBufferInfo bufferInfo {};
-        bufferInfo.buffer = mUniformBuffers[i];
-        bufferInfo.offset = 0;
-        bufferInfo.range = sizeof(UniformBufferObject);
+    for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
+        vk::DescriptorBufferInfo info {};
+        info.buffer = mUniformBuffers[i];
+        info.offset = 0;
+        info.range = sizeof(UniformBufferObject); // or VK_WHOLE_SIZE
 
         vk::WriteDescriptorSet descriptorWrite {};
         descriptorWrite.dstSet = mDescriptorSets[i];
@@ -1123,9 +1118,7 @@ void VulkanRenderer::configureDescriptors() {
         descriptorWrite.dstArrayElement = 0;
         descriptorWrite.descriptorType = vk::DescriptorType::eUniformBuffer;
         descriptorWrite.descriptorCount = 1;
-        descriptorWrite.pBufferInfo = &bufferInfo;
-        descriptorWrite.pImageInfo = nullptr;
-        descriptorWrite.pTexelBufferView = nullptr;
+        descriptorWrite.pBufferInfo = &info;
 
         mDevice.updateDescriptorSets(1, &descriptorWrite, 0, nullptr);
     }

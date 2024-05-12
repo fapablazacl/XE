@@ -71,6 +71,8 @@ struct SwapchainDetail {
     std::vector<vk::PresentModeKHR> surfacePresentModes;
 };
 
+//! struct used to transfer data from the host to the shader program
+//! all the descriptor stuff will be used for that
 struct UniformBufferObject {
     XE::Matrix4 model;
     XE::Matrix4 view;
@@ -104,7 +106,11 @@ private:
     vk::Extent2D mSwapchainExtent;
     vk::SurfaceFormatKHR mSwapchainFormat;
     vk::RenderPass mRenderPass;
+
+    //! the resource descriptor set layout describes the types of resources
+    //! that are going to be accessed by the pipeline
     vk::DescriptorSetLayout mDescriptorSetLayout;
+
     vk::PipelineLayout mPipelineLayout;
     vk::Pipeline mGraphicsPipeline;
     std::vector<vk::Framebuffer> mSwapchainFramebuffers;
@@ -134,8 +140,16 @@ private:
     std::vector<vk::DeviceMemory> mUniformBuffersMemory;
     std::vector<void*> mUniformBuffersMapped;
 
+    //! allocation object for descriptor sets
     vk::DescriptorPool mDescriptorPool;
+
+    //! the descriptor sets specifies the *actual* buffer or image resources
+    //! that will be bound to the descriptors, so it needs to be bound to be
+    //! for the drawing commands.
     std::vector<vk::DescriptorSet> mDescriptorSets;
+
+    //! image index, in the mSwapchainImage member array
+    uint32_t imageIndex;
 
     vk::ApplicationInfo createAppInfo() const;
 
@@ -175,11 +189,11 @@ private:
 
     std::vector<char> loadBinaryFile(const std::string& filename) const;
 
-    vk::Pipeline createGraphicsPipeline(vk::Device& device, const vk::Extent2D& swapchainExtent, const vk::PipelineLayout& pipelineLayout, const vk::RenderPass& renderPass) const;
+    vk::Pipeline createGraphicsPipeline(const vk::Extent2D& swapchainExtent, const vk::PipelineLayout& pipelineLayout, const vk::RenderPass& renderPass);
 
     vk::ShaderModule createShaderModule(const vk::Device& device, const std::vector<char>& shaderCode) const;
 
-    vk::PipelineLayout createPipelineLayout(const vk::Device& device) const;
+    vk::PipelineLayout createPipelineLayout(const vk::DescriptorSetLayout &descriptorSetLayout);
 
     vk::RenderPass createRenderPass(const vk::Device& device, const vk::Format& swapchainFormat) const;
 
@@ -197,7 +211,7 @@ private:
 
     vk::Fence createFence(const vk::Device& device) const;
 
-    void drawFrame() const;
+    void drawFrame();
     
     void createVertexBuffer();
 
@@ -210,10 +224,12 @@ private:
     // creates both a buffer and a buffer memory object, based on supplied specs
     std::tuple<vk::Buffer, vk::DeviceMemory> createBuffer(const vk::DeviceSize size, const vk::BufferUsageFlags usage, vk::MemoryPropertyFlags properties) const;
 
-    // copy data between two buffers
+    //! copies data between two buffers
     void copyBuffer(vk::Buffer srcBuffer, vk::Buffer dstBuffer, const vk::DeviceSize size);
 
-    void createDescriptorSetLayout();
+    //! craetes a new descriptor set layout that specifies the details of every descriptor binding
+    //! this needs to be called right before createGraphicsPipeline
+    vk::DescriptorSetLayout createDescriptorSetLayout();
 
     void createUniformBuffers();
 
