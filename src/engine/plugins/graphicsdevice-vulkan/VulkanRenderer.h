@@ -149,7 +149,12 @@ private:
     std::vector<vk::DescriptorSet> mDescriptorSets;
 
     //! image index, in the mSwapchainImage member array
-    uint32_t imageIndex;
+    //! used for indicaing which swapchain image use
+    //! when presenting to the user
+    uint32_t imageIndex = 0;
+
+    //!
+    uint32_t currentFrame = 0;
 
     vk::ApplicationInfo createAppInfo() const;
 

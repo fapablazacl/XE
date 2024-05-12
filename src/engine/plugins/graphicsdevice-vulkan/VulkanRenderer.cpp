@@ -831,7 +831,7 @@ void VulkanRenderer::drawFrame() {
 
     assert(imageIndex < mSwapchainFramebuffers.size());
 
-    updateUniformBuffer(imageIndex);
+    updateUniformBuffer(currentFrame);
 
     // record the necesary commands render the frame
     mCommandBuffer.reset();
