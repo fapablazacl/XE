@@ -2,7 +2,7 @@
 #include <xe/graphics/png/ImageLoaderPNG.h>
 
 #include <iostream>
-#include <lodepng.h>
+#include <LodePNG/lodepng.h>
 #include <vector>
 #include <xe/graphics/Image.h>
 #include <xe/io/Stream.h>

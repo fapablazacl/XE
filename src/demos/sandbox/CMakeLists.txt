@@ -1,6 +1,8 @@
 
 # CGLTF dependency
-find_path(CGLTF_INCLUDE_DIRS "cgltf.h")
+
+hunter_add_package(cgltf)
+find_package(cgltf CONFIG REQUIRED)
 
 set (target "XE.Sandbox")
 set (src
@@ -36,5 +38,4 @@ add_executable (${target} ${src} )
 
 get_filename_component(PARENT_DIR "${CMAKE_CURRENT_LIST_DIR}" DIRECTORY)
 target_compile_definitions(${target} PRIVATE XE_SANDBOX_ROOT_PATH="${PARENT_DIR}/sandbox")
-target_include_directories(${target} PRIVATE ${CGLTF_INCLUDE_DIRS})
-target_link_libraries (${target} XE.Interface XE.Core XE.Graphics.GL XE.Platform.GLFW XE.Graphics.PNG)
+target_link_libraries (${target} XE.Interface XE.Core XE.Graphics.GL XE.Platform.GLFW XE.Graphics.PNG cgltf::cgltf)

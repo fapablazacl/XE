@@ -1,5 +1,11 @@
-
 cmake_minimum_required (VERSION 3.16)
+
+include("cmake/HunterGate.cmake")
+
+HunterGate(
+    URL "https://github.com/cpp-pm/hunter/archive/v0.25.6.tar.gz"
+    SHA1 "69e4a05bd514bb05cb2c5aa02ce8ac420516aaf7"
+)
 
 project (XE)
 
@@ -36,6 +42,7 @@ add_definitions(-DXE_MEDIA_PATH="${CMAKE_CURRENT_LIST_DIR}/media")
 if (XE_DEV_UNIT_TEST)
     include(CTest)
     enable_testing()
+    hunter_add_package(GTest)
     find_package(GTest CONFIG REQUIRED)
 endif()
 
