@@ -1,12 +1,30 @@
 
 #include <array>
 #include <iostream>
-#include <xe/Timer.h>
+#include <cstdio>
 
 #include "SandboxApp.h"
 #include <xe/FPSCounter.h>
 
-int main(int argc, char **argv) {
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_main.h>
+
+
+int main(int argc, char *argv[]) {
+    const int SCREEN_WIDTH = 640;
+    const int SCREEN_HEIGHT = 480;
+
+    if (SDL_Init(SDL_INIT_VIDEO) < 0) {
+        std::printf("Error while initialising SDL: %s\n", SDL_GetError());
+
+        return EXIT_FAILURE;
+    }
+
+
+
+    SDL_Quit();
+
+
     try {
         XE::FPSCounter fpsCounter;
 
