@@ -1,8 +1,70 @@
 
 #include <cstdio>
+#include <cstdlib>
 #include <xe/FPSCounter.h>
 #include <SDL2/SDL.h>
-#include <SDL_opengl.h>
+#include <map>
+#include <iostream>
+
+#include "RendererGL.h"
+
+
+static std::string hexstr(const GLenum value) {
+    std::string str;
+    str.resize(16, ' ');
+    std::snprintf(str.data(), str.size(), "%x", value);
+
+    return str;
+}
+
+static std::string stringval(const GLenum err) {
+    switch (err) {
+    case GL_INVALID_ENUM:
+        return "GL_INVALID_ENUM";
+    case GL_INVALID_VALUE:
+        return "GL_INVALID_VALUE";
+    case GL_INVALID_OPERATION:
+        return "GL_INVALID_OPERATION";
+    case GL_STACK_OVERFLOW:
+        return "GL_STACK_OVERFLOW";
+    case GL_STACK_UNDERFLOW:
+        return "GL_STACK_UNDERFLOW";
+    case GL_OUT_OF_MEMORY:
+        return "GL_OUT_OF_MEMORY";
+    case GL_INVALID_FRAMEBUFFER_OPERATION:
+        return "GL_INVALID_FRAMEBUFFER_OPERATION";
+    case GL_CONTEXT_LOST:
+        return "GL_CONTEXT_LOST";
+
+#if defined(GL_TABLE_TOO_LARGE)
+    case GL_TABLE_TOO_LARGE:
+        return "GL_TABLE_TOO_LARGE";
+#endif
+
+    default:
+        return "UNNOWN_ERR_CODE_" + hexstr(err);
+    }
+}
+
+void GraphicsDeviceGL_callback(const char *name, void *, int, ...) {
+    if (std::string(name) == "glGetError") {
+        return;
+    }
+
+    GLenum err = glGetError();
+
+    if (err != GL_NO_ERROR) {
+        std::cerr << "GraphicsDeviceGL: Error while calling function " << name << std::endl;
+        std::cerr << "GraphicsDeviceGL: Errors generated:" << std::endl;
+
+        while (err != GL_NO_ERROR) {
+            std::cerr << "GraphicsDeviceGL:" << stringval(err) << std::endl;
+            err = glGetError();
+        }
+
+        throw std::runtime_error("GraphicsDeviceGL: Error while calling function " + std::string(name));
+    }
+}
 
 
 int main(int argc, char *argv[]) {
@@ -17,18 +79,28 @@ int main(int argc, char *argv[]) {
     }
 
     std::printf("Creating diplay window with 640 x 480 mode, windowed mode\n");
-    auto window = SDL_CreateWindow( "Capybaria", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN );
+    auto window = SDL_CreateWindow( "Capybaria", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL );
     if( window == nullptr ) {
         std::printf( "Error while creating Window. SDL_Error: %s\n", SDL_GetError() );
 
         return EXIT_FAILURE;
     }
 
-    //Use OpenGL 3.1 core
-    std::printf("Creating OpenGL context 3.1 core profile context\n");
-    SDL_GL_SetAttribute( SDL_GL_CONTEXT_MAJOR_VERSION, 3 );
-    SDL_GL_SetAttribute( SDL_GL_CONTEXT_MINOR_VERSION, 1 );
-    SDL_GL_SetAttribute( SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE );
+    // OpenGL context configuration
+    const int majorVersion = 4;
+    const int minorVersion = 1;
+
+    std::map<SDL_GLattr, int> sdlGlAttributes = {
+        {SDL_GL_CONTEXT_MAJOR_VERSION, majorVersion},
+        {SDL_GL_CONTEXT_MINOR_VERSION, minorVersion},
+        {SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE},
+    };
+
+    for (const auto& pair : sdlGlAttributes) {
+        SDL_GL_SetAttribute(pair.first, pair.second);
+    }
+
+    std::printf("Creating OpenGL context %d.%d\n", majorVersion, minorVersion);
 
     auto context = SDL_GL_CreateContext(window);
     if (context == nullptr) {
@@ -36,6 +108,14 @@ int main(int argc, char *argv[]) {
 
         return EXIT_FAILURE;
     }
+    
+    gladLoadGL();
+    // gladLoadGLLoader(SDL_GL_GetProcAddress);
+
+#ifndef NDEBUG
+    glad_set_post_callback_gl(GraphicsDeviceGL_callback);
+    glad_set_post_callback(GraphicsDeviceGL_callback);
+#endif
 
     std::printf("OpenGL info:\n");
     std::printf("GL_VENDOR: %s\n", glGetString(GL_VENDOR));
@@ -43,12 +123,51 @@ int main(int argc, char *argv[]) {
     std::printf("GL_VERSION: %s\n", glGetString(GL_VERSION));
     std::printf("GL_EXTENSIONS: %s\n", glGetString(GL_EXTENSIONS));
 
+    // initialize GL state, and render a single triangle
+    const std::string vertexShader = R"(
+#version 410 core
+
+layout(location = 0) in vec2 vertCoord;
+
+void main() {
+    gl_Position = vec4(vertCoord, 0.0, 1.0);
+}
+)";
+
+
+    const std::string fragmentShader = R"(
+#version 410 core
+
+out vec4 finalColor;
+
+void main() {
+    finalColor = vec4(1.0, 1.0, 1.0, 1.0);
+}
+)";
+
+    const RendererGL renderer;
+    const GLuint program = renderer.createProgram({
+        renderer.createShader(GL_VERTEX_SHADER, vertexShader), 
+        renderer.createShader(GL_FRAGMENT_SHADER, fragmentShader)});
+
+    if (!program) {
+        return EXIT_FAILURE;
+    }
+
+    // prepare buffer 
+    const GLfloat vertices[] = {
+        0.0f, 0.5f, 0.5f, -0.5f, -0.5f, -0.5f
+    };
+    const GLuint vertexBuffer = renderer.createBuffer(GL_VERTEX_ARRAY, GL_STATIC_DRAW, vertices, sizeof(GLfloat) * 6);
+
+    // get attrib location
+    const GLint location = glGetAttribLocation(program, "vertCoord");
+
+
     //Use Vsync
     std::printf("Configuring swap interval\n");
     if( SDL_GL_SetSwapInterval( 1 ) < 0 ) {
-        printf( "Warning: Unable to set VSync! SDL Error: %s\n", SDL_GetError() );
-
-        return EXIT_FAILURE;
+        std::printf( "Warning: Unable to set VSync! SDL Error: %s\n", SDL_GetError() );
     }
 
     //Hack to get window to stay up
@@ -65,6 +184,14 @@ int main(int argc, char *argv[]) {
 
         glClearColor(0.0f, 0.0f, 0.8f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
+
+        glUseProgram(program);
+        glEnableVertexAttribArray(location);
+        glBindBuffer(GL_VERTEX_ARRAY, vertexBuffer);
+        glVertexAttribPointer(location, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 3);
+
+        glDisableVertexAttribArray(location);
 
         glFlush();
         SDL_GL_SwapWindow(window);

@@ -36,7 +36,9 @@ set (src
 	"src/DemoRenderable.cpp" 
 	"src/DemoRenderable.h" 
 	"src/Logger.cpp" 
-	"src/Logger.h")
+	"src/Logger.h"
+	"src/RendererGL.cpp"
+	"src/RendererGL.h")
 
 add_executable (${target} ${src} )
 
