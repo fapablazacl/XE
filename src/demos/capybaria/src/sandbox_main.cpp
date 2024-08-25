@@ -42,7 +42,7 @@ static std::string stringval(const GLenum err) {
 #endif
 
     default:
-        return "UNNOWN_ERR_CODE_" + hexstr(err);
+        return "UNKNOWN_ERR_CODE_" + hexstr(err);
     }
 }
 
@@ -54,15 +54,15 @@ void GraphicsDeviceGL_callback(const char *name, void *, int, ...) {
     GLenum err = glGetError();
 
     if (err != GL_NO_ERROR) {
-        std::cerr << "GraphicsDeviceGL: Error while calling function " << name << std::endl;
-        std::cerr << "GraphicsDeviceGL: Errors generated:" << std::endl;
+        std::cerr << "Error while calling function " << name << std::endl;
+        std::cerr << "Errors generated:" << std::endl;
 
         while (err != GL_NO_ERROR) {
-            std::cerr << "GraphicsDeviceGL:" << stringval(err) << std::endl;
+            std::cerr << stringval(err) << std::endl;
             err = glGetError();
         }
 
-        throw std::runtime_error("GraphicsDeviceGL: Error while calling function " + std::string(name));
+        throw std::runtime_error("");
     }
 }
 
@@ -87,8 +87,8 @@ int main(int argc, char *argv[]) {
     }
 
     // OpenGL context configuration
-    const int majorVersion = 4;
-    const int minorVersion = 1;
+    const int majorVersion = 3;
+    const int minorVersion = 3;
 
     std::map<SDL_GLattr, int> sdlGlAttributes = {
         {SDL_GL_CONTEXT_MAJOR_VERSION, majorVersion},
@@ -100,7 +100,7 @@ int main(int argc, char *argv[]) {
         SDL_GL_SetAttribute(pair.first, pair.second);
     }
 
-    std::printf("Creating OpenGL context %d.%d\n", majorVersion, minorVersion);
+    std::printf("Requested OpenGL context %d.%d\n", majorVersion, minorVersion);
 
     auto context = SDL_GL_CreateContext(window);
     if (context == nullptr) {
@@ -108,7 +108,13 @@ int main(int argc, char *argv[]) {
 
         return EXIT_FAILURE;
     }
-    
+
+    const int makeCurrentResult = SDL_GL_MakeCurrent(window, context);
+    if (makeCurrentResult < 0) {
+        std::printf( "Error while making OpenGL context current. SDL_Error: %s\n", SDL_GetError() );
+        return EXIT_FAILURE;
+    }
+
     gladLoadGL();
     // gladLoadGLLoader(SDL_GL_GetProcAddress);
 
@@ -116,12 +122,6 @@ int main(int argc, char *argv[]) {
     glad_set_post_callback_gl(GraphicsDeviceGL_callback);
     glad_set_post_callback(GraphicsDeviceGL_callback);
 #endif
-
-    std::printf("OpenGL info:\n");
-    std::printf("GL_VENDOR: %s\n", glGetString(GL_VENDOR));
-    std::printf("GL_RENDERER: %s\n", glGetString(GL_RENDERER));
-    std::printf("GL_VERSION: %s\n", glGetString(GL_VERSION));
-    std::printf("GL_EXTENSIONS: %s\n", glGetString(GL_EXTENSIONS));
 
     // initialize GL state, and render a single triangle
     const std::string vertexShader = R"(
@@ -145,6 +145,12 @@ void main() {
 }
 )";
 
+    std::printf("OpenGL info:\n");
+    std::printf("GL_VENDOR: %s\n", glGetString(GL_VENDOR));
+    std::printf("GL_RENDERER: %s\n", glGetString(GL_RENDERER));
+    std::printf("GL_VERSION: %s\n", glGetString(GL_VERSION));
+    std::printf("GL_SHADING_LANGUAGE_VERSION: %s\n", glGetString(GL_SHADING_LANGUAGE_VERSION));
+
     const RendererGL renderer;
     const GLuint program = renderer.createProgram({
         renderer.createShader(GL_VERTEX_SHADER, vertexShader), 
@@ -154,15 +160,24 @@ void main() {
         return EXIT_FAILURE;
     }
 
+    glUseProgram(program);
+
+    // get attrib location
+    const GLint vertCoordLoc = glGetAttribLocation(program, "vertCoord");
+    assert(vertCoordLoc >= 0);
+
     // prepare buffer 
     const GLfloat vertices[] = {
         0.0f, 0.5f, 0.5f, -0.5f, -0.5f, -0.5f
     };
-    const GLuint vertexBuffer = renderer.createBuffer(GL_VERTEX_ARRAY, GL_STATIC_DRAW, vertices, sizeof(GLfloat) * 6);
+    const GLuint vertexBuffer = renderer.createBuffer(GL_ARRAY_BUFFER, GL_STATIC_DRAW, vertices, sizeof(GLfloat) * 6);
 
-    // get attrib location
-    const GLint location = glGetAttribLocation(program, "vertCoord");
-
+    GLuint vao;
+    glGenVertexArrays(1, &vao);
+    glBindVertexArray(vao);
+    glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
+    glEnableVertexAttribArray(vertCoordLoc);
+    glVertexAttribPointer(vertCoordLoc, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
 
     //Use Vsync
     std::printf("Configuring swap interval\n");
@@ -185,13 +200,8 @@ void main() {
         glClearColor(0.0f, 0.0f, 0.8f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        glUseProgram(program);
-        glEnableVertexAttribArray(location);
-        glBindBuffer(GL_VERTEX_ARRAY, vertexBuffer);
-        glVertexAttribPointer(location, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
+        glBindVertexArray(vao);
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 3);
-
-        glDisableVertexAttribArray(location);
 
         glFlush();
         SDL_GL_SwapWindow(window);
