@@ -1,10 +1,13 @@
 
 #include <cstdio>
 #include <cstdlib>
-#include <xe/FPSCounter.h>
 #include <SDL2/SDL.h>
 #include <map>
 #include <iostream>
+#include <cassert>
+
+#include <xe/math/Vector.h>
+#include <xe/math/Matrix.h>
 
 #include "RendererGL.h"
 
@@ -67,7 +70,7 @@ void GraphicsDeviceGL_callback(const char *name, void *, int, ...) {
 }
 
 
-int main(int argc, char *argv[]) {
+int main(int /*argc*/, char */*argv*/[]) {
     const int SCREEN_WIDTH = 640;
     const int SCREEN_HEIGHT = 480;
 
@@ -87,8 +90,8 @@ int main(int argc, char *argv[]) {
     }
 
     // OpenGL context configuration
-    const int majorVersion = 3;
-    const int minorVersion = 3;
+    const int majorVersion = 4;
+    const int minorVersion = 1;
 
     std::map<SDL_GLattr, int> sdlGlAttributes = {
         {SDL_GL_CONTEXT_MAJOR_VERSION, majorVersion},
@@ -115,9 +118,13 @@ int main(int argc, char *argv[]) {
         return EXIT_FAILURE;
     }
 
-    gladLoadGL();
-    // gladLoadGLLoader(SDL_GL_GetProcAddress);
-
+    const int gladLoadResult = gladLoadGL();
+    // const int gladLoadResult = gladLoadGLLoader(SDL_GL_GetProcAddress);
+    if (!gladLoadResult) {
+        std::printf("Error while initializing GLAD entry points");
+        return EXIT_FAILURE;
+    }
+    
 #ifndef NDEBUG
     glad_set_post_callback_gl(GraphicsDeviceGL_callback);
     glad_set_post_callback(GraphicsDeviceGL_callback);
@@ -127,10 +134,12 @@ int main(int argc, char *argv[]) {
     const std::string vertexShader = R"(
 #version 410 core
 
-layout(location = 0) in vec2 vertCoord;
+in vec2 vertCoord;
+
+uniform mat4 uMvp;
 
 void main() {
-    gl_Position = vec4(vertCoord, 0.0, 1.0);
+    gl_Position = uMvp * vec4(vertCoord, 0.0, 1.0);
 }
 )";
 
@@ -160,8 +169,6 @@ void main() {
         return EXIT_FAILURE;
     }
 
-    glUseProgram(program);
-
     // get attrib location
     const GLint vertCoordLoc = glGetAttribLocation(program, "vertCoord");
     assert(vertCoordLoc >= 0);
@@ -171,7 +178,6 @@ void main() {
         0.0f, 0.5f, 0.5f, -0.5f, -0.5f, -0.5f
     };
     const GLuint vertexBuffer = renderer.createBuffer(GL_ARRAY_BUFFER, GL_STATIC_DRAW, vertices, sizeof(GLfloat) * 6);
-
     GLuint vao;
     glGenVertexArrays(1, &vao);
     glBindVertexArray(vao);
@@ -189,16 +195,41 @@ void main() {
     std::printf("Entering main loop\n");
     SDL_Event e;
 
+    float angle = 0.0f;
+
+    auto ticksLastTime = SDL_GetTicks64();
+
     bool quit = false;
     while( !quit ) {
+        auto seconds = (SDL_GetTicks64()  - ticksLastTime) / 1000.0f;
+        ticksLastTime = SDL_GetTicks64();
+
         while( SDL_PollEvent( &e ) ) {
             if( e.type == SDL_QUIT ) {
                 quit = true;
             }
         }
 
+        if ((angle += 100.0f * seconds) > 360.0f) {
+            angle = std::fmod(angle, 360.0f);
+        }
+
         glClearColor(0.0f, 0.0f, 0.8f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
+
+        glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+
+        glUseProgram(program);
+
+        const int mvpLoc = glGetUniformLocation(program, "uMvp");
+
+        auto mvp = 
+            XE::mat4Identity() *
+            XE::mat4RotationY(XE::radians(angle)) *
+            XE::mat4LookAtRH({0.0f, 0.0f, 10.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f}) /**
+            XE::mat4Perspective(XE::radians(60.0f), SCREEN_HEIGHT / static_cast<float>(SCREEN_WIDTH), 0.01f, 100.0f)*/;
+
+        glUniformMatrix4fv(mvpLoc, 1, GL_FALSE, mvp.data());
 
         glBindVertexArray(vao);
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 3);
@@ -209,37 +240,6 @@ void main() {
 
     SDL_DestroyWindow(window);
     SDL_Quit();
-
-    /*
-    try {
-        XE::FPSCounter fpsCounter;
-
-        auto app = std::make_unique<Sandbox::SandboxApp>(argc, argv);
-        app->initialize();
-
-        int lastTime = XE::Timer::getTick();
-
-        while (!app->shouldClose()) {
-            int current = XE::Timer::getTick() - lastTime;
-            float seconds = static_cast<float>(current) / 1000.0f;
-
-            lastTime = XE::Timer::getTick();
-
-            app->update(seconds);
-            app->render();
-
-            if (fpsCounter.frame()) {
-                std::cout << "FPS: " << fpsCounter.getFPS() << std::endl;
-            }
-        }
-    } catch (const std::exception &exp) {
-        std::cerr << "Unmanaged exception caught" << std::endl;
-        std::cerr << "    type: \"" << typeid(exp).name() << "\"" << std::endl;
-        std::cerr << "    message: \"" << exp.what() << "\"" << std::endl;
-
-        return EXIT_FAILURE;
-    }
-    */
 
     return EXIT_SUCCESS;
 }
