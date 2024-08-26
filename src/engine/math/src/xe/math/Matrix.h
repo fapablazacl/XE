@@ -28,7 +28,7 @@ namespace XE {
     enum class MatrixOrder { RowMajor, ColumnMajor };
 
     /**
-     * @brief NxM matrix struct, in column-major order.
+     * @brief NxM matrix struct, in row-major order.
      */
     template <typename T, int R, int C> struct TMatrix {
     private:
@@ -417,12 +417,13 @@ namespace XE {
         const auto xaxis = normalize(cross(zaxis, up));
         const auto yaxis = cross(xaxis, zaxis);
 
-        return TMatrix<T, 4, 4>::rows({
-            TVector<T, 4>{xaxis.X, xaxis.Y, xaxis.Z, -dot(xaxis, eye)},
-            TVector<T, 4>{yaxis.X, yaxis.Y, yaxis.Z, -dot(yaxis, eye)},
-            TVector<T, 4>{-zaxis.X, -zaxis.Y, -zaxis.Z, -dot(zaxis, eye)},
-            TVector<T, 4>{T(0), T(0), T(0), T(1)},
-        });
+        auto result = TMatrix<T, 4, 4>{};
+        result[0] = {xaxis.X, xaxis.Y, xaxis.Z, -dot(xaxis, eye)};
+        result[1] = {yaxis.X, yaxis.Y, yaxis.Z, -dot(yaxis, eye)};
+        result[2] = {-zaxis.X, -zaxis.Y, -zaxis.Z, dot(zaxis, eye)};
+        result[3] = {T(0), T(0), T(0), T(1)};
+
+        return result;
     }
 
     template <typename T = float> auto mat4Perspective(const T fov_radians, const T aspect, const T znear, const T zfar) {
@@ -543,8 +544,7 @@ namespace XE {
                 const auto rowI = getRow(i);
                 const auto colJ = rhs.getColumn(j);
                 const auto mIJ = dot(rowI, colJ);
-                ;
-
+                
                 result(i, j) = mIJ;
             }
         }

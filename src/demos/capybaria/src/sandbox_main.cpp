@@ -135,11 +135,22 @@ int main(int /*argc*/, char */*argv*/[]) {
 #version 410 core
 
 in vec2 vertCoord;
+in vec4 vertColor;
+
+out vec4 fragColor;
 
 uniform mat4 uMvp;
 
 void main() {
-    gl_Position = uMvp * vec4(vertCoord, 0.0, 1.0);
+    // GLSL matrix-vector multiplication performs the correct linear-algebra operation
+    // matrix-vector will multiply each row of the matrix with the column-vector at the right
+    // vector-matrix will multiply the row-vector at the left with each column of the matrix.
+    
+    // vector-matrix should be more efficient because we are using matrices column-major order
+    // wich is more efficient because of cache locality
+    gl_Position = vec4(vertCoord, 0.0, 1.0) * uMvp;
+
+    fragColor = vertColor;
 }
 )";
 
@@ -147,10 +158,12 @@ void main() {
     const std::string fragmentShader = R"(
 #version 410 core
 
+in vec4 fragColor;
+
 out vec4 finalColor;
 
 void main() {
-    finalColor = vec4(1.0, 1.0, 1.0, 1.0);
+    finalColor = fragColor;
 }
 )";
 
@@ -173,17 +186,37 @@ void main() {
     const GLint vertCoordLoc = glGetAttribLocation(program, "vertCoord");
     assert(vertCoordLoc >= 0);
 
+    const GLint vertColorLoc = glGetAttribLocation(program, "vertColor");
+    assert(vertColorLoc >= 0);
+
     // prepare buffer 
+    const int VERTEX_COLOUR = 3;
+
     const GLfloat vertices[] = {
-        0.0f, 0.5f, 0.5f, -0.5f, -0.5f, -0.5f
+        0.0f, 0.5f, 
+        0.5f, -0.5f, 
+        -0.5f, -0.5f
     };
-    const GLuint vertexBuffer = renderer.createBuffer(GL_ARRAY_BUFFER, GL_STATIC_DRAW, vertices, sizeof(GLfloat) * 6);
+
+    const GLfloat colours[] = {
+        1.0f, 0.0f, 0.0f, 1.0f,
+        0.0f, 1.0f, 0.0f, 1.0f,
+        0.0f, 0.0f, 1.0f, 1.0f,
+    };
+
+    const GLuint vertexBuffer = renderer.createBuffer(GL_ARRAY_BUFFER, GL_STATIC_DRAW, vertices, sizeof(GLfloat) * VERTEX_COLOUR * 2);
+    const GLuint colourBuffer = renderer.createBuffer(GL_ARRAY_BUFFER, GL_STATIC_DRAW, colours, sizeof(GLfloat) * VERTEX_COLOUR * 4);
+
     GLuint vao;
     glGenVertexArrays(1, &vao);
     glBindVertexArray(vao);
     glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
     glEnableVertexAttribArray(vertCoordLoc);
     glVertexAttribPointer(vertCoordLoc, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
+
+    glBindBuffer(GL_ARRAY_BUFFER, colourBuffer);
+    glEnableVertexAttribArray(vertColorLoc);
+    glVertexAttribPointer(vertColorLoc, 4, GL_FLOAT, GL_FALSE, 0, nullptr);
 
     //Use Vsync
     std::printf("Configuring swap interval\n");
@@ -196,6 +229,10 @@ void main() {
     SDL_Event e;
 
     float angle = 0.0f;
+    const float cameraSpeed = 1.0f;
+    XE::Vector3 cameraPos = {0.0f, 0.0f, 0.0f};
+    XE::Vector3 cameraDir = {0.0f, 0.0f, -1.0f};
+    XE::Vector3 cameraVelocity = {0.0f, 0.0f, 0.0f};
 
     auto ticksLastTime = SDL_GetTicks64();
 
@@ -204,9 +241,53 @@ void main() {
         auto seconds = (SDL_GetTicks64()  - ticksLastTime) / 1000.0f;
         ticksLastTime = SDL_GetTicks64();
 
+        assert(seconds >= 0.0f);
+
         while( SDL_PollEvent( &e ) ) {
             if( e.type == SDL_QUIT ) {
                 quit = true;
+            }
+
+            switch (e.type) {
+            case SDL_KEYDOWN:
+                switch (e.key.keysym.sym) {
+                case SDLK_LEFT:
+                    cameraVelocity.X = -1.0f;
+                    break;
+
+                case SDLK_RIGHT:
+                    cameraVelocity.X = 1.0f;
+                    break;
+
+                case SDLK_UP:
+                    cameraVelocity.Z = -1.0f;
+                    break;
+
+                case SDLK_DOWN:
+                    cameraVelocity.Z = 1.0f;
+                    break;
+                }
+                break;
+
+            case SDL_KEYUP:
+                switch (e.key.keysym.sym) {
+                case SDLK_LEFT:
+                    cameraVelocity.X = 0.0f;
+                    break;
+
+                case SDLK_RIGHT:
+                    cameraVelocity.X = 0.0f;
+                    break;
+
+                case SDLK_UP:
+                    cameraVelocity.Z = 0.0f;
+                    break;
+
+                case SDLK_DOWN:
+                    cameraVelocity.Z = 0.0f;
+                    break;
+                }
+                break;
             }
         }
 
@@ -214,7 +295,9 @@ void main() {
             angle = std::fmod(angle, 360.0f);
         }
 
-        glClearColor(0.0f, 0.0f, 0.8f, 1.0f);
+        cameraPos += seconds * cameraSpeed * cameraVelocity;
+
+        glClearColor(0.2f, 0.2f, 0.25f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
         glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -224,10 +307,12 @@ void main() {
         const int mvpLoc = glGetUniformLocation(program, "uMvp");
 
         auto mvp = 
-            XE::mat4Identity() *
-            XE::mat4RotationY(XE::radians(angle)) *
-            XE::mat4LookAtRH({0.0f, 0.0f, 10.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f}) /**
-            XE::mat4Perspective(XE::radians(60.0f), SCREEN_HEIGHT / static_cast<float>(SCREEN_WIDTH), 0.01f, 100.0f)*/;
+            XE::mat4Perspective(XE::radians(60.0f), SCREEN_HEIGHT / static_cast<float>(SCREEN_WIDTH), 0.0001f, 1000.0f) * 
+            XE::mat4LookAtRH(cameraPos, cameraPos + cameraDir, {0.0f, 1.0f, 0.0f}) * 
+            XE::mat4Translation({0.0f, 0.0f, -5.0f}) /* * 
+            XE::mat4RotationY(XE::radians(angle))*/;
+
+        std::printf("cameraPos: %0.2f, %0.2f, %0.2f\n", cameraPos.X, cameraPos.Y, cameraPos.Z);
 
         glUniformMatrix4fv(mvpLoc, 1, GL_FALSE, mvp.data());
 
