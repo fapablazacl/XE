@@ -69,6 +69,72 @@ void GraphicsDeviceGL_callback(const char *name, void *, int, ...) {
     }
 }
 
+struct FloorGeometry {
+    int tilesInX = 0;
+    int tilesInZ = 0;
+    
+    float tileSizeX = 0.0f;
+    float tileSizeZ = 0.0f;
+
+    int stripVertexCount = 0;
+
+    GLuint vao = 0;
+    GLuint vertexBuffer = 0;
+};
+
+
+FloorGeometry createFloorGeometry(const RendererGL &renderer, const GLint vertCoordLoc, const GLint vertColorLoc, const int tilesInX, const int tilesInZ, const float tileSizeX,
+                                  const float tileSizeZ) {
+    FloorGeometry floorGeometry;
+    floorGeometry.tilesInX = tilesInX;
+    floorGeometry.tilesInZ = tilesInZ;
+    floorGeometry.tileSizeX = tileSizeX;
+    floorGeometry.tileSizeZ = tileSizeZ;
+    floorGeometry.stripVertexCount = 2 * (tilesInX + 1);
+
+    std::vector<XE::Vector3> vertices{static_cast<size_t>(floorGeometry.stripVertexCount)};
+
+    int j = 0;
+
+    for (int i = 0; i < tilesInX + 1; i++) {
+        vertices[2 * i] = XE::Vector3(i * tileSizeX, 0.0f, j * tileSizeZ);
+        vertices[2 * i + 1] = XE::Vector3(i * tileSizeX, 0.0f, (j + 1) * tileSizeZ);
+    }
+
+    floorGeometry.vertexBuffer = renderer.createBuffer(GL_ARRAY_BUFFER, GL_STATIC_DRAW, vertices.data(), vertices.size() * sizeof(XE::Vector3));
+
+    glGenVertexArrays(1, &floorGeometry.vao);
+    glBindVertexArray(floorGeometry.vao);
+
+    glBindBuffer(GL_ARRAY_BUFFER, floorGeometry.vertexBuffer);
+    glEnableVertexAttribArray(vertCoordLoc);
+    glVertexAttribPointer(vertCoordLoc, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
+
+    glDisableVertexAttribArray(vertColorLoc);
+    glVertexAttrib4f(vertColorLoc, 1.0f, 1.0f, 1.0f, 1.0f);
+
+    glBindVertexArray(0);
+
+    return floorGeometry;
+}
+
+void renderFloorGeometry(const FloorGeometry &floorGeometry, const GLint vertCoordZLoc, const GLint vertColourLoc) {
+    glBindVertexArray(floorGeometry.vao);
+
+    const XE::Vector4 colorFrom = {0.2f, 0.2f, 0.2f, 1.0f};
+    const XE::Vector4 colorTo = {0.2f, 0.2f, 1.0f, 1.0f};
+
+    for (int k = 0; k < floorGeometry.tilesInZ; k++) {
+        const float z = k * floorGeometry.tileSizeZ;
+        const float s = static_cast<float>(k) / (floorGeometry.tilesInZ - 1);
+        const XE::Vector4 color = XE::lerp(colorFrom, colorTo, s);
+
+        glVertexAttrib4fv(vertColourLoc, color.data());
+        glVertexAttrib1f(vertCoordZLoc, z);
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, floorGeometry.stripVertexCount);
+    }
+}
+
 
 int main(int /*argc*/, char */*argv*/[]) {
     const int SCREEN_WIDTH = 640;
@@ -97,6 +163,13 @@ int main(int /*argc*/, char */*argv*/[]) {
         {SDL_GL_CONTEXT_MAJOR_VERSION, majorVersion},
         {SDL_GL_CONTEXT_MINOR_VERSION, minorVersion},
         {SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE},
+        {SDL_GL_RED_SIZE, 8},
+        {SDL_GL_GREEN_SIZE, 8},
+        {SDL_GL_BLUE_SIZE, 8},
+        {SDL_GL_ALPHA_SIZE, 8},
+        {SDL_GL_DEPTH_SIZE, 16},
+        {SDL_GL_BUFFER_SIZE, 32},
+        {SDL_GL_DOUBLEBUFFER, 1}
     };
 
     for (const auto& pair : sdlGlAttributes) {
@@ -134,7 +207,8 @@ int main(int /*argc*/, char */*argv*/[]) {
     const std::string vertexShader = R"(
 #version 410 core
 
-in vec2 vertCoord;
+in vec3 vertCoord;
+in float vertCoordZ;
 in vec4 vertColor;
 
 out vec4 fragColor;
@@ -148,7 +222,7 @@ void main() {
     
     // vector-matrix should be more efficient because we are using matrices column-major order
     // wich is more efficient because of cache locality
-    gl_Position = vec4(vertCoord, 0.0, 1.0) * uMvp;
+    gl_Position = vec4(vertCoord.xy, vertCoord.z + vertCoordZ, 1.0) * uMvp;
 
     fragColor = vertColor;
 }
@@ -189,13 +263,16 @@ void main() {
     const GLint vertColorLoc = glGetAttribLocation(program, "vertColor");
     assert(vertColorLoc >= 0);
 
+    const GLint vertCoordZLoc = glGetAttribLocation(program, "vertCoordZ");
+    assert(vertCoordZLoc >= 0);
+
     // prepare buffer 
     const int VERTEX_COLOUR = 3;
 
     const GLfloat vertices[] = {
-        0.0f, 0.5f, 
-        0.5f, -0.5f, 
-        -0.5f, -0.5f
+        0.0f, 0.5f, 0.0f,
+        0.5f, -0.5f, 0.0f,
+        -0.5f, -0.5f, 0.0f
     };
 
     const GLfloat colours[] = {
@@ -204,19 +281,23 @@ void main() {
         0.0f, 0.0f, 1.0f, 1.0f,
     };
 
-    const GLuint vertexBuffer = renderer.createBuffer(GL_ARRAY_BUFFER, GL_STATIC_DRAW, vertices, sizeof(GLfloat) * VERTEX_COLOUR * 2);
+    const GLuint vertexBuffer = renderer.createBuffer(GL_ARRAY_BUFFER, GL_STATIC_DRAW, vertices, sizeof(GLfloat) * VERTEX_COLOUR * 3);
     const GLuint colourBuffer = renderer.createBuffer(GL_ARRAY_BUFFER, GL_STATIC_DRAW, colours, sizeof(GLfloat) * VERTEX_COLOUR * 4);
 
-    GLuint vao;
-    glGenVertexArrays(1, &vao);
-    glBindVertexArray(vao);
+    GLuint triangleVao;
+    glGenVertexArrays(1, &triangleVao);
+    glBindVertexArray(triangleVao);
     glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
     glEnableVertexAttribArray(vertCoordLoc);
-    glVertexAttribPointer(vertCoordLoc, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
+    glVertexAttribPointer(vertCoordLoc, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
 
     glBindBuffer(GL_ARRAY_BUFFER, colourBuffer);
     glEnableVertexAttribArray(vertColorLoc);
     glVertexAttribPointer(vertColorLoc, 4, GL_FLOAT, GL_FALSE, 0, nullptr);
+
+    glBindVertexArray(0);
+
+    const auto floor = createFloorGeometry(renderer, vertCoordLoc, vertColorLoc, 10, 10, 1.0f, 1.0f);
 
     //Use Vsync
     std::printf("Configuring swap interval\n");
@@ -230,8 +311,8 @@ void main() {
 
     float angle = 0.0f;
     const float cameraSpeed = 1.0f;
-    XE::Vector3 cameraPos = {0.0f, 0.0f, 0.0f};
-    XE::Vector3 cameraDir = {0.0f, 0.0f, -1.0f};
+    XE::Vector3 cameraPos = {0.0f, 0.125f, 0.0f};
+    XE::Vector3 cameraDir = {0.0f, 0.125f, -1.0f};
     XE::Vector3 cameraVelocity = {0.0f, 0.0f, 0.0f};
 
     auto ticksLastTime = SDL_GetTicks64();
@@ -272,17 +353,11 @@ void main() {
             case SDL_KEYUP:
                 switch (e.key.keysym.sym) {
                 case SDLK_LEFT:
-                    cameraVelocity.X = 0.0f;
-                    break;
-
                 case SDLK_RIGHT:
                     cameraVelocity.X = 0.0f;
                     break;
 
                 case SDLK_UP:
-                    cameraVelocity.Z = 0.0f;
-                    break;
-
                 case SDLK_DOWN:
                     cameraVelocity.Z = 0.0f;
                     break;
@@ -297,8 +372,11 @@ void main() {
 
         cameraPos += seconds * cameraSpeed * cameraVelocity;
 
+        glEnable(GL_DEPTH_TEST);
+        glDepthFunc(GL_LEQUAL);
+
         glClearColor(0.2f, 0.2f, 0.25f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 
@@ -306,18 +384,31 @@ void main() {
 
         const int mvpLoc = glGetUniformLocation(program, "uMvp");
 
-        auto mvp = 
-            XE::mat4Perspective(XE::radians(60.0f), SCREEN_HEIGHT / static_cast<float>(SCREEN_WIDTH), 0.0001f, 1000.0f) * 
-            XE::mat4LookAtRH(cameraPos, cameraPos + cameraDir, {0.0f, 1.0f, 0.0f}) * 
-            XE::mat4Translation({0.0f, 0.0f, -5.0f}) /* * 
-            XE::mat4RotationY(XE::radians(angle))*/;
+        const auto aspectRatio = SCREEN_HEIGHT / static_cast<float>(SCREEN_WIDTH);
+
+        auto viewProj = 
+            XE::mat4Perspective(XE::radians(60.0f), aspectRatio, 0.0001f, 1000.0f) *
+            XE::mat4LookAtRH(cameraPos, cameraPos + cameraDir, {0.0f, 1.0f, 0.0f});
+
+        //auto mvp = 
+        //    XE::mat4Perspective(XE::radians(60.0f), SCREEN_HEIGHT / static_cast<float>(SCREEN_WIDTH), 0.0001f, 1000.0f) * 
+        //    XE::mat4LookAtRH(cameraPos, cameraPos + cameraDir, {0.0f, 1.0f, 0.0f}) * 
+        //    XE::mat4Translation({0.0f, 0.0f, -5.0f}) * 
+        //    XE::mat4RotationY(XE::radians(angle));
 
         std::printf("cameraPos: %0.2f, %0.2f, %0.2f\n", cameraPos.X, cameraPos.Y, cameraPos.Z);
 
-        glUniformMatrix4fv(mvpLoc, 1, GL_FALSE, mvp.data());
+        const auto triangleMatrix = viewProj * XE::mat4Translation({0.0f, 0.0f, 0.0f}) * XE::mat4RotationY(XE::radians(angle));
 
-        glBindVertexArray(vao);
+        glUniformMatrix4fv(mvpLoc, 1, GL_FALSE, triangleMatrix.data());
+
+        glBindVertexArray(triangleVao);
+        glVertexAttrib1f(vertCoordZLoc, 0.0f);
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 3);
+
+        const auto floorMatrix = viewProj;
+        glUniformMatrix4fv(mvpLoc, 1, GL_FALSE, floorMatrix.data());
+        renderFloorGeometry(floor, vertCoordZLoc, vertColorLoc);
 
         glFlush();
         SDL_GL_SwapWindow(window);
