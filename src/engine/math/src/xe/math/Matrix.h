@@ -107,6 +107,16 @@ namespace XE {
 
         TVector<T, R> operator*(const TVector<T, R> &v) const;
 
+        inline friend TVector<T, R> operator*(const TVector<T, R> &c, const TMatrix<T, R, C> &m) {
+            TVector<T, R> result;
+
+            for (int row = 0; row < R; row++) {
+                result[row] = dot(m.getColumn(row), c);
+            }
+
+            return result;
+        }
+
         inline friend TMatrix<T, R, C> operator*(const T s, const TMatrix<T, R, C> &m) { return m * s; }
 
         const TVector<T, C> &operator[](const size_t i) const {

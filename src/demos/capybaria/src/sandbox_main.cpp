@@ -310,10 +310,17 @@ void main() {
     SDL_Event e;
 
     float angle = 0.0f;
+
+    bool cameraMoveForward = false;
+    bool cameraMoveBackward = false;
+    bool cameraTurnLeft = false;
+    bool cameraTurnRight = false;
+
     const float cameraSpeed = 1.0f;
-    XE::Vector3 cameraPos = {0.0f, 0.125f, 0.0f};
-    XE::Vector3 cameraDir = {0.0f, 0.125f, -1.0f};
-    XE::Vector3 cameraVelocity = {0.0f, 0.0f, 0.0f};
+    XE::Vector3 cameraPos;
+    XE::Vector3 cameraLookAt;
+    XE::Vector3 cameraDir = {0.0f, 0.0f, -1.0f};
+    float cameraAngle = 0.0f;
 
     auto ticksLastTime = SDL_GetTicks64();
 
@@ -331,46 +338,53 @@ void main() {
 
             switch (e.type) {
             case SDL_KEYDOWN:
-                switch (e.key.keysym.sym) {
-                case SDLK_LEFT:
-                    cameraVelocity.X = -1.0f;
-                    break;
-
-                case SDLK_RIGHT:
-                    cameraVelocity.X = 1.0f;
-                    break;
-
-                case SDLK_UP:
-                    cameraVelocity.Z = -1.0f;
-                    break;
-
-                case SDLK_DOWN:
-                    cameraVelocity.Z = 1.0f;
-                    break;
-                }
-                break;
-
             case SDL_KEYUP:
                 switch (e.key.keysym.sym) {
                 case SDLK_LEFT:
+                    cameraTurnLeft = (e.type == SDL_KEYDOWN);
+                    break;
+
                 case SDLK_RIGHT:
-                    cameraVelocity.X = 0.0f;
+                    cameraTurnRight = (e.type == SDL_KEYDOWN);
                     break;
 
                 case SDLK_UP:
+                    cameraMoveForward = (e.type == SDL_KEYDOWN);
+                    break;
+
                 case SDLK_DOWN:
-                    cameraVelocity.Z = 0.0f;
+                    cameraMoveBackward = (e.type == SDL_KEYDOWN);
                     break;
                 }
                 break;
             }
         }
-
+        
         if ((angle += 100.0f * seconds) > 360.0f) {
             angle = std::fmod(angle, 360.0f);
         }
 
-        cameraPos += seconds * cameraSpeed * cameraVelocity;
+        if (cameraTurnLeft) {
+            cameraAngle += 50.0f * seconds;
+        }
+
+        if (cameraTurnRight) {
+            cameraAngle -= 50.0f * seconds;
+        }
+
+        cameraDir = XE::mat3RotationY(XE::radians(cameraAngle)) * XE::Vector3(0.0f, 0.0f, -1.0f);
+
+        if (cameraMoveForward) {
+            cameraPos += seconds * cameraSpeed * cameraDir;
+        }
+
+        if (cameraMoveBackward) {
+            cameraPos -= seconds * cameraSpeed * cameraDir;
+        }
+
+        cameraDir.Y = cameraPos.Y = 0.25f;
+
+        cameraLookAt = cameraPos + cameraDir;
 
         glEnable(GL_DEPTH_TEST);
         glDepthFunc(GL_LEQUAL);
@@ -386,17 +400,12 @@ void main() {
 
         const auto aspectRatio = SCREEN_HEIGHT / static_cast<float>(SCREEN_WIDTH);
 
-        auto viewProj = 
+        const auto viewProj = 
             XE::mat4Perspective(XE::radians(60.0f), aspectRatio, 0.0001f, 1000.0f) *
-            XE::mat4LookAtRH(cameraPos, cameraPos + cameraDir, {0.0f, 1.0f, 0.0f});
-
-        //auto mvp = 
-        //    XE::mat4Perspective(XE::radians(60.0f), SCREEN_HEIGHT / static_cast<float>(SCREEN_WIDTH), 0.0001f, 1000.0f) * 
-        //    XE::mat4LookAtRH(cameraPos, cameraPos + cameraDir, {0.0f, 1.0f, 0.0f}) * 
-        //    XE::mat4Translation({0.0f, 0.0f, -5.0f}) * 
-        //    XE::mat4RotationY(XE::radians(angle));
+            XE::mat4LookAtRH(cameraPos, cameraLookAt, {0.0f, 1.0f, 0.0f});
 
         std::printf("cameraPos: %0.2f, %0.2f, %0.2f\n", cameraPos.X, cameraPos.Y, cameraPos.Z);
+        std::printf("cameraDir: %0.2f, %0.2f, %0.2f\n", cameraDir.X, cameraDir.Y, cameraDir.Z);
 
         const auto triangleMatrix = viewProj * XE::mat4Translation({0.0f, 0.0f, 0.0f}) * XE::mat4RotationY(XE::radians(angle));
 
