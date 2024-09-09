@@ -6,6 +6,16 @@
 constexpr size_t INFO_LOG_BUFFER_SIZE = 4096;
 
 
+RendererGL::RendererGL() {
+    const auto info = getInfo();
+    std::printf("OpenGL info:\n");
+    std::printf("GL_VENDOR: %s\n", info.vendor.c_str());
+    std::printf("GL_RENDERER: %s\n", info.renderer.c_str());
+    std::printf("GL_VERSION: %s\n", info.version.c_str());
+    std::printf("GL_SHADING_LANGUAGE_VERSION: %s\n", info.shadingLanguageVersion.c_str());
+}
+
+
 GLuint RendererGL::createShader(const GLenum type, const std::string& source) const {
     if (source.empty()) {
         std::cerr << "Error while creating shader: Non-empty string expected" << std::endl;
@@ -79,4 +89,16 @@ GLuint RendererGL::createBuffer(const GLenum target, const GLenum usage, const G
     glBindBuffer(target, 0);
 
     return bufferId;
+}
+
+
+RendererInfo RendererGL::getInfo() const {
+    RendererInfo info;
+
+    info.vendor = reinterpret_cast<const char*>(glGetString(GL_VENDOR));
+    info.renderer = reinterpret_cast<const char *>(glGetString(GL_RENDERER));
+    info.version = reinterpret_cast<const char *>(glGetString(GL_VERSION));
+    info.shadingLanguageVersion = reinterpret_cast<const char *>(glGetString(GL_SHADING_LANGUAGE_VERSION));
+    
+    return info;
 }

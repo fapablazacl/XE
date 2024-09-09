@@ -49,7 +49,7 @@ static std::string stringval(const GLenum err) {
     }
 }
 
-void GraphicsDeviceGL_callback(const char *name, void *, int, ...) {
+void GL_callback(const char *name, void *, int, ...) {
     if (std::string(name) == "glGetError") {
         return;
     }
@@ -118,6 +118,38 @@ FloorGeometry createFloorGeometry(const RendererGL &renderer, const GLint vertCo
     return floorGeometry;
 }
 
+
+GLuint createTriangleGeometry(const RendererGL &renderer, const GLint vertCoordLoc, const GLint vertColorLoc) {
+    // prepare buffer
+    const int VERTEX_COLOUR = 3;
+
+    const GLfloat vertices[] = {0.0f, 0.5f, 0.0f, 0.5f, -0.5f, 0.0f, -0.5f, -0.5f, 0.0f};
+
+    const GLfloat colours[] = {
+        1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f,
+    };
+
+    const GLuint vertexBuffer = renderer.createBuffer(GL_ARRAY_BUFFER, GL_STATIC_DRAW, vertices, sizeof(GLfloat) * VERTEX_COLOUR * 3);
+    const GLuint colourBuffer = renderer.createBuffer(GL_ARRAY_BUFFER, GL_STATIC_DRAW, colours, sizeof(GLfloat) * VERTEX_COLOUR * 4);
+
+    GLuint triangleVao;
+    glGenVertexArrays(1, &triangleVao);
+    glBindVertexArray(triangleVao);
+
+    glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
+    glEnableVertexAttribArray(vertCoordLoc);
+    glVertexAttribPointer(vertCoordLoc, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
+
+    glBindBuffer(GL_ARRAY_BUFFER, colourBuffer);
+    glEnableVertexAttribArray(vertColorLoc);
+    glVertexAttribPointer(vertColorLoc, 4, GL_FLOAT, GL_FALSE, 0, nullptr);
+
+    glBindVertexArray(0);
+
+    return triangleVao;
+}
+
+
 void renderFloorGeometry(const FloorGeometry &floorGeometry, const GLint vertCoordZLoc, const GLint vertColourLoc) {
     glBindVertexArray(floorGeometry.vao);
 
@@ -134,6 +166,179 @@ void renderFloorGeometry(const FloorGeometry &floorGeometry, const GLint vertCoo
         glDrawArrays(GL_TRIANGLE_STRIP, 0, floorGeometry.stripVertexCount);
     }
 }
+
+
+enum GAME_ACTION {
+    GAME_ACTION_NONE = 0x00,
+    GAME_ACTION_CAMERA_TURN_LEFT = 0x0001,
+    GAME_ACTION_CAMERA_TURN_RIGHT = 0x0002,
+    GAME_ACTION_CAMERA_TURN_UP = 0x0004,
+    GAME_ACTION_CAMERA_TURN_DOWN = 0x0008,
+    GAME_ACTION_CAMERA_MOVE_FORWARD = 0x00010,
+    GAME_ACTION_CAMERA_MOVE_BACKWARD = 0x0020,
+    GAME_ACTION_CAMERA_MOVE_LEFT = 0x0040,
+    GAME_ACTION_CAMERA_MOVE_RIGHT = 0x0080,
+
+    GAME_ACTION_QUIT = 0x1000,
+};
+
+
+struct Camera {
+    const float turnSpeed = 25.0f;
+    const float movementSpeed = 1.0f;
+    const XE::Vector3 up = {0.0f, 1.0f, 0.0f};
+    XE::Vector3 position;
+    XE::Vector3 lookAt;
+    XE::Vector3 direction = {0.0f, 0.0f, -1.0f};
+    float yaw = 0.0f;
+    float pitch = 0.0f;
+
+    void update(const float seconds, const int actions) {
+        if (actions & GAME_ACTION_CAMERA_TURN_LEFT) {
+            yaw += turnSpeed * seconds;
+        }
+
+        if (actions & GAME_ACTION_CAMERA_TURN_RIGHT) {
+            yaw -= turnSpeed * seconds;
+        }
+
+        if (actions & GAME_ACTION_CAMERA_TURN_UP) {
+            pitch += turnSpeed * seconds;
+
+            if (pitch >= 80.0f) {
+                pitch = 80.0f;
+            }
+        }
+
+        if (actions & GAME_ACTION_CAMERA_TURN_DOWN) {
+            pitch -= turnSpeed * seconds;
+
+            if (pitch <= -80.0f) {
+                pitch = -80.0f;
+            }
+        }
+
+        // direction = XE::mat3RotationX(XE::radians(pitch)) * XE::mat3RotationY(XE::radians(yaw)) * XE::Vector3(0.0f, 0.0f, -1.0f);
+        direction = XE::mat3Rotation(XE::radians(pitch), {1.0f, 0.0f, 0.0f}) * XE::mat3RotationY(XE::radians(yaw)) * XE::Vector3(0.0f, 0.0f, -1.0f);
+        const auto cameraRight = XE::normalize(XE::cross(direction, up));
+
+        if (actions & GAME_ACTION_CAMERA_MOVE_FORWARD) {
+            position += seconds * movementSpeed * direction;
+        }
+
+        if (actions & GAME_ACTION_CAMERA_MOVE_BACKWARD) {
+            position -= seconds * movementSpeed * direction;
+        }
+
+        if (actions & GAME_ACTION_CAMERA_MOVE_RIGHT) {
+            position += seconds * movementSpeed * cameraRight;
+        }
+
+        if (actions & GAME_ACTION_CAMERA_MOVE_LEFT) {
+            position -= seconds * movementSpeed * cameraRight;
+        }
+
+        direction.Y = position.Y = 0.25f;
+
+        lookAt = position + direction;
+    }
+
+    XE::Matrix4 getViewProj(const int screenWidth, const int screenHeight) const {
+        const auto aspectRatio = screenHeight / static_cast<float>(screenWidth);
+        const auto proj = XE::mat4Perspective(XE::radians(60.0f), aspectRatio, 0.0001f, 1000.0f);
+        const auto view = XE::mat4LookAtRH(position, lookAt, up);
+
+        std::printf("cameraPos: %0.2f, %0.2f, %0.2f\n", position.X, position.Y, position.Z);
+        std::printf("cameraDir: %0.2f, %0.2f, %0.2f\n", direction.X, direction.Y, direction.Z);
+
+        return proj * view;
+    }
+};
+
+
+struct Transformation {
+    XE::Vector3 scale = {1.0f, 1.0f, 1.0f};
+    XE::Vector3 position;
+    XE::Vector3 rotation;
+
+    XE::Matrix4 computeModelMatrix() const { 
+        return 
+            XE::mat4Translation(position) * 
+            XE::mat4RotationX(rotation.X) * 
+            XE::mat4RotationY(rotation.Y) * 
+            XE::mat4RotationZ(rotation.Z);
+    }
+};
+
+
+struct ActionState {
+    int actions = 0;
+    bool quit = false;
+
+    std::map<int, int> actionMap;
+
+    ActionState() {
+        actionMap = {
+            {SDLK_LEFT, GAME_ACTION_CAMERA_TURN_LEFT}, 
+            {SDLK_RIGHT, GAME_ACTION_CAMERA_TURN_RIGHT}, 
+            {SDLK_UP, GAME_ACTION_CAMERA_TURN_UP},
+            {SDLK_DOWN, GAME_ACTION_CAMERA_TURN_DOWN},
+            {SDLK_a, GAME_ACTION_CAMERA_MOVE_LEFT},
+            {SDLK_d, GAME_ACTION_CAMERA_MOVE_RIGHT},   
+            {SDLK_w, GAME_ACTION_CAMERA_MOVE_FORWARD},
+            {SDLK_s, GAME_ACTION_CAMERA_MOVE_BACKWARD},
+            {SDLK_ESCAPE, GAME_ACTION_QUIT}, 
+        };
+    }
+
+    void update(const SDL_Event &e) {
+        if (e.type == SDL_QUIT) {
+            quit = true;
+        }
+
+        if (e.type == SDL_MOUSEMOTION) {
+            const auto xrel = e.motion.xrel;
+            const auto yrel = e.motion.yrel;
+
+            std::printf("MouseMotion: %d, %d", xrel, yrel);
+        }
+
+        if (e.type == SDL_KEYDOWN || e.type == SDL_KEYUP) {
+            auto it = actionMap.find(e.key.keysym.sym);
+            if (it == actionMap.end()) {
+                return;
+            }
+
+            const auto action = it->second;
+
+            if (e.type == SDL_KEYDOWN) {
+                actions |= action;
+            }
+
+            if (e.type == SDL_KEYUP) {
+                actions &= ~action;
+            }
+        }
+
+        // FIXME: an action map should not become a action handler
+        if (actions & GAME_ACTION_QUIT) {
+            quit = true;
+        }
+    }
+};
+
+
+struct Timer {
+    Uint64 lastTime = SDL_GetTicks64();
+
+    //! must be called one per frame
+    float getFrameTimeInSeconds() {
+        auto seconds = (SDL_GetTicks64() - lastTime) / 1000.0f;
+        lastTime = SDL_GetTicks64();
+
+        return seconds;
+    }
+};
 
 
 int main(int /*argc*/, char */*argv*/[]) {
@@ -199,8 +404,8 @@ int main(int /*argc*/, char */*argv*/[]) {
     }
     
 #ifndef NDEBUG
-    glad_set_post_callback_gl(GraphicsDeviceGL_callback);
-    glad_set_post_callback(GraphicsDeviceGL_callback);
+    glad_set_post_callback_gl(GL_callback);
+    glad_set_post_callback(GL_callback);
 #endif
 
     // initialize GL state, and render a single triangle
@@ -241,13 +446,8 @@ void main() {
 }
 )";
 
-    std::printf("OpenGL info:\n");
-    std::printf("GL_VENDOR: %s\n", glGetString(GL_VENDOR));
-    std::printf("GL_RENDERER: %s\n", glGetString(GL_RENDERER));
-    std::printf("GL_VERSION: %s\n", glGetString(GL_VERSION));
-    std::printf("GL_SHADING_LANGUAGE_VERSION: %s\n", glGetString(GL_SHADING_LANGUAGE_VERSION));
-
     const RendererGL renderer;
+
     const GLuint program = renderer.createProgram({
         renderer.createShader(GL_VERTEX_SHADER, vertexShader), 
         renderer.createShader(GL_FRAGMENT_SHADER, fragmentShader)});
@@ -266,38 +466,8 @@ void main() {
     const GLint vertCoordZLoc = glGetAttribLocation(program, "vertCoordZ");
     assert(vertCoordZLoc >= 0);
 
-    // prepare buffer 
-    const int VERTEX_COLOUR = 3;
-
-    const GLfloat vertices[] = {
-        0.0f, 0.5f, 0.0f,
-        0.5f, -0.5f, 0.0f,
-        -0.5f, -0.5f, 0.0f
-    };
-
-    const GLfloat colours[] = {
-        1.0f, 0.0f, 0.0f, 1.0f,
-        0.0f, 1.0f, 0.0f, 1.0f,
-        0.0f, 0.0f, 1.0f, 1.0f,
-    };
-
-    const GLuint vertexBuffer = renderer.createBuffer(GL_ARRAY_BUFFER, GL_STATIC_DRAW, vertices, sizeof(GLfloat) * VERTEX_COLOUR * 3);
-    const GLuint colourBuffer = renderer.createBuffer(GL_ARRAY_BUFFER, GL_STATIC_DRAW, colours, sizeof(GLfloat) * VERTEX_COLOUR * 4);
-
-    GLuint triangleVao;
-    glGenVertexArrays(1, &triangleVao);
-    glBindVertexArray(triangleVao);
-    glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
-    glEnableVertexAttribArray(vertCoordLoc);
-    glVertexAttribPointer(vertCoordLoc, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
-
-    glBindBuffer(GL_ARRAY_BUFFER, colourBuffer);
-    glEnableVertexAttribArray(vertColorLoc);
-    glVertexAttribPointer(vertColorLoc, 4, GL_FLOAT, GL_FALSE, 0, nullptr);
-
-    glBindVertexArray(0);
-
     const auto floor = createFloorGeometry(renderer, vertCoordLoc, vertColorLoc, 10, 10, 1.0f, 1.0f);
+    GLuint triangleVao = createTriangleGeometry(renderer, vertCoordLoc, vertColorLoc);
 
     //Use Vsync
     std::printf("Configuring swap interval\n");
@@ -311,85 +481,30 @@ void main() {
 
     float angle = 0.0f;
 
-    bool cameraMoveForward = false;
-    bool cameraMoveBackward = false;
-    bool cameraTurnLeft = false;
-    bool cameraTurnRight = false;
+    Camera camera;
+    Timer timer;
+    ActionState actionState;
 
-    const float cameraSpeed = 1.0f;
-    XE::Vector3 cameraPos;
-    XE::Vector3 cameraLookAt;
-    XE::Vector3 cameraDir = {0.0f, 0.0f, -1.0f};
-    float cameraAngle = 0.0f;
-
-    auto ticksLastTime = SDL_GetTicks64();
-
-    bool quit = false;
-    while( !quit ) {
-        auto seconds = (SDL_GetTicks64()  - ticksLastTime) / 1000.0f;
-        ticksLastTime = SDL_GetTicks64();
+    while (!actionState.quit) {
+        auto seconds = timer.getFrameTimeInSeconds();
 
         assert(seconds >= 0.0f);
 
         while( SDL_PollEvent( &e ) ) {
-            if( e.type == SDL_QUIT ) {
-                quit = true;
-            }
-
-            switch (e.type) {
-            case SDL_KEYDOWN:
-            case SDL_KEYUP:
-                switch (e.key.keysym.sym) {
-                case SDLK_LEFT:
-                    cameraTurnLeft = (e.type == SDL_KEYDOWN);
-                    break;
-
-                case SDLK_RIGHT:
-                    cameraTurnRight = (e.type == SDL_KEYDOWN);
-                    break;
-
-                case SDLK_UP:
-                    cameraMoveForward = (e.type == SDL_KEYDOWN);
-                    break;
-
-                case SDLK_DOWN:
-                    cameraMoveBackward = (e.type == SDL_KEYDOWN);
-                    break;
-                }
-                break;
-            }
+            actionState.update(e);
         }
-        
-        if ((angle += 100.0f * seconds) > 360.0f) {
+
+        camera.update(seconds, actionState.actions);
+
+        if ((angle += 30.0f * seconds) > 360.0f) {
             angle = std::fmod(angle, 360.0f);
         }
-
-        if (cameraTurnLeft) {
-            cameraAngle += 50.0f * seconds;
-        }
-
-        if (cameraTurnRight) {
-            cameraAngle -= 50.0f * seconds;
-        }
-
-        cameraDir = XE::mat3RotationY(XE::radians(cameraAngle)) * XE::Vector3(0.0f, 0.0f, -1.0f);
-
-        if (cameraMoveForward) {
-            cameraPos += seconds * cameraSpeed * cameraDir;
-        }
-
-        if (cameraMoveBackward) {
-            cameraPos -= seconds * cameraSpeed * cameraDir;
-        }
-
-        cameraDir.Y = cameraPos.Y = 0.25f;
-
-        cameraLookAt = cameraPos + cameraDir;
 
         glEnable(GL_DEPTH_TEST);
         glDepthFunc(GL_LEQUAL);
 
         glClearColor(0.2f, 0.2f, 0.25f, 1.0f);
+        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -397,24 +512,23 @@ void main() {
         glUseProgram(program);
 
         const int mvpLoc = glGetUniformLocation(program, "uMvp");
+        const auto viewProj = camera.getViewProj(SCREEN_WIDTH, SCREEN_HEIGHT);
 
-        const auto aspectRatio = SCREEN_HEIGHT / static_cast<float>(SCREEN_WIDTH);
+        // render triangle
+        Transformation transformation;
+        transformation.rotation.X = XE::radians(angle);
+        transformation.rotation.Y = XE::radians(angle);
+        transformation.rotation.Z = XE::radians(angle);
 
-        const auto viewProj = 
-            XE::mat4Perspective(XE::radians(60.0f), aspectRatio, 0.0001f, 1000.0f) *
-            XE::mat4LookAtRH(cameraPos, cameraLookAt, {0.0f, 1.0f, 0.0f});
-
-        std::printf("cameraPos: %0.2f, %0.2f, %0.2f\n", cameraPos.X, cameraPos.Y, cameraPos.Z);
-        std::printf("cameraDir: %0.2f, %0.2f, %0.2f\n", cameraDir.X, cameraDir.Y, cameraDir.Z);
-
-        const auto triangleMatrix = viewProj * XE::mat4Translation({0.0f, 0.0f, 0.0f}) * XE::mat4RotationY(XE::radians(angle));
-
+        const auto triangleMatrix = viewProj * transformation.computeModelMatrix();
+        
         glUniformMatrix4fv(mvpLoc, 1, GL_FALSE, triangleMatrix.data());
 
         glBindVertexArray(triangleVao);
         glVertexAttrib1f(vertCoordZLoc, 0.0f);
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 3);
 
+        // render floor geometry
         const auto floorMatrix = viewProj;
         glUniformMatrix4fv(mvpLoc, 1, GL_FALSE, floorMatrix.data());
         renderFloorGeometry(floor, vertCoordZLoc, vertColorLoc);

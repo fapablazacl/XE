@@ -406,10 +406,10 @@ namespace XE {
             const auto matUUT = TMatrix<T, 3, 1>{V} * TMatrix<T, 1, 3>{V};
             const auto tempResult = matUUT + cos * (I - matUUT) + sin * matS;
 
-            auto result = matIdentity<T, 4>();
+            auto result = matIdentity<T, N>();
 
-            for (int i = 0; i < 3; ++i) {
-                for (int j = 0; j < 3; ++j) {
+            for (int i = 0; i < N; ++i) {
+                for (int j = 0; j < N; ++j) {
                     result(i, j) = tempResult(i, j);
                 }
             }
