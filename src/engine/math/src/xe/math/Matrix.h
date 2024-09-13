@@ -408,8 +408,8 @@ namespace XE {
 
             auto result = matIdentity<T, N>();
 
-            for (int i = 0; i < N; ++i) {
-                for (int j = 0; j < N; ++j) {
+            for (int i = 0; i < 3; ++i) {
+                for (int j = 0; j < 3; ++j) {
                     result(i, j) = tempResult(i, j);
                 }
             }
