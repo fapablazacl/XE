@@ -14,11 +14,6 @@
 #include "Common.h"
 
 namespace Sandbox {
-    class SceneLoaderGLTF : public SceneLoader {
-    public:
-        Scene load(const std::string &filePath) const override;
-    };
-
     using SceneNodeCallback = std::function<void(const XE::Matrix4 &transform, const std::string &meshName)>;
 
     class Asset_CGLTF {

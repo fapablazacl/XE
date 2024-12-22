@@ -294,6 +294,4 @@ namespace Sandbox {
         //     visitNode(0, scene->nodes[i]);
         // }
     }
-
-    Scene SceneLoaderGLTF::load(const std::string &) const { return {}; }
 } // namespace Sandbox
