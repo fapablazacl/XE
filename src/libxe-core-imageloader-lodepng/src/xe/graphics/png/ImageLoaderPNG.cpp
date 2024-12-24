@@ -1,11 +1,11 @@
 
-#include <ImageLoaderPNG.h>
+#include "ImageLoaderPNG.h"
 
-#include <../../../../../libxe-core/src/xe/graphics/Image.h>
-#include <../../../../../libxe-core/src/xe/io/Stream.h>
-#include <LodePNG/lodepng.h>
 #include <iostream>
 #include <vector>
+#include "xe/graphics/Image.h"
+#include "xe/io/Stream.h"
+#include "LodePNG/lodepng.h"
 
 namespace XE {
     class ImagePNG : public Image {
