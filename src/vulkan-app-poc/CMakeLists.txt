@@ -1,6 +1,5 @@
 
 find_package(Vulkan REQUIRED)
-
 if (NOT Vulkan_FOUND)
     message(STATUS "Vulkan not found. vulkan-poc target is unavailable")
     return()
@@ -10,7 +9,7 @@ hunter_add_package(glfw)
 find_package(glfw3 CONFIG REQUIRED)
 
 set (target "vulkan-app-poc")
-set (src "VulkanAppPoc.cpp")
+set (src VulkanAppMain.cpp HostPlatform.h HostPlatform.cpp VulkanRenderer.h VulkanRenderer.cpp)
 
 add_executable(${target} ${src})
 
@@ -22,5 +21,4 @@ target_link_libraries(
   PUBLIC ${Vulkan_LIBRARIES} 
   PUBLIC glfw
   PRIVATE XE.Interface
-        PRIVATE Vulkan::Vulkan
 )
