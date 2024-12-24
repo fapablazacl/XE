@@ -1,20 +1,21 @@
-
 cmake_minimum_required (VERSION 3.16)
+
+include("cmake/HunterGate.cmake")
+
+HunterGate(
+    URL "https://github.com/cpp-pm/hunter/archive/v0.25.6.tar.gz"
+    SHA1 "69e4a05bd514bb05cb2c5aa02ce8ac420516aaf7"
+)
 
 project (XE)
 
 option (XE_PLUGIN_PNG           "Include PNG image support via LodePNG" ON)
-option (XE_PLUGIN_DIRECT3D11    "Include Direct3D 11 support" OFF)
 option (XE_PLUGIN_GL            "Include OpenGL 3+ support" ON)
 option (XE_PLUGIN_ES2           "Include OpenGL ES 2 support" OFF)
 option (XE_PLUGIN_GL_GLFW       "Include GLFW-based Window and Context creation support (requires 'XE_PLUGIN_GL')" ON)
-option (XE_PLUGIN_VULKAN        "Include Vulkan support" OFF)
-
-option (XE_EXAMPLE_SANDBOX      "Include example program that is used for various development activities" OFF)
 
 # options suited for development
 option (XE_DEV_UNIT_TEST            "Enable unit test suite" ON)
-option (XE_DEV_BENCHMARK_TEST       "Enable benchmark tests" OFF)
 option (XE_DEV_WARNINGS_AS_ERRORS   "Marks all warnings as errors" OFF)
 option (XE_DEV_INSTRUMENT_COVERAGE  "Instrument code for code coverage reporting during unit tests" OFF)
 option (XE_DEV_PRECOMPILED_HEADERS  "Enable precompiled headers for internal libraries, to improve build times" OFF)
@@ -36,6 +37,7 @@ add_definitions(-DXE_MEDIA_PATH="${CMAKE_CURRENT_LIST_DIR}/media")
 if (XE_DEV_UNIT_TEST)
     include(CTest)
     enable_testing()
+    hunter_add_package(GTest)
     find_package(GTest CONFIG REQUIRED)
 endif()
 
