@@ -14,7 +14,7 @@ option (XE_PLUGIN_DIRECT3D11    "Include Direct3D 11 support" OFF)
 option (XE_PLUGIN_GL            "Include OpenGL 3+ support" ON)
 option (XE_PLUGIN_ES2           "Include OpenGL ES 2 support" OFF)
 option (XE_PLUGIN_GL_GLFW       "Include GLFW-based Window and Context creation support (requires 'XE_PLUGIN_GL')" ON)
-option (XE_PLUGIN_VULKAN        "Include Vulkan support" OFF)
+option (XE_PLUGIN_VULKAN        "Include Vulkan support" ON)
 
 # options suited for development
 option (XE_DEV_UNIT_TEST            "Enable unit test suite" ON)

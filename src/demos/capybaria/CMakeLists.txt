@@ -7,7 +7,6 @@ find_package(cgltf CONFIG REQUIRED)
 hunter_add_package(SDL2)
 find_package(SDL2 CONFIG REQUIRED)
 
-
 set (target "capybaria")
 set (src
 	"src/sandbox_main.cpp"

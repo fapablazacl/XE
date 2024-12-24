@@ -1,3 +1,9 @@
+
+find_package(Vulkan REQUIRED)
+
+hunter_add_package(glfw)
+find_package(glfw3 CONFIG REQUIRED)
+
 set (target "XE.Graphics.Vulkan.TestApp")
 set (src "Main.cpp")
 
@@ -11,4 +17,5 @@ target_link_libraries(
   PUBLIC ${Vulkan_LIBRARIES} 
   PUBLIC glfw
   PRIVATE XE.Interface
+        PRIVATE Vulkan::Vulkan
 )
