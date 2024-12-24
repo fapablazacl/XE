@@ -1,5 +1,0 @@
-add_subdirectory ("libxe-core")
-add_subdirectory ("libxe-math")
-add_subdirectory ("plugins")
-add_subdirectory ("libxe-scene")
-add_subdirectory ("libxe-geometry")
