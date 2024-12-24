@@ -1,6 +1,7 @@
-add_subdirectory(capybaria)
-add_subdirectory(vulkan-app-poc)
-add_subdirectory(d3d11-app-poc)
+add_subdirectory("apostate")
+add_subdirectory("capybaria")
+add_subdirectory("vulkan-app-poc")
+add_subdirectory("d3d11-app-poc")
 
 add_subdirectory ("libxe-core")
 add_subdirectory ("libxe-math")
