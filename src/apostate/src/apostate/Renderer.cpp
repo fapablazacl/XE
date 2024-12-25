@@ -1,11 +1,12 @@
 
-#include <apostate/Renderer.h>
-#include <apostate/Platform.h>
+#include "Renderer.h"
 
+#include "Platform.h"
+
+#include <cassert>
 #include <iostream>
 #include <memory>
 #include <vector>
-#include <cassert>
 
 #include <glad/glad.h>
 

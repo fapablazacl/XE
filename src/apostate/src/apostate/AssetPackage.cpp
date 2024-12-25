@@ -1,5 +1,5 @@
 
-#include <apostate/AssetPackage.h>
+#include "AssetPackage.h"
 
 #include <cassert>
 #include <fstream>

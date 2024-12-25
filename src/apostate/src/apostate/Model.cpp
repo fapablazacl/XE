@@ -1,5 +1,5 @@
 
-#include <apostate/Model.h>
+#include "Model.h"
 
 void Model::render(Renderer &renderer, const ShaderLocationMap &location) const {
     glm::mat4 transform = glm::identity<glm::mat4>();

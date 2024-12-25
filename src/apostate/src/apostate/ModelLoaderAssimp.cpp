@@ -1,19 +1,16 @@
 
+#include "ModelLoaderAssimp.h"
+
 #include "Logger.h"
+#include "MiscUtils.h"
+#include "Model.h"
 
-#include <apostate/ModelLoaderAssimp.h>
-
-#include <apostate/Model.h>
-#include <apostate/Renderer.h>
-#include <apostate/TextureRepository.h>
-#include <apostate/MiscUtils.h>
-
-#include <iostream>
-#include <stdexcept>
 #include <filesystem>
+#include <glm/fwd.hpp>
+#include <iostream>
 #include <optional>
 #include <regex>
-
+#include <stdexcept>
 
 namespace fs = std::filesystem;
 

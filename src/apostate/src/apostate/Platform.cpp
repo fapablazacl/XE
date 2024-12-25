@@ -1,5 +1,6 @@
 
-#include <apostate/Platform.h>
+#include "Platform.h"
+
 #include <glad/glad.h>
 
 #include <iostream>

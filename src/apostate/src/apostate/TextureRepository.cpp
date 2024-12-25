@@ -1,11 +1,12 @@
 
-#include <apostate/TextureRepository.h>
+#include "TextureRepository.h"
 
-#include <iostream>
+#include "Image.h"
+#include "ImageLoader.h"
+#include "Renderer.h"
+
 #include <cassert>
-#include <apostate/Renderer.h>
-#include <apostate/Image.h>
-#include <apostate/ImageLoader.h>
+#include <iostream>
 
 TextureRepository::TextureRepository(ImageLoader &loader) : loader{loader} {}
 

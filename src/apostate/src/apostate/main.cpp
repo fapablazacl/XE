@@ -1,15 +1,15 @@
 
-#include <apostate/AssetPackage.h>
-#include <apostate/Renderer.h>
-#include <apostate/TextureRepository.h>
-#include <apostate/Platform.h>
-#include <apostate/Model.h>
-#include <apostate/ModelLoaderAssimp.h>
-#include <apostate/ImageLoaderFI.h>
+#include "AssetPackage.h"
+#include "ImageLoaderFI.h"
+#include "Model.h"
+#include "ModelLoaderAssimp.h"
+#include "Platform.h"
+#include "Renderer.h"
+#include "TextureRepository.h"
 
-#include <vector>
 #include <iostream>
 #include <optional>
+#include <vector>
 
 #include <nlohmann/json.hpp>
 
