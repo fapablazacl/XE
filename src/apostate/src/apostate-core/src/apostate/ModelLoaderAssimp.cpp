@@ -1,4 +1,6 @@
 
+#include "Logger.h"
+
 #include <apostate/ModelLoaderAssimp.h>
 
 #include <apostate/Model.h>
@@ -281,13 +283,10 @@ std::vector<GLuint> createTextureArray(const aiScene* scene, Renderer &renderer,
 
         if (height == 0) {
             const std::string imageTypeHint = scene->mTextures[ti]->achFormatHint;
-            std::cout << "Loading compressed texture " << name << ", with compressed type (hint:" << imageTypeHint << ")" << std::endl;
+            XE_LOG_INFO("Going to load compressed texture map {} with {} format from buffer {}\n", name, imageTypeHint, data);
             textures[ti] = textureRepository.createTexture(renderer, imageTypeHint, width, data);
         } else {
-            std::cout 
-                << "Loading texture " << name
-                << ", with size " << width << "x" << height
-                << std::endl;
+            XE_LOG_INFO("Loading texture map {} with size {}x{}", name, width, height);
 
             const GLuint wrap = (formatHint) ? GL_REPEAT : GL_CLAMP_TO_EDGE;
             textures[ti] = renderer.createTexture(GL_RGBA8, width, height, GL_BGRA, GL_UNSIGNED_BYTE, data, wrap, wrap);
@@ -432,14 +431,13 @@ Material createMaterial(const std::string &parentPath, Renderer &renderer, Textu
     if (!aimaterial) {
         return {};
     }
-    
-    std::cout << "Creating material " << aimaterial->GetName().C_Str() << " ..." << std::endl;
+
+    XE_LOG_INFO("Creating material {}\n", aimaterial->GetName().C_Str());
 
     Material material;
     
     // extract material colors
     const MaterialImportedProperties props = extractProperties(*aimaterial);
-    
     material.ambient.color = extract(props.ambient, glm::vec4{0.0f, 0.0f, 0.0f, 1.0f});
     material.diffuse.color = extract(props.diffuse, glm::vec4{0.0f, 0.0f, 0.0f, 1.0f});
     material.specular.color = extract(props.specular, glm::vec4{0.0f, 0.0f, 0.0f, 1.0f});
@@ -481,8 +479,24 @@ Material createMaterial(const std::string &parentPath, Renderer &renderer, Textu
         
         std::cout << "    " << "Texture type: " << to_str(textureType) << ", has this filename: \"" << fileName << "\"" << std::endl;
         std::string filePath = join(split(fileName, "\\"), "/");
-        
-        if (filePath[0] == '/') {
+
+        if (filePath[0] == '*') {
+            std::cout << "Texture embedded directly into the scene" << std::endl;
+
+            const std::string indexPart = fileName.substr(1, fileName.size() - 1);
+            const auto index = static_cast<size_t>(std::atoi(indexPart.c_str()));
+
+            if (index < textures.size()) {
+                std::cout << "    " << "Linking texture index " << index << " in this material." << std::endl;
+
+                setupTextureMap(material, textures[index], textureType);
+                continue;
+            }
+            else {
+                std::cout << "    " << "Can't link texture index " << index << " in this material. Scene Textures just have " << (textures.size() + 1) << " elements" << std::endl;
+            }
+        }
+        else if (filePath[0] == '/') {
             if (! can_be_opened(filePath)) {
                 const std::string textureParentPath = parent_path(filePath);
                 
@@ -508,22 +522,6 @@ Material createMaterial(const std::string &parentPath, Renderer &renderer, Textu
             std::cout << "    " << "Normalizing path for texture: " << to_str(textureType) << " = " << fileName << " -> " << filePath << std::endl;
 
             setupTextureMap(material, textureRepository.getOrCreate(filePath, renderer), textureType);
-        } 
-        else if (fileName.size() >= 2 && fileName[0] == '*') {
-            std::cout << "Texture embedded directly into the scene" << std::endl;
-
-            const std::string indexPart = fileName.substr(1, fileName.size() - 1);
-            const auto index = static_cast<size_t>(std::atoi(indexPart.c_str()));
-
-            if (index < textures.size()) {
-                std::cout << "    " << "Linking texture index " << index << " in this material." << std::endl;
-
-                setupTextureMap(material, textures[index], textureType);
-            } 
-            else {
-                std::cout << "    " << "Can't link texture index " << index << " in this material. Scene Textures just have " << (textures.size() + 1) << " elements" << std::endl;
-            }
-
         }
         else {
             std::cout << "    " << "Texture filepath normalization failed, because it cannot be opened. The generated filepath was: " << filePath << std::endl;

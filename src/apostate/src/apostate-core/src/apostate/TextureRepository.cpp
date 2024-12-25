@@ -39,6 +39,11 @@ GLuint TextureRepository::createTexture(const char* theFileName, Renderer &rende
     assert(std::string(theFileName) != "");
 
     const std::unique_ptr<Image> image = loader.loadImage(theFileName);
+
+    if (!image) {
+        return 0;
+    }
+
     const ImageData imageData = image->getData();
 
     return createTexture(renderer, imageData);

@@ -1,12 +1,3 @@
-/**
- * @file apostate.cpp
- * @author Felipe Apablaza
- * @brief Modulo principal de codigo
- * @version 0.1
- * @date 2022-09-03
- * 
- * @copyright Copyright (c) 2022
- */
 
 #include <apostate/AssetPackage.h>
 #include <apostate/Renderer.h>
