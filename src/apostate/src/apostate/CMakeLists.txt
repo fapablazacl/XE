@@ -50,7 +50,7 @@ add_executable(${target}
         Logger.cpp
         Logger.h
 
-        main.cpp
+        ApostateMain.cpp
 )
 
 target_link_libraries(

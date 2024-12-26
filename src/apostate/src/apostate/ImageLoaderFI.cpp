@@ -79,19 +79,24 @@ std::unique_ptr<Image> ImageLoaderFI::loadImage(const std::string &file) const {
     std::filesystem::path path{file};
 
     if (!std::filesystem::exists(path)) {
-        std::cerr << "File: \"" << file << "\" doesn't exists." << std::endl;
+        XE_LOG_WARNING("Bitmap file {} doesn't exists.\n", file);
         return {};
     }
 
     const std::string type = path.extension().string();
-    FREE_IMAGE_FORMAT imageType = mapType(type);  // Assuming PNG for simplicity
+    FREE_IMAGE_FORMAT imageType = mapType(type);
     FIBITMAP *bitmap = FreeImage_Load(imageType, file.c_str());
     if (!bitmap) {
-        std::cerr << "Image load failed: \"" << file << "\"" << std::endl;
+        XE_LOG_WARNING("Failed load bitmap file {} to 24 bits.\n", file);
         return {};
     }
 
     FIBITMAP *convertedBitmap = FreeImage_ConvertTo24Bits(bitmap);
+    if (!convertedBitmap) {
+        XE_LOG_WARNING("Failed to convert bitmap file {} to 24 bits.\n", file);
+        FreeImage_Unload(bitmap);
+        return {};
+    }
 
     FreeImage_Unload(bitmap);
 

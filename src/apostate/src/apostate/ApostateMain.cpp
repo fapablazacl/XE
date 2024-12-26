@@ -74,12 +74,21 @@ int main(int argc, char **argv) {
 
     const std::string mediaFolder = "/Users/fapablaza/Dropbox/GameDev";
 
-    // const std::string sceneFilePath = "Capybaras/capybara.glb";
-    const std::string sceneFilePath = "Capybaras/capybara_01/source/capybara.glb";
-    // const std::string sceneFilePath = "Capybaras/capybara_02/source/Capybara.fbx";
-    // this have some reading errors
-    // const std::string sceneFilePath = "Capybaras/capybara-low-poly/source/Capybara.fbx";
-    // const std::string sceneFilePath = "Capybaras/carpincho-capybara-vrchat-avatar/source/Carpincho/Carpincho.obj";
+    const std::vector<std::string> modelFiles = {
+        "Generic/the-bathroom-free/source/Old House scene.fbx",
+        /*
+        "Generic/phoenix-bird/source/fly.fbx",
+
+        "Generic/abandoned-warehouse-interior-scene/abandoned_warehouse_-_interior_scene.glb",
+        "Capybaras/capybara.glb",
+        "Capybaras/capybara.glb",
+        "Capybaras/capybara_01/source/capybara.glb",
+        // this one have some reading errors
+        // "Capybaras/capybara_02/source/Capybara.fbx",
+        // "Capybaras/capybara-low-poly/source/Capybara.fbx",
+        "Capybaras/carpincho-capybara-vrchat-avatar/source/Carpincho/Carpincho.obj"
+        */
+    };
 
     ImageLoaderFI imageLoader;
     TextureRepository textureRepository{imageLoader};
@@ -112,8 +121,20 @@ int main(int argc, char **argv) {
     const ShaderLocationMap location = renderer.createShaderLocationMap(renderer.program);
 
     ModelLoaderAssimp modelLoader;
-    Model model = modelLoader.createModel(mediaFolder + "/" + sceneFilePath, renderer, textureRepository, location);
-    
+
+    std::vector<Model> models;
+
+    for (const auto &modelFile : modelFiles) {
+        std::string modelPath;
+        modelPath.append(mediaFolder);
+        modelPath.append("/");
+        modelPath.append(modelFile);
+
+        Model model = modelLoader.createModel(modelPath, renderer, textureRepository, location);
+
+        models.push_back(model);
+    }
+
     const Lighting lighting = {
         {0.1f, 0.1f, 0.1f, 0.1f}, {
             Light {
@@ -172,7 +193,10 @@ int main(int argc, char **argv) {
         renderer.beginRenderFrame();
         renderer.renderCamera(location, camera);
         renderer.renderLighting(renderer.program, lighting);
-        model.render(renderer, location);
+
+        for (const auto &model : models) {
+            model.render(renderer, location);
+        }
 
         renderer.endRenderFrame();
 
