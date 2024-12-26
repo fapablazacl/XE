@@ -77,6 +77,7 @@ vec4 computeLighting(Lighting lighting, Material material, vec3 normal) {
 
 
 void main() {
+    // this block of code generates a segmentation fault in MacOS while performing linking
     // vec3 normal = fragNormal;
     // finalColor = computeLighting(uLighting, uMaterial, normal);
 

@@ -129,6 +129,7 @@ Model ModelLoaderAssimp::createModel(
 
     // If the import failed, report it
     if (!scene) {
+        XE_LOG_ERROR("Failed to load scene at {}. Assimp error: {}\n", sceneFilePath, importer.GetErrorString());
         throw std::runtime_error(importer.GetErrorString());
     }
 
@@ -360,7 +361,7 @@ void setupTextureMap(Material &material, const GLuint textureMap, const aiTextur
         break;
 
     default:
-        std::cout << "    " << "Warning: missing case for texture type " << textureType << std::endl;
+        XE_LOG_WARNING("Missing case for texture type {}\n", static_cast<int>(textureType));
     }
 }
 

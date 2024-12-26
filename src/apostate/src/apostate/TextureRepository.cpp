@@ -3,6 +3,7 @@
 
 #include "Image.h"
 #include "ImageLoader.h"
+#include "Logger.h"
 #include "Renderer.h"
 
 #include <cassert>
@@ -58,13 +59,22 @@ GLuint TextureRepository::createTexture(Renderer &renderer, const std::string &i
 
 
 GLuint TextureRepository::createTexture(Renderer &renderer, const ImageData &image) const {
-    GLenum internalFormat = 0;
+    GLenum internalFormat = GL_RGB;
+    GLenum format = GL_RGB;
 
     switch (image.bpp) {
-    case 3: internalFormat = GL_RGB; break;
-    case 4: internalFormat = GL_RGBA; break;
-    default: internalFormat = GL_RGB;
+    case 24:
+        internalFormat = GL_RGB;
+        format = GL_BGR;
+        break;
+
+    case 32:
+        internalFormat = GL_RGBA;
+        format = GL_BGRA;
+        break;
+    default:
+        XE_LOG_WARNING("TextureRepository::createTexture: Unsupported image bpp {}. Defaulting to GL_RGB\n", image.bpp);
     }
     
-    return renderer.createTexture(internalFormat, image.width, image.height, internalFormat, GL_UNSIGNED_BYTE, image.pixels);
+    return renderer.createTexture(internalFormat, image.width, image.height, format, GL_UNSIGNED_BYTE, image.pixels);
 }

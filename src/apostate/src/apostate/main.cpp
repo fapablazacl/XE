@@ -63,12 +63,23 @@ int main(int argc, char **argv) {
     std::cout << "Apostate Project" << std::endl;
     std::cout << "Copyright(c) 2022 Felipe Apablaza" << std::endl;
 
+    /*
     if (argc < 2) {
         std::cerr << "Command Line Error: Missing model file path in the command line." << std::endl;
         return EXIT_FAILURE;
     }
 
     const std::string sceneFilePath = argv[1];
+    */
+
+    const std::string mediaFolder = "/Users/fapablaza/Dropbox/GameDev";
+
+    // const std::string sceneFilePath = "Capybaras/capybara.glb";
+    const std::string sceneFilePath = "Capybaras/capybara_01/source/capybara.glb";
+    // const std::string sceneFilePath = "Capybaras/capybara_02/source/Capybara.fbx";
+    // this have some reading errors
+    // const std::string sceneFilePath = "Capybaras/capybara-low-poly/source/Capybara.fbx";
+    // const std::string sceneFilePath = "Capybaras/carpincho-capybara-vrchat-avatar/source/Carpincho/Carpincho.obj";
 
     ImageLoaderFI imageLoader;
     TextureRepository textureRepository{imageLoader};
@@ -101,7 +112,7 @@ int main(int argc, char **argv) {
     const ShaderLocationMap location = renderer.createShaderLocationMap(renderer.program);
 
     ModelLoaderAssimp modelLoader;
-    Model model = modelLoader.createModel(sceneFilePath, renderer, textureRepository, location);
+    Model model = modelLoader.createModel(mediaFolder + "/" + sceneFilePath, renderer, textureRepository, location);
     
     const Lighting lighting = {
         {0.1f, 0.1f, 0.1f, 0.1f}, {

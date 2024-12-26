@@ -1,6 +1,7 @@
 
 #include "Renderer.h"
 
+#include "Logger.h"
 #include "Platform.h"
 
 #include <cassert>
@@ -311,8 +312,7 @@ GLuint Renderer::createShader(const std::string &source, const GLenum type) {
         GLsizei size = 0;
 
         glGetShaderInfoLog(shader, 2048, &size, buffer);
-        const std::string msg = buffer;
-        std::cerr << msg << std::endl;
+        XE_LOG_ERROR("Error while compiling shader: {}\n", std::string(buffer));
 
         return 0;
     }
