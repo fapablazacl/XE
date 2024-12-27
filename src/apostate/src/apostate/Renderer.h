@@ -31,6 +31,19 @@ struct Camera {
     float aspect = 4.0f / 3.0f;
 };
 
+struct Transformation {
+    glm::vec3 scaling = glm::vec3(1.0f);
+    glm::vec3 translation = glm::vec3(0.0f);
+
+    glm::mat4 computeMatrix() const {
+        auto model = glm::identity<glm::mat4>();
+
+        model = glm::scale(model, scaling);
+        model = glm::translate(model, translation);
+
+        return model;
+    }
+};
 
 struct MaterialChannel {
     glm::vec4 color = {1.0f, 1.0f, 1.0f, 1.0f};
@@ -179,6 +192,8 @@ public:
     void renderMesh(const Mesh &mesh);
 
     void renderMeshes(const Mesh *meshes, const size_t count);
+
+    void renderTranformation(const ShaderLocationMap &location, const Transformation &transformation);
 
 public:
     Platform &platform;

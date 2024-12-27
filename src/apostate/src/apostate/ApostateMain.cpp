@@ -1,6 +1,7 @@
 
 #include "AssetPackage.h"
 #include "ImageLoaderFI.h"
+#include "Logger.h"
 #include "Model.h"
 #include "ModelLoaderAssimp.h"
 #include "Platform.h"
@@ -8,8 +9,9 @@
 #include "TextureRepository.h"
 
 #include <iostream>
-#include <optional>
+#include <map>
 #include <vector>
+#include <set>
 
 #include <nlohmann/json.hpp>
 
@@ -18,7 +20,7 @@ using namespace apostate;
 
 struct GameState {
     float angle = 0.0f;
-    glm::vec3 playerPosition = {0.0f, 0.25f, 10.0f};
+    glm::vec3 playerPosition = {0.0f, 5.25f, 10.0f};
     glm::vec3 playerDirection = {0.0f, 0.0f, 0.0f};
 
     void updateOrientation(const bool turnLeft, const bool turnRight) {
@@ -48,7 +50,6 @@ struct GameState {
     }
 };
 
-
 static GLuint createProgram(Renderer& renderer, AssetPackage &assetPackage, const std::string &vertFile, const std::string &fragFile) {
     const std::vector<GLuint> shaders {
         renderer.createShader(assetPackage.loadTextFile(vertFile), GL_VERTEX_SHADER), 
@@ -74,27 +75,32 @@ int main(int argc, char **argv) {
 
     const std::string mediaFolder = "/Users/fapablaza/Dropbox/GameDev";
 
-    const std::vector<std::string> modelFiles = {
-        "Generic/the-bathroom-free/source/Old House scene.fbx",
+    const std::map<std::string, std::string> modelFileMap = {
+        {"capybara01", "Capybaras/capybara_01/source/capybara.glb"},
+        {"capybara02", "Capybaras/capybara.glb"},
         /*
+         *"Generic/the-bathroom-free/source/Old House scene.fbx",
         "Generic/phoenix-bird/source/fly.fbx",
-
         "Generic/abandoned-warehouse-interior-scene/abandoned_warehouse_-_interior_scene.glb",
-        "Capybaras/capybara.glb",
-        "Capybaras/capybara.glb",
-        "Capybaras/capybara_01/source/capybara.glb",
-        // this one have some reading errors
+
+        // these two fbxs have some reading errors
         // "Capybaras/capybara_02/source/Capybara.fbx",
         // "Capybaras/capybara-low-poly/source/Capybara.fbx",
+
         "Capybaras/carpincho-capybara-vrchat-avatar/source/Carpincho/Carpincho.obj"
         */
     };
 
+    std::map<std::string, Transformation> modelTransformationMap = {
+        {"capybara01", Transformation{{1.0f, 1.0f, 1.0f}, {2.0f, 0.0f, 0.0f}}},
+        {"capybara02", Transformation{{1.0f, 1.0f, 1.0f}, {-2.0f, 0.0f, 0.0f}}}
+    };
+
     ImageLoaderFI imageLoader;
     TextureRepository textureRepository{imageLoader};
-    
+
     Camera camera;
-    
+
     Platform platform;
     if (!platform.initialize()) {
         std::cerr << "Failed platform initialization." << std::endl;
@@ -109,7 +115,7 @@ int main(int argc, char **argv) {
 
     AssetPackage assetPackage;
 
-    const GLuint 
+    const GLuint
     program = createProgram(renderer, assetPackage, "assets/gouraud.vert", "assets/gouraud.frag");
     if (! program) {
         std::cerr << "Failed to initialize Gouraud shader" << std::endl;
@@ -122,17 +128,17 @@ int main(int argc, char **argv) {
 
     ModelLoaderAssimp modelLoader;
 
-    std::vector<Model> models;
+    std::map<std::string, Model> modelMap;
 
-    for (const auto &modelFile : modelFiles) {
+    for (const auto &pair : modelFileMap) {
         std::string modelPath;
         modelPath.append(mediaFolder);
         modelPath.append("/");
-        modelPath.append(modelFile);
+        modelPath.append(pair.second);
 
         Model model = modelLoader.createModel(modelPath, renderer, textureRepository, location);
 
-        models.push_back(model);
+        modelMap.emplace(pair.first, model);
     }
 
     const Lighting lighting = {
@@ -161,6 +167,8 @@ int main(int argc, char **argv) {
 
     double lastTime = glfwGetTime();
     int fpsCount = 0;
+
+    std::set<std::string> modelsNotLoaded;
 
     while (running) {
         double current = glfwGetTime() - lastTime;
@@ -194,7 +202,21 @@ int main(int argc, char **argv) {
         renderer.renderCamera(location, camera);
         renderer.renderLighting(renderer.program, lighting);
 
-        for (const auto &model : models) {
+        for (const auto &modelTransformation : modelTransformationMap) {
+            const auto &modelName = modelTransformation.first;
+            const auto &transformation = modelTransformation.second;
+            const auto it = modelMap.find(modelName);
+
+            if (it == modelMap.end() && modelsNotLoaded.find(modelName) == modelsNotLoaded.end()) {
+                XE_LOG_WARNING("Model {} is not loaded. Skipping rendering (log once)\n", modelName);
+                modelsNotLoaded.insert(modelName);
+                continue;
+            }
+
+            auto &model = it->second;
+
+            // HACK: overriding the model's original root transformation, for testing purposes
+            model.rootNode.transform = transformation.computeMatrix();
             model.render(renderer, location);
         }
 

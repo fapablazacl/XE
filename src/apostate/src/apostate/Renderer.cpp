@@ -593,6 +593,8 @@ void Renderer::renderMaterial(const GLuint programId, const Material &material) 
 
 
 void Renderer::renderModelTransform(const ShaderLocationMap &location, const float *transform) {
+    assert(transform != nullptr);
+    assert(location.uModel >= 0);
     glUniformMatrix4fv(location.uModel, 1, GL_FALSE, transform);    
 }
 
@@ -617,4 +619,10 @@ void Renderer::renderMeshes(const Mesh *meshes, const size_t count) {
     for (size_t i = 0; i < count; i++) {
         renderMesh(meshes[i]);
     }
+}
+
+void Renderer::renderTranformation(const ShaderLocationMap &location, const Transformation &transformation) {
+    auto model = transformation.computeMatrix();
+
+    this->renderModelTransform(location, value_ptr(model));
 }
