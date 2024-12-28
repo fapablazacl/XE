@@ -1,4 +1,4 @@
-#version 450core
+#version 410core
 
 #define MAX_LIGHTS 8
 
@@ -26,14 +26,14 @@ struct Lighting {
     Light lights[MAX_LIGHTS];
 };
 
-layout(location = 3) uniform int uEnableLighting = 0;
-layout(location = 4) uniform Material uMaterial;
-layout(location = 5) uniform Lighting uLighting;
+uniform int uEnableLighting = 0;
+uniform Material uMaterial;
+uniform Lighting uLighting;
 
-layout(location = 0) in vec3 fragNormal;
-layout(location = 1) in vec2 fragTexCoord;
+in vec3 fragNormal;
+in vec2 fragTexCoord;
 
-layout(location = 2) out vec4 finalColor;
+out vec4 finalColor;
 
 vec4 evaluateMaterialChannel(MaterialChannel channel, vec2 texCoord) {
     if (channel.textureMapEnable == 1.0) {
@@ -44,6 +44,19 @@ vec4 evaluateMaterialChannel(MaterialChannel channel, vec2 texCoord) {
 }
 
 vec4 computeLighting(Lighting lighting, Material material, vec3 normal) {
+    // compute ambient component
+    vec4 ambient = vec4(0.0, 0.0, 0.0, 1.0);
+
+    // FIXME: The lines below are causing a segmentation fault while linking the program
+    for (int i = 0; i < 0; i++) {
+        ambient += evaluateMaterialChannel(material.ambient, fragTexCoord);
+    }
+
+    return vec4(0.0, 0.0, 0.0, 1.0);
+}
+
+
+vec4 computeLighting2(Lighting lighting, Material material, vec3 normal) {
     // compute ambient component
     vec4 ambient = lighting.globalAmbient;
 

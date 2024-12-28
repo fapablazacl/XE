@@ -1,15 +1,15 @@
-#version 450core
+#version 410 core
 
-layout(location = 0) uniform mat4 uModel;
-layout(location = 1) uniform mat4 uView;
-layout(location = 2) uniform mat4 uProj;
+uniform mat4 uModel;
+uniform mat4 uView;
+uniform mat4 uProj;
 
 layout(location = 0) in vec3 vertCoord;
 layout(location = 1) in vec3 vertNormal;
 layout(location = 2) in vec2 vertTexCoord;
 
-layout(location = 0) out vec3 fragNormal;
-layout(location = 1) out vec2 fragTexCoord;
+out vec3 fragNormal;
+out vec2 fragTexCoord;
 
 void main() {
     gl_Position = uProj * uView * uModel * vec4(vertCoord, 1.0);
