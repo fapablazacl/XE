@@ -11,6 +11,9 @@
 
 #include <glad/glad.h>
 
+
+#if 0
+
 namespace gl {
     class ErrorChecker {
     public:
@@ -156,7 +159,7 @@ namespace test {
     }
 }
 
-
+#endif
 
 static std::string GLErrorToString(GLenum error) {
     switch (error) {
@@ -525,7 +528,15 @@ void Renderer::renderCamera(const ShaderLocationMap &location, const Camera &cam
 
 
 void Renderer::renderLighting(const GLuint programId, const Lighting &lighting) {
-    GLuint loc = 0;
+    GLint loc = 0;
+
+    loc = glGetUniformLocation(programId, "uEnableLighting");
+    assert(loc >= 0);
+    glUniform1i(loc, lighting.enabled == true ? 1 : 0);
+
+    loc = glGetUniformLocation(programId, "uLighting.globalAmbient");
+    assert(loc >= 0);
+    glUniform4fv(loc, 1, glm::value_ptr(lighting.globalAmbient));
 
     const int lightCount = static_cast<int>(lighting.lights.size());
 
@@ -559,7 +570,7 @@ void Renderer::renderMaterialChannel(
     const MaterialChannel &channel
 ) {
     char name[128] = {};
-    GLuint loc = 0;
+    GLint loc = 0;
 
     std::snprintf(name, sizeof(name), "%s.color", uniformPrefix.c_str());
     loc = glGetUniformLocation(programId, name);

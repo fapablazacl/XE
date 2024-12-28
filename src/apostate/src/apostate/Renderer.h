@@ -68,8 +68,8 @@ struct Light {
 struct Lighting {
     glm::vec4 globalAmbient = {0.0f, 0.0f, 0.0f, 1.0f};
     std::vector<Light> lights;
+    bool enabled = true;
 };
-
 
 struct MaterialImportedProperties {
     std::optional<glm::vec4> ambient;
