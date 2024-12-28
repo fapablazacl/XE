@@ -1,9 +1,6 @@
-#version 330
+#version 450core
 
 #define MAX_LIGHTS 8
-
-in vec3 fragNormal;
-in vec2 fragTexCoord;
 
 struct MaterialChannel {
     vec4 color;
@@ -11,23 +8,12 @@ struct MaterialChannel {
     float textureMapEnable;
 };
 
-
-vec4 evaluateMaterialChannel(MaterialChannel channel, vec2 texCoord) {
-    if (channel.textureMapEnable == 1.0) {
-        return channel.color * texture(channel.textureMap, texCoord);
-    }
-
-    return channel.color;
-}
-
-
 struct Material {
     MaterialChannel ambient;
     MaterialChannel diffuse;
     MaterialChannel specular;
     MaterialChannel emissive;
 };
-
 
 struct Light {
     vec3 direction;
@@ -40,23 +26,35 @@ struct Lighting {
     Light lights[MAX_LIGHTS];
 };
 
+layout(location = 3) uniform int uEnableLighting = 0;
+layout(location = 4) uniform Material uMaterial;
+layout(location = 5) uniform Lighting uLighting;
 
-uniform int uEnableLighting = 0;
-uniform Material uMaterial;
-uniform Lighting uLighting;
+layout(location = 0) in vec3 fragNormal;
+layout(location = 1) in vec2 fragTexCoord;
 
-out vec4 finalColor;
+layout(location = 2) out vec4 finalColor;
+
+vec4 evaluateMaterialChannel(MaterialChannel channel, vec2 texCoord) {
+    if (channel.textureMapEnable == 1.0) {
+        return channel.color * texture(channel.textureMap, texCoord);
+    }
+
+    return channel.color;
+}
 
 vec4 computeLighting(Lighting lighting, Material material, vec3 normal) {
     // compute ambient component
     vec4 ambient = lighting.globalAmbient;
 
-    return vec4(0.0, 0.0, 0.0, 1.0);
-
     // FIXME: The lines below are causing a segmentation fault while linking the program
     for (int i = 0; i < 0; i++) {
-        ambient += evaluateMaterialChannel(material.ambient, fragTexCoord); // * lighting.lights[i].ambient;
+        // ambient += evaluateMaterialChannel(material.ambient, fragTexCoord)  * lighting.lights[i].ambient;
     }
+
+    ambient += evaluateMaterialChannel(material.ambient, fragTexCoord)  * lighting.lights[0].ambient;
+
+    return vec4(0.0, 0.0, 0.0, 1.0);
 
     // compute diffuse component
 
@@ -83,15 +81,15 @@ vec4 computeLighting(Lighting lighting, Material material, vec3 normal) {
 
 void main() {
     // this block of code generates a segmentation fault in MacOS while performing linking
-    /*
     vec3 normal = fragNormal;
     finalColor = computeLighting(uLighting, uMaterial, normal);
-    */
 
+    /*
     // evaluate without lighting
     vec4 color = vec4(0.0);
     color += evaluateMaterialChannel(uMaterial.ambient, fragTexCoord);
     color += evaluateMaterialChannel(uMaterial.diffuse, fragTexCoord);
 
     finalColor = color;
+    */
 }
