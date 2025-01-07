@@ -1,7 +1,7 @@
 
-#include <xe/graphics/gl/BufferGL.h>
-#include <xe/graphics/gl/Conversion.h>
-#include <xe/graphics/gl/SubsetGL.h>
+#include "BufferGL.h"
+#include "Conversion.h"
+#include "SubsetGL.h"
 
 #include <cassert>
 

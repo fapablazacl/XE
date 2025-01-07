@@ -13,7 +13,7 @@ if (XE_PLUGIN_PNG)
 endif ()
 
 if (XE_PLUGIN_GL)
-    add_subdirectory ("libxe-core-graphicsdevice-gl")
+    add_subdirectory ("libxe-core-gl")
 endif ()
 
 if (XE_PLUGIN_GL_GLFW)

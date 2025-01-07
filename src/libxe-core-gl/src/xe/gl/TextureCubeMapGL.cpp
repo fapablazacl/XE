@@ -1,6 +1,6 @@
 
-#include <xe/graphics/gl/Conversion.h>
-#include <xe/graphics/gl/TextureCubeMapGL.h>
+#include "Conversion.h"
+#include "TextureCubeMapGL.h"
 
 namespace XE {
     TextureCubeMapGL::TextureCubeMapGL(const PixelFormat format, const Vector2i &size, const PixelFormat sourceFormat, const DataType sourceDataType,

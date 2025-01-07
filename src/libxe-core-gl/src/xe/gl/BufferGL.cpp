@@ -1,23 +1,19 @@
 
-#include <xe/graphics/gl/BufferGL.h>
+#include "BufferGL.h"
 
 #include <cassert>
 #include <cstdint>
-#include <xe/graphics/gl/Conversion.h>
+#include "Conversion.h"
 
 namespace XE {
-    BufferGL::BufferGL(const BufferDescriptor &desc) {
-        const GLenum targetGL = convertToGL(desc.type);
-        const GLenum usageGL = convertToGL(desc.usage, desc.access);
-
+    BufferGL::BufferGL(GLenum target, GLenum usage, const void * data, GLsizei size) : m_target(target), m_size(size) {
         glGenBuffers(1, &m_id);
-        glBindBuffer(targetGL, m_id);
-        glBufferData(targetGL, desc.size, desc.data, usageGL);
-        glBindBuffer(targetGL, 0);
+        glBindBuffer(target, m_id);
+        glBufferData(target, size, data, usage);
+        glBindBuffer(target, 0);
 
-        m_size = desc.size;
-        m_target = targetGL;
-        m_usage = usageGL;
+        m_size = size;
+        m_target = target;
     }
 
     BufferGL::~BufferGL() {

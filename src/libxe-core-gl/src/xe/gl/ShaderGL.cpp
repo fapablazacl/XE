@@ -1,5 +1,5 @@
 
-#include <xe/graphics/gl/ShaderGL.h>
+#include "ShaderGL.h"
 
 #include <cassert>
 #include <stdexcept>

@@ -216,7 +216,7 @@ struct GLErrorRAII {
 };
 
 
-#define GL_SCOPED_ERROR_CHECK GLErrorRAII __gl_error_raii(__FILE__, __LINE__);
+#define GL_SCOPED_ERROR_CHECK() GLErrorRAII __gl_error_raii(__FILE__, __LINE__)
 
 void pre_call_callback_gl(const char *name, void *funcptr, int len_args, ...) {
     (void) name;
@@ -594,12 +594,12 @@ void Renderer::renderMaterialChannel(
 
 
 void Renderer::renderMaterial(const GLuint programId, const Material &material) {
-    GLint textureUnit = 0;
+    GLint textureUnit = -1;
 
-    renderMaterialChannel(programId, "uMaterial.ambient", textureUnit++, material.ambient);
-    renderMaterialChannel(programId, "uMaterial.diffuse", textureUnit++, material.diffuse);
-    renderMaterialChannel(programId, "uMaterial.specular", textureUnit++, material.specular);
-    renderMaterialChannel(programId, "uMaterial.emissive", textureUnit++, material.emissive);
+    renderMaterialChannel(programId, "uMaterial.ambient", ++textureUnit, material.ambient);
+    renderMaterialChannel(programId, "uMaterial.diffuse", ++textureUnit, material.diffuse);
+    renderMaterialChannel(programId, "uMaterial.specular", ++textureUnit, material.specular);
+    renderMaterialChannel(programId, "uMaterial.emissive", ++textureUnit, material.emissive);
 }
 
 

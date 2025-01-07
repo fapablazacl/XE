@@ -1,25 +1,25 @@
 
-#include <xe/graphics/gl/GraphicsDeviceGL.h>
+#include "GraphicsDeviceGL.h"
 
-#include <xe/graphics/gl/glcore.h>
+#include "glcore.h"
 
-#include <xe/graphics/gl/BufferGL.h>
-#include <xe/graphics/gl/Conversion.h>
-#include <xe/graphics/gl/ProgramGL.h>
-#include <xe/graphics/gl/SubsetGL.h>
-#include <xe/graphics/gl/Texture2DArrayGL.h>
-#include <xe/graphics/gl/Texture2DGL.h>
-#include <xe/graphics/gl/Texture3DGL.h>
-#include <xe/graphics/gl/TextureCubeMapGL.h>
-#include <xe/graphics/gl/Util.h>
+#include "BufferGL.h"
+#include "Conversion.h"
+#include "ProgramGL.h"
+#include "SubsetGL.h"
+#include "Texture2DArrayGL.h"
+#include "Texture2DGL.h"
+#include "Texture3DGL.h"
+#include "TextureCubeMapGL.h"
+#include "UtilGL.h"
 
+#include <../../../../libxe-core/src/xe/graphics/Material.h>
+#include <../../../../libxe-core/src/xe/graphics/Subset.h>
+#include <../../../../libxe-core/src/xe/graphics/Texture2DArray.h>
+#include <../../../../libxe-core/src/xe/graphics/Texture3D.h>
+#include <../../../../libxe-core/src/xe/graphics/TextureCubeMap.h>
+#include <../../../../libxe-core/src/xe/graphics/Uniform.h>
 #include <iostream>
-#include <xe/graphics/Material.h>
-#include <xe/graphics/Subset.h>
-#include <xe/graphics/Texture2DArray.h>
-#include <xe/graphics/Texture3D.h>
-#include <xe/graphics/TextureCubeMap.h>
-#include <xe/graphics/Uniform.h>
 
 namespace XE {
     static std::string hexstr(const GLenum value) {
@@ -95,7 +95,7 @@ namespace XE {
 
     Subset *GraphicsDeviceGL::createSubset(const SubsetDescriptor &desc) { return new SubsetGL(desc); }
 
-    Buffer *GraphicsDeviceGL::createBuffer(const BufferDescriptor &desc) { return new BufferGL(desc); }
+    Buffer *GraphicsDeviceGL::createBuffer(const BufferDescriptor &desc) { return nullptr; }
 
     Texture2D *GraphicsDeviceGL::createTexture2D(const PixelFormat format, const Vector2i &size, const PixelFormat sourceFormat, const DataType sourceDataType,
                                                  const void *sourceData) {
