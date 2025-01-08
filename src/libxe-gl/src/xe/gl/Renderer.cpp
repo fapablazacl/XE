@@ -1,16 +1,15 @@
 
 #include "Renderer.h"
 
-#include "Logger.h"
-#include "Platform.h"
+#include "../../../../apostate/src/apostate/Logger.h"
+#include "../../../../apostate/src/apostate/Platform.h"
 
 #include <cassert>
 #include <iostream>
 #include <memory>
 #include <vector>
 
-#include <glad/glad.h>
-
+#include <../../../../apostate/src/glad/include/glad/glad.h>
 
 #if 0
 

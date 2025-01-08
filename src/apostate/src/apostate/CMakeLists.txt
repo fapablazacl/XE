@@ -9,14 +9,8 @@ endif()
 hunter_add_package(glfw)
 find_package(glfw3 REQUIRED)
 
-hunter_add_package(glm)
-find_package(glm REQUIRED)
-
 hunter_add_package(nlohmann_json)
 find_package(nlohmann_json REQUIRED)
-
-hunter_add_package(fmt)
-find_package(fmt CONFIG REQUIRED)
 
 find_package(FreeImage REQUIRED)
 
@@ -24,21 +18,18 @@ set (target apostate)
 add_executable(${target}
     "MiscUtils.h"
 
-        "AssetPackage.h"
+    "AssetPackage.h"
     "Image.h"
     "ImageLoader.h"
     "Model.h"
     "ModelLoader.h"
-    "Renderer.h"
-    "Platform.h"
-    "TextureRepository.h"
 
-        "AssetPackage.cpp"
+    "Platform.h"
+    "AssetPackage.cpp"
     "Model.cpp"
     "ImageLoader.cpp"
-    "Renderer.cpp"
+
     "Platform.cpp"
-    "TextureRepository.cpp"
 
     # FreeImage
     "ImageLoaderFI.h"
@@ -47,19 +38,17 @@ add_executable(${target}
     # AssImp
     "ModelLoaderAssimp.h"
     "ModelLoaderAssimp.cpp"
-        Logger.cpp
-        Logger.h
+    Logger.cpp
+    Logger.h
 
-        ApostateMain.cpp
+    ApostateMain.cpp
 )
 
 target_link_libraries(
     ${target}
-        assimp::assimp
-        glfw
-        glm
-        glad
-        nlohmann_json::nlohmann_json
-        freeimage::FreeImage
-        fmt::fmt
+    assimp::assimp
+    glfw
+    nlohmann_json::nlohmann_json
+    freeimage::FreeImage
+        XE.GL
 )

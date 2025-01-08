@@ -3,22 +3,20 @@
 
 #include "TextureRepository.h"
 
-#include <optional>
-#include <fstream>
-#include <string>
-#include <vector>
+#include <../../../../apostate/src/glad/include/glad/glad.h>
 #include <algorithm>
-#include <glad/glad.h>
+#include <fstream>
+#include <glm/ext.hpp>
 #include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <glm/gtx/string_cast.hpp>
+#include <glm/mat4x4.hpp>
 #include <glm/vec3.hpp>
 #include <glm/vec4.hpp>
-#include <glm/mat4x4.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/ext.hpp>
-#include <glm/gtx/string_cast.hpp>
-
-
+#include <optional>
+#include <string>
+#include <vector>
 
 struct Camera {
     glm::vec3 position = {0.0f, 0.0f, 0.0f};

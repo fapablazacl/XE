@@ -1,10 +1,9 @@
 
-#pragma once 
+#pragma once
 
-#include <string>
+#include <../../../../apostate/src/glad/include/glad/glad.h>
 #include <map>
-#include <glad/glad.h>
-
+#include <string>
 
 struct ImageData;
 

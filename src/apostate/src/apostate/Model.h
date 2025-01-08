@@ -1,7 +1,7 @@
 
 #pragma once 
 
-#include "Renderer.h"
+#include "../../../libxe-gl/src/xe/gl/Renderer.h"
 
 struct MeshNode {
     glm::mat4 transform = glm::identity<glm::mat4>();

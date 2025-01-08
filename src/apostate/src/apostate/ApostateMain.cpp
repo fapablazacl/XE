@@ -1,17 +1,18 @@
 
+#include "xe/gl/Renderer.h"
+#include "xe/gl/TextureRepository.h"
+
 #include "AssetPackage.h"
 #include "ImageLoaderFI.h"
 #include "Logger.h"
 #include "Model.h"
 #include "ModelLoaderAssimp.h"
 #include "Platform.h"
-#include "Renderer.h"
-#include "TextureRepository.h"
 
 #include <iostream>
 #include <map>
-#include <vector>
 #include <set>
+#include <vector>
 
 #include <nlohmann/json.hpp>
 

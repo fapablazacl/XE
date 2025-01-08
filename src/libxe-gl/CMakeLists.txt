@@ -2,9 +2,15 @@
 hunter_add_package(Microsoft.GSL)
 find_package(Microsoft.GSL CONFIG REQUIRED)
 
+hunter_add_package(fmt)
+find_package(fmt CONFIG REQUIRED)
+
+hunter_add_package(glm)
+find_package(glm REQUIRED)
+
 add_subdirectory("dependencies/glad-gl4")
 
-set (target "XE.Graphics.GL")
+set (target "XE.GL")
 
 set (headers
 	"src/xe/GL.h"
@@ -22,6 +28,8 @@ set (headers
 	"src/xe/gl/SubsetGL.h"
 	"src/xe/gl/Conversion.h"
 	"src/xe/gl/UtilGL.h"
+	"src/xe/gl/TextureRepository.h"
+	"src/xe/gl/Renderer.h"
 )
 
 set (sources
@@ -39,6 +47,8 @@ set (sources
 	"src/xe/gl/SubsetGL.cpp"
 	"src/xe/gl/Conversion.cpp"
 	"src/xe/gl/UtilGL.cpp"
+	"src/xe/gl/Renderer.cpp"
+	"src/xe/gl/TextureRepository.cpp"
 ) 
 
 add_library (${target} ${sources})
@@ -49,9 +59,11 @@ endif()
 
 target_include_directories (${target} PUBLIC "src")
 target_link_libraries (${target} 
-	PUBLIC XE.Core 
+	PUBLIC XE.Core
 	PUBLIC glad-gl4
 	PRIVATE XE.Interface
+	PUBLIC fmt::fmt
+	PUBLIC glm
 )
 
 if (XE_DEV_UNIT_TEST)
