@@ -9,8 +9,7 @@
 #include <xe/math/Vector.h>
 #include <xe/math/Matrix.h>
 
-#include "RendererGL.h"
-
+#include "xe/gl/RendererGL.h"
 
 static std::string hexstr(const GLenum value) {
     std::string str;

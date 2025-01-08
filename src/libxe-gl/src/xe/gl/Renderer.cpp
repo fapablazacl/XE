@@ -9,7 +9,7 @@
 #include <memory>
 #include <vector>
 
-#include <../../../../apostate/src/glad/include/glad/glad.h>
+#include <glad/glad.h>
 
 #if 0
 
@@ -217,6 +217,7 @@ struct GLErrorRAII {
 
 #define GL_SCOPED_ERROR_CHECK() GLErrorRAII __gl_error_raii(__FILE__, __LINE__)
 
+#if defined(GLAD_DEBUG)
 void pre_call_callback_gl(const char *name, void *funcptr, int len_args, ...) {
     (void) name;
     (void) funcptr;
@@ -262,6 +263,7 @@ void post_call_callback_gl(const char *name, void *funcptr, int len_args, ...) {
 
     abort();
 }
+#endif
 
 
 Renderer::Renderer(Platform &platform) : platform{platform} {}
@@ -287,8 +289,10 @@ bool Renderer::initialize() {
         std::cout << "    " << glGetStringi(GL_EXTENSIONS, i) << std::endl;
     }
 
+#if defined(GLAD_DEBUG)
     glad_set_pre_callback_gl(pre_call_callback_gl);
     glad_set_post_callback_gl(post_call_callback_gl);
+#endif
 
     return true;
 }

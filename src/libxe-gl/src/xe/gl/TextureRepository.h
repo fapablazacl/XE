@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include <../../../../apostate/src/glad/include/glad/glad.h>
+#include <glad/glad.h>
 #include <map>
 #include <string>
 

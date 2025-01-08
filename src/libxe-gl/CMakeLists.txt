@@ -30,6 +30,7 @@ set (headers
 	"src/xe/gl/UtilGL.h"
 	"src/xe/gl/TextureRepository.h"
 	"src/xe/gl/Renderer.h"
+	"src/xe/gl/RendererGL.h"
 )
 
 set (sources
@@ -49,6 +50,7 @@ set (sources
 	"src/xe/gl/UtilGL.cpp"
 	"src/xe/gl/Renderer.cpp"
 	"src/xe/gl/TextureRepository.cpp"
+	"src/xe/gl/RendererGL.cpp"
 ) 
 
 add_library (${target} ${sources})

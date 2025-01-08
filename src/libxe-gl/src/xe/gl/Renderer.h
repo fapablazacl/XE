@@ -3,7 +3,7 @@
 
 #include "TextureRepository.h"
 
-#include <../../../../apostate/src/glad/include/glad/glad.h>
+#include <glad/glad.h>
 #include <algorithm>
 #include <fstream>
 #include <glm/ext.hpp>
