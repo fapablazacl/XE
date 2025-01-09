@@ -4,7 +4,7 @@
 
 #include <xe/graphics/Shader.h>
 
-#include "glcore.h"
+#include "gl.h"
 
 namespace XE {
     class ShaderGL : public Shader {

@@ -2,7 +2,7 @@
 #ifndef __XE_GRAPHICS_GL_BUFFERGL_HPP__
 #define __XE_GRAPHICS_GL_BUFFERGL_HPP__
 
-#include "glcore.h"
+#include "gl.h"
 #include "xe/Buffer.h"
 
 #include <cstddef>
@@ -49,6 +49,45 @@ namespace XE {
         GLenum m_target;
         GLsizei m_size;
     };
+
+
 } // namespace xe
 
+namespace xe::gl {
+    template<GLenum Target>
+    class Buffer {
+    public:
+        Buffer() = default;
+
+        Buffer(const void * data, GLsizei size, GLenum usage) {
+            glGenBuffers(1, &m_id);
+            glBindBuffer(Target, m_id);
+            glBufferData(Target, size, data, usage);
+            glBindBuffer(Target, 0);
+        }
+
+        GLuint getID() const {
+            return m_id;
+        }
+
+        explicit operator bool() const {
+            return m_id != 0;
+        }
+
+        [[nodiscard]]
+        explicit operator GLuint() const {
+            return m_id;
+        }
+
+    private:
+        GLuint m_id = 0;
+    };
+
+    template<GLenum Target>
+    void bind(const Buffer<Target> & buffer) {
+        glBindBuffer(Target, buffer.getID());
+    }
+}
+
 #endif
+

@@ -14,7 +14,7 @@ set (target "XE.GL")
 
 set (headers
 	"src/xe/GL.h"
-	"src/xe/gl/glcore.h"
+	"src/xe/gl/gl.h"
 	"src/xe/gl/GraphicsDeviceGL.h"
 	"src/xe/gl/TextureBaseGL.h"
 	"src/xe/gl/Texture2DGL.h"

@@ -1,7 +1,7 @@
 
 #include "GraphicsDeviceGL.h"
 
-#include "glcore.h"
+#include "gl.h"
 
 #include "BufferGL.h"
 #include "Conversion.h"

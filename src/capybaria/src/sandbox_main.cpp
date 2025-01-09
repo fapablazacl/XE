@@ -11,6 +11,9 @@
 
 #include "xe/gl/RendererGL.h"
 
+
+using xe::gl::RendererGL;
+
 static std::string hexstr(const GLenum value) {
     std::string str;
     str.resize(16, ' ');
@@ -78,11 +81,11 @@ struct FloorGeometry {
     int stripVertexCount = 0;
 
     GLuint vao = 0;
-    GLuint vertexBuffer = 0;
+    xe::gl::Buffer vertexBuffer;
 };
 
 
-FloorGeometry createFloorGeometry(const RendererGL &renderer, const GLint vertCoordLoc, const GLint vertColorLoc, const int tilesInX, const int tilesInZ, const float tileSizeX,
+FloorGeometry createFloorGeometry(const xe::gl::RendererGL &renderer, const GLint vertCoordLoc, const GLint vertColorLoc, const int tilesInX, const int tilesInZ, const float tileSizeX,
                                   const float tileSizeZ) {
     FloorGeometry floorGeometry;
     floorGeometry.tilesInX = tilesInX;
@@ -105,7 +108,7 @@ FloorGeometry createFloorGeometry(const RendererGL &renderer, const GLint vertCo
     glGenVertexArrays(1, &floorGeometry.vao);
     glBindVertexArray(floorGeometry.vao);
 
-    glBindBuffer(GL_ARRAY_BUFFER, floorGeometry.vertexBuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, floorGeometry.vertexBuffer.value);
     glEnableVertexAttribArray(vertCoordLoc);
     glVertexAttribPointer(vertCoordLoc, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
 
@@ -128,18 +131,18 @@ GLuint createTriangleGeometry(const RendererGL &renderer, const GLint vertCoordL
         1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f,
     };
 
-    const GLuint vertexBuffer = renderer.createBuffer(GL_ARRAY_BUFFER, GL_STATIC_DRAW, vertices, sizeof(GLfloat) * VERTEX_COLOUR * 3);
-    const GLuint colourBuffer = renderer.createBuffer(GL_ARRAY_BUFFER, GL_STATIC_DRAW, colours, sizeof(GLfloat) * VERTEX_COLOUR * 4);
+    const auto vertexBuffer = renderer.createBuffer(GL_ARRAY_BUFFER, GL_STATIC_DRAW, vertices, sizeof(GLfloat) * VERTEX_COLOUR * 3);
+    const auto colourBuffer = renderer.createBuffer(GL_ARRAY_BUFFER, GL_STATIC_DRAW, colours, sizeof(GLfloat) * VERTEX_COLOUR * 4);
 
     GLuint triangleVao;
     glGenVertexArrays(1, &triangleVao);
     glBindVertexArray(triangleVao);
 
-    glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer.value);
     glEnableVertexAttribArray(vertCoordLoc);
     glVertexAttribPointer(vertCoordLoc, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
 
-    glBindBuffer(GL_ARRAY_BUFFER, colourBuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, colourBuffer.value);
     glEnableVertexAttribArray(vertColorLoc);
     glVertexAttribPointer(vertColorLoc, 4, GL_FLOAT, GL_FALSE, 0, nullptr);
 
@@ -447,22 +450,22 @@ void main() {
 
     const RendererGL renderer;
 
-    const GLuint program = renderer.createProgram({
+    const auto program = renderer.createProgram({
         renderer.createShader(GL_VERTEX_SHADER, vertexShader), 
         renderer.createShader(GL_FRAGMENT_SHADER, fragmentShader)});
 
-    if (!program) {
+    if (!program.value) {
         return EXIT_FAILURE;
     }
 
     // get attrib location
-    const GLint vertCoordLoc = glGetAttribLocation(program, "vertCoord");
+    const GLint vertCoordLoc = glGetAttribLocation(program.value, "vertCoord");
     assert(vertCoordLoc >= 0);
 
-    const GLint vertColorLoc = glGetAttribLocation(program, "vertColor");
+    const GLint vertColorLoc = glGetAttribLocation(program.value, "vertColor");
     assert(vertColorLoc >= 0);
 
-    const GLint vertCoordZLoc = glGetAttribLocation(program, "vertCoordZ");
+    const GLint vertCoordZLoc = glGetAttribLocation(program.value, "vertCoordZ");
     assert(vertCoordZLoc >= 0);
 
     const auto floor = createFloorGeometry(renderer, vertCoordLoc, vertColorLoc, 10, 10, 1.0f, 1.0f);
@@ -508,9 +511,9 @@ void main() {
 
         glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 
-        glUseProgram(program);
+        glUseProgram(program.value);
 
-        const int mvpLoc = glGetUniformLocation(program, "uMvp");
+        const int mvpLoc = glGetUniformLocation(program.value, "uMvp");
         const auto viewProj = camera.getViewProj(SCREEN_WIDTH, SCREEN_HEIGHT);
 
         // render triangle

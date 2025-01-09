@@ -5,7 +5,7 @@
 #include <xe/graphics/Subset.h>
 
 #include "BufferGL.h"
-#include "glcore.h"
+#include "gl.h"
 
 namespace XE {
     class SubsetGL : public Subset {

@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include "glcore.h"
+#include "gl.h"
 
 namespace xe::gl {
 

@@ -6,99 +6,101 @@
 constexpr size_t INFO_LOG_BUFFER_SIZE = 4096;
 
 
-RendererGL::RendererGL() {
-    const auto info = getInfo();
-    std::printf("OpenGL info:\n");
-    std::printf("GL_VENDOR: %s\n", info.vendor.c_str());
-    std::printf("GL_RENDERER: %s\n", info.renderer.c_str());
-    std::printf("GL_VERSION: %s\n", info.version.c_str());
-    std::printf("GL_SHADING_LANGUAGE_VERSION: %s\n", info.shadingLanguageVersion.c_str());
-}
-
-
-GLuint RendererGL::createShader(const GLenum type, const std::string& source) const {
-    if (source.empty()) {
-        std::cerr << "Error while creating shader: Non-empty string expected" << std::endl;
-        return 0;
+namespace xe::gl {
+    RendererGL::RendererGL() {
+        const auto info = getInfo();
+        std::printf("OpenGL info:\n");
+        std::printf("GL_VENDOR: %s\n", info.vendor.c_str());
+        std::printf("GL_RENDERER: %s\n", info.renderer.c_str());
+        std::printf("GL_VERSION: %s\n", info.version.c_str());
+        std::printf("GL_SHADING_LANGUAGE_VERSION: %s\n", info.shadingLanguageVersion.c_str());
     }
 
-    const auto shaderId = glCreateShader(type);
-
-    const GLchar *const glsl = source.c_str();
-    auto size = static_cast<GLsizei>(source.size());
-    glShaderSource(shaderId, 1, &glsl, &size);
-    glCompileShader(shaderId);
-
-    // check for errors
-    GLint status;
-    glGetShaderiv(shaderId, GL_COMPILE_STATUS, &status);
-
-    if (status == static_cast<GLint>(GL_FALSE)) {
-        std::cerr << "Error while creating shader " << type << ": ";
-
-        char msg[INFO_LOG_BUFFER_SIZE] = {};
-        glGetShaderInfoLog(shaderId, INFO_LOG_BUFFER_SIZE, nullptr, msg);
-
-        std::cerr << msg << std::endl;
-
-        return 0;
-    }
-
-    return shaderId;
-}
-
-
-GLuint RendererGL::createProgram(const std::vector<GLuint> &shaderIds) const {
-    const auto programId = glCreateProgram();
-
-    for (auto &shaderId : shaderIds) {
-        if (shaderId == 0) {
-            glDeleteProgram(programId);
-            return 0;
+    Shader RendererGL::createShader(const GLenum type, const std::string& source) const {
+        if (source.empty()) {
+            std::cerr << "Error while creating shader: Non-empty string expected" << std::endl;
+            return {};
         }
 
-        glAttachShader(programId, shaderId);
+        const auto shaderId = glCreateShader(type);
+
+        const GLchar *const glsl = source.c_str();
+        auto size = static_cast<GLsizei>(source.size());
+        glShaderSource(shaderId, 1, &glsl, &size);
+        glCompileShader(shaderId);
+
+        // check for errors
+        GLint status;
+        glGetShaderiv(shaderId, GL_COMPILE_STATUS, &status);
+
+        if (status == static_cast<GLint>(GL_FALSE)) {
+            std::cerr << "Error while creating shader " << type << ": ";
+
+            char msg[INFO_LOG_BUFFER_SIZE] = {};
+            glGetShaderInfoLog(shaderId, INFO_LOG_BUFFER_SIZE, nullptr, msg);
+
+            std::cerr << msg << std::endl;
+
+            return {};
+        }
+
+        return {shaderId};
     }
 
-    glLinkProgram(programId);
 
-    GLint status;
-    glGetProgramiv(programId, GL_LINK_STATUS, &status);
+    Program RendererGL::createProgram(const std::vector<Shader> &shader) const {
+        const auto programId = glCreateProgram();
 
-    if (status == static_cast<GLint>(GL_FALSE)) {
-        std::cerr << "Error while creating program: ";
+        for (auto &shader : shader) {
+            if (shader.value == 0) {
+                glDeleteProgram(programId);
+                return { 0 };
+            }
 
-        char msg[INFO_LOG_BUFFER_SIZE] = {};
-        glGetProgramInfoLog(programId, INFO_LOG_BUFFER_SIZE, nullptr, msg);
+            glAttachShader(programId, shader.value);
+        }
 
-        std::cerr << msg << std::endl;
+        glLinkProgram(programId);
 
-        return 0;
+        GLint status;
+        glGetProgramiv(programId, GL_LINK_STATUS, &status);
+
+        if (status == static_cast<GLint>(GL_FALSE)) {
+            std::cerr << "Error while creating program: ";
+
+            char msg[INFO_LOG_BUFFER_SIZE] = {};
+            glGetProgramInfoLog(programId, INFO_LOG_BUFFER_SIZE, nullptr, msg);
+
+            std::cerr << msg << std::endl;
+
+            return {};
+        }
+
+        return {programId};
     }
 
-    return programId;
-}
+
+    Buffer RendererGL::createBuffer(const GLenum target, const GLenum usage, const GLvoid *data, const GLsizei size) const {
+        GLuint bufferId = 0;
+
+        glGenBuffers(1, &bufferId);
+        glBindBuffer(target, bufferId);
+        glBufferData(target, size, data, usage);
+        glBindBuffer(target, 0);
+
+        return {bufferId};
+    }
 
 
-GLuint RendererGL::createBuffer(const GLenum target, const GLenum usage, const GLvoid *data, const size_t size) const {
-    GLuint bufferId = 0;
+    RendererInfo RendererGL::getInfo() const {
+        RendererInfo info;
 
-    glGenBuffers(1, &bufferId);
-    glBindBuffer(target, bufferId);
-    glBufferData(target, size, data, usage);
-    glBindBuffer(target, 0);
+        info.vendor = reinterpret_cast<const char*>(glGetString(GL_VENDOR));
+        info.renderer = reinterpret_cast<const char *>(glGetString(GL_RENDERER));
+        info.version = reinterpret_cast<const char *>(glGetString(GL_VERSION));
+        info.shadingLanguageVersion = reinterpret_cast<const char *>(glGetString(GL_SHADING_LANGUAGE_VERSION));
 
-    return bufferId;
-}
+        return info;
+    }
 
-
-RendererInfo RendererGL::getInfo() const {
-    RendererInfo info;
-
-    info.vendor = reinterpret_cast<const char*>(glGetString(GL_VENDOR));
-    info.renderer = reinterpret_cast<const char *>(glGetString(GL_RENDERER));
-    info.version = reinterpret_cast<const char *>(glGetString(GL_VERSION));
-    info.shadingLanguageVersion = reinterpret_cast<const char *>(glGetString(GL_SHADING_LANGUAGE_VERSION));
-    
-    return info;
 }

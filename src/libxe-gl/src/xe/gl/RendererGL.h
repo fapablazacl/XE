@@ -5,6 +5,8 @@
 #include <vector>
 #include <glad/glad.h>
 
+#include "Types.h"
+
 struct RendererInfo {
     std::string vendor;
     std::string renderer;
@@ -12,16 +14,17 @@ struct RendererInfo {
     std::string shadingLanguageVersion;
 };
 
+namespace xe::gl {
+    class RendererGL {
+    public:
+        RendererGL();
 
-class RendererGL {
-public:
-    RendererGL();
+        Shader createShader(const GLenum type, const std::string &source) const;
 
-	GLuint createShader(const GLenum type, const std::string &source) const;
+        Program createProgram(const std::vector<Shader> &shaders) const;
 
-	GLuint createProgram(const std::vector<GLuint> &shaders) const;
+        Buffer createBuffer(const GLenum target, const GLenum usage, const GLvoid *data, const GLsizei size) const;
 
-	GLuint createBuffer(const GLenum target, const GLenum usage, const GLvoid *data, const size_t size) const;
-
-    RendererInfo getInfo() const;
-};
+        RendererInfo getInfo() const;
+    };
+}

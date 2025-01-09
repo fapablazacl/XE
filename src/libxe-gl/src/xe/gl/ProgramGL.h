@@ -8,7 +8,7 @@
 #include <vector>
 #include <xe/graphics/Program.h>
 
-#include "glcore.h"
+#include "gl.h"
 
 namespace XE {
     enum class ShaderType;
