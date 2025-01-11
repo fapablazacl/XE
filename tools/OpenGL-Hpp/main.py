@@ -1,8 +1,10 @@
 
 import xml.dom.minidom
 import sys
-import glregistry
-import hppgenerator
+
+from oglhpp.glregistry import GLXMLParser
+from oglhpp.hppgenerator import CodeGenerator
+
 import os
 
 def generate_hpp_header_filename(api, version):
@@ -13,9 +15,9 @@ def generate_hpp_header(gl_xml_file_path, api, version, output_folder):
 
     # Open XML document using minidom parser
     DOMTree = xml.dom.minidom.parse(gl_xml_file_path)
-    parser = glregistry.GLXMLParser()
+    parser = GLXMLParser()
     repository = parser.create_repository(DOMTree)
-    generator = hppgenerator.CodeGenerator(repository)
+    generator = CodeGenerator(repository)
     consolidated_require = repository.consolidate(api, version)
     generated_code = generator.generate_consolidated_require(consolidated_require)
 

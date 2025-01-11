@@ -1,4 +1,6 @@
 
+from oglhpp.string_utils import split_capitalized
+
 class Capitalizer:
     def __init__(self) -> None:
         self.excluded_words = [
