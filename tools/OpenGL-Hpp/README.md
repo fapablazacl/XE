@@ -12,10 +12,10 @@ Automatically generates language-specific headers and source files for the OpenG
 1. Generated code should catch build-time errors
 2. Generated code should check for runtime errors
 
-# C language
+### C language
 The usual C language bindings should be generated.
 
-# C++ language
+### C++ language
 In the case of C++, an API that is very similar to OpenGL should be generated (and inspired by Vulkan C++), but with the following changes:
 
 | Strategy                                        | Reasoning           |

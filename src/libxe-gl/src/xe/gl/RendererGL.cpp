@@ -3,10 +3,81 @@
 
 #include <iostream>
 
-constexpr size_t INFO_LOG_BUFFER_SIZE = 4096;
-
-
 namespace xe::gl {
+    static std::string errorCodeToString(GLenum error) {
+        switch (error) {
+        case GL_INVALID_ENUM: return "GL_INVALID_ENUM";
+        case GL_INVALID_VALUE: return "GL_INVALID_VALUE";
+        case GL_INVALID_OPERATION: return "GL_INVALID_OPERATION";
+        case GL_OUT_OF_MEMORY: return "GL_OUT_OF_MEMORY";
+        default: return "<Unknown Error Value: " + std::to_string(error) + ">";
+        }
+    }
+
+    struct GLScopedErrorChecker {
+        GLScopedErrorChecker(const char *file, const int line) : file(file), line(line) {
+            check();
+        }
+
+        ~GLScopedErrorChecker() {
+            check();
+        }
+
+        void check() const {
+            if (const GLenum error = glGetError(); error) {
+                const auto str = errorCodeToString(error);
+                std::fprintf(stderr, "Error %s generated while checking with guard (%s:%d) \n", str.c_str(), file, line);
+                std::fprintf(stderr, "Aborting ...\n");
+                abort();
+            }
+        }
+
+        const char *file;
+        const int line;
+    };
+
+
+#define XE_GL_SCOPED_ERROR_CHECK() GLScopedErrorChecker __gl_error_raii(__FILE__, __LINE__)
+
+#if defined(GLAD_DEBUG)
+    void pre_call_callback_gl(const char *name, void *funcptr, int len_args, ...) {
+        (void) name;
+        (void) funcptr;
+        (void) len_args;
+    }
+
+    void post_call_callback_gl(const char *name, void *funcptr, int len_args, ...) {
+        (void) funcptr;
+        (void) len_args;
+
+        if (const GLenum error_code = glad_glGetError(); error_code) {
+            const auto errorCodeString = errorCodeToString(error_code);
+            std::fprintf(stderr, "Error %s generated while executing command %s\n", name, errorCodeString.c_str());
+        }
+    }
+#endif
+
+    std::unique_ptr<RendererGL> RendererGL::create() {
+        return create(nullptr);
+    }
+
+    std::unique_ptr<RendererGL> RendererGL::create(GetProcAddress getProcAddress) {
+        const auto loadproc = reinterpret_cast<GLADloadproc>(getProcAddress);
+        const int result = getProcAddress ? gladLoadGLLoader(loadproc) : gladLoadGL();
+
+        if (!result) {
+            std::fprintf(stderr, "GLAD: Couldn't load GL functions. Error code %d \n", result);
+            return {};
+        }
+
+#if defined(GLAD_DEBUG)
+        glad_set_pre_callback_gl(pre_call_callback_gl);
+        glad_set_post_callback_gl(post_call_callback_gl);
+#endif
+
+        return std::unique_ptr<RendererGL>{new RendererGL()};
+    }
+
     RendererGL::RendererGL() {
         const auto info = getInfo();
         std::printf("OpenGL info:\n");
@@ -14,18 +85,76 @@ namespace xe::gl {
         std::printf("GL_RENDERER: %s\n", info.renderer.c_str());
         std::printf("GL_VERSION: %s\n", info.version.c_str());
         std::printf("GL_SHADING_LANGUAGE_VERSION: %s\n", info.shadingLanguageVersion.c_str());
+
+        GLint extensionCount;
+        glGetIntegerv(GL_NUM_EXTENSIONS, &extensionCount);
+
+        std::printf("Supported extensions %d\n", extensionCount);
+
+        for (int i = 0; i < extensionCount; i++) {
+            const auto str = glGetStringi(GL_EXTENSIONS, i);
+            const auto cstr = reinterpret_cast<const char*>(str);
+
+            std::printf("%s ", cstr);
+        }
+
+        glUniformXfv[0] = glUniform1fv;
+        glUniformXfv[1] = glUniform2fv;
+        glUniformXfv[2] = glUniform3fv;
+        glUniformXfv[3] = glUniform4fv;
+
+        glUniformXiv[0] = glUniform1iv;
+        glUniformXiv[1] = glUniform2iv;
+        glUniformXiv[2] = glUniform3iv;
+        glUniformXiv[3] = glUniform4iv;
+
+        glUniformXuiv[0] = glUniform1uiv;
+        glUniformXuiv[1] = glUniform2uiv;
+        glUniformXuiv[2] = glUniform3uiv;
+        glUniformXuiv[3] = glUniform4uiv;
+
+        glUniformMatrixXfv[0] = glUniformMatrix2fv;
+        glUniformMatrixXfv[1] = glUniformMatrix2x3fv;
+        glUniformMatrixXfv[2] = glUniformMatrix2x4fv;
+        glUniformMatrixXfv[3] = glUniformMatrix3x2fv;
+        glUniformMatrixXfv[4] = glUniformMatrix3fv;
+        glUniformMatrixXfv[5] = glUniformMatrix3x4fv;
+        glUniformMatrixXfv[6] = glUniformMatrix4x2fv;
+        glUniformMatrixXfv[7] = glUniformMatrix4x3fv;
+        glUniformMatrixXfv[8] = glUniformMatrix4fv;
+
+        glUniformMatrixXdv[0] = glUniformMatrix2dv;
+        glUniformMatrixXdv[1] = glUniformMatrix2x3dv;
+        glUniformMatrixXdv[2] = glUniformMatrix2x4dv;
+        glUniformMatrixXdv[3] = glUniformMatrix3x2dv;
+        glUniformMatrixXdv[4] = glUniformMatrix3dv;
+        glUniformMatrixXdv[5] = glUniformMatrix3x4dv;
+        glUniformMatrixXdv[6] = glUniformMatrix4x2dv;
+        glUniformMatrixXdv[7] = glUniformMatrix4x3dv;
+        glUniformMatrixXdv[8] = glUniformMatrix4dv;
+
+        glXable[0] = glDisable;
+        glXable[1] = glEnable;
     }
 
-    Shader RendererGL::createShader(const GLenum type, const std::string& source) const {
-        if (source.empty()) {
-            std::cerr << "Error while creating shader: Non-empty string expected" << std::endl;
-            return {};
-        }
+    RendererInfo RendererGL::getInfo() const {
+        RendererInfo info;
+
+        info.vendor = reinterpret_cast<const char*>(glGetString(GL_VENDOR));
+        info.renderer = reinterpret_cast<const char *>(glGetString(GL_RENDERER));
+        info.version = reinterpret_cast<const char *>(glGetString(GL_VERSION));
+        info.shadingLanguageVersion = reinterpret_cast<const char *>(glGetString(GL_SHADING_LANGUAGE_VERSION));
+
+        return info;
+    }
+
+    Shader RendererGL::createShader(const GLenum type, const char *source) const {
+        XE_GL_SCOPED_ERROR_CHECK();
 
         const auto shaderId = glCreateShader(type);
 
-        const GLchar *const glsl = source.c_str();
-        auto size = static_cast<GLsizei>(source.size());
+        const GLchar *const glsl = source;
+        const GLsizei size = 1;
         glShaderSource(shaderId, 1, &glsl, &size);
         glCompileShader(shaderId);
 
@@ -34,6 +163,7 @@ namespace xe::gl {
         glGetShaderiv(shaderId, GL_COMPILE_STATUS, &status);
 
         if (status == static_cast<GLint>(GL_FALSE)) {
+            constexpr size_t INFO_LOG_BUFFER_SIZE = 4096;
             std::cerr << "Error while creating shader " << type << ": ";
 
             char msg[INFO_LOG_BUFFER_SIZE] = {};
@@ -48,13 +178,17 @@ namespace xe::gl {
     }
 
 
-    Program RendererGL::createProgram(const std::vector<Shader> &shader) const {
+    Program RendererGL::createProgram(const tcb::span<Shader> &shaders) const {
+        XE_GL_SCOPED_ERROR_CHECK();
+
         const auto programId = glCreateProgram();
 
-        for (auto &shader : shader) {
+        for (const auto &shader : shaders) {
             if (shader.value == 0) {
+                std::cerr << "Empty shader was supplied" << std::endl;
+
                 glDeleteProgram(programId);
-                return { 0 };
+                return {};
             }
 
             glAttachShader(programId, shader.value);
@@ -66,12 +200,14 @@ namespace xe::gl {
         glGetProgramiv(programId, GL_LINK_STATUS, &status);
 
         if (status == static_cast<GLint>(GL_FALSE)) {
-            std::cerr << "Error while creating program: ";
+            constexpr size_t INFO_LOG_BUFFER_SIZE = 4096;
 
+            std::cerr << "Error while creating program: ";
             char msg[INFO_LOG_BUFFER_SIZE] = {};
             glGetProgramInfoLog(programId, INFO_LOG_BUFFER_SIZE, nullptr, msg);
-
             std::cerr << msg << std::endl;
+
+            glDeleteProgram(programId);
 
             return {};
         }
@@ -80,27 +216,251 @@ namespace xe::gl {
     }
 
 
-    Buffer RendererGL::createBuffer(const GLenum target, const GLenum usage, const GLvoid *data, const GLsizei size) const {
+    Buffer RendererGL::createBuffer(const GLenum target, const GLenum usage, const MemoryRegion &memory) const {
+        XE_GL_SCOPED_ERROR_CHECK();
+
         GLuint bufferId = 0;
 
         glGenBuffers(1, &bufferId);
         glBindBuffer(target, bufferId);
-        glBufferData(target, size, data, usage);
+        glBufferData(target, static_cast<GLsizeiptr>(memory.size()), memory.data(), usage);
         glBindBuffer(target, 0);
 
-        return {bufferId};
+        return {bufferId, target};
     }
 
 
-    RendererInfo RendererGL::getInfo() const {
-        RendererInfo info;
+    VertexArray RendererGL::createVertexArray(const tcb::span<Attribute> &attributes, Buffer elementArrayBuffer) const {
+        XE_GL_SCOPED_ERROR_CHECK();
 
-        info.vendor = reinterpret_cast<const char*>(glGetString(GL_VENDOR));
-        info.renderer = reinterpret_cast<const char *>(glGetString(GL_RENDERER));
-        info.version = reinterpret_cast<const char *>(glGetString(GL_VERSION));
-        info.shadingLanguageVersion = reinterpret_cast<const char *>(glGetString(GL_SHADING_LANGUAGE_VERSION));
+        VertexArray vao;
+        auto &id = vao.value;
 
-        return info;
+        glGenVertexArrays(1, &id);
+        glBindVertexArray(id);
+
+        for (const auto &attr : attributes) {
+            glBindBuffer(attr.buffer.target, attr.buffer.value);
+            glEnableVertexAttribArray(attr.index);
+            glVertexAttribPointer(attr.index, attr.size, attr.type, attr.normalized, attr.stride, reinterpret_cast<const void*>(attr.offset));
+        }
+
+        if (elementArrayBuffer.value) {
+            assert(elementArrayBuffer.target == GL_ELEMENT_ARRAY_BUFFER);
+            glBindBuffer(elementArrayBuffer.target, elementArrayBuffer.value);
+        }
+
+        return vao;
     }
 
+    void RendererGL::draw(VertexArray vertexArray, GLenum primitiveType, const tcb::span<VertexArrayPrimitive> &primitives) const {
+        XE_GL_SCOPED_ERROR_CHECK();
+
+        glBindVertexArray(vertexArray.value);
+
+        for (const auto &primitive : primitives) {
+            glDrawArrays(primitiveType, primitive.start, primitive.count);
+        }
+    }
+
+    void RendererGL::draw(VertexArray vertexArray, GLenum primitiveType, const MultiDraw &multiDraw) const {
+        XE_GL_SCOPED_ERROR_CHECK();
+
+        glBindVertexArray(vertexArray.value);
+        glMultiDrawArrays(primitiveType, multiDraw.start, multiDraw.count, multiDraw.drawCount);
+    }
+
+    void RendererGL::drawIndexed(VertexArray vertexArray, GLenum primitiveType, GLenum dataType, const tcb::span<VertexArrayPrimitive> &primitives) const {
+        XE_GL_SCOPED_ERROR_CHECK();
+
+        glBindVertexArray(vertexArray.value);
+
+        for (const auto &primitive : primitives) {
+            const auto indices = reinterpret_cast<const void*>(primitive.start);
+
+            glDrawElements(primitiveType, primitive.count, dataType, indices);
+        }
+    }
+
+    void RendererGL::apply(const tcb::span<Uniform> &uniforms) const {
+        XE_GL_SCOPED_ERROR_CHECK();
+
+        for (const auto &uniform : uniforms) {
+            const auto &[location, type, uniformDim, count, data] = uniform;
+            const auto dim = static_cast<int>(uniformDim);
+
+            switch (type) {
+            case UniformType::Float:
+                glUniformXfv[dim](location, count, static_cast<const GLfloat*>(data));
+                break;
+
+            case UniformType::Int:
+                glUniformXiv[dim](location, count, static_cast<const GLint*>(data));
+                break;
+
+            case UniformType::UnsignedInt:
+                glUniformXuiv[dim](location, count, static_cast<const GLuint*>(data));
+                break;
+            }
+        }
+    }
+
+    void RendererGL::apply(const tcb::span<UniformMatrix> &uniforms) const {
+        XE_GL_SCOPED_ERROR_CHECK();
+
+        for (const auto &[location, type, dim, transpose, count, data] : uniforms) {
+            const auto index = static_cast<int>(dim);
+
+            switch (type) {
+            case UniformMatrixType::Float:
+                glUniformMatrixXfv[index](location, count, transpose, static_cast<const GLfloat*>(data));
+                break;
+
+            case UniformMatrixType::Double:
+                glUniformMatrixXdv[index](location, count, transpose, static_cast<const GLdouble*>(data));
+                break;
+            }
+        }
+    }
+
+
+    Texture RendererGL::createTexture(GLenum target, GLint internalFormat, const ClientTextureImage1D &image, bool generateMipMaps, const tcb::span<TextureParameter> &parameters) const {
+        XE_GL_SCOPED_ERROR_CHECK();
+
+        GLuint textureId = 0;
+
+        glGenTextures(1, &textureId);
+        glBindTexture(target, textureId);
+
+        glTexImage1D(target, 0, internalFormat, image.size, 0, image.format, image.type, image.pixels);
+
+        if (generateMipMaps) {
+            glGenerateMipmap(target);
+        }
+
+        render(target, parameters);
+
+        glBindTexture(target, 0);
+
+        return {textureId, target};
+    }
+
+
+    Texture RendererGL::createTexture(GLenum target, GLint internalFormat, const ClientTextureImage2D &image, bool generateMipMaps, const tcb::span<TextureParameter> &parameters) const {
+        XE_GL_SCOPED_ERROR_CHECK();
+
+        GLuint textureId = 0;
+
+        glGenTextures(1, &textureId);
+        glBindTexture(target, textureId);
+
+        glTexImage2D(target, 0, internalFormat, image.size.X, image.size.Y, 0, image.format, image.type, image.pixels);
+
+        if (generateMipMaps) {
+            glGenerateMipmap(target);
+        }
+
+        render(target, parameters);
+
+        glBindTexture(target, 0);
+
+        return {textureId, target};
+    }
+
+    Texture RendererGL::createTexture(GLenum target, GLint internalFormat, const ClientTextureImage3D &image, bool generateMipMaps, const tcb::span<TextureParameter> &parameters) const {
+        XE_GL_SCOPED_ERROR_CHECK();
+
+        GLuint textureId = 0;
+
+        glGenTextures(1, &textureId);
+        glBindTexture(target, textureId);
+
+        glTexImage3D(target, 0, internalFormat, image.size.X, image.size.Y, image.size.Z, 0, image.format, image.type, image.pixels);
+
+        if (generateMipMaps) {
+            glGenerateMipmap(target);
+        }
+
+        render(target, parameters);
+
+        glBindTexture(target, 0);
+
+        return {textureId, target};
+    }
+
+    void RendererGL::render(GLenum target, const tcb::span<TextureParameter> &parameters) const {
+        XE_GL_SCOPED_ERROR_CHECK();
+
+        for (const auto &parameter : parameters) {
+            glTexParameteri(target, parameter.param, parameter.value);
+        }
+    }
+
+    void RendererGL::render(const tcb::span<CapabilityStatus> &capabilities) const {
+        XE_GL_SCOPED_ERROR_CHECK();
+
+        for (const auto &[capability, enabled] : capabilities) {
+            glXable[enabled](capability);
+        }
+    }
+
+    void RendererGL::render(const tcb::span<TextureLayer> &layers) const {
+        XE_GL_SCOPED_ERROR_CHECK();
+
+        for (uint32_t i = 0; i < layers.size(); i++) {
+            const auto &layer = layers[i];
+
+            glActiveTexture(GL_TEXTURE0 + i);
+            glBindTexture(layer.texture.target, layer.texture.value);
+
+            render(layer.texture.target, layer.parameters);
+        }
+    }
+
+    void RendererGL::clear(const ClearParams &params) const {
+        XE_GL_SCOPED_ERROR_CHECK();
+
+        GLenum clearFlags = {};
+
+        if (params.colour) {
+            const auto &color = params.colour.value();
+
+            clearFlags |= GL_COLOR_BUFFER_BIT;
+            glClearColor(color.X, color.Y, color.Z, color.W);
+        }
+
+        if (params.depth) {
+            const auto &depth = params.depth.value();
+
+            clearFlags |= GL_DEPTH_BUFFER_BIT;
+            glClearDepthf(depth);
+        }
+
+        if (params.stencil) {
+            const auto &stencil = params.stencil.value();
+
+            clearFlags |= GL_DEPTH_BUFFER_BIT;
+            glClearStencil(stencil);
+        }
+
+        glClear(clearFlags);
+    }
+
+    void RendererGL::flush() const {
+        XE_GL_SCOPED_ERROR_CHECK();
+
+        glFlush();
+    }
+
+    void RendererGL::viewport(const XE::Vector2i &pos, const XE::Vector2i &size) const {
+        XE_GL_SCOPED_ERROR_CHECK();
+
+        glViewport(pos.X, pos.Y, size.X, size.Y);
+    }
+
+    void RendererGL::useProgram(const Program &program) const {
+        XE_GL_SCOPED_ERROR_CHECK();
+
+        glUseProgram(program.value);
+    }
 }

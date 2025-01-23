@@ -103,7 +103,7 @@ FloorGeometry createFloorGeometry(const xe::gl::RendererGL &renderer, const GLin
         vertices[2 * i + 1] = XE::Vector3(i * tileSizeX, 0.0f, (j + 1) * tileSizeZ);
     }
 
-    floorGeometry.vertexBuffer = renderer.createBuffer(GL_ARRAY_BUFFER, GL_STATIC_DRAW, vertices.data(), vertices.size() * sizeof(XE::Vector3));
+    floorGeometry.vertexBuffer = renderer.createBuffer(GL_ARRAY_BUFFER, GL_STATIC_DRAW, { vertices.data(), vertices.size() * sizeof(XE::Vector3) });
 
     glGenVertexArrays(1, &floorGeometry.vao);
     glBindVertexArray(floorGeometry.vao);
@@ -131,8 +131,8 @@ GLuint createTriangleGeometry(const RendererGL &renderer, const GLint vertCoordL
         1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f,
     };
 
-    const auto vertexBuffer = renderer.createBuffer(GL_ARRAY_BUFFER, GL_STATIC_DRAW, vertices, sizeof(GLfloat) * VERTEX_COLOUR * 3);
-    const auto colourBuffer = renderer.createBuffer(GL_ARRAY_BUFFER, GL_STATIC_DRAW, colours, sizeof(GLfloat) * VERTEX_COLOUR * 4);
+    const auto vertexBuffer = renderer.createBuffer(GL_ARRAY_BUFFER, GL_STATIC_DRAW, {vertices, sizeof(GLfloat) * VERTEX_COLOUR * 3});
+    const auto colourBuffer = renderer.createBuffer(GL_ARRAY_BUFFER, GL_STATIC_DRAW, {colours, sizeof(GLfloat) * VERTEX_COLOUR * 4});
 
     GLuint triangleVao;
     glGenVertexArrays(1, &triangleVao);
@@ -448,11 +448,14 @@ void main() {
 }
 )";
 
-    const RendererGL renderer;
+    auto renderer = RendererGL::create();
 
-    const auto program = renderer.createProgram({
-        renderer.createShader(GL_VERTEX_SHADER, vertexShader), 
-        renderer.createShader(GL_FRAGMENT_SHADER, fragmentShader)});
+    std::vector<xe::gl::Shader> shaders = {
+        renderer->createShader(GL_VERTEX_SHADER, vertexShader.c_str()),
+        renderer->createShader(GL_FRAGMENT_SHADER, fragmentShader.c_str())
+    };
+
+    const auto program = renderer->createProgram({shaders.data(), shaders.size()});
 
     if (!program.value) {
         return EXIT_FAILURE;
@@ -468,8 +471,8 @@ void main() {
     const GLint vertCoordZLoc = glGetAttribLocation(program.value, "vertCoordZ");
     assert(vertCoordZLoc >= 0);
 
-    const auto floor = createFloorGeometry(renderer, vertCoordLoc, vertColorLoc, 10, 10, 1.0f, 1.0f);
-    GLuint triangleVao = createTriangleGeometry(renderer, vertCoordLoc, vertColorLoc);
+    const auto floor = createFloorGeometry(*renderer, vertCoordLoc, vertColorLoc, 10, 10, 1.0f, 1.0f);
+    GLuint triangleVao = createTriangleGeometry(*renderer, vertCoordLoc, vertColorLoc);
 
     //Use Vsync
     std::printf("Configuring swap interval\n");

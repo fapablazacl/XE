@@ -55,7 +55,7 @@ namespace XE {
 #endif
 
         default:
-            return "UNNOWN_ERR_CODE_" + hexstr(err);
+            return "UNKNOWN_ERR_CODE_" + hexstr(err);
         }
     }
 

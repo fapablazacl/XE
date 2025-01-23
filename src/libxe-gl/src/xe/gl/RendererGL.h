@@ -6,6 +6,11 @@
 #include <glad/glad.h>
 
 #include "Types.h"
+#include "xe/math/Vector.h"
+
+#include <optional>
+
+#include "span.hpp"
 
 struct RendererInfo {
     std::string vendor;
@@ -15,16 +20,195 @@ struct RendererInfo {
 };
 
 namespace xe::gl {
+    struct CapabilityStatus {
+        GLenum capability = {};
+        GLboolean enabled = GL_FALSE;
+    };
+
+    enum class UniformType {
+        Float, Int, UnsignedInt
+    };
+
+    enum class UniformDim {
+        _1, _2, _3, _4
+    };
+
+    struct Uniform {
+        GLint location = 0;
+        UniformType type = UniformType::Float;
+        UniformDim dim = UniformDim::_1;
+        GLsizei count = 0;
+
+        const void* data = nullptr;
+    };
+
+    enum class UniformMatrixDim {
+        _2x2, _2x3, _2x4,
+        _3x2, _3x3, _3x4,
+        _4x2, _4x3, _4x4,
+    };
+
+    enum class UniformMatrixType {
+        Float,
+        Double
+    };
+
+    struct UniformMatrix {
+        GLint location = 0;
+        UniformMatrixType type = UniformMatrixType::Float;
+        UniformMatrixDim dim = UniformMatrixDim::_4x4;
+        GLboolean transpose = GL_FALSE;
+        GLsizei count = 0;
+
+        const void* data = nullptr;
+    };
+
+    struct Attribute {
+        GLuint index = 0;
+        GLsizei size = 3;
+        GLenum type = GL_FLOAT;
+        GLboolean normalized = GL_FALSE;
+        GLsizei stride = 0;
+        Buffer buffer = {};
+        GLuint offset = 0;
+    };
+
+    struct VertexArrayPrimitive {
+        GLint start = 0;
+        GLsizei count = 0;
+    };
+
+    struct MultiDraw {
+        GLint *start = nullptr;
+        GLsizei *count = nullptr;
+        GLsizei drawCount = 0;
+    };
+
+    struct TextureParameter {
+        GLenum param = {};
+        GLint value = {};
+    };
+
+    struct TextureLayer {
+        Texture texture = {};
+        tcb::span<TextureParameter> parameters;
+    };
+
+    struct ClearParams {
+        std::optional<XE::Vector4> colour;
+        std::optional<float> depth;
+        std::optional<float> stencil;
+
+        explicit operator bool() const { return colour || depth || stencil; }
+    };
+
+    struct ClientTextureImage1D {
+        int size = 0;
+        GLenum format = GL_RGBA;
+        GLenum type = GL_UNSIGNED_BYTE;
+        const void *pixels = nullptr;
+    };
+
+    struct ClientTextureImage2D {
+        XE::Vector2i size = {0, 0};
+        GLenum format = GL_RGBA;
+        GLenum type = GL_UNSIGNED_BYTE;
+        const void *pixels = nullptr;
+    };
+
+    struct ClientTextureImage3D {
+        XE::Vector3i size = {0, 0, 0};
+        GLenum format = GL_RGBA;
+        GLenum type = GL_UNSIGNED_BYTE;
+        const void *pixels = nullptr;
+    };
+
+    class Context;
+
+    // TODO: Unify the different drawing APIs, with respect to the native glMultiDraw* functions.
+    // TODO: Integrate the Logging facility (maybe use lib-xecore?
+    // TODO: Define more specifically how to manage the errors
+    // TODO: Define Mixin classes to support both manual and automatic resource management
+    // TODO: Add 2d texture support
+    // TODO: Add cubemap texture support
+
+    /**
+     * @brief Wrapper to OpenGL 3+ APIs
+     */
     class RendererGL {
     public:
-        RendererGL();
+        using GLproc = void (*)();
+        using GetProcAddress = GLproc (*)(const char *);
 
-        Shader createShader(const GLenum type, const std::string &source) const;
+        static std::unique_ptr<RendererGL> create(GetProcAddress getProcAddress);
 
-        Program createProgram(const std::vector<Shader> &shaders) const;
+        static std::unique_ptr<RendererGL> create();
 
-        Buffer createBuffer(const GLenum target, const GLenum usage, const GLvoid *data, const GLsizei size) const;
+    private:
+        RendererGL();// caca i pipi
 
+    public:
+        [[nodiscard]]
+        Shader createShader(GLenum type, const char *source) const;
+
+        [[nodiscard]]
+        Program createProgram(const tcb::span<Shader> &shaders) const;
+
+        [[nodiscard]]
+        Buffer createBuffer(GLenum target, GLenum usage, const MemoryRegion &memory) const;
+
+        [[nodiscard]]
+        VertexArray createVertexArray(const tcb::span<Attribute> &attributes, Buffer elementArrayBuffer) const;
+
+        [[nodiscard]]
         RendererInfo getInfo() const;
+
+        [[nodiscard]]
+        Texture createTexture(GLenum target, GLint internalFormat, const ClientTextureImage1D &image, bool generateMipMaps, const tcb::span<TextureParameter> &parameters) const;
+
+        [[nodiscard]]
+        Texture createTexture(GLenum target, GLint internalFormat, const ClientTextureImage2D &image, bool generateMipMaps, const tcb::span<TextureParameter> &parameters) const;
+
+        [[nodiscard]]
+        Texture createTexture(GLenum target, GLint internalFormat, const ClientTextureImage3D &image, bool generateMipMaps, const tcb::span<TextureParameter> &parameters) const;
+
+        void render(const tcb::span<CapabilityStatus> &capabilities) const;
+
+        void render(const tcb::span<TextureLayer> &layers) const;
+
+        void render(GLenum target, const tcb::span<TextureParameter> &parameters) const;
+
+        void apply(const tcb::span<Uniform> &uniforms) const;
+
+        void apply(const tcb::span<UniformMatrix> &uniforms) const;
+
+        void draw(VertexArray vertexArray, GLenum primitiveType, const tcb::span<VertexArrayPrimitive> &primitives) const;
+
+        void draw(VertexArray vertexArray, GLenum primitiveType, const MultiDraw &multiDraw) const;
+
+        void drawIndexed(VertexArray vertexArray, GLenum primitiveType, GLenum dataType, const tcb::span<VertexArrayPrimitive> &primitives) const;
+
+        void clear(const ClearParams &params) const;
+
+        void flush() const;
+
+        void viewport(const XE::Vector2i &pos, const XE::Vector2i &size) const;
+
+        void useProgram(const Program &program) const;
+
+    private:
+        using PFNGLUNIFORMXFVPROC = void (*)(GLint location, GLsizei count, const GLfloat *value);
+        using PFNGLUNIFORMXIVPROC = void (*)(GLint location, GLsizei count, const GLint *value);
+        using PFNGLUNIFORMXUIVPROC = void (*)(GLint location, GLsizei count, const GLuint *value);
+        using PFNGLUNIFORMMATRIXXFVPROC = void (*)(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value);
+        using PFNGLUNIFORMMATRIXXDVPROC = void (*)(GLint location, GLsizei count, GLboolean transpose, const GLdouble *value);
+        using PFNGLXABLEPROC = void (*)(GLenum pname);
+
+        PFNGLUNIFORMXFVPROC glUniformXfv[4];
+        PFNGLUNIFORMXIVPROC glUniformXiv[4];
+        PFNGLUNIFORMXUIVPROC glUniformXuiv[4];
+        PFNGLUNIFORMMATRIXXFVPROC glUniformMatrixXfv[9];
+        PFNGLUNIFORMMATRIXXDVPROC glUniformMatrixXdv[9];
+        PFNGLXABLEPROC glXable[2];
     };
 }
