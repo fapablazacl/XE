@@ -13,8 +13,32 @@ namespace xe::gl {
         typedef T Type;
         typedef Tag TagType;
 
-        T value = {};
+        T id = {};
     };
+
+    /*
+    template<typename T, typename DeleterFn>
+    struct Resource {
+        Resource() = default;
+
+        explicit Resource(const T id)
+            : id(id) {}
+
+        ~Resource() { 
+            delete_();
+        }
+
+        void delete_() {
+            if (id) {
+                DeleterFn fn;
+                fn(id);
+                id = {};
+            }
+        }
+
+        T id = {};
+    };
+    */
 
     struct buffer_tag {};
     struct texture_tag {};
@@ -28,7 +52,7 @@ namespace xe::gl {
         Buffer() = default;
 
         Buffer(GLuint id, GLenum target) {
-            this->value = id;
+            this->id = id;
             this->target = target;
         }
     };
@@ -39,7 +63,7 @@ namespace xe::gl {
         Texture() = default;
 
         Texture(GLuint id, GLenum target) {
-            this->value = id;
+            this->id = id;
             this->target = target;
         }
     };

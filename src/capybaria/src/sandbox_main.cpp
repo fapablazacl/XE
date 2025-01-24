@@ -80,7 +80,8 @@ struct FloorGeometry {
 
     int stripVertexCount = 0;
 
-    GLuint vao = 0;
+    xe::gl::VertexArray vao;
+
     xe::gl::Buffer vertexBuffer;
 };
 
@@ -105,23 +106,18 @@ FloorGeometry createFloorGeometry(const xe::gl::RendererGL &renderer, const GLin
 
     floorGeometry.vertexBuffer = renderer.createBuffer(GL_ARRAY_BUFFER, GL_STATIC_DRAW, { vertices.data(), vertices.size() * sizeof(XE::Vector3) });
 
-    glGenVertexArrays(1, &floorGeometry.vao);
-    glBindVertexArray(floorGeometry.vao);
+    xe::gl::Attribute attribs[] = {
+        xe::gl::Attribute{vertCoordLoc, xe::gl::AttributeDim::_3, xe::gl::AttributeType::Float, GL_FALSE, 0, floorGeometry.vertexBuffer, 0}, 
+        xe::gl::Attribute{vertColorLoc, xe::gl::AttributeDim::_3, xe::gl::AttributeType::Float, GL_FALSE, 0, {}, 0}
+    };
 
-    glBindBuffer(GL_ARRAY_BUFFER, floorGeometry.vertexBuffer.value);
-    glEnableVertexAttribArray(vertCoordLoc);
-    glVertexAttribPointer(vertCoordLoc, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
-
-    glDisableVertexAttribArray(vertColorLoc);
-    glVertexAttrib4f(vertColorLoc, 1.0f, 1.0f, 1.0f, 1.0f);
-
-    glBindVertexArray(0);
+    floorGeometry.vao = renderer.createVertexArray({attribs, 1}, {});
 
     return floorGeometry;
 }
 
 
-GLuint createTriangleGeometry(const RendererGL &renderer, const GLint vertCoordLoc, const GLint vertColorLoc) {
+xe::gl::VertexArray createTriangleGeometry(const RendererGL &renderer, const GLint vertCoordLoc, const GLint vertColorLoc) {
     // prepare buffer
     const int VERTEX_COLOUR = 3;
 
@@ -134,26 +130,17 @@ GLuint createTriangleGeometry(const RendererGL &renderer, const GLint vertCoordL
     const auto vertexBuffer = renderer.createBuffer(GL_ARRAY_BUFFER, GL_STATIC_DRAW, {vertices, sizeof(GLfloat) * VERTEX_COLOUR * 3});
     const auto colourBuffer = renderer.createBuffer(GL_ARRAY_BUFFER, GL_STATIC_DRAW, {colours, sizeof(GLfloat) * VERTEX_COLOUR * 4});
 
-    GLuint triangleVao;
-    glGenVertexArrays(1, &triangleVao);
-    glBindVertexArray(triangleVao);
+    xe::gl::Attribute attribs[] = {
+        xe::gl::Attribute{vertCoordLoc, xe::gl::AttributeDim::_3, xe::gl::AttributeType::Float, GL_FALSE, 0, vertexBuffer, 0}, 
+        xe::gl::Attribute{vertColorLoc, xe::gl::AttributeDim::_3, xe::gl::AttributeType::Float, GL_FALSE, 0, colourBuffer, 0}
+    };
 
-    glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer.value);
-    glEnableVertexAttribArray(vertCoordLoc);
-    glVertexAttribPointer(vertCoordLoc, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
-
-    glBindBuffer(GL_ARRAY_BUFFER, colourBuffer.value);
-    glEnableVertexAttribArray(vertColorLoc);
-    glVertexAttribPointer(vertColorLoc, 4, GL_FLOAT, GL_FALSE, 0, nullptr);
-
-    glBindVertexArray(0);
-
-    return triangleVao;
+    return renderer.createVertexArray({attribs, 1}, {});
 }
 
 
 void renderFloorGeometry(const FloorGeometry &floorGeometry, const GLint vertCoordZLoc, const GLint vertColourLoc) {
-    glBindVertexArray(floorGeometry.vao);
+    glBindVertexArray(floorGeometry.vao.id);
 
     const XE::Vector4 colorFrom = {0.2f, 0.2f, 0.2f, 1.0f};
     const XE::Vector4 colorTo = {0.2f, 0.2f, 1.0f, 1.0f};
@@ -457,22 +444,22 @@ void main() {
 
     const auto program = renderer->createProgram({shaders.data(), shaders.size()});
 
-    if (!program.value) {
+    if (!program.id) {
         return EXIT_FAILURE;
     }
 
     // get attrib location
-    const GLint vertCoordLoc = glGetAttribLocation(program.value, "vertCoord");
+    const GLint vertCoordLoc = glGetAttribLocation(program.id, "vertCoord");
     assert(vertCoordLoc >= 0);
 
-    const GLint vertColorLoc = glGetAttribLocation(program.value, "vertColor");
+    const GLint vertColorLoc = glGetAttribLocation(program.id, "vertColor");
     assert(vertColorLoc >= 0);
 
-    const GLint vertCoordZLoc = glGetAttribLocation(program.value, "vertCoordZ");
+    const GLint vertCoordZLoc = glGetAttribLocation(program.id, "vertCoordZ");
     assert(vertCoordZLoc >= 0);
 
     const auto floor = createFloorGeometry(*renderer, vertCoordLoc, vertColorLoc, 10, 10, 1.0f, 1.0f);
-    GLuint triangleVao = createTriangleGeometry(*renderer, vertCoordLoc, vertColorLoc);
+    const auto triangleVao = createTriangleGeometry(*renderer, vertCoordLoc, vertColorLoc);
 
     //Use Vsync
     std::printf("Configuring swap interval\n");
@@ -512,11 +499,16 @@ void main() {
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+        xe::gl::ClearParams clearParams;
+        clearParams.colour = {0.0f, 0.0f, 0.0f, 1.0f};
+        clearParams.depth = 1.0f;
+        renderer->clear(clearParams);
 
-        glUseProgram(program.value);
+        renderer->viewport({0, 0}, {SCREEN_WIDTH, SCREEN_HEIGHT});
 
-        const int mvpLoc = glGetUniformLocation(program.value, "uMvp");
+        glUseProgram(program.id);
+
+        const int mvpLoc = glGetUniformLocation(program.id, "uMvp");
         const auto viewProj = camera.getViewProj(SCREEN_WIDTH, SCREEN_HEIGHT);
 
         // render triangle
@@ -528,10 +520,10 @@ void main() {
         const auto triangleMatrix = viewProj * transformation.computeModelMatrix();
         
         glUniformMatrix4fv(mvpLoc, 1, GL_FALSE, triangleMatrix.data());
-
-        glBindVertexArray(triangleVao);
         glVertexAttrib1f(vertCoordZLoc, 0.0f);
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, 3);
+        auto triangleVaoPrimitive = xe::gl::VertexArrayPrimitive{0, 3};
+        auto triangleVaoPrimitiveMem = tcb::span<xe::gl::VertexArrayPrimitive>{&triangleVaoPrimitive, 1};
+        renderer->draw(xe::gl::VertexArray{triangleVao}, GL_TRIANGLE_STRIP, triangleVaoPrimitiveMem);
 
         // render floor geometry
         const auto floorMatrix = viewProj;

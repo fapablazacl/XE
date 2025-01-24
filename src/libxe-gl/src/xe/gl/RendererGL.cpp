@@ -98,6 +98,18 @@ namespace xe::gl {
             std::printf("%s ", cstr);
         }
 
+        std::printf("\n");
+
+        glVertexAttribXfv[0] = glVertexAttrib1fv;
+        glVertexAttribXfv[1] = glVertexAttrib2fv;
+        glVertexAttribXfv[2] = glVertexAttrib3fv;
+        glVertexAttribXfv[3] = glVertexAttrib4fv;
+
+        glVertexAttribXiv[0] = nullptr;
+        glVertexAttribXiv[1] = nullptr;
+        glVertexAttribXiv[2] = nullptr;
+        glVertexAttribXiv[3] = glVertexAttrib4iv;
+
         glUniformXfv[0] = glUniform1fv;
         glUniformXfv[1] = glUniform2fv;
         glUniformXfv[2] = glUniform3fv;
@@ -154,8 +166,7 @@ namespace xe::gl {
         const auto shaderId = glCreateShader(type);
 
         const GLchar *const glsl = source;
-        const GLsizei size = 1;
-        glShaderSource(shaderId, 1, &glsl, &size);
+        glShaderSource(shaderId, 1, &glsl, nullptr);
         glCompileShader(shaderId);
 
         // check for errors
@@ -184,14 +195,14 @@ namespace xe::gl {
         const auto programId = glCreateProgram();
 
         for (const auto &shader : shaders) {
-            if (shader.value == 0) {
+            if (shader.id == 0) {
                 std::cerr << "Empty shader was supplied" << std::endl;
 
                 glDeleteProgram(programId);
                 return {};
             }
 
-            glAttachShader(programId, shader.value);
+            glAttachShader(programId, shader.id);
         }
 
         glLinkProgram(programId);
@@ -202,7 +213,7 @@ namespace xe::gl {
         if (status == static_cast<GLint>(GL_FALSE)) {
             constexpr size_t INFO_LOG_BUFFER_SIZE = 4096;
 
-            std::cerr << "Error while creating program: ";
+            std::cerr << "Shader linker error: " << std::endl;
             char msg[INFO_LOG_BUFFER_SIZE] = {};
             glGetProgramInfoLog(programId, INFO_LOG_BUFFER_SIZE, nullptr, msg);
             std::cerr << msg << std::endl;
@@ -234,20 +245,42 @@ namespace xe::gl {
         XE_GL_SCOPED_ERROR_CHECK();
 
         VertexArray vao;
-        auto &id = vao.value;
+        auto &id = vao.id;
 
         glGenVertexArrays(1, &id);
         glBindVertexArray(id);
 
         for (const auto &attr : attributes) {
-            glBindBuffer(attr.buffer.target, attr.buffer.value);
-            glEnableVertexAttribArray(attr.index);
-            glVertexAttribPointer(attr.index, attr.size, attr.type, attr.normalized, attr.stride, reinterpret_cast<const void*>(attr.offset));
+            if (attr.buffer.id != 0) {
+                glBindBuffer(attr.buffer.target, attr.buffer.id);
+                glEnableVertexAttribArray(attr.index);
+
+                GLenum type;
+
+                switch (attr.type) { 
+                case AttributeType::Float:
+                    type = GL_FLOAT;
+                    break; 
+
+                case AttributeType::Int:
+                    type = GL_INT;
+                    break; 
+                    
+                case AttributeType::UnsignedInt:
+                    type = GL_UNSIGNED_INT;
+                    break; 
+                }
+
+                glVertexAttribPointer(attr.index, static_cast<GLint>(attr.size) + 1, type, attr.normalized, attr.stride, reinterpret_cast<const void *>(attr.offset));
+            }
+            else {
+                glDisableVertexAttribArray(attr.index);
+            }
         }
 
-        if (elementArrayBuffer.value) {
+        if (elementArrayBuffer.id) {
             assert(elementArrayBuffer.target == GL_ELEMENT_ARRAY_BUFFER);
-            glBindBuffer(elementArrayBuffer.target, elementArrayBuffer.value);
+            glBindBuffer(elementArrayBuffer.target, elementArrayBuffer.id);
         }
 
         return vao;
@@ -256,29 +289,52 @@ namespace xe::gl {
     void RendererGL::draw(VertexArray vertexArray, GLenum primitiveType, const tcb::span<VertexArrayPrimitive> &primitives) const {
         XE_GL_SCOPED_ERROR_CHECK();
 
-        glBindVertexArray(vertexArray.value);
+        glBindVertexArray(vertexArray.id);
 
         for (const auto &primitive : primitives) {
+            apply(primitive.attribs);
+
             glDrawArrays(primitiveType, primitive.start, primitive.count);
         }
     }
 
-    void RendererGL::draw(VertexArray vertexArray, GLenum primitiveType, const MultiDraw &multiDraw) const {
+    void RendererGL::draw(VertexArray vertexArray, GLenum primitiveType, const VertexArrayMultiDraw &multiDraw) const {
         XE_GL_SCOPED_ERROR_CHECK();
 
-        glBindVertexArray(vertexArray.value);
+        glBindVertexArray(vertexArray.id);
         glMultiDrawArrays(primitiveType, multiDraw.start, multiDraw.count, multiDraw.drawCount);
     }
 
     void RendererGL::drawIndexed(VertexArray vertexArray, GLenum primitiveType, GLenum dataType, const tcb::span<VertexArrayPrimitive> &primitives) const {
         XE_GL_SCOPED_ERROR_CHECK();
 
-        glBindVertexArray(vertexArray.value);
+        glBindVertexArray(vertexArray.id);
 
         for (const auto &primitive : primitives) {
             const auto indices = reinterpret_cast<const void*>(primitive.start);
 
+            apply(primitive.attribs);
+
             glDrawElements(primitiveType, primitive.count, dataType, indices);
+        }
+    }
+
+    void RendererGL::apply(const tcb::span<Attribute> &attribs) const {
+        XE_GL_SCOPED_ERROR_CHECK();
+
+        for (const auto &attrib : attribs) {
+            const auto dim = static_cast<int>(attrib.size);
+
+            switch (attrib.type) {
+            case AttributeType::Float:
+                glVertexAttribXfv[dim](attrib.index, static_cast<const GLfloat *>(attrib.data));
+                break;
+
+            default:
+                fprintf(stderr, "Non float vertex attribute support is missing.");
+                abort();
+                break;
+            }
         }
     }
 
@@ -411,7 +467,7 @@ namespace xe::gl {
             const auto &layer = layers[i];
 
             glActiveTexture(GL_TEXTURE0 + i);
-            glBindTexture(layer.texture.target, layer.texture.value);
+            glBindTexture(layer.texture.target, layer.texture.id);
 
             render(layer.texture.target, layer.parameters);
         }
@@ -461,6 +517,6 @@ namespace xe::gl {
     void RendererGL::useProgram(const Program &program) const {
         XE_GL_SCOPED_ERROR_CHECK();
 
-        glUseProgram(program.value);
+        glUseProgram(program.id);
     }
 }

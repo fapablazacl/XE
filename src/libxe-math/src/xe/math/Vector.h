@@ -17,7 +17,7 @@
 
 namespace XE {
     template <typename T, int N> struct VectorBase {
-        T values[N];
+        T values[N] = {};
 
         VectorBase() {}
 

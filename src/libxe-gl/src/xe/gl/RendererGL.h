@@ -63,22 +63,30 @@ namespace xe::gl {
         const void* data = nullptr;
     };
 
+    enum class AttributeDim { _1, _2, _3, _4 };
+
+    enum class AttributeType { Float, Int, UnsignedInt };
+
     struct Attribute {
-        GLuint index = 0;
-        GLsizei size = 3;
-        GLenum type = GL_FLOAT;
+        GLint index = 0;
+        AttributeDim size = AttributeDim::_3;
+        AttributeType type = AttributeType::Float;
         GLboolean normalized = GL_FALSE;
         GLsizei stride = 0;
         Buffer buffer = {};
         GLuint offset = 0;
+        const void *data = nullptr;
     };
 
     struct VertexArrayPrimitive {
         GLint start = 0;
         GLsizei count = 0;
+
+        //! attributes to set prior making the rendering call
+        tcb::span<Attribute> attribs;
     };
 
-    struct MultiDraw {
+    struct VertexArrayMultiDraw {
         GLint *start = nullptr;
         GLsizei *count = nullptr;
         GLsizei drawCount = 0;
@@ -123,12 +131,16 @@ namespace xe::gl {
         const void *pixels = nullptr;
     };
 
+
+
     class Context;
 
-    // TODO: Unify the different drawing APIs, with respect to the native glMultiDraw* functions.
-    // TODO: Integrate the Logging facility (maybe use lib-xecore?
-    // TODO: Define more specifically how to manage the errors
+
     // TODO: Define Mixin classes to support both manual and automatic resource management
+
+    // -- Low Priority --
+    // TODO: Integrate the Logging facility (maybe use lib-xecore?)
+    // TODO: Define more specifically how to manage the errors
     // TODO: Add 2d texture support
     // TODO: Add cubemap texture support
 
@@ -178,13 +190,15 @@ namespace xe::gl {
 
         void render(GLenum target, const tcb::span<TextureParameter> &parameters) const;
 
+        void apply(const tcb::span<Attribute> &attribs) const;
+
         void apply(const tcb::span<Uniform> &uniforms) const;
 
         void apply(const tcb::span<UniformMatrix> &uniforms) const;
 
         void draw(VertexArray vertexArray, GLenum primitiveType, const tcb::span<VertexArrayPrimitive> &primitives) const;
 
-        void draw(VertexArray vertexArray, GLenum primitiveType, const MultiDraw &multiDraw) const;
+        void draw(VertexArray vertexArray, GLenum primitiveType, const VertexArrayMultiDraw &multiDraw) const;
 
         void drawIndexed(VertexArray vertexArray, GLenum primitiveType, GLenum dataType, const tcb::span<VertexArrayPrimitive> &primitives) const;
 
@@ -197,18 +211,28 @@ namespace xe::gl {
         void useProgram(const Program &program) const;
 
     private:
+        using PFNGLVERTEXATTRIBMXFVPROC = void (*)(GLuint index, const GLfloat *v);
+        using PFNGLVERTEXATTRIBMXIVPROC = void (*)(GLuint index, const GLint *v);
+        
         using PFNGLUNIFORMXFVPROC = void (*)(GLint location, GLsizei count, const GLfloat *value);
         using PFNGLUNIFORMXIVPROC = void (*)(GLint location, GLsizei count, const GLint *value);
         using PFNGLUNIFORMXUIVPROC = void (*)(GLint location, GLsizei count, const GLuint *value);
+
         using PFNGLUNIFORMMATRIXXFVPROC = void (*)(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value);
         using PFNGLUNIFORMMATRIXXDVPROC = void (*)(GLint location, GLsizei count, GLboolean transpose, const GLdouble *value);
+
         using PFNGLXABLEPROC = void (*)(GLenum pname);
+
+        PFNGLVERTEXATTRIBMXFVPROC glVertexAttribXfv[4];
+        PFNGLVERTEXATTRIBMXIVPROC glVertexAttribXiv[4];
 
         PFNGLUNIFORMXFVPROC glUniformXfv[4];
         PFNGLUNIFORMXIVPROC glUniformXiv[4];
         PFNGLUNIFORMXUIVPROC glUniformXuiv[4];
+
         PFNGLUNIFORMMATRIXXFVPROC glUniformMatrixXfv[9];
         PFNGLUNIFORMMATRIXXDVPROC glUniformMatrixXdv[9];
+
         PFNGLXABLEPROC glXable[2];
     };
 }
