@@ -5,6 +5,8 @@
 
 #include "Image.h"
 
+#include <memory>
+
 class ImageLoader {
 public:
     virtual ~ImageLoader();

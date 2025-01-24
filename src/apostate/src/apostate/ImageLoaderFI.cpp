@@ -8,6 +8,7 @@
 #include <fstream>
 #include <iostream>
 #include <map>
+#include <filesystem>
 
 #include <FreeImage.h>
 

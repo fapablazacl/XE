@@ -508,7 +508,7 @@ Material createMaterial(const std::string &parentPath, Renderer &renderer, Textu
             if (path.has_value()) {
                 std::cout << "Texture " << filePath << " located at " << path.value().string() << std::endl;
 
-                filePath = path.value();
+                filePath = path.value().string();
             }
             else {
                 std::cout << "Texture " << filePath << " couldn't be located" << std::endl;
