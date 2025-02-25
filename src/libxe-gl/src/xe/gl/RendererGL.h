@@ -84,6 +84,17 @@ namespace xe::gl {
 
         //! attributes to set prior making the rendering call
         tcb::span<Attribute> attribs;
+
+        VertexArrayPrimitive(GLint start, GLsizei count) {
+            this->start = start;
+            this->count = count;
+        }
+
+        VertexArrayPrimitive(GLint start, GLsizei count, const tcb::span<Attribute> &attribs) {
+            this->start = start;
+            this->count = count;
+            this->attribs = attribs;
+        }
     };
 
     struct VertexArrayMultiDraw {
@@ -135,14 +146,12 @@ namespace xe::gl {
 
     class Context;
 
-
-    // TODO: Define Mixin classes to support both manual and automatic resource management
-
     // -- Low Priority --
     // TODO: Integrate the Logging facility (maybe use lib-xecore?)
     // TODO: Define more specifically how to manage the errors
     // TODO: Add 2d texture support
     // TODO: Add cubemap texture support
+    // TODO: Define Mixin classes to support both manual and automatic resource management
 
     /**
      * @brief Wrapper to OpenGL 3+ APIs

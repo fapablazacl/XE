@@ -223,7 +223,7 @@ namespace xe::gl {
             return {};
         }
 
-        return {programId};
+        return Program {programId};
     }
 
 
@@ -255,7 +255,7 @@ namespace xe::gl {
                 glBindBuffer(attr.buffer.target, attr.buffer.id);
                 glEnableVertexAttribArray(attr.index);
 
-                GLenum type;
+                GLenum type = GL_FLOAT;
 
                 switch (attr.type) { 
                 case AttributeType::Float:
@@ -333,7 +333,6 @@ namespace xe::gl {
             default:
                 fprintf(stderr, "Non float vertex attribute support is missing.");
                 abort();
-                break;
             }
         }
     }

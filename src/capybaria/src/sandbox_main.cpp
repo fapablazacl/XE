@@ -14,62 +14,6 @@
 
 using xe::gl::RendererGL;
 
-static std::string hexstr(const GLenum value) {
-    std::string str;
-    str.resize(16, ' ');
-    std::snprintf(str.data(), str.size(), "%x", value);
-
-    return str;
-}
-
-static std::string stringval(const GLenum err) {
-    switch (err) {
-    case GL_INVALID_ENUM:
-        return "GL_INVALID_ENUM";
-    case GL_INVALID_VALUE:
-        return "GL_INVALID_VALUE";
-    case GL_INVALID_OPERATION:
-        return "GL_INVALID_OPERATION";
-    case GL_STACK_OVERFLOW:
-        return "GL_STACK_OVERFLOW";
-    case GL_STACK_UNDERFLOW:
-        return "GL_STACK_UNDERFLOW";
-    case GL_OUT_OF_MEMORY:
-        return "GL_OUT_OF_MEMORY";
-    case GL_INVALID_FRAMEBUFFER_OPERATION:
-        return "GL_INVALID_FRAMEBUFFER_OPERATION";
-    case GL_CONTEXT_LOST:
-        return "GL_CONTEXT_LOST";
-
-#if defined(GL_TABLE_TOO_LARGE)
-    case GL_TABLE_TOO_LARGE:
-        return "GL_TABLE_TOO_LARGE";
-#endif
-
-    default:
-        return "UNKNOWN_ERR_CODE_" + hexstr(err);
-    }
-}
-
-void GL_callback(const char *name, void *, int, ...) {
-    if (std::string(name) == "glGetError") {
-        return;
-    }
-
-    GLenum err = glGetError();
-
-    if (err != GL_NO_ERROR) {
-        std::cerr << "Error while calling function " << name << std::endl;
-        std::cerr << "Errors generated:" << std::endl;
-
-        while (err != GL_NO_ERROR) {
-            std::cerr << stringval(err) << std::endl;
-            err = glGetError();
-        }
-
-        throw std::runtime_error("");
-    }
-}
 
 struct FloorGeometry {
     int tilesInX = 0;
@@ -117,6 +61,24 @@ FloorGeometry createFloorGeometry(const xe::gl::RendererGL &renderer, const GLin
 }
 
 
+void renderFloorGeometry(const FloorGeometry &floorGeometry, const GLint vertCoordZLoc, const GLint vertColourLoc) {
+    glBindVertexArray(floorGeometry.vao.id);
+
+    const XE::Vector4 colorFrom = {0.2f, 0.2f, 0.2f, 1.0f};
+    const XE::Vector4 colorTo = {0.2f, 0.2f, 1.0f, 1.0f};
+
+    for (int k = 0; k < floorGeometry.tilesInZ; k++) {
+        const float z = static_cast<float>(k) * floorGeometry.tileSizeZ;
+        const float s = static_cast<float>(k) / static_cast<float>((floorGeometry.tilesInZ - 1));
+        const XE::Vector4 color = XE::lerp(colorFrom, colorTo, s);
+
+        glVertexAttrib4fv(vertColourLoc, color.data());
+        glVertexAttrib1f(vertCoordZLoc, z);
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, floorGeometry.stripVertexCount);
+    }
+}
+
+
 xe::gl::VertexArray createTriangleGeometry(const RendererGL &renderer, const GLint vertCoordLoc, const GLint vertColorLoc) {
     // prepare buffer
     const int VERTEX_COLOUR = 3;
@@ -137,25 +99,6 @@ xe::gl::VertexArray createTriangleGeometry(const RendererGL &renderer, const GLi
 
     return renderer.createVertexArray({attribs, 1}, {});
 }
-
-
-void renderFloorGeometry(const FloorGeometry &floorGeometry, const GLint vertCoordZLoc, const GLint vertColourLoc) {
-    glBindVertexArray(floorGeometry.vao.id);
-
-    const XE::Vector4 colorFrom = {0.2f, 0.2f, 0.2f, 1.0f};
-    const XE::Vector4 colorTo = {0.2f, 0.2f, 1.0f, 1.0f};
-
-    for (int k = 0; k < floorGeometry.tilesInZ; k++) {
-        const float z = k * floorGeometry.tileSizeZ;
-        const float s = static_cast<float>(k) / (floorGeometry.tilesInZ - 1);
-        const XE::Vector4 color = XE::lerp(colorFrom, colorTo, s);
-
-        glVertexAttrib4fv(vertColourLoc, color.data());
-        glVertexAttrib1f(vertCoordZLoc, z);
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, floorGeometry.stripVertexCount);
-    }
-}
-
 
 enum GAME_ACTION {
     GAME_ACTION_NONE = 0x00,
@@ -385,18 +328,6 @@ int main(int /*argc*/, char */*argv*/[]) {
         return EXIT_FAILURE;
     }
 
-    const int gladLoadResult = gladLoadGL();
-    // const int gladLoadResult = gladLoadGLLoader(SDL_GL_GetProcAddress);
-    if (!gladLoadResult) {
-        std::printf("Error while initializing GLAD entry points");
-        return EXIT_FAILURE;
-    }
-    
-#ifndef NDEBUG
-    glad_set_post_callback_gl(GL_callback);
-    glad_set_post_callback(GL_callback);
-#endif
-
     // initialize GL state, and render a single triangle
     const std::string vertexShader = R"(
 #version 410 core
@@ -449,14 +380,9 @@ void main() {
     }
 
     // get attrib location
-    const GLint vertCoordLoc = glGetAttribLocation(program.id, "vertCoord");
-    assert(vertCoordLoc >= 0);
-
-    const GLint vertColorLoc = glGetAttribLocation(program.id, "vertColor");
-    assert(vertColorLoc >= 0);
-
-    const GLint vertCoordZLoc = glGetAttribLocation(program.id, "vertCoordZ");
-    assert(vertCoordZLoc >= 0);
+    const GLint vertCoordLoc = program.getAttribLocation("vertCoord");
+    const GLint vertColorLoc = program.getAttribLocation("vertColor");
+    const GLint vertCoordZLoc = program.getAttribLocation("vertCoordZ");
 
     const auto floor = createFloorGeometry(*renderer, vertCoordLoc, vertColorLoc, 10, 10, 1.0f, 1.0f);
     const auto triangleVao = createTriangleGeometry(*renderer, vertCoordLoc, vertColorLoc);
@@ -495,10 +421,6 @@ void main() {
         glEnable(GL_DEPTH_TEST);
         glDepthFunc(GL_LEQUAL);
 
-        glClearColor(0.2f, 0.2f, 0.25f, 1.0f);
-        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
         xe::gl::ClearParams clearParams;
         clearParams.colour = {0.0f, 0.0f, 0.0f, 1.0f};
         clearParams.depth = 1.0f;
@@ -506,9 +428,9 @@ void main() {
 
         renderer->viewport({0, 0}, {SCREEN_WIDTH, SCREEN_HEIGHT});
 
-        glUseProgram(program.id);
+        renderer->useProgram(program);
 
-        const int mvpLoc = glGetUniformLocation(program.id, "uMvp");
+        const int mvpLoc = program.getUniformLocation( "uMvp");
         const auto viewProj = camera.getViewProj(SCREEN_WIDTH, SCREEN_HEIGHT);
 
         // render triangle
@@ -520,17 +442,21 @@ void main() {
         const auto triangleMatrix = viewProj * transformation.computeModelMatrix();
         
         glUniformMatrix4fv(mvpLoc, 1, GL_FALSE, triangleMatrix.data());
-        glVertexAttrib1f(vertCoordZLoc, 0.0f);
-        auto triangleVaoPrimitive = xe::gl::VertexArrayPrimitive{0, 3};
+        auto triangleVaoAttribData = 0.0f;
+        auto triangleVaoAttrib = xe::gl::Attribute{vertCoordZLoc, xe::gl::AttributeDim::_1, xe::gl::AttributeType::Float};
+        triangleVaoAttrib.data = &triangleVaoAttribData;
+
+        auto triangleVaoPrimitive = xe::gl::VertexArrayPrimitive{0, 3, {&triangleVaoAttrib, 1}};
         auto triangleVaoPrimitiveMem = tcb::span<xe::gl::VertexArrayPrimitive>{&triangleVaoPrimitive, 1};
-        renderer->draw(xe::gl::VertexArray{triangleVao}, GL_TRIANGLE_STRIP, triangleVaoPrimitiveMem);
+        renderer->draw(triangleVao, GL_TRIANGLE_STRIP, triangleVaoPrimitiveMem);
 
         // render floor geometry
         const auto floorMatrix = viewProj;
         glUniformMatrix4fv(mvpLoc, 1, GL_FALSE, floorMatrix.data());
         renderFloorGeometry(floor, vertCoordZLoc, vertColorLoc);
 
-        glFlush();
+        renderer->flush();
+
         SDL_GL_SwapWindow(window);
     }
 

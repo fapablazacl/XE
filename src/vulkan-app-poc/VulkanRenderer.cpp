@@ -813,20 +813,20 @@ void VulkanRenderer::drawFrame() {
     const auto waitResult = mDevice.waitForFences(1, &mInFlightFence, VK_TRUE, UINT64_MAX);
 
     if (waitResult != vk::Result::eSuccess) {
-        vk::throwResultException(waitResult, "Fence Wait operation failed.");
+        throw std::runtime_error("Fence Wait operation failed.");
     }
 
     // reset the frame-rendering fence
     const auto resetResult = mDevice.resetFences(1, &mInFlightFence);
 
     if (resetResult != vk::Result::eSuccess) {
-        vk::throwResultException(resetResult, "Fence Reset operation failed.");
+        throw std::runtime_error("Fence Reset operation failed.");
     }
 
     // acquire an image from the swapchain
     const auto acquireResult = mDevice.acquireNextImageKHR(mSwapchain, UINT64_MAX, mImageAvailableSemaphore, nullptr, &imageIndex);
     if (acquireResult != vk::Result::eSuccess) {
-        vk::throwResultException(acquireResult, "Acquire image from the swapchain operation failed.");
+        throw std::runtime_error("Acquire image from the swapchain operation failed.");
     }
 
     assert(imageIndex < mSwapchainFramebuffers.size());
@@ -860,7 +860,7 @@ void VulkanRenderer::drawFrame() {
 
     const auto resultSubmit = mGraphicsQueue.submit(1, &submitInfo, mInFlightFence);
     if (resultSubmit != vk::Result::eSuccess) {
-        vk::throwResultException(resetResult, "Graphics queue submit operation failed.");
+        throw std::runtime_error("Graphics queue submit operation failed.");
     }
 
     // presentation info
@@ -882,7 +882,7 @@ void VulkanRenderer::drawFrame() {
 
     const vk::Result presentResult = mPresentationQueue.presentKHR(presentInfo);
     if (presentResult != vk::Result::eSuccess) {
-        vk::throwResultException(resetResult, "Graphics queue submit operation failed.");
+        throw std::runtime_error("Graphics queue submit operation failed.");
     }
 }
 

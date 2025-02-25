@@ -3,6 +3,8 @@
 
 #include "gl.h"
 
+#include <cassert>
+
 namespace xe::gl {
     /**
      * Defines a strongly-typed alias for a basic type.
@@ -69,11 +71,36 @@ namespace xe::gl {
     };
 
     using Shader = TaggedType<shader_tag, GLuint>;
-    using Program = TaggedType<program_tag, GLuint>;
     using VertexArray = TaggedType<vertex_array_tag, GLuint>;
 
+    struct Program : TaggedType<program_tag, GLuint> {
+        Program() = default;
+
+        explicit Program(GLuint id) {
+            this->id = id;
+        }
+
+        GLint getAttribLocation(const GLchar* name) const {
+            assert(name);
+
+            const auto loc = glGetAttribLocation(id, name);
+            assert(loc >= 0);
+
+            return loc;
+        }
+
+        GLint getUniformLocation(const GLchar* name) const {
+            assert(name);
+
+            const auto loc = glGetUniformLocation(id, name);
+            assert(loc >= 0);
+
+            return loc;
+        }
+    };
+
     /**
-     * Like std::span, but it should be used in all places where a typeless memory region is expected.
+     * Like std::span, but it should be used in all places where a typeless memory region along with a size in bytes is expected.
      *
      * Utility methods will be added on as-needed basis
      */
