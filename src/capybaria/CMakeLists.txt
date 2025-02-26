@@ -9,9 +9,11 @@ find_package(SDL2 CONFIG REQUIRED)
 
 set (target "capybaria")
 set (src
-	"src/sandbox_main.cpp"
+	"src/capybaria_main.cpp"
 	"src/Common.h"
 	"src/Common.cpp"
+	"src/Game.h"
+	"src/Game.cpp"
 	"src/Asset_CGLTF.cpp"
 	"src/Asset_CGLTF.h"
 	"src/Util.cpp"
