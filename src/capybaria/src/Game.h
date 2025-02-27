@@ -1,6 +1,5 @@
 #pragma once
 
-
 #include <cstdio>
 #include <cstdlib>
 #include <SDL2/SDL.h>
@@ -13,9 +12,7 @@
 
 #include "xe/gl/RendererGL.h"
 
-
 using xe::gl::RendererGL;
-
 
 struct FloorGeometry {
     int tilesInX = 0;
@@ -30,77 +27,6 @@ struct FloorGeometry {
 
     xe::gl::Buffer vertexBuffer;
 };
-
-
-inline FloorGeometry createFloorGeometry(const xe::gl::RendererGL &renderer, const GLint vertCoordLoc, const GLint vertColorLoc, const int tilesInX, const int tilesInZ, const float tileSizeX,
-                                  const float tileSizeZ) {
-    FloorGeometry floorGeometry;
-    floorGeometry.tilesInX = tilesInX;
-    floorGeometry.tilesInZ = tilesInZ;
-    floorGeometry.tileSizeX = tileSizeX;
-    floorGeometry.tileSizeZ = tileSizeZ;
-    floorGeometry.stripVertexCount = 2 * (tilesInX + 1);
-
-    std::vector<XE::Vector3> vertices{static_cast<size_t>(floorGeometry.stripVertexCount)};
-
-    int j = 0;
-
-    for (int i = 0; i < tilesInX + 1; i++) {
-        vertices[2 * i] = XE::Vector3(i * tileSizeX, 0.0f, j * tileSizeZ);
-        vertices[2 * i + 1] = XE::Vector3(i * tileSizeX, 0.0f, (j + 1) * tileSizeZ);
-    }
-
-    floorGeometry.vertexBuffer = renderer.createBuffer(GL_ARRAY_BUFFER, GL_STATIC_DRAW, { vertices.data(), vertices.size() * sizeof(XE::Vector3) });
-
-    xe::gl::Attribute attribs[] = {
-        xe::gl::Attribute{vertCoordLoc, xe::gl::AttributeDim::_3, xe::gl::AttributeType::Float, GL_FALSE, 0, floorGeometry.vertexBuffer, 0},
-        xe::gl::Attribute{vertColorLoc, xe::gl::AttributeDim::_3, xe::gl::AttributeType::Float, GL_FALSE, 0, {}, 0}
-    };
-
-    floorGeometry.vao = renderer.createVertexArray({attribs, 1}, {});
-
-    return floorGeometry;
-}
-
-
-inline void renderFloorGeometry(const FloorGeometry &floorGeometry, const GLint vertCoordZLoc, const GLint vertColourLoc) {
-    glBindVertexArray(floorGeometry.vao.id);
-
-    const XE::Vector4 colorFrom = {0.2f, 0.2f, 0.2f, 1.0f};
-    const XE::Vector4 colorTo = {0.2f, 0.2f, 1.0f, 1.0f};
-
-    for (int k = 0; k < floorGeometry.tilesInZ; k++) {
-        const float z = static_cast<float>(k) * floorGeometry.tileSizeZ;
-        const float s = static_cast<float>(k) / static_cast<float>((floorGeometry.tilesInZ - 1));
-        const XE::Vector4 color = XE::lerp(colorFrom, colorTo, s);
-
-        glVertexAttrib4fv(vertColourLoc, color.data());
-        glVertexAttrib1f(vertCoordZLoc, z);
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, floorGeometry.stripVertexCount);
-    }
-}
-
-
-inline xe::gl::VertexArray createTriangleGeometry(const RendererGL &renderer, const GLint vertCoordLoc, const GLint vertColorLoc) {
-    // prepare buffer
-    const int VERTEX_COLOUR = 3;
-
-    const GLfloat vertices[] = {0.0f, 0.5f, 0.0f, 0.5f, -0.5f, 0.0f, -0.5f, -0.5f, 0.0f};
-
-    const GLfloat colours[] = {
-        1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f,
-    };
-
-    const auto vertexBuffer = renderer.createBuffer(GL_ARRAY_BUFFER, GL_STATIC_DRAW, {vertices, sizeof(GLfloat) * VERTEX_COLOUR * 3});
-    const auto colourBuffer = renderer.createBuffer(GL_ARRAY_BUFFER, GL_STATIC_DRAW, {colours, sizeof(GLfloat) * VERTEX_COLOUR * 4});
-
-    xe::gl::Attribute attribs[] = {
-        xe::gl::Attribute{vertCoordLoc, xe::gl::AttributeDim::_3, xe::gl::AttributeType::Float, GL_FALSE, 0, vertexBuffer, 0},
-        xe::gl::Attribute{vertColorLoc, xe::gl::AttributeDim::_3, xe::gl::AttributeType::Float, GL_FALSE, 0, colourBuffer, 0}
-    };
-
-    return renderer.createVertexArray({attribs, 1}, {});
-}
 
 enum GAME_ACTION {
     GAME_ACTION_NONE = 0x00,
@@ -267,13 +193,13 @@ struct Timer {
 
     //! must be called one per frame
     float getFrameTimeInSeconds() {
-        auto seconds = (SDL_GetTicks64() - lastTime) / 1000.0f;
+        const auto seconds = static_cast<float>(SDL_GetTicks64() - lastTime) / 1000.0f;
+
         lastTime = SDL_GetTicks64();
 
         return seconds;
     }
 };
-
 
 
 class Game {
