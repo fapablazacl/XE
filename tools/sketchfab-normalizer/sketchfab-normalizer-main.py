@@ -2,7 +2,6 @@ import os
 import shutil
 import patoolib
 
-
 def extract_file(file_path, extract_to):
     try:
         patoolib.extract_archive(file_path, outdir=extract_to)
@@ -35,7 +34,10 @@ def extract_and_process(file_path):
     extract_file(file_path, extract_to)
     source_path = os.path.join(extract_to, "source")
 
+    extracted_files = []
+
     if move_folder_contents(source_path, extract_to):
+        # checks if there's any additionally compressed assets in the extracted archive
         compressed_files = [f for f in os.listdir(extract_to) if f.endswith((".rar", ".zip"))]
 
         if compressed_files:
@@ -45,10 +47,27 @@ def extract_and_process(file_path):
                     continue
 
                 extract_file(file_full_path, extract_to)
+
+                extracted_files.append(file_full_path)
         else:
             print("No compressed further files where found.")
+
+    # maybe we shouldn't clear the original file
+    os.remove(file_path)
+
+
+    textures_path = os.path.join(extract_to, "textures")
+    if os.path.exists(textures_path):
+        move_folder_contents(textures_path, extract_to)
+        shutil.rmtree(textures_path)
+
+    if os.path.exists(source_path):
+        shutil.rmtree(source_path)
+
+    for file in extracted_files:
+        os.remove(file)
 
     print("Processing complete.")
 
 if __name__=='__main__':
-    extract_and_process('/Users/fapablaza/Dropbox/GameDev/Capybaria/raw-assets/amongus-02-test/among-us (2).zip')
+    extract_and_process('/Users/fapablaza/Dropbox/GameDev/Capybaria/raw-assets/amongus-03-test/among-us-character-model.zip')
