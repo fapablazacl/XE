@@ -29,43 +29,44 @@ def move_folder_contents(source_folder, destination_folder):
 
     return True
 
-def extract_and_process(file_path):
-    extract_to = os.path.dirname(file_path)
-    extract_file(file_path, extract_to)
-    source_path = os.path.join(extract_to, "source")
+def extract_and_process(archive_path, cleanup_temporaries=True):
+    archive_exts = [".rar", ".zip"]
+
+    extraction_path = os.path.dirname(archive_path)
+    extract_file(archive_path, extraction_path)
+    source_path = os.path.join(extraction_path, "source")
 
     extracted_files = []
 
-    if move_folder_contents(source_path, extract_to):
+    if move_folder_contents(source_path, extraction_path):
         # checks if there's any additionally compressed assets in the extracted archive
-        compressed_files = [f for f in os.listdir(extract_to) if f.endswith((".rar", ".zip"))]
+        compressed_files = [f for f in os.listdir(extraction_path) if f.endswith(archive_exts)]
 
         if compressed_files:
             for file in compressed_files:
-                file_full_path = os.path.join(extract_to, file)
-                if file_full_path == file_path:
+                file_full_path = os.path.join(extraction_path, file)
+                if file_full_path == archive_path:
                     continue
 
-                extract_file(file_full_path, extract_to)
+                extract_file(file_full_path, extraction_path)
 
                 extracted_files.append(file_full_path)
         else:
             print("No compressed further files where found.")
 
-    # maybe we shouldn't clear the original file
-    os.remove(file_path)
-
-
-    textures_path = os.path.join(extract_to, "textures")
+    textures_path = os.path.join(extraction_path, "textures")
     if os.path.exists(textures_path):
-        move_folder_contents(textures_path, extract_to)
-        shutil.rmtree(textures_path)
+        move_folder_contents(textures_path, extraction_path)
 
-    if os.path.exists(source_path):
-        shutil.rmtree(source_path)
+    if cleanup_temporaries:
+        if os.path.exists(textures_path):
+            shutil.rmtree(textures_path)
 
-    for file in extracted_files:
-        os.remove(file)
+        if os.path.exists(source_path):
+            shutil.rmtree(source_path)
+
+        for file in extracted_files:
+            os.remove(file)
 
     print("Processing complete.")
 
