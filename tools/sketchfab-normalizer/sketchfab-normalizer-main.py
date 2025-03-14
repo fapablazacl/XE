@@ -80,11 +80,19 @@ def extract_and_process(archive_path, extraction_path, cleanup_temporaries=True)
     print("Processing complete.")
 
 if __name__=='__main__':
-    test_archive_path = '/Users/fapablaza/Dropbox/GameDev/Capybaria/raw-assets/amongus-03/among-us-character-model.zip'
-    extraction_path = os.path.join(os.path.dirname(test_archive_path), Path(test_archive_path).stem)
+    archive_folder = '/Users/fapablaza/Dropbox/GameDev/Capybaria/raw-assets/models'
+    archives = [f for f in os.listdir(archive_folder) if f.endswith(archive_exts)]
 
-    try:
-        extract_and_process(test_archive_path, extraction_path)
-    except Exception as e:
-        print(f'Error while extracting "{test_archive_path}":\n{e}')
-        exit(1)
+    for archive in archives:
+        archive_path = os.path.join(archive_folder, archive)
+        extraction_folder = os.path.join(os.path.dirname(archive_path), Path(archive_path).stem)
+
+        if os.path.exists(extraction_folder):
+            print(f'Archive "{archive}" already extracted. Skipping')
+            continue
+
+        try:
+            extract_and_process(archive_path, extraction_folder)
+        except Exception as e:
+            print(f'Error while extracting "{archive}":\n{e}')
+            exit(1)
