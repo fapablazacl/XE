@@ -121,11 +121,15 @@ void process_skins(cgltf_skin *skin) {
 }
 
 void process_texture(cgltf_texture *texture) {
-
+    std::cout << "Texture name: " << (texture->name ? texture->name : "<noname>")  << std::endl;
+    std::cout << "Texture has sampler: " << (texture->sampler ? "true" : "false")  << std::endl;
 }
 
 void process_image(cgltf_image *image) {
-
+    std::cout << "Image name: " << (image->name ? image->name : "<noname>")  << std::endl;
+    std::cout << "Image uri: " << (image->uri ? image->uri : "<noname>")  << std::endl;
+    std::cout << "Image mime type: " << (image->mime_type ? image->mime_type : "<noname>")  << std::endl;
+    std::cout << "Image has buffer view: " << (image->buffer_view ? "true" : "false")  << std::endl;
 }
 
 void process_sampler(cgltf_sampler *sampler) {
@@ -176,81 +180,97 @@ int main() {
     for (cgltf_size i = 0; i < data->lights_count; i++) {
         process_light(data->lights + i);
     }
+    std::cout << std::endl;
 
     std::cout << "Found " << data->cameras_count << " cameras" << std::endl;
     for (cgltf_size i = 0; i < data->cameras_count; i++) {
         process_camera(data->cameras + i);
     }
+    std::cout << std::endl;
 
     std::cout << "Found " << data->meshes_count << " meshes" << std::endl;
     for (cgltf_size i = 0; i < data->meshes_count; i++) {
         process_mesh(data->meshes + i);
     }
+    std::cout << std::endl;
 
     std::cout << "Found " << data->animations_count << " animations" << std::endl;
     for (cgltf_size i = 0; i < data->animations_count; i++) {
         process_animation(data->animations + i);
     }
+    std::cout << std::endl;
 
     std::cout << "Found " << data->skins_count << " skins" << std::endl;
     for (cgltf_size i = 0; i < data->skins_count; i++) {
         process_skins(data->skins + i);
     }
+    std::cout << std::endl;
 
     std::cout << "Found " << data->textures_count << " textures" << std::endl;
     for (cgltf_size i = 0; i < data->textures_count; i++) {
         process_texture(data->textures + i);
     }
+    std::cout << std::endl;
 
     std::cout << "Found " << data->images_count << " images" << std::endl;
     for (cgltf_size i = 0; i < data->images_count; i++) {
         process_image(data->images + i);
     }
+    std::cout << std::endl;
 
     std::cout << "Found " << data->samplers_count << " samplers" << std::endl;
     for (cgltf_size i = 0; i < data->samplers_count; i++) {
         process_sampler(data->samplers + i);
     }
+    std::cout << std::endl;
 
     std::cout << "Found " << data->accessors_count << " accessors" << std::endl;
     for (cgltf_size i = 0; i < data->accessors_count; i++) {
         process_accessor(data->accessors + i);
     }
+    std::cout << std::endl;
 
     std::cout << "Found " << data->buffers_count << " buffers" << std::endl;
     for (cgltf_size i = 0; i < data->buffers_count; i++) {
         process_buffer(data->buffers + i);
     }
+    std::cout << std::endl;
 
     std::cout << "Found " << data->buffer_views_count << " buffer views" << std::endl;
     for (cgltf_size i = 0; i < data->buffer_views_count; i++) {
         process_buffer_view(data->buffer_views + i);
     }
+    std::cout << std::endl;
 
     std::cout << "Found " << data->data_extensions_count << " data extensions" << std::endl;
     for (cgltf_size i = 0; i < data->data_extensions_count; i++) {
         process_data_extension(data->data_extensions + i);
     }
+    std::cout << std::endl;
 
     std::cout << "Found " << data->extensions_required_count << " extensions required" << std::endl;
     for (cgltf_size i = 0; i < data->extensions_required_count; i++) {
         process_extensions_required(data->extensions_required + i);
     }
+    std::cout << std::endl;
 
     std::cout << "Found " << data->extensions_used_count << " extensions used" << std::endl;
     for (cgltf_size i = 0; i < data->extensions_used_count; i++) {
         process_extensions_used(data->extensions_used + i);
     }
+    std::cout << std::endl;
 
     std::cout << "Found " << data->variants_count << " variants" << std::endl;
     for (cgltf_size i = 0; i < data->variants_count; i++) {
         process_variant(data->variants + i);
     }
+    std::cout << std::endl;
 
     std::cout << "Found " << data->scenes_count << " scenes" << std::endl;
     for (cgltf_size i = 0; i<data->scenes_count; i++) {
         process_scene(data, data->scenes + i);
     }
+    std::cout << std::endl;
 
     return EXIT_SUCCESS;
 }
