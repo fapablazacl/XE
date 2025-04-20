@@ -22,7 +22,7 @@ public:
 
     virtual ~Platform();
 
-    bool initialize();
+    bool initialize(const std::string& title, int width, int height);
 
     InputState pollInputState();
 

@@ -20,7 +20,7 @@ Platform::~Platform() {
     glfwTerminate();
 }
 
-bool Platform::initialize() {
+bool Platform::initialize(const std::string& title, int width, int height) {
     const auto monitor = glfwGetPrimaryMonitor();
     const GLFWvidmode* mode = glfwGetVideoMode(monitor);
 
@@ -38,7 +38,7 @@ bool Platform::initialize() {
     glfwWindowHint(GLFW_BLUE_BITS, mode->blueBits);
     glfwWindowHint(GLFW_REFRESH_RATE, mode->refreshRate);
     
-    window = glfwCreateWindow(mode->width, mode->height, "Apostate", nullptr, nullptr);
+    window = glfwCreateWindow(width, height, title.c_str(), nullptr, nullptr);
     
     if (!window) {
         std::cout << "Can't open a Window" << std::endl;

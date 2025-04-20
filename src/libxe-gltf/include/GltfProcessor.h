@@ -2,6 +2,8 @@
 #pragma once
 
 #include <iostream>
+
+#include "xe/gl/RendererGL.h"
 #include "cgltf/cgltf.h"
 
 inline std::string to_string(cgltf_result result) {
@@ -18,6 +20,81 @@ inline std::string to_string(cgltf_result result) {
     case cgltf_result_success: return "cgltf_result_success";
     default: return "unknown enum" + std::to_string(result);
     }
+}
+
+inline std::string to_string(cgltf_primitive_type type) {
+    switch (type) {
+    case cgltf_primitive_type_points: return "cgltf_primitive_type_points";
+    case cgltf_primitive_type_lines: return "cgltf_primitive_type_lines";
+    case cgltf_primitive_type_line_loop: return "cgltf_primitive_type_line_loop";
+    case cgltf_primitive_type_line_strip: return "cgltf_primitive_type_line_strip";
+    case cgltf_primitive_type_triangles: return "cgltf_primitive_type_triangles";
+    case cgltf_primitive_type_triangle_strip: return "cgltf_primitive_type_triangle_strip";
+    case cgltf_primitive_type_triangle_fan: return "cgltf_primitive_type_triangle_fan";
+    }
+
+    return "<unknown primitive type>";
+}
+
+inline std::ostream& operator<<(std::ostream& os, cgltf_primitive_type type) {
+    return os << to_string(type);
+}
+
+inline std::string to_string(cgltf_attribute_type type) {
+    switch (type) {
+    case cgltf_attribute_type_invalid: return "cgltf_attribute_type_invalid";
+    case cgltf_attribute_type_position: return "cgltf_attribute_type_position";
+    case cgltf_attribute_type_normal: return "cgltf_attribute_type_normal";
+    case cgltf_attribute_type_tangent: return "cgltf_attribute_type_tangent";
+    case cgltf_attribute_type_texcoord: return "cgltf_attribute_type_texcoord";
+    case cgltf_attribute_type_color: return "cgltf_attribute_type_color";
+    case cgltf_attribute_type_joints: return "cgltf_attribute_type_joints";
+    case cgltf_attribute_type_weights: return "cgltf_attribute_type_weights";
+    }
+
+    return "<unknown primitive type>";
+}
+
+inline std::ostream& operator<<(std::ostream& os, cgltf_attribute_type type) {
+    return os << to_string(type);
+}
+
+
+inline std::string to_string(cgltf_type type) {
+    switch (type) {
+    case cgltf_type_invalid: return "cgltf_type_invalid";
+    case cgltf_type_scalar: return "cgltf_type_scalar";
+    case cgltf_type_vec2: return "cgltf_type_vec2";
+    case cgltf_type_vec3: return "cgltf_type_vec3";
+    case cgltf_type_vec4: return "cgltf_type_vec4";
+    case cgltf_type_mat2: return "cgltf_type_mat2";
+    case cgltf_type_mat3: return "cgltf_type_mat3";
+    case cgltf_type_mat4: return "cgltf_type_mat4";
+    }
+
+    return "<unknown type>";
+}
+
+inline std::ostream& operator<<(std::ostream& os, cgltf_type type) {
+    return os << to_string(type);
+}
+
+inline std::string to_string(cgltf_component_type type) {
+    switch (type) {
+    case cgltf_component_type_invalid: return "cgltf_component_type_invalid";
+    case cgltf_component_type_r_8: return "cgltf_component_type_r_8";
+    case cgltf_component_type_r_8u: return "cgltf_component_type_r_8u";
+    case cgltf_component_type_r_16: return "cgltf_component_type_r_16";
+    case cgltf_component_type_r_16u: return "cgltf_component_type_r_16u";
+    case cgltf_component_type_r_32u: return "cgltf_component_type_r_32u";
+    case cgltf_component_type_r_32f: return "cgltf_component_type_r_32f";
+    }
+
+    return "<unknown component type>";
+}
+
+inline std::ostream& operator<<(std::ostream& os, cgltf_component_type type) {
+    return os << to_string(type);
 }
 
 inline std::string evaluate_name(const char* name) {
@@ -38,7 +115,7 @@ inline std::string evaluate_bool(const cgltf_bool value) {
 }
 
 inline std::string toStr(const char *value) {
-    return value ? value : "";
+    return value ? value : "<noname>";
 }
 
 inline bool toBool(const cgltf_bool value) {
@@ -134,9 +211,9 @@ public:
         std::cout << std::endl;
 
         std::cout << "Found " << data->accessors_count << " accessors" << std::endl;
-        for (cgltf_size i = 0; i < data->accessors_count; i++) {
-            process_accessor(data->accessors + i);
-        }
+        // for (cgltf_size i = 0; i < data->accessors_count; i++) {
+        //     process_accessor(data->accessors + i);
+        // }
         std::cout << std::endl;
 
         std::cout << "Found " << data->buffers_count << " buffers" << std::endl;
@@ -213,10 +290,17 @@ private:
         // std::cout << "Buffer view type: " << view->type << std::endl;
     }
 
-    void process_accessor(cgltf_accessor *accessor) {
-        // std::cout << "Accessor count: " << accessor->count << std::endl;
-        // std::cout << "Accessor extensions count: " << accessor->extensions_count << std::endl;
-        // std::cout << "Accessor have buffer_view: " << (accessor->buffer_view != nullptr) << std::endl;
+    void process_accessor(const cgltf_accessor *accessor) {
+        std::cout << "Accessor name: " << toStr(accessor->name) << std::endl;
+        std::cout << "Accessor count: " << accessor->count << std::endl;
+        std::cout << "Accessor type: " << accessor->type << std::endl;
+        std::cout << "Accessor component type: " << accessor->component_type << std::endl;
+        std::cout << "Accessor extensions count: " << accessor->extensions_count << std::endl;
+        std::cout << "Accessor have buffer_view: " << toBool(accessor->buffer_view) << std::endl;
+        std::cout << "Accessor has max: " << toBool(accessor->has_max) << std::endl;
+        std::cout << "Accessor has min: " << toBool(accessor->has_min) << std::endl;
+        std::cout << "Accessor is sparse: " << toBool(accessor->is_sparse) << std::endl;
+        std::cout << "Accessor normalized: " << toBool(accessor->normalized) << std::endl;
 
         if (accessor->buffer_view) {
             process_buffer_view(accessor->buffer_view);
@@ -224,14 +308,20 @@ private:
     }
 
     void process_attribute(const cgltf_attribute &attribute) {
-        std::cout << "Attribute name" << attribute.name << std::endl;
-        std::cout << "Attribute type" << attribute.type << std::endl;
-
+        std::cout << "Attribute name " << attribute.name << std::endl;
+        std::cout << "Attribute index " << attribute.index << std::endl;
+        std::cout << "Attribute type " << attribute.type << std::endl;
         process_accessor(attribute.data);
     }
 
     void process_primitive(const cgltf_primitive &primitive) {
         std::cout << "Primitive type " << primitive.type << std::endl;
+        std::cout << "Primitive attribute count  " << primitive.attributes_count << std::endl;
+        std::cout << "Primitive has indices " << toBool(primitive.indices) << std::endl;
+        std::cout << "Primitive has material " << toBool(primitive.material) << std::endl;
+        std::cout << "Primitive mappings count " << primitive.mappings_count << std::endl;
+        std::cout << "Primitive targets count " << primitive.targets_count << std::endl;
+        std::cout << "Primitive has draco mesh compression " << toBool(primitive.has_draco_mesh_compression) << std::endl;
         std::cout << "Primitive extension count " << primitive.extensions_count << std::endl;
 
         if (primitive.indices) {
@@ -239,11 +329,47 @@ private:
         }
 
         for (cgltf_size i = 0; i < primitive.attributes_count; i++) {
-            process_attribute(primitive.attributes[i]);
+            const auto attribute = primitive.attributes[i];
+            const cgltf_accessor *accessor = attribute.data;
+
+            std::cout << "Attribute name " << attribute.name << std::endl;
+            std::cout << "Attribute index " << attribute.index << std::endl;
+            std::cout << "Attribute type " << attribute.type << std::endl;
+
+            std::cout << "Attribute accessor address: " << accessor << std::endl;
+            std::cout << "Attribute accessor name: " << toStr(accessor->name) << std::endl;
+            std::cout << "Attribute accessor count: " << accessor->count << std::endl;
+            std::cout << "Attribute accessor type: " << accessor->type << std::endl;
+            std::cout << "Attribute accessor component type: " << accessor->component_type << std::endl;
+            std::cout << "Attribute accessor extensions count: " << accessor->extensions_count << std::endl;
+            std::cout << "Attribute accessor have buffer_view: " << toBool(accessor->buffer_view) << std::endl;
+            std::cout << "Attribute accessor has max: " << toBool(accessor->has_max) << std::endl;
+            std::cout << "Attribute accessor has min: " << toBool(accessor->has_min) << std::endl;
+            std::cout << "Attribute accessor is sparse: " << toBool(accessor->is_sparse) << std::endl;
+            std::cout << "Attribute accessor normalized: " << toBool(accessor->normalized) << std::endl;
+
+            if (accessor->buffer_view) {
+                const auto view = accessor->buffer_view;
+
+                std::cout << "Buffer view address: " << view << std::endl;
+                std::cout << "Buffer view name: " << (view->name ? view->name : "<noname>") << std::endl;
+                std::cout << "Buffer view type: " << view->type << std::endl;
+                std::cout << "Buffer view offset, size: " << view->offset << ", " << view->size << std::endl;
+                std::cout << "Buffer view stride: " << view->stride << std::endl;
+            }
         }
 
         if (primitive.material) {
             process_material(primitive.material);
+        }
+
+        for (cgltf_size i = 0; i < primitive.targets_count; i++) {
+            auto target = primitive.targets + i;
+            std::cout << "Primitive morph target " << i << " attribute count: " << target->attributes_count << std::endl;
+
+            for (cgltf_size j = 0; j < target->attributes_count; j++) {
+                std::cout << "Primitive morph target " << i << " attribute " << j << " name: " << target->attributes[j].name << std::endl;
+            }
         }
     }
 
@@ -336,15 +462,17 @@ private:
     }
 
     void process_buffer(cgltf_buffer *buffer) {
-
+        std::cout << "Buffer name: " << toStr(buffer->name) << std::endl;
+        std::cout << "Buffer uri: " << toStr(buffer->uri) << std::endl;
+        std::cout << "Buffer size: " << (static_cast<float>(buffer->size) / 1024.0f / 1024.0f) << " MB" << std::endl;
     }
 
     void process_data_extension(cgltf_extension *extension) {
-
+        std::cout << "Data extension name" << extension->name << std::endl;
     }
 
     void process_extensions_required(char *str) {
-
+        std::cout << "Extension required " << str << std::endl;
     }
 
     void process_extensions_used(char *str) {
@@ -355,4 +483,3 @@ private:
 
     }
 };
-
