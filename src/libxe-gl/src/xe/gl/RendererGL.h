@@ -118,6 +118,16 @@ namespace xe::gl {
         std::optional<float> depth;
         std::optional<float> stencil;
 
+        ClearParams& color(const XE::Vector4 &value) {
+            colour = value;
+            return *this;
+        }
+
+        ClearParams& depthX(const float value) {
+            depth = value;
+            return *this;
+        }
+
         explicit operator bool() const { return colour || depth || stencil; }
     };
 
