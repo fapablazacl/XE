@@ -134,6 +134,9 @@ namespace xe::gl {
 class GltfProcessor {
     xe::gl::RendererGL *renderer = nullptr;
 
+    xe::gl::Buffer vertexBuffer;
+    xe::gl::Buffer indexBuffer;
+
 public:
     explicit GltfProcessor(xe::gl::RendererGL *renderer) : renderer(renderer) {}
 
@@ -325,9 +328,32 @@ private:
         std::cout << "Primitive extension count " << primitive.extensions_count << std::endl;
 
         if (primitive.indices) {
-            process_accessor(primitive.indices);
+            const auto indexAccessor = primitive.indices;
+            const auto indicesOffset = indexAccessor->buffer_view->offset;
+            const auto indicesSize = indexAccessor->buffer_view->size;
+
+            std::cout << "Primitive indices offset " << indicesOffset << std::endl;
+            std::cout << "Primitive indices size " << indicesSize << std::endl;
+            // process_accessor(primitive.indices);
+
+            const auto indexPtr = static_cast<const void*>(static_cast<const unsigned char *>(indexAccessor->buffer_view->buffer->data) + indicesOffset);
+
+            indexBuffer = renderer->createBuffer(GL_ELEMENT_ARRAY_BUFFER, GL_STATIC_DRAW, {indexPtr, indicesSize});
         }
 
+        // assumes that the attributes are sorted
+        const auto lastAttribIndex = primitive.attributes_count - 1;
+        const auto offset = primitive.attributes[0].data->buffer_view->offset;
+        const auto size = primitive.attributes[lastAttribIndex].data->buffer_view->offset;
+        const auto buffer_view = primitive.attributes[0].data->buffer_view;
+
+        std::cout << "Primitive vertices offset " << offset << std::endl;
+        std::cout << "Primitive vertices size " << size << std::endl;
+
+        const auto vertexPtr = static_cast<const void*>(static_cast<const unsigned char *>(buffer_view->buffer->data) + offset);
+        vertexBuffer = renderer->createBuffer(GL_ARRAY_BUFFER, GL_STATIC_DRAW, {vertexPtr, size});
+
+        /*
         for (cgltf_size i = 0; i < primitive.attributes_count; i++) {
             const auto attribute = primitive.attributes[i];
             const cgltf_accessor *accessor = attribute.data;
@@ -352,12 +378,13 @@ private:
                 const auto view = accessor->buffer_view;
 
                 std::cout << "Buffer view address: " << view << std::endl;
-                std::cout << "Buffer view name: " << (view->name ? view->name : "<noname>") << std::endl;
+                std::cout << "Buffer view name: " << toStr(view->name) << std::endl;
                 std::cout << "Buffer view type: " << view->type << std::endl;
                 std::cout << "Buffer view offset, size: " << view->offset << ", " << view->size << std::endl;
                 std::cout << "Buffer view stride: " << view->stride << std::endl;
             }
         }
+        */
 
         if (primitive.material) {
             process_material(primitive.material);
