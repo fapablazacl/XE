@@ -59,7 +59,6 @@ inline std::ostream& operator<<(std::ostream& os, cgltf_attribute_type type) {
     return os << to_string(type);
 }
 
-
 inline std::string to_string(cgltf_type type) {
     switch (type) {
     case cgltf_type_invalid: return "cgltf_type_invalid";
@@ -140,7 +139,7 @@ void* addPointerOffset(void* ptr, IntegerLike offset) {
  * could change in the future
  */
 [[nodiscard]]
-constexpr GLenum mapToPrimitive(cgltf_primitive_type type) {
+constexpr GLenum mapToPrimitive(const cgltf_primitive_type type) {
     switch (type) {
     case cgltf_primitive_type_points: return GL_POINTS;
     case cgltf_primitive_type_lines: return GL_LINES;
@@ -152,6 +151,26 @@ constexpr GLenum mapToPrimitive(cgltf_primitive_type type) {
     }
 
     return GL_INVALID_ENUM;
+}
+
+
+[[nodiscard]]
+constexpr std::optional<xe::gl::AttributeType> mapToAttributeDataType(const cgltf_component_type type) {
+    switch (type) {
+    // case cgltf_component_type_invalid: return "cgltf_component_type_invalid";
+    // case cgltf_component_type_r_8: return "cgltf_component_type_r_8";
+    // case cgltf_component_type_r_8u: return "cgltf_component_type_r_8u";
+    // case cgltf_component_type_r_16: return "cgltf_component_type_r_16";
+    // case cgltf_component_type_r_16u: return "cgltf_component_type_r_16u";
+    case cgltf_component_type_r_32u:
+        return xe::gl::AttributeType::UnsignedInt;
+
+    case cgltf_component_type_r_32f:
+        return xe::gl::AttributeType::Float;
+
+    default:
+        return std::nullopt;
+    }
 }
 
 namespace xe::gl {
@@ -344,11 +363,6 @@ private:
     xe::gl::Buffer createIndexBuffer(const cgltf_accessor &accessor) {
         const auto indicesOffset = accessor.buffer_view->offset;
         const auto indicesSize = accessor.buffer_view->size;
-
-        std::cout << "Primitive indices offset " << indicesOffset << std::endl;
-        std::cout << "Primitive indices size " << indicesSize << std::endl;
-        // process_accessor(primitive.indices);
-
         const auto indexPtr = addPointerOffset(accessor.buffer_view->buffer->data, indicesOffset);
 
         return renderer->createBuffer(GL_ELEMENT_ARRAY_BUFFER, GL_STATIC_DRAW, {indexPtr, indicesSize});
@@ -362,9 +376,6 @@ private:
         const auto vertexSize = primitive.attributes[lastAttribIndex].data->buffer_view->offset;
         const auto vertexBufferView = primitive.attributes[0].data->buffer_view;
 
-        std::cout << "Primitive vertices offset " << vertexOffset << std::endl;
-        std::cout << "Primitive vertices size " << vertexSize << std::endl;
-
         const auto vertexPtr = addPointerOffset(vertexBufferView->buffer->data, vertexOffset);
 
         return renderer->createBuffer(GL_ARRAY_BUFFER, GL_STATIC_DRAW, {vertexPtr, vertexSize});
@@ -377,9 +388,25 @@ private:
             const auto &attribute = primitive.attributes[i];
             const auto &accessor = *attribute.data;
             const auto &bufferView = *accessor.buffer_view;
+
+            auto dataTypeGL = mapToAttributeDataType(accessor.component_type);
+
+            if (!dataTypeGL) {
+                std::cerr << "Could not map attribute " << attribute.name << " with accessor component type " << accessor.component_type << std::endl;
+                return {};
+            }
+
+            xe::gl::Attribute attributeGL;
+            attributeGL.offset = bufferView.offset;
+            attributeGL.type = dataTypeGL.value();
+            attributeGL.stride = static_cast<GLsizei>(bufferView.stride);
+
+            attributesGL.push_back(attributeGL);
         }
 
-        return renderer->createVertexArray({attributesGL.data(), attributesGL.size()}, xe::gl::Buffer());
+        // return renderer->createVertexArray({attributesGL.data(), attributesGL.size()}, xe::gl::Buffer());
+
+        return {};
     }
 
     void process_primitive(const cgltf_primitive &primitive) {
@@ -399,7 +426,7 @@ private:
         // FIXME: Assuming that the attributes all reference the same count of vertices
         const auto count = static_cast<GLsizei>(primitive.indices ? primitive.indices->count : primitive.attributes[0].data->count);
 
-        xe::gl::VertexArray vao;
+        const auto vao = createVertexArray(primitive);
 
         if (primitive.indices) {
             const auto indexAccessor = primitive.indices;
