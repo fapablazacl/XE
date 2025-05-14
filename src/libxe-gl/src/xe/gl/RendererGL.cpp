@@ -268,7 +268,11 @@ namespace xe::gl {
                     
                 case AttributeType::UnsignedInt:
                     type = GL_UNSIGNED_INT;
-                    break; 
+                    break;
+
+                case AttributeType::UnsignedByte:
+                    type = GL_UNSIGNED_BYTE;
+                    break;
                 }
 
                 glVertexAttribPointer(attr.index, static_cast<GLint>(attr.size) + 1, type, attr.normalized, attr.stride, reinterpret_cast<const void *>(attr.offset));

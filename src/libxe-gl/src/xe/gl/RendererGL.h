@@ -65,7 +65,7 @@ namespace xe::gl {
 
     enum class AttributeDim { _1, _2, _3, _4 };
 
-    enum class AttributeType { Float, Int, UnsignedInt };
+    enum class AttributeType { Float, Int, UnsignedInt, UnsignedByte };
 
     struct Attribute {
         GLint index = 0;

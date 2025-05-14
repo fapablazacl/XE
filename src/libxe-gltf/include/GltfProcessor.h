@@ -162,6 +162,10 @@ constexpr std::optional<xe::gl::AttributeType> mapToAttributeDataType(const cglt
     // case cgltf_component_type_r_8u: return "cgltf_component_type_r_8u";
     // case cgltf_component_type_r_16: return "cgltf_component_type_r_16";
     // case cgltf_component_type_r_16u: return "cgltf_component_type_r_16u";
+
+    case cgltf_component_type_r_8u:
+        return xe::gl::AttributeType::UnsignedByte;
+
     case cgltf_component_type_r_32u:
         return xe::gl::AttributeType::UnsignedInt;
 
@@ -452,6 +456,10 @@ private:
         return renderer->createBuffer(GL_ARRAY_BUFFER, GL_STATIC_DRAW, {vertexPtr, vertexSize});
     }
 
+    GLint mapAttributeName(const std::string &name) {
+        return -1;
+    }
+
     xe::gl::VertexArray createVertexArray(const cgltf_primitive &primitive) {
         std::vector<xe::gl::Attribute> attributesGL;
 
@@ -462,17 +470,24 @@ private:
 
             auto dataTypeGL = mapToAttributeDataType(accessor.component_type);
 
+            std::cout << attribute.name << std::endl;
+
             if (!dataTypeGL) {
                 std::cerr << "Could not map attribute " << attribute.name << " with accessor component type " << accessor.component_type << std::endl;
                 return {};
             }
 
             xe::gl::Attribute attributeGL;
+            attributeGL.index = mapAttributeName(attribute.name);
             attributeGL.offset = bufferView.offset;
             attributeGL.type = dataTypeGL.value();
             attributeGL.stride = static_cast<GLsizei>(bufferView.stride);
-
+            attributeGL.normalized = accessor.normalized;
             attributesGL.push_back(attributeGL);
+
+            if (attributeGL.index == -1) {
+                std::cerr << "Could not map attribute " << attribute.name << std::endl;
+            }
         }
 
         return renderer->createVertexArray({attributesGL.data(), attributesGL.size()}, xe::gl::Buffer());
