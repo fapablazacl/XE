@@ -113,8 +113,8 @@ inline std::string evaluate_bool(const cgltf_bool value) {
     return (value ? "true" : "false");
 }
 
-inline std::string toStr(const char *value) {
-    return value ? value : "<noname>";
+inline std::string sanitizeString(const char *value, const std::string &defaultValue = "<noname>") {
+    return value ? value : defaultValue;
 }
 
 inline bool toBool(const cgltf_bool value) {
@@ -176,6 +176,20 @@ constexpr std::optional<xe::gl::AttributeType> mapToAttributeDataType(const cglt
 namespace xe::gl {
     class RendererGL;
 }
+
+// Contains OpenGL objects with data loaded from a gltf mesh
+struct GltfMeshPrimitive {
+    xe::gl::VertexArray vao;
+    xe::gl::Buffer vertexBuffer;
+    xe::gl::Buffer indexBuffer;
+    GLenum primitive = GL_NONE;
+    GLsizei count = 0;
+};
+
+struct GltfMesh {
+    std::string name;
+    std::vector<GltfMeshPrimitive> primitives;
+};
 
 class GltfProcessor {
     xe::gl::RendererGL *renderer = nullptr;
@@ -309,6 +323,63 @@ public:
         return true;
     }
 
+    std::vector<GltfMesh> loadMeshes(const std::string &filePath) {
+        cgltf_options options = {};
+        cgltf_data *data = nullptr;
+        cgltf_result result = cgltf_parse_file(&options, filePath.c_str(), &data);
+
+        if (result != cgltf_result_success) {
+            std::cerr << "CGLTF: Couldn't load file '" << filePath << "'. Error code: " << to_string(result);
+            return {};
+        }
+
+        result = cgltf_load_buffers(&options, data, filePath.c_str());
+        if (result != cgltf_result_success) {
+            std::cerr << "CGLTF: error while loading buffers '" << filePath << "'. Error code: " << to_string(result);
+
+            return {};
+        }
+
+        std::vector<GltfMesh> meshes;
+        meshes.reserve(data->meshes_count);
+
+        for (cgltf_size i = 0; i < data->meshes_count; i++) {
+            meshes.push_back(createMesh(data->meshes + i));
+        }
+
+        return meshes;
+    }
+
+    GltfMeshPrimitive createMeshPrimitive(const cgltf_primitive &primitive) {
+        const auto primitiveType = mapToPrimitive(primitive.type);
+        const auto vertexBuffer = createVertexBuffer(primitive);
+        const auto indexBuffer = primitive.indices ? createIndexBuffer(*primitive.indices) : xe::gl::Buffer();
+
+        // FIXME: Assuming that the all of the attributes are referencing the same count of vertices
+        const auto count = static_cast<GLsizei>(primitive.indices ? primitive.indices->count : primitive.attributes[0].data->count);
+        const auto vao = createVertexArray(primitive);
+
+        GltfMeshPrimitive loadedMesh;
+        loadedMesh.primitive = primitiveType;
+        loadedMesh.vertexBuffer = vertexBuffer;
+        loadedMesh.indexBuffer = indexBuffer;
+        loadedMesh.vao = vao;
+        loadedMesh.count = count;
+
+        return loadedMesh;
+    }
+
+    GltfMesh createMesh(const cgltf_mesh *mesh) {
+        std::vector<GltfMeshPrimitive> primitives = {};
+        primitives.reserve(mesh->primitives_count);
+
+        for (cgltf_size i = 0; i < mesh->primitives_count; i++) {
+            primitives.push_back(createMeshPrimitive(mesh->primitives[i]));
+        }
+
+        return { sanitizeString(mesh->name), primitives};
+    }
+
 private:
     void process_camera(cgltf_camera *camera) {
         std::cout << "camera node" << std::endl;
@@ -337,7 +408,7 @@ private:
     }
 
     void process_accessor(const cgltf_accessor *accessor) {
-        std::cout << "Accessor name: " << toStr(accessor->name) << std::endl;
+        std::cout << "Accessor name: " << sanitizeString(accessor->name) << std::endl;
         std::cout << "Accessor count: " << accessor->count << std::endl;
         std::cout << "Accessor type: " << accessor->type << std::endl;
         std::cout << "Accessor component type: " << accessor->component_type << std::endl;
@@ -404,11 +475,10 @@ private:
             attributesGL.push_back(attributeGL);
         }
 
-        // return renderer->createVertexArray({attributesGL.data(), attributesGL.size()}, xe::gl::Buffer());
-
-        return {};
+        return renderer->createVertexArray({attributesGL.data(), attributesGL.size()}, xe::gl::Buffer());
     }
 
+    // process a single mesh primitive
     void process_primitive(const cgltf_primitive &primitive) {
         std::cout << "Primitive type " << primitive.type << std::endl;
         std::cout << "Primitive attribute count  " << primitive.attributes_count << std::endl;
@@ -418,15 +488,6 @@ private:
         std::cout << "Primitive targets count " << primitive.targets_count << std::endl;
         std::cout << "Primitive has draco mesh compression " << toBool(primitive.has_draco_mesh_compression) << std::endl;
         std::cout << "Primitive extension count " << primitive.extensions_count << std::endl;
-
-        const auto primitiveType = mapToPrimitive(primitive.type);
-        const auto vertexBuffer = createVertexBuffer(primitive);
-        const auto indexBuffer = primitive.indices ? createIndexBuffer(*primitive.indices) : xe::gl::Buffer();
-
-        // FIXME: Assuming that the attributes all reference the same count of vertices
-        const auto count = static_cast<GLsizei>(primitive.indices ? primitive.indices->count : primitive.attributes[0].data->count);
-
-        const auto vao = createVertexArray(primitive);
 
         if (primitive.indices) {
             const auto indexAccessor = primitive.indices;
@@ -574,8 +635,8 @@ private:
     }
 
     void process_buffer(cgltf_buffer *buffer) {
-        std::cout << "Buffer name: " << toStr(buffer->name) << std::endl;
-        std::cout << "Buffer uri: " << toStr(buffer->uri) << std::endl;
+        std::cout << "Buffer name: " << sanitizeString(buffer->name) << std::endl;
+        std::cout << "Buffer uri: " << sanitizeString(buffer->uri) << std::endl;
         std::cout << "Buffer size: " << (static_cast<float>(buffer->size) / 1024.0f / 1024.0f) << " MB" << std::endl;
     }
 

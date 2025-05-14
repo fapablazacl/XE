@@ -17,12 +17,15 @@ int main() {
     }
 
     auto renderer = xe::gl::RendererGL::create(platform.getGLProcAddressProcedure());
+    auto processor = GltfProcessor{renderer.get()};
+    const auto meshes = processor.loadMeshes(filePath);
 
-    GltfProcessor processor(renderer.get());
-    if (!processor.process(filePath)) {
-        std::cerr << "Failed gltf processing step." << std::endl;
+    if (meshes.empty()) {
+        std::cerr << "Meshes could not be loaded. " << std::endl;
         return EXIT_FAILURE;
     }
+
+    std::cout << meshes.size() << " meshes were loaded" << std::endl;
 
     const auto vertexShaderSource = R"(
 #version 330
