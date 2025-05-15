@@ -9,8 +9,8 @@ set (target gltf-test)
 set (sources
         src/gltf-test-main.cpp
         include/GltfProcessor.h
-        include/GltfLoader.h
-        src/GltfLoader.cpp
+        include/GltfDataLoader.h
+        src/GltfDataLoader.cpp
 )
 
 add_executable(${target} ${sources})

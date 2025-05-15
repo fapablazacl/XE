@@ -5,8 +5,8 @@
 #include "xe/app/Platform.h"
 #include "xe/gl/RendererGL.h"
 
+#include "GltfDataLoader.h"
 #include "GltfProcessor.h"
-#include "GltfLoader.h"
 
 int main() {
     const char* filePath = "/Users/fapablaza/Dropbox/GameDev/Capybaria/raw-assets/models/capybara-01/capybara.glb";
@@ -18,15 +18,6 @@ int main() {
     }
 
     auto renderer = xe::gl::RendererGL::create(platform.getGLProcAddressProcedure());
-    auto processor = GltfLoader{renderer.get()};
-    const auto meshes = processor.loadMeshes(filePath);
-
-    if (meshes.empty()) {
-        std::cerr << "Meshes could not be loaded. " << std::endl;
-        return EXIT_FAILURE;
-    }
-
-    std::cout << meshes.size() << " meshes were loaded" << std::endl;
 
     const auto vertexShaderSource = R"(
 #version 330
@@ -66,6 +57,24 @@ void main() {
         std::cerr << "Failed create program." << std::endl;
         return EXIT_FAILURE;
     }
+
+    auto gltfParser = GltfDataParser{};
+    auto gltfData = gltfParser.parse(filePath);
+
+    if (! gltfData) {
+        std::cerr << "Failed gltfParser.parse()." << std::endl;
+        return EXIT_FAILURE;
+    }
+
+    auto gltfLoader = GltfDataLoader{gltfData, renderer.get()};
+    const auto meshes = gltfLoader.loadAllMeshes();
+
+    if (meshes.empty()) {
+        std::cerr << "Meshes could not be loaded. " << std::endl;
+        return EXIT_FAILURE;
+    }
+
+    std::cout << meshes.size() << " meshes were loaded" << std::endl;
 
     bool running = true;
 

@@ -1,25 +1,26 @@
 
-#include "GltfLoader.h"
+#include "GltfDataLoader.h"
 
-GltfLoader::GltfLoader(xe::gl::RendererGL *renderer) : renderer(renderer) {}
-
-std::vector<GltfMesh> GltfLoader::loadMeshes(const std::string &filePath) {
-    cgltf_options options = {};
+cgltf_data* GltfDataParser::parse(const std::string &filePath) const {
     cgltf_data *data = nullptr;
-    cgltf_result result = cgltf_parse_file(&options, filePath.c_str(), &data);
+    const auto filePathCstr = filePath.c_str();
 
-    if (result != cgltf_result_success) {
+    if (auto result = cgltf_parse_file(&options, filePathCstr, &data); result != cgltf_result_success) {
         std::cerr << "CGLTF: Couldn't load file '" << filePath << "'. Error code: " << to_string(result);
         return {};
     }
 
-    const auto result2 = cgltf_load_buffers(&options, data, filePath.c_str());
-    if (result2 != cgltf_result_success) {
+    if (auto result = cgltf_load_buffers(&options, data, filePathCstr); result != cgltf_result_success) {
         std::cerr << "CGLTF: error while loading buffers '" << filePath << "'. Error code: " << to_string(result);
-
         return {};
     }
 
+    return data;
+}
+
+GltfDataLoader::GltfDataLoader(cgltf_data *data, xe::gl::RendererGL *renderer) : data(data), renderer(renderer) {}
+
+std::vector<GltfMesh> GltfDataLoader::loadAllMeshes() {
     std::vector<GltfMesh> meshes;
     meshes.reserve(data->meshes_count);
 
@@ -37,12 +38,12 @@ std::vector<GltfMesh> GltfLoader::loadMeshes(const std::string &filePath) {
     return meshes;
 }
 
-GltfMeshPrimitive GltfLoader::createMeshPrimitive(const cgltf_primitive &primitive) {
+GltfMeshPrimitive GltfDataLoader::createMeshPrimitive(const cgltf_primitive &primitive) {
     const auto primitiveType = mapToPrimitive(primitive.type);
     const auto vertexBuffer = createVertexBuffer(primitive);
     const auto indexBuffer = primitive.indices ? createIndexBuffer(*primitive.indices) : xe::gl::Buffer();
 
-    // FIXME: Assuming that the all of the attributes are referencing the same count of vertices
+    // FIXME: Assuming that all of the attributes are referencing the same count of vertices
     const auto count = static_cast<GLsizei>(primitive.indices ? primitive.indices->count : primitive.attributes[0].data->count);
     const auto vao = createVertexArray(primitive);
 
@@ -61,7 +62,7 @@ GltfMeshPrimitive GltfLoader::createMeshPrimitive(const cgltf_primitive &primiti
     return loadedMesh;
 }
 
-GltfMesh GltfLoader::createMesh(const cgltf_mesh *mesh) {
+GltfMesh GltfDataLoader::createMesh(const cgltf_mesh *mesh) {
     std::vector<GltfMeshPrimitive> primitives = {};
     primitives.reserve(mesh->primitives_count);
 
@@ -79,7 +80,7 @@ GltfMesh GltfLoader::createMesh(const cgltf_mesh *mesh) {
     return { sanitizeString(mesh->name), primitives};
 }
 
-xe::gl::Buffer GltfLoader::createIndexBuffer(const cgltf_accessor &accessor) {
+xe::gl::Buffer GltfDataLoader::createIndexBuffer(const cgltf_accessor &accessor) {
     const auto indicesOffset = accessor.buffer_view->offset;
     const auto indicesSize = accessor.buffer_view->size;
     const auto indexPtr = addPointerOffset(accessor.buffer_view->buffer->data, indicesOffset);
@@ -87,7 +88,7 @@ xe::gl::Buffer GltfLoader::createIndexBuffer(const cgltf_accessor &accessor) {
     return renderer->createBuffer(GL_ELEMENT_ARRAY_BUFFER, GL_STATIC_DRAW, {indexPtr, indicesSize});
 }
 
-xe::gl::Buffer GltfLoader::createVertexBuffer(const cgltf_primitive &primitive) {
+xe::gl::Buffer GltfDataLoader::createVertexBuffer(const cgltf_primitive &primitive) {
     // FIXME: Assuming that the attributes are stored in different regions of the same buffer
 
     const auto lastAttribIndex = primitive.attributes_count - 1;
@@ -100,11 +101,11 @@ xe::gl::Buffer GltfLoader::createVertexBuffer(const cgltf_primitive &primitive) 
     return renderer->createBuffer(GL_ARRAY_BUFFER, GL_STATIC_DRAW, {vertexPtr, vertexSize});
 }
 
-GLint GltfLoader::mapAttributeName(const std::string &name) {
+GLint GltfDataLoader::mapAttributeName(const std::string &name) {
     return -1;
 }
 
-xe::gl::VertexArray GltfLoader::createVertexArray(const cgltf_primitive &primitive) {
+xe::gl::VertexArray GltfDataLoader::createVertexArray(const cgltf_primitive &primitive) {
     std::vector<xe::gl::Attribute> attributesGL;
 
     for (cgltf_size i = 0; i < primitive.attributes_count; i++) {

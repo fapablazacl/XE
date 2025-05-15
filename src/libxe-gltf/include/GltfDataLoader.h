@@ -25,13 +25,27 @@ struct GltfMesh {
     std::vector<GltfMeshPrimitive> primitives;
 };
 
-class GltfLoader {
+class GltfDataParser {
+    cgltf_options options = {};
+
+public:
+    GltfDataParser() = default;
+
+    explicit GltfDataParser(const cgltf_options &options) : options(options) {}
+
+    [[nodiscard]]
+    cgltf_data* parse(const std::string &filePath) const;
+};
+
+// Loads gltf data in the GPU
+class GltfDataLoader {
+    cgltf_data *data = nullptr;
     xe::gl::RendererGL *renderer = nullptr;
 
 public:
-    explicit GltfLoader(xe::gl::RendererGL *renderer);
+    explicit GltfDataLoader(cgltf_data *data, xe::gl::RendererGL *renderer);
 
-    std::vector<GltfMesh> loadMeshes(const std::string &filePath);
+    std::vector<GltfMesh> loadAllMeshes();
 
 private:
     GltfMeshPrimitive createMeshPrimitive(const cgltf_primitive &primitive);
