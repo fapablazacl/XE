@@ -6,6 +6,7 @@
 #include "xe/gl/RendererGL.h"
 
 #include "GltfProcessor.h"
+#include "GltfLoader.h"
 
 int main() {
     const char* filePath = "/Users/fapablaza/Dropbox/GameDev/Capybaria/raw-assets/models/capybara-01/capybara.glb";
@@ -17,7 +18,7 @@ int main() {
     }
 
     auto renderer = xe::gl::RendererGL::create(platform.getGLProcAddressProcedure());
-    auto processor = GltfProcessor{renderer.get()};
+    auto processor = GltfLoader{renderer.get()};
     const auto meshes = processor.loadMeshes(filePath);
 
     if (meshes.empty()) {
