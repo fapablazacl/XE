@@ -2,6 +2,7 @@
 #pragma once
 
 #include <iostream>
+#include <map>
 
 #include "xe/gl/RendererGL.h"
 #include "cgltf/cgltf.h"
@@ -25,6 +26,18 @@ struct GltfMesh {
     std::vector<GltfMeshPrimitive> primitives;
 };
 
+using GltfAttributeName = std::string;
+using ShaderAttributeName = std::string;
+
+struct ShaderAttrib {
+    std::string name;
+    bool required = false;
+    explicit ShaderAttrib(std::string name) : name(std::move(name)) {}
+    explicit ShaderAttrib(std::string name, bool required) : name(std::move(name)), required(required) {}
+};
+
+using GltfAttributeMap = std::map<GltfAttributeName, ShaderAttrib>;
+
 class GltfDataParser {
     cgltf_options options = {};
 
@@ -41,9 +54,11 @@ public:
 class GltfDataLoader {
     cgltf_data *data = nullptr;
     xe::gl::RendererGL *renderer = nullptr;
+    xe::gl::Program program;
+    GltfAttributeMap attributeMap;
 
 public:
-    explicit GltfDataLoader(cgltf_data *data, xe::gl::RendererGL *renderer);
+    explicit GltfDataLoader(cgltf_data *data, xe::gl::RendererGL *renderer, xe::gl::Program program, const GltfAttributeMap &attributeMap);
 
     std::vector<GltfMesh> loadAllMeshes();
 
@@ -56,7 +71,7 @@ private:
 
     xe::gl::Buffer createVertexBuffer(const cgltf_primitive &primitive);
 
-    GLint mapAttributeName(const std::string &name);
+    GLint computeAttributeLocation(const std::string &gltfAttributeName);
 
     xe::gl::VertexArray createVertexArray(const cgltf_primitive &primitive);
 };

@@ -66,7 +66,10 @@ void main() {
         return EXIT_FAILURE;
     }
 
-    auto gltfLoader = GltfDataLoader{gltfData, renderer.get()};
+    auto gltfLoader = GltfDataLoader{gltfData, renderer.get(), program, {
+        {"POSITION", ShaderAttrib("vertCoord")},
+    }};
+
     const auto meshes = gltfLoader.loadAllMeshes();
 
     if (meshes.empty()) {

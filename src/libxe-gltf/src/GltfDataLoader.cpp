@@ -18,7 +18,8 @@ cgltf_data* GltfDataParser::parse(const std::string &filePath) const {
     return data;
 }
 
-GltfDataLoader::GltfDataLoader(cgltf_data *data, xe::gl::RendererGL *renderer) : data(data), renderer(renderer) {}
+GltfDataLoader::GltfDataLoader(cgltf_data *data, xe::gl::RendererGL *renderer, xe::gl::Program program, const GltfAttributeMap &attributeMap)
+    : data(data), renderer(renderer), program(program), attributeMap(attributeMap) {}
 
 std::vector<GltfMesh> GltfDataLoader::loadAllMeshes() {
     std::vector<GltfMesh> meshes;
@@ -101,8 +102,23 @@ xe::gl::Buffer GltfDataLoader::createVertexBuffer(const cgltf_primitive &primiti
     return renderer->createBuffer(GL_ARRAY_BUFFER, GL_STATIC_DRAW, {vertexPtr, vertexSize});
 }
 
-GLint GltfDataLoader::mapAttributeName(const std::string &name) {
-    return -1;
+GLint GltfDataLoader::computeAttributeLocation(const std::string &gltfAttributeName) {
+    const auto it = attributeMap.find(gltfAttributeName);
+    if (it == attributeMap.end()) {
+        std::cout << "Ignoring unused gltf attribute '" << gltfAttributeName << std::endl;
+        return -1;
+    }
+
+    const auto shaderAttrib = it->second;
+    const auto location = program.getAttribLocation(shaderAttrib.name.c_str());
+
+    if (shaderAttrib.required && location == -1) {
+        const auto msg = "Shader Attribute '" + shaderAttrib.name + "' does not exists";
+        std::cerr << msg << std::endl;
+        throw std::runtime_error(msg);
+    }
+
+    return location;
 }
 
 xe::gl::VertexArray GltfDataLoader::createVertexArray(const cgltf_primitive &primitive) {
@@ -115,24 +131,21 @@ xe::gl::VertexArray GltfDataLoader::createVertexArray(const cgltf_primitive &pri
 
         auto dataTypeGL = mapToAttributeDataType(accessor.component_type);
 
-        std::cout << attribute.name << std::endl;
-
         if (!dataTypeGL) {
             std::cerr << "Could not map attribute " << attribute.name << " with accessor component type " << accessor.component_type << std::endl;
             return {};
         }
 
-        xe::gl::Attribute attributeGL;
-        attributeGL.index = mapAttributeName(attribute.name);
-        attributeGL.offset = bufferView.offset;
-        attributeGL.type = dataTypeGL.value();
-        attributeGL.stride = static_cast<GLsizei>(bufferView.stride);
-        attributeGL.normalized = accessor.normalized;
-        attributesGL.push_back(attributeGL);
+        const auto location = computeAttributeLocation(attribute.name);
 
-        if (attributeGL.index == -1) {
-            std::cerr << "Could not map attribute " << attribute.name << ": it is unknown by the current shader program." << std::endl;
-            return {};
+        if (location != -1) {
+            xe::gl::Attribute attributeGL;
+            attributeGL.index = location;
+            attributeGL.offset = bufferView.offset;
+            attributeGL.type = dataTypeGL.value();
+            attributeGL.stride = static_cast<GLsizei>(bufferView.stride);
+            attributeGL.normalized = accessor.normalized;
+            attributesGL.push_back(attributeGL);
         }
     }
 
