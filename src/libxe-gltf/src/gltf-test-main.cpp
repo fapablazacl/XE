@@ -1,5 +1,6 @@
 
 #include <stdexcept>
+#include <array>
 
 #include "fmt/printf.h"
 #include "xe/app/Platform.h"
@@ -7,19 +8,9 @@
 
 #include "GltfDataLoader.h"
 #include "GltfProcessor.h"
+#include "xe/math/Matrix.h"
 
-int main() {
-    const char* filePath = "/Users/fapablaza/Dropbox/GameDev/Capybaria/raw-assets/models/capybara-01/capybara.glb";
-
-    Platform platform;
-    if (!platform.initialize("gltf viewer", 640, 480)) {
-        std::cerr << "Failed platform initialization." << std::endl;
-        return EXIT_FAILURE;
-    }
-
-    auto renderer = xe::gl::RendererGL::create(platform.getGLProcAddressProcedure());
-
-    const auto vertexShaderSource = R"(
+const auto vertexShaderSource = R"(
 #version 330
 
 uniform mat4 model;
@@ -36,7 +27,7 @@ void main() {
     fragColor = vertColor;
 })";
 
-    const auto fragmentShaderSource = R"(
+const auto fragmentShaderSource = R"(
 #version 330
 
 in vec4 fragColor;
@@ -46,6 +37,32 @@ out vec4 color;
 void main() {
     color = fragColor;
 })";
+
+struct ShaderProgramUniformData {
+    XE::Matrix4 model;
+    XE::Matrix4 view;
+    XE::Matrix4 proj;
+
+    [[nodiscard]]
+    std::array<xe::gl::UniformMatrix, 3> mapUniforms(xe::gl::Program shaderProgram) const {
+        return {
+            xe::gl::makeUniform(shaderProgram.getUniformLocation("model"), model),
+            xe::gl::makeUniform(shaderProgram.getUniformLocation("view"), view),
+            xe::gl::makeUniform(shaderProgram.getUniformLocation("proj"), proj),
+        };
+    }
+};
+
+int main() {
+    const char* filePath = "/Users/fapablaza/Dropbox/GameDev/Capybaria/raw-assets/models/capybara-01/capybara.glb";
+
+    Platform platform;
+    if (!platform.initialize("gltf viewer", 640, 480)) {
+        std::cerr << "Failed platform initialization." << std::endl;
+        return EXIT_FAILURE;
+    }
+
+    auto renderer = xe::gl::RendererGL::create(platform.getGLProcAddressProcedure());
 
     std::vector<xe::gl::Shader> shaders = {
         renderer->createShader(GL_VERTEX_SHADER, vertexShaderSource),
@@ -81,17 +98,35 @@ void main() {
 
     bool running = true;
 
+    ShaderProgramUniformData uniformData;
+
     while (running) {
         const InputState inputState = platform.pollInputState();
         running = !inputState.keyEscPress;
 
+        uniformData.proj = XE::mat4Perspective(XE::radians(60.0f), 1.33333f, 0.01f, 1000.0f);
+        uniformData.view = XE::mat4LookAtRH({0.0f, 0.0f, -25.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f});
+        uniformData.model = XE::mat4Identity();
+
         renderer->clear(xe::gl::ClearParams()
-            .color({0.0f, 0.0f, 0.0f, 1.0f})
+            .color({0.2f, 0.2f, 0.8f, 1.0f})
             .depthX(1.0f));
 
         renderer->useProgram(program);
+        renderer->apply(uniformData.mapUniforms(program));
+
+        for (const auto &mesh : meshes) {
+            for (const auto &primitive: mesh.primitives) {
+                const xe::gl::VertexArrayPrimitive prims [] = {
+                    {0, primitive.count}
+                };
+
+                renderer->draw(primitive.vao, primitive.primitive, prims);
+            }
+        }
 
         renderer->flush();
+        platform.swapBuffers();
     }
 
     return EXIT_SUCCESS;

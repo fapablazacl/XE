@@ -241,7 +241,7 @@ namespace xe::gl {
     }
 
 
-    VertexArray RendererGL::createVertexArray(const tcb::span<Attribute> &attributes, Buffer elementArrayBuffer) const {
+    VertexArray RendererGL::createVertexArray(const tcb::span<const Attribute> &attributes, Buffer elementArrayBuffer) const {
         XE_GL_SCOPED_ERROR_CHECK();
 
         VertexArray vao;
@@ -290,7 +290,7 @@ namespace xe::gl {
         return vao;
     }
 
-    void RendererGL::draw(VertexArray vertexArray, GLenum primitiveType, const tcb::span<VertexArrayPrimitive> &primitives) const {
+    void RendererGL::draw(VertexArray vertexArray, GLenum primitiveType, const tcb::span<const VertexArrayPrimitive> &primitives) const {
         XE_GL_SCOPED_ERROR_CHECK();
 
         glBindVertexArray(vertexArray.id);
@@ -309,7 +309,7 @@ namespace xe::gl {
         glMultiDrawArrays(primitiveType, multiDraw.start, multiDraw.count, multiDraw.drawCount);
     }
 
-    void RendererGL::drawIndexed(VertexArray vertexArray, GLenum primitiveType, GLenum dataType, const tcb::span<VertexArrayPrimitive> &primitives) const {
+    void RendererGL::drawIndexed(VertexArray vertexArray, GLenum primitiveType, GLenum dataType, const tcb::span<const VertexArrayPrimitive> &primitives) const {
         XE_GL_SCOPED_ERROR_CHECK();
 
         glBindVertexArray(vertexArray.id);
@@ -323,7 +323,7 @@ namespace xe::gl {
         }
     }
 
-    void RendererGL::apply(const tcb::span<Attribute> &attribs) const {
+    void RendererGL::apply(const tcb::span<const Attribute> &attribs) const {
         XE_GL_SCOPED_ERROR_CHECK();
 
         for (const auto &attrib : attribs) {
@@ -341,7 +341,7 @@ namespace xe::gl {
         }
     }
 
-    void RendererGL::apply(const tcb::span<Uniform> &uniforms) const {
+    void RendererGL::apply(const tcb::span<const Uniform> &uniforms) const {
         XE_GL_SCOPED_ERROR_CHECK();
 
         for (const auto &uniform : uniforms) {
@@ -364,7 +364,7 @@ namespace xe::gl {
         }
     }
 
-    void RendererGL::apply(const tcb::span<UniformMatrix> &uniforms) const {
+    void RendererGL::apply(const tcb::span<const UniformMatrix> &uniforms) const {
         XE_GL_SCOPED_ERROR_CHECK();
 
         for (const auto &[location, type, dim, transpose, count, data] : uniforms) {

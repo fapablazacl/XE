@@ -7,6 +7,7 @@
 
 #include "Types.h"
 #include "xe/math/Vector.h"
+#include "xe/math/Matrix.h"
 
 #include <optional>
 
@@ -48,9 +49,50 @@ namespace xe::gl {
         _4x2, _4x3, _4x4,
     };
 
+    template<int rows, int cols>
+    constexpr UniformMatrixDim mapUniformMatrixDim() {
+        static_assert(rows >= 2 && rows <= 4);
+        static_assert(cols >= 2 && cols <= 4);
+
+        if constexpr (rows == 2) {
+            if constexpr (cols == 2) { return UniformMatrixDim::_2x2; }
+            if constexpr (cols == 3) { return UniformMatrixDim::_2x3; }
+            if constexpr (cols == 4) { return UniformMatrixDim::_2x4; }
+        }
+
+        if constexpr (rows == 3) {
+            if constexpr (cols == 2) { return UniformMatrixDim::_3x2; }
+            if constexpr (cols == 3) { return UniformMatrixDim::_3x3; }
+            if constexpr (cols == 4) { return UniformMatrixDim::_3x4; }
+        }
+
+        if constexpr (rows == 4) {
+            if constexpr (cols == 2) { return UniformMatrixDim::_4x2; }
+            if constexpr (cols == 3) { return UniformMatrixDim::_4x3; }
+            if constexpr (cols == 4) { return UniformMatrixDim::_4x4; }
+        }
+    }
+
     enum class UniformMatrixType {
         Float,
         Double
+    };
+
+    template<typename BasicType>
+    struct MetaUniformMatrixTypeMapper {};
+
+    template<>
+    struct MetaUniformMatrixTypeMapper<float> {
+        static UniformMatrixType map() {
+            return UniformMatrixType::Float;
+        }
+    };
+
+    template<>
+    struct MetaUniformMatrixTypeMapper<double> {
+        static UniformMatrixType map() {
+            return UniformMatrixType::Double;
+        }
     };
 
     struct UniformMatrix {
@@ -59,9 +101,22 @@ namespace xe::gl {
         UniformMatrixDim dim = UniformMatrixDim::_4x4;
         GLboolean transpose = GL_FALSE;
         GLsizei count = 0;
-
         const void* data = nullptr;
     };
+
+    template<typename Type, int Rows, int Cols>
+    UniformMatrix makeUniform(GLint location, const XE::TMatrix<Type, Rows, Cols> &matrix, const bool transpose = false) {
+        UniformMatrix uniform;
+
+        uniform.location = location;
+        uniform.type = MetaUniformMatrixTypeMapper<Type>::map();
+        uniform.dim = mapUniformMatrixDim<Rows, Cols>();
+        uniform.transpose = transpose == GL_TRUE;
+        uniform.count = 1;
+        uniform.data = matrix.data();
+
+        return uniform;
+    }
 
     enum class AttributeDim { _1, _2, _3, _4 };
 
@@ -189,7 +244,7 @@ namespace xe::gl {
         Buffer createBuffer(GLenum target, GLenum usage, const MemoryRegion &memory) const;
 
         [[nodiscard]]
-        VertexArray createVertexArray(const tcb::span<Attribute> &attributes, Buffer elementArrayBuffer) const;
+        VertexArray createVertexArray(const tcb::span<const Attribute> &attributes, Buffer elementArrayBuffer) const;
 
         [[nodiscard]]
         RendererInfo getInfo() const;
@@ -209,17 +264,17 @@ namespace xe::gl {
 
         void render(GLenum target, const tcb::span<TextureParameter> &parameters) const;
 
-        void apply(const tcb::span<Attribute> &attribs) const;
+        void apply(const tcb::span<const Attribute> &attribs) const;
 
-        void apply(const tcb::span<Uniform> &uniforms) const;
+        void apply(const tcb::span<const Uniform> &uniforms) const;
 
-        void apply(const tcb::span<UniformMatrix> &uniforms) const;
+        void apply(const tcb::span<const UniformMatrix> &uniforms) const;
 
-        void draw(VertexArray vertexArray, GLenum primitiveType, const tcb::span<VertexArrayPrimitive> &primitives) const;
+        void draw(VertexArray vertexArray, GLenum primitiveType, const tcb::span<const VertexArrayPrimitive> &primitives) const;
 
         void draw(VertexArray vertexArray, GLenum primitiveType, const VertexArrayMultiDraw &multiDraw) const;
 
-        void drawIndexed(VertexArray vertexArray, GLenum primitiveType, GLenum dataType, const tcb::span<VertexArrayPrimitive> &primitives) const;
+        void drawIndexed(VertexArray vertexArray, GLenum primitiveType, GLenum dataType, const tcb::span<const VertexArrayPrimitive> &primitives) const;
 
         void clear(const ClearParams &params) const;
 
