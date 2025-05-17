@@ -19,6 +19,7 @@ struct GltfMeshPrimitive {
     xe::gl::Buffer indexBuffer;
     GLenum primitive = GL_NONE;
     GLsizei count = 0;
+    GLenum indexType = GL_UNSIGNED_INT;
 };
 
 struct GltfMesh {
@@ -73,5 +74,5 @@ private:
 
     GLint computeAttributeLocation(const std::string &gltfAttributeName);
 
-    xe::gl::VertexArray createVertexArray(const cgltf_primitive &primitive);
+    xe::gl::VertexArray createVertexArray(const cgltf_primitive &primitive, xe::gl::Buffer vertexBuffer, xe::gl::Buffer indexBuffer);
 };

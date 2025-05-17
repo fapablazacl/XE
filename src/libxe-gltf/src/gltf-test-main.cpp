@@ -13,9 +13,7 @@
 const auto vertexShaderSource = R"(
 #version 330
 
-uniform mat4 model;
-uniform mat4 view;
-uniform mat4 proj;
+uniform mat4 modelViewProj;
 
 in vec3 vertCoord;
 in vec4 vertColor;
@@ -23,8 +21,8 @@ in vec4 vertColor;
 out vec4 fragColor;
 
 void main() {
-    gl_Position = vec4(vertCoord, 1.0) * model * view * proj;
-    fragColor = vertColor;
+    gl_Position = vec4(vertCoord, 1.0) * modelViewProj;
+    fragColor = vec4(1.0, 1.0, 1.0, 1.0);
 })";
 
 const auto fragmentShaderSource = R"(
@@ -39,25 +37,23 @@ void main() {
 })";
 
 struct ShaderProgramUniformData {
-    XE::Matrix4 model;
-    XE::Matrix4 view;
-    XE::Matrix4 proj;
+    XE::Matrix4 projViewModel;
 
     [[nodiscard]]
-    std::array<xe::gl::UniformMatrix, 3> mapUniforms(xe::gl::Program shaderProgram) const {
+    std::array<xe::gl::UniformMatrix, 1> mapUniforms(xe::gl::Program shaderProgram) const {
         return {
-            xe::gl::makeUniform(shaderProgram.getUniformLocation("model"), model),
-            xe::gl::makeUniform(shaderProgram.getUniformLocation("view"), view),
-            xe::gl::makeUniform(shaderProgram.getUniformLocation("proj"), proj),
+            xe::gl::makeUniform(shaderProgram.getUniformLocation("modelViewProj"), projViewModel),
         };
     }
 };
 
 int main() {
+    const int SCREEN_WIDTH = 640;
+    const int SCREEN_HEIGHT = 480;
     const char* filePath = "/Users/fapablaza/Dropbox/GameDev/Capybaria/raw-assets/models/capybara-01/capybara.glb";
 
     Platform platform;
-    if (!platform.initialize("gltf viewer", 640, 480)) {
+    if (!platform.initialize("gltf viewer", SCREEN_WIDTH, SCREEN_HEIGHT)) {
         std::cerr << "Failed platform initialization." << std::endl;
         return EXIT_FAILURE;
     }
@@ -85,6 +81,7 @@ int main() {
 
     auto gltfLoader = GltfDataLoader{gltfData, renderer.get(), program, {
         {"POSITION", ShaderAttrib("vertCoord")},
+        // {"NORMAL", ShaderAttrib{"vertColor"}}
     }};
 
     const auto meshes = gltfLoader.loadAllMeshes();
@@ -104,16 +101,21 @@ int main() {
         const InputState inputState = platform.pollInputState();
         running = !inputState.keyEscPress;
 
-        uniformData.proj = XE::mat4Perspective(XE::radians(60.0f), 1.33333f, 0.01f, 1000.0f);
-        uniformData.view = XE::mat4LookAtRH({0.0f, 0.0f, -25.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f});
-        uniformData.model = XE::mat4Identity();
+        const auto proj = XE::mat4Perspective(XE::radians(60.0f), static_cast<float>(SCREEN_HEIGHT) / static_cast<float>(SCREEN_WIDTH), 0.001f, 1000.0f);
+        const auto view = XE::mat4LookAtRH({0.0f, 0.0f, -25.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f});
+        const auto model = XE::mat4Identity();
 
+        uniformData.projViewModel = proj * view * model;
+
+        // renderer->viewport({0, 0}, {SCREEN_WIDTH, SCREEN_HEIGHT});
         renderer->clear(xe::gl::ClearParams()
             .color({0.2f, 0.2f, 0.8f, 1.0f})
             .depthX(1.0f));
 
         renderer->useProgram(program);
-        renderer->apply(uniformData.mapUniforms(program));
+
+        const auto uniforms = uniformData.mapUniforms(program);
+        renderer->apply(uniforms);
 
         for (const auto &mesh : meshes) {
             for (const auto &primitive: mesh.primitives) {
@@ -121,7 +123,12 @@ int main() {
                     {0, primitive.count}
                 };
 
-                renderer->draw(primitive.vao, primitive.primitive, prims);
+                if (primitive.indexBuffer.id) {
+                    renderer->drawIndexed(primitive.vao, primitive.primitive, primitive.indexType, prims);
+                }
+                else {
+                    renderer->draw(primitive.vao, primitive.primitive, prims);
+                }
             }
         }
 

@@ -175,3 +175,27 @@ constexpr std::optional<xe::gl::AttributeType> mapToAttributeDataType(const cglt
         return std::nullopt;
     }
 }
+
+[[nodiscard]]
+constexpr std::optional<GLenum> mapToGLDataType(const cgltf_component_type type) {
+    switch (type) {
+    case cgltf_component_type_r_8: return GL_BYTE;
+    case cgltf_component_type_r_8u: return GL_UNSIGNED_BYTE;
+    case cgltf_component_type_r_16: return GL_SHORT;
+    case cgltf_component_type_r_16u: return GL_UNSIGNED_SHORT;
+    case cgltf_component_type_r_32u: return GL_UNSIGNED_INT;
+    case cgltf_component_type_r_32f: return GL_FLOAT;
+    default: return std::nullopt;
+    }
+}
+
+[[nodiscard]]
+constexpr std::optional<xe::gl::AttributeDim> mapToAttribDim(const cgltf_type type) {
+    switch (type) {
+    case cgltf_type_scalar: return xe::gl::AttributeDim::_1;
+    case cgltf_type_vec2: return xe::gl::AttributeDim::_2;
+    case cgltf_type_vec3: return xe::gl::AttributeDim::_3;
+    case cgltf_type_vec4: return xe::gl::AttributeDim::_4;
+    default: return std::nullopt;
+    }
+}

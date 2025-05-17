@@ -43,10 +43,11 @@ GltfMeshPrimitive GltfDataLoader::createMeshPrimitive(const cgltf_primitive &pri
     const auto primitiveType = mapToPrimitive(primitive.type);
     const auto vertexBuffer = createVertexBuffer(primitive);
     const auto indexBuffer = primitive.indices ? createIndexBuffer(*primitive.indices) : xe::gl::Buffer();
+    const auto indexType = primitive.indices ? mapToGLDataType(primitive.indices->component_type).value_or(GL_NONE) : GL_NONE;
 
     // FIXME: Assuming that all of the attributes are referencing the same count of vertices
     const auto count = static_cast<GLsizei>(primitive.indices ? primitive.indices->count : primitive.attributes[0].data->count);
-    const auto vao = createVertexArray(primitive);
+    const auto vao = createVertexArray(primitive, vertexBuffer, indexBuffer);
 
     if (! vao.id) {
         std::cerr << "Could not create vertex array." << std::endl;
@@ -57,6 +58,7 @@ GltfMeshPrimitive GltfDataLoader::createMeshPrimitive(const cgltf_primitive &pri
     loadedMesh.primitive = primitiveType;
     loadedMesh.vertexBuffer = vertexBuffer;
     loadedMesh.indexBuffer = indexBuffer;
+    loadedMesh.indexType = indexType;
     loadedMesh.vao = vao;
     loadedMesh.count = count;
 
@@ -121,7 +123,9 @@ GLint GltfDataLoader::computeAttributeLocation(const std::string &gltfAttributeN
     return location;
 }
 
-xe::gl::VertexArray GltfDataLoader::createVertexArray(const cgltf_primitive &primitive) {
+xe::gl::VertexArray GltfDataLoader::createVertexArray(const cgltf_primitive &primitive, xe::gl::Buffer vertexBuffer, xe::gl::Buffer indexBuffer) {
+    assert(vertexBuffer.id);
+
     std::vector<xe::gl::Attribute> attributesGL;
 
     for (cgltf_size i = 0; i < primitive.attributes_count; i++) {
@@ -130,9 +134,14 @@ xe::gl::VertexArray GltfDataLoader::createVertexArray(const cgltf_primitive &pri
         const auto &bufferView = *accessor.buffer_view;
 
         auto dataTypeGL = mapToAttributeDataType(accessor.component_type);
-
         if (!dataTypeGL) {
             std::cerr << "Could not map attribute " << attribute.name << " with accessor component type " << accessor.component_type << std::endl;
+            return {};
+        }
+
+        auto attribDimGL = mapToAttribDim(accessor.type);
+        if (!attribDimGL) {
+            std::cerr << "Could not map attribute" << accessor.name << " with accessor type " << accessor.type << std::endl;
             return {};
         }
 
@@ -145,9 +154,11 @@ xe::gl::VertexArray GltfDataLoader::createVertexArray(const cgltf_primitive &pri
             attributeGL.type = dataTypeGL.value();
             attributeGL.stride = static_cast<GLsizei>(bufferView.stride);
             attributeGL.normalized = accessor.normalized;
+            attributeGL.buffer = vertexBuffer;
+            attributeGL.size = attribDimGL.value();
             attributesGL.push_back(attributeGL);
         }
     }
 
-    return renderer->createVertexArray({attributesGL.data(), attributesGL.size()}, xe::gl::Buffer());
+    return renderer->createVertexArray({attributesGL.data(), attributesGL.size()}, indexBuffer);
 }

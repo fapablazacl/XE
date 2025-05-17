@@ -292,12 +292,14 @@ namespace xe::gl {
 
     void RendererGL::draw(VertexArray vertexArray, GLenum primitiveType, const tcb::span<const VertexArrayPrimitive> &primitives) const {
         XE_GL_SCOPED_ERROR_CHECK();
+        assert(!primitives.empty());
+        assert(vertexArray.id);
 
         glBindVertexArray(vertexArray.id);
 
         for (const auto &primitive : primitives) {
+            assert(primitive.count > 0);
             apply(primitive.attribs);
-
             glDrawArrays(primitiveType, primitive.start, primitive.count);
         }
     }
@@ -368,6 +370,10 @@ namespace xe::gl {
         XE_GL_SCOPED_ERROR_CHECK();
 
         for (const auto &[location, type, dim, transpose, count, data] : uniforms) {
+            assert(location >= 0);
+            assert(count > 0);
+            assert(data);
+
             const auto index = static_cast<int>(dim);
 
             switch (type) {
