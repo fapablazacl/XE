@@ -453,7 +453,7 @@ namespace xe::gl {
         return {textureId, target};
     }
 
-    void RendererGL::render(GLenum target, const tcb::span<TextureParameter> &parameters) const {
+    void RendererGL::render(GLenum target, const tcb::span<const TextureParameter> &parameters) const {
         XE_GL_SCOPED_ERROR_CHECK();
 
         for (const auto &parameter : parameters) {
@@ -461,7 +461,7 @@ namespace xe::gl {
         }
     }
 
-    void RendererGL::render(const tcb::span<CapabilityStatus> &capabilities) const {
+    void RendererGL::render(const tcb::span<const CapabilityStatus> &capabilities) const {
         XE_GL_SCOPED_ERROR_CHECK();
 
         for (const auto &[capability, enabled] : capabilities) {
@@ -469,7 +469,7 @@ namespace xe::gl {
         }
     }
 
-    void RendererGL::render(const tcb::span<TextureLayer> &layers) const {
+    void RendererGL::render(const tcb::span<const TextureLayer> &layers) const {
         XE_GL_SCOPED_ERROR_CHECK();
 
         for (uint32_t i = 0; i < layers.size(); i++) {
@@ -509,6 +509,11 @@ namespace xe::gl {
         }
 
         glClear(clearFlags);
+    }
+
+    void RendererGL::clear(const GLenum flags) const {
+        XE_GL_SCOPED_ERROR_CHECK();
+        glClear(flags);
     }
 
     void RendererGL::flush() const {

@@ -16,13 +16,14 @@ const auto vertexShaderSource = R"(
 uniform mat4 modelViewProj;
 
 in vec3 vertCoord;
-in vec4 vertColor;
+in vec3 vertNormal;
 
 out vec4 fragColor;
 
 void main() {
+    vec3 lightDirection = normalize(vec3(0.1, 0.3, 0.4));
     gl_Position = vec4(vertCoord, 1.0) * modelViewProj;
-    fragColor = vec4(1.0, 1.0, 1.0, 1.0);
+    fragColor = vec4(vec3(1.0, 1.0, 1.0) * dot(lightDirection, vertNormal), 1.0);
 })";
 
 const auto fragmentShaderSource = R"(
@@ -79,9 +80,11 @@ int main() {
         return EXIT_FAILURE;
     }
 
-    auto gltfLoader = GltfDataLoader{gltfData, renderer.get(), program, {
+    auto gltfTextureLoader = GltfTextureLoader{renderer.get()};
+
+    auto gltfLoader = GltfDataLoader{gltfData, renderer.get(), &gltfTextureLoader, program, {
         {"POSITION", ShaderAttrib("vertCoord")},
-        // {"NORMAL", ShaderAttrib{"vertColor"}}
+        {"NORMAL", ShaderAttrib{"vertNormal"}}
     }};
 
     const auto meshes = gltfLoader.loadAllMeshes();
@@ -94,6 +97,7 @@ int main() {
     std::cout << meshes.size() << " meshes were loaded" << std::endl;
 
     bool running = true;
+    float angle = 0.0f;
 
     ShaderProgramUniformData uniformData;
 
@@ -103,15 +107,18 @@ int main() {
 
         const auto proj = XE::mat4Perspective(XE::radians(60.0f), static_cast<float>(SCREEN_HEIGHT) / static_cast<float>(SCREEN_WIDTH), 0.001f, 1000.0f);
         const auto view = XE::mat4LookAtRH({0.0f, 0.0f, -25.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f});
-        const auto model = XE::mat4Identity();
+        const auto model = XE::mat4RotationY(angle += 0.005f);
 
         uniformData.projViewModel = proj * view * model;
 
-        // renderer->viewport({0, 0}, {SCREEN_WIDTH, SCREEN_HEIGHT});
-        renderer->clear(xe::gl::ClearParams()
-            .color({0.2f, 0.2f, 0.8f, 1.0f})
-            .depthX(1.0f));
+        const std::vector<xe::gl::CapabilityStatus> renderState = {
+            {GL_DEPTH_TEST, GL_TRUE},
+            {GL_CULL_FACE, GL_TRUE}
+        };
 
+        renderer->render(renderState);
+        renderer->clear(xe::gl::ClearParams().color({0.2f, 0.2f, 0.8f, 1.0f}));
+        renderer->clear(GL_DEPTH_BUFFER_BIT);
         renderer->useProgram(program);
 
         const auto uniforms = uniformData.mapUniforms(program);

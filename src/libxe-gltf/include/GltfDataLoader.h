@@ -12,8 +12,25 @@ namespace xe::gl {
     class RendererGL;
 }
 
+struct GltfMaterial {
+    xe::gl::Texture texture;
+};
+
+class GltfTextureLoader {
+public:
+    GltfTextureLoader(const xe::gl::RendererGL* renderer);
+
+    xe::gl::Texture createTexture(const xe::gl::RendererGL* renderer, cgltf_texture_view* texture) const;
+
+private:
+    const xe::gl::RendererGL* renderer = nullptr;
+};
+
 // Contains OpenGL objects with data loaded from a gltf mesh
 struct GltfMeshPrimitive {
+    // TODO: this should be a reference / pointer.
+    GltfMaterial material;
+
     xe::gl::VertexArray vao;
     xe::gl::Buffer vertexBuffer;
     xe::gl::Buffer indexBuffer;
@@ -55,11 +72,12 @@ public:
 class GltfDataLoader {
     cgltf_data *data = nullptr;
     xe::gl::RendererGL *renderer = nullptr;
+    GltfTextureLoader *textureLoader = nullptr;
     xe::gl::Program program;
     GltfAttributeMap attributeMap;
 
 public:
-    explicit GltfDataLoader(cgltf_data *data, xe::gl::RendererGL *renderer, xe::gl::Program program, const GltfAttributeMap &attributeMap);
+    explicit GltfDataLoader(cgltf_data *data, xe::gl::RendererGL *renderer, GltfTextureLoader *textureLoader, xe::gl::Program program, const GltfAttributeMap &attributeMap);
 
     std::vector<GltfMesh> loadAllMeshes();
 

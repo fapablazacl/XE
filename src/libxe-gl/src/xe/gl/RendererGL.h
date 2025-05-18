@@ -258,11 +258,11 @@ namespace xe::gl {
         [[nodiscard]]
         Texture createTexture(GLenum target, GLint internalFormat, const ClientTextureImage3D &image, bool generateMipMaps, const tcb::span<TextureParameter> &parameters) const;
 
-        void render(const tcb::span<CapabilityStatus> &capabilities) const;
+        void render(const tcb::span<const CapabilityStatus> &capabilities) const;
 
-        void render(const tcb::span<TextureLayer> &layers) const;
+        void render(const tcb::span<const TextureLayer> &layers) const;
 
-        void render(GLenum target, const tcb::span<TextureParameter> &parameters) const;
+        void render(GLenum target, const tcb::span<const TextureParameter> &parameters) const;
 
         void apply(const tcb::span<const Attribute> &attribs) const;
 
@@ -277,6 +277,8 @@ namespace xe::gl {
         void drawIndexed(VertexArray vertexArray, GLenum primitiveType, GLenum dataType, const tcb::span<const VertexArrayPrimitive> &primitives) const;
 
         void clear(const ClearParams &params) const;
+
+        void clear(const GLenum flags) const;
 
         void flush() const;
 

@@ -1,6 +1,12 @@
 
 #include "GltfDataLoader.h"
 
+GltfTextureLoader::GltfTextureLoader(const xe::gl::RendererGL* renderer) : renderer(renderer) {}
+
+xe::gl::Texture GltfTextureLoader::createTexture(const xe::gl::RendererGL* renderer, cgltf_texture_view* textureView) const {
+    return {};
+}
+
 cgltf_data* GltfDataParser::parse(const std::string &filePath) const {
     cgltf_data *data = nullptr;
     const auto filePathCstr = filePath.c_str();
@@ -18,8 +24,8 @@ cgltf_data* GltfDataParser::parse(const std::string &filePath) const {
     return data;
 }
 
-GltfDataLoader::GltfDataLoader(cgltf_data *data, xe::gl::RendererGL *renderer, xe::gl::Program program, const GltfAttributeMap &attributeMap)
-    : data(data), renderer(renderer), program(program), attributeMap(attributeMap) {}
+GltfDataLoader::GltfDataLoader(cgltf_data *data, xe::gl::RendererGL *renderer, GltfTextureLoader *textureLoader, xe::gl::Program program, const GltfAttributeMap &attributeMap)
+    : data(data), renderer(renderer), textureLoader(textureLoader), program(program), attributeMap(attributeMap) {}
 
 std::vector<GltfMesh> GltfDataLoader::loadAllMeshes() {
     std::vector<GltfMesh> meshes;
