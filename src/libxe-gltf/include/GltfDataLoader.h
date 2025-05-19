@@ -20,7 +20,7 @@ class GltfTextureLoader {
 public:
     GltfTextureLoader(const xe::gl::RendererGL* renderer);
 
-    xe::gl::Texture createTexture(const xe::gl::RendererGL* renderer, cgltf_texture_view* texture) const;
+    xe::gl::Texture createTexture(const xe::gl::RendererGL* renderer, const cgltf_texture_view &texture) const;
 
 private:
     const xe::gl::RendererGL* renderer = nullptr;

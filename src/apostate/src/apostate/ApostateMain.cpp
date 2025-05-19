@@ -3,8 +3,8 @@
 #include "xe/gl/TextureRepository.h"
 
 #include "AssetPackage.h"
-#include "ImageLoaderFI.h"
-#include "Logger.h"
+#include "xe/ImageLoader.h"
+#include "xe/Logger.h"
 #include "Model.h"
 #include "ModelLoaderAssimp.h"
 #include "Platform.h"
@@ -97,8 +97,8 @@ int main(int argc, char **argv) {
         {"capybara02", Transformation{{1.0f, 1.0f, 1.0f}, {-2.0f, 0.0f, 0.0f}}}
     };
 
-    ImageLoaderFI imageLoader;
-    TextureRepository textureRepository{imageLoader};
+    auto imageLoader = createImageLoader();
+    TextureRepository textureRepository{*imageLoader};
 
     Camera camera;
 

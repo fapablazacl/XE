@@ -1,7 +1,7 @@
 
 #include "ModelLoaderAssimp.h"
 
-#include "Logger.h"
+#include "xe/Logger.h"
 #include "MiscUtils.h"
 #include "Model.h"
 

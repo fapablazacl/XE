@@ -19,27 +19,18 @@ add_executable(${target}
     "MiscUtils.h"
 
     "AssetPackage.h"
-    "Image.h"
-    "ImageLoader.h"
     "Model.h"
     "ModelLoader.h"
 
     "Platform.h"
     "AssetPackage.cpp"
     "Model.cpp"
-    "ImageLoader.cpp"
 
     "Platform.cpp"
-
-    # FreeImage
-    "ImageLoaderFI.h"
-    "ImageLoaderFI.cpp"
 
     # AssImp
     "ModelLoaderAssimp.h"
     "ModelLoaderAssimp.cpp"
-    Logger.cpp
-    Logger.h
 
     ApostateMain.cpp
 )
@@ -51,4 +42,5 @@ target_link_libraries(
     nlohmann_json::nlohmann_json
     freeimage::FreeImage
         XE.GL
+        libxe-imageloader
 )

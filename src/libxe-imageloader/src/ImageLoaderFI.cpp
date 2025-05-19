@@ -1,14 +1,11 @@
 
 #include "ImageLoaderFI.h"
 
-#include "Logger.h"
-
 #include <cassert>
-#include <cstring>
 #include <fstream>
-#include <iostream>
 #include <map>
 #include <filesystem>
+#include "xe/Logger.h"
 
 #include <FreeImage.h>
 

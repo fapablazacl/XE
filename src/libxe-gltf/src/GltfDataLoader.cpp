@@ -3,7 +3,9 @@
 
 GltfTextureLoader::GltfTextureLoader(const xe::gl::RendererGL* renderer) : renderer(renderer) {}
 
-xe::gl::Texture GltfTextureLoader::createTexture(const xe::gl::RendererGL* renderer, cgltf_texture_view* textureView) const {
+xe::gl::Texture GltfTextureLoader::createTexture(const xe::gl::RendererGL* renderer, const cgltf_texture_view &textureView) const {
+    std::cout << "Creating texture " << sanitizeString(textureView.texture->name) << std::endl;
+
     return {};
 }
 
@@ -60,15 +62,16 @@ GltfMeshPrimitive GltfDataLoader::createMeshPrimitive(const cgltf_primitive &pri
         return {};
     }
 
-    GltfMeshPrimitive loadedMesh;
-    loadedMesh.primitive = primitiveType;
-    loadedMesh.vertexBuffer = vertexBuffer;
-    loadedMesh.indexBuffer = indexBuffer;
-    loadedMesh.indexType = indexType;
-    loadedMesh.vao = vao;
-    loadedMesh.count = count;
+    GltfMeshPrimitive meshPrimitive;
+    meshPrimitive.primitive = primitiveType;
+    meshPrimitive.vertexBuffer = vertexBuffer;
+    meshPrimitive.indexBuffer = indexBuffer;
+    meshPrimitive.indexType = indexType;
+    meshPrimitive.vao = vao;
+    meshPrimitive.count = count;
+    meshPrimitive.material.texture = textureLoader->createTexture(renderer, primitive.material->pbr_metallic_roughness.base_color_texture);
 
-    return loadedMesh;
+    return meshPrimitive;
 }
 
 GltfMesh GltfDataLoader::createMesh(const cgltf_mesh *mesh) {

@@ -1,7 +1,7 @@
 
 #pragma once 
 
-#include "ImageLoader.h"
+#include "xe/ImageLoader.h"
 
 class ImageLoaderFI : public ImageLoader {
 public:

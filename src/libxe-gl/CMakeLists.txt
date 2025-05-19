@@ -62,6 +62,7 @@ endif()
 target_include_directories (${target} PUBLIC "src")
 target_link_libraries (${target} 
 	PUBLIC XE.Core
+		PUBLIC libxe-imageloader
 	PUBLIC glad-gl4
 	PRIVATE XE.Interface
 	PUBLIC fmt::fmt

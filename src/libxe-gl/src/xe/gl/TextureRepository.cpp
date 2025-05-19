@@ -1,10 +1,9 @@
 
 #include "TextureRepository.h"
 
-#include "../../../../apostate/src/apostate/Image.h"
-#include "../../../../apostate/src/apostate/ImageLoader.h"
-#include "../../../../apostate/src/apostate/Logger.h"
-
+#include "xe/Image.h"
+#include "xe/ImageLoader.h"
+#include "xe/Logger.h"
 #include "xe/gl/Renderer.h"
 
 #include <cassert>
