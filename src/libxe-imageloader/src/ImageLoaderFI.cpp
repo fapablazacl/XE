@@ -34,6 +34,16 @@ private:
     FIBITMAP *mBitmap = nullptr;
 };
 
+inline std::string str(const FREE_IMAGE_FORMAT format) {
+    switch (format) {
+    case FIF_PNG: return "FIF_PNG";
+    case FIF_JPEG: return "FIF_JPEG";
+    case FIF_UNKNOWN: return "FIF_UNKNOWN";
+    default:
+        return "FREE_IMAGE_FORMAT(" + std::to_string(format) + ")";
+    }
+}
+
 static std::map<std::string, FREE_IMAGE_FORMAT> typeFIOMap = {
     {".png", FIF_PNG},
     {".jpg", FIF_JPEG},
@@ -50,6 +60,15 @@ static FREE_IMAGE_FORMAT mapType(const std::string &type) {
     }
 
     return it->second;
+}
+
+
+static FREE_IMAGE_FORMAT mapType(const ImageFormat &imageFormat) {
+    switch (imageFormat) {
+    case ImageFormat::Png: return FIF_PNG;
+    case ImageFormat::Jpeg: return FIF_JPEG;
+    default: return FIF_UNKNOWN;
+    }
 }
 
 // this will get called whenever a load or save error happens
@@ -101,13 +120,11 @@ std::unique_ptr<Image> ImageLoaderFI::loadImage(const std::string &file) const {
     return std::make_unique<ImageFI>(convertedBitmap);
 }
 
-std::unique_ptr<Image> ImageLoaderFI::loadImage(const void *data, const size_t size, const std::string &compressionFormat) const {
-    XE_LOG_INFO("Loading {} image from memory buffer {}\n", compressionFormat, data);
-
-    FREE_IMAGE_FORMAT imageType = mapType(compressionFormat);
+std::unique_ptr<Image> createImage(const void *data, const size_t size, FREE_IMAGE_FORMAT imageType) {
+    XE_LOG_INFO("Loading {} image from memory buffer {}\n", str(imageType), data);
 
     if (imageType == FIF_UNKNOWN) {
-        XE_LOG_WARNING("Could not recognize the format {}\n", compressionFormat);
+        XE_LOG_WARNING("Could not recognize the format {}\n", str(imageType));
         return {};
     }
 
@@ -115,7 +132,7 @@ std::unique_ptr<Image> ImageLoaderFI::loadImage(const void *data, const size_t s
     FIBITMAP *bitmap = FreeImage_LoadFromMemory(imageType, mem);
 
     if (!bitmap) {
-        XE_LOG_WARNING("Could not load the image with format {}\n", compressionFormat);
+        XE_LOG_WARNING("Could not load the image with format {}\n", str(imageType));
         FreeImage_CloseMemory(mem);
         return {};
     }
@@ -125,4 +142,14 @@ std::unique_ptr<Image> ImageLoaderFI::loadImage(const void *data, const size_t s
     FreeImage_CloseMemory(mem);
 
     return std::make_unique<ImageFI>(convertedBitmap);
+}
+
+std::unique_ptr<Image> ImageLoaderFI::loadImage(const void *data, const size_t size, const std::string &compressionFormat) const {
+    const FREE_IMAGE_FORMAT imageType = mapType(compressionFormat);
+    return createImage(data, size, imageType);
+}
+
+std::unique_ptr<Image> ImageLoaderFI::loadImage(const void *data, const size_t size, const ImageFormat &format) const {
+    const FREE_IMAGE_FORMAT imageType = mapType(format);
+    return createImage(data, size, imageType);
 }

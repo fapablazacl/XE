@@ -1,12 +1,51 @@
 
 #include "GltfDataLoader.h"
 
-GltfTextureLoader::GltfTextureLoader(const xe::gl::RendererGL* renderer) : renderer(renderer) {}
+#include "xe/Logger.h"
+
+GltfTextureLoader::GltfTextureLoader(const xe::gl::RendererGL* renderer, ImageLoader* imageLoader) : renderer(renderer), imageLoader(imageLoader) {}
 
 xe::gl::Texture GltfTextureLoader::createTexture(const xe::gl::RendererGL* renderer, const cgltf_texture_view &textureView) const {
     std::cout << "Creating texture " << sanitizeString(textureView.texture->name) << std::endl;
 
-    return {};
+    const auto mimeType = textureView.texture->image->mime_type;
+    const auto buffer = textureView.texture->image->buffer_view->buffer->data;
+    const auto offset = textureView.texture->image->buffer_view->offset;
+    const auto size = textureView.texture->image->buffer_view->size;
+    const auto imageFormat = parseImageFormat(mimeType);
+
+    if (!imageFormat.has_value()) {
+        std::cerr << "Failed to parse image format " << mimeType << std::endl;
+        return {};
+    }
+
+    auto image = imageLoader->loadImage(addPointerOffset(buffer, offset), size, imageFormat.value());
+    auto imageData = image->getData();
+
+    GLenum internalFormat = GL_RGB;
+    GLenum format = GL_RGB;
+
+    switch (imageData.bpp) {
+    case 24:
+        internalFormat = GL_RGB;
+        format = GL_BGR;
+        break;
+
+    case 32:
+        internalFormat = GL_RGBA;
+        format = GL_BGRA;
+        break;
+    default:
+        XE_LOG_WARNING("TextureRepository::createTexture: Unsupported image bpp {}. Defaulting to GL_RGB\n", imageData.bpp);
+    }
+
+    auto clientImage = xe::gl::ClientTextureImage2D {
+        {imageData.width, imageData.height},
+        format, GL_UNSIGNED_BYTE,
+        imageData.pixels
+    };
+
+    return renderer->createTexture(GL_TEXTURE_2D, internalFormat, clientImage, true, {});
 }
 
 cgltf_data* GltfDataParser::parse(const std::string &filePath) const {

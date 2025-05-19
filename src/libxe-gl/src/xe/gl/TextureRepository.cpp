@@ -57,7 +57,6 @@ GLuint TextureRepository::createTexture(Renderer &renderer, const std::string &i
     return createTexture(renderer, image->getData());
 }
 
-
 GLuint TextureRepository::createTexture(Renderer &renderer, const ImageData &image) const {
     GLenum internalFormat = GL_RGB;
     GLenum format = GL_RGB;

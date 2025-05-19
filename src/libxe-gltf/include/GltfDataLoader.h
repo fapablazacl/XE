@@ -4,9 +4,11 @@
 #include <iostream>
 #include <map>
 
-#include "xe/gl/RendererGL.h"
-#include "cgltf/cgltf.h"
 #include "GltfUtil.h"
+#include "cgltf/cgltf.h"
+#include "xe/ImageLoader.h"
+#include "xe/gl/RendererGL.h"
+#include "xe/graphics/ImageLoader.h"
 
 namespace xe::gl {
     class RendererGL;
@@ -18,12 +20,13 @@ struct GltfMaterial {
 
 class GltfTextureLoader {
 public:
-    GltfTextureLoader(const xe::gl::RendererGL* renderer);
+    GltfTextureLoader(const xe::gl::RendererGL* renderer, ImageLoader* imageLoader);
 
     xe::gl::Texture createTexture(const xe::gl::RendererGL* renderer, const cgltf_texture_view &texture) const;
 
 private:
     const xe::gl::RendererGL* renderer = nullptr;
+    const ImageLoader* imageLoader = nullptr;
 };
 
 // Contains OpenGL objects with data loaded from a gltf mesh

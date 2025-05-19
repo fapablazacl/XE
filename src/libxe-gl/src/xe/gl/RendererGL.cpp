@@ -389,7 +389,7 @@ namespace xe::gl {
     }
 
 
-    Texture RendererGL::createTexture(GLenum target, GLint internalFormat, const ClientTextureImage1D &image, bool generateMipMaps, const tcb::span<TextureParameter> &parameters) const {
+    Texture RendererGL::createTexture(GLenum target, GLenum internalFormat, const ClientTextureImage1D &image, bool generateMipMaps, const tcb::span<TextureParameter> &parameters) const {
         XE_GL_SCOPED_ERROR_CHECK();
 
         GLuint textureId = 0;
@@ -397,7 +397,7 @@ namespace xe::gl {
         glGenTextures(1, &textureId);
         glBindTexture(target, textureId);
 
-        glTexImage1D(target, 0, internalFormat, image.size, 0, image.format, image.type, image.pixels);
+        glTexImage1D(target, 0, static_cast<GLint>(internalFormat), image.size, 0, image.format, image.type, image.pixels);
 
         if (generateMipMaps) {
             glGenerateMipmap(target);
@@ -411,7 +411,7 @@ namespace xe::gl {
     }
 
 
-    Texture RendererGL::createTexture(GLenum target, GLint internalFormat, const ClientTextureImage2D &image, bool generateMipMaps, const tcb::span<TextureParameter> &parameters) const {
+    Texture RendererGL::createTexture(GLenum target, GLenum internalFormat, const ClientTextureImage2D &image, bool generateMipMaps, const tcb::span<TextureParameter> &parameters) const {
         XE_GL_SCOPED_ERROR_CHECK();
 
         GLuint textureId = 0;
@@ -432,7 +432,7 @@ namespace xe::gl {
         return {textureId, target};
     }
 
-    Texture RendererGL::createTexture(GLenum target, GLint internalFormat, const ClientTextureImage3D &image, bool generateMipMaps, const tcb::span<TextureParameter> &parameters) const {
+    Texture RendererGL::createTexture(GLenum target, GLenum internalFormat, const ClientTextureImage3D &image, bool generateMipMaps, const tcb::span<TextureParameter> &parameters) const {
         XE_GL_SCOPED_ERROR_CHECK();
 
         GLuint textureId = 0;

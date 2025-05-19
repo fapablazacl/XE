@@ -250,13 +250,13 @@ namespace xe::gl {
         RendererInfo getInfo() const;
 
         [[nodiscard]]
-        Texture createTexture(GLenum target, GLint internalFormat, const ClientTextureImage1D &image, bool generateMipMaps, const tcb::span<TextureParameter> &parameters) const;
+        Texture createTexture(GLenum target, GLenum internalFormat, const ClientTextureImage1D &image, bool generateMipMaps, const tcb::span<TextureParameter> &parameters) const;
 
         [[nodiscard]]
-        Texture createTexture(GLenum target, GLint internalFormat, const ClientTextureImage2D &image, bool generateMipMaps, const tcb::span<TextureParameter> &parameters) const;
+        Texture createTexture(GLenum target, GLenum internalFormat, const ClientTextureImage2D &image, bool generateMipMaps, const tcb::span<TextureParameter> &parameters) const;
 
         [[nodiscard]]
-        Texture createTexture(GLenum target, GLint internalFormat, const ClientTextureImage3D &image, bool generateMipMaps, const tcb::span<TextureParameter> &parameters) const;
+        Texture createTexture(GLenum target, GLenum internalFormat, const ClientTextureImage3D &image, bool generateMipMaps, const tcb::span<TextureParameter> &parameters) const;
 
         void render(const tcb::span<const CapabilityStatus> &capabilities) const;
 

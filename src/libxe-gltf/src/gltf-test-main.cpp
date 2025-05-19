@@ -8,6 +8,7 @@
 
 #include "GltfDataLoader.h"
 #include "GltfProcessor.h"
+#include "xe/ImageLoader.h"
 #include "xe/math/Matrix.h"
 
 const auto vertexShaderSource = R"(
@@ -80,7 +81,8 @@ int main() {
         return EXIT_FAILURE;
     }
 
-    auto gltfTextureLoader = GltfTextureLoader{renderer.get()};
+    auto imageLoader = createImageLoader();
+    auto gltfTextureLoader = GltfTextureLoader{renderer.get(), imageLoader.get()};
 
     auto gltfLoader = GltfDataLoader{gltfData, renderer.get(), &gltfTextureLoader, program, {
         {"POSITION", ShaderAttrib("vertCoord")},
