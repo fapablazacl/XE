@@ -30,6 +30,26 @@ namespace xe::gl {
         Float, Int, UnsignedInt
     };
 
+    template<typename BasicType> struct MetaUniformTypeMapper {};
+
+    template<> struct MetaUniformTypeMapper<float> {
+        static UniformType map() {
+            return UniformType::Float;
+        }
+    };
+
+    template<> struct MetaUniformTypeMapper<int> {
+        static UniformType map() {
+            return UniformType::Int;
+        }
+    };
+
+    template<> struct MetaUniformTypeMapper<unsigned int> {
+        static UniformType map() {
+            return UniformType::UnsignedInt;
+        }
+    };
+
     enum class UniformDim {
         _1, _2, _3, _4
     };
@@ -114,6 +134,19 @@ namespace xe::gl {
         uniform.transpose = transpose == GL_TRUE;
         uniform.count = 1;
         uniform.data = matrix.data();
+
+        return uniform;
+    }
+
+    template<typename Type>
+    Uniform makeUniform(GLint location, Type &value) {
+        Uniform uniform;
+
+        uniform.location = location;
+        uniform.type = MetaUniformTypeMapper<typename std::remove_const<Type>::type>::map();
+        uniform.dim = UniformDim::_1;
+        uniform.count = 1;
+        uniform.data = &value;
 
         return uniform;
     }
@@ -270,11 +303,12 @@ namespace xe::gl {
 
         void apply(const tcb::span<const UniformMatrix> &uniforms) const;
 
-        void draw(VertexArray vertexArray, GLenum primitiveType, const tcb::span<const VertexArrayPrimitive> &primitives) const;
-
         void draw(VertexArray vertexArray, GLenum primitiveType, const VertexArrayMultiDraw &multiDraw) const;
 
-        void drawIndexed(VertexArray vertexArray, GLenum primitiveType, GLenum dataType, const tcb::span<const VertexArrayPrimitive> &primitives) const;
+        void draw(VertexArray vertexArray, GLenum primitiveType, const tcb::span<const VertexArrayPrimitive> &primitives) const;
+
+        // Draws an indexed geometry
+        void draw(VertexArray vertexArray, GLenum primitiveType, const tcb::span<const VertexArrayPrimitive> &primitives, GLenum dataType) const;
 
         void clear(const ClearParams &params) const;
 

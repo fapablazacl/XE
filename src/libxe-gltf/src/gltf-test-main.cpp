@@ -9,42 +9,90 @@
 #include "GltfDataLoader.h"
 #include "GltfProcessor.h"
 #include "xe/ImageLoader.h"
+#include "xe/Timer.h"
 #include "xe/math/Matrix.h"
 
 const auto vertexShaderSource = R"(
-#version 330
+#version 330 core
 
 uniform mat4 modelViewProj;
+uniform mat4 model;
+
+uniform float seconds;
 
 in vec3 vertCoord;
 in vec3 vertNormal;
+in vec2 vertTexCoord;
 
 out vec4 fragColor;
+out vec2 fragTexCoord;
+
+float fmod(float x, float y) {
+    return x - y * floor(x / y);
+}
+
+float wave(float seconds) {
+    return (cos(seconds) + 1.0) / 2.0 * 0.5 + 0.5;
+}
+
+vec3 computeLightingColour() {
+    return vec3(wave(seconds), wave(seconds + 0.5), wave(seconds - 0.5));
+}
 
 void main() {
-    vec3 lightDirection = normalize(vec3(0.1, 0.3, 0.4));
+    vec3 lightDirection[4];
+    lightDirection[0] = normalize(vec3(0.5, 0.3, 0.4));
+    lightDirection[1] = normalize(vec3(-0.5, 0.3, -0.4));
+    lightDirection[2] = normalize(vec3(0.5, -0.3, 0.4));
+    lightDirection[3] = normalize(vec3(-0.5, -0.3, -0.4));
+
     gl_Position = vec4(vertCoord, 1.0) * modelViewProj;
-    fragColor = vec4(vec3(1.0, 1.0, 1.0) * dot(lightDirection, vertNormal), 1.0);
+
+    vec4 color = vec4(0.0);
+    for (int i = 0; i < 4; i++) {
+        color += vec4(computeLightingColour() * max(dot(lightDirection[i], vertNormal), 0.0), 1.0);
+    }
+    fragColor = color;
+
+    fragTexCoord = vertTexCoord;
 })";
 
 const auto fragmentShaderSource = R"(
-#version 330
+#version 330 core
+
+uniform sampler2D diffuseTexture;
 
 in vec4 fragColor;
+in vec2 fragTexCoord;
 
 out vec4 color;
 
 void main() {
-    color = fragColor;
+    color = fragColor * texture(diffuseTexture, fragTexCoord);
 })";
 
 struct ShaderProgramUniformData {
-    XE::Matrix4 projViewModel;
+    XE::Matrix4 projViewModel = XE::mat4Identity();
+
+    XE::Matrix4 model = XE::mat4Identity();
+
+    // The Texture Unit which contains the diffuse texture
+    GLint diffuseTexture = 0;
+
+    float seconds = 0.0f;
 
     [[nodiscard]]
-    std::array<xe::gl::UniformMatrix, 1> mapUniforms(xe::gl::Program shaderProgram) const {
+    std::vector<xe::gl::UniformMatrix> mapMatrixUniforms(xe::gl::Program shaderProgram) const {
         return {
             xe::gl::makeUniform(shaderProgram.getUniformLocation("modelViewProj"), projViewModel),
+        };
+    }
+
+    [[nodiscard]]
+    std::vector<xe::gl::Uniform> mapUniforms(xe::gl::Program shaderProgram) const {
+        return {
+            xe::gl::makeUniform(shaderProgram.getUniformLocation("diffuseTexture"), diffuseTexture),
+            xe::gl::makeUniform(shaderProgram.getUniformLocation("seconds"), seconds),
         };
     }
 };
@@ -86,7 +134,8 @@ int main() {
 
     auto gltfLoader = GltfDataLoader{gltfData, renderer.get(), &gltfTextureLoader, program, {
         {"POSITION", ShaderAttrib("vertCoord")},
-        {"NORMAL", ShaderAttrib{"vertNormal"}}
+        {"NORMAL", ShaderAttrib{"vertNormal"}},
+        {"TEXCOORD_0", ShaderAttrib{"vertTexCoord"}}
     }};
 
     const auto meshes = gltfLoader.loadAllMeshes();
@@ -103,7 +152,11 @@ int main() {
 
     ShaderProgramUniformData uniformData;
 
+    const float startSeconds = static_cast<float>(XE::Timer::getTick()) / 1000.0f;
+
     while (running) {
+        uniformData.seconds = (static_cast<float>(XE::Timer::getTick()) / 1000.0f) - startSeconds;
+
         const InputState inputState = platform.pollInputState();
         running = !inputState.keyEscPress;
 
@@ -111,6 +164,7 @@ int main() {
         const auto view = XE::mat4LookAtRH({0.0f, 0.0f, -25.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f});
         const auto model = XE::mat4RotationY(angle += 0.005f);
 
+        uniformData.model = model;
         uniformData.projViewModel = proj * view * model;
 
         const std::vector<xe::gl::CapabilityStatus> renderState = {
@@ -123,20 +177,26 @@ int main() {
         renderer->clear(GL_DEPTH_BUFFER_BIT);
         renderer->useProgram(program);
 
-        const auto uniforms = uniformData.mapUniforms(program);
-        renderer->apply(uniforms);
+        renderer->apply(uniformData.mapUniforms(program));
+        renderer->apply(uniformData.mapMatrixUniforms(program));
 
         for (const auto &mesh : meshes) {
-            for (const auto &primitive: mesh.primitives) {
+            for (const auto &meshSubset: mesh.primitives) {
                 const xe::gl::VertexArrayPrimitive prims [] = {
-                    {0, primitive.count}
+                    {0, meshSubset.count}
                 };
 
-                if (primitive.indexBuffer.id) {
-                    renderer->drawIndexed(primitive.vao, primitive.primitive, primitive.indexType, prims);
+                xe::gl::TextureLayer layer;
+                layer.texture = meshSubset.material.texture;
+
+                glActiveTexture(GL_TEXTURE0);
+                renderer->render({&layer, 1});
+
+                if (meshSubset.indexData.has_value()) {
+                    renderer->draw(meshSubset.vao, meshSubset.primitive, prims, meshSubset.indexData->type);
                 }
                 else {
-                    renderer->draw(primitive.vao, primitive.primitive, prims);
+                    renderer->draw(meshSubset.vao, meshSubset.primitive, prims);
                 }
             }
         }

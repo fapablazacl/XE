@@ -104,11 +104,13 @@ GltfMeshPrimitive GltfDataLoader::createMeshPrimitive(const cgltf_primitive &pri
     GltfMeshPrimitive meshPrimitive;
     meshPrimitive.primitive = primitiveType;
     meshPrimitive.vertexBuffer = vertexBuffer;
-    meshPrimitive.indexBuffer = indexBuffer;
-    meshPrimitive.indexType = indexType;
     meshPrimitive.vao = vao;
     meshPrimitive.count = count;
     meshPrimitive.material.texture = textureLoader->createTexture(renderer, primitive.material->pbr_metallic_roughness.base_color_texture);
+
+    if (indexBuffer.id != 0) {
+        meshPrimitive.indexData = {indexBuffer, indexType};
+    }
 
     return meshPrimitive;
 }

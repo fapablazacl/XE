@@ -175,7 +175,7 @@ namespace xe::gl {
 
         if (status == static_cast<GLint>(GL_FALSE)) {
             constexpr size_t INFO_LOG_BUFFER_SIZE = 4096;
-            std::cerr << "Error while creating shader " << type << ": ";
+            std::cerr << "Error while creating shader " << type << ": " << std::endl;
 
             char msg[INFO_LOG_BUFFER_SIZE] = {};
             glGetShaderInfoLog(shaderId, INFO_LOG_BUFFER_SIZE, nullptr, msg);
@@ -311,7 +311,7 @@ namespace xe::gl {
         glMultiDrawArrays(primitiveType, multiDraw.start, multiDraw.count, multiDraw.drawCount);
     }
 
-    void RendererGL::drawIndexed(VertexArray vertexArray, GLenum primitiveType, GLenum dataType, const tcb::span<const VertexArrayPrimitive> &primitives) const {
+    void RendererGL::draw(VertexArray vertexArray, GLenum primitiveType, const tcb::span<const VertexArrayPrimitive> &primitives, GLenum dataType) const {
         XE_GL_SCOPED_ERROR_CHECK();
 
         glBindVertexArray(vertexArray.id);

@@ -29,6 +29,11 @@ private:
     const ImageLoader* imageLoader = nullptr;
 };
 
+struct GltfIndexData {
+    xe::gl::Buffer buffer;
+    GLenum type = GL_UNSIGNED_INT;
+};
+
 // Contains OpenGL objects with data loaded from a gltf mesh
 struct GltfMeshPrimitive {
     // TODO: this should be a reference / pointer.
@@ -36,10 +41,9 @@ struct GltfMeshPrimitive {
 
     xe::gl::VertexArray vao;
     xe::gl::Buffer vertexBuffer;
-    xe::gl::Buffer indexBuffer;
     GLenum primitive = GL_NONE;
     GLsizei count = 0;
-    GLenum indexType = GL_UNSIGNED_INT;
+    std::optional<GltfIndexData> indexData;
 };
 
 struct GltfMesh {
