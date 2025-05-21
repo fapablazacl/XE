@@ -187,8 +187,6 @@ int main() {
 
                 xe::gl::TextureLayer layer;
                 layer.texture = meshSubset.material.texture;
-
-                glActiveTexture(GL_TEXTURE0);
                 renderer->bindRenderState({&layer, 1});
 
                 if (meshSubset.indexData.has_value()) {
