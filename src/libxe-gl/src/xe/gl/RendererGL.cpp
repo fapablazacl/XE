@@ -482,38 +482,22 @@ namespace xe::gl {
         }
     }
 
-    void RendererGL::clear(const ClearParams &params) const {
-        XE_GL_SCOPED_ERROR_CHECK();
-
-        GLenum clearFlags = {};
-
-        if (params.colour) {
-            const auto &color = params.colour.value();
-
-            clearFlags |= GL_COLOR_BUFFER_BIT;
-            glClearColor(color.X, color.Y, color.Z, color.W);
+    void RendererGL::clear(const GLenum flags, std::optional<XE::Vector4> color, std::optional<float> depth, std::optional<int> stencil) const {
+        if (color.has_value()) {
+            glClearColor(color->X, color->Y, color->Z, color->W);
         }
 
-        if (params.depth) {
-            const auto &depth = params.depth.value();
-
-            clearFlags |= GL_DEPTH_BUFFER_BIT;
-            glClearDepthf(depth);
+        if (depth.has_value()) {
+            glClearDepthf(depth.value());
         }
 
-        if (params.stencil) {
-            const auto &stencil = params.stencil.value();
-
-            clearFlags |= GL_DEPTH_BUFFER_BIT;
-            glClearStencil(stencil);
+        if (stencil.has_value()) {
+            glClearStencil(stencil.value());
         }
 
-        glClear(clearFlags);
-    }
-
-    void RendererGL::clear(const GLenum flags) const {
-        XE_GL_SCOPED_ERROR_CHECK();
         glClear(flags);
+
+        XE_GL_SCOPED_ERROR_CHECK();
     }
 
     void RendererGL::flush() const {

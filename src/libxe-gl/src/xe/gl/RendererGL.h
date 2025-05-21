@@ -201,22 +201,12 @@ namespace xe::gl {
         tcb::span<TextureParameter> parameters;
     };
 
+    enum class ClearFlags { Color = 0x01, Depth = 0x02, Stencil = 0x04 };
+
     struct ClearParams {
-        std::optional<XE::Vector4> colour;
+        std::optional<XE::Vector4> color;
         std::optional<float> depth;
-        std::optional<float> stencil;
-
-        ClearParams& color(const XE::Vector4 &value) {
-            colour = value;
-            return *this;
-        }
-
-        ClearParams& depthX(const float value) {
-            depth = value;
-            return *this;
-        }
-
-        explicit operator bool() const { return colour || depth || stencil; }
+        std::optional<int> stencil;
     };
 
     struct ClientTextureImage1D {
@@ -310,9 +300,7 @@ namespace xe::gl {
         // Draws an indexed geometry
         void draw(VertexArray vertexArray, GLenum primitiveType, const tcb::span<const VertexArrayPrimitive> &primitives, GLenum dataType) const;
 
-        void clear(const ClearParams &params) const;
-
-        void clear(const GLenum flags) const;
+        void clear(const GLenum flags, std::optional<XE::Vector4> color, std::optional<float> depth, std::optional<int> stencil) const;
 
         void flush() const;
 

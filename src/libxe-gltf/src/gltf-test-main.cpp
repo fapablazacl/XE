@@ -173,8 +173,7 @@ int main() {
         };
 
         renderer->render(renderState);
-        renderer->clear(xe::gl::ClearParams().color({0.2f, 0.2f, 0.8f, 1.0f}));
-        renderer->clear(GL_DEPTH_BUFFER_BIT);
+        renderer->clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, XE::Vector4{0.2f, 0.2f, 0.8f, 1.0f}, {}, {});
         renderer->useProgram(program);
 
         renderer->apply(uniformData.mapUniforms(program));

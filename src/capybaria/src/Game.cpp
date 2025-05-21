@@ -159,11 +159,7 @@ void Game::render() {
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LEQUAL);
 
-    xe::gl::ClearParams clearParams;
-    clearParams.colour = {0.0f, 0.0f, 0.0f, 1.0f};
-    clearParams.depth = 1.0f;
-    renderer->clear(clearParams);
-
+    renderer->clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, XE::Vector4{0.0f, 0.0f, 0.0f, 1.0f}, {1.0f}, {});
     renderer->viewport({0, 0}, {SCREEN_WIDTH, SCREEN_HEIGHT});
 
     renderer->useProgram(program);
