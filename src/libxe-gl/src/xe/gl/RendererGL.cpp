@@ -299,7 +299,7 @@ namespace xe::gl {
 
         for (const auto &primitive : primitives) {
             assert(primitive.count > 0);
-            apply(primitive.attribs);
+            bindRenderState(primitive.attribs);
             glDrawArrays(primitiveType, primitive.start, primitive.count);
         }
     }
@@ -319,13 +319,13 @@ namespace xe::gl {
         for (const auto &primitive : primitives) {
             const auto indices = reinterpret_cast<const void*>(primitive.start);
 
-            apply(primitive.attribs);
+            bindRenderState(primitive.attribs);
 
             glDrawElements(primitiveType, primitive.count, dataType, indices);
         }
     }
 
-    void RendererGL::apply(const tcb::span<const Attribute> &attribs) const {
+    void RendererGL::bindRenderState(const tcb::span<const Attribute> &attribs) const {
         XE_GL_SCOPED_ERROR_CHECK();
 
         for (const auto &attrib : attribs) {
@@ -343,7 +343,7 @@ namespace xe::gl {
         }
     }
 
-    void RendererGL::apply(const tcb::span<const Uniform> &uniforms) const {
+    void RendererGL::bindRenderState(const tcb::span<const Uniform> &uniforms) const {
         XE_GL_SCOPED_ERROR_CHECK();
 
         for (const auto &uniform : uniforms) {
@@ -366,7 +366,7 @@ namespace xe::gl {
         }
     }
 
-    void RendererGL::apply(const tcb::span<const UniformMatrix> &uniforms) const {
+    void RendererGL::bindRenderState(const tcb::span<const UniformMatrix> &uniforms) const {
         XE_GL_SCOPED_ERROR_CHECK();
 
         for (const auto &[location, type, dim, transpose, count, data] : uniforms) {
@@ -389,7 +389,7 @@ namespace xe::gl {
     }
 
 
-    Texture RendererGL::createTexture(GLenum target, GLenum internalFormat, const ClientTextureImage1D &image, bool generateMipMaps, const tcb::span<TextureParameter> &parameters) const {
+    Texture RendererGL::createTexture(GLenum target, GLenum internalFormat, const ClientTextureImage1D &image, const CreateTextureOptions &options) const {
         XE_GL_SCOPED_ERROR_CHECK();
 
         GLuint textureId = 0;
@@ -399,11 +399,11 @@ namespace xe::gl {
 
         glTexImage1D(target, 0, static_cast<GLint>(internalFormat), image.size, 0, image.format, image.type, image.pixels);
 
-        if (generateMipMaps) {
+        if (options.flags & GenerateMipMaps) {
             glGenerateMipmap(target);
         }
 
-        render(target, parameters);
+        bindRenderState(target, options.parameters);
 
         glBindTexture(target, 0);
 
@@ -411,7 +411,7 @@ namespace xe::gl {
     }
 
 
-    Texture RendererGL::createTexture(GLenum target, GLenum internalFormat, const ClientTextureImage2D &image, bool generateMipMaps, const tcb::span<TextureParameter> &parameters) const {
+    Texture RendererGL::createTexture(GLenum target, GLenum internalFormat, const ClientTextureImage2D &image, const CreateTextureOptions &options ) const {
         XE_GL_SCOPED_ERROR_CHECK();
 
         GLuint textureId = 0;
@@ -421,18 +421,18 @@ namespace xe::gl {
 
         glTexImage2D(target, 0, internalFormat, image.size.X, image.size.Y, 0, image.format, image.type, image.pixels);
 
-        if (generateMipMaps) {
+        if (options.flags & GenerateMipMaps) {
             glGenerateMipmap(target);
         }
 
-        render(target, parameters);
+        bindRenderState(target, options.parameters);
 
         glBindTexture(target, 0);
 
         return {textureId, target};
     }
 
-    Texture RendererGL::createTexture(GLenum target, GLenum internalFormat, const ClientTextureImage3D &image, bool generateMipMaps, const tcb::span<TextureParameter> &parameters) const {
+    Texture RendererGL::createTexture(GLenum target, GLenum internalFormat, const ClientTextureImage3D &image, const CreateTextureOptions &options) const {
         XE_GL_SCOPED_ERROR_CHECK();
 
         GLuint textureId = 0;
@@ -442,26 +442,26 @@ namespace xe::gl {
 
         glTexImage3D(target, 0, internalFormat, image.size.X, image.size.Y, image.size.Z, 0, image.format, image.type, image.pixels);
 
-        if (generateMipMaps) {
+        if (options.flags & GenerateMipMaps) {
             glGenerateMipmap(target);
         }
 
-        render(target, parameters);
+        bindRenderState(target, options.parameters);
 
         glBindTexture(target, 0);
 
         return {textureId, target};
     }
 
-    void RendererGL::render(GLenum target, const tcb::span<const TextureParameter> &parameters) const {
+    void RendererGL::bindRenderState(GLenum textureTarget, const tcb::span<const TextureParameter> &parameters) const {
         XE_GL_SCOPED_ERROR_CHECK();
 
         for (const auto &parameter : parameters) {
-            glTexParameteri(target, parameter.param, parameter.value);
+            glTexParameteri(textureTarget, parameter.param, parameter.value);
         }
     }
 
-    void RendererGL::render(const tcb::span<const CapabilityStatus> &capabilities) const {
+    void RendererGL::bindRenderState(const tcb::span<const CapabilityStatus> &capabilities) const {
         XE_GL_SCOPED_ERROR_CHECK();
 
         for (const auto &[capability, enabled] : capabilities) {
@@ -469,7 +469,7 @@ namespace xe::gl {
         }
     }
 
-    void RendererGL::render(const tcb::span<const TextureLayer> &layers) const {
+    void RendererGL::bindRenderState(const tcb::span<const TextureLayer> &layers) const {
         XE_GL_SCOPED_ERROR_CHECK();
 
         for (uint32_t i = 0; i < layers.size(); i++) {
@@ -478,7 +478,7 @@ namespace xe::gl {
             glActiveTexture(GL_TEXTURE0 + i);
             glBindTexture(layer.texture.target, layer.texture.id);
 
-            render(layer.texture.target, layer.parameters);
+            bindRenderState(layer.texture.target, layer.parameters);
         }
     }
 

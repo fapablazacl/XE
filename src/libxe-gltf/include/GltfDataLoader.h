@@ -16,6 +16,7 @@ namespace xe::gl {
 
 struct GltfMaterial {
     xe::gl::Texture texture;
+    std::vector<xe::gl::TextureParameter> parameters;
 };
 
 class GltfTextureLoader {

@@ -230,8 +230,6 @@ namespace xe::gl {
         const void *pixels = nullptr;
     };
 
-
-
     class Context;
 
     // -- Low Priority --
@@ -240,6 +238,16 @@ namespace xe::gl {
     // TODO: Add 2d texture support
     // TODO: Add cubemap texture support
     // TODO: Define Mixin classes to support both manual and automatic resource management
+
+    enum CreateTextureFlags {
+        None = 0x0,
+        GenerateMipMaps = 0x1,
+    };
+
+    struct CreateTextureOptions {
+        CreateTextureFlags flags = None;
+        tcb::span<TextureParameter> parameters;
+    };
 
     /**
      * @brief Wrapper to OpenGL 3+ APIs
@@ -273,25 +281,25 @@ namespace xe::gl {
         RendererInfo getInfo() const;
 
         [[nodiscard]]
-        Texture createTexture(GLenum target, GLenum internalFormat, const ClientTextureImage1D &image, bool generateMipMaps, const tcb::span<TextureParameter> &parameters) const;
+        Texture createTexture(GLenum target, GLenum internalFormat, const ClientTextureImage1D &image, const CreateTextureOptions &options = {}) const;
 
         [[nodiscard]]
-        Texture createTexture(GLenum target, GLenum internalFormat, const ClientTextureImage2D &image, bool generateMipMaps, const tcb::span<TextureParameter> &parameters) const;
+        Texture createTexture(GLenum target, GLenum internalFormat, const ClientTextureImage2D &image, const CreateTextureOptions &options = {}) const;
 
         [[nodiscard]]
-        Texture createTexture(GLenum target, GLenum internalFormat, const ClientTextureImage3D &image, bool generateMipMaps, const tcb::span<TextureParameter> &parameters) const;
+        Texture createTexture(GLenum target, GLenum internalFormat, const ClientTextureImage3D &image, const CreateTextureOptions &options = {}) const;
 
-        void render(const tcb::span<const CapabilityStatus> &capabilities) const;
+        void bindRenderState(const tcb::span<const CapabilityStatus> &capabilities) const;
 
-        void render(const tcb::span<const TextureLayer> &layers) const;
+        void bindRenderState(const tcb::span<const TextureLayer> &layers) const;
 
-        void render(GLenum target, const tcb::span<const TextureParameter> &parameters) const;
+        void bindRenderState(GLenum textureTarget, const tcb::span<const TextureParameter> &parameters) const;
 
-        void apply(const tcb::span<const Attribute> &attribs) const;
+        void bindRenderState(const tcb::span<const Attribute> &attribs) const;
 
-        void apply(const tcb::span<const Uniform> &uniforms) const;
+        void bindRenderState(const tcb::span<const Uniform> &uniforms) const;
 
-        void apply(const tcb::span<const UniformMatrix> &uniforms) const;
+        void bindRenderState(const tcb::span<const UniformMatrix> &uniforms) const;
 
         void draw(VertexArray vertexArray, GLenum primitiveType, const VertexArrayMultiDraw &multiDraw) const;
 

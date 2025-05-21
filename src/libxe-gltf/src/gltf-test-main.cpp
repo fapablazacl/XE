@@ -172,12 +172,12 @@ int main() {
             {GL_CULL_FACE, GL_TRUE}
         };
 
-        renderer->render(renderState);
+        renderer->bindRenderState(renderState);
         renderer->clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, XE::Vector4{0.2f, 0.2f, 0.8f, 1.0f}, {}, {});
         renderer->useProgram(program);
 
-        renderer->apply(uniformData.mapUniforms(program));
-        renderer->apply(uniformData.mapMatrixUniforms(program));
+        renderer->bindRenderState(uniformData.mapUniforms(program));
+        renderer->bindRenderState(uniformData.mapMatrixUniforms(program));
 
         for (const auto &mesh : meshes) {
             for (const auto &meshSubset: mesh.primitives) {
@@ -189,7 +189,7 @@ int main() {
                 layer.texture = meshSubset.material.texture;
 
                 glActiveTexture(GL_TEXTURE0);
-                renderer->render({&layer, 1});
+                renderer->bindRenderState({&layer, 1});
 
                 if (meshSubset.indexData.has_value()) {
                     renderer->draw(meshSubset.vao, meshSubset.primitive, prims, meshSubset.indexData->type);

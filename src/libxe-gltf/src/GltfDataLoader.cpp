@@ -45,7 +45,19 @@ xe::gl::Texture GltfTextureLoader::createTexture(const xe::gl::RendererGL* rende
         imageData.pixels
     };
 
-    return renderer->createTexture(GL_TEXTURE_2D, internalFormat, clientImage, true, {});
+    xe::gl::CreateTextureOptions options;
+    options.flags = xe::gl::GenerateMipMaps;
+
+    std::vector<xe::gl::TextureParameter> parameters;
+    if (auto *sampler = textureView.texture->sampler; sampler) {
+        parameters.push_back({GL_TEXTURE_MAG_FILTER, sampler->mag_filter});
+        parameters.push_back({GL_TEXTURE_MIN_FILTER, sampler->min_filter});
+        parameters.push_back({GL_TEXTURE_WRAP_S, sampler->wrap_s});
+        parameters.push_back({GL_TEXTURE_WRAP_T, sampler->wrap_t});
+        options.parameters = parameters;
+    }
+
+    return renderer->createTexture(GL_TEXTURE_2D, internalFormat, clientImage, options);
 }
 
 cgltf_data* GltfDataParser::parse(const std::string &filePath) const {
@@ -106,6 +118,7 @@ GltfMeshPrimitive GltfDataLoader::createMeshPrimitive(const cgltf_primitive &pri
     meshPrimitive.vertexBuffer = vertexBuffer;
     meshPrimitive.vao = vao;
     meshPrimitive.count = count;
+
     meshPrimitive.material.texture = textureLoader->createTexture(renderer, primitive.material->pbr_metallic_roughness.base_color_texture);
 
     if (indexBuffer.id != 0) {
