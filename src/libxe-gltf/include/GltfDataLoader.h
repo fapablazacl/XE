@@ -89,6 +89,8 @@ public:
 
     std::vector<GltfMesh> loadAllMeshes();
 
+    void loadAllAnimations();
+
 private:
     GltfMeshPrimitive createMeshPrimitive(const cgltf_primitive &primitive);
 

@@ -138,6 +138,8 @@ int main() {
         {"TEXCOORD_0", ShaderAttrib{"vertTexCoord"}}
     }};
 
+    gltfLoader.loadAllAnimations();
+
     const auto meshes = gltfLoader.loadAllMeshes();
 
     if (meshes.empty()) {
@@ -172,8 +174,11 @@ int main() {
             {GL_CULL_FACE, GL_TRUE}
         };
 
+        const auto clearFlags = GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT;
+        const auto clearColor = XE::Vector4{0.2f, 0.2f, 0.8f, 1.0f};
+
         renderer->bindRenderState(renderState);
-        renderer->clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, XE::Vector4{0.2f, 0.2f, 0.8f, 1.0f}, {}, {});
+        renderer->clear(clearFlags, clearColor, {}, {});
         renderer->useProgram(program);
 
         renderer->bindRenderState(uniformData.mapUniforms(program));

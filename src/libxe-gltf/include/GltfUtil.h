@@ -95,6 +95,36 @@ inline std::ostream& operator<<(std::ostream& os, cgltf_component_type type) {
     return os << to_string(type);
 }
 
+inline std::string to_string(cgltf_interpolation_type type) {
+    switch (type) {
+    case cgltf_interpolation_type_linear: return "cgltf_interpolation_type_linear";
+    case cgltf_interpolation_type_step: return "cgltf_interpolation_type_step";
+    case cgltf_interpolation_type_cubic_spline: return "cgltf_interpolation_type_cubic_spline";
+    }
+
+    return "<unknown internpolation_type>";
+}
+
+inline std::ostream& operator<<(std::ostream& os, cgltf_interpolation_type type) {
+    return os << to_string(type);
+}
+
+inline std::string to_string(cgltf_animation_path_type type) {
+    switch (type) {
+    case cgltf_animation_path_type_invalid: return "cgltf_animation_path_type_invalid";
+    case cgltf_animation_path_type_translation: return "cgltf_animation_path_type_translation";
+    case cgltf_animation_path_type_rotation: return "cgltf_animation_path_type_rotation";
+    case cgltf_animation_path_type_scale: return "cgltf_animation_path_type_scale";
+    case cgltf_animation_path_type_weights: return "cgltf_animation_path_type_weights";
+    }
+
+    return "<unknown internpolation_type>";
+}
+
+inline std::ostream& operator<<(std::ostream& os, cgltf_animation_path_type type) {
+    return os << to_string(type);
+}
+
 inline std::string evaluate_name(const char* name) {
     if (name) {
         return name;

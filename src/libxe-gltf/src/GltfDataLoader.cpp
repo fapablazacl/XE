@@ -5,6 +5,22 @@
 
 GltfTextureLoader::GltfTextureLoader(const xe::gl::RendererGL* renderer, ImageLoader* imageLoader) : renderer(renderer), imageLoader(imageLoader) {}
 
+inline std::optional<GLenum> mapBppToFormat(const int bpp) {
+    switch (bpp) {
+    case 24: return GL_BGR;
+    case 32: return GL_BGRA;
+    default: return {};
+    }
+}
+
+inline std::optional<GLenum> mapBppToInternalFormat(const int bpp) {
+    switch (bpp) {
+    case 24: return GL_RGB;
+    case 32: return GL_RGBA;
+    default: return {};
+    }
+}
+
 xe::gl::Texture GltfTextureLoader::createTexture(const xe::gl::RendererGL* renderer, const cgltf_texture_view &textureView) const {
     std::cout << "Creating texture " << sanitizeString(textureView.texture->name) << std::endl;
 
@@ -22,26 +38,17 @@ xe::gl::Texture GltfTextureLoader::createTexture(const xe::gl::RendererGL* rende
     auto image = imageLoader->loadImage(addPointerOffset(buffer, offset), size, imageFormat.value());
     auto imageData = image->getData();
 
-    GLenum internalFormat = GL_RGB;
-    GLenum format = GL_RGB;
+    const std::optional<GLenum> internalFormat = mapBppToInternalFormat(imageData.bpp);
+    const std::optional<GLenum> format = mapBppToFormat(imageData.bpp);
 
-    switch (imageData.bpp) {
-    case 24:
-        internalFormat = GL_RGB;
-        format = GL_BGR;
-        break;
-
-    case 32:
-        internalFormat = GL_RGBA;
-        format = GL_BGRA;
-        break;
-    default:
-        XE_LOG_WARNING("TextureRepository::createTexture: Unsupported image bpp {}. Defaulting to GL_RGB\n", imageData.bpp);
+    if (!internalFormat.has_value() || !format.has_value()) {
+        XE_LOG_ERROR("TextureRepository::createTexture: Unsupported image bpp {}. Defaulting to GL_RGB\n", imageData.bpp);
+        return {};
     }
 
     auto clientImage = xe::gl::ClientTextureImage2D {
         {imageData.width, imageData.height},
-        format, GL_UNSIGNED_BYTE,
+        *format, GL_UNSIGNED_BYTE,
         imageData.pixels
     };
 
@@ -57,7 +64,7 @@ xe::gl::Texture GltfTextureLoader::createTexture(const xe::gl::RendererGL* rende
         options.parameters = parameters;
     }
 
-    return renderer->createTexture(GL_TEXTURE_2D, internalFormat, clientImage, options);
+    return renderer->createTexture(GL_TEXTURE_2D, *internalFormat, clientImage, options);
 }
 
 cgltf_data* GltfDataParser::parse(const std::string &filePath) const {
@@ -96,6 +103,34 @@ std::vector<GltfMesh> GltfDataLoader::loadAllMeshes() {
     }
 
     return meshes;
+}
+
+void process_animation(cgltf_animation *animation) {
+    std::cout << "Animation name: " << evaluate_name(animation->name) << std::endl;
+    std::cout << "Animation samplers count: " << animation->samplers_count << std::endl;
+    std::cout << "Animation channels count: " << animation->channels_count << std::endl;
+    std::cout << "Animation extensions count: " << animation->extensions_count << std::endl;
+
+    for (int i = 0; i < animation->samplers_count; i++) {
+        const auto sampler = animation->samplers + i;
+        std::cout << "Animation Sampler Intepolation Type " << sampler->interpolation << std::endl;
+    }
+    std::cout << std::endl;
+
+    for (int i = 0; i < animation->channels_count; i++) {
+        const auto channel = animation->channels + i;
+        std::cout << "Animation Channel Target Path " << channel->target_path << std::endl;
+    }
+    std::cout << std::endl;
+}
+
+void GltfDataLoader::loadAllAnimations() {
+    std::cout << "Found " << data->animations_count << " animations" << std::endl;
+    for (cgltf_size i = 0; i < data->animations_count; i++) {
+        process_animation(data->animations + i);
+        std::cout << std::endl;
+    }
+    std::cout << std::endl;
 }
 
 GltfMeshPrimitive GltfDataLoader::createMeshPrimitive(const cgltf_primitive &primitive) {
