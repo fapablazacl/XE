@@ -1,7 +1,5 @@
 
-hunter_add_package(glfw)
 find_package(glfw3 CONFIG REQUIRED)
-
 find_package(Vulkan 1.2 REQUIRED)
 
 set (target "vulkan-app-poc")

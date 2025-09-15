@@ -5,7 +5,7 @@
 #include <vector>
 #include "xe/graphics/Image.h"
 #include "xe/io/Stream.h"
-#include "LodePNG/lodepng.h"
+#include "lodepng.h"
 
 namespace XE {
     class ImagePNG : public Image {

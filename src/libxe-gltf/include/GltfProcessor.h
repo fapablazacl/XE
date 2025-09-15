@@ -4,7 +4,7 @@
 #include <iostream>
 
 #include "xe/gl/RendererGL.h"
-#include "cgltf/cgltf.h"
+#include "cgltf.h"
 #include "GltfUtil.h"
 
 namespace xe::gl {

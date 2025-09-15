@@ -1,5 +1,4 @@
 
-hunter_add_package(glfw)
 find_package(glfw3 REQUIRED)
 
 set (target XE.App)

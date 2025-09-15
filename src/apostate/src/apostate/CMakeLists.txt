@@ -1,17 +1,7 @@
 
-find_package(Assimp)
-if (NOT Assimp_FOUND)
-    MESSAGE(WARNING "Host Assimp not found. Managing it via Hunter")
-    hunter_add_package(Assimp)
-    find_package(Assimp REQUIRED)
-endif()
-
-hunter_add_package(glfw)
+find_package(Assimp REQUIRED)
 find_package(glfw3 REQUIRED)
-
-hunter_add_package(nlohmann_json)
 find_package(nlohmann_json REQUIRED)
-
 find_package(FreeImage REQUIRED)
 
 set (target apostate)

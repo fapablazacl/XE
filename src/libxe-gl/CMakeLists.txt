@@ -1,12 +1,8 @@
 
-hunter_add_package(Microsoft.GSL)
 find_package(Microsoft.GSL CONFIG REQUIRED)
-
-hunter_add_package(fmt)
 find_package(fmt CONFIG REQUIRED)
-
-hunter_add_package(glm)
 find_package(glm REQUIRED)
+find_package(glfw3 CONFIG REQUIRED)
 
 add_subdirectory("dependencies/glad-gl4")
 
@@ -66,7 +62,8 @@ target_link_libraries (${target}
 	PUBLIC glad-gl4
 	PRIVATE XE.Interface
 	PUBLIC fmt::fmt
-	PUBLIC glm
+	PUBLIC glm::glm
+	PUBLIC glfw
 )
 
 if (XE_DEV_UNIT_TEST)

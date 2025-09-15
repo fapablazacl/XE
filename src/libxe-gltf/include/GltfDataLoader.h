@@ -5,7 +5,7 @@
 #include <map>
 
 #include "GltfUtil.h"
-#include "cgltf/cgltf.h"
+#include "cgltf.h"
 #include "xe/ImageLoader.h"
 #include "xe/gl/RendererGL.h"
 #include "xe/graphics/ImageLoader.h"

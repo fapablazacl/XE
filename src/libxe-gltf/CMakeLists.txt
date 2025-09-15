@@ -1,8 +1,5 @@
 
-hunter_add_package(cgltf)
 find_package(cgltf CONFIG REQUIRED)
-
-hunter_add_package(glfw)
 find_package(glfw3 REQUIRED)
 
 set (target gltf-test)
