@@ -1,6 +1,7 @@
 
 #include <stdexcept>
 #include <array>
+#include <filesystem>
 
 #include "fmt/printf.h"
 #include "xe/app/Platform.h"
@@ -97,10 +98,15 @@ struct ShaderProgramUniformData {
     }
 };
 
+std::string getAssetPath(const std::string &path) {
+    return std::filesystem::path{XE_EXTERNAL_ASSET_ROOT_PATH} / path;
+}
+
 int main() {
     const int SCREEN_WIDTH = 640;
     const int SCREEN_HEIGHT = 480;
-    const char* filePath = "/Users/fapablaza/Dropbox/GameDev/Capybaria/raw-assets/models/capybara-01/capybara.glb";
+
+    const std::string filePath = getAssetPath("GameDev/Capybaria/raw-assets/models/capybara-01/capybara.glb");
 
     Platform platform;
     if (!platform.initialize("gltf viewer", SCREEN_WIDTH, SCREEN_HEIGHT)) {
