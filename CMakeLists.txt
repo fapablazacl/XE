@@ -24,7 +24,7 @@ option (XE_DEV_PRECOMPILED_HEADERS  "Enable precompiled headers for internal lib
 option (XE_DEV_LINT_CLANG_TIDY      "Enable linting checks with clang-tidy" OFF)
 option (XE_DEV_IWYU                 "Enable include checks with IWYU" OFF)
 
-set (CMAKE_CXX_STANDARD             17)
+set (CMAKE_CXX_STANDARD             20)
 set (CMAKE_CXX_STANDARD_REQUIRED    ON)
 set (CMAKE_CXX_EXTENSIONS           OFF)
 
