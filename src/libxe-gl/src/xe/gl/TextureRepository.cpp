@@ -1,10 +1,9 @@
 
 #include "TextureRepository.h"
 
-#include "../../../../apostate/src/apostate/Image.h"
-#include "../../../../apostate/src/apostate/ImageLoader.h"
-#include "../../../../apostate/src/apostate/Logger.h"
-
+#include "xe/Image.h"
+#include "xe/ImageLoader.h"
+#include "xe/Logger.h"
 #include "xe/gl/Renderer.h"
 
 #include <cassert>
@@ -57,7 +56,6 @@ GLuint TextureRepository::createTexture(Renderer &renderer, const std::string &i
     const auto image = loader.loadImage(imageData, size, imageTypeStr);
     return createTexture(renderer, image->getData());
 }
-
 
 GLuint TextureRepository::createTexture(Renderer &renderer, const ImageData &image) const {
     GLenum internalFormat = GL_RGB;

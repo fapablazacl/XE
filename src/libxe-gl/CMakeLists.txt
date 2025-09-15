@@ -1,12 +1,8 @@
 
-hunter_add_package(Microsoft.GSL)
 find_package(Microsoft.GSL CONFIG REQUIRED)
-
-hunter_add_package(fmt)
 find_package(fmt CONFIG REQUIRED)
-
-hunter_add_package(glm)
 find_package(glm REQUIRED)
+find_package(glfw3 CONFIG REQUIRED)
 
 add_subdirectory("dependencies/glad-gl4")
 
@@ -62,10 +58,12 @@ endif()
 target_include_directories (${target} PUBLIC "src")
 target_link_libraries (${target} 
 	PUBLIC XE.Core
+		PUBLIC libxe-imageloader
 	PUBLIC glad-gl4
 	PRIVATE XE.Interface
 	PUBLIC fmt::fmt
-	PUBLIC glm
+	PUBLIC glm::glm
+	PUBLIC glfw
 )
 
 if (XE_DEV_UNIT_TEST)

@@ -1,4 +1,6 @@
 
+find_package(fmt CONFIG REQUIRED)
+
 set (target "XE.Core")
 
 set (headers 
@@ -9,6 +11,7 @@ set (headers
 	"src/xe/Core.h"
 	"src/xe/Timer.h"
 	"src/xe/FPSCounter.h"
+	"src/xe/Logger.h"
 	"src/xe/graphics/Graphics.h"
 	"src/xe/graphics/IWindow.h"
 	"src/xe/graphics/GraphicsAPI.h" 
@@ -99,4 +102,6 @@ endif()
 target_include_directories(${target} PUBLIC "src")
 target_link_libraries(${target}
 		PUBLIC XE.Math
-		PRIVATE XE.Interface)
+		PRIVATE XE.Interface
+		PUBLIC fmt::fmt
+)

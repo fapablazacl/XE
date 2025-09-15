@@ -1,7 +1,7 @@
 
 #include "Renderer.h"
 
-#include "../../../../apostate/src/apostate/Logger.h"
+#include "xe/Logger.h"
 #include "../../../../apostate/src/apostate/Platform.h"
 
 #include <cassert>

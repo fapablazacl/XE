@@ -175,7 +175,7 @@ namespace xe::gl {
 
         if (status == static_cast<GLint>(GL_FALSE)) {
             constexpr size_t INFO_LOG_BUFFER_SIZE = 4096;
-            std::cerr << "Error while creating shader " << type << ": ";
+            std::cerr << "Error while creating shader " << type << ": " << std::endl;
 
             char msg[INFO_LOG_BUFFER_SIZE] = {};
             glGetShaderInfoLog(shaderId, INFO_LOG_BUFFER_SIZE, nullptr, msg);
@@ -241,7 +241,7 @@ namespace xe::gl {
     }
 
 
-    VertexArray RendererGL::createVertexArray(const tcb::span<Attribute> &attributes, Buffer elementArrayBuffer) const {
+    VertexArray RendererGL::createVertexArray(const tcb::span<const Attribute> &attributes, Buffer elementArrayBuffer) const {
         XE_GL_SCOPED_ERROR_CHECK();
 
         VertexArray vao;
@@ -268,7 +268,11 @@ namespace xe::gl {
                     
                 case AttributeType::UnsignedInt:
                     type = GL_UNSIGNED_INT;
-                    break; 
+                    break;
+
+                case AttributeType::UnsignedByte:
+                    type = GL_UNSIGNED_BYTE;
+                    break;
                 }
 
                 glVertexAttribPointer(attr.index, static_cast<GLint>(attr.size) + 1, type, attr.normalized, attr.stride, reinterpret_cast<const void *>(attr.offset));
@@ -286,14 +290,16 @@ namespace xe::gl {
         return vao;
     }
 
-    void RendererGL::draw(VertexArray vertexArray, GLenum primitiveType, const tcb::span<VertexArrayPrimitive> &primitives) const {
+    void RendererGL::draw(VertexArray vertexArray, GLenum primitiveType, const tcb::span<const VertexArrayPrimitive> &primitives) const {
         XE_GL_SCOPED_ERROR_CHECK();
+        assert(!primitives.empty());
+        assert(vertexArray.id);
 
         glBindVertexArray(vertexArray.id);
 
         for (const auto &primitive : primitives) {
-            apply(primitive.attribs);
-
+            assert(primitive.count > 0);
+            bindRenderState(primitive.attribs);
             glDrawArrays(primitiveType, primitive.start, primitive.count);
         }
     }
@@ -305,7 +311,7 @@ namespace xe::gl {
         glMultiDrawArrays(primitiveType, multiDraw.start, multiDraw.count, multiDraw.drawCount);
     }
 
-    void RendererGL::drawIndexed(VertexArray vertexArray, GLenum primitiveType, GLenum dataType, const tcb::span<VertexArrayPrimitive> &primitives) const {
+    void RendererGL::draw(VertexArray vertexArray, GLenum primitiveType, const tcb::span<const VertexArrayPrimitive> &primitives, GLenum dataType) const {
         XE_GL_SCOPED_ERROR_CHECK();
 
         glBindVertexArray(vertexArray.id);
@@ -313,13 +319,13 @@ namespace xe::gl {
         for (const auto &primitive : primitives) {
             const auto indices = reinterpret_cast<const void*>(primitive.start);
 
-            apply(primitive.attribs);
+            bindRenderState(primitive.attribs);
 
             glDrawElements(primitiveType, primitive.count, dataType, indices);
         }
     }
 
-    void RendererGL::apply(const tcb::span<Attribute> &attribs) const {
+    void RendererGL::bindRenderState(const tcb::span<const Attribute> &attribs) const {
         XE_GL_SCOPED_ERROR_CHECK();
 
         for (const auto &attrib : attribs) {
@@ -337,7 +343,7 @@ namespace xe::gl {
         }
     }
 
-    void RendererGL::apply(const tcb::span<Uniform> &uniforms) const {
+    void RendererGL::bindRenderState(const tcb::span<const Uniform> &uniforms) const {
         XE_GL_SCOPED_ERROR_CHECK();
 
         for (const auto &uniform : uniforms) {
@@ -360,10 +366,14 @@ namespace xe::gl {
         }
     }
 
-    void RendererGL::apply(const tcb::span<UniformMatrix> &uniforms) const {
+    void RendererGL::bindRenderState(const tcb::span<const UniformMatrix> &uniforms) const {
         XE_GL_SCOPED_ERROR_CHECK();
 
         for (const auto &[location, type, dim, transpose, count, data] : uniforms) {
+            assert(location >= 0);
+            assert(count > 0);
+            assert(data);
+
             const auto index = static_cast<int>(dim);
 
             switch (type) {
@@ -379,7 +389,7 @@ namespace xe::gl {
     }
 
 
-    Texture RendererGL::createTexture(GLenum target, GLint internalFormat, const ClientTextureImage1D &image, bool generateMipMaps, const tcb::span<TextureParameter> &parameters) const {
+    Texture RendererGL::createTexture(GLenum target, GLenum internalFormat, const ClientTextureImage1D &image, const CreateTextureOptions &options) const {
         XE_GL_SCOPED_ERROR_CHECK();
 
         GLuint textureId = 0;
@@ -387,13 +397,13 @@ namespace xe::gl {
         glGenTextures(1, &textureId);
         glBindTexture(target, textureId);
 
-        glTexImage1D(target, 0, internalFormat, image.size, 0, image.format, image.type, image.pixels);
+        glTexImage1D(target, 0, static_cast<GLint>(internalFormat), image.size, 0, image.format, image.type, image.pixels);
 
-        if (generateMipMaps) {
+        if (options.flags & GenerateMipMaps) {
             glGenerateMipmap(target);
         }
 
-        render(target, parameters);
+        bindRenderState(target, options.parameters);
 
         glBindTexture(target, 0);
 
@@ -401,7 +411,7 @@ namespace xe::gl {
     }
 
 
-    Texture RendererGL::createTexture(GLenum target, GLint internalFormat, const ClientTextureImage2D &image, bool generateMipMaps, const tcb::span<TextureParameter> &parameters) const {
+    Texture RendererGL::createTexture(GLenum target, GLenum internalFormat, const ClientTextureImage2D &image, const CreateTextureOptions &options ) const {
         XE_GL_SCOPED_ERROR_CHECK();
 
         GLuint textureId = 0;
@@ -411,18 +421,18 @@ namespace xe::gl {
 
         glTexImage2D(target, 0, internalFormat, image.size.X, image.size.Y, 0, image.format, image.type, image.pixels);
 
-        if (generateMipMaps) {
+        if (options.flags & GenerateMipMaps) {
             glGenerateMipmap(target);
         }
 
-        render(target, parameters);
+        bindRenderState(target, options.parameters);
 
         glBindTexture(target, 0);
 
         return {textureId, target};
     }
 
-    Texture RendererGL::createTexture(GLenum target, GLint internalFormat, const ClientTextureImage3D &image, bool generateMipMaps, const tcb::span<TextureParameter> &parameters) const {
+    Texture RendererGL::createTexture(GLenum target, GLenum internalFormat, const ClientTextureImage3D &image, const CreateTextureOptions &options) const {
         XE_GL_SCOPED_ERROR_CHECK();
 
         GLuint textureId = 0;
@@ -432,26 +442,26 @@ namespace xe::gl {
 
         glTexImage3D(target, 0, internalFormat, image.size.X, image.size.Y, image.size.Z, 0, image.format, image.type, image.pixels);
 
-        if (generateMipMaps) {
+        if (options.flags & GenerateMipMaps) {
             glGenerateMipmap(target);
         }
 
-        render(target, parameters);
+        bindRenderState(target, options.parameters);
 
         glBindTexture(target, 0);
 
         return {textureId, target};
     }
 
-    void RendererGL::render(GLenum target, const tcb::span<TextureParameter> &parameters) const {
+    void RendererGL::bindRenderState(GLenum textureTarget, const tcb::span<const TextureParameter> &parameters) const {
         XE_GL_SCOPED_ERROR_CHECK();
 
         for (const auto &parameter : parameters) {
-            glTexParameteri(target, parameter.param, parameter.value);
+            glTexParameteri(textureTarget, parameter.param, parameter.value);
         }
     }
 
-    void RendererGL::render(const tcb::span<CapabilityStatus> &capabilities) const {
+    void RendererGL::bindRenderState(const tcb::span<const CapabilityStatus> &capabilities) const {
         XE_GL_SCOPED_ERROR_CHECK();
 
         for (const auto &[capability, enabled] : capabilities) {
@@ -459,7 +469,7 @@ namespace xe::gl {
         }
     }
 
-    void RendererGL::render(const tcb::span<TextureLayer> &layers) const {
+    void RendererGL::bindRenderState(const tcb::span<const TextureLayer> &layers) const {
         XE_GL_SCOPED_ERROR_CHECK();
 
         for (uint32_t i = 0; i < layers.size(); i++) {
@@ -468,37 +478,26 @@ namespace xe::gl {
             glActiveTexture(GL_TEXTURE0 + i);
             glBindTexture(layer.texture.target, layer.texture.id);
 
-            render(layer.texture.target, layer.parameters);
+            bindRenderState(layer.texture.target, layer.parameters);
         }
     }
 
-    void RendererGL::clear(const ClearParams &params) const {
+    void RendererGL::clear(const GLenum flags, std::optional<XE::Vector4> color, std::optional<float> depth, std::optional<int> stencil) const {
+        if (color.has_value()) {
+            glClearColor(color->X, color->Y, color->Z, color->W);
+        }
+
+        if (depth.has_value()) {
+            glClearDepthf(depth.value());
+        }
+
+        if (stencil.has_value()) {
+            glClearStencil(stencil.value());
+        }
+
+        glClear(flags);
+
         XE_GL_SCOPED_ERROR_CHECK();
-
-        GLenum clearFlags = {};
-
-        if (params.colour) {
-            const auto &color = params.colour.value();
-
-            clearFlags |= GL_COLOR_BUFFER_BIT;
-            glClearColor(color.X, color.Y, color.Z, color.W);
-        }
-
-        if (params.depth) {
-            const auto &depth = params.depth.value();
-
-            clearFlags |= GL_DEPTH_BUFFER_BIT;
-            glClearDepthf(depth);
-        }
-
-        if (params.stencil) {
-            const auto &stencil = params.stencil.value();
-
-            clearFlags |= GL_DEPTH_BUFFER_BIT;
-            glClearStencil(stencil);
-        }
-
-        glClear(clearFlags);
     }
 
     void RendererGL::flush() const {

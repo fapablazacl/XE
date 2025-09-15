@@ -5,6 +5,9 @@
 - Barebones for a future multiplatform game engine.
 - Contains code for libraries, tools, and simple game and demos
 
+## Vulkan 
+- Needs VulkanSDK to be downloaded manually, because the Hunter package manager provided an old version that didn't worked with the current implementation
+
 ## GLTF loader 
 
 Implement 3d model gltf loading for testing the renderer methods

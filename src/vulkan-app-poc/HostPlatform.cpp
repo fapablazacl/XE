@@ -41,7 +41,7 @@ std::vector<const char *> HostPlatform::enumerateRequiredInstanceExtensions() co
 
     // SDK 1.3.216 for macOS now requires the enablement of the VK_KHR_portability_enumeration instance extension
 #if defined(XE_OS_MACOS) || defined(XE_OS_IOS)
-    result.push_back(VK_KHR_PORTABILITY_ENUMERATION_EXTENSION_NAME);
+    result.push_back("VK_KHR_portability_enumeration");
 #endif
 
     std::cout << "These " << result.size() << " extensions are required:" << std::endl;

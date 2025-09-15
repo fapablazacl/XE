@@ -1,5 +1,4 @@
 
-hunter_add_package(lodepng)
 find_package(lodepng CONFIG REQUIRED)
 
 set (target "XE.Graphics.PNG")
@@ -13,6 +12,6 @@ add_library(${target} ${sources})
 target_include_directories(${target} PUBLIC "src")
 target_link_libraries(${target} 
     PUBLIC XE.Core 
-    PRIVATE LodePNG::lodepng
+    PRIVATE lodepng::lodepng
     PRIVATE XE.Interface
 )

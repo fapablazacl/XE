@@ -7,6 +7,7 @@
 
 #include "Types.h"
 #include "xe/math/Vector.h"
+#include "xe/math/Matrix.h"
 
 #include <optional>
 
@@ -29,6 +30,26 @@ namespace xe::gl {
         Float, Int, UnsignedInt
     };
 
+    template<typename BasicType> struct MetaUniformTypeMapper {};
+
+    template<> struct MetaUniformTypeMapper<float> {
+        static UniformType map() {
+            return UniformType::Float;
+        }
+    };
+
+    template<> struct MetaUniformTypeMapper<int> {
+        static UniformType map() {
+            return UniformType::Int;
+        }
+    };
+
+    template<> struct MetaUniformTypeMapper<unsigned int> {
+        static UniformType map() {
+            return UniformType::UnsignedInt;
+        }
+    };
+
     enum class UniformDim {
         _1, _2, _3, _4
     };
@@ -48,9 +69,50 @@ namespace xe::gl {
         _4x2, _4x3, _4x4,
     };
 
+    template<int rows, int cols>
+    constexpr UniformMatrixDim mapUniformMatrixDim() {
+        static_assert(rows >= 2 && rows <= 4);
+        static_assert(cols >= 2 && cols <= 4);
+
+        if constexpr (rows == 2) {
+            if constexpr (cols == 2) { return UniformMatrixDim::_2x2; }
+            if constexpr (cols == 3) { return UniformMatrixDim::_2x3; }
+            if constexpr (cols == 4) { return UniformMatrixDim::_2x4; }
+        }
+
+        if constexpr (rows == 3) {
+            if constexpr (cols == 2) { return UniformMatrixDim::_3x2; }
+            if constexpr (cols == 3) { return UniformMatrixDim::_3x3; }
+            if constexpr (cols == 4) { return UniformMatrixDim::_3x4; }
+        }
+
+        if constexpr (rows == 4) {
+            if constexpr (cols == 2) { return UniformMatrixDim::_4x2; }
+            if constexpr (cols == 3) { return UniformMatrixDim::_4x3; }
+            if constexpr (cols == 4) { return UniformMatrixDim::_4x4; }
+        }
+    }
+
     enum class UniformMatrixType {
         Float,
         Double
+    };
+
+    template<typename BasicType>
+    struct MetaUniformMatrixTypeMapper {};
+
+    template<>
+    struct MetaUniformMatrixTypeMapper<float> {
+        static UniformMatrixType map() {
+            return UniformMatrixType::Float;
+        }
+    };
+
+    template<>
+    struct MetaUniformMatrixTypeMapper<double> {
+        static UniformMatrixType map() {
+            return UniformMatrixType::Double;
+        }
     };
 
     struct UniformMatrix {
@@ -59,13 +121,39 @@ namespace xe::gl {
         UniformMatrixDim dim = UniformMatrixDim::_4x4;
         GLboolean transpose = GL_FALSE;
         GLsizei count = 0;
-
         const void* data = nullptr;
     };
 
+    template<typename Type, int Rows, int Cols>
+    UniformMatrix makeUniform(GLint location, const XE::TMatrix<Type, Rows, Cols> &matrix, const bool transpose = false) {
+        UniformMatrix uniform;
+
+        uniform.location = location;
+        uniform.type = MetaUniformMatrixTypeMapper<Type>::map();
+        uniform.dim = mapUniformMatrixDim<Rows, Cols>();
+        uniform.transpose = transpose == GL_TRUE;
+        uniform.count = 1;
+        uniform.data = matrix.data();
+
+        return uniform;
+    }
+
+    template<typename Type>
+    Uniform makeUniform(GLint location, Type &value) {
+        Uniform uniform;
+
+        uniform.location = location;
+        uniform.type = MetaUniformTypeMapper<typename std::remove_const<Type>::type>::map();
+        uniform.dim = UniformDim::_1;
+        uniform.count = 1;
+        uniform.data = &value;
+
+        return uniform;
+    }
+
     enum class AttributeDim { _1, _2, _3, _4 };
 
-    enum class AttributeType { Float, Int, UnsignedInt };
+    enum class AttributeType { Float, Int, UnsignedInt, UnsignedByte };
 
     struct Attribute {
         GLint index = 0;
@@ -113,12 +201,12 @@ namespace xe::gl {
         tcb::span<TextureParameter> parameters;
     };
 
-    struct ClearParams {
-        std::optional<XE::Vector4> colour;
-        std::optional<float> depth;
-        std::optional<float> stencil;
+    enum class ClearFlags { Color = 0x01, Depth = 0x02, Stencil = 0x04 };
 
-        explicit operator bool() const { return colour || depth || stencil; }
+    struct ClearParams {
+        std::optional<XE::Vector4> color;
+        std::optional<float> depth;
+        std::optional<int> stencil;
     };
 
     struct ClientTextureImage1D {
@@ -142,8 +230,6 @@ namespace xe::gl {
         const void *pixels = nullptr;
     };
 
-
-
     class Context;
 
     // -- Low Priority --
@@ -152,6 +238,16 @@ namespace xe::gl {
     // TODO: Add 2d texture support
     // TODO: Add cubemap texture support
     // TODO: Define Mixin classes to support both manual and automatic resource management
+
+    enum CreateTextureFlags {
+        None = 0x0,
+        GenerateMipMaps = 0x1,
+    };
+
+    struct CreateTextureOptions {
+        CreateTextureFlags flags = None;
+        tcb::span<TextureParameter> parameters;
+    };
 
     /**
      * @brief Wrapper to OpenGL 3+ APIs
@@ -179,39 +275,40 @@ namespace xe::gl {
         Buffer createBuffer(GLenum target, GLenum usage, const MemoryRegion &memory) const;
 
         [[nodiscard]]
-        VertexArray createVertexArray(const tcb::span<Attribute> &attributes, Buffer elementArrayBuffer) const;
+        VertexArray createVertexArray(const tcb::span<const Attribute> &attributes, Buffer elementArrayBuffer) const;
 
         [[nodiscard]]
         RendererInfo getInfo() const;
 
         [[nodiscard]]
-        Texture createTexture(GLenum target, GLint internalFormat, const ClientTextureImage1D &image, bool generateMipMaps, const tcb::span<TextureParameter> &parameters) const;
+        Texture createTexture(GLenum target, GLenum internalFormat, const ClientTextureImage1D &image, const CreateTextureOptions &options = {}) const;
 
         [[nodiscard]]
-        Texture createTexture(GLenum target, GLint internalFormat, const ClientTextureImage2D &image, bool generateMipMaps, const tcb::span<TextureParameter> &parameters) const;
+        Texture createTexture(GLenum target, GLenum internalFormat, const ClientTextureImage2D &image, const CreateTextureOptions &options = {}) const;
 
         [[nodiscard]]
-        Texture createTexture(GLenum target, GLint internalFormat, const ClientTextureImage3D &image, bool generateMipMaps, const tcb::span<TextureParameter> &parameters) const;
+        Texture createTexture(GLenum target, GLenum internalFormat, const ClientTextureImage3D &image, const CreateTextureOptions &options = {}) const;
 
-        void render(const tcb::span<CapabilityStatus> &capabilities) const;
+        void bindRenderState(const tcb::span<const CapabilityStatus> &capabilities) const;
 
-        void render(const tcb::span<TextureLayer> &layers) const;
+        void bindRenderState(const tcb::span<const TextureLayer> &layers) const;
 
-        void render(GLenum target, const tcb::span<TextureParameter> &parameters) const;
+        void bindRenderState(GLenum textureTarget, const tcb::span<const TextureParameter> &parameters) const;
 
-        void apply(const tcb::span<Attribute> &attribs) const;
+        void bindRenderState(const tcb::span<const Attribute> &attribs) const;
 
-        void apply(const tcb::span<Uniform> &uniforms) const;
+        void bindRenderState(const tcb::span<const Uniform> &uniforms) const;
 
-        void apply(const tcb::span<UniformMatrix> &uniforms) const;
-
-        void draw(VertexArray vertexArray, GLenum primitiveType, const tcb::span<VertexArrayPrimitive> &primitives) const;
+        void bindRenderState(const tcb::span<const UniformMatrix> &uniforms) const;
 
         void draw(VertexArray vertexArray, GLenum primitiveType, const VertexArrayMultiDraw &multiDraw) const;
 
-        void drawIndexed(VertexArray vertexArray, GLenum primitiveType, GLenum dataType, const tcb::span<VertexArrayPrimitive> &primitives) const;
+        void draw(VertexArray vertexArray, GLenum primitiveType, const tcb::span<const VertexArrayPrimitive> &primitives) const;
 
-        void clear(const ClearParams &params) const;
+        // Draws an indexed geometry
+        void draw(VertexArray vertexArray, GLenum primitiveType, const tcb::span<const VertexArrayPrimitive> &primitives, GLenum dataType) const;
+
+        void clear(const GLenum flags, std::optional<XE::Vector4> color, std::optional<float> depth, std::optional<int> stencil) const;
 
         void flush() const;
 
