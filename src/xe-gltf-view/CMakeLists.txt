@@ -2,11 +2,11 @@
 find_package(cgltf CONFIG REQUIRED)
 find_package(glfw3 REQUIRED)
 
-set (target gltf-test)
+set (target xe-gltf-view)
 set (sources
         src/gltf-test-main.cpp
-        include/GltfProcessor.h
-        include/GltfDataLoader.h
+        src/GltfProcessor.h
+        src/GltfDataLoader.h
         src/GltfDataLoader.cpp
 )
 

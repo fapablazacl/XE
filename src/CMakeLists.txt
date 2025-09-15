@@ -6,8 +6,9 @@ add_subdirectory ("libxe-math")
 add_subdirectory ("libxe-scene")
 add_subdirectory ("libxe-geometry")
 add_subdirectory ("libxe-app")
-add_subdirectory ("libxe-gltf")
 add_subdirectory ("libxe-imageloader")
+
+add_subdirectory ("xe-gltf-view")
 
 if (XE_PLUGIN_PNG)
     add_subdirectory("libxe-core-imageloader-lodepng")
