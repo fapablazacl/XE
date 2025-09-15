@@ -1,14 +1,5 @@
 cmake_minimum_required (VERSION 3.16)
 
-include("cmake/HunterGate.cmake")
-
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
-
-HunterGate(
-    URL "https://github.com/cpp-pm/hunter/archive/v0.25.8.tar.gz"
-    SHA1 "26c79d587883ec910bce168e25f6ac4595f97033"
-)
-
 project (XE)
 
 option (XE_PLUGIN_PNG           "Include PNG image support via LodePNG" ON)
@@ -35,11 +26,11 @@ set (XE_VERSION_REVISION 0)
 set (XE_VERSION "${XE_VERSION_MAJOR}.${XE_VERSION_MINOR}.${XE_VERSION_REVISION}")
 
 add_definitions(-DXE_MEDIA_PATH="${CMAKE_CURRENT_LIST_DIR}/media")
+add_definitions(-DGLM_ENABLE_EXPERIMENTAL)
 
 if (XE_DEV_UNIT_TEST)
     include(CTest)
     enable_testing()
-    hunter_add_package(GTest)
     find_package(GTest CONFIG REQUIRED)
 endif()
 
