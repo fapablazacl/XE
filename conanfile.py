@@ -36,6 +36,7 @@ class xeRecipe(ConanFile):
         self.requires("glm/1.0.1")
         self.requires("nlohmann_json/3.12.0")
         self.requires("vulkan-loader/1.4.313.0")
+        self.requires("glad/0.1.36", options={"spec": "gl", "gl_profile": "core", "gl_version": "4.6"})
         
     def generate(self):
         deps = CMakeDeps(self)

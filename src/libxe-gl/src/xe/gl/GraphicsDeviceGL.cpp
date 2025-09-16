@@ -13,12 +13,12 @@
 #include "TextureCubeMapGL.h"
 #include "UtilGL.h"
 
-#include <../../../../libxe-core/src/xe/graphics/Material.h>
-#include <../../../../libxe-core/src/xe/graphics/Subset.h>
-#include <../../../../libxe-core/src/xe/graphics/Texture2DArray.h>
-#include <../../../../libxe-core/src/xe/graphics/Texture3D.h>
-#include <../../../../libxe-core/src/xe/graphics/TextureCubeMap.h>
-#include <../../../../libxe-core/src/xe/graphics/Uniform.h>
+#include <xe/graphics/Material.h>
+#include <xe/graphics/Subset.h>
+#include <xe/graphics/Texture2DArray.h>
+#include <xe/graphics/Texture3D.h>
+#include <xe/graphics/TextureCubeMap.h>
+#include <xe/graphics/Uniform.h>
 #include <iostream>
 
 namespace XE {
@@ -95,7 +95,7 @@ namespace XE {
 
     Subset *GraphicsDeviceGL::createSubset(const SubsetDescriptor &desc) { return new SubsetGL(desc); }
 
-    Buffer *GraphicsDeviceGL::createBuffer(const BufferDescriptor &desc) { return nullptr; }
+    Buffer *GraphicsDeviceGL::createBuffer(const BufferDescriptor &/*desc*/) { return nullptr; }
 
     Texture2D *GraphicsDeviceGL::createTexture2D(const PixelFormat format, const Vector2i &size, const PixelFormat sourceFormat, const DataType sourceDataType,
                                                  const void *sourceData) {

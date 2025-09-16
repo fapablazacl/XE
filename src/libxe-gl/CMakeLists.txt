@@ -3,8 +3,7 @@ find_package(Microsoft.GSL CONFIG REQUIRED)
 find_package(fmt CONFIG REQUIRED)
 find_package(glm REQUIRED)
 find_package(glfw3 CONFIG REQUIRED)
-
-add_subdirectory("dependencies/glad-gl4")
+find_package(glad CONFIG REQUIRED)
 
 set (target "XE.GL")
 
@@ -59,7 +58,7 @@ target_include_directories (${target} PUBLIC "src")
 target_link_libraries (${target} 
 	PUBLIC XE.Core
 		PUBLIC libxe-imageloader
-	PUBLIC glad-gl4
+	PUBLIC glad::glad
 	PRIVATE XE.Interface
 	PUBLIC fmt::fmt
 	PUBLIC glm::glm

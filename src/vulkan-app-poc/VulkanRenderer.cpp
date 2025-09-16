@@ -51,10 +51,10 @@ static std::ostream &operator<<(std::ostream &os, const vk::PhysicalDeviceType d
 }
 
 vk::Bool32 debugCallback(
-    vk::DebugUtilsMessageSeverityFlagBitsEXT       messageSeverity,
-    vk::DebugUtilsMessageTypeFlagsEXT              messageTypes,
+    vk::DebugUtilsMessageSeverityFlagBitsEXT       /*messageSeverity*/,
+    vk::DebugUtilsMessageTypeFlagsEXT              /*messageTypes*/,
 	const vk::DebugUtilsMessengerCallbackDataEXT* pCallbackData,
-	void* pUserData) {
+	void* /*pUserData*/) {
 
     std::cout << pCallbackData->pMessage << std::endl << std::endl;
 
