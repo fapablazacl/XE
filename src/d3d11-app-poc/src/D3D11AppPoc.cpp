@@ -36,7 +36,7 @@ BOOL InitWindowClass(const HINSTANCE hInstance, const LPSTR className) {
 int main() {
     using namespace TestApp;
 
-    const LPSTR className = TEXT("D3D11_01_Triangle");
+    const LPSTR className = const_cast<char*>("D3D11_01_Triangle");
 
     HINSTANCE hInstance = ::GetModuleHandle(NULL);
 

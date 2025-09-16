@@ -50,8 +50,11 @@ static std::ostream &operator<<(std::ostream &os, const vk::PhysicalDeviceType d
     return os;
 }
 
-static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT /*severity*/, VkDebugUtilsMessageTypeFlagsEXT /*type*/,
-                                                    const VkDebugUtilsMessengerCallbackDataEXT *pCallbackData, void * /*pUserData*/) {
+vk::Bool32 debugCallback(
+    vk::DebugUtilsMessageSeverityFlagBitsEXT       messageSeverity,
+    vk::DebugUtilsMessageTypeFlagsEXT              messageTypes,
+	const vk::DebugUtilsMessengerCallbackDataEXT* pCallbackData,
+	void* pUserData) {
 
     std::cout << pCallbackData->pMessage << std::endl << std::endl;
 

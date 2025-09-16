@@ -3,11 +3,11 @@
 
 #include "xe/ImageLoader.h"
 
-class ImageLoaderFI : public ImageLoader {
+class ImageLoaderIL : public ImageLoader {
 public:
-    ImageLoaderFI();
+    ImageLoaderIL();
 
-    ~ImageLoaderFI();
+    ~ImageLoaderIL();
 
     std::unique_ptr<Image> loadImage(const std::string &file) const override;
 

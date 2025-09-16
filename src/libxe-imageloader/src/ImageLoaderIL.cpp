@@ -5,7 +5,6 @@
 #include <map>
 #include "xe/Logger.h"
 
-// DevIL
 #include <IL/il.h>
 #include <IL/ilu.h>
 
@@ -75,31 +74,56 @@ static void logDevILErrors(const char *ctx) {
     }
 }
 
+static std::unique_ptr<Image> createImageFromBoundIL(ILuint id) {
+	if (!ilConvertImage(IL_RGB, IL_UNSIGNED_BYTE)) {
+		logDevILErrors("ilConvertImage");
+		ilDeleteImages(1, &id);
+		return {};
+	}
+
+	const int width = ilGetInteger(IL_IMAGE_WIDTH);
+	const int height = ilGetInteger(IL_IMAGE_HEIGHT);
+	const int bppChannels = ilGetInteger(IL_IMAGE_CHANNELS);
+	int bpp = bppChannels * 8; // bits
+	return std::make_unique<ImageIL>(id, width, height, bpp);
+}
+
+static std::unique_ptr<Image> createImage(const void* data, size_t size, ILenum imageType) {
+	XE_LOG_INFO("Loading {} image from memory buffer {}\n", str(imageType), data);
+
+	ILuint id = 0;
+	ilGenImages(1, &id);
+	ilBindImage(id);
+
+	bool ok = false;
+	if (imageType != 0) {
+		ok = (ilLoadL(imageType, (const ILubyte*)data, (ILuint)size) == IL_TRUE);
+	}
+	else {
+		ILenum detected = ilDetermineTypeL((const ILubyte*)data, (ILuint)size);
+		if (detected != IL_TYPE_UNKNOWN)
+			ok = (ilLoadL(detected, (const ILubyte*)data, (ILuint)size) == IL_TRUE);
+	}
+
+	if (!ok) {
+		logDevILErrors("ilLoadL");
+		ilDeleteImages(1, &id);
+		return {};
+	}
+
+	return createImageFromBoundIL(id);
+}
+
 ImageLoaderIL::ImageLoaderIL() {
     ilInit();
     iluInit();
-    // Ensure consistent origin (FreeImage default is top-left after ConvertTo24Bits)
+    
     ilEnable(IL_ORIGIN_SET);
     ilOriginFunc(IL_ORIGIN_UPPER_LEFT);
 }
 
 ImageLoaderIL::~ImageLoaderIL() {
-    // DevIL has no explicit global deinit required (ilShutDown optional)
-}
-
-static std::unique_ptr<Image> createImageFromBoundIL(ILuint id) {
-    // Convert to 24-bit RGB unsigned byte (matches prior FreeImage_ConvertTo24Bits)
-    if (!ilConvertImage(IL_RGB, IL_UNSIGNED_BYTE)) {
-        logDevILErrors("ilConvertImage");
-        ilDeleteImages(1, &id);
-        return {};
-    }
-
-    const int width = ilGetInteger(IL_IMAGE_WIDTH);
-    const int height = ilGetInteger(IL_IMAGE_HEIGHT);
-    const int bppChannels = ilGetInteger(IL_IMAGE_CHANNELS); // should be 3 after conversion
-    int bpp = bppChannels * 8; // bits
-    return std::make_unique<ImageIL>(id, width, height, bpp);
+	ilShutDown();
 }
 
 std::unique_ptr<Image> ImageLoaderIL::loadImage(const std::string &file) const {
@@ -115,32 +139,6 @@ std::unique_ptr<Image> ImageLoaderIL::loadImage(const std::string &file) const {
 
     if (!ilLoadImage(file.c_str())) {
         logDevILErrors("ilLoadImage");
-        ilDeleteImages(1, &id);
-        return {};
-    }
-
-    return createImageFromBoundIL(id);
-}
-
-static std::unique_ptr<Image> createImage(const void *data, size_t size, ILenum imageType) {
-    XE_LOG_INFO("Loading {} image from memory buffer {}\n", str(imageType), data);
-
-    ILuint id = 0;
-    ilGenImages(1, &id);
-    ilBindImage(id);
-
-    bool ok = false;
-    if (imageType != 0) {
-        ok = (ilLoadL(imageType, (const ILubyte*)data, (ILuint)size) == IL_TRUE);
-    } else {
-        // Try automatic detection
-        ILenum detected = ilDetermineTypeL((const ILubyte*)data, (ILuint)size);
-        if (detected != IL_TYPE_UNKNOWN)
-            ok = (ilLoadL(detected, (const ILubyte*)data, (ILuint)size) == IL_TRUE);
-    }
-
-    if (!ok) {
-        logDevILErrors("ilLoadL");
         ilDeleteImages(1, &id);
         return {};
     }

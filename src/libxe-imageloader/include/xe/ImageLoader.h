@@ -6,6 +6,7 @@
 #include "Image.h"
 
 #include <memory>
+#include <optional>
 
 enum class ImageFormat {
     Jpeg,

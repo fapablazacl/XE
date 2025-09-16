@@ -99,7 +99,7 @@ struct ShaderProgramUniformData {
 };
 
 std::string getAssetPath(const std::string &path) {
-    return std::filesystem::path{XE_EXTERNAL_ASSET_ROOT_PATH} / path;
+    return (std::filesystem::path{XE_EXTERNAL_ASSET_ROOT_PATH} / path).string();
 }
 
 int main() {

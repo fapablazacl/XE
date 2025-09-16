@@ -1,7 +1,7 @@
 
 #include "xe/ImageLoader.h"
-#include "ImageLoaderFI.h"
+#include "ImageLoaderIL.h"
 
 std::unique_ptr<ImageLoader> createImageLoader() {
-    return std::make_unique<ImageLoaderFI>();
+    return std::make_unique<ImageLoaderIL>();
 }

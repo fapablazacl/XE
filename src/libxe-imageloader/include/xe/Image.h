@@ -7,7 +7,7 @@ struct ImageData {
     int width = 0;
     int height = 0;
     int bpp = 0;
-    uint8_t* pixels;
+    uint8_t* pixels = nullptr;
 
     ImageData() {}
 };
