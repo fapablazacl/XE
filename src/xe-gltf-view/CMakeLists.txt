@@ -4,7 +4,7 @@ find_package(glfw3 REQUIRED)
 
 set (target xe-gltf-view)
 set (sources
-        src/gltf-test-main.cpp
+        src/xe-gltf-view-main.cpp
         src/GltfProcessor.h
         src/GltfDataLoader.h
         src/GltfDataLoader.cpp

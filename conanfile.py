@@ -32,9 +32,10 @@ class xeRecipe(ConanFile):
         self.requires("sdl/2.32.8")
         self.requires("lodepng/cci.20230410")
         self.requires("ms-gsl/4.2.0")
-        self.requires("freeimage/3.18.0")
+        self.requires("devil/1.8.0")
         self.requires("glm/1.0.1")
         self.requires("nlohmann_json/3.12.0")
+        self.requires("vulkan-loader/1.4.313.0")
         
     def generate(self):
         deps = CMakeDeps(self)

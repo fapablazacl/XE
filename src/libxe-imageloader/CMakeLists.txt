@@ -1,5 +1,5 @@
 
-find_package(FreeImage REQUIRED)
+find_package(DevIL)
 
 set (target libxe-imageloader)
 add_library(${target}
@@ -7,10 +7,9 @@ add_library(${target}
         "include/xe/ImageLoader.h"
         "src/ImageLoader.cpp"
 
-        # FreeImage
-        "src/ImageLoaderFI.h"
-        "src/ImageLoaderFI.cpp"
+        "src/ImageLoaderIL.h"
+        "src/ImageLoaderIL.cpp"
 )
 
 target_include_directories(${target} PUBLIC include/)
-target_link_libraries(${target} freeimage::FreeImage XE.Core)
+target_link_libraries(${target} DevIL::DevIL XE.Core)

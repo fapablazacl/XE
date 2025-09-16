@@ -2,7 +2,6 @@
 find_package(Assimp REQUIRED)
 find_package(glfw3 REQUIRED)
 find_package(nlohmann_json REQUIRED)
-find_package(FreeImage REQUIRED)
 
 set (target apostate)
 add_executable(${target}
@@ -30,7 +29,6 @@ target_link_libraries(
     assimp::assimp
     glfw
     nlohmann_json::nlohmann_json
-    freeimage::FreeImage
         XE.GL
         libxe-imageloader
 )
