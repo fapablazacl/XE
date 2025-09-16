@@ -86,23 +86,13 @@ int Window::initializeOpenGL() {
     return 0;
 }
 
-
-void Window::loop() {
-    std::printf("Entering main loop\n");
-
-    while (true) {
-        pollInput();
-        update();
-        render();
-    }
-}
-
-
 bool Window::pollInput() {
     SDL_Event e;
 
     while( SDL_PollEvent( &e ) ) {
-
+        if (e.type == SDL_QUIT) {
+            return false;
+        }
     }
 
     return true;

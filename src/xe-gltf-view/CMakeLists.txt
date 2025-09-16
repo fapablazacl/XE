@@ -11,6 +11,8 @@ set (sources
         src/GltfProcessor.h
         src/GltfDataLoader.h
         src/GltfDataLoader.cpp
+        src/GltfRenderer.h
+        src/GltfRenderer.cpp
         src/Window.h
         src/Window.cpp
 )

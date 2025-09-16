@@ -8,20 +8,18 @@ public:
 
     ~Window();
 
-    bool initialize();
-
-    void loop();
-
-private:
-    int initializeSDL();
-
-    int initializeOpenGL();
-
     bool pollInput();
 
     void update();
 
     void render();
+
+    bool initialize();
+
+private:
+    int initializeSDL();
+
+    int initializeOpenGL();
 
     SDL_Window *window = nullptr;
     SDL_GLContext context = nullptr;
