@@ -9,6 +9,8 @@ add_subdirectory ("libxe-app")
 add_subdirectory ("libxe-imageloader")
 
 add_subdirectory ("xe-gltf-view")
+add_subdirectory ("xe-gltfc")
+add_subdirectory ("xe-ktxc")
 
 if (XE_PLUGIN_PNG)
     add_subdirectory("libxe-core-imageloader-lodepng")

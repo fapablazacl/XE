@@ -32,7 +32,7 @@ class xeRecipe(ConanFile):
         self.requires("gtest/1.17.0")
         self.requires("glfw/3.4")
         self.requires("cgltf/1.13")
-        self.requires("fmt/11.2.0")
+        self.requires("fmt/10.2.1")
         self.requires("sdl/2.32.8")
         self.requires("lodepng/cci.20230410")
         self.requires("ms-gsl/4.2.0")
@@ -42,6 +42,7 @@ class xeRecipe(ConanFile):
         self.requires("vulkan-loader/1.4.313.0")
         self.requires("glad/0.1.36", options={"spec": "gl", "gl_profile": "core", "gl_version": "4.6"})
         self.requires("imgui/1.92.2b")
+        self.requires("ktx/4.3.2")
 
     def generate(self):
         deps = CMakeDeps(self)
