@@ -141,8 +141,20 @@ GltfRenderer::GltfRenderer() {
 
 GltfRenderer::~GltfRenderer() {}
 
+void GltfRenderer::beginFrame() {
+    const auto clearFlags = GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT;
+    const auto clearColor = XE::Vector4{0.2f, 0.2f, 0.8f, 1.0f};
+
+    renderer->clear(clearFlags, clearColor, {}, {});
+}
+
+void GltfRenderer::endFrame() {
+    renderer->flush();
+}
+
 void GltfRenderer::render() {
     uniformData.seconds = (static_cast<float>(XE::Timer::getTick()) / 1000.0f) - startSeconds;
+    startSeconds = uniformData.seconds;
 
     const auto proj = XE::mat4Perspective(XE::radians(60.0f), static_cast<float>(SCREEN_HEIGHT) / static_cast<float>(SCREEN_WIDTH), 0.001f, 1000.0f);
     const auto view = XE::mat4LookAtRH({0.0f, 0.0f, -25.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f});
@@ -156,11 +168,7 @@ void GltfRenderer::render() {
         {GL_CULL_FACE, GL_TRUE}
     };
 
-    const auto clearFlags = GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT;
-    const auto clearColor = XE::Vector4{0.2f, 0.2f, 0.8f, 1.0f};
-
     renderer->bindRenderState(renderState);
-    renderer->clear(clearFlags, clearColor, {}, {});
     renderer->useProgram(program);
 
     renderer->bindRenderState(uniformData.mapUniforms(program));

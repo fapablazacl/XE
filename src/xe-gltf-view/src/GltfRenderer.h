@@ -31,6 +31,10 @@ namespace xe::gltf_view {
 
         void render();
 
+        void beginFrame();
+
+        void endFrame();
+
     private:
         std::unique_ptr<xe::gl::RendererGL> renderer;
         ShaderProgramUniformData uniformData;

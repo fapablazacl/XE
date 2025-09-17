@@ -12,8 +12,18 @@ int main(int argc,char *argv[]) {
 
     while (window.pollInput()) {
         window.update();
+        renderer.beginFrame();
+
+        window.prepareUI();
+        // render the geometries
         renderer.render();
-        window.render();
+
+        // render the UI
+        window.drawUI();
+
+        // present the frame
+        renderer.endFrame();
+        window.swapBuffers();
     }
 
     return 0;

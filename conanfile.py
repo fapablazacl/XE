@@ -1,6 +1,10 @@
 from conan import ConanFile
 from conan.tools.cmake import CMakeToolchain, CMake, cmake_layout, CMakeDeps
 from conan.tools.env import VirtualRunEnv
+from conan.tools.cmake import cmake_layout
+from conan.tools.files import copy
+
+import os
 
 class xeRecipe(ConanFile):
     name = "xe"
@@ -44,6 +48,15 @@ class xeRecipe(ConanFile):
         deps.generate()
         tc = CMakeToolchain(self)
         tc.generate()
+
+        # imgui backends
+        package_folder = self.dependencies["imgui"].package_folder
+        bindings_folder_src = os.path.join(package_folder, "res", "bindings")
+        bindings_folder_dest = os.path.join(self.source_folder, "src", "xe-gltf-view", "src", "bindings")
+
+        backends = ["glfw", "opengl3", "sdl2", "sdl3"]
+        for backend in backends:
+            copy(self, f"*{backend}*", bindings_folder_src, bindings_folder_dest)
 
     def build(self):
         cmake = CMake(self)
