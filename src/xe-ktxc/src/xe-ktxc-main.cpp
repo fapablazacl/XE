@@ -161,7 +161,10 @@ void writeTextureKTX(const std::string &fileName, const ImageDesc &image)
   createInfo.isArray = KTX_FALSE;
   createInfo.generateMipmaps = KTX_FALSE;
   createInfo.vkFormat = computeVkFormat(image);
-    assert(createInfo.vkFormat != VK_FORMAT_UNDEFINED);
+
+    if (createInfo.vkFormat == VK_FORMAT_UNDEFINED) {
+        throw std::runtime_error("Could not determine texture format from image description");
+    }
 
   ktxTexture2* texture = nullptr;
   KTX_error_code result = ktxTexture2_Create(&createInfo, KTX_TEXTURE_CREATE_ALLOC_STORAGE, &texture);
@@ -207,14 +210,21 @@ int main(int argc,char *argv[]) {
     ilEnable(IL_ORIGIN_SET);
     ilOriginFunc(IL_ORIGIN_UPPER_LEFT);
 
-    // const std::filesystem::path inputFilePath = argv[1];
-    const std::filesystem::path inputFilePath = "/Users/fapablaza/Downloads/photos_2023_9_12_fst_brown-wood-floor.jpg";
-    const std::filesystem::path outputFilePath = inputFilePath.parent_path() / "output.ktx2";
+    const std::filesystem::path base = "/Users/fapablaza/Dropbox/GameDev/Capybaria/raw-assets/models/capybara-03";
+    const std::vector<std::string> images =  { "4k_Capybara_Metallic.png", "4k_Capybara_Normal.png", "4k_Capybara_V1_Diffuse.png"};
 
-    const ILuint imageId = createImage(inputFilePath.string());
-    ilBindImage(imageId);
-    const ImageDesc image = describeCurrentImage();
-    writeTextureKTX(outputFilePath, image);
+    // const std::filesystem::path inputFilePath = argv[1];
+    // const std::filesystem::path inputFilePath = "/Users/fapablaza/Downloads/photos_2023_9_12_fst_brown-wood-floor.jpg";
+
+    for (const auto &imageFilePath : images) {
+        const std::filesystem::path inputFilePath = base / imageFilePath;
+        const std::filesystem::path outputFilePath = inputFilePath.parent_path() / (inputFilePath.stem().string() + ".ktx2");
+
+        const ILuint imageId = createImage(inputFilePath.string());
+        ilBindImage(imageId);
+        const ImageDesc image = describeCurrentImage();
+        writeTextureKTX(outputFilePath, image);
+    }
 
     ilShutDown();
 
