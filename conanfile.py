@@ -43,6 +43,7 @@ class xeRecipe(ConanFile):
         self.requires("glad/0.1.36", options={"spec": "gl", "gl_profile": "core", "gl_version": "4.6"})
         self.requires("imgui/1.92.2b")
         self.requires("ktx/4.3.2")
+        self.requires("cxxopts/3.3.1")
 
     def generate(self):
         deps = CMakeDeps(self)
