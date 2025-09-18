@@ -125,6 +125,8 @@ ILuint createImage(const std::string &file) {
 }
 
 const std::map<std::pair<ILuint, ILuint>, ktx_uint32_t> vkFormatMap = {
+    {{IL_LUMINANCE, IL_UNSIGNED_BYTE}, VK_FORMAT_R8_UNORM},
+    {{IL_LUMINANCE_ALPHA, IL_UNSIGNED_BYTE}, VK_FORMAT_R8G8_UNORM},
     {{IL_RGB, IL_UNSIGNED_BYTE}, VK_FORMAT_R8G8B8_UNORM},
     {{IL_RGBA, IL_UNSIGNED_BYTE}, VK_FORMAT_R8G8B8A8_UNORM},
 };
@@ -200,7 +202,24 @@ void writeTextureKTX(const std::string &fileName, const ImageDesc &image)
   }
 
     XE_LOG_INFO("Writing KTX texture to file: {}", fileName);
-  ktxTexture_WriteToNamedFile(ktxTexture(texture), fileName.c_str());
+    ktxTexture_WriteToNamedFile(ktxTexture(texture), fileName.c_str());
+}
+
+std::optional<ILenum> paletteTypeToFormat(ILenum paletteType) {
+    switch (paletteType) {
+    case IL_PAL_RGB24:
+    case IL_PAL_RGB32:
+    case IL_PAL_BGR24:
+    case IL_PAL_BGR32:
+        return IL_RGB;
+
+    case IL_PAL_RGBA32:
+    case IL_PAL_BGRA32:
+        return IL_RGBA;
+
+    default:
+        return {};
+    }
 }
 
 int main(int argc,char *argv[]) {
@@ -222,11 +241,28 @@ int main(int argc,char *argv[]) {
 
         const ILuint imageId = createImage(inputFilePath.string());
         ilBindImage(imageId);
+
+        // convert images with palettes to appropiate RGB/A formats,
+        if (const ILenum format = ilGetInteger(IL_IMAGE_FORMAT); format == IL_COLOUR_INDEX) {
+            const ILenum paletteType = ilGetInteger(IL_PALETTE_TYPE);
+            const std::optional<ILenum> destFormatOpt = paletteTypeToFormat(paletteType);
+
+            if (!destFormatOpt.has_value()) {
+                XE_LOG_ERROR("Could not determine image format from image description");
+                return EXIT_FAILURE;
+            }
+
+            if (!ilConvertImage(destFormatOpt.value(), IL_UNSIGNED_BYTE)) {
+                logDevILErrors("ilConvertImage");
+                return EXIT_FAILURE;
+            }
+        }
+
         const ImageDesc image = describeCurrentImage();
         writeTextureKTX(outputFilePath, image);
     }
 
     ilShutDown();
 
-    return 0;
+    return EXIT_SUCCESS;
 }
