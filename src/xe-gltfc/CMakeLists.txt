@@ -14,4 +14,4 @@ set (sources
 
 add_executable(${target} ${sources})
 target_include_directories(${target} PUBLIC include)
-target_link_libraries(${target} PUBLIC XE.Core PUBLIC XE.GL PUBLIC XE.App PUBLIC cgltf::cgltf PUBLIC glad::glad PUBLIC imgui::imgui PUBLIC assimp::assimp PUBLIC DevIL::IL PUBLIC KTX::ktx)
+target_link_libraries(${target} PRIVATE XE.Interface PUBLIC XE.Core PUBLIC XE.GL PUBLIC XE.App PUBLIC cgltf::cgltf PUBLIC glad::glad PUBLIC imgui::imgui PUBLIC assimp::assimp PUBLIC DevIL::IL PUBLIC KTX::ktx)

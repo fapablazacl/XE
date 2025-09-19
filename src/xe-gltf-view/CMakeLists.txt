@@ -23,4 +23,4 @@ set (sources
 
 add_executable(${target} ${sources})
 target_include_directories(${target} PUBLIC include)
-target_link_libraries(${target} PUBLIC XE.Core PUBLIC XE.GL PUBLIC XE.App PUBLIC cgltf::cgltf PRIVATE SDL2::SDL2 SDL2::SDL2main PUBLIC glad::glad PUBLIC imgui::imgui)
+target_link_libraries(${target} PRIVATE XE.Interface PUBLIC XE.Core PUBLIC XE.GL PUBLIC XE.App PUBLIC cgltf::cgltf PRIVATE SDL2::SDL2 SDL2::SDL2main PUBLIC glad::glad PUBLIC imgui::imgui)
