@@ -8,8 +8,8 @@ BUILD_CONTEXT := docker/cpp
 docker:
 	$(DOCKER) build -t $(IMAGE) $(BUILD_CONTEXT)
 
+format:
+	$(DOCKER) run --rm -v $(CURDIR):/workspace -w /workspace $(IMAGE) sh -c 'clang-format -i src/*'
+
 clean:
 	@echo "Nothing to clean."
-
-format:
-	$(DOCKER) run --rm -v $(CURDIR):/workspace -w /workspace $(IMAGE) sh -c 'clang-format -i $$(find . -type f \( -name "*.c" -o -name "*.cc" -o -name "*.cpp" -o -name "*.h" -o -name "*.hpp" \))'
