@@ -20,6 +20,6 @@ namespace XE {
     private:
         std::string directory;
     };
-} // namespace xe
+} // namespace XE
 
 #endif

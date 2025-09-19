@@ -45,6 +45,6 @@ namespace XE {
             return 0;
         }
     }
-} // namespace xe
+} // namespace XE
 
 #endif

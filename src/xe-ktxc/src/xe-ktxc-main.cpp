@@ -1,17 +1,17 @@
 
-#include <string>
 #include <cassert>
-#include <span>
 #include <filesystem>
 #include <map>
+#include <span>
+#include <string>
 
-#include <ktx.h>
-#include <glad/glad.h>
-#include <vulkan/vulkan.h>
 #include <IL/il.h>
 #include <IL/ilu.h>
 #include <cxxopts.hpp>
+#include <glad/glad.h>
 #include <iostream>
+#include <ktx.h>
+#include <vulkan/vulkan.h>
 
 #include "xe/Logger.h"
 
@@ -31,9 +31,12 @@ struct ImageDesc {
 
 inline std::string to_string(ILenum t) {
     switch (t) {
-    case IL_PNG: return "IL_PNG";
-    case IL_JPG: return "IL_JPG";
-    default: return "ILenum(" + std::to_string(static_cast<int>(t)) + ")";
+    case IL_PNG:
+        return "IL_PNG";
+    case IL_JPG:
+        return "IL_JPG";
+    default:
+        return "ILenum(" + std::to_string(static_cast<int>(t)) + ")";
     }
 }
 
@@ -60,8 +63,8 @@ static void logDevILErrors(const char *ctx) {
 ImageDesc describeCurrentImage() {
     /*
     if (!ilConvertImage(IL_RGB, IL_UNSIGNED_BYTE)) {
-	logDevILErrors("ilConvertImage");
-	return {};
+        logDevILErrors("ilConvertImage");
+        return {};
     }
     */
 
@@ -87,18 +90,17 @@ ILuint createImage(const FileSpan &fileSpan, ILenum imageType) {
 
     bool ok = false;
     if (imageType != 0) {
-	    ok = (ilLoadL(imageType, (const ILubyte*)data, (ILuint)size) == IL_TRUE);
-    }
-    else {
-	    ILenum detected = ilDetermineTypeL((const ILubyte*)data, (ILuint)size);
-	    if (detected != IL_TYPE_UNKNOWN)
-		    ok = (ilLoadL(detected, (const ILubyte*)data, (ILuint)size) == IL_TRUE);
+        ok = (ilLoadL(imageType, (const ILubyte *)data, (ILuint)size) == IL_TRUE);
+    } else {
+        ILenum detected = ilDetermineTypeL((const ILubyte *)data, (ILuint)size);
+        if (detected != IL_TYPE_UNKNOWN)
+            ok = (ilLoadL(detected, (const ILubyte *)data, (ILuint)size) == IL_TRUE);
     }
 
     if (!ok) {
-	    logDevILErrors("ilLoadL");
-	    ilDeleteImages(1, &id);
-	    return {};
+        logDevILErrors("ilLoadL");
+        ilDeleteImages(1, &id);
+        return {};
     }
 
     return id;
@@ -143,65 +145,63 @@ ktx_uint32_t computeVkFormat(const ImageDesc &imageDesc) {
     return VK_FORMAT_UNDEFINED;
 }
 
-void writeTextureKTX2(const std::string &fileName, const ImageDesc &image)
-{
+void writeTextureKTX2(const std::string &fileName, const ImageDesc &image) {
     XE_LOG_INFO("Creating KTX2 texture\n");
-  const uint32_t height = static_cast<uint32_t>(image.width);
-  const uint32_t width = static_cast<uint32_t>(image.height);
-  const uint32_t depth = 1;
+    const uint32_t height = static_cast<uint32_t>(image.width);
+    const uint32_t width = static_cast<uint32_t>(image.height);
+    const uint32_t depth = 1;
 
-  // assert(depth >= 1 && depth <= 4 && "Expects an image with 1 to 4 color channels");
-  assert(depth == 1 && "Only gray-scale images are supported for KTX export for now");
+    // assert(depth >= 1 && depth <= 4 && "Expects an image with 1 to 4 color channels");
+    assert(depth == 1 && "Only gray-scale images are supported for KTX export for now");
 
-  // Prepare KTX texture info
-  ktxTextureCreateInfo createInfo{};
-  createInfo.baseWidth = width;
-  createInfo.baseHeight = height;
-  createInfo.baseDepth = depth;
-  createInfo.numDimensions = 2;
-  createInfo.numLevels = 1;
-  createInfo.numLayers = 1;
-  createInfo.numFaces = 1;
-  createInfo.isArray = KTX_FALSE;
-  createInfo.generateMipmaps = KTX_FALSE;
-  createInfo.vkFormat = computeVkFormat(image);
+    // Prepare KTX texture info
+    ktxTextureCreateInfo createInfo{};
+    createInfo.baseWidth = width;
+    createInfo.baseHeight = height;
+    createInfo.baseDepth = depth;
+    createInfo.numDimensions = 2;
+    createInfo.numLevels = 1;
+    createInfo.numLayers = 1;
+    createInfo.numFaces = 1;
+    createInfo.isArray = KTX_FALSE;
+    createInfo.generateMipmaps = KTX_FALSE;
+    createInfo.vkFormat = computeVkFormat(image);
 
     if (createInfo.vkFormat == VK_FORMAT_UNDEFINED) {
         throw std::runtime_error("Could not determine texture format from image description");
     }
 
-  ktxTexture2* texture = nullptr;
-  KTX_error_code result = ktxTexture2_Create(&createInfo, KTX_TEXTURE_CREATE_ALLOC_STORAGE, &texture);
-  if (result != KTX_SUCCESS) {
-    throw std::runtime_error("Failed to create KTX texture");
-  }
-
-  result = ktxTexture_SetImageFromMemory(
-    ktxTexture(texture), 0, 0, 0, image.data.data(), image.data.size());
-
-  if (result != KTX_SUCCESS) {
-    ktxTexture_Destroy(ktxTexture(texture));
-    throw std::runtime_error("Failed to upload image to KTX texture");
-  }
-
-  const bool compress = true;
-
-  if (compress) {
-      XE_LOG_INFO("Compressing KTX2 texture\n");
-    // Basis compression parameters
-    ktxBasisParams params{};
-
-    // ETC1S (smaller) or UASTC (higher quality) can be chosen
-    params.structSize = sizeof(ktxBasisParams);
-    params.uastc = KTX_FALSE; // set to KTX_TRUE for UASTC instead of ETC1S
-    params.verbose = KTX_FALSE;
-
-    result = ktxTexture2_CompressBasisEx(texture, &params);
+    ktxTexture2 *texture = nullptr;
+    KTX_error_code result = ktxTexture2_Create(&createInfo, KTX_TEXTURE_CREATE_ALLOC_STORAGE, &texture);
     if (result != KTX_SUCCESS) {
-      ktxTexture_Destroy(ktxTexture(texture));
-      throw std::runtime_error("Failed to compress KTX texture with BasisU");
+        throw std::runtime_error("Failed to create KTX texture");
     }
-  }
+
+    result = ktxTexture_SetImageFromMemory(ktxTexture(texture), 0, 0, 0, image.data.data(), image.data.size());
+
+    if (result != KTX_SUCCESS) {
+        ktxTexture_Destroy(ktxTexture(texture));
+        throw std::runtime_error("Failed to upload image to KTX texture");
+    }
+
+    const bool compress = true;
+
+    if (compress) {
+        XE_LOG_INFO("Compressing KTX2 texture\n");
+        // Basis compression parameters
+        ktxBasisParams params{};
+
+        // ETC1S (smaller) or UASTC (higher quality) can be chosen
+        params.structSize = sizeof(ktxBasisParams);
+        params.uastc = KTX_FALSE; // set to KTX_TRUE for UASTC instead of ETC1S
+        params.verbose = KTX_FALSE;
+
+        result = ktxTexture2_CompressBasisEx(texture, &params);
+        if (result != KTX_SUCCESS) {
+            ktxTexture_Destroy(ktxTexture(texture));
+            throw std::runtime_error("Failed to compress KTX texture with BasisU");
+        }
+    }
 
     XE_LOG_INFO("Writing KTX2 texture to file: {}\n", fileName);
     ktxTexture_WriteToNamedFile(ktxTexture(texture), fileName.c_str());
@@ -224,14 +224,11 @@ std::optional<ILenum> paletteTypeToFormat(ILenum paletteType) {
     }
 }
 
-enum class KtxcOutputFormat {
-    KTX,
-    KTX2
-};
+enum class KtxcOutputFormat { KTX, KTX2 };
 
 struct KtxcOptions {
     std::filesystem::path inputImageFilePath = "";
-    KtxcOutputFormat outputFormat  = KtxcOutputFormat::KTX2;
+    KtxcOutputFormat outputFormat = KtxcOutputFormat::KTX2;
 };
 
 void compileImage(const KtxcOptions &options) {
@@ -282,12 +279,9 @@ void compileImage(const KtxcOptions &options) {
 std::optional<KtxcOptions> parseCommandLine(const int argc, char *argv[]) {
     cxxopts::Options options("xe-ktxc", "KTX texture compiler");
 
-    options.add_options()
-        ("h,help", "Print usage")
-        ("i,input-file", "Input image file", cxxopts::value<std::string>())
+    options.add_options()("h,help", "Print usage")("i,input-file", "Input image file", cxxopts::value<std::string>())
         // ("v,verbose", "Enable verbose output", cxxopts::value<bool>()->default_value("false"))
-        ("f,output-format", "Output format", cxxopts::value<std::string>()->default_value("ktx2"))
-        ;
+        ("f,output-format", "Output format", cxxopts::value<std::string>()->default_value("ktx2"));
 
     const auto parseResult = options.parse(argc, argv);
 
@@ -308,11 +302,9 @@ std::optional<KtxcOptions> parseCommandLine(const int argc, char *argv[]) {
         const std::string outputFormat = parseResult["output-format"].as<std::string>();
         if (outputFormat == "ktx2") {
             result.outputFormat = KtxcOutputFormat::KTX2;
-        }
-        else if (outputFormat == "ktx") {
+        } else if (outputFormat == "ktx") {
             result.outputFormat = KtxcOutputFormat::KTX;
-        }
-        else {
+        } else {
             throw std::runtime_error("Unknown output-format specified");
         }
     } else {
@@ -322,16 +314,14 @@ std::optional<KtxcOptions> parseCommandLine(const int argc, char *argv[]) {
     return result;
 }
 
-
-int main(int argc,char *argv[]) {
+int main(int argc, char *argv[]) {
     try {
         if (std::optional<KtxcOptions> options = parseCommandLine(argc, argv); options) {
             compileImage(options.value());
         }
 
         return EXIT_SUCCESS;
-    }
-    catch (const std::exception &e) {
+    } catch (const std::exception &e) {
         XE_LOG_ERROR("Error while compiling image\n");
         XE_LOG_ERROR("{}\n", e.what());
         return EXIT_FAILURE;

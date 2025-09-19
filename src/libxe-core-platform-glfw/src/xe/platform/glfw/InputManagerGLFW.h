@@ -13,7 +13,9 @@ namespace XE {
 
         virtual void poll() override;
 
-        virtual KeyboardStatus getKeyboardStatus() override { return m_keyboardStatus; }
+        virtual KeyboardStatus getKeyboardStatus() override {
+            return m_keyboardStatus;
+        }
 
         virtual MouseStatus getMouseStatus() override;
 
@@ -28,6 +30,6 @@ namespace XE {
         GLFWwindow *m_windowGLFW = nullptr;
         KeyboardStatus m_keyboardStatus = {};
     };
-} // namespace xe
+} // namespace XE
 
 #endif

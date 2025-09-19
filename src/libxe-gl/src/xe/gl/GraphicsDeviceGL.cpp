@@ -13,13 +13,13 @@
 #include "TextureCubeMapGL.h"
 #include "UtilGL.h"
 
+#include <iostream>
 #include <xe/graphics/Material.h>
 #include <xe/graphics/Subset.h>
 #include <xe/graphics/Texture2DArray.h>
 #include <xe/graphics/Texture3D.h>
 #include <xe/graphics/TextureCubeMap.h>
 #include <xe/graphics/Uniform.h>
-#include <iostream>
 
 namespace XE {
     static std::string hexstr(const GLenum value) {
@@ -91,36 +91,49 @@ namespace XE {
 #endif
     }
 
-    GraphicsDeviceGL::~GraphicsDeviceGL() {}
+    GraphicsDeviceGL::~GraphicsDeviceGL() {
+    }
 
-    Subset *GraphicsDeviceGL::createSubset(const SubsetDescriptor &desc) { return new SubsetGL(desc); }
+    Subset *GraphicsDeviceGL::createSubset(const SubsetDescriptor &desc) {
+        return new SubsetGL(desc);
+    }
 
-    Buffer *GraphicsDeviceGL::createBuffer(const BufferDescriptor &/*desc*/) { return nullptr; }
+    Buffer *GraphicsDeviceGL::createBuffer(const BufferDescriptor & /*desc*/) {
+        return nullptr;
+    }
 
-    Texture2D *GraphicsDeviceGL::createTexture2D(const PixelFormat format, const Vector2i &size, const PixelFormat sourceFormat, const DataType sourceDataType,
-                                                 const void *sourceData) {
+    Texture2D *
+    GraphicsDeviceGL::createTexture2D(const PixelFormat format, const Vector2i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void *sourceData) {
         return new Texture2DGL(format, size, sourceFormat, sourceDataType, sourceData);
     }
 
-    Texture3D *GraphicsDeviceGL::createTexture3D(const PixelFormat format, const Vector3i &size, const PixelFormat sourceFormat, const DataType sourceDataType,
-                                                 const void *sourceData) {
+    Texture3D *
+    GraphicsDeviceGL::createTexture3D(const PixelFormat format, const Vector3i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void *sourceData) {
         return new Texture3DGL(format, size, sourceFormat, sourceDataType, sourceData);
     }
 
-    Texture2DArray *GraphicsDeviceGL::createTexture2DArray(const PixelFormat format, const Vector2i &size, const int count) { return new Texture2DArrayGL(format, size, count); }
+    Texture2DArray *GraphicsDeviceGL::createTexture2DArray(const PixelFormat format, const Vector2i &size, const int count) {
+        return new Texture2DArrayGL(format, size, count);
+    }
 
-    TextureCubeMap *GraphicsDeviceGL::createTextureCubeMap(const PixelFormat format, const Vector2i &size, const PixelFormat sourceFormat, const DataType sourceDataType,
-                                                           const void **sourceData) {
+    TextureCubeMap *
+    GraphicsDeviceGL::createTextureCubeMap(const PixelFormat format, const Vector2i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void **sourceData) {
 
         const std::array<TextureCubeMapSide, 6> sides = {
-            TextureCubeMapSide::PositiveX, TextureCubeMapSide::PositiveY, TextureCubeMapSide::PositiveZ,
-            TextureCubeMapSide::NegativeX, TextureCubeMapSide::NegativeY, TextureCubeMapSide::NegativeZ,
+            TextureCubeMapSide::PositiveX,
+            TextureCubeMapSide::PositiveY,
+            TextureCubeMapSide::PositiveZ,
+            TextureCubeMapSide::NegativeX,
+            TextureCubeMapSide::NegativeY,
+            TextureCubeMapSide::NegativeZ,
         };
 
         return new TextureCubeMapGL(format, size, sourceFormat, sourceDataType, sides, sourceData);
     }
 
-    Program *GraphicsDeviceGL::createProgram(const ProgramDescriptor &desc) { return new ProgramGL(desc); }
+    Program *GraphicsDeviceGL::createProgram(const ProgramDescriptor &desc) {
+        return new ProgramGL(desc);
+    }
 
     void GraphicsDeviceGL::draw(const Subset *subset, const SubsetEnvelope *envelopes, const size_t envelopeCount) {
         assert(subset);
@@ -296,7 +309,9 @@ namespace XE {
         }
     }
 
-    const Program *GraphicsDeviceGL::getProgram() const { return m_program; }
+    const Program *GraphicsDeviceGL::getProgram() const {
+        return m_program;
+    }
 
     void GraphicsDeviceGL::applyUniform(const UniformMatrix *uniformMatrix, const size_t count, const void *data) {
         // TODO: Add support for matrix transposition
@@ -487,7 +502,11 @@ namespace XE {
         m_viewport = viewport;
     }
 
-    Viewport GraphicsDeviceGL::getViewport() const { return m_viewport; }
+    Viewport GraphicsDeviceGL::getViewport() const {
+        return m_viewport;
+    }
 
-    const Material *GraphicsDeviceGL::getMaterial() const { return m_material; }
-} // namespace xe
+    const Material *GraphicsDeviceGL::getMaterial() const {
+        return m_material;
+    }
+} // namespace XE

@@ -1,6 +1,6 @@
 
-#include <xe/io/FileStream.h>
 #include <stdexcept>
+#include <xe/io/FileStream.h>
 
 namespace XE {
     FileStream::FileStream(const std::string &fileName, const StreamFlags flags) {
@@ -26,11 +26,16 @@ namespace XE {
         }
     }
 
-    FileStream::~FileStream() {}
+    FileStream::~FileStream() {
+    }
 
-    int FileStream::read(void *buffer, const int size, const int count) { return (int)std::fread(buffer, size, count, m_fileHandle); }
+    int FileStream::read(void *buffer, const int size, const int count) {
+        return (int)std::fread(buffer, size, count, m_fileHandle);
+    }
 
-    int FileStream::write(const void *buffer, const int size, const int count) { return (int)std::fwrite(buffer, size, count, m_fileHandle); }
+    int FileStream::write(const void *buffer, const int size, const int count) {
+        return (int)std::fwrite(buffer, size, count, m_fileHandle);
+    }
 
     bool FileStream::seek(const int offset, const StreamOffset position) {
         switch (position) {
@@ -50,7 +55,11 @@ namespace XE {
         return true;
     }
 
-    int FileStream::tell() const { return (int)std::ftell(m_fileHandle); }
+    int FileStream::tell() const {
+        return (int)std::ftell(m_fileHandle);
+    }
 
-    StreamFlags FileStream::getFlags() const { return m_flags; }
-} // namespace xe
+    StreamFlags FileStream::getFlags() const {
+        return m_flags;
+    }
+} // namespace XE

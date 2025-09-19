@@ -13,7 +13,7 @@ namespace XE {
      */
     class BufferGL : public Buffer {
     public:
-        BufferGL(GLenum target, GLenum usage, const void * data, GLsizei size);
+        BufferGL(GLenum target, GLenum usage, const void *data, GLsizei size);
 
         explicit BufferGL(GLuint bufferId);
 
@@ -50,16 +50,14 @@ namespace XE {
         GLsizei m_size;
     };
 
-
-} // namespace xe
+} // namespace XE
 
 namespace xe::gl {
-    template<GLenum Target>
-    class Buffer {
+    template <GLenum Target> class Buffer {
     public:
         Buffer() = default;
 
-        Buffer(const void * data, GLsizei size, GLenum usage) {
+        Buffer(const void *data, GLsizei size, GLenum usage) {
             glGenBuffers(1, &m_id);
             glBindBuffer(Target, m_id);
             glBufferData(Target, size, data, usage);
@@ -83,11 +81,9 @@ namespace xe::gl {
         GLuint m_id = 0;
     };
 
-    template<GLenum Target>
-    void bind(const Buffer<Target> & buffer) {
+    template <GLenum Target> void bind(const Buffer<Target> &buffer) {
         glBindBuffer(Target, buffer.getID());
     }
-}
+} // namespace xe::gl
 
 #endif
-

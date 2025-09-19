@@ -7,19 +7,31 @@ namespace XE {
     // using MyFlags = Flags<MyEnumBits>;
     template <typename T> class Flags {
     public:
-        Flags() {}
+        Flags() {
+        }
 
-        explicit Flags(const T value) : value{value} {}
+        explicit Flags(const T value) : value{value} {
+        }
 
-        bool operator==(const Flags<T> &rhs) const { return value == rhs.value; }
+        bool operator==(const Flags<T> &rhs) const {
+            return value == rhs.value;
+        }
 
-        bool operator!=(const Flags<T> &rhs) const { return value != rhs.value; }
+        bool operator!=(const Flags<T> &rhs) const {
+            return value != rhs.value;
+        }
 
-        Flags<T> operator&(const Flags<T> &rhs) const { return value & rhs.value; }
+        Flags<T> operator&(const Flags<T> &rhs) const {
+            return value & rhs.value;
+        }
 
-        Flags<T> operator|(const Flags<T> &rhs) const { return value | rhs.value; }
+        Flags<T> operator|(const Flags<T> &rhs) const {
+            return value | rhs.value;
+        }
 
-        Flags<T> operator^(const Flags<T> &rhs) const { return value ^ rhs.value; }
+        Flags<T> operator^(const Flags<T> &rhs) const {
+            return value ^ rhs.value;
+        }
 
         Flags<T> &operator&=(const Flags<T> &rhs) {
             value &= rhs.value;
@@ -42,6 +54,6 @@ namespace XE {
     private:
         T value{};
     };
-} // namespace xe
+} // namespace XE
 
 #endif // XE_FLAGS_H

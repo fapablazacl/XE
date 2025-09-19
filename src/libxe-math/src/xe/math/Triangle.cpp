@@ -4,4 +4,4 @@
 namespace XE {
     template struct TTriangle<float>;
     template struct TTriangle<double>;
-} // namespace xe
+} // namespace XE

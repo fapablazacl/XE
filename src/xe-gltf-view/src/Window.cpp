@@ -2,17 +2,17 @@
 #include "Window.h"
 
 #include <cstdio>
-#include <map>
 #include <iostream>
+#include <map>
 #include <span>
 
-#include <glad/glad.h>
-#include "xe/gl/RendererGL.h"
-#include "cgltf.h"
 #include "GltfUtil.h"
+#include "cgltf.h"
+#include "xe/gl/RendererGL.h"
+#include <glad/glad.h>
 
-#include "bindings/imgui_impl_sdl2.h"
 #include "bindings/imgui_impl_opengl3.h"
+#include "bindings/imgui_impl_sdl2.h"
 
 const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 480;
@@ -197,34 +197,33 @@ void process_skins(cgltf_skin *skin) {
 }
 
 void process_texture(cgltf_texture *texture) {
-    std::cout << "Texture name: " << (texture->name ? texture->name : "<noname>")  << std::endl;
-    std::cout << "Texture extensions count: " << texture->extensions_count  << std::endl;
-    std::cout << "Texture has sampler: " << (texture->sampler ? "true" : "false")  << std::endl;
+    std::cout << "Texture name: " << (texture->name ? texture->name : "<noname>") << std::endl;
+    std::cout << "Texture extensions count: " << texture->extensions_count << std::endl;
+    std::cout << "Texture has sampler: " << (texture->sampler ? "true" : "false") << std::endl;
 
     const cgltf_sampler *sampler = texture->sampler;
 
     if (sampler) {
-        std::cout << "Texture sampler name: " << (sampler->name ? sampler->name : "<noname>")  << std::endl;
-        std::cout << "Texture mag filter: " << sampler->mag_filter  << std::endl;
-        std::cout << "Texture min filter: " << sampler->min_filter  << std::endl;
-        std::cout << "Texture wrap s: " << sampler->wrap_s  << std::endl;
-        std::cout << "Texture wrap t: " << sampler->wrap_t  << std::endl;
+        std::cout << "Texture sampler name: " << (sampler->name ? sampler->name : "<noname>") << std::endl;
+        std::cout << "Texture mag filter: " << sampler->mag_filter << std::endl;
+        std::cout << "Texture min filter: " << sampler->min_filter << std::endl;
+        std::cout << "Texture wrap s: " << sampler->wrap_s << std::endl;
+        std::cout << "Texture wrap t: " << sampler->wrap_t << std::endl;
         std::cout << "Texture extensions count: " << sampler->extensions_count << std::endl;
     }
 
-    std::cout << "Texture has basisu: " << (texture->has_basisu ? "true" : "false")  << std::endl;
+    std::cout << "Texture has basisu: " << (texture->has_basisu ? "true" : "false") << std::endl;
 }
 
 void process_image(cgltf_image *image) {
-    std::cout << "Image name: " << (image->name ? image->name : "<noname>")  << std::endl;
-    std::cout << "Image uri: " << (image->uri ? image->uri : "<noname>")  << std::endl;
-    std::cout << "Image mime type: " << (image->mime_type ? image->mime_type : "<noname>")  << std::endl;
-    std::cout << "Image has buffer view: " << (image->buffer_view ? "true" : "false")  << std::endl;
-    std::cout << "Image extensions count: " << image->extensions_count  << std::endl;
+    std::cout << "Image name: " << (image->name ? image->name : "<noname>") << std::endl;
+    std::cout << "Image uri: " << (image->uri ? image->uri : "<noname>") << std::endl;
+    std::cout << "Image mime type: " << (image->mime_type ? image->mime_type : "<noname>") << std::endl;
+    std::cout << "Image has buffer view: " << (image->buffer_view ? "true" : "false") << std::endl;
+    std::cout << "Image extensions count: " << image->extensions_count << std::endl;
 }
 
 void process_sampler(cgltf_sampler *sampler) {
-
 }
 
 void process_buffer(cgltf_buffer *buffer) {
@@ -245,8 +244,7 @@ void process_extensions_used(char *str) {
     std::cout << "Extension used " << str << std::endl;
 }
 
-void process_variant(cgltf_material_variant * material_variant) {
-
+void process_variant(cgltf_material_variant *material_variant) {
 }
 
 void treeNodeLights(cgltf_light *lights, cgltf_size lights_count) {
@@ -314,7 +312,7 @@ void treeNodeImages(cgltf_image *images, cgltf_size images_count) {
 
 void treeNodeScenes(cgltf_data *data, cgltf_scene *scenes, cgltf_size scenes_count) {
     std::cout << "Found " << scenes_count << " scenes" << std::endl;
-    for (cgltf_size i = 0; i<scenes_count; i++) {
+    for (cgltf_size i = 0; i < scenes_count; i++) {
         process_scene(data, scenes + i);
     }
     std::cout << std::endl;
@@ -324,13 +322,11 @@ std::span<cgltf_light> getLightsSpan(cgltf_data *data) {
     return {data->lights, data->lights_count};
 }
 
-template<typename T>
-std::span<T> make_span(T *ptr, cgltf_size size) {
+template <typename T> std::span<T> make_span(T *ptr, cgltf_size size) {
     return {ptr, size};
 }
 
-template<typename T>
-void renderTreeNode(const std::string &label, const std::span<T> &values) {
+template <typename T> void renderTreeNode(const std::string &label, const std::span<T> &values) {
     ImGuiTreeNodeFlags flag = ImGuiTreeNodeFlags_DefaultOpen;
     if (ImGui::TreeNodeEx(label.c_str(), flag)) {
 
@@ -338,8 +334,7 @@ void renderTreeNode(const std::string &label, const std::span<T> &values) {
     }
 }
 
-template<typename Func>
-void treeNode(const std::string &label, Func func) {
+template <typename Func> void treeNode(const std::string &label, Func func) {
     ImGuiTreeNodeFlags flag = ImGuiTreeNodeFlags_DefaultOpen;
     if (ImGui::TreeNodeEx(label.c_str(), flag)) {
         func();
@@ -349,17 +344,18 @@ void treeNode(const std::string &label, Func func) {
 
 void visitData(cgltf_data *data) {
     assert(data != nullptr);
-    std::span<cgltf_scene> scenes {data->scenes, data->scenes_count};
-    std::span<cgltf_light> lights {data->lights, data->lights_count};
-    std::span<cgltf_camera> cameras {data->cameras, data->cameras_count};
-    std::span<cgltf_mesh> meshes {data->meshes, data->meshes_count};
-    std::span<cgltf_animation> animations {data->animations, data->animations_count};
-    std::span<cgltf_skin> skins {data->skins, data->skins_count};
-    std::span<cgltf_texture> textures {data->textures, data->textures_count};
-    std::span<cgltf_image> images {data->images, data->images_count};
+    std::span<cgltf_scene> scenes{data->scenes, data->scenes_count};
+    std::span<cgltf_light> lights{data->lights, data->lights_count};
+    std::span<cgltf_camera> cameras{data->cameras, data->cameras_count};
+    std::span<cgltf_mesh> meshes{data->meshes, data->meshes_count};
+    std::span<cgltf_animation> animations{data->animations, data->animations_count};
+    std::span<cgltf_skin> skins{data->skins, data->skins_count};
+    std::span<cgltf_texture> textures{data->textures, data->textures_count};
+    std::span<cgltf_image> images{data->images, data->images_count};
 }
 
-Window::Window() {}
+Window::Window() {
+}
 
 Window::~Window() {
     ImGui_ImplOpenGL3_Shutdown();
@@ -402,9 +398,9 @@ int Window::initializeSDL() {
 
     std::printf("Creating diplay window with 640 x 480 mode, windowed mode\n");
     const Uint32 flags = SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN;
-    window = SDL_CreateWindow( "Capybaria", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, flags );
-    if( window == nullptr ) {
-        std::printf( "Error while creating Window. SDL_Error: %s\n", SDL_GetError() );
+    window = SDL_CreateWindow("Capybaria", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, flags);
+    if (window == nullptr) {
+        std::printf("Error while creating Window. SDL_Error: %s\n", SDL_GetError());
 
         return EXIT_FAILURE;
     }
@@ -430,7 +426,7 @@ int Window::initializeOpenGL() {
         {SDL_GL_DOUBLEBUFFER, 1}
     };
 
-    for (const auto& pair : sdlGlAttributes) {
+    for (const auto &pair : sdlGlAttributes) {
         SDL_GL_SetAttribute(pair.first, pair.second);
     }
 
@@ -438,14 +434,14 @@ int Window::initializeOpenGL() {
 
     context = SDL_GL_CreateContext(window);
     if (context == nullptr) {
-        std::printf( "Error while creating OpenGL context. SDL_Error: %s\n", SDL_GetError() );
+        std::printf("Error while creating OpenGL context. SDL_Error: %s\n", SDL_GetError());
 
         return EXIT_FAILURE;
     }
 
     const int makeCurrentResult = SDL_GL_MakeCurrent(window, context);
     if (makeCurrentResult < 0) {
-        std::printf( "Error while making OpenGL context current. SDL_Error: %s\n", SDL_GetError() );
+        std::printf("Error while making OpenGL context current. SDL_Error: %s\n", SDL_GetError());
         return EXIT_FAILURE;
     }
 
@@ -455,7 +451,7 @@ int Window::initializeOpenGL() {
 bool Window::pollInput() {
     SDL_Event e;
 
-    while( SDL_PollEvent( &e ) ) {
+    while (SDL_PollEvent(&e)) {
         ImGui_ImplSDL2_ProcessEvent(&e);
 
         if (e.type == SDL_QUIT) {
@@ -466,7 +462,8 @@ bool Window::pollInput() {
     return true;
 }
 
-void Window::update() {}
+void Window::update() {
+}
 
 void Window::prepareUI() {
     ImGui_ImplOpenGL3_NewFrame();

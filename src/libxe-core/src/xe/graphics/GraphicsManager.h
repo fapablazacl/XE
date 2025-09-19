@@ -37,4 +37,4 @@ namespace XE {
          */
         GraphicsDevice *createDevice();
     };
-} // namespace xe
+} // namespace XE

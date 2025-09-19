@@ -1,5 +1,5 @@
 
-#pragma once 
+#pragma once
 
 #include <string>
 
@@ -13,11 +13,8 @@ class TextureRepository;
 
 class ModelLoader {
 public:
-    virtual ~ModelLoader() {}
+    virtual ~ModelLoader() {
+    }
 
-    virtual Model createModel(
-        const std::string &fileName,
-        Renderer &renderer, 
-        TextureRepository &textureRepository, 
-        const ShaderLocationMap &location) = 0;
+    virtual Model createModel(const std::string &fileName, Renderer &renderer, TextureRepository &textureRepository, const ShaderLocationMap &location) = 0;
 };

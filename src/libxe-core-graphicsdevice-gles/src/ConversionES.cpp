@@ -186,5 +186,7 @@ namespace XE {
         }
     }
 
-    GLboolean convertToES(const bool value) { return value ? GL_TRUE : GL_FALSE; }
-} // namespace xe
+    GLboolean convertToES(const bool value) {
+        return value ? GL_TRUE : GL_FALSE;
+    }
+} // namespace XE

@@ -1,5 +1,5 @@
 
-#pragma once 
+#pragma once
 
 #include <string>
 
@@ -8,10 +8,7 @@
 #include <memory>
 #include <optional>
 
-enum class ImageFormat {
-    Jpeg,
-    Png
-};
+enum class ImageFormat { Jpeg, Png };
 
 inline std::optional<ImageFormat> parseImageFormat(std::string_view str) {
     if (str == "image/jpeg") {

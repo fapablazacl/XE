@@ -10,7 +10,9 @@
 #include <map>
 
 namespace XE {
-    void static errorCallback(int error, const char *description) { std::cout << "GLFW errorCallback: " << error << ": " << description << std::endl; }
+    void static errorCallback(int error, const char *description) {
+        std::cout << "GLFW errorCallback: " << error << ": " << description << std::endl;
+    }
 
     static std::map<int, int> mapToHints(const GraphicsContext::Descriptor &descriptor) {
         std::map<int, int> hints;
@@ -106,9 +108,13 @@ namespace XE {
             ::glfwSetWindowTitle(glfwWindow, title.c_str());
         }
 
-        virtual GraphicsContext *getContext() const override { return graphicsContext.get(); }
+        virtual GraphicsContext *getContext() const override {
+            return graphicsContext.get();
+        }
 
-        virtual InputManager *getInputManager() const override { return inputManager.get(); }
+        virtual InputManager *getInputManager() const override {
+            return inputManager.get();
+        }
 
     private:
         GLFWwindow *glfwWindow = nullptr;
@@ -121,10 +127,11 @@ namespace XE {
 
     int WindowGLFWImpl::usageCount = 0;
 
-    WindowGLFW::~WindowGLFW() {}
+    WindowGLFW::~WindowGLFW() {
+    }
 
-    std::unique_ptr<WindowGLFW> WindowGLFW::create(const GraphicsContext::Descriptor &contextDescriptor, const std::string &title, const Vector2i &windowSize,
-                                                   const bool fullScreen) {
+    std::unique_ptr<WindowGLFW>
+    WindowGLFW::create(const GraphicsContext::Descriptor &contextDescriptor, const std::string &title, const Vector2i &windowSize, const bool fullScreen) {
         return std::make_unique<WindowGLFWImpl>(contextDescriptor, title, windowSize, fullScreen);
     }
-} // namespace xe
+} // namespace XE

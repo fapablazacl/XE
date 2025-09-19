@@ -22,7 +22,7 @@ namespace XE {
     enum class TextureFilter;
     enum class TextureWrap;
     enum class TextureCubeMapSide;
-} // namespace xe
+} // namespace XE
 
 namespace XE {
     extern GLenum convertToGL(const DataType type);
@@ -38,6 +38,6 @@ namespace XE {
     extern GLenum convertToGL(const TextureWrap wrap);
     extern GLenum convertToGL(const TextureCubeMapSide side);
     extern GLboolean convertToGL(const bool value);
-} // namespace xe
+} // namespace XE
 
 #endif

@@ -1,6 +1,4 @@
 
 #include "UtilGL.h"
 
-namespace xe::gl {
-
-}
+namespace xe::gl {}

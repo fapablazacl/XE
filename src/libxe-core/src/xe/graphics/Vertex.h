@@ -10,6 +10,6 @@ namespace XE {
         Vector3 Normal;
         Vector2 TexCoord;
     };
-} // namespace xe
+} // namespace XE
 
 #endif

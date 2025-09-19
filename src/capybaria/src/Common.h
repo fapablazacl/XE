@@ -19,9 +19,11 @@ namespace demo {
         XE::Vector3 normal;
         XE::Vector4 color;
 
-        Vertex() {}
+        Vertex() {
+        }
 
-        Vertex(XE::Vector3 coord, XE::Vector3 normal, XE::Vector4 color) : coord(coord), normal(normal), color(color) {}
+        Vertex(XE::Vector3 coord, XE::Vector3 normal, XE::Vector4 color) : coord(coord), normal(normal), color(color) {
+        }
     };
 
     struct Mesh {
@@ -72,7 +74,8 @@ namespace Sandbox {
 
     class SceneLoader {
     public:
-        virtual ~SceneLoader() {}
+        virtual ~SceneLoader() {
+        }
         virtual Scene load(const std::string &filePath) const = 0;
     };
 

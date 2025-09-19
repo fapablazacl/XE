@@ -36,6 +36,6 @@ namespace XE {
         Vector3i division;
         Vector3 size;
     };
-} // namespace xe
+} // namespace XE
 
 #endif

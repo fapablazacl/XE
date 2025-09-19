@@ -84,9 +84,13 @@ namespace XE {
 
         void setState(const KeyCode code, const BinaryState state);
 
-        bool isPressed(const KeyCode code) const { return getState(code) == BinaryState::Press; }
+        bool isPressed(const KeyCode code) const {
+            return getState(code) == BinaryState::Press;
+        }
 
-        bool isReleased(const KeyCode code) const { return getState(code) == BinaryState::Release; }
+        bool isReleased(const KeyCode code) const {
+            return getState(code) == BinaryState::Release;
+        }
 
     private:
         BinaryState m_keys[static_cast<int>(KeyCode::Max)] = {};
@@ -127,6 +131,6 @@ namespace XE {
         BinaryState m_buttons[static_cast<int>(ControllerButton::Max)];
         Vector2 m_joysticks[static_cast<int>(ControllerJoystick::Max)];
     };
-} // namespace xe
+} // namespace XE
 
 #endif

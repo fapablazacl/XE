@@ -1,8 +1,8 @@
 
-#include "Window.h"
 #include "GltfRenderer.h"
+#include "Window.h"
 
-int main(int argc,char *argv[]) {
+int main(int argc, char *argv[]) {
     using xe::gltf_view::GltfRenderer;
 
     Window window;

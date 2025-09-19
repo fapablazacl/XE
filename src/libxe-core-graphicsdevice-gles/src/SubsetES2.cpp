@@ -21,8 +21,14 @@ namespace XE {
             glBindBuffer(buffer->getTarget(), buffer->getID());
             glEnableVertexAttribArray(attrib.shaderLocation);
 
-            glVertexAttribPointer(attrib.shaderLocation, attrib.size, convertToES(attrib.type), convertToES(attrib.normalized), static_cast<GLsizei>(attrib.stride),
-                                  reinterpret_cast<const void *>(attrib.bufferOffset));
+            glVertexAttribPointer(
+                attrib.shaderLocation,
+                attrib.size,
+                convertToES(attrib.type),
+                convertToES(attrib.normalized),
+                static_cast<GLsizei>(attrib.stride),
+                reinterpret_cast<const void *>(attrib.bufferOffset)
+            );
         }
 
         if (indexBuffer) {
@@ -44,15 +50,26 @@ namespace XE {
         }
     }
 
-    SubsetES::~SubsetES() {}
+    SubsetES::~SubsetES() {
+    }
 
-    int SubsetES::getBufferCount() const { return (int)buffers.size(); }
+    int SubsetES::getBufferCount() const {
+        return (int)buffers.size();
+    }
 
-    BufferES2 *SubsetES::getBuffer(const int index) { return const_cast<BufferES2 *>(buffers[index]); }
+    BufferES2 *SubsetES::getBuffer(const int index) {
+        return const_cast<BufferES2 *>(buffers[index]);
+    }
 
-    BufferES2 *SubsetES::getIndexBuffer() { return const_cast<BufferES2 *>(indexBuffer); }
+    BufferES2 *SubsetES::getIndexBuffer() {
+        return const_cast<BufferES2 *>(indexBuffer);
+    }
 
-    const BufferES2 *SubsetES::getBuffer(const int index) const { return buffers[index]; }
+    const BufferES2 *SubsetES::getBuffer(const int index) const {
+        return buffers[index];
+    }
 
-    const BufferES2 *SubsetES::getIndexBuffer() const { return indexBuffer; }
-} // namespace xe
+    const BufferES2 *SubsetES::getIndexBuffer() const {
+        return indexBuffer;
+    }
+} // namespace XE

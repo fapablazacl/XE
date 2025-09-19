@@ -1,14 +1,14 @@
 #pragma once
 
+#include <SDL2/SDL.h>
+#include <cassert>
 #include <cstdio>
 #include <cstdlib>
-#include <SDL2/SDL.h>
-#include <map>
 #include <iostream>
-#include <cassert>
+#include <map>
 
-#include <xe/math/Vector.h>
 #include <xe/math/Matrix.h>
+#include <xe/math/Vector.h>
 
 #include "xe/gl/RendererGL.h"
 
@@ -41,7 +41,6 @@ enum GAME_ACTION {
 
     GAME_ACTION_QUIT = 0x1000,
 };
-
 
 struct Camera {
     const float turnSpeed = 25.0f;
@@ -115,21 +114,15 @@ struct Camera {
     }
 };
 
-
 struct Transformation {
     XE::Vector3 scale = {1.0f, 1.0f, 1.0f};
     XE::Vector3 position;
     XE::Vector3 rotation;
 
     XE::Matrix4 computeModelMatrix() const {
-        return
-            XE::mat4Translation(position) *
-            XE::mat4RotationX(rotation.X) *
-            XE::mat4RotationY(rotation.Y) *
-            XE::mat4RotationZ(rotation.Z);
+        return XE::mat4Translation(position) * XE::mat4RotationX(rotation.X) * XE::mat4RotationY(rotation.Y) * XE::mat4RotationZ(rotation.Z);
     }
 };
-
 
 struct ActionState {
     int actions = 0;
@@ -187,7 +180,6 @@ struct ActionState {
     }
 };
 
-
 struct Timer {
     Uint64 lastTime = SDL_GetTicks64();
 
@@ -200,7 +192,6 @@ struct Timer {
         return seconds;
     }
 };
-
 
 class Game {
 public:

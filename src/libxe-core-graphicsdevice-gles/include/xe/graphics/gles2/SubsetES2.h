@@ -34,6 +34,6 @@ namespace XE {
         const BufferES2 *indexBuffer = nullptr;
         SubsetDescriptor descriptor = {};
     };
-} // namespace xe
+} // namespace XE
 
 #endif

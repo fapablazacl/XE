@@ -15,9 +15,11 @@ namespace TestApp {
         // static_assert(std::is_base_of<IUnknown, T>)
 
     public:
-        COMPtr() {}
+        COMPtr() {
+        }
 
-        COMPtr(T *object) : m_obj(object) {}
+        COMPtr(T *object) : m_obj(object) {
+        }
 
         ~COMPtr() {
             if (m_obj) {
@@ -25,7 +27,9 @@ namespace TestApp {
             }
         }
 
-        T **operator&() { return &m_obj; }
+        T **operator&() {
+            return &m_obj;
+        }
 
         T *operator->() {
             assert(m_obj);
@@ -37,9 +41,13 @@ namespace TestApp {
             return m_obj;
         }
 
-        operator T *() { return m_obj; }
+        operator T *() {
+            return m_obj;
+        }
 
-        operator const T *() const { return m_obj; }
+        operator const T *() const {
+            return m_obj;
+        }
 
     private:
         T *m_obj = nullptr;

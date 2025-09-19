@@ -32,6 +32,6 @@ namespace XE {
 
         FILE *m_fileHandle = nullptr;
     };
-} // namespace xe
+} // namespace XE
 
 #endif

@@ -1,11 +1,11 @@
 
 #include "ImageLoaderPNG.h"
 
-#include <iostream>
-#include <vector>
+#include "lodepng.h"
 #include "xe/graphics/Image.h"
 #include "xe/io/Stream.h"
-#include "lodepng.h"
+#include <iostream>
+#include <vector>
 
 namespace XE {
     class ImagePNG : public Image {
@@ -16,13 +16,20 @@ namespace XE {
             this->size = size;
         }
 
-        virtual ~ImagePNG() {}
+        virtual ~ImagePNG() {
+        }
 
-        virtual const void *getPointer() const override { return pointer; }
+        virtual const void *getPointer() const override {
+            return pointer;
+        }
 
-        virtual PixelFormat getFormat() const override { return format; }
+        virtual PixelFormat getFormat() const override {
+            return format;
+        }
 
-        virtual Vector2i getSize() const override { return size; }
+        virtual Vector2i getSize() const override {
+            return size;
+        }
 
     private:
         const void *pointer;
@@ -30,7 +37,8 @@ namespace XE {
         Vector2i size;
     };
 
-    ImageLoaderPNG::~ImageLoaderPNG() {}
+    ImageLoaderPNG::~ImageLoaderPNG() {
+    }
 
     std::unique_ptr<Image> ImageLoaderPNG::load(Stream *inputStream) {
         // TODO: Add support for another pixel formats
@@ -67,4 +75,4 @@ namespace XE {
 
         return std::make_unique<ImagePNG>((const void *)pixels, PixelFormat::R8G8B8A8, Vector2i(int(width), int(height)));
     }
-} // namespace xe
+} // namespace XE

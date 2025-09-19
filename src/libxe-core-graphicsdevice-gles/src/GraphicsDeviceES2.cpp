@@ -103,30 +103,40 @@ namespace XE {
         XE_GRAPHICS_GL_CHECK_ERROR();
     }
 
-    GraphicsDeviceES2::~GraphicsDeviceES2() {}
+    GraphicsDeviceES2::~GraphicsDeviceES2() {
+    }
 
-    Subset *GraphicsDeviceES2::createSubset(const SubsetDescriptor &desc) { return new SubsetES(desc); }
+    Subset *GraphicsDeviceES2::createSubset(const SubsetDescriptor &desc) {
+        return new SubsetES(desc);
+    }
 
-    Buffer *GraphicsDeviceES2::createBuffer(const BufferDescriptor &desc) { return new BufferES2(desc); }
+    Buffer *GraphicsDeviceES2::createBuffer(const BufferDescriptor &desc) {
+        return new BufferES2(desc);
+    }
 
-    Texture2D *GraphicsDeviceES2::createTexture2D(const PixelFormat format, const Vector2i &size, const PixelFormat sourceFormat, const DataType sourceDataType,
-                                                  const void *sourceData) {
+    Texture2D *
+    GraphicsDeviceES2::createTexture2D(const PixelFormat format, const Vector2i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void *sourceData) {
         return new Texture2DES(format, size, sourceFormat, sourceDataType, sourceData);
     }
 
-    Texture3D *GraphicsDeviceES2::createTexture3D(const PixelFormat format, const Vector3i &size, const PixelFormat sourceFormat, const DataType sourceDataType,
-                                                  const void *sourceData) {
+    Texture3D *
+    GraphicsDeviceES2::createTexture3D(const PixelFormat format, const Vector3i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void *sourceData) {
         return nullptr;
     }
 
-    Texture2DArray *GraphicsDeviceES2::createTexture2DArray(const PixelFormat format, const Vector2i &size, const int count) { return nullptr; }
-
-    TextureCubeMap *GraphicsDeviceES2::createTextureCubeMap(const PixelFormat format, const Vector2i &size, const PixelFormat sourceFormat, const DataType sourceDataType,
-                                                            const void **sourceData) {
+    Texture2DArray *GraphicsDeviceES2::createTexture2DArray(const PixelFormat format, const Vector2i &size, const int count) {
         return nullptr;
     }
 
-    Program *GraphicsDeviceES2::createProgram(const ProgramDescriptor &desc) { return new ProgramES(desc); }
+    TextureCubeMap *GraphicsDeviceES2::createTextureCubeMap(
+        const PixelFormat format, const Vector2i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void **sourceData
+    ) {
+        return nullptr;
+    }
+
+    Program *GraphicsDeviceES2::createProgram(const ProgramDescriptor &desc) {
+        return new ProgramES(desc);
+    }
 
     void GraphicsDeviceES2::draw(const Subset *subset, const SubsetEnvelope *envelopes, const size_t envelopeCount) {
         assert(subset);
@@ -314,7 +324,9 @@ namespace XE {
         XE_GRAPHICS_GL_CHECK_ERROR();
     }
 
-    const Program *GraphicsDeviceES2::getProgram() const { return m_program; }
+    const Program *GraphicsDeviceES2::getProgram() const {
+        return m_program;
+    }
 
     void GraphicsDeviceES2::applyUniform(const UniformMatrix *uniformMatrix, const size_t count, const void *data) {
         // TODO: Add support for matrix transposition
@@ -441,7 +453,11 @@ namespace XE {
         XE_GRAPHICS_GL_CHECK_ERROR();
     }
 
-    Viewport GraphicsDeviceES2::getViewport() const { return m_viewport; }
+    Viewport GraphicsDeviceES2::getViewport() const {
+        return m_viewport;
+    }
 
-    const Material *GraphicsDeviceES2::getMaterial() const { return m_material; }
-} // namespace xe
+    const Material *GraphicsDeviceES2::getMaterial() const {
+        return m_material;
+    }
+} // namespace XE

@@ -2,11 +2,16 @@
 #include <xe/scene/VirtualSphere.h>
 
 namespace XE {
-    VirtualSphere::VirtualSphere() {}
+    VirtualSphere::VirtualSphere() {
+    }
 
-    VirtualSphere::VirtualSphere(const Vector2i &screenSize) { this->setScreenSize(screenSize); }
+    VirtualSphere::VirtualSphere(const Vector2i &screenSize) {
+        this->setScreenSize(screenSize);
+    }
 
-    void VirtualSphere::setScreenSize(const Vector2i &value) { screenSize = value; }
+    void VirtualSphere::setScreenSize(const Vector2i &value) {
+        screenSize = value;
+    }
 
     Vector3 VirtualSphere::computePointAt(const Vector2i &screenPosition) const {
         // map position to the [-1, 1]^2 range domain
@@ -24,5 +29,7 @@ namespace XE {
         return {sp, std::sqrt(1.0f - sp_length_squared)};
     }
 
-    bool VirtualSphere::operator==(const VirtualSphere &rhs) const { return screenSize == rhs.screenSize; }
-} // namespace xe
+    bool VirtualSphere::operator==(const VirtualSphere &rhs) const {
+        return screenSize == rhs.screenSize;
+    }
+} // namespace XE

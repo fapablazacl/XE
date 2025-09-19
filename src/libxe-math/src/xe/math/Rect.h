@@ -11,6 +11,6 @@ namespace XE {
     extern template class TBoundary<float, 2>;
     extern template class TBoundary<double, 2>;
     extern template class TBoundary<int, 2>;
-} // namespace xe
+} // namespace XE
 
 #endif

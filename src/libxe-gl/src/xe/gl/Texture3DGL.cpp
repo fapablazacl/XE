@@ -1,6 +1,6 @@
 
-#include "Conversion.h"
 #include "Texture3DGL.h"
+#include "Conversion.h"
 
 namespace XE {
     Texture3DGL::Texture3DGL(const PixelFormat format, const Vector3i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void *sourceData)
@@ -18,7 +18,8 @@ namespace XE {
         glBindTexture(GL_TEXTURE_3D, 0);
     }
 
-    Texture3DGL::~Texture3DGL() {}
+    Texture3DGL::~Texture3DGL() {
+    }
 
     void Texture3DGL::setData(const void *surfaceData, const int mipLevel, const PixelFormat surfaceFormat, const DataType surfaceDataType, const Boxi &volume) {
         const Vector3i offset = volume.getMinEdge();
@@ -39,4 +40,4 @@ namespace XE {
         glGetTexImage(GL_TEXTURE_3D, mipLevel, formatGL, dataTypeGL, surfaceData);
         glBindTexture(GL_TEXTURE_3D, 0);
     }
-} // namespace xe
+} // namespace XE

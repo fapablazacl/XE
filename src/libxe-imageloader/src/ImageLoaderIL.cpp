@@ -1,17 +1,17 @@
 #include "ImageLoaderIL.h"
 
+#include "xe/Logger.h"
 #include <cassert>
 #include <filesystem>
 #include <map>
-#include "xe/Logger.h"
 
 #include <IL/il.h>
 #include <IL/ilu.h>
 
 class ImageIL : public Image {
 public:
-    explicit ImageIL(ILuint imageId, int width, int height, int bpp)
-        : mImageId(imageId), mWidth(width), mHeight(height), mBpp(bpp) {}
+    explicit ImageIL(ILuint imageId, int width, int height, int bpp) : mImageId(imageId), mWidth(width), mHeight(height), mBpp(bpp) {
+    }
 
     ~ImageIL() override {
         if (mImageId != 0) {
@@ -38,9 +38,12 @@ private:
 
 inline std::string str(ILenum t) {
     switch (t) {
-    case IL_PNG: return "IL_PNG";
-    case IL_JPG: return "IL_JPG";
-    default: return "ILenum(" + std::to_string(static_cast<int>(t)) + ")";
+    case IL_PNG:
+        return "IL_PNG";
+    case IL_JPG:
+        return "IL_JPG";
+    default:
+        return "ILenum(" + std::to_string(static_cast<int>(t)) + ")";
     }
 }
 
@@ -62,9 +65,12 @@ static ILenum mapType(const std::string &ext) {
 
 static ILenum mapType(const ImageFormat &fmt) {
     switch (fmt) {
-    case ImageFormat::Png: return IL_PNG;
-    case ImageFormat::Jpeg: return IL_JPG;
-    default: return 0;
+    case ImageFormat::Png:
+        return IL_PNG;
+    case ImageFormat::Jpeg:
+        return IL_JPG;
+    default:
+        return 0;
     }
 }
 
@@ -75,55 +81,54 @@ static void logDevILErrors(const char *ctx) {
 }
 
 static std::unique_ptr<Image> createImageFromBoundIL(ILuint id) {
-	if (!ilConvertImage(IL_RGB, IL_UNSIGNED_BYTE)) {
-		logDevILErrors("ilConvertImage");
-		ilDeleteImages(1, &id);
-		return {};
-	}
+    if (!ilConvertImage(IL_RGB, IL_UNSIGNED_BYTE)) {
+        logDevILErrors("ilConvertImage");
+        ilDeleteImages(1, &id);
+        return {};
+    }
 
-	const int width = ilGetInteger(IL_IMAGE_WIDTH);
-	const int height = ilGetInteger(IL_IMAGE_HEIGHT);
-	const int bppChannels = ilGetInteger(IL_IMAGE_CHANNELS);
-	int bpp = bppChannels * 8; // bits
-	return std::make_unique<ImageIL>(id, width, height, bpp);
+    const int width = ilGetInteger(IL_IMAGE_WIDTH);
+    const int height = ilGetInteger(IL_IMAGE_HEIGHT);
+    const int bppChannels = ilGetInteger(IL_IMAGE_CHANNELS);
+    int bpp = bppChannels * 8; // bits
+    return std::make_unique<ImageIL>(id, width, height, bpp);
 }
 
-static std::unique_ptr<Image> createImage(const void* data, size_t size, ILenum imageType) {
-	XE_LOG_INFO("Loading {} image from memory buffer {}\n", str(imageType), data);
+static std::unique_ptr<Image> createImage(const void *data, size_t size, ILenum imageType) {
+    XE_LOG_INFO("Loading {} image from memory buffer {}\n", str(imageType), data);
 
-	ILuint id = 0;
-	ilGenImages(1, &id);
-	ilBindImage(id);
+    ILuint id = 0;
+    ilGenImages(1, &id);
+    ilBindImage(id);
 
-	bool ok = false;
-	if (imageType != 0) {
-		ok = (ilLoadL(imageType, (const ILubyte*)data, (ILuint)size) == IL_TRUE);
-	}
-	else {
-		ILenum detected = ilDetermineTypeL((const ILubyte*)data, (ILuint)size);
-		if (detected != IL_TYPE_UNKNOWN)
-			ok = (ilLoadL(detected, (const ILubyte*)data, (ILuint)size) == IL_TRUE);
-	}
+    bool ok = false;
+    if (imageType != 0) {
+        ok = (ilLoadL(imageType, (const ILubyte *)data, (ILuint)size) == IL_TRUE);
+    } else {
+        ILenum detected = ilDetermineTypeL((const ILubyte *)data, (ILuint)size);
+        if (detected != IL_TYPE_UNKNOWN)
+            ok = (ilLoadL(detected, (const ILubyte *)data, (ILuint)size) == IL_TRUE);
+    }
 
-	if (!ok) {
-		logDevILErrors("ilLoadL");
-		ilDeleteImages(1, &id);
-		return {};
-	}
+    if (!ok) {
+        logDevILErrors("ilLoadL");
+        ilDeleteImages(1, &id);
+        return {};
+    }
 
-	return createImageFromBoundIL(id);
+    return createImageFromBoundIL(id);
 }
 
 ImageLoaderIL::ImageLoaderIL() {
     ilInit();
     iluInit();
-    
+
     ilEnable(IL_ORIGIN_SET);
     ilOriginFunc(IL_ORIGIN_UPPER_LEFT);
 }
 
 ImageLoaderIL::~ImageLoaderIL() {
-	ilShutDown();
+    ilShutDown();
 }
 
 std::unique_ptr<Image> ImageLoaderIL::loadImage(const std::string &file) const {

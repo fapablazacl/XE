@@ -30,6 +30,6 @@ namespace XE {
 
         int m_offset = 0;
     };
-} // namespace xe
+} // namespace XE
 
 #endif

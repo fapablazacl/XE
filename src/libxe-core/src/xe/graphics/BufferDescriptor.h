@@ -19,6 +19,6 @@ namespace XE {
         std::size_t size;
         const void *data;
     };
-} // namespace xe
+} // namespace XE
 
 #endif

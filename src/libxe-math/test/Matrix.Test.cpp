@@ -100,7 +100,8 @@ TEST(MatrixTest, ConstructorShouldSetupTheMatrixComponentsCorrectlyForThreeDimen
 
 TEST(MatrixTest, ConstructorShouldSetupTheMatrixComponentsCorrectlyForFourDimensions) {
     const auto m = XE::Matrix4::rows(
-        {XE::Vector4{1.0f, 2.0f, 3.0f, 4.0f}, XE::Vector4{5.0f, 6.0f, 7.0f, 8.0f}, XE::Vector4{9.0f, 10.0f, 11.0f, 12.0f}, XE::Vector4{13.0f, 14.0f, 15.0f, 16.0f}});
+        {XE::Vector4{1.0f, 2.0f, 3.0f, 4.0f}, XE::Vector4{5.0f, 6.0f, 7.0f, 8.0f}, XE::Vector4{9.0f, 10.0f, 11.0f, 12.0f}, XE::Vector4{13.0f, 14.0f, 15.0f, 16.0f}}
+    );
 
     EXPECT_EQ(m(0, 0), 1.0f);
     EXPECT_EQ(m(0, 1), 2.0f);
@@ -122,7 +123,8 @@ TEST(MatrixTest, ConstructorShouldSetupTheMatrixComponentsCorrectlyForFourDimens
 
 TEST(MatrixTest, ConstructorShouldSetupTheMatrixComponentsCorrectlyForFourDimensionsRowVector) {
     const auto m = XE::Matrix4::rows(
-        {XE::Vector4{1.0f, 2.0f, 3.0f, 4.0f}, XE::Vector4{5.0f, 6.0f, 7.0f, 8.0f}, XE::Vector4{9.0f, 10.0f, 11.0f, 12.0f}, XE::Vector4{13.0f, 14.0f, 15.0f, 16.0f}});
+        {XE::Vector4{1.0f, 2.0f, 3.0f, 4.0f}, XE::Vector4{5.0f, 6.0f, 7.0f, 8.0f}, XE::Vector4{9.0f, 10.0f, 11.0f, 12.0f}, XE::Vector4{13.0f, 14.0f, 15.0f, 16.0f}}
+    );
 
     EXPECT_EQ(m(0, 0), 1.0f);
     EXPECT_EQ(m(0, 1), 2.0f);
@@ -143,8 +145,9 @@ TEST(MatrixTest, ConstructorShouldSetupTheMatrixComponentsCorrectlyForFourDimens
 }
 
 TEST(MatrixTest, DeterminantShouldComputeTheMatrixDeterminantCorrectly) {
-    const auto matA = XE::Matrix4::rows(
-        {XE::Vector4{1.0f, 2.0f, 1.0f, 0.0f}, XE::Vector4{2.0f, 1.0f, -3.0f, -1.0f}, XE::Vector4{-3.0f, 2.0f, 1.0f, 0.0f}, XE::Vector4{2.0f, -1.0f, 0.0f, -1.0f}});
+    const auto matA =
+        XE::Matrix4::rows({XE::Vector4{1.0f, 2.0f, 1.0f, 0.0f}, XE::Vector4{2.0f, 1.0f, -3.0f, -1.0f}, XE::Vector4{-3.0f, 2.0f, 1.0f, 0.0f}, XE::Vector4{2.0f, -1.0f, 0.0f, -1.0f}}
+        );
 
     // matrix determinant
     EXPECT_FLOAT_EQ(XE::determinant(XE::Matrix4::zero()), 0.0f);
@@ -154,10 +157,12 @@ TEST(MatrixTest, DeterminantShouldComputeTheMatrixDeterminantCorrectly) {
 
 TEST(MatrixTest, ComparisonOperatorsShouldCheckMatrixComponents) {
     const XE::Matrix4 m1 = XE::Matrix4::rows(
-        {XE::Vector4{1.0f, 2.0f, 3.0f, 4.0f}, XE::Vector4{5.0f, 6.0f, 7.0f, 8.0f}, XE::Vector4{9.0f, 10.0f, 11.0f, 12.0f}, XE::Vector4{13.0f, 14.0f, 15.0f, 16.0f}});
+        {XE::Vector4{1.0f, 2.0f, 3.0f, 4.0f}, XE::Vector4{5.0f, 6.0f, 7.0f, 8.0f}, XE::Vector4{9.0f, 10.0f, 11.0f, 12.0f}, XE::Vector4{13.0f, 14.0f, 15.0f, 16.0f}}
+    );
 
     const XE::Matrix4 m2 = XE::Matrix4::rows(
-        {XE::Vector4{16.0f, 15.0f, 14.0f, 13.0f}, XE::Vector4{12.0f, 11.0f, 10.0f, 9.0f}, XE::Vector4{8.0f, 7.0f, 6.0f, 5.0f}, XE::Vector4{4.0f, 3.0f, 2.0f, 1.0f}});
+        {XE::Vector4{16.0f, 15.0f, 14.0f, 13.0f}, XE::Vector4{12.0f, 11.0f, 10.0f, 9.0f}, XE::Vector4{8.0f, 7.0f, 6.0f, 5.0f}, XE::Vector4{4.0f, 3.0f, 2.0f, 1.0f}}
+    );
 
     EXPECT_EQ(m1, m1);
     EXPECT_EQ(m2, m2);
@@ -166,14 +171,17 @@ TEST(MatrixTest, ComparisonOperatorsShouldCheckMatrixComponents) {
 }
 
 TEST(MatrixTest, AdditionAddsEveryFieldOneToOne) {
-    const auto matA = XE::Matrix4::rows(
-        {XE::Vector4{1.0f, 2.0f, 1.0f, 0.0f}, XE::Vector4{2.0f, 1.0f, -3.0f, -1.0f}, XE::Vector4{-3.0f, 2.0f, 1.0f, 0.0f}, XE::Vector4{2.0f, -1.0f, 0.0f, -1.0f}});
+    const auto matA =
+        XE::Matrix4::rows({XE::Vector4{1.0f, 2.0f, 1.0f, 0.0f}, XE::Vector4{2.0f, 1.0f, -3.0f, -1.0f}, XE::Vector4{-3.0f, 2.0f, 1.0f, 0.0f}, XE::Vector4{2.0f, -1.0f, 0.0f, -1.0f}}
+        );
 
-    const auto matB = XE::Matrix4::rows(
-        {XE::Vector4{-3.0f, 1.0f, 5.0f, 1.0f}, XE::Vector4{1.0f, 2.0f, -1.0f, 1.0f}, XE::Vector4{1.0f, 2.0f, 1.0f, -2.0f}, XE::Vector4{1.0f, -1.0f, -3.0f, -1.0f}});
+    const auto matB =
+        XE::Matrix4::rows({XE::Vector4{-3.0f, 1.0f, 5.0f, 1.0f}, XE::Vector4{1.0f, 2.0f, -1.0f, 1.0f}, XE::Vector4{1.0f, 2.0f, 1.0f, -2.0f}, XE::Vector4{1.0f, -1.0f, -3.0f, -1.0f}}
+        );
 
     const auto matAddResult = XE::Matrix4::rows(
-        {XE::Vector4{-2.0f, 3.0f, 6.0f, 1.0f}, XE::Vector4{3.0f, 3.0f, -4.0f, 0.0f}, XE::Vector4{-2.0f, 4.0f, 2.0f, -2.0f}, XE::Vector4{3.0f, -2.0f, -3.0f, -2.0f}});
+        {XE::Vector4{-2.0f, 3.0f, 6.0f, 1.0f}, XE::Vector4{3.0f, 3.0f, -4.0f, 0.0f}, XE::Vector4{-2.0f, 4.0f, 2.0f, -2.0f}, XE::Vector4{3.0f, -2.0f, -3.0f, -2.0f}}
+    );
 
     // addition
     EXPECT_EQ(matA, +matA);
@@ -190,17 +198,21 @@ TEST(MatrixTest, AdditionAddsEveryFieldOneToOne) {
 }
 
 TEST(MatrixTest, SubtractionSubtractsEveryFieldOneToOne) {
-    const auto matA = XE::Matrix4::rows(
-        {XE::Vector4{1.0f, 2.0f, 1.0f, 0.0f}, XE::Vector4{2.0f, 1.0f, -3.0f, -1.0f}, XE::Vector4{-3.0f, 2.0f, 1.0f, 0.0f}, XE::Vector4{2.0f, -1.0f, 0.0f, -1.0f}});
+    const auto matA =
+        XE::Matrix4::rows({XE::Vector4{1.0f, 2.0f, 1.0f, 0.0f}, XE::Vector4{2.0f, 1.0f, -3.0f, -1.0f}, XE::Vector4{-3.0f, 2.0f, 1.0f, 0.0f}, XE::Vector4{2.0f, -1.0f, 0.0f, -1.0f}}
+        );
 
     const auto matNegA = XE::Matrix4::rows(
-        {XE::Vector4{-1.0f, -2.0f, -1.0f, -0.0f}, XE::Vector4{-2.0f, -1.0f, 3.0f, 1.0f}, XE::Vector4{3.0f, -2.0f, -1.0f, -0.0f}, XE::Vector4{-2.0f, 1.0f, -0.0f, 1.0f}});
+        {XE::Vector4{-1.0f, -2.0f, -1.0f, -0.0f}, XE::Vector4{-2.0f, -1.0f, 3.0f, 1.0f}, XE::Vector4{3.0f, -2.0f, -1.0f, -0.0f}, XE::Vector4{-2.0f, 1.0f, -0.0f, 1.0f}}
+    );
 
-    const auto matB = XE::Matrix4::rows(
-        {XE::Vector4{-3.0f, 1.0f, 5.0f, 1.0f}, XE::Vector4{1.0f, 2.0f, -1.0f, 1.0f}, XE::Vector4{1.0f, 2.0f, 1.0f, -2.0f}, XE::Vector4{1.0f, -1.0f, -3.0f, -1.0f}});
+    const auto matB =
+        XE::Matrix4::rows({XE::Vector4{-3.0f, 1.0f, 5.0f, 1.0f}, XE::Vector4{1.0f, 2.0f, -1.0f, 1.0f}, XE::Vector4{1.0f, 2.0f, 1.0f, -2.0f}, XE::Vector4{1.0f, -1.0f, -3.0f, -1.0f}}
+        );
 
-    const auto matSubResult = XE::Matrix4::rows(
-        {XE::Vector4{4.0f, 1.0f, -4.0f, -1.0f}, XE::Vector4{1.0f, -1.0f, -2.0f, -2.0f}, XE::Vector4{-4.0f, 0.0f, 0.0f, 2.0f}, XE::Vector4{1.0f, 0.0f, 3.0f, 0.0f}});
+    const auto matSubResult =
+        XE::Matrix4::rows({XE::Vector4{4.0f, 1.0f, -4.0f, -1.0f}, XE::Vector4{1.0f, -1.0f, -2.0f, -2.0f}, XE::Vector4{-4.0f, 0.0f, 0.0f, 2.0f}, XE::Vector4{1.0f, 0.0f, 3.0f, 0.0f}}
+        );
 
     // subtraction
     EXPECT_EQ(matNegA, -matA);
@@ -218,8 +230,9 @@ TEST(MatrixTest, SubtractionSubtractsEveryFieldOneToOne) {
 }
 
 TEST(MatrixTest, ScalarMultiplicationMultipliesEveryFieldWithAnScalar) {
-    const auto matA = XE::Matrix4::rows(
-        {XE::Vector4{1.0f, 2.0f, 1.0f, 0.0f}, XE::Vector4{2.0f, 1.0f, -3.0f, -1.0f}, XE::Vector4{-3.0f, 2.0f, 1.0f, 0.0f}, XE::Vector4{2.0f, -1.0f, 0.0f, -1.0f}});
+    const auto matA =
+        XE::Matrix4::rows({XE::Vector4{1.0f, 2.0f, 1.0f, 0.0f}, XE::Vector4{2.0f, 1.0f, -3.0f, -1.0f}, XE::Vector4{-3.0f, 2.0f, 1.0f, 0.0f}, XE::Vector4{2.0f, -1.0f, 0.0f, -1.0f}}
+        );
 
     // scalar multiplication
     EXPECT_EQ(matA * -1.0f, -matA);
@@ -229,14 +242,17 @@ TEST(MatrixTest, ScalarMultiplicationMultipliesEveryFieldWithAnScalar) {
 }
 
 TEST(MatrixTest, MatrixMultiplicationPerformsADotProductBetweenRowAndColumnsForEachResultField) {
-    const auto matA = XE::Matrix4::rows(
-        {XE::Vector4{1.0f, 2.0f, 1.0f, 0.0f}, XE::Vector4{2.0f, 1.0f, -3.0f, -1.0f}, XE::Vector4{-3.0f, 2.0f, 1.0f, 0.0f}, XE::Vector4{2.0f, -1.0f, 0.0f, -1.0f}});
+    const auto matA =
+        XE::Matrix4::rows({XE::Vector4{1.0f, 2.0f, 1.0f, 0.0f}, XE::Vector4{2.0f, 1.0f, -3.0f, -1.0f}, XE::Vector4{-3.0f, 2.0f, 1.0f, 0.0f}, XE::Vector4{2.0f, -1.0f, 0.0f, -1.0f}}
+        );
 
-    const auto matB = XE::Matrix4::rows(
-        {XE::Vector4{-3.0f, 1.0f, 5.0f, 1.0f}, XE::Vector4{1.0f, 2.0f, -1.0f, 1.0f}, XE::Vector4{1.0f, 2.0f, 1.0f, -2.0f}, XE::Vector4{1.0f, -1.0f, -3.0f, -1.0f}});
+    const auto matB =
+        XE::Matrix4::rows({XE::Vector4{-3.0f, 1.0f, 5.0f, 1.0f}, XE::Vector4{1.0f, 2.0f, -1.0f, 1.0f}, XE::Vector4{1.0f, 2.0f, 1.0f, -2.0f}, XE::Vector4{1.0f, -1.0f, -3.0f, -1.0f}}
+        );
 
     const XE::Matrix4 matMulResult = XE::Matrix4::rows(
-        {XE::Vector4{0.0f, 7.0f, 4.0f, 1.0f}, XE::Vector4{-9.0f, -1.0f, 9.0f, 10.0f}, XE::Vector4{12.0f, 3.0f, -16.0f, -3.0f}, XE::Vector4{-8.0f, 1.0f, 14.0f, 2.0f}});
+        {XE::Vector4{0.0f, 7.0f, 4.0f, 1.0f}, XE::Vector4{-9.0f, -1.0f, 9.0f, 10.0f}, XE::Vector4{12.0f, 3.0f, -16.0f, -3.0f}, XE::Vector4{-8.0f, 1.0f, 14.0f, 2.0f}}
+    );
 
     // matrix multiplication
     EXPECT_EQ(XE::Matrix4::zero(), XE::Matrix4::zero() * XE::Matrix4::zero());
@@ -258,18 +274,28 @@ TEST(MatrixTest, TransposeShouldSwapRowsAndColumns) {
     EXPECT_EQ(m0, transpose(m0));
 
     const auto m = XE::Matrix4::rows(
-        {XE::Vector4{1.0f, 2.0f, 3.0f, 4.0f}, XE::Vector4{5.0f, 6.0f, 7.0f, 8.0f}, XE::Vector4{9.0f, 10.0f, 11.0f, 12.0f}, XE::Vector4{13.0f, 14.0f, 15.0f, 16.0f}});
+        {XE::Vector4{1.0f, 2.0f, 3.0f, 4.0f}, XE::Vector4{5.0f, 6.0f, 7.0f, 8.0f}, XE::Vector4{9.0f, 10.0f, 11.0f, 12.0f}, XE::Vector4{13.0f, 14.0f, 15.0f, 16.0f}}
+    );
 
-    EXPECT_EQ(transpose(m), XE::Matrix4::rows({XE::Vector4{1.0f, 5.0f, 9.0f, 13.0f}, XE::Vector4{2.0f, 6.0f, 10.0f, 14.0f}, XE::Vector4{3.0f, 7.0f, 11.0f, 15.0f},
-                                               XE::Vector4{4.0f, 8.0f, 12.0f, 16.0f}}));
+    EXPECT_EQ(
+        transpose(m),
+        XE::Matrix4::rows(
+            {XE::Vector4{1.0f, 5.0f, 9.0f, 13.0f}, XE::Vector4{2.0f, 6.0f, 10.0f, 14.0f}, XE::Vector4{3.0f, 7.0f, 11.0f, 15.0f}, XE::Vector4{4.0f, 8.0f, 12.0f, 16.0f}}
+        )
+    );
 }
 
 TEST(MatrixTest, InverseShouldComputeTheMatrixInverseMultiplicative) {
-    const auto invMatA = XE::Matrix4::rows({XE::Vector4{0.25000f, 0.000f, -0.25000f, 0.000}, XE::Vector4{0.28125f, 0.125f, 0.09375f, -0.125},
-                                            XE::Vector4{0.18750f, -0.250f, 0.06250f, 0.250}, XE::Vector4{0.21875f, -0.125f, -0.59375f, -0.875}});
+    const auto invMatA = XE::Matrix4::rows(
+        {XE::Vector4{0.25000f, 0.000f, -0.25000f, 0.000},
+         XE::Vector4{0.28125f, 0.125f, 0.09375f, -0.125},
+         XE::Vector4{0.18750f, -0.250f, 0.06250f, 0.250},
+         XE::Vector4{0.21875f, -0.125f, -0.59375f, -0.875}}
+    );
 
-    const XE::Matrix4 matA = XE::Matrix4::rows(
-        {XE::Vector4{1.0f, 2.0f, 1.0f, 0.0f}, XE::Vector4{2.0f, 1.0f, -3.0f, -1.0f}, XE::Vector4{-3.0f, 2.0f, 1.0f, 0.0f}, XE::Vector4{2.0f, -1.0f, 0.0f, -1.0f}});
+    const XE::Matrix4 matA =
+        XE::Matrix4::rows({XE::Vector4{1.0f, 2.0f, 1.0f, 0.0f}, XE::Vector4{2.0f, 1.0f, -3.0f, -1.0f}, XE::Vector4{-3.0f, 2.0f, 1.0f, 0.0f}, XE::Vector4{2.0f, -1.0f, 0.0f, -1.0f}}
+        );
 
     auto mi = XE::mat4Identity();
     auto detMatA = -32.0f;
@@ -281,7 +307,8 @@ TEST(MatrixTest, InverseShouldComputeTheMatrixInverseMultiplicative) {
 
 TEST(MatrixTest, GetColumnShouldExtractACertainColumnFromTheMatrixAsVector) {
     const XE::Matrix4 m = XE::Matrix4::rows(
-        {XE::Vector4{1.0f, 2.0f, 3.0f, 4.0f}, XE::Vector4{5.0f, 6.0f, 7.0f, 8.0f}, XE::Vector4{9.0f, 10.0f, 11.0f, 12.0f}, XE::Vector4{13.0f, 14.0f, 15.0f, 16.0f}});
+        {XE::Vector4{1.0f, 2.0f, 3.0f, 4.0f}, XE::Vector4{5.0f, 6.0f, 7.0f, 8.0f}, XE::Vector4{9.0f, 10.0f, 11.0f, 12.0f}, XE::Vector4{13.0f, 14.0f, 15.0f, 16.0f}}
+    );
 
     EXPECT_EQ(m.getColumn(0), XE::Vector4(1.0f, 5.0f, 9.0f, 13.0f));
     EXPECT_EQ(m.getColumn(1), XE::Vector4(2.0f, 6.0f, 10.0f, 14.0f));
@@ -291,18 +318,21 @@ TEST(MatrixTest, GetColumnShouldExtractACertainColumnFromTheMatrixAsVector) {
 
 TEST(MatrixTest, SetColumnShouldChangeCorrectlyACertainColumnInTheMatrix) {
     const auto m = XE::Matrix4::rows(
-        {XE::Vector4{1.0f, 2.0f, 3.0f, 4.0f}, XE::Vector4{5.0f, 6.0f, 7.0f, 8.0f}, XE::Vector4{9.0f, 10.0f, 11.0f, 12.0f}, XE::Vector4{13.0f, 14.0f, 15.0f, 16.0f}});
+        {XE::Vector4{1.0f, 2.0f, 3.0f, 4.0f}, XE::Vector4{5.0f, 6.0f, 7.0f, 8.0f}, XE::Vector4{9.0f, 10.0f, 11.0f, 12.0f}, XE::Vector4{13.0f, 14.0f, 15.0f, 16.0f}}
+    );
 
     const auto m1 = XE::Matrix4(m).setColumn(0, XE::Vector4{4.0f, 3.0f, 2.0f, 1.0f});
-    const auto m1_result = XE::Matrix4::rows(
-        {XE::Vector4{4.0f, 2.0f, 3.0f, 4.0f}, XE::Vector4{3.0f, 6.0f, 7.0f, 8.0f}, XE::Vector4{2.0f, 10.0f, 11.0f, 12.0f}, XE::Vector4{1.0f, 14.0f, 15.0f, 16.0f}});
+    const auto m1_result =
+        XE::Matrix4::rows({XE::Vector4{4.0f, 2.0f, 3.0f, 4.0f}, XE::Vector4{3.0f, 6.0f, 7.0f, 8.0f}, XE::Vector4{2.0f, 10.0f, 11.0f, 12.0f}, XE::Vector4{1.0f, 14.0f, 15.0f, 16.0f}}
+        );
 
     EXPECT_EQ(m1, m1_result);
 }
 
 TEST(MatrixTest, GetRowShouldExtractACertainRowFromTheMatrixAsAVector) {
     const XE::Matrix4 m = XE::Matrix4::rows(
-        {XE::Vector4{1.0f, 2.0f, 3.0f, 4.0f}, XE::Vector4{5.0f, 6.0f, 7.0f, 8.0f}, XE::Vector4{9.0f, 10.0f, 11.0f, 12.0f}, XE::Vector4{13.0f, 14.0f, 15.0f, 16.0f}});
+        {XE::Vector4{1.0f, 2.0f, 3.0f, 4.0f}, XE::Vector4{5.0f, 6.0f, 7.0f, 8.0f}, XE::Vector4{9.0f, 10.0f, 11.0f, 12.0f}, XE::Vector4{13.0f, 14.0f, 15.0f, 16.0f}}
+    );
 
     EXPECT_EQ(m.getRow(0), XE::Vector4(1.0f, 2.0f, 3.0f, 4.0f));
     EXPECT_EQ(m.getRow(1), XE::Vector4(5.0f, 6.0f, 7.0f, 8.0f));
@@ -312,7 +342,8 @@ TEST(MatrixTest, GetRowShouldExtractACertainRowFromTheMatrixAsAVector) {
 
 TEST(MatrixTest, GetSubMatrixShouldExtractASmallerMatrixFromAnother) {
     const XE::Matrix4 m = XE::Matrix4::rows(
-        {XE::Vector4{1.0f, 2.0f, 3.0f, 4.0f}, XE::Vector4{5.0f, 6.0f, 7.0f, 8.0f}, XE::Vector4{9.0f, 10.0f, 11.0f, 12.0f}, XE::Vector4{13.0f, 14.0f, 15.0f, 16.0f}});
+        {XE::Vector4{1.0f, 2.0f, 3.0f, 4.0f}, XE::Vector4{5.0f, 6.0f, 7.0f, 8.0f}, XE::Vector4{9.0f, 10.0f, 11.0f, 12.0f}, XE::Vector4{13.0f, 14.0f, 15.0f, 16.0f}}
+    );
 
     EXPECT_EQ(m.getSubMatrix(0, 0), XE::Matrix3::rows({XE::Vector3(6.0f, 7.0f, 8.0f), XE::Vector3(10.0f, 11.0f, 12.0f), XE::Vector3(14.0f, 15.0f, 16.0f)}));
 
@@ -322,11 +353,14 @@ TEST(MatrixTest, GetSubMatrixShouldExtractASmallerMatrixFromAnother) {
 
     EXPECT_EQ(m.getSubMatrix(3, 3), XE::Matrix3::rows({XE::Vector3(1.0f, 2.0f, 3.0f), XE::Vector3(5.0f, 6.0f, 7.0f), XE::Vector3(9.0f, 10.0f, 11.0f)}));
 
-    EXPECT_EQ(m.getSubMatrix(3, 0), XE::Matrix3::rows({
-                                        XE::Vector3(2.0f, 3.0f, 4.0f),
-                                        XE::Vector3(6.0f, 7.0f, 8.0f),
-                                        XE::Vector3(10.0f, 11.0f, 12.0f),
-                                    }));
+    EXPECT_EQ(
+        m.getSubMatrix(3, 0),
+        XE::Matrix3::rows({
+            XE::Vector3(2.0f, 3.0f, 4.0f),
+            XE::Vector3(6.0f, 7.0f, 8.0f),
+            XE::Vector3(10.0f, 11.0f, 12.0f),
+        })
+    );
 }
 
 TEST(MatrixTest, MatrixVectorMultiplyOperationShouldTransformTheVectorByTheRight) {
@@ -338,8 +372,10 @@ TEST(MatrixTest, MatrixVectorMultiplyOperationShouldTransformTheVectorByTheRight
 }
 
 TEST(MatrixTest, ZeroStaticFunctionShouldCreateAValidZeroMatrix) {
-    EXPECT_EQ(XE::Matrix4::zero(), XE::Matrix4::rows({XE::Vector4(0.0f, 0.0f, 0.0f, 0.0f), XE::Vector4(0.0f, 0.0f, 0.0f, 0.0f), XE::Vector4(0.0f, 0.0f, 0.0f, 0.0f),
-                                                      XE::Vector4(0.0f, 0.0f, 0.0f, 0.0f)}));
+    EXPECT_EQ(
+        XE::Matrix4::zero(),
+        XE::Matrix4::rows({XE::Vector4(0.0f, 0.0f, 0.0f, 0.0f), XE::Vector4(0.0f, 0.0f, 0.0f, 0.0f), XE::Vector4(0.0f, 0.0f, 0.0f, 0.0f), XE::Vector4(0.0f, 0.0f, 0.0f, 0.0f)})
+    );
 
     EXPECT_EQ(XE::Matrix3::zero(), XE::Matrix3::rows({XE::Vector3(0.0f, 0.0f, 0.0f), XE::Vector3(0.0f, 0.0f, 0.0f), XE::Vector3(0.0f, 0.0f, 0.0f)}));
 
@@ -354,8 +390,10 @@ TEST(MatrixTest, ZeroStaticFunctionShouldCreateAValidZeroMatrix) {
 }
 
 TEST(MatrixTest, IdentityStaticFunctionShouldCreateAValidIdentityMatrix) {
-    EXPECT_EQ(XE::mat4Identity(), XE::Matrix4::rows({XE::Vector4(1.0f, 0.0f, 0.0f, 0.0f), XE::Vector4(0.0f, 1.0f, 0.0f, 0.0f), XE::Vector4(0.0f, 0.0f, 1.0f, 0.0f),
-                                                     XE::Vector4(0.0f, 0.0f, 0.0f, 1.0f)}));
+    EXPECT_EQ(
+        XE::mat4Identity(),
+        XE::Matrix4::rows({XE::Vector4(1.0f, 0.0f, 0.0f, 0.0f), XE::Vector4(0.0f, 1.0f, 0.0f, 0.0f), XE::Vector4(0.0f, 0.0f, 1.0f, 0.0f), XE::Vector4(0.0f, 0.0f, 0.0f, 1.0f)})
+    );
 
     EXPECT_EQ(XE::mat3Identity(), XE::Matrix3::rows({XE::Vector3(1.0f, 0.0f, 0.0f), XE::Vector3(0.0f, 1.0f, 0.0f), XE::Vector3(0.0f, 0.0f, 1.0f)}));
 
@@ -370,8 +408,10 @@ TEST(MatrixTest, IdentityStaticFunctionShouldCreateAValidIdentityMatrix) {
 }
 
 TEST(MatrixTest, ScaleStaticFunctionShouldCreateAValidScalingMatrix) {
-    EXPECT_EQ(XE::mat4Scaling({1.0f, 2.0f, 3.0f, 4.0f}), XE::Matrix4::rows({XE::Vector4(1.0f, 0.0f, 0.0f, 0.0f), XE::Vector4(0.0f, 2.0f, 0.0f, 0.0f),
-                                                                            XE::Vector4(0.0f, 0.0f, 3.0f, 0.0f), XE::Vector4(0.0f, 0.0f, 0.0f, 4.0f)}));
+    EXPECT_EQ(
+        XE::mat4Scaling({1.0f, 2.0f, 3.0f, 4.0f}),
+        XE::Matrix4::rows({XE::Vector4(1.0f, 0.0f, 0.0f, 0.0f), XE::Vector4(0.0f, 2.0f, 0.0f, 0.0f), XE::Vector4(0.0f, 0.0f, 3.0f, 0.0f), XE::Vector4(0.0f, 0.0f, 0.0f, 4.0f)})
+    );
 
     EXPECT_EQ(XE::mat3Scaling({1.0f, 2.0f, 3.0f}), XE::Matrix3::rows({XE::Vector3(1.0f, 0.0f, 0.0f), XE::Vector3(0.0f, 2.0f, 0.0f), XE::Vector3(0.0f, 0.0f, 3.0f)}));
 
@@ -514,11 +554,14 @@ TEST(MatrixTest, LookAtRHShouldCreateATransformThatSimulatesAStandardLookAtCamer
 
 TEST(
     MatrixTest,
-    LookAtRHShouldCreateATransformThatSimulatesAStandardLookAtCamera_WithCenterAtTheOrigin_LookingAtTheZAxisAndYOrientation_ShouldGenerateAnPseudoIdentityMatrixWithSomeNegativeUnitAxis) {
+    LookAtRHShouldCreateATransformThatSimulatesAStandardLookAtCamera_WithCenterAtTheOrigin_LookingAtTheZAxisAndYOrientation_ShouldGenerateAnPseudoIdentityMatrixWithSomeNegativeUnitAxis
+) {
     const auto lookAt = XE::mat4LookAtRH({0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f, 0.0f});
 
-    EXPECT_EQ(lookAt, XE::Matrix4::rows(
-                          {XE::Vector4(-1.0f, 0.0f, 0.0f, 0.0f), XE::Vector4(0.0f, 1.0f, 0.0f, 0.0f), XE::Vector4(0.0f, 0.0f, -1.0f, 0.0f), XE::Vector4(0.0f, 0.0f, 0.0f, 1.0f)}));
+    EXPECT_EQ(
+        lookAt,
+        XE::Matrix4::rows({XE::Vector4(-1.0f, 0.0f, 0.0f, 0.0f), XE::Vector4(0.0f, 1.0f, 0.0f, 0.0f), XE::Vector4(0.0f, 0.0f, -1.0f, 0.0f), XE::Vector4(0.0f, 0.0f, 0.0f, 1.0f)})
+    );
 }
 
 TEST(MatrixTest, LookAtRHShouldCreateATransformThatSimulatesAStandardLookAtCamera_WithCenterAtTheMinus10ZLookingAtTheZAxisAndYOrientationShouldGenerateATranslationMatrix) {
@@ -531,36 +574,70 @@ TEST(MatrixTest, LookAtRHShouldCreateATransformThatSimulatesAStandardLookAtCamer
 
 TEST(MatrixTest, createPerspectiveShouldCreateAPerspectiveTransformationMatrix) {
     const auto m1 = XE::mat4Perspective(XE::radians(60.0f), (320.0f / 240.0f), 0.1f, 100.0f);
-    EXPECT_EQ(m1, XE::Matrix4::rows({XE::Vector4(1.299038170f, 0.000000000f, 0.000000000f, 0.000000000f), XE::Vector4(0.000000000f, 1.73205090f, 0.000000000f, 0.000000000f),
-                                     XE::Vector4(0.000000000f, 0.000000000f, -1.002002001f, -0.200200200f), XE::Vector4(0.000000000f, 0.000000000f, -1.000000000f, 0.000000000f)}));
+    EXPECT_EQ(
+        m1,
+        XE::Matrix4::rows(
+            {XE::Vector4(1.299038170f, 0.000000000f, 0.000000000f, 0.000000000f),
+             XE::Vector4(0.000000000f, 1.73205090f, 0.000000000f, 0.000000000f),
+             XE::Vector4(0.000000000f, 0.000000000f, -1.002002001f, -0.200200200f),
+             XE::Vector4(0.000000000f, 0.000000000f, -1.000000000f, 0.000000000f)}
+        )
+    );
 
     const auto m2 = XE::mat4Perspective(XE::radians(120.0f), 1.33333f, 0.1f, 100.0f);
-    EXPECT_EQ(m2, XE::Matrix4::rows({XE::Vector4(0.433013767f, 0.000000000f, 0.000000000f, 0.000000000f), XE::Vector4(0.000000000f, 0.577350259f, 0.000000000f, 0.000000000f),
-                                     XE::Vector4(0.000000000f, 0.000000000f, -1.002002001f, -0.200200200f), XE::Vector4(0.000000000f, 0.000000000f, -1.000000000f, 0.000000000f)}));
+    EXPECT_EQ(
+        m2,
+        XE::Matrix4::rows(
+            {XE::Vector4(0.433013767f, 0.000000000f, 0.000000000f, 0.000000000f),
+             XE::Vector4(0.000000000f, 0.577350259f, 0.000000000f, 0.000000000f),
+             XE::Vector4(0.000000000f, 0.000000000f, -1.002002001f, -0.200200200f),
+             XE::Vector4(0.000000000f, 0.000000000f, -1.000000000f, 0.000000000f)}
+        )
+    );
 }
 
 TEST(MatrixTest, CreateOrthographicShouldCreateAOrthographicTransformationMatrix) {
     const auto m1 = XE::mat4Ortho({-1.0f, -1.0f, -1.0f}, {1.0f, 1.0f, 1.0f});
-    EXPECT_EQ(m1, XE::Matrix4::rows({
-                      XE::Vector4(1.0f, 0.0f, 0.0f, 0.0f),
-                      XE::Vector4(0.0f, 1.0f, 0.0f, 0.0f),
-                      XE::Vector4(0.0f, 0.0f, -1.0f, 0.0f),
-                      XE::Vector4(0.0f, 0.0f, 0.0f, 1.0f),
-                  }));
+    EXPECT_EQ(
+        m1,
+        XE::Matrix4::rows({
+            XE::Vector4(1.0f, 0.0f, 0.0f, 0.0f),
+            XE::Vector4(0.0f, 1.0f, 0.0f, 0.0f),
+            XE::Vector4(0.0f, 0.0f, -1.0f, 0.0f),
+            XE::Vector4(0.0f, 0.0f, 0.0f, 1.0f),
+        })
+    );
 
     const auto m2 = XE::mat4Ortho({-2.0f, -2.0f, -2.0f}, {2.0f, 2.0f, 2.0f});
-    EXPECT_EQ(m2, XE::Matrix4::rows({
-                      XE::Vector4(0.5f, 0.0f, 0.0f, 0.0f),
-                      XE::Vector4(0.0f, 0.5f, 0.0f, 0.0f),
-                      XE::Vector4(0.0f, 0.0f, -0.5f, 0.0f),
-                      XE::Vector4(0.0f, 0.0f, 0.0f, 1.0f),
-                  }));
+    EXPECT_EQ(
+        m2,
+        XE::Matrix4::rows({
+            XE::Vector4(0.5f, 0.0f, 0.0f, 0.0f),
+            XE::Vector4(0.0f, 0.5f, 0.0f, 0.0f),
+            XE::Vector4(0.0f, 0.0f, -0.5f, 0.0f),
+            XE::Vector4(0.0f, 0.0f, 0.0f, 1.0f),
+        })
+    );
 
     const auto m3 = XE::mat4Ortho({-0.5f, -1.5f, 0.0f}, {2.5f, 3.5f, 100.0f});
-    EXPECT_EQ(m3, XE::Matrix4::rows({XE::Vector4(0.666666687f, 0.000000000f, 0.000000000f, -0.666666687f), XE::Vector4(0.000000000f, 0.400000006f, 0.000000000f, -0.400000006f),
-                                     XE::Vector4(0.000000000f, 0.000000000f, -0.020000000f, -1.000000000f), XE::Vector4(0.000000000f, 0.000000000f, 0.000000000f, 1.000000000f)}));
+    EXPECT_EQ(
+        m3,
+        XE::Matrix4::rows(
+            {XE::Vector4(0.666666687f, 0.000000000f, 0.000000000f, -0.666666687f),
+             XE::Vector4(0.000000000f, 0.400000006f, 0.000000000f, -0.400000006f),
+             XE::Vector4(0.000000000f, 0.000000000f, -0.020000000f, -1.000000000f),
+             XE::Vector4(0.000000000f, 0.000000000f, 0.000000000f, 1.000000000f)}
+        )
+    );
 
     const auto m4 = XE::mat4Ortho({-0.5f, -1.5f, 100.0f}, {2.5f, 3.5f, -50.0f});
-    EXPECT_EQ(m4, XE::Matrix4::rows({XE::Vector4(0.666666687f, 0.000000000f, 0.000000000f, -0.666666687f), XE::Vector4(0.000000000f, 0.400000006f, 0.000000000f, -0.400000006f),
-                                     XE::Vector4(0.000000000f, 0.000000000f, 0.013333334f, 0.333333343f), XE::Vector4(0.000000000f, 0.000000000f, 0.000000000f, 1.000000000f)}));
+    EXPECT_EQ(
+        m4,
+        XE::Matrix4::rows(
+            {XE::Vector4(0.666666687f, 0.000000000f, 0.000000000f, -0.666666687f),
+             XE::Vector4(0.000000000f, 0.400000006f, 0.000000000f, -0.400000006f),
+             XE::Vector4(0.000000000f, 0.000000000f, 0.013333334f, 0.333333343f),
+             XE::Vector4(0.000000000f, 0.000000000f, 0.000000000f, 1.000000000f)}
+        )
+    );
 }

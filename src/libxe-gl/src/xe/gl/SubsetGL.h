@@ -25,7 +25,9 @@ namespace XE {
         virtual const BufferGL *getIndexBuffer() const override;
 
     public:
-        GLuint getID() const { return id; }
+        GLuint getID() const {
+            return id;
+        }
 
     private:
         GLuint id = 0;
@@ -33,6 +35,6 @@ namespace XE {
         const BufferGL *indexBuffer = nullptr;
         SubsetDescriptor descriptor;
     };
-} // namespace xe
+} // namespace XE
 
 #endif

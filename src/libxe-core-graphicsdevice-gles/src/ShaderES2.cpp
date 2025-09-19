@@ -38,7 +38,11 @@ namespace XE {
         }
     }
 
-    ShaderType ShaderES::getType() const { return m_type; }
+    ShaderType ShaderES::getType() const {
+        return m_type;
+    }
 
-    std::string ShaderES::getSource() const { return m_source; }
-} // namespace xe
+    std::string ShaderES::getSource() const {
+        return m_source;
+    }
+} // namespace XE

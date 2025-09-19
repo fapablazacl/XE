@@ -27,6 +27,6 @@ namespace XE {
         GLFWwindow *glfwWindow = nullptr;
         Descriptor descriptor;
     };
-} // namespace xe
+} // namespace XE
 
 #endif

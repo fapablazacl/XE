@@ -2,9 +2,9 @@
 #ifndef __XE_MATH_TRIANGLE_HPP__
 #define __XE_MATH_TRIANGLE_HPP__
 
-#include "Vector.h"
 #include "Plane.h"
 #include "Ray.h"
+#include "Vector.h"
 #include <array>
 
 namespace XE {
@@ -13,7 +13,8 @@ namespace XE {
         TVector<T, 3> P2;
         TVector<T, 3> P3;
 
-        TTriangle() {}
+        TTriangle() {
+        }
 
         TTriangle(const TVector<T, 3> &p1, const TVector<T, 3> &p2, const TVector<T, 3> &p3) {
             P1 = p1;
@@ -21,9 +22,13 @@ namespace XE {
             P3 = p3;
         }
 
-        TVector<T, 3> computeNormal() const { return normalize(computeNormalUnnormalized()); }
+        TVector<T, 3> computeNormal() const {
+            return normalize(computeNormalUnnormalized());
+        }
 
-        TVector<T, 3> computeNormalUnnormalized() const { return cross((P2 - P1), P3 - P1); }
+        TVector<T, 3> computeNormalUnnormalized() const {
+            return cross((P2 - P1), P3 - P1);
+        }
     };
 
     using Triangle = TTriangle<float>;
@@ -65,6 +70,6 @@ namespace XE {
         }
     }
      */
-} // namespace xe
+} // namespace XE
 
 #endif

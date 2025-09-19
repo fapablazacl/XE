@@ -3,6 +3,4 @@
 
 #include "gl.h"
 
-namespace xe::gl {
-
-}
+namespace xe::gl {}

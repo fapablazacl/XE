@@ -41,11 +41,15 @@ namespace XE {
         enum { MinEdge = 0, MaxEdge = PointCount - 1 };
 
     public:
-        TBoundary() {}
+        TBoundary() {
+        }
 
-        explicit TBoundary(const TVector<T, N> &value) : minEdge(value), maxEdge(value) {}
+        explicit TBoundary(const TVector<T, N> &value) : minEdge(value), maxEdge(value) {
+        }
 
-        TBoundary(const TVector<T, N> &value1, const TVector<T, N> &value2) : TBoundary(value1) { expand(value2); }
+        TBoundary(const TVector<T, N> &value1, const TVector<T, N> &value2) : TBoundary(value1) {
+            expand(value2);
+        }
 
         void expand(const TVector<T, N> &value) {
             minEdge = minimize(minEdge, value);
@@ -57,13 +61,21 @@ namespace XE {
             expand(other.maxEdge);
         }
 
-        TVector<T, N> getMinEdge() const { return minEdge; }
+        TVector<T, N> getMinEdge() const {
+            return minEdge;
+        }
 
-        TVector<T, N> getMaxEdge() const { return maxEdge; }
+        TVector<T, N> getMaxEdge() const {
+            return maxEdge;
+        }
 
-        TVector<T, N> getSize() const { return maxEdge - minEdge; }
+        TVector<T, N> getSize() const {
+            return maxEdge - minEdge;
+        }
 
-        TVector<T, N> getCenter() const { return minEdge + ((maxEdge - minEdge) / T(2)); }
+        TVector<T, N> getCenter() const {
+            return minEdge + ((maxEdge - minEdge) / T(2));
+        }
 
         bool isValid() const {
             for (int i = 0; i < N; i++) {
@@ -120,14 +132,23 @@ namespace XE {
          */
         std::array<TVector<T, N>, SideCount> getNormals() const {
             if constexpr (N == 2) {
-                return {TVector2<T>{static_cast<T>(-1), static_cast<T>(0)}, TVector2<T>{static_cast<T>(0), static_cast<T>(-1)}, TVector2<T>{static_cast<T>(1), static_cast<T>(0)},
-                        TVector2<T>{static_cast<T>(0), static_cast<T>(1)}};
+                return {
+                    TVector2<T>{static_cast<T>(-1), static_cast<T>(0)},
+                    TVector2<T>{static_cast<T>(0), static_cast<T>(-1)},
+                    TVector2<T>{static_cast<T>(1), static_cast<T>(0)},
+                    TVector2<T>{static_cast<T>(0), static_cast<T>(1)}
+                };
             }
 
             if constexpr (N == 3) {
-                return {TVector3<T>{static_cast<T>(-1), static_cast<T>(0), static_cast<T>(0)}, TVector3<T>{static_cast<T>(0), static_cast<T>(-1), static_cast<T>(0)},
-                        TVector3<T>{static_cast<T>(0), static_cast<T>(0), static_cast<T>(-1)}, TVector3<T>{static_cast<T>(1), static_cast<T>(0), static_cast<T>(0)},
-                        TVector3<T>{static_cast<T>(0), static_cast<T>(1), static_cast<T>(0)},  TVector3<T>{static_cast<T>(0), static_cast<T>(0), static_cast<T>(1)}};
+                return {
+                    TVector3<T>{static_cast<T>(-1), static_cast<T>(0), static_cast<T>(0)},
+                    TVector3<T>{static_cast<T>(0), static_cast<T>(-1), static_cast<T>(0)},
+                    TVector3<T>{static_cast<T>(0), static_cast<T>(0), static_cast<T>(-1)},
+                    TVector3<T>{static_cast<T>(1), static_cast<T>(0), static_cast<T>(0)},
+                    TVector3<T>{static_cast<T>(0), static_cast<T>(1), static_cast<T>(0)},
+                    TVector3<T>{static_cast<T>(0), static_cast<T>(0), static_cast<T>(1)}
+                };
             }
         }
 
@@ -195,6 +216,6 @@ namespace XE {
         TVector<T, N> minEdge;
         TVector<T, N> maxEdge;
     };
-} // namespace xe
+} // namespace XE
 
 #endif

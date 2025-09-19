@@ -1,7 +1,7 @@
 
+#include "SubsetGL.h"
 #include "BufferGL.h"
 #include "Conversion.h"
-#include "SubsetGL.h"
 
 #include <cassert>
 
@@ -24,8 +24,14 @@ namespace XE {
             glBindBuffer(buffer->getTarget(), buffer->getID());
             glEnableVertexAttribArray(attrib.shaderLocation);
 
-            glVertexAttribPointer(attrib.shaderLocation, attrib.size, convertToGL(attrib.type), convertToGL(attrib.normalized), static_cast<GLsizei>(attrib.stride),
-                                  reinterpret_cast<const void *>(attrib.bufferOffset));
+            glVertexAttribPointer(
+                attrib.shaderLocation,
+                attrib.size,
+                convertToGL(attrib.type),
+                convertToGL(attrib.normalized),
+                static_cast<GLsizei>(attrib.stride),
+                reinterpret_cast<const void *>(attrib.bufferOffset)
+            );
         }
 
         indexBuffer = static_cast<const BufferGL *>(desc.indexBuffer);
@@ -43,13 +49,23 @@ namespace XE {
         }
     }
 
-    int SubsetGL::getBufferCount() const { return (int)buffers.size(); }
+    int SubsetGL::getBufferCount() const {
+        return (int)buffers.size();
+    }
 
-    BufferGL *SubsetGL::getBuffer(const int index) { return const_cast<BufferGL *>(buffers[index]); }
+    BufferGL *SubsetGL::getBuffer(const int index) {
+        return const_cast<BufferGL *>(buffers[index]);
+    }
 
-    BufferGL *SubsetGL::getIndexBuffer() { return const_cast<BufferGL *>(indexBuffer); }
+    BufferGL *SubsetGL::getIndexBuffer() {
+        return const_cast<BufferGL *>(indexBuffer);
+    }
 
-    const BufferGL *SubsetGL::getBuffer(const int index) const { return buffers[index]; }
+    const BufferGL *SubsetGL::getBuffer(const int index) const {
+        return buffers[index];
+    }
 
-    const BufferGL *SubsetGL::getIndexBuffer() const { return indexBuffer; }
-} // namespace xe
+    const BufferGL *SubsetGL::getIndexBuffer() const {
+        return indexBuffer;
+    }
+} // namespace XE

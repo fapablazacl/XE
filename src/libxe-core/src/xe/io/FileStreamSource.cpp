@@ -46,4 +46,4 @@ namespace XE {
 
         return fs.is_open();
     }
-} // namespace xe
+} // namespace XE

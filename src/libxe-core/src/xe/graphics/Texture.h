@@ -21,6 +21,6 @@ namespace XE {
         virtual TextureType getType() const = 0;
     };
 
-} // namespace xe
+} // namespace XE
 
 #endif

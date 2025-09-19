@@ -20,4 +20,4 @@ namespace XE {
             return true;
         }
     }
-}
+} // namespace XE

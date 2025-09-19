@@ -30,6 +30,6 @@ namespace XE {
          */
         virtual Vector2i getSize() const = 0;
     };
-} // namespace xe
+} // namespace XE
 
 #endif

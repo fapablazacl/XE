@@ -141,8 +141,12 @@ TEST(BoxTest, intersectsChecksIfThereIsAnOverlappingWithAHalfSizedBox) {
     const auto size = box.getSize();
 
     const XE::Vector3 displacements[] = {
-        {0.5f * size.X, 0.0f, 0.0f},  {0.0f, 0.5f * size.Y, 0.0f},  {0.0f, 0.0f, 0.5f * size.Z},
-        {-0.5f * size.X, 0.0f, 0.0f}, {0.0f, -0.5f * size.Y, 0.0f}, {0.0f, 0.0f, -0.5f * size.Z},
+        {0.5f * size.X, 0.0f, 0.0f},
+        {0.0f, 0.5f * size.Y, 0.0f},
+        {0.0f, 0.0f, 0.5f * size.Z},
+        {-0.5f * size.X, 0.0f, 0.0f},
+        {0.0f, -0.5f * size.Y, 0.0f},
+        {0.0f, 0.0f, -0.5f * size.Z},
     };
 
     for (const auto &displacement : displacements) {
@@ -159,8 +163,12 @@ TEST(BoxTest, intersectsChecksIfThereIsAnOverlappingBetweenTwoBoxesWithANearlyPo
     const auto size = box.getSize();
 
     const XE::Vector3 displacements[] = {
-        {0.99f * size.X, 0.0f, 0.0f},  {0.0f, 0.99f * size.Y, 0.0f},  {0.0f, 0.0f, 0.99f * size.Z},
-        {-0.99f * size.X, 0.0f, 0.0f}, {0.0f, -0.99f * size.Y, 0.0f}, {0.0f, 0.0f, -0.99f * size.Z},
+        {0.99f * size.X, 0.0f, 0.0f},
+        {0.0f, 0.99f * size.Y, 0.0f},
+        {0.0f, 0.0f, 0.99f * size.Z},
+        {-0.99f * size.X, 0.0f, 0.0f},
+        {0.0f, -0.99f * size.Y, 0.0f},
+        {0.0f, 0.0f, -0.99f * size.Z},
     };
 
     for (const auto &displacement : displacements) {
@@ -176,7 +184,12 @@ TEST(BoxTest, intersectsChecksIfThereIsAnOverlappingBetweenTwoBoxesWithExactSize
     const auto size = box.getSize();
 
     const XE::Vector3 displacements[] = {
-        {size.X, 0.0f, 0.0f}, {0.0f, size.Y, 0.0f}, {0.0f, 0.0f, size.Z}, {-size.X, 0.0f, 0.0f}, {0.0f, -size.Y, 0.0f}, {0.0f, 0.0f, -size.Z},
+        {size.X, 0.0f, 0.0f},
+        {0.0f, size.Y, 0.0f},
+        {0.0f, 0.0f, size.Z},
+        {-size.X, 0.0f, 0.0f},
+        {0.0f, -size.Y, 0.0f},
+        {0.0f, 0.0f, -size.Z},
     };
 
     for (const auto &displacement : displacements) {
@@ -192,8 +205,12 @@ TEST(BoxTest, intersectsChecksIfThereIsAnOverlappingBetweenTwoBoxesDisplacesTwoA
     const auto size = box.getSize();
 
     const XE::Vector3 displacements[] = {
-        {2.5f * size.X, 0.0f, 0.0f},  {0.0f, 2.5f * size.Y, 0.0f},  {0.0f, 0.0f, 2.5f * size.Z},
-        {-2.5f * size.X, 0.0f, 0.0f}, {0.0f, -2.5f * size.Y, 0.0f}, {0.0f, 0.0f, -2.5f * size.Z},
+        {2.5f * size.X, 0.0f, 0.0f},
+        {0.0f, 2.5f * size.Y, 0.0f},
+        {0.0f, 0.0f, 2.5f * size.Z},
+        {-2.5f * size.X, 0.0f, 0.0f},
+        {0.0f, -2.5f * size.Y, 0.0f},
+        {0.0f, 0.0f, -2.5f * size.Z},
     };
 
     for (const auto &displacement : displacements) {

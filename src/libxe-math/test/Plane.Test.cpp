@@ -60,9 +60,13 @@ struct TestCase {
 TEST(PlaneTest, EqualityOperatorChecksForEqualityForEachTerm) {
     XE::Plane subject{1.0f, 2.0f, 3.0f, 4.0f};
 
-    const TestCase testCases[] = {TestCase{XE::Plane{1.0f, 2.0f, 3.0f, 4.0f}, true}, TestCase{XE::Plane{-1.0f, 2.0f, 3.0f, 4.0f}, false},
-                                  TestCase{XE::Plane{1.0f, -2.0f, 3.0f, 4.0f}, false}, TestCase{XE::Plane{1.0f, 2.0f, -3.0f, 4.0f}, false},
-                                  TestCase{XE::Plane{1.0f, 2.0f, 3.0f, -4.0f}, false}};
+    const TestCase testCases[] = {
+        TestCase{XE::Plane{1.0f, 2.0f, 3.0f, 4.0f}, true},
+        TestCase{XE::Plane{-1.0f, 2.0f, 3.0f, 4.0f}, false},
+        TestCase{XE::Plane{1.0f, -2.0f, 3.0f, 4.0f}, false},
+        TestCase{XE::Plane{1.0f, 2.0f, -3.0f, 4.0f}, false},
+        TestCase{XE::Plane{1.0f, 2.0f, 3.0f, -4.0f}, false}
+    };
 
     for (const auto &testCase : testCases) {
         EXPECT_EQ(testCase.output, subject.operator==(testCase.input));
@@ -72,9 +76,13 @@ TEST(PlaneTest, EqualityOperatorChecksForEqualityForEachTerm) {
 TEST(PlaneTest, InequalityOperatorChecksForEqualityForEachTerm) {
     XE::Plane subject{1.0f, 2.0f, 3.0f, 4.0f};
 
-    const TestCase testCases[] = {TestCase{XE::Plane{1.0f, 2.0f, 3.0f, 4.0f}, false}, TestCase{XE::Plane{-1.0f, 2.0f, 3.0f, 4.0f}, true},
-                                  TestCase{XE::Plane{1.0f, -2.0f, 3.0f, 4.0f}, true}, TestCase{XE::Plane{1.0f, 2.0f, -3.0f, 4.0f}, true},
-                                  TestCase{XE::Plane{1.0f, 2.0f, 3.0f, -4.0f}, true}};
+    const TestCase testCases[] = {
+        TestCase{XE::Plane{1.0f, 2.0f, 3.0f, 4.0f}, false},
+        TestCase{XE::Plane{-1.0f, 2.0f, 3.0f, 4.0f}, true},
+        TestCase{XE::Plane{1.0f, -2.0f, 3.0f, 4.0f}, true},
+        TestCase{XE::Plane{1.0f, 2.0f, -3.0f, 4.0f}, true},
+        TestCase{XE::Plane{1.0f, 2.0f, 3.0f, -4.0f}, true}
+    };
 
     for (const auto &testCase : testCases) {
         EXPECT_EQ(testCase.output, subject.operator!=(testCase.input));
@@ -110,7 +118,6 @@ TEST(PlaneTest, VectorialFactoryMethodGeneratesAPlaneFromASpecificPointAndANorma
     }
 }
 
-
 TEST(PlaneTest, EvaluateReturnsTheResultScalarOfEvaluatingPointAgainstThePlaneEquation) {
     using XE::Plane;
 
@@ -121,8 +128,6 @@ TEST(PlaneTest, EvaluateReturnsTheResultScalarOfEvaluatingPointAgainstThePlaneEq
     EXPECT_EQ(plane.evaluate({-1.0f, 0.0f, 0.0f}), 0.0f);
     EXPECT_EQ(plane.evaluate({-1.0f, 1.0f, 0.0f}), 2.0f);
 }
-
-
 
 TEST(PlaneTest, IntersectChecksIfTwoPlanesIntersect) {
     using XE::Plane;
@@ -136,7 +141,6 @@ TEST(PlaneTest, IntersectChecksIfTwoPlanesIntersect) {
     EXPECT_TRUE(plane3.intersect(plane1));
 }
 
-
 TEST(PlaneTest, TestChecksHowAPointRelatesToAPlane) {
     using XE::Plane;
     using XE::PlaneSide;
@@ -147,7 +151,6 @@ TEST(PlaneTest, TestChecksHowAPointRelatesToAPlane) {
     EXPECT_EQ(plane.test({0.0f, -2.0f, 0.0f}), PlaneSide::Back);
     EXPECT_EQ(plane.test({0.0f, 1.0f, 0.0f}), PlaneSide::Inside);
 }
-
 
 TEST(PlaneTest, SerializationGeneratesANonEmptyString) {
     XE::Plane subject;

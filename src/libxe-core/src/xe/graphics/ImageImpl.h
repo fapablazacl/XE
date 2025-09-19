@@ -29,6 +29,6 @@ namespace XE {
         PixelFormat format = PixelFormat::Unknown;
         Vector2i size = {0, 0};
     };
-} // namespace xe
+} // namespace XE
 
 #endif

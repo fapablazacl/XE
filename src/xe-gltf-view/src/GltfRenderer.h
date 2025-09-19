@@ -1,9 +1,9 @@
 
 #pragma once
 
-#include <memory>
-#include "xe/gl/RendererGL.h"
 #include "GltfMesh.h"
+#include "xe/gl/RendererGL.h"
+#include <memory>
 
 namespace xe::gltf_view {
     struct ShaderProgramUniformData {
@@ -43,4 +43,4 @@ namespace xe::gltf_view {
         xe::gl::Program program;
         std::vector<GltfMesh> meshes;
     };
-}
+} // namespace xe::gltf_view

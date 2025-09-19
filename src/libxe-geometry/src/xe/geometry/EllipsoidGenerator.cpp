@@ -8,13 +8,22 @@ namespace XE {
         this->dimensions = dimensions;
     }
 
-    EllipsoidGenerator::~EllipsoidGenerator() {}
+    EllipsoidGenerator::~EllipsoidGenerator() {
+    }
 
-    std::vector<Vector3> EllipsoidGenerator::generateVertexCoordinates() const { return {}; }
+    std::vector<Vector3> EllipsoidGenerator::generateVertexCoordinates() const {
+        return {};
+    }
 
-    std::vector<Vector3> EllipsoidGenerator::generateVertexNormals() const { return {}; }
+    std::vector<Vector3> EllipsoidGenerator::generateVertexNormals() const {
+        return {};
+    }
 
-    std::vector<Vector2> EllipsoidGenerator::generateVertexTexCoords() const { return {}; }
+    std::vector<Vector2> EllipsoidGenerator::generateVertexTexCoords() const {
+        return {};
+    }
 
-    std::vector<int> EllipsoidGenerator::generateIndices() const { return {}; }
-} // namespace xe
+    std::vector<int> EllipsoidGenerator::generateIndices() const {
+        return {};
+    }
+} // namespace XE

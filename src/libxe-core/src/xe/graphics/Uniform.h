@@ -70,6 +70,6 @@ namespace XE {
 
         return -1;
     }
-} // namespace xe
+} // namespace XE
 
 #endif

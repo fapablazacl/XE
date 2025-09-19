@@ -15,7 +15,9 @@ namespace XE {
 
         VirtualSphere(const Vector2i &screenSize);
 
-        Vector2i getScreenSize() const { return screenSize; }
+        Vector2i getScreenSize() const {
+            return screenSize;
+        }
 
         void setScreenSize(const Vector2i &value);
 
@@ -23,11 +25,13 @@ namespace XE {
 
         bool operator==(const VirtualSphere &rhs) const;
 
-        bool operator!=(const VirtualSphere &rhs) const { return !(*this == rhs); }
+        bool operator!=(const VirtualSphere &rhs) const {
+            return !(*this == rhs);
+        }
 
     private:
         Vector2i screenSize;
     };
-} // namespace xe
+} // namespace XE
 
 #endif

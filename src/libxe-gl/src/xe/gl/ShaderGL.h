@@ -17,7 +17,9 @@ namespace XE {
 
         virtual std::string getSource() const override;
 
-        GLuint GetID() const { return m_id; }
+        GLuint GetID() const {
+            return m_id;
+        }
 
     private:
         ShaderType m_type;
@@ -26,6 +28,6 @@ namespace XE {
         GLuint m_id;
         GLenum m_typeGL;
     };
-} // namespace xe
+} // namespace XE
 
 #endif

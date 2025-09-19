@@ -39,11 +39,19 @@ namespace XE {
         }
     }
 
-    int ProgramES::getShaderCount() const { return int(m_shaders.size()); }
+    int ProgramES::getShaderCount() const {
+        return int(m_shaders.size());
+    }
 
-    Shader *ProgramES::getShader(const int index) { return m_shaders[index].get(); }
+    Shader *ProgramES::getShader(const int index) {
+        return m_shaders[index].get();
+    }
 
-    int ProgramES::getUniformLoction(const std::string &name) const { return glGetUniformLocation(m_id, name.c_str()); }
+    int ProgramES::getUniformLoction(const std::string &name) const {
+        return glGetUniformLocation(m_id, name.c_str());
+    }
 
-    int ProgramES::getAttributeLocation(const std::string &name) const { return glGetAttribLocation(m_id, name.c_str()); }
-} // namespace xe
+    int ProgramES::getAttributeLocation(const std::string &name) const {
+        return glGetAttribLocation(m_id, name.c_str());
+    }
+} // namespace XE

@@ -24,6 +24,6 @@ namespace XE {
 
         virtual StreamFlags getFlags() const = 0;
     };
-} // namespace xe
+} // namespace XE
 
 #endif

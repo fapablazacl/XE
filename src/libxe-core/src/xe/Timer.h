@@ -12,6 +12,6 @@ namespace XE {
 
         static uint32_t getTick();
     };
-} // namespace xe
+} // namespace XE
 
 #endif

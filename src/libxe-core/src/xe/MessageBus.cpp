@@ -1,8 +1,4 @@
 
 #include "MessageBus.h"
 
-
-
-namespace XE {
-
-}
+namespace XE {}

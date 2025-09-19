@@ -2,9 +2,9 @@
 
 #pragma once
 
-#include <vector>
-#include <glad/glad.h>
 #include "xe/gl/RendererGL.h"
+#include <glad/glad.h>
+#include <vector>
 
 struct GltfMaterial {
     xe::gl::Texture texture;

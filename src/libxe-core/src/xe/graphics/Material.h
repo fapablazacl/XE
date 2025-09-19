@@ -78,6 +78,6 @@ namespace XE {
         int layerCount = 0;
         MaterialRenderState renderState;
     };
-} // namespace xe
+} // namespace XE
 
 #endif

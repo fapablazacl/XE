@@ -1,6 +1,6 @@
 
-#include "Conversion.h"
 #include "Texture2DArrayGL.h"
+#include "Conversion.h"
 
 namespace XE {
     Texture2DArrayGL::Texture2DArrayGL(const PixelFormat format, const Vector2i &size, const int count) : TextureBaseGL(GL_TEXTURE_2D_ARRAY) {
@@ -16,10 +16,12 @@ namespace XE {
         glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
     }
 
-    Texture2DArrayGL::~Texture2DArrayGL() {}
+    Texture2DArrayGL::~Texture2DArrayGL() {
+    }
 
-    void Texture2DArrayGL::setData(const void *surfaceData, const int mipLevel, const int arrayIndex, const PixelFormat surfaceFormat, const DataType surfaceDataType,
-                                   const Recti &area, int count) {
+    void Texture2DArrayGL::setData(
+        const void *surfaceData, const int mipLevel, const int arrayIndex, const PixelFormat surfaceFormat, const DataType surfaceDataType, const Recti &area, int count
+    ) {
         const Vector2i offset = area.getMinEdge();
         const Vector2i size = area.getSize();
         const GLenum formatGL = convertToGL(surfaceFormat);
@@ -38,4 +40,4 @@ namespace XE {
         glGetTexImage(GL_TEXTURE_2D_ARRAY, mipLevel, formatGL, dataTypeGL, surfaceData);
         glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
     }
-} // namespace xe
+} // namespace XE

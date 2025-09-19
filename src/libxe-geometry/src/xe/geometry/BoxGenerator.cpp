@@ -10,13 +10,20 @@ namespace XE {
         this->size = size;
     }
 
-    BoxGenerator::~BoxGenerator() {}
+    BoxGenerator::~BoxGenerator() {
+    }
 
-    std::vector<Vector3> BoxGenerator::generateVertexCoordinates() const { return {}; }
+    std::vector<Vector3> BoxGenerator::generateVertexCoordinates() const {
+        return {};
+    }
 
-    std::vector<Vector3> BoxGenerator::generateVertexNormals() const { return {}; }
+    std::vector<Vector3> BoxGenerator::generateVertexNormals() const {
+        return {};
+    }
 
-    std::vector<Vector2> BoxGenerator::generateVertexTexCoords() const { return {}; }
+    std::vector<Vector2> BoxGenerator::generateVertexTexCoords() const {
+        return {};
+    }
 
     std::vector<int> BoxGenerator::generateIndices() const {
         const int slices = division.X;
@@ -50,7 +57,7 @@ namespace XE {
 
         return indices;
     }
-} // namespace xe
+} // namespace XE
 
 /*
     //! TODO: Replace with a quaternion object

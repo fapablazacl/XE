@@ -4,4 +4,4 @@
 namespace XE {
     template struct TEllipsoid<float>;
     template struct TEllipsoid<double>;
-} // namespace xe
+} // namespace XE

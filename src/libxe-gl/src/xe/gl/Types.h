@@ -10,8 +10,7 @@ namespace xe::gl {
      * Defines a strongly-typed alias for a basic type.
      * This ensures that common errors, like binding a Texture where a Buffer was expected, are caught at build time.
      */
-    template <typename Tag, typename T>
-    struct TaggedType {
+    template <typename Tag, typename T> struct TaggedType {
         typedef T Type;
         typedef Tag TagType;
 
@@ -26,7 +25,7 @@ namespace xe::gl {
         explicit Resource(const T id)
             : id(id) {}
 
-        ~Resource() { 
+        ~Resource() {
             delete_();
         }
 
@@ -80,7 +79,7 @@ namespace xe::gl {
             this->id = id;
         }
 
-        GLint getAttribLocation(const GLchar* name) const {
+        GLint getAttribLocation(const GLchar *name) const {
             assert(name);
 
             const auto loc = glGetAttribLocation(id, name);
@@ -89,7 +88,7 @@ namespace xe::gl {
             return loc;
         }
 
-        GLint getUniformLocation(const GLchar* name) const {
+        GLint getUniformLocation(const GLchar *name) const {
             assert(name);
 
             const auto loc = glGetUniformLocation(id, name);
@@ -108,16 +107,21 @@ namespace xe::gl {
     public:
         MemoryRegion() = default;
 
-        MemoryRegion(const void* data, size_t size) : m_data(data), m_size(size) {}
+        MemoryRegion(const void *data, size_t size) : m_data(data), m_size(size) {
+        }
 
         [[nodiscard]]
-        size_t size() const { return m_size; }
+        size_t size() const {
+            return m_size;
+        }
 
         [[nodiscard]]
-        const void* data() const { return m_data; }
+        const void *data() const {
+            return m_data;
+        }
 
     private:
-        const void* m_data = nullptr;
+        const void *m_data = nullptr;
         size_t m_size = 0;
     };
-}
+} // namespace xe::gl

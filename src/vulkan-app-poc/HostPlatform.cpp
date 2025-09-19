@@ -1,11 +1,13 @@
 
 #include "HostPlatform.h"
 
-#include <xe/Predef.h>
 #include <iostream>
+#include <xe/Predef.h>
 
 HostPlatform::HostPlatform(const std::string &title, const uint32_t screenWidth, const uint32_t screenHeight, const HostPlatformFlagBits flags)
-    : mScreenWidth(screenWidth), mScreenHeight(screenHeight), mFlags(flags) {
+    : mScreenWidth(screenWidth),
+      mScreenHeight(screenHeight),
+      mFlags(flags) {
     assert(screenWidth > 0);
     assert(screenHeight > 0);
 
@@ -21,11 +23,17 @@ HostPlatform::~HostPlatform() {
     glfwTerminate();
 }
 
-bool HostPlatform::closeWasRequested() const { return glfwGetKey(mWindow, GLFW_KEY_ESCAPE) == GLFW_PRESS || glfwWindowShouldClose(mWindow) == GLFW_TRUE; }
+bool HostPlatform::closeWasRequested() const {
+    return glfwGetKey(mWindow, GLFW_KEY_ESCAPE) == GLFW_PRESS || glfwWindowShouldClose(mWindow) == GLFW_TRUE;
+}
 
-uint32_t HostPlatform::getScreenWidth() const { return mScreenWidth; }
+uint32_t HostPlatform::getScreenWidth() const {
+    return mScreenWidth;
+}
 
-uint32_t HostPlatform::getScreenHeight() const { return mScreenHeight; }
+uint32_t HostPlatform::getScreenHeight() const {
+    return mScreenHeight;
+}
 
 std::vector<const char *> HostPlatform::enumerateRequiredInstanceExtensions() const {
     uint32_t extensionCount = 0;
@@ -51,11 +59,10 @@ std::vector<const char *> HostPlatform::enumerateRequiredInstanceExtensions() co
 }
 
 std::vector<const char *> HostPlatform::enumerateRequiredDeviceExtensions() const {
-    return {
-        // these extensions provide all the objects required for swapchains
-        VK_KHR_SWAPCHAIN_EXTENSION_NAME,
+    return {// these extensions provide all the objects required for swapchains
+            VK_KHR_SWAPCHAIN_EXTENSION_NAME,
 
-        // required for platforms where Vulkan isn't supported directly by the OS
+    // required for platforms where Vulkan isn't supported directly by the OS
 #if defined(XE_OS_MACOS) || defined(XE_OS_IOS)
             "VK_KHR_portability_subset"
 #endif
@@ -70,7 +77,9 @@ std::vector<const char *> HostPlatform::enumerateValidationLayers() const {
     return {};
 }
 
-void HostPlatform::pollEvents() { glfwPollEvents(); }
+void HostPlatform::pollEvents() {
+    glfwPollEvents();
+}
 
 vk::Extent2D HostPlatform::pickSwapExtent(const vk::SurfaceCapabilitiesKHR &surfaceCaps) const {
     assert(mWindow);
@@ -99,7 +108,6 @@ vk::SurfaceKHR HostPlatform::createSurface(vk::Instance &instance) const {
 
     return rawsurf;
 }
-
 
 void HostPlatform::destroyWindow() {
     if (mWindow) {

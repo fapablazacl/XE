@@ -4,12 +4,12 @@
 #include <iostream>
 #include <map>
 
+#include "GltfMesh.h"
 #include "GltfUtil.h"
 #include "cgltf.h"
 #include "xe/ImageLoader.h"
 #include "xe/gl/RendererGL.h"
 #include "xe/graphics/ImageLoader.h"
-#include "GltfMesh.h"
 
 namespace xe::gl {
     class RendererGL;
@@ -17,13 +17,13 @@ namespace xe::gl {
 
 class GltfTextureLoader {
 public:
-    GltfTextureLoader(const xe::gl::RendererGL* renderer, ImageLoader* imageLoader);
+    GltfTextureLoader(const xe::gl::RendererGL *renderer, ImageLoader *imageLoader);
 
-    xe::gl::Texture createTexture(const xe::gl::RendererGL* renderer, const cgltf_texture_view &texture) const;
+    xe::gl::Texture createTexture(const xe::gl::RendererGL *renderer, const cgltf_texture_view &texture) const;
 
 private:
-    const xe::gl::RendererGL* renderer = nullptr;
-    const ImageLoader* imageLoader = nullptr;
+    const xe::gl::RendererGL *renderer = nullptr;
+    const ImageLoader *imageLoader = nullptr;
 };
 
 using GltfAttributeName = std::string;
@@ -32,8 +32,10 @@ using ShaderAttributeName = std::string;
 struct ShaderAttrib {
     std::string name;
     bool required = false;
-    explicit ShaderAttrib(std::string name) : name(std::move(name)) {}
-    explicit ShaderAttrib(std::string name, bool required) : name(std::move(name)), required(required) {}
+    explicit ShaderAttrib(std::string name) : name(std::move(name)) {
+    }
+    explicit ShaderAttrib(std::string name, bool required) : name(std::move(name)), required(required) {
+    }
 };
 
 using GltfAttributeMap = std::map<GltfAttributeName, ShaderAttrib>;
@@ -44,10 +46,11 @@ class GltfDataParser {
 public:
     GltfDataParser() = default;
 
-    explicit GltfDataParser(const cgltf_options &options) : options(options) {}
+    explicit GltfDataParser(const cgltf_options &options) : options(options) {
+    }
 
     [[nodiscard]]
-    cgltf_data* parse(const std::string &filePath) const;
+    cgltf_data *parse(const std::string &filePath) const;
 };
 
 // Loads gltf data in the GPU

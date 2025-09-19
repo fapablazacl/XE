@@ -15,4 +15,4 @@ namespace XE {
             assert(false);
         }
     }
-} // namespace xe
+} // namespace XE

@@ -26,6 +26,6 @@ namespace XE {
 
         virtual Shader *getShader(const int index) = 0;
     };
-} // namespace xe
+} // namespace XE
 
 #endif

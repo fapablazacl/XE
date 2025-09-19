@@ -8,7 +8,9 @@
 #include "ShapeGenerator.h"
 
 namespace XE {
-    template <typename FloatT> inline FloatT ratio(const int a, const int b) { return static_cast<FloatT>(a) / static_cast<FloatT>(b); }
+    template <typename FloatT> inline FloatT ratio(const int a, const int b) {
+        return static_cast<FloatT>(a) / static_cast<FloatT>(b);
+    }
 
     /**
      * @brief Generate a geometry mesh over the plane XZ
@@ -88,16 +90,26 @@ namespace XE {
             }
         }
 
-        int getVertexCount() const { return vertexCount; }
+        int getVertexCount() const {
+            return vertexCount;
+        }
 
-        int getIndexCount() const { return indexCount; }
+        int getIndexCount() const {
+            return indexCount;
+        }
 
     private:
-        TVector<T, 3> computeCoordinate(const T ti, const T tj) const { return {lerp(T(-0.5), T(0.5), tj), lerp(T(0.5), T(-0.5), ti), T(0.0)}; }
+        TVector<T, 3> computeCoordinate(const T ti, const T tj) const {
+            return {lerp(T(-0.5), T(0.5), tj), lerp(T(0.5), T(-0.5), ti), T(0.0)};
+        }
 
-        TVector<T, 3> computeNormal(const T ti, const T tj) const { return {T(0), T(0), T(-1)}; }
+        TVector<T, 3> computeNormal(const T ti, const T tj) const {
+            return {T(0), T(0), T(-1)};
+        }
 
-        TVector<T, 2> computeTextureCoordinate(const T ti, const T tj) const { return {lerp(T(0), T(1), tj), lerp(T(1), T(0), ti)}; }
+        TVector<T, 2> computeTextureCoordinate(const T ti, const T tj) const {
+            return {lerp(T(0), T(1), tj), lerp(T(1), T(0), ti)};
+        }
 
         int computeVertexCount() const {
             const int slices = division.X;
@@ -121,6 +133,6 @@ namespace XE {
         int vertexCount;
         int indexCount;
     };
-} // namespace xe
+} // namespace XE
 
 #endif

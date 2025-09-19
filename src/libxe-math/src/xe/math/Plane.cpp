@@ -4,4 +4,4 @@
 namespace XE {
     template struct TPlane<float>;
     template struct TPlane<double>;
-} // namespace xe
+} // namespace XE

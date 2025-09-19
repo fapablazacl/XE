@@ -1,13 +1,13 @@
 
-#pragma once 
+#pragma once
 
+#include <glad/glad.h>
 #include <string>
 #include <vector>
-#include <glad/glad.h>
 
 #include "Types.h"
-#include "xe/math/Vector.h"
 #include "xe/math/Matrix.h"
+#include "xe/math/Vector.h"
 
 #include <optional>
 
@@ -26,33 +26,29 @@ namespace xe::gl {
         GLboolean enabled = GL_FALSE;
     };
 
-    enum class UniformType {
-        Float, Int, UnsignedInt
-    };
+    enum class UniformType { Float, Int, UnsignedInt };
 
-    template<typename BasicType> struct MetaUniformTypeMapper {};
+    template <typename BasicType> struct MetaUniformTypeMapper {};
 
-    template<> struct MetaUniformTypeMapper<float> {
+    template <> struct MetaUniformTypeMapper<float> {
         static UniformType map() {
             return UniformType::Float;
         }
     };
 
-    template<> struct MetaUniformTypeMapper<int> {
+    template <> struct MetaUniformTypeMapper<int> {
         static UniformType map() {
             return UniformType::Int;
         }
     };
 
-    template<> struct MetaUniformTypeMapper<unsigned int> {
+    template <> struct MetaUniformTypeMapper<unsigned int> {
         static UniformType map() {
             return UniformType::UnsignedInt;
         }
     };
 
-    enum class UniformDim {
-        _1, _2, _3, _4
-    };
+    enum class UniformDim { _1, _2, _3, _4 };
 
     struct Uniform {
         GLint location = 0;
@@ -60,56 +56,73 @@ namespace xe::gl {
         UniformDim dim = UniformDim::_1;
         GLsizei count = 0;
 
-        const void* data = nullptr;
+        const void *data = nullptr;
     };
 
     enum class UniformMatrixDim {
-        _2x2, _2x3, _2x4,
-        _3x2, _3x3, _3x4,
-        _4x2, _4x3, _4x4,
+        _2x2,
+        _2x3,
+        _2x4,
+        _3x2,
+        _3x3,
+        _3x4,
+        _4x2,
+        _4x3,
+        _4x4,
     };
 
-    template<int rows, int cols>
-    constexpr UniformMatrixDim mapUniformMatrixDim() {
+    template <int rows, int cols> constexpr UniformMatrixDim mapUniformMatrixDim() {
         static_assert(rows >= 2 && rows <= 4);
         static_assert(cols >= 2 && cols <= 4);
 
         if constexpr (rows == 2) {
-            if constexpr (cols == 2) { return UniformMatrixDim::_2x2; }
-            if constexpr (cols == 3) { return UniformMatrixDim::_2x3; }
-            if constexpr (cols == 4) { return UniformMatrixDim::_2x4; }
+            if constexpr (cols == 2) {
+                return UniformMatrixDim::_2x2;
+            }
+            if constexpr (cols == 3) {
+                return UniformMatrixDim::_2x3;
+            }
+            if constexpr (cols == 4) {
+                return UniformMatrixDim::_2x4;
+            }
         }
 
         if constexpr (rows == 3) {
-            if constexpr (cols == 2) { return UniformMatrixDim::_3x2; }
-            if constexpr (cols == 3) { return UniformMatrixDim::_3x3; }
-            if constexpr (cols == 4) { return UniformMatrixDim::_3x4; }
+            if constexpr (cols == 2) {
+                return UniformMatrixDim::_3x2;
+            }
+            if constexpr (cols == 3) {
+                return UniformMatrixDim::_3x3;
+            }
+            if constexpr (cols == 4) {
+                return UniformMatrixDim::_3x4;
+            }
         }
 
         if constexpr (rows == 4) {
-            if constexpr (cols == 2) { return UniformMatrixDim::_4x2; }
-            if constexpr (cols == 3) { return UniformMatrixDim::_4x3; }
-            if constexpr (cols == 4) { return UniformMatrixDim::_4x4; }
+            if constexpr (cols == 2) {
+                return UniformMatrixDim::_4x2;
+            }
+            if constexpr (cols == 3) {
+                return UniformMatrixDim::_4x3;
+            }
+            if constexpr (cols == 4) {
+                return UniformMatrixDim::_4x4;
+            }
         }
     }
 
-    enum class UniformMatrixType {
-        Float,
-        Double
-    };
+    enum class UniformMatrixType { Float, Double };
 
-    template<typename BasicType>
-    struct MetaUniformMatrixTypeMapper {};
+    template <typename BasicType> struct MetaUniformMatrixTypeMapper {};
 
-    template<>
-    struct MetaUniformMatrixTypeMapper<float> {
+    template <> struct MetaUniformMatrixTypeMapper<float> {
         static UniformMatrixType map() {
             return UniformMatrixType::Float;
         }
     };
 
-    template<>
-    struct MetaUniformMatrixTypeMapper<double> {
+    template <> struct MetaUniformMatrixTypeMapper<double> {
         static UniformMatrixType map() {
             return UniformMatrixType::Double;
         }
@@ -121,11 +134,10 @@ namespace xe::gl {
         UniformMatrixDim dim = UniformMatrixDim::_4x4;
         GLboolean transpose = GL_FALSE;
         GLsizei count = 0;
-        const void* data = nullptr;
+        const void *data = nullptr;
     };
 
-    template<typename Type, int Rows, int Cols>
-    UniformMatrix makeUniform(GLint location, const XE::TMatrix<Type, Rows, Cols> &matrix, const bool transpose = false) {
+    template <typename Type, int Rows, int Cols> UniformMatrix makeUniform(GLint location, const XE::TMatrix<Type, Rows, Cols> &matrix, const bool transpose = false) {
         UniformMatrix uniform;
 
         uniform.location = location;
@@ -138,8 +150,7 @@ namespace xe::gl {
         return uniform;
     }
 
-    template<typename Type>
-    Uniform makeUniform(GLint location, Type &value) {
+    template <typename Type> Uniform makeUniform(GLint location, Type &value) {
         Uniform uniform;
 
         uniform.location = location;
@@ -262,7 +273,7 @@ namespace xe::gl {
         static std::unique_ptr<RendererGL> create();
 
     private:
-        RendererGL();// caca i pipi
+        RendererGL(); // caca i pipi
 
     public:
         [[nodiscard]]
@@ -319,7 +330,7 @@ namespace xe::gl {
     private:
         using PFNGLVERTEXATTRIBMXFVPROC = void (*)(GLuint index, const GLfloat *v);
         using PFNGLVERTEXATTRIBMXIVPROC = void (*)(GLuint index, const GLint *v);
-        
+
         using PFNGLUNIFORMXFVPROC = void (*)(GLint location, GLsizei count, const GLfloat *value);
         using PFNGLUNIFORMXIVPROC = void (*)(GLint location, GLsizei count, const GLint *value);
         using PFNGLUNIFORMXUIVPROC = void (*)(GLint location, GLsizei count, const GLuint *value);
@@ -341,4 +352,4 @@ namespace xe::gl {
 
         PFNGLXABLEPROC glXable[2];
     };
-}
+} // namespace xe::gl

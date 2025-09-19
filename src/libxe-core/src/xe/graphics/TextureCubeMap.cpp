@@ -2,5 +2,6 @@
 #include <xe/graphics/TextureCubeMap.h>
 
 namespace XE {
-    TextureCubeMap::~TextureCubeMap() {}
-} // namespace xe
+    TextureCubeMap::~TextureCubeMap() {
+    }
+} // namespace XE

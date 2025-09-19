@@ -13,10 +13,14 @@ namespace XE {
 
         virtual ~Texture3DGL();
 
-        virtual PixelFormat getFormat() const override { return m_format; }
+        virtual PixelFormat getFormat() const override {
+            return m_format;
+        }
 
     public:
-        virtual Vector3i getSize() const override { return m_size; }
+        virtual Vector3i getSize() const override {
+            return m_size;
+        }
 
         virtual void setData(const void *surfaceData, const int mipLevel, const PixelFormat surfaceFormat, const DataType surfaceDataType, const Boxi &volume) override;
 
@@ -26,6 +30,6 @@ namespace XE {
         PixelFormat m_format;
         Vector3i m_size;
     };
-} // namespace xe
+} // namespace XE
 
 #endif

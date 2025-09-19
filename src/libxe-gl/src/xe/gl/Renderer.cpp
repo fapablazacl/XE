@@ -1,8 +1,8 @@
 
 #include "Renderer.h"
 
-#include "xe/Logger.h"
 #include "../../../../apostate/src/apostate/Platform.h"
+#include "xe/Logger.h"
 
 #include <cassert>
 #include <iostream>
@@ -162,29 +162,30 @@ namespace test {
 
 static std::string GLErrorToString(GLenum error) {
     switch (error) {
-    case GL_INVALID_ENUM: return "GL_INVALID_ENUM";
-    case GL_INVALID_VALUE: return "GL_INVALID_VALUE";
-    case GL_INVALID_OPERATION: return "GL_INVALID_OPERATION";
-    case GL_OUT_OF_MEMORY: return "GL_OUT_OF_MEMORY";
-    default: return "<Unknown Error Value: " + std::to_string(error) + ">";
+    case GL_INVALID_ENUM:
+        return "GL_INVALID_ENUM";
+    case GL_INVALID_VALUE:
+        return "GL_INVALID_VALUE";
+    case GL_INVALID_OPERATION:
+        return "GL_INVALID_OPERATION";
+    case GL_OUT_OF_MEMORY:
+        return "GL_OUT_OF_MEMORY";
+    default:
+        return "<Unknown Error Value: " + std::to_string(error) + ">";
     }
 }
 
-
 #ifndef NDEBUG
-#   define M_Assert(Expr, Msg) \
-    __M_Assert(#Expr, Expr, __FILE__, __LINE__, Msg)
+#define M_Assert(Expr, Msg) __M_Assert(#Expr, Expr, __FILE__, __LINE__, Msg)
 #else
-#   define M_Assert(Expr, Msg) ;
+#define M_Assert(Expr, Msg) ;
 #endif
 
-void __M_Assert(const char* expr_str, bool expr, const char* file, int line, const char* msg)
-{
-    if (!expr)
-    {
+void __M_Assert(const char *expr_str, bool expr, const char *file, int line, const char *msg) {
+    if (!expr) {
         std::cerr << "Assert failed:\t" << msg << "\n"
-            << "Expected:\t" << expr_str << "\n"
-            << "Source:\t\t" << file << ", line " << line << "\n";
+                  << "Expected:\t" << expr_str << "\n"
+                  << "Source:\t\t" << file << ", line " << line << "\n";
         abort();
     }
 }
@@ -193,44 +194,41 @@ struct GLErrorRAII {
     GLErrorRAII(const char *file, const int line) : file(file), line(line) {
         check();
     }
-    
+
     ~GLErrorRAII() {
         check();
     }
-    
+
     void check() const {
         const GLenum error = glGetError();
-        
+
         if (error != GL_NO_ERROR) {
-            std::cerr
-                << "GL Error Detected:\t" << GLErrorToString(error) << "\n"
-                << "Source:\t\t" << file << ", line " << line << "\n";
-            
+            std::cerr << "GL Error Detected:\t" << GLErrorToString(error) << "\n"
+                      << "Source:\t\t" << file << ", line " << line << "\n";
+
             abort();
         }
     }
-    
+
     const char *file;
     const int line;
 };
-
 
 #define GL_SCOPED_ERROR_CHECK() GLErrorRAII __gl_error_raii(__FILE__, __LINE__)
 
 #if defined(GLAD_DEBUG)
 void pre_call_callback_gl(const char *name, void *funcptr, int len_args, ...) {
-    (void) name;
-    (void) funcptr;
-    (void) len_args;
+    (void)name;
+    (void)funcptr;
+    (void)len_args;
 
     if (strcmp(name, "glLinkProgram") == 0) {
         std::cout << "pre glLinkProgram" << std::endl;
     }
 }
 
-
-void post_call_callback_gl(const char *name, void *funcptr, int len_args, ...) {    
-    (void) funcptr;
+void post_call_callback_gl(const char *name, void *funcptr, int len_args, ...) {
+    (void)funcptr;
 
     const GLenum error_code = glad_glGetError();
 
@@ -240,7 +238,7 @@ void post_call_callback_gl(const char *name, void *funcptr, int len_args, ...) {
 
     va_list valist;
     va_start(valist, len_args);
-    
+
     std::cerr << name << "(";
 
     // TODO: Generate a lookup-table, for Debug builds, to process this debug information.
@@ -265,8 +263,8 @@ void post_call_callback_gl(const char *name, void *funcptr, int len_args, ...) {
 }
 #endif
 
-
-Renderer::Renderer(Platform &platform) : platform{platform} {}
+Renderer::Renderer(Platform &platform) : platform{platform} {
+}
 
 bool Renderer::initialize() {
     if (!gladLoadGLLoader((GLADloadproc)platform.getGLProcAddressProcedure())) {
@@ -297,14 +295,13 @@ bool Renderer::initialize() {
     return true;
 }
 
-
-Renderer::~Renderer() {}
-
+Renderer::~Renderer() {
+}
 
 GLuint Renderer::createShader(const std::string &source, const GLenum type) {
     GLuint shader = glCreateShader(type);
 
-    const GLchar * const sources = source.c_str();
+    const GLchar *const sources = source.c_str();
     const GLint sourceSizes = source.size();
 
     glShaderSource(shader, 1, &sources, &sourceSizes);
@@ -325,7 +322,6 @@ GLuint Renderer::createShader(const std::string &source, const GLenum type) {
 
     return shader;
 }
-
 
 GLuint Renderer::createShaderProgram(const std::vector<GLuint> &shaders) {
     GLuint program = glCreateProgram();
@@ -356,7 +352,6 @@ GLuint Renderer::createShaderProgram(const std::vector<GLuint> &shaders) {
     return program;
 }
 
-
 GLuint Renderer::createBuffer(const GLenum target, const GLsizeiptr size, const void *data, GLenum usage) {
     assert(size);
     assert(data);
@@ -376,9 +371,9 @@ GLuint Renderer::createBuffer(const GLenum target, const GLsizeiptr size, const 
 ShaderLocationMap Renderer::createShaderLocationMap(const GLuint program) {
     assert(program);
     assert(glIsProgram(program));
-    
+
     ShaderLocationMap location;
-    
+
     location.coord = 0;
     assert(location.coord >= 0);
 
@@ -387,24 +382,23 @@ ShaderLocationMap Renderer::createShaderLocationMap(const GLuint program) {
 
     location.texCoord = 2;
     assert(location.texCoord >= 0);
-    
+
     location.uModel = glGetUniformLocation(program, "uModel");
     location.uView = glGetUniformLocation(program, "uView");
     location.uProj = glGetUniformLocation(program, "uProj");
-    
+
     location.uMaterialDiffuseSamplerEnable = glGetUniformLocation(program, "uMaterialDiffuseSamplerEnable");
     location.uMaterialDiffuseSampler = glGetUniformLocation(program, "uMaterialDiffuseSampler");
     location.uMaterialAmbient = glGetUniformLocation(program, "uMaterialAmbient");
     location.uMaterialDiffuse = glGetUniformLocation(program, "uMaterialDiffuse");
     location.uMaterialSpecular = glGetUniformLocation(program, "uMaterialSpecular");
-    
+
     location.uLightAmbient = glGetUniformLocation(program, "uLightAmbient");
     location.uLightDirection = glGetUniformLocation(program, "uLightDirection");
     location.uLightDiffuse = glGetUniformLocation(program, "uLightDiffuse");
-    
+
     return location;
 }
-
 
 void Renderer::beginRenderFrame() {
     glClearColor(0.2f, 0.2f, 0.8f, 1.0f);
@@ -419,28 +413,27 @@ void Renderer::endRenderFrame() {
     platform.swapBuffers();
 }
 
-
 Mesh Renderer::createMeshVAO(const ShaderLocationMap &location, const MeshData &meshData) {
     Mesh meshVAO;
-    
+
     meshVAO.material = meshData.materialIndex;
 
     GLuint coordBuffer = createBuffer(GL_ARRAY_BUFFER, meshData.vertexCoord, GL_STATIC_DRAW);
-    
+
     GLuint normalBuffer = 0;
-    if (! meshData.vertexNormal.empty()) {
+    if (!meshData.vertexNormal.empty()) {
         normalBuffer = createBuffer(GL_ARRAY_BUFFER, meshData.vertexNormal, GL_STATIC_DRAW);
     }
-    
+
     GLuint texCoordBuffer = 0;
-    if (! meshData.vertexTexCoord.empty()) {
+    if (!meshData.vertexTexCoord.empty()) {
         texCoordBuffer = createBuffer(GL_ARRAY_BUFFER, meshData.vertexTexCoord, GL_STATIC_DRAW);
     }
-    
+
     GLuint indexBuffer = 0;
-    if (! meshData.indices.empty()) {
+    if (!meshData.indices.empty()) {
         indexBuffer = createBuffer(GL_ELEMENT_ARRAY_BUFFER, meshData.indices, GL_STATIC_DRAW);
-        
+
         meshVAO.indexDataType = GL_UNSIGNED_INT;
         meshVAO.indexed = true;
         meshVAO.count = meshData.indexCount;
@@ -451,10 +444,10 @@ Mesh Renderer::createMeshVAO(const ShaderLocationMap &location, const MeshData &
         meshVAO.count = meshData.vertexCount;
         meshVAO.primitiveType = GL_TRIANGLES;
     }
-    
+
     glGenVertexArrays(1, &meshVAO.vao);
     glBindVertexArray(meshVAO.vao);
-    
+
     glEnableVertexAttribArray(location.coord);
     glBindBuffer(GL_ARRAY_BUFFER, coordBuffer);
     glVertexAttribPointer(location.coord, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
@@ -465,36 +458,37 @@ Mesh Renderer::createMeshVAO(const ShaderLocationMap &location, const MeshData &
         glBindBuffer(GL_ARRAY_BUFFER, normalBuffer);
         glVertexAttribPointer(location.normal, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
     }
-    
+
     if (texCoordBuffer) {
         assert(location.texCoord >= 0);
-        
+
         glEnableVertexAttribArray(location.texCoord);
         glBindBuffer(GL_ARRAY_BUFFER, texCoordBuffer);
         glVertexAttribPointer(location.texCoord, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
     }
-    
+
     if (indexBuffer) {
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer);
     }
-    
+
     glBindVertexArray(0);
 
     return meshVAO;
 }
 
-
-GLuint Renderer::createTexture(GLenum internalFormat, const unsigned width, const unsigned height, const GLenum format, const GLenum type, const void *data, const GLuint wrapS, const GLuint wrapT) {
+GLuint Renderer::createTexture(
+    GLenum internalFormat, const unsigned width, const unsigned height, const GLenum format, const GLenum type, const void *data, const GLuint wrapS, const GLuint wrapT
+) {
     // Generate a new texture
     GLuint texture = 0;
     glGenTextures(1, &texture);
-    
+
     // Bind the texture to a name
     glBindTexture(GL_TEXTURE_2D, texture);
-    
-    glTexImage2D( GL_TEXTURE_2D, 0, internalFormat, width, height, 0, format, type, data);
+
+    glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, format, type, data);
     glGenerateMipmap(GL_TEXTURE_2D);
-    
+
     // Set texture clamping method
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrapS);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrapT);
@@ -504,31 +498,22 @@ GLuint Renderer::createTexture(GLenum internalFormat, const unsigned width, cons
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
     glBindTexture(GL_TEXTURE_2D, 0);
-    
+
     return texture;
 }
-
 
 GLuint Renderer::createTexture(GLenum internalFormat, const unsigned width, const unsigned height, const GLenum format, const GLenum type, const void *data) {
     return createTexture(internalFormat, width, height, format, type, data, GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE);
 }
 
 void Renderer::renderCamera(const ShaderLocationMap &location, const Camera &camera) {
-    const glm::mat4 proj = glm::perspective(
-        camera.fov,
-        camera.aspect,
-        camera.znear,
-        camera.zfar);
+    const glm::mat4 proj = glm::perspective(camera.fov, camera.aspect, camera.znear, camera.zfar);
 
-    const glm::mat4 view = glm::lookAt(
-        camera.position,
-        camera.lookAt,
-        camera.up);
+    const glm::mat4 view = glm::lookAt(camera.position, camera.lookAt, camera.up);
 
     glUniformMatrix4fv(location.uProj, 1, GL_FALSE, glm::value_ptr(proj));
     glUniformMatrix4fv(location.uView, 1, GL_FALSE, glm::value_ptr(view));
 }
-
 
 void Renderer::renderLighting(const GLuint programId, const Lighting &lighting) {
     GLint loc = 0;
@@ -547,7 +532,7 @@ void Renderer::renderLighting(const GLuint programId, const Lighting &lighting) 
     assert(loc >= 0);
     glUniform1i(loc, lightCount);
 
-    for (int i=0; i<lightCount; i++) {
+    for (int i = 0; i < lightCount; i++) {
         const Light &light = lighting.lights[i];
         const std::string lightName = "uLighting.lights[" + std::to_string(i) + "]";
 
@@ -565,13 +550,7 @@ void Renderer::renderLighting(const GLuint programId, const Lighting &lighting) 
     }
 }
 
-
-void Renderer::renderMaterialChannel(
-    const GLuint programId,
-    const std::string &uniformPrefix,
-    const GLint textureUnit,
-    const MaterialChannel &channel
-) {
+void Renderer::renderMaterialChannel(const GLuint programId, const std::string &uniformPrefix, const GLint textureUnit, const MaterialChannel &channel) {
     char name[128] = {};
     GLint loc = 0;
 
@@ -587,14 +566,13 @@ void Renderer::renderMaterialChannel(
 
     if (channel.textureMap) {
         std::snprintf(name, sizeof(name), "%s.textureMap", uniformPrefix.c_str());
-        loc  = glGetUniformLocation(programId, name);
+        loc = glGetUniformLocation(programId, name);
         assert(loc >= 0);
         glUniform1i(loc, textureUnit);
         glActiveTexture(GL_TEXTURE0 + textureUnit);
         glBindTexture(GL_TEXTURE_2D, channel.textureMap);
     }
 }
-
 
 void Renderer::renderMaterial(const GLuint programId, const Material &material) {
     GLint textureUnit = -1;
@@ -605,13 +583,11 @@ void Renderer::renderMaterial(const GLuint programId, const Material &material) 
     renderMaterialChannel(programId, "uMaterial.emissive", ++textureUnit, material.emissive);
 }
 
-
 void Renderer::renderModelTransform(const ShaderLocationMap &location, const float *transform) {
     assert(transform != nullptr);
     assert(location.uModel >= 0);
-    glUniformMatrix4fv(location.uModel, 1, GL_FALSE, transform);    
+    glUniformMatrix4fv(location.uModel, 1, GL_FALSE, transform);
 }
-
 
 void Renderer::renderMesh(const Mesh &mesh) {
     assert(mesh.vao);
@@ -620,12 +596,10 @@ void Renderer::renderMesh(const Mesh &mesh) {
     glBindVertexArray(mesh.vao);
     if (mesh.indexed) {
         glDrawElements(mesh.primitiveType, mesh.count, mesh.indexDataType, nullptr);
-    }
-    else {
+    } else {
         glDrawArrays(mesh.primitiveType, 0, mesh.count);
     }
 }
-
 
 void Renderer::renderMeshes(const Mesh *meshes, const size_t count) {
     assert(meshes);

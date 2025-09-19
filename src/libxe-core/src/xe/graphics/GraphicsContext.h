@@ -1,8 +1,8 @@
 
 #pragma once
 
-#include <tuple>
 #include <set>
+#include <tuple>
 
 #include "GraphicsAPI.h"
 #include "PixelFormat.h"
@@ -24,7 +24,8 @@ namespace XE {
         using GetProcAddressGL = ProcAddressGL (*)(const char *);
 
     public:
-        virtual ~GraphicsContext() {}
+        virtual ~GraphicsContext() {
+        }
 
         virtual GetProcAddressGL getProcAddressFunctionGL() const = 0;
 
@@ -34,4 +35,4 @@ namespace XE {
 
         virtual Descriptor getDescriptor() const = 0;
     };
-} // namespace xe
+} // namespace XE

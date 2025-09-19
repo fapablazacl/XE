@@ -29,6 +29,6 @@ namespace XE {
 
         virtual ControllerStatus getControllerStatus(const int index) = 0;
     };
-} // namespace xe
+} // namespace XE
 
 #endif

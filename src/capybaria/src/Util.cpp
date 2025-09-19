@@ -23,10 +23,15 @@ namespace demo {
         const XE::Vector3 n = {0.0f, 0.0f, 1.0};
 
         const std::vector<Vertex> vertices = {
-            {{-0.5f * width, -0.5f * height, 0.5f * depth}, n, {1.0f, 0.0f, 0.0f, 1.0f}},  {{0.5f * width, -0.5f * height, 0.5f * depth}, n, {0.0f, 1.0f, 0.0f, 1.0f}},
-            {{-0.5f * width, 0.5f * height, 0.5f * depth}, n, {0.0f, 0.0f, 1.0f, 1.0f}},   {{0.5f * width, 0.5f * height, 0.5f * depth}, n, {1.0f, 1.0f, 0.0f, 1.0f}},
-            {{-0.5f * width, -0.5f * height, -0.5f * depth}, n, {0.0f, 1.0f, 1.0f, 1.0f}}, {{0.5f * width, -0.5f * height, -0.5f * depth}, n, {1.0f, 0.0f, 1.0f, 1.0f}},
-            {{-0.5f * width, 0.5f * height, -0.5f * depth}, n, {0.0f, 0.0f, 0.0f, 1.0f}},  {{0.5f * width, 0.5f * height, -0.5f * depth}, n, {1.0f, 1.0f, 1.0f, 1.0f}}};
+            {{-0.5f * width, -0.5f * height, 0.5f * depth}, n, {1.0f, 0.0f, 0.0f, 1.0f}},
+            {{0.5f * width, -0.5f * height, 0.5f * depth}, n, {0.0f, 1.0f, 0.0f, 1.0f}},
+            {{-0.5f * width, 0.5f * height, 0.5f * depth}, n, {0.0f, 0.0f, 1.0f, 1.0f}},
+            {{0.5f * width, 0.5f * height, 0.5f * depth}, n, {1.0f, 1.0f, 0.0f, 1.0f}},
+            {{-0.5f * width, -0.5f * height, -0.5f * depth}, n, {0.0f, 1.0f, 1.0f, 1.0f}},
+            {{0.5f * width, -0.5f * height, -0.5f * depth}, n, {1.0f, 0.0f, 1.0f, 1.0f}},
+            {{-0.5f * width, 0.5f * height, -0.5f * depth}, n, {0.0f, 0.0f, 0.0f, 1.0f}},
+            {{0.5f * width, 0.5f * height, -0.5f * depth}, n, {1.0f, 1.0f, 1.0f, 1.0f}}
+        };
 
         mesh.primitive = XE::PrimitiveType::TriangleList;
 
@@ -71,10 +76,12 @@ namespace demo {
 
         Mesh mesh;
 
-        mesh.vertices = {{{0.0f, 0.0f, 0.0f}, n, {0.5f, 0.5f, 0.5f, 1.0f}},
-                         {{width, 0.0f, 0.0f}, n, {1.0f, 0.5f, 0.5f, 1.0f}},
-                         {{0.0f, height, 0.0f}, n, {0.5f, 1.0f, 0.5f, 1.0f}},
-                         {{0.0f, 0.0f, depth}, n, {0.5f, 0.0f, 1.0f, 1.0f}}};
+        mesh.vertices = {
+            {{0.0f, 0.0f, 0.0f}, n, {0.5f, 0.5f, 0.5f, 1.0f}},
+            {{width, 0.0f, 0.0f}, n, {1.0f, 0.5f, 0.5f, 1.0f}},
+            {{0.0f, height, 0.0f}, n, {0.5f, 1.0f, 0.5f, 1.0f}},
+            {{0.0f, 0.0f, depth}, n, {0.5f, 0.0f, 1.0f, 1.0f}}
+        };
         mesh.primitive = XE::PrimitiveType::LineList;
         mesh.indices = {0, 1, 0, 2, 0, 3};
 
@@ -87,10 +94,15 @@ namespace demo {
         Mesh mesh;
 
         const std::vector<Vertex> vertices = {
-            {{-0.5f * width, -0.5f * height, 0.5f * depth}, n, {1.0f, 0.0f, 1.0f, 1.0f}},  {{0.5f * width, -0.5f * height, 0.5f * depth}, n, {1.0f, 0.0f, 1.0f, 1.0f}},
-            {{-0.5f * width, 0.5f * height, 0.5f * depth}, n, {0.0f, 1.0f, 1.0f, 1.0f}},   {{0.5f * width, 0.5f * height, 0.5f * depth}, n, {0.0f, 1.0f, 1.0f, 1.0f}},
-            {{-0.5f * width, -0.5f * height, -0.5f * depth}, n, {1.0f, 0.0f, 0.0f, 1.0f}}, {{0.5f * width, -0.5f * height, -0.5f * depth}, n, {1.0f, 0.0f, 0.0f, 1.0f}},
-            {{-0.5f * width, 0.5f * height, -0.5f * depth}, n, {1.0f, 1.0f, 0.0f, 1.0f}},  {{0.5f * width, 0.5f * height, -0.5f * depth}, n, {0.0f, 1.0f, 0.0f, 1.0f}}};
+            {{-0.5f * width, -0.5f * height, 0.5f * depth}, n, {1.0f, 0.0f, 1.0f, 1.0f}},
+            {{0.5f * width, -0.5f * height, 0.5f * depth}, n, {1.0f, 0.0f, 1.0f, 1.0f}},
+            {{-0.5f * width, 0.5f * height, 0.5f * depth}, n, {0.0f, 1.0f, 1.0f, 1.0f}},
+            {{0.5f * width, 0.5f * height, 0.5f * depth}, n, {0.0f, 1.0f, 1.0f, 1.0f}},
+            {{-0.5f * width, -0.5f * height, -0.5f * depth}, n, {1.0f, 0.0f, 0.0f, 1.0f}},
+            {{0.5f * width, -0.5f * height, -0.5f * depth}, n, {1.0f, 0.0f, 0.0f, 1.0f}},
+            {{-0.5f * width, 0.5f * height, -0.5f * depth}, n, {1.0f, 1.0f, 0.0f, 1.0f}},
+            {{0.5f * width, 0.5f * height, -0.5f * depth}, n, {0.0f, 1.0f, 0.0f, 1.0f}}
+        };
 
         mesh.primitive = XE::PrimitiveType::TriangleList;
 
@@ -136,10 +148,15 @@ namespace demo {
         Mesh mesh;
 
         const std::vector<Vertex> vertices = {
-            {{-0.5f * width, -0.5f * height, 0.5f * depth}, n, {1.0f, 1.0f, 1.0f, 1.0f}},  {{0.5f * width, -0.5f * height, 0.5f * depth}, n, {1.0f, 1.0f, 1.0f, 1.0f}},
-            {{-0.5f * width, 0.5f * height, 0.5f * depth}, n, {1.0f, 1.0f, 1.0f, 1.0f}},   {{0.5f * width, 0.5f * height, 0.5f * depth}, n, {1.0f, 1.0f, 1.0f, 1.0f}},
-            {{-0.5f * width, -0.5f * height, -0.5f * depth}, n, {1.0f, 1.0f, 1.0f, 1.0f}}, {{0.5f * width, -0.5f * height, -0.5f * depth}, n, {1.0f, 1.0f, 1.0f, 1.0f}},
-            {{-0.5f * width, 0.5f * height, -0.5f * depth}, n, {1.0f, 1.0f, 1.0f, 1.0f}},  {{0.5f * width, 0.5f * height, -0.5f * depth}, n, {1.0f, 1.0f, 1.0f, 1.0f}}};
+            {{-0.5f * width, -0.5f * height, 0.5f * depth}, n, {1.0f, 1.0f, 1.0f, 1.0f}},
+            {{0.5f * width, -0.5f * height, 0.5f * depth}, n, {1.0f, 1.0f, 1.0f, 1.0f}},
+            {{-0.5f * width, 0.5f * height, 0.5f * depth}, n, {1.0f, 1.0f, 1.0f, 1.0f}},
+            {{0.5f * width, 0.5f * height, 0.5f * depth}, n, {1.0f, 1.0f, 1.0f, 1.0f}},
+            {{-0.5f * width, -0.5f * height, -0.5f * depth}, n, {1.0f, 1.0f, 1.0f, 1.0f}},
+            {{0.5f * width, -0.5f * height, -0.5f * depth}, n, {1.0f, 1.0f, 1.0f, 1.0f}},
+            {{-0.5f * width, 0.5f * height, -0.5f * depth}, n, {1.0f, 1.0f, 1.0f, 1.0f}},
+            {{0.5f * width, 0.5f * height, -0.5f * depth}, n, {1.0f, 1.0f, 1.0f, 1.0f}}
+        };
 
         mesh.primitive = XE::PrimitiveType::TriangleList;
 
@@ -198,23 +215,35 @@ namespace demo {
     }
 
     XE::Subset *createSubset(XE::GraphicsDevice *graphicsDevice, const Mesh &mesh) {
-        const XE::BufferDescriptor bufferDesc{XE::BufferType::Vertex, XE::BufferUsage::Read, XE::BufferAccess::Static, static_cast<size_t>(sizeof(Vertex) * mesh.vertices.size()),
-                                              reinterpret_cast<const void *>(mesh.vertices.data())};
+        const XE::BufferDescriptor bufferDesc{
+            XE::BufferType::Vertex,
+            XE::BufferUsage::Read,
+            XE::BufferAccess::Static,
+            static_cast<size_t>(sizeof(Vertex) * mesh.vertices.size()),
+            reinterpret_cast<const void *>(mesh.vertices.data())
+        };
 
         XE::Buffer *vertexBuffer = graphicsDevice->createBuffer(bufferDesc);
 
         XE::Buffer *indexBuffer = nullptr;
 
         if (mesh.indices.size() > 0) {
-            const XE::BufferDescriptor indexBufferDesc{XE::BufferType::Index, XE::BufferUsage::Read, XE::BufferAccess::Static,
-                                                       static_cast<size_t>(sizeof(uint32_t) * mesh.indices.size()), reinterpret_cast<const void *>(mesh.indices.data())};
+            const XE::BufferDescriptor indexBufferDesc{
+                XE::BufferType::Index,
+                XE::BufferUsage::Read,
+                XE::BufferAccess::Static,
+                static_cast<size_t>(sizeof(uint32_t) * mesh.indices.size()),
+                reinterpret_cast<const void *>(mesh.indices.data())
+            };
 
             indexBuffer = graphicsDevice->createBuffer(indexBufferDesc);
         }
 
-        const std::vector<XE::SubsetVertexAttrib> attribs{{0, XE::DataType::Float32, 3, false, sizeof(Vertex), 0, OFFSETOF(Vertex, coord)},
-                                                          {1, XE::DataType::Float32, 3, false, sizeof(Vertex), 0, OFFSETOF(Vertex, normal)},
-                                                          {2, XE::DataType::Float32, 4, false, sizeof(Vertex), 0, OFFSETOF(Vertex, color)}};
+        const std::vector<XE::SubsetVertexAttrib> attribs{
+            {0, XE::DataType::Float32, 3, false, sizeof(Vertex), 0, OFFSETOF(Vertex, coord)},
+            {1, XE::DataType::Float32, 3, false, sizeof(Vertex), 0, OFFSETOF(Vertex, normal)},
+            {2, XE::DataType::Float32, 4, false, sizeof(Vertex), 0, OFFSETOF(Vertex, color)}
+        };
 
         XE::SubsetDescriptor subsetDesc{{vertexBuffer}, attribs, indexBuffer};
         XE::Subset *subset = graphicsDevice->createSubset(subsetDesc);
@@ -223,14 +252,21 @@ namespace demo {
     }
 
     XE::Subset *createCubeSubset2(XE::GraphicsDevice *graphicsDevice, const Mesh &mesh) {
-        const XE::BufferDescriptor bufferDesc{XE::BufferType::Vertex, XE::BufferUsage::Read, XE::BufferAccess::Static, static_cast<size_t>(sizeof(Vertex) * mesh.vertices.size()),
-                                              reinterpret_cast<const void *>(mesh.vertices.data())};
+        const XE::BufferDescriptor bufferDesc{
+            XE::BufferType::Vertex,
+            XE::BufferUsage::Read,
+            XE::BufferAccess::Static,
+            static_cast<size_t>(sizeof(Vertex) * mesh.vertices.size()),
+            reinterpret_cast<const void *>(mesh.vertices.data())
+        };
 
         XE::Buffer *vertexBuffer = graphicsDevice->createBuffer(bufferDesc);
 
-        const std::vector<XE::SubsetVertexAttrib> attribs{{0, XE::DataType::Float32, 3, false, sizeof(Vertex), 0, OFFSETOF(Vertex, coord)},
-                                                          {1, XE::DataType::Float32, 3, false, sizeof(Vertex), 0, OFFSETOF(Vertex, normal)},
-                                                          {2, XE::DataType::Float32, 4, false, sizeof(Vertex), 0, OFFSETOF(Vertex, color)}};
+        const std::vector<XE::SubsetVertexAttrib> attribs{
+            {0, XE::DataType::Float32, 3, false, sizeof(Vertex), 0, OFFSETOF(Vertex, coord)},
+            {1, XE::DataType::Float32, 3, false, sizeof(Vertex), 0, OFFSETOF(Vertex, normal)},
+            {2, XE::DataType::Float32, 4, false, sizeof(Vertex), 0, OFFSETOF(Vertex, color)}
+        };
 
         XE::SubsetDescriptor subsetDesc{{vertexBuffer}, attribs, nullptr};
 

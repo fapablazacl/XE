@@ -17,7 +17,9 @@ namespace XE {
          * @brief Computes the point of the ray at 't' distance from the starting point, to the
          * direction of the ray.
          */
-        TVector<T, 3> pointAt(const T t) const { return position + t * direction; }
+        TVector<T, 3> pointAt(const T t) const {
+            return position + t * direction;
+        }
 
         /**
          * @brief Initializes the ray, positioned around the origin and aiming to the positive Z-axis.
@@ -33,6 +35,6 @@ namespace XE {
 
     extern template struct TRay<float>;
     extern template struct TRay<double>;
-} // namespace xe
+} // namespace XE
 
 #endif

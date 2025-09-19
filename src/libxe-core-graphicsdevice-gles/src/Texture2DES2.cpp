@@ -21,7 +21,8 @@ namespace XE {
         XE_GRAPHICS_GL_CHECK_ERROR();
     }
 
-    Texture2DES::~Texture2DES() {}
+    Texture2DES::~Texture2DES() {
+    }
 
     void Texture2DES::setData(const void *surfaceData, const int mipLevel, const PixelFormat surfaceFormat, const DataType surfaceDataType, const Recti &area) {
         const Vector2i offset = area.getMinEdge();
@@ -36,5 +37,6 @@ namespace XE {
         XE_GRAPHICS_GL_CHECK_ERROR();
     }
 
-    void Texture2DES::getData(void *surfaceData, const int mipLevel, const PixelFormat surfaceFormat, const DataType surfaceDataType) const {}
-} // namespace xe
+    void Texture2DES::getData(void *surfaceData, const int mipLevel, const PixelFormat surfaceFormat, const DataType surfaceDataType) const {
+    }
+} // namespace XE

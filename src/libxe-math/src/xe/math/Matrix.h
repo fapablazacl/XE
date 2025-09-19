@@ -77,7 +77,9 @@ namespace XE {
             }
         }
 
-        constexpr MatrixOrder order() const { return MatrixOrder::RowMajor; }
+        constexpr MatrixOrder order() const {
+            return MatrixOrder::RowMajor;
+        }
 
         bool operator==(const TMatrix<T, R, C> &other) const;
 
@@ -117,7 +119,9 @@ namespace XE {
             return result;
         }
 
-        inline friend TMatrix<T, R, C> operator*(const T s, const TMatrix<T, R, C> &m) { return m * s; }
+        inline friend TMatrix<T, R, C> operator*(const T s, const TMatrix<T, R, C> &m) {
+            return m * s;
+        }
 
         const TVector<T, C> &operator[](const size_t i) const {
             assert(i < R);
@@ -225,9 +229,13 @@ namespace XE {
             }
         }
 
-        T *data() { return &element[0][0]; }
+        T *data() {
+            return &element[0][0];
+        }
 
-        const T *data() const { return &element[0][0]; }
+        const T *data() const {
+            return &element[0][0];
+        }
 
     public:
         static auto columns(const std::array<TVector<T, R>, C> &columns) {
@@ -283,11 +291,17 @@ namespace XE {
         return result;
     }
 
-    template <typename T = float> auto mat2Identity() { return matIdentity<T, 2>(); }
+    template <typename T = float> auto mat2Identity() {
+        return matIdentity<T, 2>();
+    }
 
-    template <typename T = float> auto mat3Identity() { return matIdentity<T, 3>(); }
+    template <typename T = float> auto mat3Identity() {
+        return matIdentity<T, 3>();
+    }
 
-    template <typename T = float> auto mat4Identity() { return matIdentity<T, 4>(); }
+    template <typename T = float> auto mat4Identity() {
+        return matIdentity<T, 4>();
+    }
 
     template <typename T, int N> auto matScaling(const TVector<T, N> &scale) {
         auto result = matIdentity<T, N>();
@@ -299,11 +313,17 @@ namespace XE {
         return result;
     }
 
-    template <typename T = float> auto mat2Scaling(const TVector<T, 2> &scale) { return matScaling<T, 2>(scale); }
+    template <typename T = float> auto mat2Scaling(const TVector<T, 2> &scale) {
+        return matScaling<T, 2>(scale);
+    }
 
-    template <typename T = float> auto mat3Scaling(const TVector<T, 3> &scale) { return matScaling<T, 3>(scale); }
+    template <typename T = float> auto mat3Scaling(const TVector<T, 3> &scale) {
+        return matScaling<T, 3>(scale);
+    }
 
-    template <typename T = float> auto mat4Scaling(const TVector<T, 4> &scale) { return matScaling<T, 4>(scale); }
+    template <typename T = float> auto mat4Scaling(const TVector<T, 4> &scale) {
+        return matScaling<T, 4>(scale);
+    }
 
     template <typename T, int N> auto matTranslation(const TVector<T, N - 1> &displace) {
         constexpr auto R = N;
@@ -318,9 +338,13 @@ namespace XE {
         return result;
     }
 
-    template <typename T = float> auto mat3Translation(const TVector<T, 2> &displace) { return matTranslation<T, 3>(displace); }
+    template <typename T = float> auto mat3Translation(const TVector<T, 2> &displace) {
+        return matTranslation<T, 3>(displace);
+    }
 
-    template <typename T = float> auto mat4Translation(const TVector<T, 3> &displace) { return matTranslation<T, 4>(displace); }
+    template <typename T = float> auto mat4Translation(const TVector<T, 3> &displace) {
+        return matTranslation<T, 4>(displace);
+    }
 
     template <typename T, int N> auto matRotationX(const T radians) {
         if constexpr (N == 3 || N == 4) {
@@ -339,9 +363,13 @@ namespace XE {
         }
     }
 
-    template <typename T = float> auto mat3RotationX(const T radians) { return matRotationX<T, 3>(radians); }
+    template <typename T = float> auto mat3RotationX(const T radians) {
+        return matRotationX<T, 3>(radians);
+    }
 
-    template <typename T = float> auto mat4RotationX(const T radians) { return matRotationX<T, 4>(radians); }
+    template <typename T = float> auto mat4RotationX(const T radians) {
+        return matRotationX<T, 4>(radians);
+    }
 
     template <typename T, int N> auto matRotationY(const T radians) {
         if constexpr (N == 3 || N == 4) {
@@ -359,9 +387,13 @@ namespace XE {
         }
     }
 
-    template <typename T = float> auto mat3RotationY(const T radians) { return matRotationY<T, 3>(radians); }
+    template <typename T = float> auto mat3RotationY(const T radians) {
+        return matRotationY<T, 3>(radians);
+    }
 
-    template <typename T = float> auto mat4RotationY(const T radians) { return matRotationY<T, 4>(radians); }
+    template <typename T = float> auto mat4RotationY(const T radians) {
+        return matRotationY<T, 4>(radians);
+    }
 
     template <typename T, int N> auto matRotationZ(const T radians) {
         if constexpr (N == 2 || N == 3 || N == 4) {
@@ -379,11 +411,17 @@ namespace XE {
         }
     }
 
-    template <typename T = float> auto mat2Rotation(const T radians) { return matRotationZ<T, 2>(radians); }
+    template <typename T = float> auto mat2Rotation(const T radians) {
+        return matRotationZ<T, 2>(radians);
+    }
 
-    template <typename T = float> auto mat3RotationZ(const T radians) { return matRotationZ<T, 3>(radians); }
+    template <typename T = float> auto mat3RotationZ(const T radians) {
+        return matRotationZ<T, 3>(radians);
+    }
 
-    template <typename T = float> auto mat4RotationZ(const T radians) { return matRotationZ<T, 4>(radians); }
+    template <typename T = float> auto mat4RotationZ(const T radians) {
+        return matRotationZ<T, 4>(radians);
+    }
 
     template <typename T, int N> static auto matRotation(const T rads, const TVector<T, 3> &axis) {
         if constexpr (N == 3 || N == 4) {
@@ -418,9 +456,13 @@ namespace XE {
         }
     }
 
-    template <typename T = float> auto mat3Rotation(const T rads, const TVector<T, 3> &axis) { return matRotation<T, 3>(rads, axis); }
+    template <typename T = float> auto mat3Rotation(const T rads, const TVector<T, 3> &axis) {
+        return matRotation<T, 3>(rads, axis);
+    }
 
-    template <typename T = float> auto mat4Rotation(const T rads, const TVector<T, 3> &axis) { return matRotation<T, 4>(rads, axis); }
+    template <typename T = float> auto mat4Rotation(const T rads, const TVector<T, 3> &axis) {
+        return matRotation<T, 4>(rads, axis);
+    }
 
     template <typename T = float> auto mat4LookAtRH(const TVector<T, 3> &eye, const TVector<T, 3> &at, const TVector<T, 3> &up) {
         const auto zaxis = normalize(at - eye);
@@ -496,7 +538,9 @@ namespace XE {
         return true;
     }
 
-    template <typename T, int R, int C> bool TMatrix<T, R, C>::operator!=(const TMatrix<T, R, C> &other) const { return !(*this == other); }
+    template <typename T, int R, int C> bool TMatrix<T, R, C>::operator!=(const TMatrix<T, R, C> &other) const {
+        return !(*this == other);
+    }
 
     template <typename T, int R, int C> TMatrix<T, R, C> TMatrix<T, R, C>::operator+(const TMatrix<T, R, C> &rhs) const {
         TMatrix<T, R, C> result;
@@ -526,7 +570,9 @@ namespace XE {
         return result;
     }
 
-    template <typename T, int R, int C> TMatrix<T, R, C> TMatrix<T, R, C>::operator+() const { return *this; }
+    template <typename T, int R, int C> TMatrix<T, R, C> TMatrix<T, R, C>::operator+() const {
+        return *this;
+    }
 
     template <typename T, int R, int C> TMatrix<T, R, C> TMatrix<T, R, C>::operator-(const TMatrix<T, R, C> &rhs) const {
         TMatrix<T, R, C> result;
@@ -554,7 +600,7 @@ namespace XE {
                 const auto rowI = getRow(i);
                 const auto colJ = rhs.getColumn(j);
                 const auto mIJ = dot(rowI, colJ);
-                
+
                 result(i, j) = mIJ;
             }
         }
@@ -562,7 +608,9 @@ namespace XE {
         return result;
     }
 
-    template <typename T, int R, int C> TMatrix<T, R, C> TMatrix<T, R, C>::operator/(const TMatrix<T, R, C> &rhs) const { return *this * inverse(rhs); }
+    template <typename T, int R, int C> TMatrix<T, R, C> TMatrix<T, R, C>::operator/(const TMatrix<T, R, C> &rhs) const {
+        return *this * inverse(rhs);
+    }
 
     template <typename T, int R, int C> TMatrix<T, R, C> TMatrix<T, R, C>::operator*(const T s) const {
         TMatrix<T, R, C> result;
@@ -640,11 +688,17 @@ namespace XE {
         return result;
     }
 
-    template <typename T, int N> TMatrix<T, N, N> transpose(const TMatrix<T, N, N> &m) { return transpose<T, N, N>(m); }
+    template <typename T, int N> TMatrix<T, N, N> transpose(const TMatrix<T, N, N> &m) {
+        return transpose<T, N, N>(m);
+    }
 
-    template <typename T, int R, int C> TMatrix<T, R, C> inverse(const TMatrix<T, R, C> &m) { return transpose(adjoint(m)) / determinant(m); }
+    template <typename T, int R, int C> TMatrix<T, R, C> inverse(const TMatrix<T, R, C> &m) {
+        return transpose(adjoint(m)) / determinant(m);
+    }
 
-    template <typename T, int R, int C> TMatrix<T, R, C> inverse(const TMatrix<T, R, C> &m, const T det) { return transpose(adjoint(m)) / det; }
+    template <typename T, int R, int C> TMatrix<T, R, C> inverse(const TMatrix<T, R, C> &m, const T det) {
+        return transpose(adjoint(m)) / det;
+    }
 
     template <typename T, int R, int C> T determinant(const TMatrix<T, R, C> &m) {
         if constexpr (R == C && R > 0) {
@@ -720,6 +774,6 @@ namespace XE {
 
         return os;
     }
-} // namespace xe
+} // namespace XE
 
 #endif

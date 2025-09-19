@@ -119,6 +119,6 @@ namespace XE {
          */
         virtual const Buffer *getIndexBuffer() const = 0;
     };
-} // namespace xe
+} // namespace XE
 
 #endif

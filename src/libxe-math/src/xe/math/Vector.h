@@ -27,7 +27,8 @@ namespace XE {
     template <typename T, int N> struct VectorBase {
         T values[N] = {};
 
-        VectorBase() {}
+        VectorBase() {
+        }
 
         VectorBase(std::initializer_list<T> il) {
             assert(il.size() == N);
@@ -47,7 +48,9 @@ namespace XE {
             };
         };
 
-        VectorBase() { X = Y = static_cast<T>(0); }
+        VectorBase() {
+            X = Y = static_cast<T>(0);
+        }
 
         VectorBase(T x, T y) {
             X = x;
@@ -63,7 +66,9 @@ namespace XE {
             };
         };
 
-        VectorBase() { X = Y = Z = static_cast<T>(0); }
+        VectorBase() {
+            X = Y = Z = static_cast<T>(0);
+        }
 
         VectorBase(T x, T y, T z) {
             X = x;
@@ -92,7 +97,9 @@ namespace XE {
             };
         };
 
-        VectorBase() { X = Y = Z = W = static_cast<T>(0); }
+        VectorBase() {
+            X = Y = Z = W = static_cast<T>(0);
+        }
 
         VectorBase(T x, T y, T z, T w) {
             X = x;
@@ -181,15 +188,25 @@ namespace XE {
 
         bool operator!=(const TVector<T, N> &rhs) const;
 
-        T *data() { return &this->values[0]; }
+        T *data() {
+            return &this->values[0];
+        }
 
-        const T *data() const { return &this->values[0]; }
+        const T *data() const {
+            return &this->values[0];
+        }
 
-        T &operator[](const int index) { return this->values[index]; }
+        T &operator[](const int index) {
+            return this->values[index];
+        }
 
-        const T operator[](const int index) const { return this->values[index]; }
+        const T operator[](const int index) const {
+            return this->values[index];
+        }
 
-        inline friend TVector<T, N> operator*(const T s, const TVector<T, N> &v) { return v * s; }
+        inline friend TVector<T, N> operator*(const T s, const TVector<T, N> &v) {
+            return v * s;
+        }
 
         template <typename T2> operator TVector<T2, N>() const {
             TVector<T2, N> result;
@@ -226,17 +243,29 @@ namespace XE {
         return {v1.Y * v2.Z - v1.Z * v2.Y, v1.Z * v2.X - v1.X * v2.Z, v1.X * v2.Y - v1.Y * v2.X};
     }
 
-    template <typename T> T cross(const TVector<T, 2> &v1, const TVector<T, 2> &v2) { return v1.X * v2.Y - v1.Y * v2.X; }
+    template <typename T> T cross(const TVector<T, 2> &v1, const TVector<T, 2> &v2) {
+        return v1.X * v2.Y - v1.Y * v2.X;
+    }
 
-    template <typename T> TVector<T, 3> cross(const TVector<T, 3> &v1, const TVector<T, 3> &v2, const TVector<T, 3> &v3) { return cross(cross(v1, v2), v3); }
+    template <typename T> TVector<T, 3> cross(const TVector<T, 3> &v1, const TVector<T, 3> &v2, const TVector<T, 3> &v3) {
+        return cross(cross(v1, v2), v3);
+    }
 
-    template <typename T> T dot(const TVector<T, 3> &v1, const TVector<T, 3> &v2, const TVector<T, 3> &v3) { return dot(cross(v1, v2), v3); }
+    template <typename T> T dot(const TVector<T, 3> &v1, const TVector<T, 3> &v2, const TVector<T, 3> &v3) {
+        return dot(cross(v1, v2), v3);
+    }
 
-    template <typename T, int N> T norm(const TVector<T, N> &v) { return static_cast<T>(std::sqrt(dot(v, v))); }
+    template <typename T, int N> T norm(const TVector<T, N> &v) {
+        return static_cast<T>(std::sqrt(dot(v, v)));
+    }
 
-    template <typename T, int N> T norm2(const TVector<T, N> &v) { return dot(v, v); }
+    template <typename T, int N> T norm2(const TVector<T, N> &v) {
+        return dot(v, v);
+    }
 
-    template <typename T, int N> TVector<T, N> normalize(const TVector<T, N> &v) { return v / norm(v); }
+    template <typename T, int N> TVector<T, N> normalize(const TVector<T, N> &v) {
+        return v / norm(v);
+    }
 
     template <typename T, int N> TVector<T, N> maximize(const TVector<T, N> &v1, const TVector<T, N> &v2) {
         TVector<T, N> result;
@@ -258,7 +287,8 @@ namespace XE {
         return result;
     }
 
-    template <typename T, int N> TVector<T, N>::TVector() {}
+    template <typename T, int N> TVector<T, N>::TVector() {
+    }
 
     template <typename T, int N> TVector<T, N>::TVector(T value) {
         for (T &element : this->values) {
@@ -274,7 +304,9 @@ namespace XE {
         }
     }
 
-    template <typename T, int N> TVector<T, N> TVector<T, N>::operator+() const { return *this; }
+    template <typename T, int N> TVector<T, N> TVector<T, N>::operator+() const {
+        return *this;
+    }
 
     template <typename T, int N> TVector<T, N> TVector<T, N>::operator-() const {
         TVector<T, N> result;
@@ -404,7 +436,9 @@ namespace XE {
         return true;
     }
 
-    template <typename T, int N> bool TVector<T, N>::operator!=(const TVector<T, N> &rhs) const { return !(*this == rhs); }
+    template <typename T, int N> bool TVector<T, N>::operator!=(const TVector<T, N> &rhs) const {
+        return !(*this == rhs);
+    }
 
     template <typename T, int N> inline std::ostream &operator<<(std::ostream &os, const TVector<T, N> &v) {
         os << "xe::TVector<" << typeid(T).name() << ", " << N << ">{ ";
@@ -445,7 +479,7 @@ namespace XE {
     extern template struct TVector<double, 2>;
     extern template struct TVector<double, 3>;
     extern template struct TVector<double, 4>;
-} // namespace xe
+} // namespace XE
 
 #if defined(_MSC_VER)
 #pragma warning(pop)

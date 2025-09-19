@@ -19,16 +19,16 @@ namespace XE {
 
         virtual Buffer *createBuffer(const BufferDescriptor &bufferDescriptor) override;
 
-        virtual Texture2D *createTexture2D(const PixelFormat format, const Vector2i &size, const PixelFormat sourceFormat, const DataType sourceDataType,
-                                           const void *sourceData) override;
+        virtual Texture2D *
+        createTexture2D(const PixelFormat format, const Vector2i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void *sourceData) override;
 
-        virtual Texture3D *createTexture3D(const PixelFormat format, const Vector3i &size, const PixelFormat sourceFormat, const DataType sourceDataType,
-                                           const void *sourceData) override;
+        virtual Texture3D *
+        createTexture3D(const PixelFormat format, const Vector3i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void *sourceData) override;
 
         virtual Texture2DArray *createTexture2DArray(const PixelFormat format, const Vector2i &size, const int count) override;
 
-        virtual TextureCubeMap *createTextureCubeMap(const PixelFormat format, const Vector2i &size, const PixelFormat sourceFormat, const DataType sourceDataType,
-                                                     const void **sourceData) override;
+        virtual TextureCubeMap *
+        createTextureCubeMap(const PixelFormat format, const Vector2i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void **sourceData) override;
 
         virtual Program *createProgram(const ProgramDescriptor &programDescriptor) override;
 
@@ -67,6 +67,6 @@ namespace XE {
 
         Viewport m_viewport;
     };
-} // namespace xe
+} // namespace XE
 
 #endif

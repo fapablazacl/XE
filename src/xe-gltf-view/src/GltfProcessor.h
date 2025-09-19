@@ -3,9 +3,9 @@
 
 #include <iostream>
 
-#include "xe/gl/RendererGL.h"
-#include "cgltf.h"
 #include "GltfUtil.h"
+#include "cgltf.h"
+#include "xe/gl/RendererGL.h"
 
 namespace xe::gl {
     class RendererGL;
@@ -129,7 +129,7 @@ public:
         std::cout << std::endl;
 
         std::cout << "Found " << data->scenes_count << " scenes" << std::endl;
-        for (cgltf_size i = 0; i<data->scenes_count; i++) {
+        for (cgltf_size i = 0; i < data->scenes_count; i++) {
             process_scene(data, data->scenes + i);
         }
         std::cout << std::endl;
@@ -316,34 +316,33 @@ private:
     }
 
     void process_texture(cgltf_texture *texture) {
-        std::cout << "Texture name: " << (texture->name ? texture->name : "<noname>")  << std::endl;
-        std::cout << "Texture extensions count: " << texture->extensions_count  << std::endl;
-        std::cout << "Texture has sampler: " << (texture->sampler ? "true" : "false")  << std::endl;
+        std::cout << "Texture name: " << (texture->name ? texture->name : "<noname>") << std::endl;
+        std::cout << "Texture extensions count: " << texture->extensions_count << std::endl;
+        std::cout << "Texture has sampler: " << (texture->sampler ? "true" : "false") << std::endl;
 
         const cgltf_sampler *sampler = texture->sampler;
 
         if (sampler) {
-            std::cout << "Texture sampler name: " << (sampler->name ? sampler->name : "<noname>")  << std::endl;
-            std::cout << "Texture mag filter: " << sampler->mag_filter  << std::endl;
-            std::cout << "Texture min filter: " << sampler->min_filter  << std::endl;
-            std::cout << "Texture wrap s: " << sampler->wrap_s  << std::endl;
-            std::cout << "Texture wrap t: " << sampler->wrap_t  << std::endl;
+            std::cout << "Texture sampler name: " << (sampler->name ? sampler->name : "<noname>") << std::endl;
+            std::cout << "Texture mag filter: " << sampler->mag_filter << std::endl;
+            std::cout << "Texture min filter: " << sampler->min_filter << std::endl;
+            std::cout << "Texture wrap s: " << sampler->wrap_s << std::endl;
+            std::cout << "Texture wrap t: " << sampler->wrap_t << std::endl;
             std::cout << "Texture extensions count: " << sampler->extensions_count << std::endl;
         }
 
-        std::cout << "Texture has basisu: " << (texture->has_basisu ? "true" : "false")  << std::endl;
+        std::cout << "Texture has basisu: " << (texture->has_basisu ? "true" : "false") << std::endl;
     }
 
     void process_image(cgltf_image *image) {
-        std::cout << "Image name: " << (image->name ? image->name : "<noname>")  << std::endl;
-        std::cout << "Image uri: " << (image->uri ? image->uri : "<noname>")  << std::endl;
-        std::cout << "Image mime type: " << (image->mime_type ? image->mime_type : "<noname>")  << std::endl;
-        std::cout << "Image has buffer view: " << (image->buffer_view ? "true" : "false")  << std::endl;
-        std::cout << "Image extensions count: " << image->extensions_count  << std::endl;
+        std::cout << "Image name: " << (image->name ? image->name : "<noname>") << std::endl;
+        std::cout << "Image uri: " << (image->uri ? image->uri : "<noname>") << std::endl;
+        std::cout << "Image mime type: " << (image->mime_type ? image->mime_type : "<noname>") << std::endl;
+        std::cout << "Image has buffer view: " << (image->buffer_view ? "true" : "false") << std::endl;
+        std::cout << "Image extensions count: " << image->extensions_count << std::endl;
     }
 
     void process_sampler(cgltf_sampler *sampler) {
-
     }
 
     void process_buffer(cgltf_buffer *buffer) {
@@ -364,7 +363,6 @@ private:
         std::cout << "Extension used " << str << std::endl;
     }
 
-    void process_variant(cgltf_material_variant * material_variant) {
-
+    void process_variant(cgltf_material_variant *material_variant) {
     }
 };

@@ -12,7 +12,7 @@
 namespace XE {
     enum class ShaderType;
     struct ProgramDescriptor;
-} // namespace xe
+} // namespace XE
 
 namespace XE {
     class ShaderES;
@@ -26,7 +26,9 @@ namespace XE {
 
         virtual Shader *getShader(const int index) override;
 
-        GLuint GetID() const { return m_id; }
+        GLuint GetID() const {
+            return m_id;
+        }
 
     public:
         int getUniformLoction(const std::string &name) const;
@@ -37,6 +39,6 @@ namespace XE {
         GLuint m_id;
         std::vector<std::unique_ptr<ShaderES>> m_shaders;
     };
-} // namespace xe
+} // namespace XE
 
 #endif

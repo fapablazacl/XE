@@ -25,7 +25,9 @@ namespace XE {
         }
     }
 
-    void BufferES2::read(void *destination, const size_t size, const size_t offset, const size_t destinationOffset) const { return; }
+    void BufferES2::read(void *destination, const size_t size, const size_t offset, const size_t destinationOffset) const {
+        return;
+    }
 
     void BufferES2::write(const void *source, const size_t size, const size_t offset, const size_t sourceOffset) {
         const size_t finalSize = size ? size : m_size;
@@ -35,4 +37,4 @@ namespace XE {
         glBufferSubData(m_target, offset, finalSize, &ptr[sourceOffset]);
         glBindBuffer(m_target, 0);
     }
-} // namespace xe
+} // namespace XE

@@ -16,6 +16,6 @@ namespace XE {
     public:
         Version GetVersion() const;
     };
-} // namespace xe
+} // namespace XE
 
 #endif

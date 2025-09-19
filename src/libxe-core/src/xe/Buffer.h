@@ -28,6 +28,6 @@ namespace XE {
          */
         virtual void write(const void *source, const std::size_t = 0, const std::size_t offset = 0, const std::size_t sourceOffset = 0) = 0;
     };
-} // namespace xe
+} // namespace XE
 
 #endif

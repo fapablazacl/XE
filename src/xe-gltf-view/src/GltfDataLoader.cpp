@@ -3,25 +3,32 @@
 
 #include "xe/Logger.h"
 
-GltfTextureLoader::GltfTextureLoader(const xe::gl::RendererGL* renderer, ImageLoader* imageLoader) : renderer(renderer), imageLoader(imageLoader) {}
+GltfTextureLoader::GltfTextureLoader(const xe::gl::RendererGL *renderer, ImageLoader *imageLoader) : renderer(renderer), imageLoader(imageLoader) {
+}
 
 inline std::optional<GLenum> mapBppToFormat(const int bpp) {
     switch (bpp) {
-    case 24: return GL_BGR;
-    case 32: return GL_BGRA;
-    default: return {};
+    case 24:
+        return GL_BGR;
+    case 32:
+        return GL_BGRA;
+    default:
+        return {};
     }
 }
 
 inline std::optional<GLenum> mapBppToInternalFormat(const int bpp) {
     switch (bpp) {
-    case 24: return GL_RGB;
-    case 32: return GL_RGBA;
-    default: return {};
+    case 24:
+        return GL_RGB;
+    case 32:
+        return GL_RGBA;
+    default:
+        return {};
     }
 }
 
-xe::gl::Texture GltfTextureLoader::createTexture(const xe::gl::RendererGL* renderer, const cgltf_texture_view &textureView) const {
+xe::gl::Texture GltfTextureLoader::createTexture(const xe::gl::RendererGL *renderer, const cgltf_texture_view &textureView) const {
     std::cout << "Creating texture " << sanitizeString(textureView.texture->name) << std::endl;
 
     const auto mimeType = textureView.texture->image->mime_type;
@@ -46,11 +53,7 @@ xe::gl::Texture GltfTextureLoader::createTexture(const xe::gl::RendererGL* rende
         return {};
     }
 
-    auto clientImage = xe::gl::ClientTextureImage2D {
-        {imageData.width, imageData.height},
-        *format, GL_UNSIGNED_BYTE,
-        imageData.pixels
-    };
+    auto clientImage = xe::gl::ClientTextureImage2D{{imageData.width, imageData.height}, *format, GL_UNSIGNED_BYTE, imageData.pixels};
 
     xe::gl::CreateTextureOptions options;
     options.flags = xe::gl::GenerateMipMaps;
@@ -67,7 +70,7 @@ xe::gl::Texture GltfTextureLoader::createTexture(const xe::gl::RendererGL* rende
     return renderer->createTexture(GL_TEXTURE_2D, *internalFormat, clientImage, options);
 }
 
-cgltf_data* GltfDataParser::parse(const std::string &filePath) const {
+cgltf_data *GltfDataParser::parse(const std::string &filePath) const {
     cgltf_data *data = nullptr;
     const auto filePathCstr = filePath.c_str();
 
@@ -85,7 +88,12 @@ cgltf_data* GltfDataParser::parse(const std::string &filePath) const {
 }
 
 GltfDataLoader::GltfDataLoader(cgltf_data *data, xe::gl::RendererGL *renderer, GltfTextureLoader *textureLoader, xe::gl::Program program, const GltfAttributeMap &attributeMap)
-    : data(data), renderer(renderer), textureLoader(textureLoader), program(program), attributeMap(attributeMap) {}
+    : data(data),
+      renderer(renderer),
+      textureLoader(textureLoader),
+      program(program),
+      attributeMap(attributeMap) {
+}
 
 std::vector<GltfMesh> GltfDataLoader::loadAllMeshes() {
     std::vector<GltfMesh> meshes;
@@ -143,7 +151,7 @@ GltfMeshPrimitive GltfDataLoader::createMeshPrimitive(const cgltf_primitive &pri
     const auto count = static_cast<GLsizei>(primitive.indices ? primitive.indices->count : primitive.attributes[0].data->count);
     const auto vao = createVertexArray(primitive, vertexBuffer, indexBuffer);
 
-    if (! vao.id) {
+    if (!vao.id) {
         std::cerr << "Could not create vertex array." << std::endl;
         return {};
     }
@@ -178,7 +186,7 @@ GltfMesh GltfDataLoader::createMesh(const cgltf_mesh *mesh) {
         primitives.push_back(meshPrimitive);
     }
 
-    return { sanitizeString(mesh->name), primitives};
+    return {sanitizeString(mesh->name), primitives};
 }
 
 xe::gl::Buffer GltfDataLoader::createIndexBuffer(const cgltf_accessor &accessor) {

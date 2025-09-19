@@ -26,6 +26,6 @@ namespace XE {
     public:
         static std::unique_ptr<WindowGLFW> create(const XE::GraphicsContext::Descriptor &descriptor, const std::string &title, const Vector2i &windowSize, const bool fullScreen);
     };
-} // namespace xe
+} // namespace XE
 
 #endif

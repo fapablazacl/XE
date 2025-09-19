@@ -10,7 +10,8 @@ namespace XE {
         assert(m_size);
     }
 
-    MemoryStream::~MemoryStream() {}
+    MemoryStream::~MemoryStream() {
+    }
 
     int MemoryStream::read(void *bufferOut, const int size, const int count) {
         assert(m_data);
@@ -50,7 +51,11 @@ namespace XE {
         return true;
     }
 
-    int MemoryStream::tell() const { return m_offset; }
+    int MemoryStream::tell() const {
+        return m_offset;
+    }
 
-    StreamFlags MemoryStream::getFlags() const { return StreamFlags::Readable; }
-} // namespace xe
+    StreamFlags MemoryStream::getFlags() const {
+        return StreamFlags::Readable;
+    }
+} // namespace XE

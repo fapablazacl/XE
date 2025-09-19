@@ -23,6 +23,6 @@ namespace XE {
 
         virtual void getData(void *surfaceData, const int mipLevel, const PixelFormat surfaceFormat, const DataType surfaceDataType, const Boxi &volume) const = 0;
     };
-} // namespace xe
+} // namespace XE
 
 #endif

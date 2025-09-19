@@ -6,11 +6,16 @@
 namespace xe::gl {
     static std::string errorCodeToString(GLenum error) {
         switch (error) {
-        case GL_INVALID_ENUM: return "GL_INVALID_ENUM";
-        case GL_INVALID_VALUE: return "GL_INVALID_VALUE";
-        case GL_INVALID_OPERATION: return "GL_INVALID_OPERATION";
-        case GL_OUT_OF_MEMORY: return "GL_OUT_OF_MEMORY";
-        default: return "<Unknown Error Value: " + std::to_string(error) + ">";
+        case GL_INVALID_ENUM:
+            return "GL_INVALID_ENUM";
+        case GL_INVALID_VALUE:
+            return "GL_INVALID_VALUE";
+        case GL_INVALID_OPERATION:
+            return "GL_INVALID_OPERATION";
+        case GL_OUT_OF_MEMORY:
+            return "GL_OUT_OF_MEMORY";
+        default:
+            return "<Unknown Error Value: " + std::to_string(error) + ">";
         }
     }
 
@@ -36,19 +41,18 @@ namespace xe::gl {
         const int line;
     };
 
-
 #define XE_GL_SCOPED_ERROR_CHECK() GLScopedErrorChecker __gl_error_raii(__FILE__, __LINE__)
 
 #if defined(GLAD_DEBUG)
     void pre_call_callback_gl(const char *name, void *funcptr, int len_args, ...) {
-        (void) name;
-        (void) funcptr;
-        (void) len_args;
+        (void)name;
+        (void)funcptr;
+        (void)len_args;
     }
 
     void post_call_callback_gl(const char *name, void *funcptr, int len_args, ...) {
-        (void) funcptr;
-        (void) len_args;
+        (void)funcptr;
+        (void)len_args;
 
         if (const GLenum error_code = glad_glGetError(); error_code) {
             const auto errorCodeString = errorCodeToString(error_code);
@@ -93,7 +97,7 @@ namespace xe::gl {
 
         for (int i = 0; i < extensionCount; i++) {
             const auto str = glGetStringi(GL_EXTENSIONS, i);
-            const auto cstr = reinterpret_cast<const char*>(str);
+            const auto cstr = reinterpret_cast<const char *>(str);
 
             std::printf("%s ", cstr);
         }
@@ -152,7 +156,7 @@ namespace xe::gl {
     RendererInfo RendererGL::getInfo() const {
         RendererInfo info;
 
-        info.vendor = reinterpret_cast<const char*>(glGetString(GL_VENDOR));
+        info.vendor = reinterpret_cast<const char *>(glGetString(GL_VENDOR));
         info.renderer = reinterpret_cast<const char *>(glGetString(GL_RENDERER));
         info.version = reinterpret_cast<const char *>(glGetString(GL_VERSION));
         info.shadingLanguageVersion = reinterpret_cast<const char *>(glGetString(GL_SHADING_LANGUAGE_VERSION));
@@ -188,7 +192,6 @@ namespace xe::gl {
         return {shaderId};
     }
 
-
     Program RendererGL::createProgram(const tcb::span<Shader> &shaders) const {
         XE_GL_SCOPED_ERROR_CHECK();
 
@@ -223,9 +226,8 @@ namespace xe::gl {
             return {};
         }
 
-        return Program {programId};
+        return Program{programId};
     }
-
 
     Buffer RendererGL::createBuffer(const GLenum target, const GLenum usage, const MemoryRegion &memory) const {
         XE_GL_SCOPED_ERROR_CHECK();
@@ -239,7 +241,6 @@ namespace xe::gl {
 
         return {bufferId, target};
     }
-
 
     VertexArray RendererGL::createVertexArray(const tcb::span<const Attribute> &attributes, Buffer elementArrayBuffer) const {
         XE_GL_SCOPED_ERROR_CHECK();
@@ -257,15 +258,15 @@ namespace xe::gl {
 
                 GLenum type = GL_FLOAT;
 
-                switch (attr.type) { 
+                switch (attr.type) {
                 case AttributeType::Float:
                     type = GL_FLOAT;
-                    break; 
+                    break;
 
                 case AttributeType::Int:
                     type = GL_INT;
-                    break; 
-                    
+                    break;
+
                 case AttributeType::UnsignedInt:
                     type = GL_UNSIGNED_INT;
                     break;
@@ -276,8 +277,7 @@ namespace xe::gl {
                 }
 
                 glVertexAttribPointer(attr.index, static_cast<GLint>(attr.size) + 1, type, attr.normalized, attr.stride, reinterpret_cast<const void *>(attr.offset));
-            }
-            else {
+            } else {
                 glDisableVertexAttribArray(attr.index);
             }
         }
@@ -317,7 +317,7 @@ namespace xe::gl {
         glBindVertexArray(vertexArray.id);
 
         for (const auto &primitive : primitives) {
-            const auto indices = reinterpret_cast<const void*>(primitive.start);
+            const auto indices = reinterpret_cast<const void *>(primitive.start);
 
             bindRenderState(primitive.attribs);
 
@@ -352,15 +352,15 @@ namespace xe::gl {
 
             switch (type) {
             case UniformType::Float:
-                glUniformXfv[dim](location, count, static_cast<const GLfloat*>(data));
+                glUniformXfv[dim](location, count, static_cast<const GLfloat *>(data));
                 break;
 
             case UniformType::Int:
-                glUniformXiv[dim](location, count, static_cast<const GLint*>(data));
+                glUniformXiv[dim](location, count, static_cast<const GLint *>(data));
                 break;
 
             case UniformType::UnsignedInt:
-                glUniformXuiv[dim](location, count, static_cast<const GLuint*>(data));
+                glUniformXuiv[dim](location, count, static_cast<const GLuint *>(data));
                 break;
             }
         }
@@ -378,16 +378,15 @@ namespace xe::gl {
 
             switch (type) {
             case UniformMatrixType::Float:
-                glUniformMatrixXfv[index](location, count, transpose, static_cast<const GLfloat*>(data));
+                glUniformMatrixXfv[index](location, count, transpose, static_cast<const GLfloat *>(data));
                 break;
 
             case UniformMatrixType::Double:
-                glUniformMatrixXdv[index](location, count, transpose, static_cast<const GLdouble*>(data));
+                glUniformMatrixXdv[index](location, count, transpose, static_cast<const GLdouble *>(data));
                 break;
             }
         }
     }
-
 
     Texture RendererGL::createTexture(GLenum target, GLenum internalFormat, const ClientTextureImage1D &image, const CreateTextureOptions &options) const {
         XE_GL_SCOPED_ERROR_CHECK();
@@ -410,8 +409,7 @@ namespace xe::gl {
         return {textureId, target};
     }
 
-
-    Texture RendererGL::createTexture(GLenum target, GLenum internalFormat, const ClientTextureImage2D &image, const CreateTextureOptions &options ) const {
+    Texture RendererGL::createTexture(GLenum target, GLenum internalFormat, const ClientTextureImage2D &image, const CreateTextureOptions &options) const {
         XE_GL_SCOPED_ERROR_CHECK();
 
         GLuint textureId = 0;
@@ -517,4 +515,4 @@ namespace xe::gl {
 
         glUseProgram(program.id);
     }
-}
+} // namespace xe::gl

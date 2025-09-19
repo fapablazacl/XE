@@ -5,8 +5,9 @@ namespace XE {
     class GraphicsDevice;
     class GraphicsDeviceFactory {
     public:
-        virtual ~GraphicsDeviceFactory() {}
+        virtual ~GraphicsDeviceFactory() {
+        }
 
         virtual GraphicsDevice *createDevice();
     };
-} // namespace xe
+} // namespace XE

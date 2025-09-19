@@ -10,6 +10,6 @@ namespace XE {
         TVector<T, 3> axis;
     };
 
-} // namespace xe
+} // namespace XE
 
 #endif

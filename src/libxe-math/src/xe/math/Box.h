@@ -25,6 +25,6 @@ namespace XE {
 
         return os;
     }
-} // namespace xe
+} // namespace XE
 
 #endif

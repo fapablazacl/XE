@@ -16,4 +16,4 @@ namespace XE {
             return {0, 0};
         }
     }
-} // namespace xe
+} // namespace XE
