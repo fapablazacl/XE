@@ -1,6 +1,6 @@
-IMAGE ?= fapablazacl/cpp
+IMAGE ?= fapablazacl/cpp-archlinux:latest
 DOCKER ?= docker
-BUILD_CONTEXT := docker/cpp
+BUILD_CONTEXT := docker/cpp-archlinux
 
 .PHONY: docker clean
 .PHONY: format
