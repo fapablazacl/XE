@@ -13,7 +13,7 @@ docker:
 	$(DOCKER) run --rm -v $(CURDIR)/docker-data/.conan2:/root/.conan2 $(IMAGE) sh -c 'conan profile detect'
 	
 configure:
-	$(DOCKER) run --rm -v $(CURDIR):/workspace $(IMAGE) sh -c 'conan install . --build=missing'
+	$(DOCKER) run --rm -v $(CURDIR)/docker-data/.conan2:/root/.conan2 -v $(CURDIR):/workspace $(IMAGE) sh -c 'conan install . --build=missing --output-folder=docker-data/build'
 	
 format:
 	$(DOCKER) run --rm -v $(CURDIR):/workspace -w /workspace $(IMAGE) sh -c 'find src -type f \( -name "*.cpp" -o -name "*.cc" -o -name "*.cxx" -o -name "*.hpp" -o -name "*.hh" -o -name "*.h" \) -print0 | xargs -0 -r clang-format -i'
