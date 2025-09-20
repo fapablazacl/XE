@@ -14,7 +14,6 @@ RUN pipx install conan
 RUN pipx ensurepath
 
 ENV PATH="$PATH:/root/.local/bin"
-ENV CONAN_HOME="/workspace/conan/cache/"
 
 # static analysis, code format, etc
 RUN apt install -y cppcheck clang-tools clang-format clang-tidy

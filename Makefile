@@ -10,9 +10,9 @@ BUILD_CONTEXT_XE := docker/xe
 
 docker:
 	$(DOCKER) build -t $(IMAGE) $(BUILD_CONTEXT)
+	$(DOCKER) run --rm -v $(CURDIR)/docker-data/.conan2:/root/.conan2 $(IMAGE) sh -c 'conan profile detect'
 	
 configure:
-	$(DOCKER) run --rm -v $(CURDIR):/workspace $(IMAGE) sh -c 'conan profile detect'
 	$(DOCKER) run --rm -v $(CURDIR):/workspace $(IMAGE) sh -c 'conan install . --build=missing'
 	
 format:
