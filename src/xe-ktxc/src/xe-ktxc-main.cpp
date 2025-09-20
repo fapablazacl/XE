@@ -268,7 +268,7 @@ void compileImage(const KtxcOptions &options) {
 
     case KtxcOutputFormat::KTX2: {
         const std::filesystem::path outputFilePath = inputFilePath.parent_path() / (inputFilePath.stem().string() + ".ktx2");
-        writeTextureKTX2(outputFilePath, image);
+        writeTextureKTX2(outputFilePath.string(), image);
         break;
     }
     }
