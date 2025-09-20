@@ -15,3 +15,5 @@ venv
 .vs
 build/*
 CMakeUserPresets.json
+
+.conan2-docker/*
