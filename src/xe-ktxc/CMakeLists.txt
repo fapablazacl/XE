@@ -1,6 +1,6 @@
 
 find_package(glad CONFIG REQUIRED)
-find_package(KTX CONFIG REQUIRED)
+find_package(Ktx CONFIG REQUIRED)
 find_package(DevIL CONFIG REQUIRED)
 find_package(Vulkan 1.2 REQUIRED)
 find_package(cxxopts REQUIRED)

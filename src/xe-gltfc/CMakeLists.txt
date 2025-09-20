@@ -4,7 +4,7 @@ find_package(SDL2 CONFIG REQUIRED)
 find_package(imgui CONFIG REQUIRED)
 find_package(glad CONFIG REQUIRED)
 find_package(Assimp CONFIG REQUIRED)
-find_package(KTX CONFIG REQUIRED)
+find_package(Ktx CONFIG REQUIRED)
 find_package(DevIL CONFIG REQUIRED)
 
 set (target xe-gltfc)

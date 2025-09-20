@@ -1,6 +1,9 @@
 
 # XE
 
+## Building with Docker
+- Clone a separate repository for building with Docker.
+
 ## Quick thoughts
 - Barebones for a future multiplatform game engine.
 - Contains code for libraries, tools, and simple game and demos
