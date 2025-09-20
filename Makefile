@@ -10,7 +10,11 @@ BUILD_CONTEXT_XE := docker/xe
 
 docker:
 	$(DOCKER) build -t $(IMAGE) $(BUILD_CONTEXT)
-
+	
+configure:
+	$(DOCKER) run --rm -v $(CURDIR):/workspace $(IMAGE) sh -c 'conan profile detect'
+	$(DOCKER) run --rm -v $(CURDIR):/workspace $(IMAGE) sh -c 'conan install . --build=missing'
+	
 format:
 	$(DOCKER) run --rm -v $(CURDIR):/workspace -w /workspace $(IMAGE) sh -c 'find src -type f \( -name "*.cpp" -o -name "*.cc" -o -name "*.cxx" -o -name "*.hpp" -o -name "*.hh" -o -name "*.h" \) -print0 | xargs -0 -r clang-format -i'
 
