@@ -1,6 +1,8 @@
 IMAGE ?= fapablazacl/cpp
+IMAGE_XE ?= fapablazacl/xe
 DOCKER ?= docker
 BUILD_CONTEXT := docker/cpp
+BUILD_CONTEXT_XE := docker/xe
 
 .PHONY: docker clean
 .PHONY: format
