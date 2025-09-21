@@ -3,26 +3,63 @@ DOCKER ?= docker
 BUILD_CONTEXT := docker/cpp-archlinux
 DOCKER_CONTEXT := $(DOCKER) run --rm -v $(CURDIR)/.conan2-docker:/root/.conan2 -v $(CURDIR):/workspace $(IMAGE)
 
-.PHONY: docker clean
-.PHONY: format
-.PHONY: tidy
+CONAN_PROFILE_DETECT := conan profile detect
+CONAN_INSTALL_RELEASE := conan install . --build=missing  --settings=build_type=Release
+CONAN_INSTALL_DEBUG := conan install . --build=missing  --settings=build_type=Debug
+CMAKE_CONFIGURE_RELEASE := cmake --preset conan-release
+CMAKE_CONFIGURE_DEBUG := cmake --preset conan-debug
+CP_COMPILE_COMMANDS_JSON := cp build/Debug/compile_commands.json .
+CLANG_FORMAT := find src -type f \( -name "*.cpp" -o -name "*.cc" -o -name "*.cxx" -o -name "*.hpp" -o -name "*.hh" -o -name "*.h" \) -print0 | xargs -0 -r clang-format -i
+CLANG_TIDY := run-clang-tidy -header-filter=.*
+CPPCHECK := cppcheck --project=./compile_commands.json
+CTEST := ctest --test-dir build/Debug --output-on-failure
 
-docker:
-	$(DOCKER) buildx build --platform=linux/amd64 -t $(IMAGE) $(BUILD_CONTEXT)
-	$(DOCKER) run --rm -v $(CURDIR)/.conan2-docker:/root/.conan2 $(IMAGE) sh -c 'conan profile detect'
-	
+.PHONY: clean
+.PHONY: format tidy cppcheck test
+.PHONY: docker 
+.PHONY: docker-format docker-tidy docker-cppcheck docker-test
+
 configure:
-	$(DOCKER_CONTEXT) sh -c 'conan install . --build=missing'
-	$(DOCKER_CONTEXT) sh -c 'conan install . --build=missing --settings=build_type=Debug'
-	$(DOCKER_CONTEXT) sh -c 'cmake --preset conan-release'
-	$(DOCKER_CONTEXT) sh -c 'cmake --preset conan-debug'
-	$(DOCKER_CONTEXT) sh -c 'cp build/Debug/compile_commands.json .'
+	$(CONAN_INSTALL_RELEASE)
+	$(CONAN_INSTALL_DEBUG)
+	$(CMAKE_CONFIGURE_RELEASE)
+	$(CMAKE_CONFIGURE_DEBUG)
+	$(CP_COMPILE_COMMANDS_JSON)
 	
 format:
-	$(DOCKER_CONTEXT) sh -c 'find src -type f \( -name "*.cpp" -o -name "*.cc" -o -name "*.cxx" -o -name "*.hpp" -o -name "*.hh" -o -name "*.h" \) -print0 | xargs -0 -r clang-format -i'
+	$(CLANG_FORMAT)
 
 tidy:
-	$(DOCKER_CONTEXT) sh -c 'run-clang-tidy -header-filter=.*'
+	$(CLANG_TIDY)
 
+cppcheck:
+	$(CPPCHECK)
+
+test:
+	$(CTEST)
+	
+docker:
+	$(DOCKER) buildx build --platform=linux/amd64 -t $(IMAGE) $(BUILD_CONTEXT)
+	$(DOCKER) run --rm -v $(CURDIR)/.conan2-docker:/root/.conan2 $(IMAGE) sh -c '$(CONAN_PROFILE_DETECT)'
+	
+docker-configure:
+	$(DOCKER_CONTEXT) sh -c '$(CONAN_INSTALL_RELEASE)'
+	$(DOCKER_CONTEXT) sh -c '$(CONAN_INSTALL_DEBUG)'
+	$(DOCKER_CONTEXT) sh -c '$(CMAKE_CONFIGURE_RELEASE)'
+	$(DOCKER_CONTEXT) sh -c '$(CMAKE_CONFIGURE_DEBUG)'
+	$(DOCKER_CONTEXT) sh -c '$(CP_COMPILE_COMMANDS_JSON)'
+	
+docker-format:
+	$(DOCKER_CONTEXT) sh -c '$(CLANG_FORMAT)'
+
+docker-tidy:
+	$(DOCKER_CONTEXT) sh -c '$(CLANG_TIDY)'
+
+docker-cppcheck:
+	$(DOCKER_CONTEXT) sh -c '$(CPPCHECK)'
+
+docker-test:
+	$(DOCKER_CONTEXT) sh -c '$(CTEST)'
+	
 clean:
 	@echo "Nothing to clean."
