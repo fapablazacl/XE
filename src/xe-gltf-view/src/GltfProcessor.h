@@ -141,11 +141,11 @@ public:
 
 private:
     void process_camera(cgltf_camera *camera) {
-        std::cout << "camera node" << std::endl;
+        std::cout << "Camera node name: " << camera->name << std::endl;
     }
 
     void process_light(cgltf_light *light) {
-        std::cout << "light node" << std::endl;
+        std::cout << "Light node name: " << light->name << std::endl;
     }
 
     void process_material(const cgltf_material *material) {
@@ -162,8 +162,8 @@ private:
     }
 
     void process_buffer_view(const cgltf_buffer_view *view) {
-        // std::cout << "Buffer view name: " << (view->name ? view->name : "<noname>") << std::endl;
-        // std::cout << "Buffer view type: " << view->type << std::endl;
+        std::cout << "Buffer view name: " << (view->name ? view->name : "<noname>") << std::endl;
+        std::cout << "Buffer view type: " << view->type << std::endl;
     }
 
     void process_accessor(const cgltf_accessor *accessor) {
@@ -343,6 +343,7 @@ private:
     }
 
     void process_sampler(cgltf_sampler *sampler) {
+        std::cout << "Image name: " << (sampler->name ? sampler->name : "<noname>") << std::endl;
     }
 
     void process_buffer(cgltf_buffer *buffer) {
@@ -364,5 +365,6 @@ private:
     }
 
     void process_variant(cgltf_material_variant *material_variant) {
+        std::cout << "Material variant name: " << material_variant->name << std::endl;
     }
 };

@@ -100,13 +100,13 @@ struct Mesh {
     GLuint vao = 0;
     GLenum primitiveType = GL_TRIANGLES;
     bool indexed = false;
-    unsigned int count = 0;
+    size_t count = 0;
     GLenum indexDataType = GL_UNSIGNED_INT;
 
-    int material = -1;
+    std::optional<size_t> material;
 
-    Mesh() {
-    }
+	Mesh() {
+	}
 
     bool empty() const {
         return vao == 0;
@@ -173,8 +173,6 @@ public:
     );
 
     void renderCamera(const ShaderLocationMap &location, const Camera &camera);
-
-    void renderLight(const ShaderLocationMap &location, const Light &light);
 
     void renderLighting(const GLuint programId, const Lighting &lighting);
 

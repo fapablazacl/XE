@@ -276,7 +276,8 @@ namespace xe::gl {
                     break;
                 }
 
-                glVertexAttribPointer(attr.index, static_cast<GLint>(attr.size) + 1, type, attr.normalized, attr.stride, reinterpret_cast<const void *>(attr.offset));
+                const auto ptr = reinterpret_cast<const void*>(static_cast<long long>(attr.offset));
+                glVertexAttribPointer(attr.index, static_cast<GLint>(attr.size) + 1, type, attr.normalized, attr.stride, ptr);
             } else {
                 glDisableVertexAttribArray(attr.index);
             }
@@ -317,7 +318,7 @@ namespace xe::gl {
         glBindVertexArray(vertexArray.id);
 
         for (const auto &primitive : primitives) {
-            const auto indices = reinterpret_cast<const void *>(primitive.start);
+            const auto indices = reinterpret_cast<const void *>(static_cast<long long>(primitive.start));
 
             bindRenderState(primitive.attribs);
 

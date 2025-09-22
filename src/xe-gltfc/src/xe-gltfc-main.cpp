@@ -19,13 +19,6 @@ static void setupAssimpLogger() {
     DefaultLogger::create("", Logger::VERBOSE, aiDefaultLogStream_STDOUT);
 }
 
-static std::string deriveOutputPath(const std::string &inPath) {
-    std::filesystem::path p(inPath);
-    auto stem = p.stem().string();
-    auto out = p.parent_path() / (stem + ".glb");
-    return out.string();
-}
-
 int main(int argc, char **argv) {
     std::string inputPath = "/Users/fapablaza/Dropbox/GameDev/Capybaria/raw-assets/models/capybara-02/Capybara.fbx";
     std::string outputPath = "/Users/fapablaza/Dropbox/GameDev/Capybaria/raw-assets/models/capybara-02/Capybara.glb";

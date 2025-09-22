@@ -302,7 +302,7 @@ GLuint Renderer::createShader(const std::string &source, const GLenum type) {
     GLuint shader = glCreateShader(type);
 
     const GLchar *const sources = source.c_str();
-    const GLint sourceSizes = source.size();
+    const GLint sourceSizes = static_cast<GLint>(source.size());
 
     glShaderSource(shader, 1, &sources, &sourceSizes);
     glCompileShader(shader);
@@ -324,32 +324,32 @@ GLuint Renderer::createShader(const std::string &source, const GLenum type) {
 }
 
 GLuint Renderer::createShaderProgram(const std::vector<GLuint> &shaders) {
-    GLuint program = glCreateProgram();
+    GLuint programId = glCreateProgram();
 
-    for (const GLuint shader : shaders) {
-        assert(shader);
-        assert(glIsShader(shader));
+    for (const GLuint shaderId : shaders) {
+        assert(shaderId);
+        assert(glIsShader(shaderId));
 
-        glAttachShader(program, shader);
+        glAttachShader(programId, shaderId);
     }
 
-    glLinkProgram(program);
+    glLinkProgram(programId);
 
     GLint status = 0;
-    glGetProgramiv(program, GL_LINK_STATUS, &status);
+    glGetProgramiv(programId, GL_LINK_STATUS, &status);
 
     if (status == GL_FALSE) {
         char buffer[2048] = {};
         GLsizei size = 0;
 
-        glGetProgramInfoLog(program, 2048, &size, buffer);
+        glGetProgramInfoLog(programId, 2048, &size, buffer);
         const std::string msg = buffer;
         std::cerr << "Error: " << msg << std::endl;
 
         return 0;
     }
 
-    return program;
+    return programId;
 }
 
 GLuint Renderer::createBuffer(const GLenum target, const GLsizeiptr size, const void *data, GLenum usage) {
@@ -368,9 +368,9 @@ GLuint Renderer::createBuffer(const GLenum target, const GLsizeiptr size, const 
     return buffer;
 }
 
-ShaderLocationMap Renderer::createShaderLocationMap(const GLuint program) {
-    assert(program);
-    assert(glIsProgram(program));
+ShaderLocationMap Renderer::createShaderLocationMap(const GLuint programId) {
+    assert(programId);
+    assert(glIsProgram(programId));
 
     ShaderLocationMap location;
 
@@ -383,19 +383,19 @@ ShaderLocationMap Renderer::createShaderLocationMap(const GLuint program) {
     location.texCoord = 2;
     assert(location.texCoord >= 0);
 
-    location.uModel = glGetUniformLocation(program, "uModel");
-    location.uView = glGetUniformLocation(program, "uView");
-    location.uProj = glGetUniformLocation(program, "uProj");
+    location.uModel = glGetUniformLocation(programId, "uModel");
+    location.uView = glGetUniformLocation(programId, "uView");
+    location.uProj = glGetUniformLocation(programId, "uProj");
 
-    location.uMaterialDiffuseSamplerEnable = glGetUniformLocation(program, "uMaterialDiffuseSamplerEnable");
-    location.uMaterialDiffuseSampler = glGetUniformLocation(program, "uMaterialDiffuseSampler");
-    location.uMaterialAmbient = glGetUniformLocation(program, "uMaterialAmbient");
-    location.uMaterialDiffuse = glGetUniformLocation(program, "uMaterialDiffuse");
-    location.uMaterialSpecular = glGetUniformLocation(program, "uMaterialSpecular");
+    location.uMaterialDiffuseSamplerEnable = glGetUniformLocation(programId, "uMaterialDiffuseSamplerEnable");
+    location.uMaterialDiffuseSampler = glGetUniformLocation(programId, "uMaterialDiffuseSampler");
+    location.uMaterialAmbient = glGetUniformLocation(programId, "uMaterialAmbient");
+    location.uMaterialDiffuse = glGetUniformLocation(programId, "uMaterialDiffuse");
+    location.uMaterialSpecular = glGetUniformLocation(programId, "uMaterialSpecular");
 
-    location.uLightAmbient = glGetUniformLocation(program, "uLightAmbient");
-    location.uLightDirection = glGetUniformLocation(program, "uLightDirection");
-    location.uLightDiffuse = glGetUniformLocation(program, "uLightDiffuse");
+    location.uLightAmbient = glGetUniformLocation(programId, "uLightAmbient");
+    location.uLightDirection = glGetUniformLocation(programId, "uLightDirection");
+    location.uLightDiffuse = glGetUniformLocation(programId, "uLightDiffuse");
 
     return location;
 }
@@ -595,9 +595,9 @@ void Renderer::renderMesh(const Mesh &mesh) {
     // render the mesh
     glBindVertexArray(mesh.vao);
     if (mesh.indexed) {
-        glDrawElements(mesh.primitiveType, mesh.count, mesh.indexDataType, nullptr);
+        glDrawElements(mesh.primitiveType, static_cast<GLsizei>(mesh.count), mesh.indexDataType, nullptr);
     } else {
-        glDrawArrays(mesh.primitiveType, 0, mesh.count);
+        glDrawArrays(mesh.primitiveType, 0, static_cast<GLsizei>(mesh.count));
     }
 }
 

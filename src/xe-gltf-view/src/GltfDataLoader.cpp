@@ -28,7 +28,7 @@ inline std::optional<GLenum> mapBppToInternalFormat(const int bpp) {
     }
 }
 
-xe::gl::Texture GltfTextureLoader::createTexture(const xe::gl::RendererGL *renderer, const cgltf_texture_view &textureView) const {
+xe::gl::Texture GltfTextureLoader::createTexture(const cgltf_texture_view &textureView) const {
     std::cout << "Creating texture " << sanitizeString(textureView.texture->name) << std::endl;
 
     const auto mimeType = textureView.texture->image->mime_type;
@@ -162,7 +162,7 @@ GltfMeshPrimitive GltfDataLoader::createMeshPrimitive(const cgltf_primitive &pri
     meshPrimitive.vao = vao;
     meshPrimitive.count = count;
 
-    meshPrimitive.material.texture = textureLoader->createTexture(renderer, primitive.material->pbr_metallic_roughness.base_color_texture);
+    meshPrimitive.material.texture = textureLoader->createTexture(primitive.material->pbr_metallic_roughness.base_color_texture);
 
     if (indexBuffer.id != 0) {
         meshPrimitive.indexData = {indexBuffer, indexType};
@@ -217,7 +217,7 @@ GLint GltfDataLoader::computeAttributeLocation(const std::string &gltfAttributeN
         return -1;
     }
 
-    const auto shaderAttrib = it->second;
+    const ShaderAttrib &shaderAttrib = it->second;
     const auto location = program.getAttribLocation(shaderAttrib.name.c_str());
 
     if (shaderAttrib.required && location == -1) {
@@ -256,10 +256,10 @@ xe::gl::VertexArray GltfDataLoader::createVertexArray(const cgltf_primitive &pri
         if (location != -1) {
             xe::gl::Attribute attributeGL;
             attributeGL.index = location;
-            attributeGL.offset = bufferView.offset;
+            attributeGL.offset = static_cast<GLuint>(bufferView.offset);
             attributeGL.type = dataTypeGL.value();
             attributeGL.stride = static_cast<GLsizei>(bufferView.stride);
-            attributeGL.normalized = accessor.normalized;
+            attributeGL.normalized = accessor.normalized ? GL_TRUE : GL_FALSE;
             attributeGL.buffer = vertexBuffer;
             attributeGL.size = attribDimGL.value();
             attributesGL.push_back(attributeGL);

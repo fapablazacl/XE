@@ -22,11 +22,11 @@ namespace xe::gl {
 }
 
 void process_camera(cgltf_camera *camera) {
-    std::cout << "camera node" << std::endl;
+    std::cout << "Camera node " << camera->name << std::endl;
 }
 
 void process_light(cgltf_light *light) {
-    std::cout << "light node" << std::endl;
+    std::cout << "Light node" << light->name << std::endl;
 }
 
 void process_material(const cgltf_material *material) {
@@ -43,8 +43,8 @@ void process_material(const cgltf_material *material) {
 }
 
 void process_buffer_view(const cgltf_buffer_view *view) {
-    // std::cout << "Buffer view name: " << (view->name ? view->name : "<noname>") << std::endl;
-    // std::cout << "Buffer view type: " << view->type << std::endl;
+    std::cout << "Buffer view name: " << (view->name ? view->name : "<noname>") << std::endl;
+    std::cout << "Buffer view type: " << view->type << std::endl;
 }
 
 void process_accessor(const cgltf_accessor *accessor) {
@@ -224,6 +224,7 @@ void process_image(cgltf_image *image) {
 }
 
 void process_sampler(cgltf_sampler *sampler) {
+	std::cout << "Sampler name: " << sampler->name << std::endl;
 }
 
 void process_buffer(cgltf_buffer *buffer) {
@@ -245,6 +246,7 @@ void process_extensions_used(char *str) {
 }
 
 void process_variant(cgltf_material_variant *material_variant) {
+    std::cout << "Material variant name: " << material_variant->name << std::endl;
 }
 
 void treeNodeLights(cgltf_light *lights, cgltf_size lights_count) {
