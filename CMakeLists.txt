@@ -4,7 +4,6 @@ project (XE)
 
 option (XE_PLUGIN_PNG           "Include PNG image support via LodePNG" ON)
 option (XE_PLUGIN_GL            "Include OpenGL 3+ support" ON)
-option (XE_PLUGIN_ES2           "Include OpenGL ES 2 support" OFF)
 option (XE_PLUGIN_GL_GLFW       "Include GLFW-based Window and Context creation support (requires 'XE_PLUGIN_GL')" ON)
 
 # options suited for development

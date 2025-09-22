@@ -24,9 +24,5 @@ if (XE_PLUGIN_GL_GLFW)
     add_subdirectory("libxe-core-platform-glfw")
 endif()
 
-if (XE_PLUGIN_ES2)
-    add_subdirectory ("libxe-core-graphicsdevice-gles")
-endif()
-
 add_subdirectory("apostate")
 add_subdirectory("capybaria")
