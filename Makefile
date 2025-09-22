@@ -11,7 +11,7 @@ CMAKE_CONFIGURE_DEBUG := cmake --preset conan-debug
 CP_COMPILE_COMMANDS_JSON := cp build/Debug/compile_commands.json .
 CLANG_FORMAT := find src -type f \( -name "*.cpp" -o -name "*.cc" -o -name "*.cxx" -o -name "*.hpp" -o -name "*.hh" -o -name "*.h" \) -print0 | xargs -0 -r clang-format -i
 CLANG_TIDY := run-clang-tidy -p build/Debug/ -quiet
-CPPCHECK := cppcheck --project=build/Debug/compile_commands.json
+CPPCHECK := cppcheck --check-level=exhaustive --quiet --project=build/Debug/compile_commands.json -isrc/xe-gltf-view/src/bindings
 CTEST := ctest --test-dir build/Debug --output-on-failure
 
 IWYU_FIXES := /tmp/iwyu.out
