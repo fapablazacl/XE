@@ -14,6 +14,10 @@ option (XE_DEV_INSTRUMENT_COVERAGE  "Instrument code for code coverage reporting
 option (XE_DEV_PRECOMPILED_HEADERS  "Enable precompiled headers for internal libraries, to improve build times" OFF)
 option (XE_DEV_LINT_CLANG_TIDY      "Enable linting checks with clang-tidy" OFF)
 option (XE_DEV_IWYU                 "Enable include checks with IWYU" OFF)
+option (XE_DEV_SANITIZER_ENABLE     "Enable sanitizer usage" OFF)
+
+# Which sanitizer to use
+set (XE_DEV_SANITIZER "" CACHE STRING "")
 
 # Options for external assets location
 if (NOT XE_EXTERNAL_ASSET_ROOT_PATH)
@@ -90,6 +94,11 @@ endif()
 
 if (XE_DEV_IWYU)
     set_target_properties(${target} PROPERTIES CMAKE_CXX_INCLUDE_WHAT_YOU_USE "iwyu")
+endif()
+
+if (XE_DEV_SANITIZER_ENABLE)
+    target_compile_options(${target} INTERFACE -fsanitize=${XE_DEV_SANITIZER})
+    target_link_options(${target} INTERFACE -fsanitize=${XE_DEV_SANITIZER})
 endif()
 
 add_subdirectory ("src")
