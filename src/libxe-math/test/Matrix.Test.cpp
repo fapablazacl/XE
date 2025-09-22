@@ -145,9 +145,9 @@ TEST(MatrixTest, ConstructorShouldSetupTheMatrixComponentsCorrectlyForFourDimens
 }
 
 TEST(MatrixTest, DeterminantShouldComputeTheMatrixDeterminantCorrectly) {
-    const auto matA =
-        XE::Matrix4::rows({XE::Vector4{1.0f, 2.0f, 1.0f, 0.0f}, XE::Vector4{2.0f, 1.0f, -3.0f, -1.0f}, XE::Vector4{-3.0f, 2.0f, 1.0f, 0.0f}, XE::Vector4{2.0f, -1.0f, 0.0f, -1.0f}}
-        );
+    const auto matA = XE::Matrix4::rows(
+        {XE::Vector4{1.0f, 2.0f, 1.0f, 0.0f}, XE::Vector4{2.0f, 1.0f, -3.0f, -1.0f}, XE::Vector4{-3.0f, 2.0f, 1.0f, 0.0f}, XE::Vector4{2.0f, -1.0f, 0.0f, -1.0f}}
+    );
 
     // matrix determinant
     EXPECT_FLOAT_EQ(XE::determinant(XE::Matrix4::zero()), 0.0f);
@@ -171,13 +171,13 @@ TEST(MatrixTest, ComparisonOperatorsShouldCheckMatrixComponents) {
 }
 
 TEST(MatrixTest, AdditionAddsEveryFieldOneToOne) {
-    const auto matA =
-        XE::Matrix4::rows({XE::Vector4{1.0f, 2.0f, 1.0f, 0.0f}, XE::Vector4{2.0f, 1.0f, -3.0f, -1.0f}, XE::Vector4{-3.0f, 2.0f, 1.0f, 0.0f}, XE::Vector4{2.0f, -1.0f, 0.0f, -1.0f}}
-        );
+    const auto matA = XE::Matrix4::rows(
+        {XE::Vector4{1.0f, 2.0f, 1.0f, 0.0f}, XE::Vector4{2.0f, 1.0f, -3.0f, -1.0f}, XE::Vector4{-3.0f, 2.0f, 1.0f, 0.0f}, XE::Vector4{2.0f, -1.0f, 0.0f, -1.0f}}
+    );
 
-    const auto matB =
-        XE::Matrix4::rows({XE::Vector4{-3.0f, 1.0f, 5.0f, 1.0f}, XE::Vector4{1.0f, 2.0f, -1.0f, 1.0f}, XE::Vector4{1.0f, 2.0f, 1.0f, -2.0f}, XE::Vector4{1.0f, -1.0f, -3.0f, -1.0f}}
-        );
+    const auto matB = XE::Matrix4::rows(
+        {XE::Vector4{-3.0f, 1.0f, 5.0f, 1.0f}, XE::Vector4{1.0f, 2.0f, -1.0f, 1.0f}, XE::Vector4{1.0f, 2.0f, 1.0f, -2.0f}, XE::Vector4{1.0f, -1.0f, -3.0f, -1.0f}}
+    );
 
     const auto matAddResult = XE::Matrix4::rows(
         {XE::Vector4{-2.0f, 3.0f, 6.0f, 1.0f}, XE::Vector4{3.0f, 3.0f, -4.0f, 0.0f}, XE::Vector4{-2.0f, 4.0f, 2.0f, -2.0f}, XE::Vector4{3.0f, -2.0f, -3.0f, -2.0f}}
@@ -198,21 +198,21 @@ TEST(MatrixTest, AdditionAddsEveryFieldOneToOne) {
 }
 
 TEST(MatrixTest, SubtractionSubtractsEveryFieldOneToOne) {
-    const auto matA =
-        XE::Matrix4::rows({XE::Vector4{1.0f, 2.0f, 1.0f, 0.0f}, XE::Vector4{2.0f, 1.0f, -3.0f, -1.0f}, XE::Vector4{-3.0f, 2.0f, 1.0f, 0.0f}, XE::Vector4{2.0f, -1.0f, 0.0f, -1.0f}}
-        );
+    const auto matA = XE::Matrix4::rows(
+        {XE::Vector4{1.0f, 2.0f, 1.0f, 0.0f}, XE::Vector4{2.0f, 1.0f, -3.0f, -1.0f}, XE::Vector4{-3.0f, 2.0f, 1.0f, 0.0f}, XE::Vector4{2.0f, -1.0f, 0.0f, -1.0f}}
+    );
 
     const auto matNegA = XE::Matrix4::rows(
         {XE::Vector4{-1.0f, -2.0f, -1.0f, -0.0f}, XE::Vector4{-2.0f, -1.0f, 3.0f, 1.0f}, XE::Vector4{3.0f, -2.0f, -1.0f, -0.0f}, XE::Vector4{-2.0f, 1.0f, -0.0f, 1.0f}}
     );
 
-    const auto matB =
-        XE::Matrix4::rows({XE::Vector4{-3.0f, 1.0f, 5.0f, 1.0f}, XE::Vector4{1.0f, 2.0f, -1.0f, 1.0f}, XE::Vector4{1.0f, 2.0f, 1.0f, -2.0f}, XE::Vector4{1.0f, -1.0f, -3.0f, -1.0f}}
-        );
+    const auto matB = XE::Matrix4::rows(
+        {XE::Vector4{-3.0f, 1.0f, 5.0f, 1.0f}, XE::Vector4{1.0f, 2.0f, -1.0f, 1.0f}, XE::Vector4{1.0f, 2.0f, 1.0f, -2.0f}, XE::Vector4{1.0f, -1.0f, -3.0f, -1.0f}}
+    );
 
-    const auto matSubResult =
-        XE::Matrix4::rows({XE::Vector4{4.0f, 1.0f, -4.0f, -1.0f}, XE::Vector4{1.0f, -1.0f, -2.0f, -2.0f}, XE::Vector4{-4.0f, 0.0f, 0.0f, 2.0f}, XE::Vector4{1.0f, 0.0f, 3.0f, 0.0f}}
-        );
+    const auto matSubResult = XE::Matrix4::rows(
+        {XE::Vector4{4.0f, 1.0f, -4.0f, -1.0f}, XE::Vector4{1.0f, -1.0f, -2.0f, -2.0f}, XE::Vector4{-4.0f, 0.0f, 0.0f, 2.0f}, XE::Vector4{1.0f, 0.0f, 3.0f, 0.0f}}
+    );
 
     // subtraction
     EXPECT_EQ(matNegA, -matA);
@@ -230,9 +230,9 @@ TEST(MatrixTest, SubtractionSubtractsEveryFieldOneToOne) {
 }
 
 TEST(MatrixTest, ScalarMultiplicationMultipliesEveryFieldWithAnScalar) {
-    const auto matA =
-        XE::Matrix4::rows({XE::Vector4{1.0f, 2.0f, 1.0f, 0.0f}, XE::Vector4{2.0f, 1.0f, -3.0f, -1.0f}, XE::Vector4{-3.0f, 2.0f, 1.0f, 0.0f}, XE::Vector4{2.0f, -1.0f, 0.0f, -1.0f}}
-        );
+    const auto matA = XE::Matrix4::rows(
+        {XE::Vector4{1.0f, 2.0f, 1.0f, 0.0f}, XE::Vector4{2.0f, 1.0f, -3.0f, -1.0f}, XE::Vector4{-3.0f, 2.0f, 1.0f, 0.0f}, XE::Vector4{2.0f, -1.0f, 0.0f, -1.0f}}
+    );
 
     // scalar multiplication
     EXPECT_EQ(matA * -1.0f, -matA);
@@ -242,13 +242,13 @@ TEST(MatrixTest, ScalarMultiplicationMultipliesEveryFieldWithAnScalar) {
 }
 
 TEST(MatrixTest, MatrixMultiplicationPerformsADotProductBetweenRowAndColumnsForEachResultField) {
-    const auto matA =
-        XE::Matrix4::rows({XE::Vector4{1.0f, 2.0f, 1.0f, 0.0f}, XE::Vector4{2.0f, 1.0f, -3.0f, -1.0f}, XE::Vector4{-3.0f, 2.0f, 1.0f, 0.0f}, XE::Vector4{2.0f, -1.0f, 0.0f, -1.0f}}
-        );
+    const auto matA = XE::Matrix4::rows(
+        {XE::Vector4{1.0f, 2.0f, 1.0f, 0.0f}, XE::Vector4{2.0f, 1.0f, -3.0f, -1.0f}, XE::Vector4{-3.0f, 2.0f, 1.0f, 0.0f}, XE::Vector4{2.0f, -1.0f, 0.0f, -1.0f}}
+    );
 
-    const auto matB =
-        XE::Matrix4::rows({XE::Vector4{-3.0f, 1.0f, 5.0f, 1.0f}, XE::Vector4{1.0f, 2.0f, -1.0f, 1.0f}, XE::Vector4{1.0f, 2.0f, 1.0f, -2.0f}, XE::Vector4{1.0f, -1.0f, -3.0f, -1.0f}}
-        );
+    const auto matB = XE::Matrix4::rows(
+        {XE::Vector4{-3.0f, 1.0f, 5.0f, 1.0f}, XE::Vector4{1.0f, 2.0f, -1.0f, 1.0f}, XE::Vector4{1.0f, 2.0f, 1.0f, -2.0f}, XE::Vector4{1.0f, -1.0f, -3.0f, -1.0f}}
+    );
 
     const XE::Matrix4 matMulResult = XE::Matrix4::rows(
         {XE::Vector4{0.0f, 7.0f, 4.0f, 1.0f}, XE::Vector4{-9.0f, -1.0f, 9.0f, 10.0f}, XE::Vector4{12.0f, 3.0f, -16.0f, -3.0f}, XE::Vector4{-8.0f, 1.0f, 14.0f, 2.0f}}
@@ -293,9 +293,9 @@ TEST(MatrixTest, InverseShouldComputeTheMatrixInverseMultiplicative) {
          XE::Vector4{0.21875f, -0.125f, -0.59375f, -0.875}}
     );
 
-    const XE::Matrix4 matA =
-        XE::Matrix4::rows({XE::Vector4{1.0f, 2.0f, 1.0f, 0.0f}, XE::Vector4{2.0f, 1.0f, -3.0f, -1.0f}, XE::Vector4{-3.0f, 2.0f, 1.0f, 0.0f}, XE::Vector4{2.0f, -1.0f, 0.0f, -1.0f}}
-        );
+    const XE::Matrix4 matA = XE::Matrix4::rows(
+        {XE::Vector4{1.0f, 2.0f, 1.0f, 0.0f}, XE::Vector4{2.0f, 1.0f, -3.0f, -1.0f}, XE::Vector4{-3.0f, 2.0f, 1.0f, 0.0f}, XE::Vector4{2.0f, -1.0f, 0.0f, -1.0f}}
+    );
 
     auto mi = XE::mat4Identity();
     auto detMatA = -32.0f;
@@ -322,9 +322,9 @@ TEST(MatrixTest, SetColumnShouldChangeCorrectlyACertainColumnInTheMatrix) {
     );
 
     const auto m1 = XE::Matrix4(m).setColumn(0, XE::Vector4{4.0f, 3.0f, 2.0f, 1.0f});
-    const auto m1_result =
-        XE::Matrix4::rows({XE::Vector4{4.0f, 2.0f, 3.0f, 4.0f}, XE::Vector4{3.0f, 6.0f, 7.0f, 8.0f}, XE::Vector4{2.0f, 10.0f, 11.0f, 12.0f}, XE::Vector4{1.0f, 14.0f, 15.0f, 16.0f}}
-        );
+    const auto m1_result = XE::Matrix4::rows(
+        {XE::Vector4{4.0f, 2.0f, 3.0f, 4.0f}, XE::Vector4{3.0f, 6.0f, 7.0f, 8.0f}, XE::Vector4{2.0f, 10.0f, 11.0f, 12.0f}, XE::Vector4{1.0f, 14.0f, 15.0f, 16.0f}}
+    );
 
     EXPECT_EQ(m1, m1_result);
 }

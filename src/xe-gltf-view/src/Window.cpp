@@ -224,7 +224,7 @@ void process_image(cgltf_image *image) {
 }
 
 void process_sampler(cgltf_sampler *sampler) {
-	std::cout << "Sampler name: " << sampler->name << std::endl;
+    std::cout << "Sampler name: " << sampler->name << std::endl;
 }
 
 void process_buffer(cgltf_buffer *buffer) {
@@ -328,7 +328,7 @@ template <typename T> std::span<T> make_span(T *ptr, cgltf_size size) {
     return {ptr, size};
 }
 
-template <typename T> void renderTreeNode(const std::string &label, const std::span<T> &values) {
+template <typename T> void renderTreeNode(const std::string &label, const std::span<T> & /*values*/) {
     ImGuiTreeNodeFlags flag = ImGuiTreeNodeFlags_DefaultOpen;
     if (ImGui::TreeNodeEx(label.c_str(), flag)) {
 

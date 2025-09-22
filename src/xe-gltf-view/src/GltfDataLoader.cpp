@@ -119,13 +119,13 @@ void process_animation(cgltf_animation *animation) {
     std::cout << "Animation channels count: " << animation->channels_count << std::endl;
     std::cout << "Animation extensions count: " << animation->extensions_count << std::endl;
 
-    for (int i = 0; i < animation->samplers_count; i++) {
+    for (cgltf_size i = 0; i < animation->samplers_count; i++) {
         const auto sampler = animation->samplers + i;
         std::cout << "Animation Sampler Intepolation Type " << sampler->interpolation << std::endl;
     }
     std::cout << std::endl;
 
-    for (int i = 0; i < animation->channels_count; i++) {
+    for (cgltf_size i = 0; i < animation->channels_count; i++) {
         const auto channel = animation->channels + i;
         std::cout << "Animation Channel Target Path " << channel->target_path << std::endl;
     }

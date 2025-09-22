@@ -16,11 +16,10 @@ void Model::renderNode(Renderer &renderer, const ShaderLocationMap &location, co
         const Mesh &mesh = meshes[meshIndex];
 
         if (mesh.material) {
-			const Material& material = materials[*mesh.material];
-			renderer.renderMaterial(renderer.program, material);
-        }
-        else {
-			// TODO: Render default material
+            const Material &material = materials[*mesh.material];
+            renderer.renderMaterial(renderer.program, material);
+        } else {
+            // TODO: Render default material
         }
 
         renderer.renderMesh(mesh);

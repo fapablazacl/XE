@@ -48,9 +48,9 @@ inline std::string to_string(cgltf_primitive_type type) {
         return "cgltf_primitive_type_triangle_strip";
     case cgltf_primitive_type_triangle_fan:
         return "cgltf_primitive_type_triangle_fan";
+    default:
+        return "<unknown primitive type>";
     }
-
-    return "<unknown primitive type>";
 }
 
 inline std::ostream &operator<<(std::ostream &os, cgltf_primitive_type type) {
@@ -75,9 +75,9 @@ inline std::string to_string(cgltf_attribute_type type) {
         return "cgltf_attribute_type_joints";
     case cgltf_attribute_type_weights:
         return "cgltf_attribute_type_weights";
+    default:
+        return "<unknown primitive type>";
     }
-
-    return "<unknown primitive type>";
 }
 
 inline std::ostream &operator<<(std::ostream &os, cgltf_attribute_type type) {
@@ -102,9 +102,9 @@ inline std::string to_string(cgltf_type type) {
         return "cgltf_type_mat3";
     case cgltf_type_mat4:
         return "cgltf_type_mat4";
+    default:
+        return "<unknown type>";
     }
-
-    return "<unknown type>";
 }
 
 inline std::ostream &operator<<(std::ostream &os, cgltf_type type) {
@@ -127,9 +127,9 @@ inline std::string to_string(cgltf_component_type type) {
         return "cgltf_component_type_r_32u";
     case cgltf_component_type_r_32f:
         return "cgltf_component_type_r_32f";
+    default:
+        return "<unknown component type>";
     }
-
-    return "<unknown component type>";
 }
 
 inline std::ostream &operator<<(std::ostream &os, cgltf_component_type type) {
@@ -144,9 +144,9 @@ inline std::string to_string(cgltf_interpolation_type type) {
         return "cgltf_interpolation_type_step";
     case cgltf_interpolation_type_cubic_spline:
         return "cgltf_interpolation_type_cubic_spline";
+    default:
+        return "<unknown internpolation_type>";
     }
-
-    return "<unknown internpolation_type>";
 }
 
 inline std::ostream &operator<<(std::ostream &os, cgltf_interpolation_type type) {
@@ -165,9 +165,9 @@ inline std::string to_string(cgltf_animation_path_type type) {
         return "cgltf_animation_path_type_scale";
     case cgltf_animation_path_type_weights:
         return "cgltf_animation_path_type_weights";
+    default:
+        return "<unknown internpolation_type>";
     }
-
-    return "<unknown internpolation_type>";
 }
 
 inline std::ostream &operator<<(std::ostream &os, cgltf_animation_path_type type) {
@@ -230,9 +230,9 @@ constexpr GLenum mapToPrimitive(const cgltf_primitive_type type) {
         return GL_TRIANGLE_STRIP;
     case cgltf_primitive_type_triangle_fan:
         return GL_TRIANGLE_FAN;
+    default:
+        return GL_INVALID_ENUM;
     }
-
-    return GL_INVALID_ENUM;
 }
 
 [[nodiscard]]

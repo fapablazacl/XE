@@ -48,9 +48,9 @@ namespace XE {
         glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
     }
 
-    void
-    TextureCubeMapGL::getData(void *surfaceData, const int mipLevel, TextureCubeMapSide cubeMapSide, const DataType surfaceDataType, const PixelFormat surfaceFormat, const Recti &)
-        const {
+    void TextureCubeMapGL::getData(
+        void *surfaceData, const int mipLevel, TextureCubeMapSide cubeMapSide, const DataType surfaceDataType, const PixelFormat surfaceFormat, const Recti &
+    ) const {
         const GLenum sideGL = convertToGL(cubeMapSide);
         const GLenum formatGL = convertToGL(surfaceFormat);
         const GLenum dataTypeGL = convertToGL(surfaceDataType);

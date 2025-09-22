@@ -105,8 +105,8 @@ struct Mesh {
 
     std::optional<size_t> material;
 
-	Mesh() {
-	}
+    Mesh() {
+    }
 
     bool empty() const {
         return vao == 0;

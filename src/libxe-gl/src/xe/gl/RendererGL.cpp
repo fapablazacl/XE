@@ -276,7 +276,7 @@ namespace xe::gl {
                     break;
                 }
 
-                const auto ptr = reinterpret_cast<const void*>(static_cast<long long>(attr.offset));
+                const auto ptr = reinterpret_cast<const void *>(static_cast<long long>(attr.offset));
                 glVertexAttribPointer(attr.index, static_cast<GLint>(attr.size) + 1, type, attr.normalized, attr.stride, ptr);
             } else {
                 glDisableVertexAttribArray(attr.index);
