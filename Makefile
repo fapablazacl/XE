@@ -1,6 +1,7 @@
-IMAGE ?= fapablazacl/cpp-archlinux:latest
+BASE := ubuntu
+IMAGE ?= fapablazacl/cpp-$(BASE):latest
 DOCKER ?= docker
-BUILD_CONTEXT := docker/cpp-archlinux
+BUILD_CONTEXT := docker/cpp-$(BASE)
 DOCKER_CONTEXT := $(DOCKER) run --rm -v $(CURDIR)/.conan2-docker:/root/.conan2 -v $(CURDIR):/workspace $(IMAGE)
 
 CONAN_PROFILE_DETECT := conan profile detect
