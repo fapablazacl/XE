@@ -4,7 +4,7 @@
  */
 
 #ifndef __XE_MATH_COMMON_HPP__
-#define XE_MATH_COMMON_HPP_
+#define __XE_MATH_COMMON_HPP__
 
 #include <cassert>
 #include <cmath>
@@ -40,7 +40,7 @@ namespace XE {
 
     //! Performs a Linear Interpolation between two values.
     template <typename T, typename S> T lerp(const T v1, const T v2, const S s) {
-        return v1 + ((v2 - v1) * s);
+        return v1 + (v2 - v1) * s;
     }
 } // namespace XE
 

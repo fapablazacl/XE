@@ -1,12 +1,12 @@
 
 #ifndef __XE_MATH_ROTATION_HPP__
-#define XE_MATH_ROTATION_HPP_
+#define __XE_MATH_ROTATION_HPP__
 
 #include "Vector.h"
 
 namespace XE {
     template <typename T> struct Rotation {
-        T angle{};
+        T angle;
         TVector<T, 3> axis;
     };
 

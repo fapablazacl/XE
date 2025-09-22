@@ -9,7 +9,7 @@ public:
 
     ~Window();
 
-    static bool pollInput();
+    bool pollInput();
 
     void update();
 
@@ -18,10 +18,10 @@ public:
     bool initialize();
 
     // called once per frame, just after the buffers are cleared
-    static void prepareUI();
+    void prepareUI();
 
     // called once per frame
-    static void drawUI();
+    void drawUI();
 
 private:
     int initializeSDL();

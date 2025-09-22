@@ -1,16 +1,12 @@
 
 #include "Texture2DArrayGL.h"
 #include "Conversion.h"
-#include "xe/gl/TextureBaseGL.h"
-#include "xe/gl/gl.h"
-#include "xe/math/Rect.h"
-#include "xe/math/Vector.h"
 
 namespace XE {
-    Texture2DArrayGL::Texture2DArrayGL(const PixelFormat format, const Vector2i &size, const int count) : TextureBaseGL(GL_TEXTURE_2D_ARRAY), m_format(format), m_size(size) {
+    Texture2DArrayGL::Texture2DArrayGL(const PixelFormat format, const Vector2i &size, const int count) : TextureBaseGL(GL_TEXTURE_2D_ARRAY) {
 
-        
-        
+        m_size = size;
+        m_format = format;
 
         // const GLenum internalFormatGL = convertToGL(m_format);
         const GLenum formatGL = convertToGL(format);
@@ -36,7 +32,7 @@ namespace XE {
         glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
     }
 
-    void Texture2DArrayGL::getData(void *surfaceData, const int mipLevel, const int /*arrayIndex*/, const PixelFormat surfaceFormat, const DataType surfaceDataType, const Recti & /*area*/) const {
+    void Texture2DArrayGL::getData(void *surfaceData, const int mipLevel, const int, const PixelFormat surfaceFormat, const DataType surfaceDataType, const Recti &) const {
         const GLenum formatGL = convertToGL(surfaceFormat);
         const GLenum dataTypeGL = convertToGL(surfaceDataType);
 

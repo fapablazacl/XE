@@ -1,9 +1,9 @@
 
 #include "BufferGL.h"
 
-#include "xe/gl/gl.h"
+#include "Conversion.h"
 #include <cassert>
-#include <cstddef>
+#include <cstdint>
 
 namespace XE {
     BufferGL::BufferGL(GLenum target, GLenum usage, const void *data, GLsizei size) : m_target(target), m_size(size) {
@@ -12,12 +12,12 @@ namespace XE {
         glBufferData(target, size, data, usage);
         glBindBuffer(target, 0);
 
-        
-        
+        m_size = size;
+        m_target = target;
     }
 
     BufferGL::~BufferGL() {
-        if (m_id != 0u) {
+        if (m_id) {
             glDeleteBuffers(1, &m_id);
         }
     }
@@ -25,8 +25,8 @@ namespace XE {
     void BufferGL::read(void *destination, const size_t size, const size_t offset, const size_t destinationOffset) const {
         assert(destination);
 
-        const size_t finalSize = (size != 0u) ? size : m_size;
-        auto *const ptr = reinterpret_cast<std::byte *>(destination);
+        const size_t finalSize = size ? size : m_size;
+        const auto ptr = reinterpret_cast<std::byte *>(destination);
 
         glBindBuffer(m_target, m_id);
         glGetBufferSubData(m_target, offset, finalSize, &ptr[destinationOffset]);
@@ -36,8 +36,8 @@ namespace XE {
     void BufferGL::write(const void *source, const size_t size, const size_t offset, const size_t sourceOffset) {
         assert(source);
 
-        const size_t finalSize = (size != 0u) ? size : m_size;
-        const auto *const ptr = reinterpret_cast<const std::byte *>(source);
+        const size_t finalSize = size ? size : m_size;
+        const auto ptr = reinterpret_cast<const std::byte *>(source);
 
         glBindBuffer(m_target, m_id);
         glBufferSubData(m_target, offset, finalSize, &ptr[sourceOffset]);

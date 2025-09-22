@@ -19,19 +19,19 @@
 #include <vector>
 
 struct Camera {
-    glm::vec3 position = {0.0F, 0.0F, 0.0F};
-    glm::vec3 lookAt = {0.0F, 0.0F, -1.0F};
-    glm::vec3 up = {0.0F, 1.0F, 0.0F};
+    glm::vec3 position = {0.0f, 0.0f, 0.0f};
+    glm::vec3 lookAt = {0.0f, 0.0f, -1.0f};
+    glm::vec3 up = {0.0f, 1.0f, 0.0f};
 
-    float fov = 60.0F;
-    float znear = 0.1F;
-    float zfar = 100.0F;
-    float aspect = 4.0F / 3.0F;
+    float fov = 60.0f;
+    float znear = 0.1f;
+    float zfar = 100.0f;
+    float aspect = 4.0f / 3.0f;
 };
 
 struct Transformation {
-    glm::vec3 scaling = glm::vec3(1.0F);
-    glm::vec3 translation = glm::vec3(0.0F);
+    glm::vec3 scaling = glm::vec3(1.0f);
+    glm::vec3 translation = glm::vec3(0.0f);
 
     glm::mat4 computeMatrix() const {
         auto model = glm::identity<glm::mat4>();
@@ -44,7 +44,7 @@ struct Transformation {
 };
 
 struct MaterialChannel {
-    glm::vec4 color = {1.0F, 1.0F, 1.0F, 1.0F};
+    glm::vec4 color = {1.0f, 1.0f, 1.0f, 1.0f};
     GLuint textureMap = 0;
 };
 
@@ -56,13 +56,13 @@ struct Material {
 };
 
 struct Light {
-    glm::vec3 direction = glm::normalize(glm::vec3{0.5F, 1.0F, 0.25F});
-    glm::vec4 ambient = {0.6F, 0.6F, 0.6F, 1.0F};
-    glm::vec4 diffuse = {0.8F, 0.8F, 0.8F, 0.8F};
+    glm::vec3 direction = glm::normalize(glm::vec3{0.5f, 1.0f, 0.25f});
+    glm::vec4 ambient = {0.6f, 0.6f, 0.6f, 1.0f};
+    glm::vec4 diffuse = {0.8f, 0.8f, 0.8f, 0.8f};
 };
 
 struct Lighting {
-    glm::vec4 globalAmbient = {0.0F, 0.0F, 0.0F, 1.0F};
+    glm::vec4 globalAmbient = {0.0f, 0.0f, 0.0f, 1.0f};
     std::vector<Light> lights;
     bool enabled = true;
 };
@@ -142,11 +142,11 @@ public:
 
     virtual ~Renderer();
 
-    static GLuint createShader(const std::string &source, GLenum type);
+    GLuint createShader(const std::string &source, const GLenum type);
 
-    static GLuint createShaderProgram(const std::vector<GLuint> &shaders);
+    GLuint createShaderProgram(const std::vector<GLuint> &shaders);
 
-    static GLuint createBuffer(GLenum target, GLsizeiptr size, const void *data, GLenum usage);
+    GLuint createBuffer(const GLenum target, const GLsizeiptr size, const void *data, GLenum usage);
 
     GLuint createBuffer(const GLenum target, const MeshAttribute &attrib, GLenum usage) {
         return createBuffer(target, attrib.size, attrib.data, usage);
@@ -158,37 +158,37 @@ public:
         return createBuffer(target, sizeof(T) * values.size(), values.data(), usage);
     }
 
-    static ShaderLocationMap createShaderLocationMap(GLuint program);
+    ShaderLocationMap createShaderLocationMap(const GLuint program);
 
-    void beginRenderFrame() const;
+    void beginRenderFrame();
 
     void endRenderFrame();
 
     Mesh createMeshVAO(const ShaderLocationMap &location, const MeshData &meshData);
 
-    GLuint createTexture(GLenum internalFormat, unsigned width, unsigned height, GLenum format, GLenum type, const void *data);
+    GLuint createTexture(GLenum internalFormat, const unsigned width, const unsigned height, const GLenum format, const GLenum type, const void *data);
 
-    static GLuint createTexture(
-        GLenum internalFormat, unsigned width, unsigned height, GLenum format, GLenum type, const void *data, GLuint wrapS, GLuint wrapT
+    GLuint createTexture(
+        GLenum internalFormat, const unsigned width, const unsigned height, const GLenum format, const GLenum type, const void *data, const GLuint wrapS, const GLuint wrapT
     );
 
-    static void renderCamera(const ShaderLocationMap &location, const Camera &camera);
+    void renderCamera(const ShaderLocationMap &location, const Camera &camera);
 
-    static void renderLighting(GLuint programId, const Lighting &lighting);
+    void renderLighting(const GLuint programId, const Lighting &lighting);
 
-    void renderMaterial(GLuint programId, const Material &material);
+    void renderMaterial(const GLuint programId, const Material &material);
 
-    static void renderMaterialChannel(GLuint programId, const std::string &uniformPrefix, GLint textureUnit, const MaterialChannel &channel);
+    void renderMaterialChannel(const GLuint programId, const std::string &uniformPrefix, const GLint textureUnit, const MaterialChannel &channel);
 
-    static void renderModelTransform(const ShaderLocationMap &location, const float *transform);
+    void renderModelTransform(const ShaderLocationMap &location, const float *transform);
 
-    static void renderMesh(const Mesh &mesh);
+    void renderMesh(const Mesh &mesh);
 
-    void renderMeshes(const Mesh *meshes, size_t count);
+    void renderMeshes(const Mesh *meshes, const size_t count);
 
     void renderTranformation(const ShaderLocationMap &location, const Transformation &transformation);
 
-
+public:
     Platform &platform;
     GLuint program = 0;
 };

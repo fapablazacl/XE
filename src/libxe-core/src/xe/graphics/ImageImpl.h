@@ -1,6 +1,6 @@
 
 #ifndef __XE_GRAPHICS_IMAGEIMPL_HPP__
-#define XE_GRAPHICS_IMAGEIMPL_HPP_
+#define __XE_GRAPHICS_IMAGEIMPL_HPP__
 
 #include "Image.h"
 
@@ -12,15 +12,15 @@ namespace XE {
     public:
         ImageImpl();
 
-        ~ImageImpl() override;
+        virtual ~ImageImpl();
 
-        const void *getPointer() const override;
+        virtual const void *getPointer() const override;
 
-        PixelFormat getFormat() const override;
+        virtual PixelFormat getFormat() const override;
 
-        Vector2i getSize() const override;
+        virtual Vector2i getSize() const override;
 
-        void allocate(PixelFormat newFormat, const Vector2i &newSize);
+        void allocate(const PixelFormat newFormat, const Vector2i &newSize);
 
         void free();
 

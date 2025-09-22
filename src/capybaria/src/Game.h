@@ -1,7 +1,6 @@
 #pragma once
 
 #include <SDL2/SDL.h>
-#include <algorithm>
 #include <cassert>
 #include <cstdio>
 #include <cstdlib>
@@ -19,8 +18,8 @@ struct FloorGeometry {
     int tilesInX = 0;
     int tilesInZ = 0;
 
-    float tileSizeX = 0.0F;
-    float tileSizeZ = 0.0F;
+    float tileSizeX = 0.0f;
+    float tileSizeZ = 0.0f;
 
     int stripVertexCount = 0;
 
@@ -44,64 +43,68 @@ enum GAME_ACTION {
 };
 
 struct Camera {
-    const float turnSpeed = 25.0F;
-    const float movementSpeed = 1.0F;
-    const XE::Vector3 up = {0.0F, 1.0F, 0.0F};
+    const float turnSpeed = 25.0f;
+    const float movementSpeed = 1.0f;
+    const XE::Vector3 up = {0.0f, 1.0f, 0.0f};
     XE::Vector3 position;
     XE::Vector3 lookAt;
-    XE::Vector3 direction = {0.0F, 0.0F, -1.0F};
-    float yaw = 0.0F;
-    float pitch = 0.0F;
+    XE::Vector3 direction = {0.0f, 0.0f, -1.0f};
+    float yaw = 0.0f;
+    float pitch = 0.0f;
 
     void update(const float seconds, const int actions) {
-        if ((actions & GAME_ACTION_CAMERA_TURN_LEFT) != 0) {
+        if (actions & GAME_ACTION_CAMERA_TURN_LEFT) {
             yaw += turnSpeed * seconds;
         }
 
-        if ((actions & GAME_ACTION_CAMERA_TURN_RIGHT) != 0) {
+        if (actions & GAME_ACTION_CAMERA_TURN_RIGHT) {
             yaw -= turnSpeed * seconds;
         }
 
-        if ((actions & GAME_ACTION_CAMERA_TURN_UP) != 0) {
+        if (actions & GAME_ACTION_CAMERA_TURN_UP) {
             pitch += turnSpeed * seconds;
 
-            pitch = std::min(pitch, 80.0f);
+            if (pitch >= 80.0f) {
+                pitch = 80.0f;
+            }
         }
 
-        if ((actions & GAME_ACTION_CAMERA_TURN_DOWN) != 0) {
+        if (actions & GAME_ACTION_CAMERA_TURN_DOWN) {
             pitch -= turnSpeed * seconds;
 
-            pitch = std::max(pitch, -80.0f);
+            if (pitch <= -80.0f) {
+                pitch = -80.0f;
+            }
         }
 
         // direction = xe::mat3RotationX(xe::radians(pitch)) * xe::mat3RotationY(xe::radians(yaw)) * xe::Vector3(0.0f, 0.0f, -1.0f);
-        direction = XE::mat3Rotation(XE::radians(pitch), {1.0F, 0.0F, 0.0F}) * XE::mat3RotationY(XE::radians(yaw)) * XE::Vector3(0.0F, 0.0F, -1.0F);
+        direction = XE::mat3Rotation(XE::radians(pitch), {1.0f, 0.0f, 0.0f}) * XE::mat3RotationY(XE::radians(yaw)) * XE::Vector3(0.0f, 0.0f, -1.0f);
         const auto cameraRight = XE::normalize(XE::cross(direction, up));
 
-        if ((actions & GAME_ACTION_CAMERA_MOVE_FORWARD) != 0) {
+        if (actions & GAME_ACTION_CAMERA_MOVE_FORWARD) {
             position += seconds * movementSpeed * direction;
         }
 
-        if ((actions & GAME_ACTION_CAMERA_MOVE_BACKWARD) != 0) {
+        if (actions & GAME_ACTION_CAMERA_MOVE_BACKWARD) {
             position -= seconds * movementSpeed * direction;
         }
 
-        if ((actions & GAME_ACTION_CAMERA_MOVE_RIGHT) != 0) {
+        if (actions & GAME_ACTION_CAMERA_MOVE_RIGHT) {
             position += seconds * movementSpeed * cameraRight;
         }
 
-        if ((actions & GAME_ACTION_CAMERA_MOVE_LEFT) != 0) {
+        if (actions & GAME_ACTION_CAMERA_MOVE_LEFT) {
             position -= seconds * movementSpeed * cameraRight;
         }
 
-        direction.Y = position.Y = 0.25F;
+        direction.Y = position.Y = 0.25f;
 
         lookAt = position + direction;
     }
 
     XE::Matrix4 getViewProj(const int screenWidth, const int screenHeight) const {
         const auto aspectRatio = screenHeight / static_cast<float>(screenWidth);
-        const auto proj = XE::mat4Perspective(XE::radians(60.0F), aspectRatio, 0.0001F, 1000.0F);
+        const auto proj = XE::mat4Perspective(XE::radians(60.0f), aspectRatio, 0.0001f, 1000.0f);
         const auto view = XE::mat4LookAtRH(position, lookAt, up);
 
         std::printf("cameraPos: %0.2f, %0.2f, %0.2f\n", position.X, position.Y, position.Z);
@@ -112,7 +115,7 @@ struct Camera {
 };
 
 struct Transformation {
-    XE::Vector3 scale = {1.0F, 1.0F, 1.0F};
+    XE::Vector3 scale = {1.0f, 1.0f, 1.0f};
     XE::Vector3 position;
     XE::Vector3 rotation;
 
@@ -171,7 +174,7 @@ struct ActionState {
         }
 
         // FIXME: an action map should not become a action handler
-        if ((actions & GAME_ACTION_QUIT) != 0) {
+        if (actions & GAME_ACTION_QUIT) {
             quit = true;
         }
     }
@@ -182,7 +185,7 @@ struct Timer {
 
     //! must be called one per frame
     float getFrameTimeInSeconds() {
-        const auto seconds = static_cast<float>(SDL_GetTicks64() - lastTime) / 1000.0F;
+        const auto seconds = static_cast<float>(SDL_GetTicks64() - lastTime) / 1000.0f;
 
         lastTime = SDL_GetTicks64();
 
@@ -221,8 +224,8 @@ private:
     GLint vertColorLoc = -1;
     GLint vertCoordZLoc = -1;
 
-    float angle = 0.0F;
-    float seconds = 0.0F;
+    float angle = 0.0f;
+    float seconds = 0.0f;
 
     FloorGeometry floor;
     xe::gl::VertexArray triangleVao;

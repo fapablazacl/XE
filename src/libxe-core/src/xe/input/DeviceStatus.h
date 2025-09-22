@@ -1,6 +1,6 @@
 
 #ifndef __XE_INPUT_INPUTSTATE_HPP__
-#define XE_INPUT_INPUTSTATE_HPP_
+#define __XE_INPUT_INPUTSTATE_HPP__
 
 #include <xe/math/Vector.h>
 
@@ -82,7 +82,7 @@ namespace XE {
     public:
         BinaryState getState(KeyCode code) const;
 
-        void setState(KeyCode code, BinaryState state);
+        void setState(const KeyCode code, const BinaryState state);
 
         bool isPressed(const KeyCode code) const {
             return getState(code) == BinaryState::Press;
@@ -104,13 +104,13 @@ namespace XE {
 
         void setPosition(const Vector2i &position);
 
-        BinaryState getState(MouseButton button) const;
+        BinaryState getState(const MouseButton button) const;
 
-        void setState(MouseButton button, BinaryState state);
+        void setState(const MouseButton button, const BinaryState state);
 
     private:
         Vector2i m_position;
-        BinaryState m_buttons[static_cast<int>(MouseButton::Max)]{};
+        BinaryState m_buttons[static_cast<int>(MouseButton::Max)];
     };
 
     enum class ControllerButton { LPad_Left, LPad_Right, LPad_Up, LPad_Down, RPad_Left, RPad_Right, RPad_Up, RPad_Down, L1, R1, L2, R2, Start, Select, Max };
@@ -119,16 +119,16 @@ namespace XE {
 
     class ControllerStatus {
     public:
-        BinaryState getState(ControllerButton button) const;
+        BinaryState getState(const ControllerButton button) const;
 
-        void setState(ControllerButton button, BinaryState state);
+        void setState(const ControllerButton button, const BinaryState state);
 
-        Vector2 getState(ControllerJoystick joystick) const;
+        Vector2 getState(const ControllerJoystick joystick) const;
 
-        void setState(ControllerJoystick joystick, const Vector2 &state);
+        void setState(const ControllerJoystick joystick, const Vector2 &state);
 
     private:
-        BinaryState m_buttons[static_cast<int>(ControllerButton::Max)]{};
+        BinaryState m_buttons[static_cast<int>(ControllerButton::Max)];
         Vector2 m_joysticks[static_cast<int>(ControllerJoystick::Max)];
     };
 } // namespace XE

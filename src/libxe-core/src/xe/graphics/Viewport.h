@@ -1,6 +1,6 @@
 
 #ifndef __XE_GRAPHICS_VIEWPORT_HPP__
-#define XE_GRAPHICS_VIEWPORT_HPP_
+#define __XE_GRAPHICS_VIEWPORT_HPP__
 
 #include <xe/math/Vector.h>
 

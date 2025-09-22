@@ -1,6 +1,6 @@
 
 #ifndef __XE_GRAPHICS_IWINDOW_HPP__
-#define XE_GRAPHICS_IWINDOW_HPP_
+#define __XE_GRAPHICS_IWINDOW_HPP__
 
 #include <string>
 #include <xe/math/Vector.h>

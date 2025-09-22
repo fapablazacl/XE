@@ -2,16 +2,13 @@
 #include "SubsetGL.h"
 #include "BufferGL.h"
 #include "Conversion.h"
-#include "xe/gl/gl.h"
-#include "xe/graphics/Subset.h"
 
 #include <cassert>
-#include <cstddef>
 
 namespace XE {
     SubsetGL::SubsetGL(const SubsetDescriptor &desc) : descriptor(desc) {
         for (std::size_t i = 0; i < desc.buffers.size(); i++) {
-            const auto *bufferGL = dynamic_cast<const BufferGL *>(desc.buffers[i]);
+            auto bufferGL = static_cast<const BufferGL *>(desc.buffers[i]);
             assert(bufferGL);
             buffers.emplace_back(bufferGL);
         }
@@ -37,9 +34,9 @@ namespace XE {
             );
         }
 
-        indexBuffer = dynamic_cast<const BufferGL *>(desc.indexBuffer);
+        indexBuffer = static_cast<const BufferGL *>(desc.indexBuffer);
 
-        if (indexBuffer != nullptr) {
+        if (indexBuffer) {
             glBindBuffer(indexBuffer->getTarget(), indexBuffer->getID());
         }
 
@@ -47,7 +44,7 @@ namespace XE {
     }
 
     SubsetGL::~SubsetGL() {
-        if (id != 0u) {
+        if (id) {
             glDeleteVertexArrays(1, &id);
         }
     }

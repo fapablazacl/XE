@@ -1,6 +1,5 @@
 
 #include "Rect.h"
-#include "xe/math/Boundary.h"
 
 namespace XE {
     template class TBoundary<float, 2>;

@@ -3,7 +3,6 @@
 //
 
 #include "FPSCounter.h"
-#include "xe/Timer.h"
 
 namespace XE {
     bool FPSCounter::frame() {
@@ -13,11 +12,12 @@ namespace XE {
             currentFrames++;
 
             return false;
-        }             fps = currentFrames;
+        } else {
+            fps = currentFrames;
             currentFrames = 0;
             lastTime = XE::Timer::getTick();
 
             return true;
-       
+        }
     }
 } // namespace XE

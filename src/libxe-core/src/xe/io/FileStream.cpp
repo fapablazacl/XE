@@ -1,14 +1,11 @@
 
-#include "xe/io/Stream.h"
-#include <cstdio>
 #include <stdexcept>
-#include <string>
 #include <xe/io/FileStream.h>
 
 namespace XE {
-    FileStream::FileStream(const std::string &fileName, const StreamFlags flags) : m_fileName(fileName), m_flags(flags) {
-        
-        
+    FileStream::FileStream(const std::string &fileName, const StreamFlags flags) {
+        m_fileName = fileName;
+        m_flags = flags;
 
         switch (flags) {
         case StreamFlags::Readable:
@@ -24,7 +21,7 @@ namespace XE {
             break;
         }
 
-        if (m_fileHandle == nullptr) {
+        if (!m_fileHandle) {
             throw std::runtime_error("Couldn't open file \"" + fileName + "\".");
         }
     }

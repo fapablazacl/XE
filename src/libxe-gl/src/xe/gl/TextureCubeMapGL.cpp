@@ -1,12 +1,6 @@
 
 #include "TextureCubeMapGL.h"
 #include "Conversion.h"
-#include "xe/gl/TextureBaseGL.h"
-#include "xe/gl/gl.h"
-#include "xe/math/Rect.h"
-#include "xe/math/Vector.h"
-#include <array>
-#include <cstddef>
 
 namespace XE {
     TextureCubeMapGL::TextureCubeMapGL(
@@ -17,10 +11,10 @@ namespace XE {
         const std::array<TextureCubeMapSide, 6> &sourceDataSides,
         const void **sourceData
     )
-        : TextureBaseGL(GL_TEXTURE_CUBE_MAP), m_format(format), m_size(size) {
+        : TextureBaseGL(GL_TEXTURE_CUBE_MAP) {
 
-        
-        
+        m_size = size;
+        m_format = format;
 
         const GLenum internalFormatGL = convertToGL(m_format);
         const GLenum formatGL = convertToGL(sourceFormat);
@@ -56,7 +50,7 @@ namespace XE {
 
     void TextureCubeMapGL::getData(
         void *surfaceData, const int mipLevel, TextureCubeMapSide cubeMapSide, const DataType surfaceDataType, const PixelFormat surfaceFormat, const Recti &
-     /*area*/) const {
+    ) const {
         const GLenum sideGL = convertToGL(cubeMapSide);
         const GLenum formatGL = convertToGL(surfaceFormat);
         const GLenum dataTypeGL = convertToGL(surfaceDataType);

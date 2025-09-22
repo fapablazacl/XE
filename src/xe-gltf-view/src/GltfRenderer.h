@@ -14,7 +14,7 @@ namespace xe::gltf_view {
         // The Texture Unit which contains the diffuse texture
         GLint diffuseTexture = 0;
 
-        float seconds = 0.0F;
+        float seconds = 0.0f;
 
         [[nodiscard]]
         std::vector<xe::gl::UniformMatrix> mapMatrixUniforms(xe::gl::Program shaderProgram) const;
@@ -38,8 +38,8 @@ namespace xe::gltf_view {
     private:
         std::unique_ptr<xe::gl::RendererGL> renderer;
         ShaderProgramUniformData uniformData;
-        float startSeconds = 0.0F;
-        float angle = 0.0F;
+        float startSeconds = 0.0f;
+        float angle = 0.0f;
         xe::gl::Program program;
         std::vector<GltfMesh> meshes;
     };

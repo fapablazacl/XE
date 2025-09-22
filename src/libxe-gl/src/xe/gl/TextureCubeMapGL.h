@@ -1,6 +1,6 @@
 
 #ifndef __XE_GRAPHICS_GL_TEXTURECUBEMAPGL_HPP__
-#define XE_GRAPHICS_GL_TEXTURECUBEMAPGL_HPP_
+#define __XE_GRAPHICS_GL_TEXTURECUBEMAPGL_HPP__
 
 #include <xe/graphics/TextureCubeMap.h>
 
@@ -11,15 +11,15 @@ namespace XE {
     class TextureCubeMapGL : public TextureCubeMap, public TextureBaseGL {
     public:
         TextureCubeMapGL(
-            PixelFormat format,
+            const PixelFormat format,
             const Vector2i &size,
-            PixelFormat sourceFormat,
-            DataType sourceDataType,
+            const PixelFormat sourceFormat,
+            const DataType sourceDataType,
             const std::array<TextureCubeMapSide, 6> &sourceDataSides,
             const void **sourceData
         );
 
-        ~TextureCubeMapGL() override;
+        virtual ~TextureCubeMapGL();
 
         PixelFormat getFormat() const override {
             return m_format;
@@ -30,11 +30,11 @@ namespace XE {
         }
 
         void setData(
-            const void *surfaceData, int mipLevel, TextureCubeMapSide cubeMap, DataType surfaceDataType, PixelFormat surfaceFormat, const Recti &area
+            const void *surfaceData, const int mipLevel, TextureCubeMapSide cubeMap, const DataType surfaceDataType, const PixelFormat surfaceFormat, const Recti &area
         ) override;
 
         void getData(
-            void *surfaceData, int mipLevel, TextureCubeMapSide cubeMap, DataType surfaceDataType, PixelFormat surfaceFormat, const Recti &area
+            void *surfaceData, const int mipLevel, TextureCubeMapSide cubeMap, const DataType surfaceDataType, const PixelFormat surfaceFormat, const Recti &area
         ) const override;
 
     private:

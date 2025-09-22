@@ -1,6 +1,6 @@
 
 #ifndef __XE_MATH_PLANE_HPP__
-#define XE_MATH_PLANE_HPP_
+#define __XE_MATH_PLANE_HPP__
 
 #include "Vector.h"
 
@@ -93,7 +93,7 @@ namespace XE {
 
             if (det < T(0)) {
                 return PlaneSide::Back;
-            } if (det > T(0)) {
+            } else if (det > T(0)) {
                 return PlaneSide::Front;
             }
 

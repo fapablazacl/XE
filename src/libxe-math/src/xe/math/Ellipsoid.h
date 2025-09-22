@@ -1,6 +1,6 @@
 
 #ifndef __XE_MATH_ELLIPSOID_HPP__
-#define XE_MATH_ELLIPSOID_HPP_
+#define __XE_MATH_ELLIPSOID_HPP__
 
 #include "Vector.h"
 
@@ -25,10 +25,10 @@ namespace XE {
 
     //! Serializes the content of a Box object to an ostream.
     template <typename T> inline std::ostream &operator<<(std::ostream &os, const TEllipsoid<T> &ellipsoid) {
-        os << "xe::Ellipsoid<" << typeid(T).name() << "{ " << '\n';
+        os << "xe::Ellipsoid<" << typeid(T).name() << "{ " << std::endl;
         os << "    " << ellipsoid.center << ", " << std::endl;
         os << "    " << ellipsoid.size << std::endl;
-        os << "}" << '\n';
+        os << "}" << std::endl;
 
         return os;
     }

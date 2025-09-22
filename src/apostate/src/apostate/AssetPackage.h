@@ -6,6 +6,6 @@
 namespace apostate {
     class AssetPackage {
     public:
-        static std::string loadTextFile(const std::string &fileName) ;
+        std::string loadTextFile(const std::string &fileName) const;
     };
 } // namespace apostate

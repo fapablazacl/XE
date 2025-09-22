@@ -1,6 +1,4 @@
 
-#include "xe/math/Vector.h"
-#include <cmath>
 #include <xe/scene/VirtualSphere.h>
 
 namespace XE {
@@ -19,16 +17,16 @@ namespace XE {
         // map position to the [-1, 1]^2 range domain
         const auto position = Vector2{screenPosition};
         const auto size = Vector2{screenSize};
-        const auto sp = (position / (0.5F * size)) - Vector2{1.0F};
+        const auto sp = (position / (0.5f * size)) - Vector2{1.0f};
 
         // compute the corresponding point in the surface of the sphere
         const auto sp_length_squared = norm2(sp);
 
-        if (sp_length_squared > 1.0F) {
-            return normalize(Vector3{sp, 0.0F});
+        if (sp_length_squared > 1.0f) {
+            return normalize(Vector3{sp, 0.0f});
         }
 
-        return {sp, std::sqrt(1.0F - sp_length_squared)};
+        return {sp, std::sqrt(1.0f - sp_length_squared)};
     }
 
     bool VirtualSphere::operator==(const VirtualSphere &rhs) const {

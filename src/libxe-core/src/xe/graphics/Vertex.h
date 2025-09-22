@@ -1,6 +1,6 @@
 
 #ifndef __XE_GRAPHICS_VERTEX_HPP__
-#define XE_GRAPHICS_VERTEX_HPP_
+#define __XE_GRAPHICS_VERTEX_HPP__
 
 #include <xe/math/Vector.h>
 

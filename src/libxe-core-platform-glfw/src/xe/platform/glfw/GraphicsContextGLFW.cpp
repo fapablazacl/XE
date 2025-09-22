@@ -1,8 +1,6 @@
 
 #include "GraphicsContextGLFW.h"
-#include "xe/graphics/GraphicsContext.h"
 
-#include <GLFW/glfw3.h>
 #include <cassert>
 
 namespace XE {

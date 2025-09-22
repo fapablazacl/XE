@@ -1,6 +1,6 @@
 
 #ifndef __XE_IO_MEMORYSTREAM_HPP__
-#define XE_IO_MEMORYSTREAM_HPP_
+#define __XE_IO_MEMORYSTREAM_HPP__
 
 #include <cstddef>
 #include <cstdint>
@@ -10,19 +10,19 @@
 namespace XE {
     class MemoryStream : public Stream {
     public:
-        MemoryStream(std::uint8_t *data, std::size_t size);
+        MemoryStream(std::uint8_t *data, const std::size_t size);
 
-        ~MemoryStream() override;
+        virtual ~MemoryStream();
 
-        int read(void *buffer, int size, int count) override;
+        virtual int read(void *buffer, const int size, const int count) override;
 
-        int write(const void *buffer, int size, int count) override;
+        virtual int write(const void *buffer, const int size, const int count) override;
 
-        bool seek(int offset, StreamOffset position) override;
+        virtual bool seek(const int offset, const StreamOffset position) override;
 
-        int tell() const override;
+        virtual int tell() const override;
 
-        StreamFlags getFlags() const override;
+        virtual StreamFlags getFlags() const override;
 
     private:
         std::uint8_t *m_data = nullptr;

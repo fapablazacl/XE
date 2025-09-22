@@ -1,6 +1,6 @@
 
 #ifndef __XE_GRAPHICS_GL_GLBINDING_H__
-#define XE_GRAPHICS_GL_GLBINDING_H_
+#define __XE_GRAPHICS_GL_GLBINDING_H__
 
 #include <glad/glad.h>
 

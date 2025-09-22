@@ -1,11 +1,11 @@
 
 #ifndef __XE_GRAPHICS_PIXELFORMAT_HPP__
-#define XE_GRAPHICS_PIXELFORMAT_HPP_
+#define __XE_GRAPHICS_PIXELFORMAT_HPP__
 
 #include <tuple>
 
 namespace XE {
-    enum class PixelFormat { MetaFirst = 0, Unknown = MetaFirst, R8G8B8 = 1, R8G8B8A8 = 2, MetaCount = 3 };
+    enum class PixelFormat { MetaFirst, Unknown = MetaFirst, R8G8B8, R8G8B8A8, MetaCount };
 
     inline std::tuple<int, int, int, int> get_color_bit_count(const PixelFormat format) {
         switch (format) {
@@ -33,7 +33,7 @@ namespace XE {
 
     enum class StencilFormat { SUnused, S8 };
 
-    extern int ComputeStorage(PixelFormat format);
+    extern int ComputeStorage(const PixelFormat format);
 
     inline int get_stencil_bit_count(const StencilFormat format) {
         switch (format) {

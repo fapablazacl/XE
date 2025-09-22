@@ -1,6 +1,6 @@
 
 #ifndef __XE_GRAPHICS_GL_SHADERGL_HPP__
-#define XE_GRAPHICS_GL_SHADERGL_HPP_
+#define __XE_GRAPHICS_GL_SHADERGL_HPP__
 
 #include <xe/graphics/Shader.h>
 
@@ -9,13 +9,13 @@
 namespace XE {
     class ShaderGL : public Shader {
     public:
-        ShaderGL(ShaderType type, const std::string &source);
+        ShaderGL(const ShaderType type, const std::string &source);
 
-        ~ShaderGL() override;
+        virtual ~ShaderGL();
 
-        ShaderType getType() const override;
+        virtual ShaderType getType() const override;
 
-        std::string getSource() const override;
+        virtual std::string getSource() const override;
 
         GLuint GetID() const {
             return m_id;

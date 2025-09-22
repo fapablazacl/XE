@@ -175,7 +175,7 @@ inline std::ostream &operator<<(std::ostream &os, cgltf_animation_path_type type
 }
 
 inline std::string evaluate_name(const char *name) {
-    if (name != nullptr) {
+    if (name) {
         return name;
     }
 
@@ -187,19 +187,19 @@ template <typename T> std::string evaluate_ptr(const std::string &msg, const T *
 }
 
 inline std::string evaluate_bool(const cgltf_bool value) {
-    return ((value != 0) ? "true" : "false");
+    return (value ? "true" : "false");
 }
 
 inline std::string sanitizeString(const char *value, const std::string &defaultValue = "<noname>") {
-    return (value != nullptr) ? value : defaultValue;
+    return value ? value : defaultValue;
 }
 
 inline bool toBool(const cgltf_bool value) {
-    return value != 0;
+    return value ? true : false;
 }
 
 template <typename T> bool toBool(const T *value) {
-    return static_cast<bool>(value);
+    return value ? true : false;
 }
 
 template <typename IntegerLike> void *addPointerOffset(void *ptr, IntegerLike offset) {

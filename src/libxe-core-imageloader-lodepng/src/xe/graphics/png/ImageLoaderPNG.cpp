@@ -3,36 +3,31 @@
 
 #include "lodepng.h"
 #include "xe/graphics/Image.h"
-#include "xe/graphics/PixelFormat.h"
 #include "xe/io/Stream.h"
-#include "xe/math/Vector.h"
-#include <cassert>
-#include <cstdint>
 #include <iostream>
-#include <memory>
 #include <vector>
 
 namespace XE {
     class ImagePNG : public Image {
     public:
-        ImagePNG(const void *pointer, const PixelFormat format, const Vector2i size) : pointer(pointer), format(format), size(size) {
-            
-            
-            
+        ImagePNG(const void *pointer, const PixelFormat format, const Vector2i size) {
+            this->pointer = pointer;
+            this->format = format;
+            this->size = size;
         }
 
-        ~ImagePNG() override {
+        virtual ~ImagePNG() {
         }
 
-        const void *getPointer() const override {
+        virtual const void *getPointer() const override {
             return pointer;
         }
 
-        PixelFormat getFormat() const override {
+        virtual PixelFormat getFormat() const override {
             return format;
         }
 
-        Vector2i getSize() const override {
+        virtual Vector2i getSize() const override {
             return size;
         }
 
@@ -51,7 +46,7 @@ namespace XE {
 
         const std::uint32_t bufferLength = 512;
 
-        std::uint32_t readed = 0;
+        std::uint32_t readed;
         std::uint8_t buffer[bufferLength];
 
         std::vector<std::uint8_t> imageBuffer;
@@ -68,12 +63,12 @@ namespace XE {
 
         LodePNGState state = {};
 
-        std::cout << "[INFO] ImageLoaderPNG::load: PNG File has " << imageBuffer.size() << " byte(s)." << '\n';
+        std::cout << "[INFO] ImageLoaderPNG::load: PNG File has " << imageBuffer.size() << " byte(s)." << std::endl;
 
-        unsigned int const error = lodepng_decode(&pixels, &width, &height, &state, imageBuffer.data(), imageBuffer.size());
+        unsigned int error = lodepng_decode(&pixels, &width, &height, &state, imageBuffer.data(), imageBuffer.size());
 
-        if (error != 0u) {
-            std::cout << "ImageLoaderPNG::load: Error at loading texture from Stream (error:" << lodepng_error_text(error) << ")" << '\n';
+        if (error) {
+            std::cout << "ImageLoaderPNG::load: Error at loading texture from Stream (error:" << lodepng_error_text(error) << ")" << std::endl;
             assert(false);
             return {};
         }

@@ -1,18 +1,7 @@
 
 #include "RendererGL.h"
-#include "xe/gl/Types.h"
-#include "xe/gl/span.hpp"
-#include "xe/math/Vector.h"
 
-#include <_abort.h>
-#include <cassert>
-#include <cstddef>
-#include <cstdint>
-#include <cstdio>
 #include <iostream>
-#include <memory>
-#include <optional>
-#include <string>
 
 namespace xe::gl {
     static std::string errorCodeToString(GLenum error) {
@@ -55,13 +44,13 @@ namespace xe::gl {
 #define XE_GL_SCOPED_ERROR_CHECK() GLScopedErrorChecker __gl_error_raii(__FILE__, __LINE__)
 
 #if defined(GLAD_DEBUG)
-    static void pre_call_callback_gl(const char *name, void *funcptr, int len_args, ...) {
+    void pre_call_callback_gl(const char *name, void *funcptr, int len_args, ...) {
         (void)name;
         (void)funcptr;
         (void)len_args;
     }
 
-    static void post_call_callback_gl(const char *name, void *funcptr, int len_args, ...) {
+    void post_call_callback_gl(const char *name, void *funcptr, int len_args, ...) {
         (void)funcptr;
         (void)len_args;
 
@@ -78,9 +67,9 @@ namespace xe::gl {
 
     std::unique_ptr<RendererGL> RendererGL::create(GetProcAddress getProcAddress) {
         const auto loadproc = reinterpret_cast<GLADloadproc>(getProcAddress);
-        const int result = (getProcAddress != nullptr) ? gladLoadGLLoader(loadproc) : gladLoadGL();
+        const int result = getProcAddress ? gladLoadGLLoader(loadproc) : gladLoadGL();
 
-        if (result == 0) {
+        if (!result) {
             std::fprintf(stderr, "GLAD: Couldn't load GL functions. Error code %d \n", result);
             return {};
         }
@@ -101,14 +90,14 @@ namespace xe::gl {
         std::printf("GL_VERSION: %s\n", info.version.c_str());
         std::printf("GL_SHADING_LANGUAGE_VERSION: %s\n", info.shadingLanguageVersion.c_str());
 
-        GLint extensionCount = 0;
+        GLint extensionCount;
         glGetIntegerv(GL_NUM_EXTENSIONS, &extensionCount);
 
         std::printf("Supported extensions %d\n", extensionCount);
 
         for (int i = 0; i < extensionCount; i++) {
-            const auto *const str = glGetStringi(GL_EXTENSIONS, i);
-            const auto *const cstr = reinterpret_cast<const char *>(str);
+            const auto str = glGetStringi(GL_EXTENSIONS, i);
+            const auto cstr = reinterpret_cast<const char *>(str);
 
             std::printf("%s ", cstr);
         }
@@ -164,7 +153,7 @@ namespace xe::gl {
         glXable[1] = glEnable;
     }
 
-    RendererInfo RendererGL::getInfo() {
+    RendererInfo RendererGL::getInfo() const {
         RendererInfo info;
 
         info.vendor = reinterpret_cast<const char *>(glGetString(GL_VENDOR));
@@ -175,7 +164,7 @@ namespace xe::gl {
         return info;
     }
 
-    Shader RendererGL::createShader(const GLenum type, const char *source) {
+    Shader RendererGL::createShader(const GLenum type, const char *source) const {
         XE_GL_SCOPED_ERROR_CHECK();
 
         const auto shaderId = glCreateShader(type);
@@ -185,17 +174,17 @@ namespace xe::gl {
         glCompileShader(shaderId);
 
         // check for errors
-        GLint status = 0;
+        GLint status;
         glGetShaderiv(shaderId, GL_COMPILE_STATUS, &status);
 
         if (status == static_cast<GLint>(GL_FALSE)) {
             constexpr size_t INFO_LOG_BUFFER_SIZE = 4096;
-            std::cerr << "Error while creating shader " << type << ": " << '\n';
+            std::cerr << "Error while creating shader " << type << ": " << std::endl;
 
             char msg[INFO_LOG_BUFFER_SIZE] = {};
             glGetShaderInfoLog(shaderId, INFO_LOG_BUFFER_SIZE, nullptr, msg);
 
-            std::cerr << msg << '\n';
+            std::cerr << msg << std::endl;
 
             return {};
         }
@@ -203,14 +192,14 @@ namespace xe::gl {
         return {shaderId};
     }
 
-    Program RendererGL::createProgram(const tcb::span<Shader> &shaders) {
+    Program RendererGL::createProgram(const tcb::span<Shader> &shaders) const {
         XE_GL_SCOPED_ERROR_CHECK();
 
         const auto programId = glCreateProgram();
 
         for (const auto &shader : shaders) {
             if (shader.id == 0) {
-                std::cerr << "Empty shader was supplied" << '\n';
+                std::cerr << "Empty shader was supplied" << std::endl;
 
                 glDeleteProgram(programId);
                 return {};
@@ -221,16 +210,16 @@ namespace xe::gl {
 
         glLinkProgram(programId);
 
-        GLint status = 0;
+        GLint status;
         glGetProgramiv(programId, GL_LINK_STATUS, &status);
 
         if (status == static_cast<GLint>(GL_FALSE)) {
             constexpr size_t INFO_LOG_BUFFER_SIZE = 4096;
 
-            std::cerr << "Shader linker error: " << '\n';
+            std::cerr << "Shader linker error: " << std::endl;
             char msg[INFO_LOG_BUFFER_SIZE] = {};
             glGetProgramInfoLog(programId, INFO_LOG_BUFFER_SIZE, nullptr, msg);
-            std::cerr << msg << '\n';
+            std::cerr << msg << std::endl;
 
             glDeleteProgram(programId);
 
@@ -240,7 +229,7 @@ namespace xe::gl {
         return Program{programId};
     }
 
-    Buffer RendererGL::createBuffer(const GLenum target, const GLenum usage, const MemoryRegion &memory) {
+    Buffer RendererGL::createBuffer(const GLenum target, const GLenum usage, const MemoryRegion &memory) const {
         XE_GL_SCOPED_ERROR_CHECK();
 
         GLuint bufferId = 0;
@@ -253,7 +242,7 @@ namespace xe::gl {
         return {bufferId, target};
     }
 
-    VertexArray RendererGL::createVertexArray(const tcb::span<const Attribute> &attributes, Buffer elementArrayBuffer) {
+    VertexArray RendererGL::createVertexArray(const tcb::span<const Attribute> &attributes, Buffer elementArrayBuffer) const {
         XE_GL_SCOPED_ERROR_CHECK();
 
         VertexArray vao;
@@ -287,14 +276,14 @@ namespace xe::gl {
                     break;
                 }
 
-                const auto *const ptr = reinterpret_cast<const void *>(static_cast<long long>(attr.offset));
+                const auto ptr = reinterpret_cast<const void *>(static_cast<long long>(attr.offset));
                 glVertexAttribPointer(attr.index, static_cast<GLint>(attr.size) + 1, type, attr.normalized, attr.stride, ptr);
             } else {
                 glDisableVertexAttribArray(attr.index);
             }
         }
 
-        if (elementArrayBuffer.id != 0u) {
+        if (elementArrayBuffer.id) {
             assert(elementArrayBuffer.target == GL_ELEMENT_ARRAY_BUFFER);
             glBindBuffer(elementArrayBuffer.target, elementArrayBuffer.id);
         }
@@ -316,7 +305,7 @@ namespace xe::gl {
         }
     }
 
-    void RendererGL::draw(VertexArray vertexArray, GLenum primitiveType, const VertexArrayMultiDraw &multiDraw) {
+    void RendererGL::draw(VertexArray vertexArray, GLenum primitiveType, const VertexArrayMultiDraw &multiDraw) const {
         XE_GL_SCOPED_ERROR_CHECK();
 
         glBindVertexArray(vertexArray.id);
@@ -329,7 +318,7 @@ namespace xe::gl {
         glBindVertexArray(vertexArray.id);
 
         for (const auto &primitive : primitives) {
-            const auto *const indices = reinterpret_cast<const void *>(static_cast<long long>(primitive.start));
+            const auto indices = reinterpret_cast<const void *>(static_cast<long long>(primitive.start));
 
             bindRenderState(primitive.attribs);
 
@@ -410,7 +399,7 @@ namespace xe::gl {
 
         glTexImage1D(target, 0, static_cast<GLint>(internalFormat), image.size, 0, image.format, image.type, image.pixels);
 
-        if ((options.flags & GenerateMipMaps) != 0) {
+        if (options.flags & GenerateMipMaps) {
             glGenerateMipmap(target);
         }
 
@@ -431,7 +420,7 @@ namespace xe::gl {
 
         glTexImage2D(target, 0, internalFormat, image.size.X, image.size.Y, 0, image.format, image.type, image.pixels);
 
-        if ((options.flags & GenerateMipMaps) != 0) {
+        if (options.flags & GenerateMipMaps) {
             glGenerateMipmap(target);
         }
 
@@ -452,7 +441,7 @@ namespace xe::gl {
 
         glTexImage3D(target, 0, internalFormat, image.size.X, image.size.Y, image.size.Z, 0, image.format, image.type, image.pixels);
 
-        if ((options.flags & GenerateMipMaps) != 0) {
+        if (options.flags & GenerateMipMaps) {
             glGenerateMipmap(target);
         }
 
@@ -463,7 +452,7 @@ namespace xe::gl {
         return {textureId, target};
     }
 
-    void RendererGL::bindRenderState(GLenum textureTarget, const tcb::span<const TextureParameter> &parameters) {
+    void RendererGL::bindRenderState(GLenum textureTarget, const tcb::span<const TextureParameter> &parameters) const {
         XE_GL_SCOPED_ERROR_CHECK();
 
         for (const auto &parameter : parameters) {
@@ -492,7 +481,7 @@ namespace xe::gl {
         }
     }
 
-    void RendererGL::clear(const GLenum flags, std::optional<XE::Vector4> color, std::optional<float> depth, std::optional<int> stencil) {
+    void RendererGL::clear(const GLenum flags, std::optional<XE::Vector4> color, std::optional<float> depth, std::optional<int> stencil) const {
         if (color.has_value()) {
             glClearColor(color->X, color->Y, color->Z, color->W);
         }
@@ -510,19 +499,19 @@ namespace xe::gl {
         XE_GL_SCOPED_ERROR_CHECK();
     }
 
-    void RendererGL::flush() {
+    void RendererGL::flush() const {
         XE_GL_SCOPED_ERROR_CHECK();
 
         glFlush();
     }
 
-    void RendererGL::viewport(const XE::Vector2i &pos, const XE::Vector2i &size) {
+    void RendererGL::viewport(const XE::Vector2i &pos, const XE::Vector2i &size) const {
         XE_GL_SCOPED_ERROR_CHECK();
 
         glViewport(pos.X, pos.Y, size.X, size.Y);
     }
 
-    void RendererGL::useProgram(const Program &program) {
+    void RendererGL::useProgram(const Program &program) const {
         XE_GL_SCOPED_ERROR_CHECK();
 
         glUseProgram(program.id);

@@ -1,20 +1,9 @@
 
 #include "Util.h"
 #include "Common.h"
-#include "xe/DataType.h"
-#include "xe/graphics/BufferDescriptor.h"
-#include "xe/graphics/GraphicsDevice.h"
-#include "xe/graphics/Program.h"
-#include "xe/graphics/Shader.h"
-#include "xe/graphics/Subset.h"
-#include "xe/math/Vector.h"
 
-#include <cassert>
 #include <cstddef>
-#include <cstdint>
 #include <fstream>
-#include <string>
-#include <vector>
 
 namespace demo {
     XE::ProgramDescriptor makeSimpleProgramDesc(const std::string &vs, const std::string &fs) {
@@ -31,17 +20,17 @@ namespace demo {
     Mesh makeIndexedCubeMesh(const float width, const float height, const float depth) {
         Mesh mesh;
 
-        const XE::Vector3 n = {0.0F, 0.0F, 1.0};
+        const XE::Vector3 n = {0.0f, 0.0f, 1.0};
 
         const std::vector<Vertex> vertices = {
-            {{-0.5F * width, -0.5F * height, 0.5F * depth}, n, {1.0F, 0.0F, 0.0F, 1.0F}},
-            {{0.5F * width, -0.5F * height, 0.5F * depth}, n, {0.0F, 1.0F, 0.0F, 1.0F}},
-            {{-0.5F * width, 0.5F * height, 0.5F * depth}, n, {0.0F, 0.0F, 1.0F, 1.0F}},
-            {{0.5F * width, 0.5F * height, 0.5F * depth}, n, {1.0F, 1.0F, 0.0F, 1.0F}},
-            {{-0.5F * width, -0.5F * height, -0.5F * depth}, n, {0.0F, 1.0F, 1.0F, 1.0F}},
-            {{0.5F * width, -0.5F * height, -0.5F * depth}, n, {1.0F, 0.0F, 1.0F, 1.0F}},
-            {{-0.5F * width, 0.5F * height, -0.5F * depth}, n, {0.0F, 0.0F, 0.0F, 1.0F}},
-            {{0.5F * width, 0.5F * height, -0.5F * depth}, n, {1.0F, 1.0F, 1.0F, 1.0F}}
+            {{-0.5f * width, -0.5f * height, 0.5f * depth}, n, {1.0f, 0.0f, 0.0f, 1.0f}},
+            {{0.5f * width, -0.5f * height, 0.5f * depth}, n, {0.0f, 1.0f, 0.0f, 1.0f}},
+            {{-0.5f * width, 0.5f * height, 0.5f * depth}, n, {0.0f, 0.0f, 1.0f, 1.0f}},
+            {{0.5f * width, 0.5f * height, 0.5f * depth}, n, {1.0f, 1.0f, 0.0f, 1.0f}},
+            {{-0.5f * width, -0.5f * height, -0.5f * depth}, n, {0.0f, 1.0f, 1.0f, 1.0f}},
+            {{0.5f * width, -0.5f * height, -0.5f * depth}, n, {1.0f, 0.0f, 1.0f, 1.0f}},
+            {{-0.5f * width, 0.5f * height, -0.5f * depth}, n, {0.0f, 0.0f, 0.0f, 1.0f}},
+            {{0.5f * width, 0.5f * height, -0.5f * depth}, n, {1.0f, 1.0f, 1.0f, 1.0f}}
         };
 
         mesh.primitive = XE::PrimitiveType::TriangleList;
@@ -52,9 +41,7 @@ namespace demo {
         bool order = true;
 
         for (std::size_t i = 0; i < indices.size() - 2; i++) {
-            Vertex p1;
-            Vertex p2;
-            Vertex p3;
+            Vertex p1, p2, p3;
 
             if (order) {
                 p1 = vertices[indices[i + 0]];
@@ -85,15 +72,15 @@ namespace demo {
     }
 
     Mesh makeAxisMesh(const float width, const float height, const float depth) {
-        const XE::Vector3 n = {0.0F, 1.0F, 0.0};
+        const XE::Vector3 n = {0.0f, 1.0f, 0.0};
 
         Mesh mesh;
 
         mesh.vertices = {
-            {{0.0F, 0.0F, 0.0F}, n, {0.5F, 0.5F, 0.5F, 1.0F}},
-            {{width, 0.0F, 0.0F}, n, {1.0F, 0.5F, 0.5F, 1.0F}},
-            {{0.0F, height, 0.0F}, n, {0.5F, 1.0F, 0.5F, 1.0F}},
-            {{0.0F, 0.0F, depth}, n, {0.5F, 0.0F, 1.0F, 1.0F}}
+            {{0.0f, 0.0f, 0.0f}, n, {0.5f, 0.5f, 0.5f, 1.0f}},
+            {{width, 0.0f, 0.0f}, n, {1.0f, 0.5f, 0.5f, 1.0f}},
+            {{0.0f, height, 0.0f}, n, {0.5f, 1.0f, 0.5f, 1.0f}},
+            {{0.0f, 0.0f, depth}, n, {0.5f, 0.0f, 1.0f, 1.0f}}
         };
         mesh.primitive = XE::PrimitiveType::LineList;
         mesh.indices = {0, 1, 0, 2, 0, 3};
@@ -102,19 +89,19 @@ namespace demo {
     }
 
     Mesh makeColoredCubeMesh(const float width, const float height, const float depth) {
-        const XE::Vector3 n = {0.0F, 0.0F, 1.0};
+        const XE::Vector3 n = {0.0f, 0.0f, 1.0};
 
         Mesh mesh;
 
         const std::vector<Vertex> vertices = {
-            {{-0.5F * width, -0.5F * height, 0.5F * depth}, n, {1.0F, 0.0F, 1.0F, 1.0F}},
-            {{0.5F * width, -0.5F * height, 0.5F * depth}, n, {1.0F, 0.0F, 1.0F, 1.0F}},
-            {{-0.5F * width, 0.5F * height, 0.5F * depth}, n, {0.0F, 1.0F, 1.0F, 1.0F}},
-            {{0.5F * width, 0.5F * height, 0.5F * depth}, n, {0.0F, 1.0F, 1.0F, 1.0F}},
-            {{-0.5F * width, -0.5F * height, -0.5F * depth}, n, {1.0F, 0.0F, 0.0F, 1.0F}},
-            {{0.5F * width, -0.5F * height, -0.5F * depth}, n, {1.0F, 0.0F, 0.0F, 1.0F}},
-            {{-0.5F * width, 0.5F * height, -0.5F * depth}, n, {1.0F, 1.0F, 0.0F, 1.0F}},
-            {{0.5F * width, 0.5F * height, -0.5F * depth}, n, {0.0F, 1.0F, 0.0F, 1.0F}}
+            {{-0.5f * width, -0.5f * height, 0.5f * depth}, n, {1.0f, 0.0f, 1.0f, 1.0f}},
+            {{0.5f * width, -0.5f * height, 0.5f * depth}, n, {1.0f, 0.0f, 1.0f, 1.0f}},
+            {{-0.5f * width, 0.5f * height, 0.5f * depth}, n, {0.0f, 1.0f, 1.0f, 1.0f}},
+            {{0.5f * width, 0.5f * height, 0.5f * depth}, n, {0.0f, 1.0f, 1.0f, 1.0f}},
+            {{-0.5f * width, -0.5f * height, -0.5f * depth}, n, {1.0f, 0.0f, 0.0f, 1.0f}},
+            {{0.5f * width, -0.5f * height, -0.5f * depth}, n, {1.0f, 0.0f, 0.0f, 1.0f}},
+            {{-0.5f * width, 0.5f * height, -0.5f * depth}, n, {1.0f, 1.0f, 0.0f, 1.0f}},
+            {{0.5f * width, 0.5f * height, -0.5f * depth}, n, {0.0f, 1.0f, 0.0f, 1.0f}}
         };
 
         mesh.primitive = XE::PrimitiveType::TriangleList;
@@ -125,9 +112,7 @@ namespace demo {
         bool order = true;
 
         for (std::size_t i = 0; i < indices.size() - 2; i++) {
-            Vertex p1;
-            Vertex p2;
-            Vertex p3;
+            Vertex p1, p2, p3;
 
             if (order) {
                 p1 = vertices[indices[i + 0]];
@@ -158,19 +143,19 @@ namespace demo {
     }
 
     Mesh makeCubeMesh(const float width, const float height, const float depth) {
-        const XE::Vector3 n = {0.0F, 1.0F, 0.0};
+        const XE::Vector3 n = {0.0f, 1.0f, 0.0};
 
         Mesh mesh;
 
         const std::vector<Vertex> vertices = {
-            {{-0.5F * width, -0.5F * height, 0.5F * depth}, n, {1.0F, 1.0F, 1.0F, 1.0F}},
-            {{0.5F * width, -0.5F * height, 0.5F * depth}, n, {1.0F, 1.0F, 1.0F, 1.0F}},
-            {{-0.5F * width, 0.5F * height, 0.5F * depth}, n, {1.0F, 1.0F, 1.0F, 1.0F}},
-            {{0.5F * width, 0.5F * height, 0.5F * depth}, n, {1.0F, 1.0F, 1.0F, 1.0F}},
-            {{-0.5F * width, -0.5F * height, -0.5F * depth}, n, {1.0F, 1.0F, 1.0F, 1.0F}},
-            {{0.5F * width, -0.5F * height, -0.5F * depth}, n, {1.0F, 1.0F, 1.0F, 1.0F}},
-            {{-0.5F * width, 0.5F * height, -0.5F * depth}, n, {1.0F, 1.0F, 1.0F, 1.0F}},
-            {{0.5F * width, 0.5F * height, -0.5F * depth}, n, {1.0F, 1.0F, 1.0F, 1.0F}}
+            {{-0.5f * width, -0.5f * height, 0.5f * depth}, n, {1.0f, 1.0f, 1.0f, 1.0f}},
+            {{0.5f * width, -0.5f * height, 0.5f * depth}, n, {1.0f, 1.0f, 1.0f, 1.0f}},
+            {{-0.5f * width, 0.5f * height, 0.5f * depth}, n, {1.0f, 1.0f, 1.0f, 1.0f}},
+            {{0.5f * width, 0.5f * height, 0.5f * depth}, n, {1.0f, 1.0f, 1.0f, 1.0f}},
+            {{-0.5f * width, -0.5f * height, -0.5f * depth}, n, {1.0f, 1.0f, 1.0f, 1.0f}},
+            {{0.5f * width, -0.5f * height, -0.5f * depth}, n, {1.0f, 1.0f, 1.0f, 1.0f}},
+            {{-0.5f * width, 0.5f * height, -0.5f * depth}, n, {1.0f, 1.0f, 1.0f, 1.0f}},
+            {{0.5f * width, 0.5f * height, -0.5f * depth}, n, {1.0f, 1.0f, 1.0f, 1.0f}}
         };
 
         mesh.primitive = XE::PrimitiveType::TriangleList;
@@ -181,9 +166,7 @@ namespace demo {
         bool order = true;
 
         for (std::size_t i = 0; i < indices.size() - 2; i++) {
-            Vertex p1;
-            Vertex p2;
-            Vertex p3;
+            Vertex p1, p2, p3;
 
             if (order) {
                 p1 = vertices[indices[i + 0]];
@@ -214,7 +197,7 @@ namespace demo {
     }
 
     std::string loadTextFile(const std::string &filePath) {
-        assert(!filePath.empty());
+        assert(filePath != "");
 
         std::fstream fs;
         fs.open(filePath.c_str());
@@ -244,7 +227,7 @@ namespace demo {
 
         XE::Buffer *indexBuffer = nullptr;
 
-        if (!mesh.indices.empty()) {
+        if (mesh.indices.size() > 0) {
             const XE::BufferDescriptor indexBufferDesc{
                 XE::BufferType::Index,
                 XE::BufferUsage::Read,
@@ -262,7 +245,7 @@ namespace demo {
             {2, XE::DataType::Float32, 4, false, sizeof(Vertex), 0, OFFSETOF(Vertex, color)}
         };
 
-        XE::SubsetDescriptor const subsetDesc{{vertexBuffer}, attribs, indexBuffer};
+        XE::SubsetDescriptor subsetDesc{{vertexBuffer}, attribs, indexBuffer};
         XE::Subset *subset = graphicsDevice->createSubset(subsetDesc);
 
         return subset;
@@ -285,7 +268,7 @@ namespace demo {
             {2, XE::DataType::Float32, 4, false, sizeof(Vertex), 0, OFFSETOF(Vertex, color)}
         };
 
-        XE::SubsetDescriptor const subsetDesc{{vertexBuffer}, attribs, nullptr};
+        XE::SubsetDescriptor subsetDesc{{vertexBuffer}, attribs, nullptr};
 
         XE::Subset *subset = graphicsDevice->createSubset(subsetDesc);
 
@@ -293,17 +276,17 @@ namespace demo {
     }
 
     Mesh makeGridMesh(const float tileSize, const int tilesInX, const int tilesInZ) {
-        const float half = tileSize * 0.5F;
+        const float half = tileSize * 0.5f;
 
-        const XE::Vector3 normal = {0.0F, 0.0F, 1.0};
+        const XE::Vector3 normal = {0.0f, 0.0f, 1.0};
 
-        const XE::Vector4 white = {0.8F, 0.8F, 0.8F, 1.0F};
-        const XE::Vector4 black = {0.2F, 0.2F, 0.2F, 1.0F};
+        const XE::Vector4 white = {0.8f, 0.8f, 0.8f, 1.0f};
+        const XE::Vector4 black = {0.2f, 0.2f, 0.2f, 1.0f};
 
-        const XE::Vector3 p1 = {-half, 0.0F, -half};
-        const XE::Vector3 p2 = {half, 0.0F, -half};
-        const XE::Vector3 p3 = {-half, 0.0F, half};
-        const XE::Vector3 p4 = {half, 0.0F, half};
+        const XE::Vector3 p1 = {-half, 0.0f, -half};
+        const XE::Vector3 p2 = {half, 0.0f, -half};
+        const XE::Vector3 p3 = {-half, 0.0f, half};
+        const XE::Vector3 p4 = {half, 0.0f, half};
 
         Mesh mesh;
 
@@ -311,7 +294,7 @@ namespace demo {
 
         for (int i = 0; i < tilesInX; i++) {
             for (int k = 0; k < tilesInZ; k++) {
-                const XE::Vector3 centroid = {(i * tileSize) - (half * tilesInX), 0.0F, (k * tileSize) - (half * tilesInZ)};
+                const XE::Vector3 centroid = {i * tileSize - half * tilesInX, 0.0f, k * tileSize - half * tilesInZ};
 
                 const auto color = colorSide ? white : black;
 

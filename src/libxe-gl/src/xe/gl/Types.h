@@ -52,9 +52,9 @@ namespace xe::gl {
 
         Buffer() = default;
 
-        Buffer(GLuint id, GLenum target) : target(target) {
+        Buffer(GLuint id, GLenum target) {
             this->id = id;
-            
+            this->target = target;
         }
     };
 
@@ -63,9 +63,9 @@ namespace xe::gl {
 
         Texture() = default;
 
-        Texture(GLuint id, GLenum target) : target(target) {
+        Texture(GLuint id, GLenum target) {
             this->id = id;
-            
+            this->target = target;
         }
     };
 

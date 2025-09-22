@@ -19,11 +19,11 @@ namespace XE {
             StencilFormat stencilBufferFormat = StencilFormat::SUnused;
         };
 
-    
+    public:
         using ProcAddressGL = void (*)();
         using GetProcAddressGL = ProcAddressGL (*)(const char *);
 
-    
+    public:
         virtual ~GraphicsContext() {
         }
 

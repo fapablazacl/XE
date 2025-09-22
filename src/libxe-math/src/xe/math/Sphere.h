@@ -1,6 +1,6 @@
 
 #ifndef __XE_MATH_SPHERE_HPP__
-#define XE_MATH_SPHERE_HPP_
+#define __XE_MATH_SPHERE_HPP__
 
 #include "Vector.h"
 
@@ -58,11 +58,11 @@ namespace XE {
         const T B = T(2) * dot(d, r0_sub_c);
         const T C = r0_c_2 - r_2;
 
-        const T disc = (B * B) - (T(4) * C);
+        const T disc = B * B - T(4) * C;
 
         if (disc == T(0)) {
             return -B / T(2);
-        } if (disc > T(0)) {
+        } else if (disc > T(0)) {
             T rootDisc = std::sqrt(disc);
 
             T t1 = (-B - rootDisc) / T(2);

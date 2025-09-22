@@ -172,7 +172,7 @@ namespace xe::gl {
         AttributeType type = AttributeType::Float;
         GLboolean normalized = GL_FALSE;
         GLsizei stride = 0;
-        Buffer buffer;
+        Buffer buffer = {};
         GLuint offset = 0;
         const void *data = nullptr;
     };
@@ -184,15 +184,15 @@ namespace xe::gl {
         //! attributes to set prior making the rendering call
         tcb::span<Attribute> attribs;
 
-        VertexArrayPrimitive(GLint start, GLsizei count) : start(start), count(count) {
-            
-            
+        VertexArrayPrimitive(GLint start, GLsizei count) {
+            this->start = start;
+            this->count = count;
         }
 
-        VertexArrayPrimitive(GLint start, GLsizei count, const tcb::span<Attribute> &attribs) : start(start), attribs(attribs), count(count) {
-            
-            
-            
+        VertexArrayPrimitive(GLint start, GLsizei count, const tcb::span<Attribute> &attribs) {
+            this->start = start;
+            this->count = count;
+            this->attribs = attribs;
         }
     };
 
@@ -208,7 +208,7 @@ namespace xe::gl {
     };
 
     struct TextureLayer {
-        Texture texture;
+        Texture texture = {};
         tcb::span<TextureParameter> parameters;
     };
 
@@ -277,19 +277,19 @@ namespace xe::gl {
 
     public:
         [[nodiscard]]
-        static Shader createShader(GLenum type, const char *source) ;
+        Shader createShader(GLenum type, const char *source) const;
 
         [[nodiscard]]
-        static Program createProgram(const tcb::span<Shader> &shaders) ;
+        Program createProgram(const tcb::span<Shader> &shaders) const;
 
         [[nodiscard]]
-        static Buffer createBuffer(GLenum target, GLenum usage, const MemoryRegion &memory) ;
+        Buffer createBuffer(GLenum target, GLenum usage, const MemoryRegion &memory) const;
 
         [[nodiscard]]
-        static VertexArray createVertexArray(const tcb::span<const Attribute> &attributes, Buffer elementArrayBuffer) ;
+        VertexArray createVertexArray(const tcb::span<const Attribute> &attributes, Buffer elementArrayBuffer) const;
 
         [[nodiscard]]
-        static RendererInfo getInfo() ;
+        RendererInfo getInfo() const;
 
         [[nodiscard]]
         Texture createTexture(GLenum target, GLenum internalFormat, const ClientTextureImage1D &image, const CreateTextureOptions &options = {}) const;
@@ -304,7 +304,7 @@ namespace xe::gl {
 
         void bindRenderState(const tcb::span<const TextureLayer> &layers) const;
 
-        static void bindRenderState(GLenum textureTarget, const tcb::span<const TextureParameter> &parameters) ;
+        void bindRenderState(GLenum textureTarget, const tcb::span<const TextureParameter> &parameters) const;
 
         void bindRenderState(const tcb::span<const Attribute> &attribs) const;
 
@@ -312,20 +312,20 @@ namespace xe::gl {
 
         void bindRenderState(const tcb::span<const UniformMatrix> &uniforms) const;
 
-        static void draw(VertexArray vertexArray, GLenum primitiveType, const VertexArrayMultiDraw &multiDraw) ;
+        void draw(VertexArray vertexArray, GLenum primitiveType, const VertexArrayMultiDraw &multiDraw) const;
 
         void draw(VertexArray vertexArray, GLenum primitiveType, const tcb::span<const VertexArrayPrimitive> &primitives) const;
 
         // Draws an indexed geometry
         void draw(VertexArray vertexArray, GLenum primitiveType, const tcb::span<const VertexArrayPrimitive> &primitives, GLenum dataType) const;
 
-        static void clear(GLenum flags, std::optional<XE::Vector4> color, std::optional<float> depth, std::optional<int> stencil) ;
+        void clear(const GLenum flags, std::optional<XE::Vector4> color, std::optional<float> depth, std::optional<int> stencil) const;
 
-        static void flush() ;
+        void flush() const;
 
-        static void viewport(const XE::Vector2i &pos, const XE::Vector2i &size) ;
+        void viewport(const XE::Vector2i &pos, const XE::Vector2i &size) const;
 
-        static void useProgram(const Program &program) ;
+        void useProgram(const Program &program) const;
 
     private:
         using PFNGLVERTEXATTRIBMXFVPROC = void (*)(GLuint index, const GLfloat *v);
@@ -340,16 +340,16 @@ namespace xe::gl {
 
         using PFNGLXABLEPROC = void (*)(GLenum pname);
 
-        PFNGLVERTEXATTRIBMXFVPROC glVertexAttribXfv[4]{};
-        PFNGLVERTEXATTRIBMXIVPROC glVertexAttribXiv[4]{};
+        PFNGLVERTEXATTRIBMXFVPROC glVertexAttribXfv[4];
+        PFNGLVERTEXATTRIBMXIVPROC glVertexAttribXiv[4];
 
-        PFNGLUNIFORMXFVPROC glUniformXfv[4]{};
-        PFNGLUNIFORMXIVPROC glUniformXiv[4]{};
-        PFNGLUNIFORMXUIVPROC glUniformXuiv[4]{};
+        PFNGLUNIFORMXFVPROC glUniformXfv[4];
+        PFNGLUNIFORMXIVPROC glUniformXiv[4];
+        PFNGLUNIFORMXUIVPROC glUniformXuiv[4];
 
-        PFNGLUNIFORMMATRIXXFVPROC glUniformMatrixXfv[9]{};
-        PFNGLUNIFORMMATRIXXDVPROC glUniformMatrixXdv[9]{};
+        PFNGLUNIFORMMATRIXXFVPROC glUniformMatrixXfv[9];
+        PFNGLUNIFORMMATRIXXDVPROC glUniformMatrixXdv[9];
 
-        PFNGLXABLEPROC glXable[2]{};
+        PFNGLXABLEPROC glXable[2];
     };
 } // namespace xe::gl

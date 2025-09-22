@@ -28,9 +28,9 @@ public:
 
     virtual std::unique_ptr<Image> loadImage(const std::string &file) const = 0;
 
-    virtual std::unique_ptr<Image> loadImage(const void *data, size_t size, const std::string &compressionFormat) const = 0;
+    virtual std::unique_ptr<Image> loadImage(const void *data, const size_t size, const std::string &compressionFormat) const = 0;
 
-    virtual std::unique_ptr<Image> loadImage(const void *data, size_t size, const ImageFormat &format) const = 0;
+    virtual std::unique_ptr<Image> loadImage(const void *data, const size_t size, const ImageFormat &format) const = 0;
 };
 
 std::unique_ptr<ImageLoader> createImageLoader();

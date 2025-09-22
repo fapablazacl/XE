@@ -1,17 +1,12 @@
 #include "ImageLoaderIL.h"
 
-#include "xe/Image.h"
-#include "xe/ImageLoader.h"
 #include "xe/Logger.h"
 #include <cassert>
-#include <cstddef>
 #include <filesystem>
 #include <map>
 
 #include <IL/il.h>
 #include <IL/ilu.h>
-#include <memory>
-#include <string>
 
 class ImageIL : public Image {
 public:
@@ -41,7 +36,7 @@ private:
     int mBpp = 0;
 };
 
-static inline std::string str(ILenum t) {
+inline std::string str(ILenum t) {
     switch (t) {
     case IL_PNG:
         return "IL_PNG";
@@ -63,9 +58,8 @@ static std::map<std::string, ILenum> typeILMap = {
 
 static ILenum mapType(const std::string &ext) {
     auto it = typeILMap.find(ext);
-    if (it == typeILMap.end()) {
+    if (it == typeILMap.end())
         return 0;
-}
     return it->second;
 }
 
@@ -87,7 +81,7 @@ static void logDevILErrors(const char *ctx) {
 }
 
 static std::unique_ptr<Image> createImageFromBoundIL(ILuint id) {
-    if (ilConvertImage(IL_RGB, IL_UNSIGNED_BYTE) == 0u) {
+    if (!ilConvertImage(IL_RGB, IL_UNSIGNED_BYTE)) {
         logDevILErrors("ilConvertImage");
         ilDeleteImages(1, &id);
         return {};
@@ -96,7 +90,7 @@ static std::unique_ptr<Image> createImageFromBoundIL(ILuint id) {
     const int width = ilGetInteger(IL_IMAGE_WIDTH);
     const int height = ilGetInteger(IL_IMAGE_HEIGHT);
     const int bppChannels = ilGetInteger(IL_IMAGE_CHANNELS);
-    int const bpp = bppChannels * 8; // bits
+    int bpp = bppChannels * 8; // bits
     return std::make_unique<ImageIL>(id, width, height, bpp);
 }
 
@@ -111,10 +105,9 @@ static std::unique_ptr<Image> createImage(const void *data, size_t size, ILenum 
     if (imageType != 0) {
         ok = (ilLoadL(imageType, (const ILubyte *)data, (ILuint)size) == IL_TRUE);
     } else {
-        ILenum const detected = ilDetermineTypeL((const ILubyte *)data, (ILuint)size);
-        if (detected != IL_TYPE_UNKNOWN) {
+        ILenum detected = ilDetermineTypeL((const ILubyte *)data, (ILuint)size);
+        if (detected != IL_TYPE_UNKNOWN)
             ok = (ilLoadL(detected, (const ILubyte *)data, (ILuint)size) == IL_TRUE);
-}
     }
 
     if (!ok) {
@@ -139,7 +132,7 @@ ImageLoaderIL::~ImageLoaderIL() {
 }
 
 std::unique_ptr<Image> ImageLoaderIL::loadImage(const std::string &file) const {
-    std::filesystem::path const path{file};
+    std::filesystem::path path{file};
     if (!std::filesystem::exists(path)) {
         XE_LOG_WARNING("Bitmap file {} doesn't exist.\n", file);
         return {};
@@ -149,7 +142,7 @@ std::unique_ptr<Image> ImageLoaderIL::loadImage(const std::string &file) const {
     ilGenImages(1, &id);
     ilBindImage(id);
 
-    if (ilLoadImage(file.c_str()) == 0u) {
+    if (!ilLoadImage(file.c_str())) {
         logDevILErrors("ilLoadImage");
         ilDeleteImages(1, &id);
         return {};
@@ -159,11 +152,11 @@ std::unique_ptr<Image> ImageLoaderIL::loadImage(const std::string &file) const {
 }
 
 std::unique_ptr<Image> ImageLoaderIL::loadImage(const void *data, size_t size, const std::string &compressionFormat) const {
-    ILenum const t = mapType(compressionFormat);
+    ILenum t = mapType(compressionFormat);
     return createImage(data, size, t);
 }
 
 std::unique_ptr<Image> ImageLoaderIL::loadImage(const void *data, size_t size, const ImageFormat &format) const {
-    ILenum const t = mapType(format);
+    ILenum t = mapType(format);
     return createImage(data, size, t);
 }

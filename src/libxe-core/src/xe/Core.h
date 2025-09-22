@@ -1,6 +1,6 @@
 
 #ifndef __XE_CORE_HPP__
-#define XE_CORE_HPP_
+#define __XE_CORE_HPP__
 
 #include <xe/Predef.h>
 
@@ -14,7 +14,7 @@ namespace XE {
      */
     class XE_API Core {
     public:
-        static Version GetVersion() ;
+        Version GetVersion() const;
     };
 } // namespace XE
 

@@ -1,9 +1,6 @@
 
 #include "InputManagerGLFW.h"
-#include "xe/input/DeviceStatus.h"
 
-#include <GLFW/glfw3.h>
-#include <cassert>
 #include <map>
 
 namespace XE {
@@ -153,7 +150,7 @@ namespace XE {
     }
 
     void InputManagerGLFW::fillKeyboardStatus() {
-        for (int const key : s_keys) {
+        for (int key : s_keys) {
             auto keyMappingIt = s_keyMapping.find(key);
 
             if (keyMappingIt == s_keyMapping.end()) {
@@ -166,8 +163,8 @@ namespace XE {
                 continue;
             }
 
-            KeyCode const keyCode = keyMappingIt->second;
-            BinaryState const stateCode = stateMappingIt->second;
+            KeyCode keyCode = keyMappingIt->second;
+            BinaryState stateCode = stateMappingIt->second;
 
             m_keyboardStatus.setState(keyCode, stateCode);
         }
@@ -185,7 +182,7 @@ namespace XE {
         return 0;
     }
 
-    ControllerStatus InputManagerGLFW::getControllerStatus(const int /*index*/) {
+    ControllerStatus InputManagerGLFW::getControllerStatus(const int) {
         // TODO: Add implementation code
         assert(false);
         // assert(index == 0);

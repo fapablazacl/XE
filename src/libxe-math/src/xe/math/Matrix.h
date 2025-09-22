@@ -1,10 +1,9 @@
 
 #ifndef __XE_MATH_MATRIX_HPP__
-#define XE_MATH_MATRIX_HPP_
+#define __XE_MATH_MATRIX_HPP__
 
 #include <array>
 #include <cassert>
-#include <cstddef>
 #include <cstdint>
 #include <cstring>
 #include <iomanip>
@@ -20,7 +19,7 @@ namespace XE {
 
     template <typename T, int R, int C> TMatrix<T, R, C> inverse(const TMatrix<T, R, C> &m);
 
-    template <typename T, int R, int C> TMatrix<T, R, C> inverse(const TMatrix<T, R, C> &m, T det);
+    template <typename T, int R, int C> TMatrix<T, R, C> inverse(const TMatrix<T, R, C> &m, const T abs);
 
     template <typename T, int R, int C> TMatrix<T, R, C> adjoint(const TMatrix<T, R, C> &matrix);
 
@@ -48,7 +47,7 @@ namespace XE {
 
         explicit TMatrix(const T *const values) {
             assert(values);
-            std::memcpy(data(), values, static_cast<unsigned long>(R * C) * sizeof(T));
+            std::memcpy(data(), values, R * C * sizeof(T));
         }
 
         explicit TMatrix(const std::initializer_list<T> il) {
@@ -98,9 +97,9 @@ namespace XE {
 
         TMatrix<T, R, C> operator/(const TMatrix<T, R, C> &rhs) const;
 
-        TMatrix<T, R, C> operator*(T s) const;
+        TMatrix<T, R, C> operator*(const T s) const;
 
-        TMatrix<T, R, C> operator/(T s) const;
+        TMatrix<T, R, C> operator/(const T s) const;
 
         TMatrix<T, R, C> &operator+=(const TMatrix<T, R, C> &rhs);
 
@@ -108,9 +107,9 @@ namespace XE {
 
         TMatrix<T, R, C> &operator*=(const TMatrix<T, R, C> &rhs);
 
-        TVector<T, R> operator*(const TVector<T, R> &c) const;
+        TVector<T, R> operator*(const TVector<T, R> &v) const;
 
-        friend TVector<T, R> operator*(const TVector<T, R> &c, const TMatrix<T, R, C> &m) {
+        inline friend TVector<T, R> operator*(const TVector<T, R> &c, const TMatrix<T, R, C> &m) {
             TVector<T, R> result;
 
             for (int row = 0; row < R; row++) {
@@ -120,7 +119,7 @@ namespace XE {
             return result;
         }
 
-        friend TMatrix<T, R, C> operator*(const T s, const TMatrix<T, R, C> &m) {
+        inline friend TMatrix<T, R, C> operator*(const T s, const TMatrix<T, R, C> &m) {
             return m * s;
         }
 
@@ -145,7 +144,7 @@ namespace XE {
             return element[i][j];
         }
 
-        T operator()(const int i, const int j) const {
+        const T operator()(const int i, const int j) const {
             assert(i >= 0);
             assert(j >= 0);
             assert(i < R);
@@ -206,8 +205,7 @@ namespace XE {
 
                 TMatrix<T, R - 1, C - 1> result;
 
-                int ii = 0;
-                int jj = 0;
+                int ii = 0, jj = 0;
 
                 for (int i = 0; i < R; ++i) {
                     if (i == row) {
@@ -239,7 +237,7 @@ namespace XE {
             return &element[0][0];
         }
 
-    
+    public:
         static auto columns(const std::array<TVector<T, R>, C> &columns) {
             TMatrix<T, R, C> result;
 
@@ -435,7 +433,7 @@ namespace XE {
             const T cos = std::cos(rads);
             const T sin = std::sin(rads);
 
-            TVector<T, 3> const V = normalize(axis);
+            TVector<T, 3> V = normalize(axis);
 
             const auto c1 = TVector<T, 3>{static_cast<T>(0), -V.Z, V.Y};
             const auto c2 = TVector<T, 3>{V.Z, static_cast<T>(0), -V.X};
@@ -444,7 +442,7 @@ namespace XE {
             const auto matS = TMatrix<T, 3, 3>::columns({c1, c2, c3});
 
             const auto matUUT = TMatrix<T, 3, 1>{V} * TMatrix<T, 1, 3>{V};
-            const auto tempResult = matUUT + (cos * (I - matUUT)) + (sin * matS);
+            const auto tempResult = matUUT + cos * (I - matUUT) + sin * matS;
 
             auto result = matIdentity<T, N>();
 
@@ -708,7 +706,7 @@ namespace XE {
                 return m(0, 0);
             }
             if constexpr (R == 2) {
-                return (m(1, 1) * m(0, 0)) - (m(0, 1) * m(1, 0));
+                return m(1, 1) * m(0, 0) - m(0, 1) * m(1, 0);
             } else {
                 T result = T(0);
 
@@ -751,7 +749,7 @@ namespace XE {
     }
 
     template <typename T, int R, int C> std::ostream &operator<<(std::ostream &os, const XE::TMatrix<T, R, C> &m) {
-        os << "xe::TMatrix<" << typeid(T).name() << ", " << R << ", " << C << "> {" << '\n';
+        os << "xe::TMatrix<" << typeid(T).name() << ", " << R << ", " << C << "> {" << std::endl;
 
         for (int i = 0; i < R; ++i) {
             os << "  ";
@@ -769,10 +767,10 @@ namespace XE {
                 os << ",";
             }
 
-            os << '\n';
+            os << std::endl;
         }
 
-        os << "}" << '\n';
+        os << "}" << std::endl;
 
         return os;
     }

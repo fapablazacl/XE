@@ -1,6 +1,6 @@
 
 #ifndef __XE_GRAPHICS_BOXGENERATOR_HPP__
-#define XE_GRAPHICS_BOXGENERATOR_HPP_
+#define __XE_GRAPHICS_BOXGENERATOR_HPP__
 
 #include <vector>
 #include <xe/math/Math.h>
@@ -15,15 +15,15 @@ namespace XE {
     public:
         BoxGenerator(const Vector3i &division, const Vector3 &size);
 
-        ~BoxGenerator() override;
+        virtual ~BoxGenerator();
 
-        std::vector<Vector3> generateVertexCoordinates() const override;
+        virtual std::vector<Vector3> generateVertexCoordinates() const override;
 
-        std::vector<Vector3> generateVertexNormals() const override;
+        virtual std::vector<Vector3> generateVertexNormals() const override;
 
-        std::vector<Vector2> generateVertexTexCoords() const override;
+        virtual std::vector<Vector2> generateVertexTexCoords() const override;
 
-        std::vector<int> generateIndices() const override;
+        virtual std::vector<int> generateIndices() const override;
 
     private:
         std::vector<Vector3> generateBaseCoords() const;
@@ -32,7 +32,7 @@ namespace XE {
 
         std::vector<Vector2> generateBaseTexCoords() const;
 
-    
+    private:
         Vector3i division;
         Vector3 size;
     };

@@ -6,26 +6,22 @@
 #include <assimp/DefaultLogger.hpp>
 #include <assimp/Exporter.hpp>
 #include <assimp/Importer.hpp>
-#include <assimp/Logger.hpp>
 #include <assimp/postprocess.h>
 #include <assimp/scene.h>
-#include <assimp/types.h>
 #include <cstdlib>
 #include <filesystem>
 #include <iostream>
-#include <string>
 
 static void setupAssimpLogger() {
     using namespace Assimp;
-    if (!DefaultLogger::isNullLogger()) {
+    if (!DefaultLogger::isNullLogger())
         return;
-}
     DefaultLogger::create("", Logger::VERBOSE, aiDefaultLogStream_STDOUT);
 }
 
-int main(int  /*argc*/, char ** /*argv*/) {
-    std::string const inputPath = "/Users/fapablaza/Dropbox/GameDev/Capybaria/raw-assets/models/capybara-02/Capybara.fbx";
-    std::string const outputPath = "/Users/fapablaza/Dropbox/GameDev/Capybaria/raw-assets/models/capybara-02/Capybara.glb";
+int main(int argc, char **argv) {
+    std::string inputPath = "/Users/fapablaza/Dropbox/GameDev/Capybaria/raw-assets/models/capybara-02/Capybara.fbx";
+    std::string outputPath = "/Users/fapablaza/Dropbox/GameDev/Capybaria/raw-assets/models/capybara-02/Capybara.glb";
 
     // std::string inputPath = argv[1];
     // std::string outputPath = (argc >= 3) ? argv[2] : deriveOutputPath(inputPath);
@@ -42,7 +38,7 @@ int main(int  /*argc*/, char ** /*argv*/) {
     // Optional: configure importer properties here if needed
     // Example: importer.SetPropertyInteger(AI_CONFIG_PP_SBP_REMOVE, aiPrimitiveType_LINE | aiPrimitiveType_POINT);
 
-    unsigned int const ppFlags = aiProcess_Triangulate |
+    unsigned int ppFlags = aiProcess_Triangulate |
                            // aiProcess_GenSmoothNormals |
                            // aiProcess_ImproveCacheLocality |
                            aiProcess_JoinIdenticalVertices | aiProcess_OptimizeMeshes | aiProcess_OptimizeGraph |
@@ -55,7 +51,7 @@ int main(int  /*argc*/, char ** /*argv*/) {
     // aiProcess_FindInvalidData;
 
     const aiScene *scene = importer.ReadFile(inputPath, ppFlags);
-    if (scene == nullptr) {
+    if (!scene) {
         std::cerr << "Import failed: " << importer.GetErrorString() << "\n";
         return 3;
     }
@@ -83,10 +79,10 @@ int main(int  /*argc*/, char ** /*argv*/) {
     try {
         std::filesystem::create_directories(std::filesystem::path(outputPath).parent_path());
     } catch (...) {
-        std::cerr << "Unknown error while create directories" << '\n';
+        std::cerr << "Unknown error while create directories" << std::endl;
     }
 
-    aiReturn const ret = exporter.Export(scene, targetFormatId, outputPath, 0);
+    aiReturn ret = exporter.Export(scene, targetFormatId, outputPath, 0);
     if (ret != aiReturn_SUCCESS) {
         std::cerr << "Export failed: " << exporter.GetErrorString() << "\n";
         return 5;

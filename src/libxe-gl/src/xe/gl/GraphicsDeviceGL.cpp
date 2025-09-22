@@ -3,6 +3,7 @@
 
 #include "gl.h"
 
+#include "BufferGL.h"
 #include "Conversion.h"
 #include "ProgramGL.h"
 #include "SubsetGL.h"
@@ -10,22 +11,9 @@
 #include "Texture2DGL.h"
 #include "Texture3DGL.h"
 #include "TextureCubeMapGL.h"
-#include "xe/DataType.h"
-#include "xe/gl/TextureBaseGL.h"
-#include "xe/graphics/GraphicsContext.h"
-#include "xe/graphics/GraphicsDevice.h"
-#include "xe/graphics/Program.h"
-#include "xe/graphics/Texture2D.h"
-#include "xe/graphics/Viewport.h"
-#include "xe/math/Vector.h"
+#include "UtilGL.h"
 
-#include <array>
-#include <cassert>
-#include <cstddef>
-#include <cstdio>
 #include <iostream>
-#include <stdexcept>
-#include <string>
 #include <xe/graphics/Material.h>
 #include <xe/graphics/Subset.h>
 #include <xe/graphics/Texture2DArray.h>
@@ -71,7 +59,7 @@ namespace XE {
         }
     }
 
-    static void GraphicsDeviceGL_callback(const char *name, void * /*unused*/, int /*unused*/, ...) {
+    void GraphicsDeviceGL_callback(const char *name, void *, int, ...) {
         if (std::string(name) == "glGetError") {
             return;
         }
@@ -79,11 +67,11 @@ namespace XE {
         GLenum err = glGetError();
 
         if (err != GL_NO_ERROR) {
-            std::cerr << "GraphicsDeviceGL: Error while calling function " << name << '\n';
-            std::cerr << "GraphicsDeviceGL: Errors generated:" << '\n';
+            std::cerr << "GraphicsDeviceGL: Error while calling function " << name << std::endl;
+            std::cerr << "GraphicsDeviceGL: Errors generated:" << std::endl;
 
             while (err != GL_NO_ERROR) {
-                std::cerr << "GraphicsDeviceGL:" << stringval(err) << '\n';
+                std::cerr << "GraphicsDeviceGL:" << stringval(err) << std::endl;
                 err = glGetError();
             }
 
@@ -94,7 +82,7 @@ namespace XE {
     GraphicsDeviceGL::GraphicsDeviceGL(GraphicsContext *context) : context(context) {
         assert(context);
 
-        std::cout << "[GL] Loading OpenGL Extensions ..." << '\n';
+        std::cout << "[GL] Loading OpenGL Extensions ..." << std::endl;
         gladLoadGL();
 
 #ifndef NDEBUG
@@ -152,13 +140,13 @@ namespace XE {
         assert(envelopes);
         assert(envelopeCount > 0);
 
-        const auto *subsetGL = dynamic_cast<const SubsetGL *>(subset);
+        auto subsetGL = static_cast<const SubsetGL *>(subset);
 
         glBindVertexArray(subsetGL->getID());
 
-        const auto *indexBuffer = subsetGL->getIndexBuffer();
+        auto indexBuffer = subsetGL->getIndexBuffer();
 
-        if (indexBuffer == nullptr) {
+        if (!indexBuffer) {
             for (size_t i = 0; i < envelopeCount; i++) {
                 const SubsetEnvelope &env = envelopes[i];
                 const GLenum primitiveGL = convertToGL(env.primitive);
@@ -247,12 +235,12 @@ namespace XE {
         for (int i = 0; i < material->layerCount; i++) {
             const auto &layer = material->layers[i];
 
-            if (layer.texture == nullptr) {
+            if (!layer.texture) {
                 continue;
             }
 
             // FIXME: This will cause segfaults if the real implementation isn't derived from the Texture/TextureBaseGL family
-            const auto *textureBaseGL = dynamic_cast<const TextureBaseGL *>(layer.texture);
+            auto textureBaseGL = dynamic_cast<const TextureBaseGL *>(layer.texture);
             auto target = textureBaseGL->GetTarget();
 
             glActiveTexture(GL_TEXTURE0 + i);
@@ -283,12 +271,12 @@ namespace XE {
         for (int i = 0; i < material->layerCount; i++) {
             const auto &layer = material->layers[i];
 
-            if (layer.texture == nullptr) {
+            if (!layer.texture) {
                 continue;
             }
 
             // FIXME: This will cause segfaults if the real implementation isn't derived from the Texture/TextureBaseGL family
-            const auto *textureBaseGL = reinterpret_cast<const TextureBaseGL *>(layer.texture);
+            auto textureBaseGL = reinterpret_cast<const TextureBaseGL *>(layer.texture);
 
             glActiveTexture(GL_TEXTURE0 + i);
             glBindTexture(textureBaseGL->GetTarget(), 0);
@@ -302,7 +290,7 @@ namespace XE {
             return;
         }
 
-        if (m_material != nullptr) {
+        if (m_material) {
             this->postRenderMaterial(m_material);
         }
 
@@ -312,9 +300,9 @@ namespace XE {
     }
 
     void GraphicsDeviceGL::setProgram(const Program *program) {
-        m_program = dynamic_cast<const ProgramGL *>(program);
+        m_program = static_cast<const ProgramGL *>(program);
 
-        if (m_program != nullptr) {
+        if (m_program) {
             glUseProgram(m_program->GetID());
         } else {
             glUseProgram(0);
@@ -333,7 +321,7 @@ namespace XE {
         assert(data);
 
         int offset = 0;
-        const auto *const ptr = reinterpret_cast<const std::byte *>(data);
+        const auto ptr = reinterpret_cast<const std::byte *>(data);
 
         for (size_t i = 0; i < count; i++) {
             const UniformMatrix *current = &uniformMatrix[i];
@@ -343,7 +331,7 @@ namespace XE {
 
             switch (current->type) {
             case DataType::Float32: {
-                const auto *const values = (const GLfloat *)&ptr[offset];
+                const auto values = (const GLfloat *)&ptr[offset];
 
                 switch (current->shape) {
                 case UniformMatrixShape::R2C2:
@@ -378,7 +366,7 @@ namespace XE {
             }
 
             case DataType::Float64: {
-                const auto *const values = (const GLdouble *)&ptr[offset];
+                const auto values = (const GLdouble *)&ptr[offset];
 
                 switch (current->shape) {
                 case UniformMatrixShape::R2C2:
@@ -428,7 +416,7 @@ namespace XE {
         assert(data);
 
         int offset = 0;
-        const auto *const ptr = reinterpret_cast<const std::byte *>(data);
+        const auto ptr = reinterpret_cast<const std::byte *>(data);
 
         for (size_t i = 0; i < count; i++) {
             const Uniform *current = &uniform[i];
@@ -503,11 +491,11 @@ namespace XE {
     }
 
     void GraphicsDeviceGL::setViewport(const Viewport &viewport) {
-        GLint const x = static_cast<GLint>(viewport.position.X);
-        GLint const y = static_cast<GLint>(viewport.position.Y);
+        GLint x = static_cast<GLint>(viewport.position.X);
+        GLint y = static_cast<GLint>(viewport.position.Y);
 
-        GLint const w = static_cast<GLint>(viewport.size.X);
-        GLint const h = static_cast<GLint>(viewport.size.Y);
+        GLint w = static_cast<GLint>(viewport.size.X);
+        GLint h = static_cast<GLint>(viewport.size.Y);
 
         glViewport(x, y, w, h);
 

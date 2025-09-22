@@ -1,6 +1,4 @@
 
-#include "xe/graphics/PixelFormat.h"
-#include "xe/math/Vector.h"
 #include <xe/graphics/ImageImpl.h>
 
 #include <cassert>
@@ -36,11 +34,11 @@ namespace XE {
 
         assert(byteSize);
 
-        pixels = std::malloc(byteSize);
+        pixels = static_cast<void *>(std::malloc(byteSize));
     }
 
     void ImageImpl::free() {
-        if (pixels != nullptr) {
+        if (pixels) {
             std::free(pixels);
             pixels = nullptr;
 

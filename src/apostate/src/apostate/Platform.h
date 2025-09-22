@@ -30,7 +30,7 @@ public:
 
     void swapBuffers();
 
-    static PlatformGetProcAddress getGLProcAddressProcedure();
+    PlatformGetProcAddress getGLProcAddressProcedure();
 
     int getWindowWidth() const {
         return windowWidth;

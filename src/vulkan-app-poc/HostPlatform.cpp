@@ -1,17 +1,7 @@
 
 #include "HostPlatform.h"
 
-#include <GLFW/glfw3.h>
-#include <algorithm>
-#include <cassert>
-#include <cstdint>
-#include <cstdio>
 #include <iostream>
-#include <string>
-#include <vector>
-#include <vulkan/vulkan_core.h>
-#include <vulkan/vulkan_handles.hpp>
-#include <vulkan/vulkan_structs.hpp>
 #include <xe/Predef.h>
 
 HostPlatform::HostPlatform(const std::string &title, const uint32_t screenWidth, const uint32_t screenHeight, const HostPlatformFlagBits flags)
@@ -62,13 +52,13 @@ std::vector<const char *> HostPlatform::enumerateRequiredInstanceExtensions() co
     result.push_back("VK_KHR_portability_enumeration");
 #endif
 
-    std::cout << "These " << result.size() << " extensions are required:" << '\n';
+    std::cout << "These " << result.size() << " extensions are required:" << std::endl;
     std::for_each(result.begin(), result.end(), std::puts);
 
     return result;
 }
 
-std::vector<const char *> HostPlatform::enumerateRequiredDeviceExtensions() {
+std::vector<const char *> HostPlatform::enumerateRequiredDeviceExtensions() const {
     return {
         // these extensions provide all the objects required for swapchains
         VK_KHR_SWAPCHAIN_EXTENSION_NAME,
@@ -99,8 +89,7 @@ vk::Extent2D HostPlatform::pickSwapExtent(const vk::SurfaceCapabilitiesKHR &surf
         return surfaceCaps.currentExtent;
     }
 
-    int width;
-    int height;
+    int width, height;
     glfwGetFramebufferSize(mWindow, &width, &height);
 
     const vk::Extent2D actualExtent = {static_cast<uint32_t>(width), static_cast<uint32_t>(height)};
@@ -112,7 +101,7 @@ vk::Extent2D HostPlatform::pickSwapExtent(const vk::SurfaceCapabilitiesKHR &surf
 }
 
 vk::SurfaceKHR HostPlatform::createSurface(vk::Instance &instance) const {
-    VkSurfaceKHR rawsurf = nullptr;
+    VkSurfaceKHR rawsurf;
 
     if (glfwCreateWindowSurface(instance, mWindow, nullptr, &rawsurf) != VK_SUCCESS) {
         return {};
@@ -122,7 +111,7 @@ vk::SurfaceKHR HostPlatform::createSurface(vk::Instance &instance) const {
 }
 
 void HostPlatform::destroyWindow() {
-    if (mWindow != nullptr) {
+    if (mWindow) {
         glfwDestroyWindow(mWindow);
         mWindow = nullptr;
     }

@@ -1,6 +1,6 @@
 
 #ifndef __XE_GRAPHICS_TEXTURE_HPP__
-#define XE_GRAPHICS_TEXTURE_HPP_
+#define __XE_GRAPHICS_TEXTURE_HPP__
 
 #include <xe/graphics/PixelFormat.h>
 #include <xe/math/Box.h>

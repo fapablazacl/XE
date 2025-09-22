@@ -1,6 +1,6 @@
 
 #ifndef __XE_GRAPHICS_GL_BUFFERGL_HPP__
-#define XE_GRAPHICS_GL_BUFFERGL_HPP_
+#define __XE_GRAPHICS_GL_BUFFERGL_HPP__
 
 #include "gl.h"
 #include "xe/Buffer.h"
@@ -17,11 +17,11 @@ namespace XE {
 
         explicit BufferGL(GLuint bufferId);
 
-        ~BufferGL() override;
+        virtual ~BufferGL();
 
-        void read(void *destination, size_t size, size_t offset, size_t destinationOffset) const override;
+        void read(void *destination, const size_t size, const size_t offset, const size_t destinationOffset) const;
 
-        void write(const void *source, size_t size, size_t offset, size_t sourceOffset) override;
+        void write(const void *source, const size_t size, const size_t offset, const size_t sourceOffset);
 
         explicit operator bool() const {
             return m_id != 0;
@@ -40,7 +40,7 @@ namespace XE {
             return m_target;
         }
 
-        std::size_t getSize() const override {
+        std::size_t getSize() const {
             return m_size;
         }
 

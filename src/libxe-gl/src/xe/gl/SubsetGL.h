@@ -1,6 +1,6 @@
 
 #ifndef __XE_GRAPHICS_GL_SUBSETGL_HPP__
-#define XE_GRAPHICS_GL_SUBSETGL_HPP_
+#define __XE_GRAPHICS_GL_SUBSETGL_HPP__
 
 #include <xe/graphics/Subset.h>
 
@@ -12,19 +12,19 @@ namespace XE {
     public:
         explicit SubsetGL(const SubsetDescriptor &desc);
 
-        ~SubsetGL() override;
+        virtual ~SubsetGL();
 
-        int getBufferCount() const override;
+        virtual int getBufferCount() const override;
 
-        BufferGL *getBuffer(int index) override;
+        virtual BufferGL *getBuffer(const int index) override;
 
-        BufferGL *getIndexBuffer() override;
+        virtual BufferGL *getIndexBuffer() override;
 
-        const BufferGL *getBuffer(int index) const override;
+        virtual const BufferGL *getBuffer(const int index) const override;
 
-        const BufferGL *getIndexBuffer() const override;
+        virtual const BufferGL *getIndexBuffer() const override;
 
-    
+    public:
         GLuint getID() const {
             return id;
         }

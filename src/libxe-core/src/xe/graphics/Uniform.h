@@ -1,6 +1,6 @@
 
 #ifndef __XE_GRAPHICS_UNIFORM_HPP__
-#define XE_GRAPHICS_UNIFORM_HPP_
+#define __XE_GRAPHICS_UNIFORM_HPP__
 
 #include <string>
 #include <vector>

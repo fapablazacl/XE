@@ -1,17 +1,8 @@
 
 #include "Asset_CGLTF.h"
-#include "xe/graphics/Subset.h"
-#include "xe/math/Matrix.h"
-#include "xe/math/Vector.h"
 
-#include <cassert>
 #include <cmath>
-#include <cstddef>
-#include <cstdint>
-#include <stdexcept>
-#include <string>
-#include <utility>
-#include <vector>
+#include <iostream>
 #include <xe/math/Quaternion.h>
 
 #define CGLTF_IMPLEMENTATION
@@ -73,7 +64,7 @@ namespace Sandbox {
     static MeshPrimitive createMeshPrimitive(const cgltf_primitive &primitive) {
         MeshPrimitive meshPrimitive;
 
-        if (primitive.material != nullptr) {
+        if (primitive.material) {
             // const cgltf_material &material = *primitive.material;
         }
 
@@ -88,7 +79,7 @@ namespace Sandbox {
         }
 
         // map indices
-        if (primitive.indices != nullptr) {
+        if (primitive.indices) {
             const cgltf_accessor &accessor = *primitive.indices;
             const cgltf_buffer_view &bufferView = *accessor.buffer_view;
             const cgltf_buffer &buffer = *bufferView.buffer;
@@ -147,7 +138,7 @@ namespace Sandbox {
         }
 
         for (std::size_t i = 0; i < meshPrimitive.coords.size(); i++) {
-            meshPrimitive.colors.push_back({1.0F, 1.0F, 1.0F, 1.0F});
+            meshPrimitive.colors.push_back({1.0f, 1.0f, 1.0f, 1.0f});
         }
 
         return meshPrimitive;
@@ -159,7 +150,7 @@ namespace Sandbox {
         mesh.name = cgltfMesh.name;
 
         for (cgltf_size i = 0; i < cgltfMesh.primitives_count; i++) {
-            MeshPrimitive const primitive = createMeshPrimitive(cgltfMesh.primitives[i]);
+            MeshPrimitive primitive = createMeshPrimitive(cgltfMesh.primitives[i]);
 
             mesh.primitives.push_back(primitive);
         }
@@ -178,7 +169,7 @@ namespace Sandbox {
     }
 
     Asset_CGLTF::~Asset_CGLTF() {
-        if (mData != nullptr) {
+        if (mData) {
             cgltf_free(mData);
         }
     }
@@ -211,11 +202,11 @@ namespace Sandbox {
     }
 
     void Asset_CGLTF::load(const std::string &filePath) {
-        cgltf_options const options = {};
+        cgltf_options options = {};
 
         this->~Asset_CGLTF();
 
-        cgltf_result const result = cgltf_parse_file(&options, filePath.c_str(), &mData);
+        cgltf_result result = cgltf_parse_file(&options, filePath.c_str(), &mData);
 
         if (result == cgltf_result_success) {
             // load the binary data
@@ -226,7 +217,7 @@ namespace Sandbox {
     }
 
     void Asset_CGLTF::visitDefaultScene(SceneNodeCallback callback) {
-        mCallback = std::move(callback);
+        mCallback = callback;
 
         visitScene(mData->scene);
     }
@@ -237,7 +228,7 @@ namespace Sandbox {
         // load the meshes
         meshes.clear();
         for (cgltf_size i = 0; i < mData->meshes_count; i++) {
-            Mesh const mesh = createMesh(mData->meshes[i]);
+            Mesh mesh = createMesh(mData->meshes[i]);
 
             meshes.push_back(mesh);
         }
@@ -253,31 +244,31 @@ namespace Sandbox {
         if (node->has_matrix == 1) {
             nodeMatrix = Sandbox::makeMatrix(node->matrix);
         } else {
-            if (node->has_translation != 0) {
+            if (node->has_translation) {
                 // TODO: Untested translation
                 const auto t = XE::Vector3{node->translation};
                 nodeMatrix *= XE::mat4Translation(t);
             }
 
-            if (node->has_rotation != 0) {
+            if (node->has_rotation) {
                 // TODO: Untested rotation
                 // TODO: Add missing cases for angle = 0 and = 180º.
                 const auto q = XE::TQuaternion<float>{node->rotation};
 
                 const float radians = std::acos(q.W);
-                const float inv_denom = 1.0F / std::sqrt(1.0F - (q.W * q.W));
+                const float inv_denom = 1.0f / std::sqrt(1.0f - q.W * q.W);
 
-                if (radians > 0.0F) {
+                if (radians > 0.0f) {
                     const XE::Vector3 axis = q.V * inv_denom;
 
                     nodeMatrix *= XE::mat4Rotation(radians, axis);
                 }
             }
 
-            if (node->has_scale != 0) {
+            if (node->has_scale) {
                 // TODO: Untested scale
                 const auto s = XE::Vector3{node->scale};
-                nodeMatrix *= XE::mat4Scaling({s, 1.0F});
+                nodeMatrix *= XE::mat4Scaling({s, 1.0f});
             }
         }
 
@@ -289,11 +280,11 @@ namespace Sandbox {
 
         const XE::Matrix4 nodeMatrix = matrix * computeNodeMatrix(node);
 
-        if (node->mesh != nullptr) {
+        if (node->mesh) {
             mCallback(nodeMatrix, node->mesh->name);
         }
 
-        if (node->light != nullptr) {
+        if (node->light) {
             // TODO: Add support.
         }
 

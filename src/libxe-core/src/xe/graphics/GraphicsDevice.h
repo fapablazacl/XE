@@ -1,6 +1,6 @@
 
 #ifndef __XE_GRAPHICS_GRAPHICSDEVICE_HPP__
-#define XE_GRAPHICS_GRAPHICSDEVICE_HPP_
+#define __XE_GRAPHICS_GRAPHICSDEVICE_HPP__
 
 #include <map>
 #include <memory>
@@ -24,7 +24,7 @@ namespace XE {
         const int nflags = static_cast<int>(flags);
         const int nvalue = static_cast<int>(value);
 
-        return (nflags & nvalue) != 0;
+        return (nflags & nvalue);
     }
 
     enum class PixelFormat;
@@ -59,15 +59,15 @@ namespace XE {
         virtual Buffer *createBuffer(const BufferDescriptor &bufferDescriptor) = 0;
 
         virtual Texture2D *
-        createTexture2D(PixelFormat format, const Vector2i &size, PixelFormat sourceFormat, DataType sourceDataType, const void *sourceData) = 0;
+        createTexture2D(const PixelFormat format, const Vector2i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void *sourceData) = 0;
 
         virtual Texture3D *
-        createTexture3D(PixelFormat format, const Vector3i &size, PixelFormat sourceFormat, DataType sourceDataType, const void *sourceData) = 0;
+        createTexture3D(const PixelFormat format, const Vector3i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void *sourceData) = 0;
 
-        virtual Texture2DArray *createTexture2DArray(PixelFormat format, const Vector2i &size, int count) = 0;
+        virtual Texture2DArray *createTexture2DArray(const PixelFormat format, const Vector2i &size, const int count) = 0;
 
         virtual TextureCubeMap *
-        createTextureCubeMap(PixelFormat format, const Vector2i &size, PixelFormat sourceFormat, DataType sourceDataType, const void **sourceData) = 0;
+        createTextureCubeMap(const PixelFormat format, const Vector2i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void **sourceData) = 0;
 
         virtual Program *createProgram(const ProgramDescriptor &programDescriptor) = 0;
 
@@ -83,17 +83,17 @@ namespace XE {
 
         virtual const Program *getProgram() const = 0;
 
-        virtual void applyUniform(const UniformMatrix *uniformMatrix, std::size_t count, const void *data) = 0;
+        virtual void applyUniform(const UniformMatrix *uniformMatrix, const std::size_t count, const void *data) = 0;
 
-        virtual void applyUniform(const Uniform *uniform, std::size_t count, const void *data) = 0;
+        virtual void applyUniform(const Uniform *uniform, const std::size_t count, const void *data) = 0;
 
-        virtual void draw(const Subset *subset, const SubsetEnvelope *envelopes, std::size_t envelopeCount) = 0;
+        virtual void draw(const Subset *subset, const SubsetEnvelope *envelopes, const std::size_t envelopeCount) = 0;
 
         void beginFrame(const ClearFlags flags, const Vector4 &color) {
-            beginFrame(flags, color, 1.0F, 0);
+            beginFrame(flags, color, 1.0f, 0);
         }
 
-        virtual void beginFrame(ClearFlags flags, const Vector4 &color, float depth, int stencil) = 0;
+        virtual void beginFrame(const ClearFlags flags, const Vector4 &color, const float depth, const int stencil) = 0;
 
         virtual void endFrame() = 0;
     };

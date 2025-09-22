@@ -2,7 +2,7 @@
 #pragma once
 
 #ifndef __XE_MATH_QUATERNION_HPP__
-#define XE_MATH_QUATERNION_HPP_
+#define __XE_MATH_QUATERNION_HPP__
 
 #include <cassert>
 #include <cmath>
@@ -117,8 +117,9 @@ namespace XE {
 
             if (angle == T(0)) {
                 return {angle, {T(1), T(0), T(0)}};
-            }                 return {angle, normalize(V)};
-           
+            } else {
+                return {angle, normalize(V)};
+            }
         }
 
         explicit operator TVector<T, 4>() const {
@@ -165,7 +166,7 @@ namespace XE {
             const auto v3 = V * rhs.W;
             const auto v = v1 + v2 + v3;
 
-            const auto w = (W * rhs.W) - dot(V, rhs.V);
+            const auto w = W * rhs.W - dot(V, rhs.V);
 
             return {v, w};
         }

@@ -1,35 +1,18 @@
 
 #include "VulkanRenderer.h"
-#include "xe/math/Common.h"
-#include "xe/math/Matrix.h"
 
-#include <GLFW/glfw3.h>
 #include <algorithm>
-#include <array>
 #include <cassert>
 #include <chrono>
-#include <cstddef>
-#include <cstdint>
-#include <cstdio>
-#include <cstring>
 #include <fstream>
+#include <functional>
 #include <iostream>
-#include <optional>
 #include <stdexcept>
-#include <string>
-#include <tuple>
-#include <vector>
-#include <vulkan/vulkan.hpp>
-#include <vulkan/vulkan_core.h>
-#include <vulkan/vulkan_enums.hpp>
-#include <vulkan/vulkan_funcs.hpp>
-#include <vulkan/vulkan_handles.hpp>
-#include <vulkan/vulkan_structs.hpp>
 
 constexpr int MAX_FRAMES_IN_FLIGHT = 2;
 
 const std::vector<Vertex> vertices{
-    {{-0.5F, -0.5F}, {1.0F, 0.0F, 0.0F}}, {{0.5F, -0.5F}, {0.0F, 1.0F, 0.0F}}, {{0.5F, 0.5F}, {0.0F, 0.0F, 1.0F}}, {{-0.5F, 0.5F}, {0.0F, 0.0F, 0.0F}}
+    {{-0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}}, {{0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}}, {{0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}}, {{-0.5f, 0.5f}, {0.0f, 0.0f, 0.0f}}
 };
 
 const std::vector<uint16_t> indices{0, 1, 2, 2, 3, 0};
@@ -62,40 +45,41 @@ static std::ostream &operator<<(std::ostream &os, const vk::PhysicalDeviceType d
     return os;
 }
 
-static vk::Bool32 debugCallback(
+vk::Bool32 debugCallback(
     vk::DebugUtilsMessageSeverityFlagBitsEXT /*messageSeverity*/,
     vk::DebugUtilsMessageTypeFlagsEXT /*messageTypes*/,
     const vk::DebugUtilsMessengerCallbackDataEXT *pCallbackData,
     void * /*pUserData*/
 ) {
 
-    std::cout << pCallbackData->pMessage << '\n' << '\n';
+    std::cout << pCallbackData->pMessage << std::endl << std::endl;
 
     return VK_FALSE;
 }
 
-static VkResult CreateDebugUtilsMessengerEXT(
+VkResult CreateDebugUtilsMessengerEXT(
     VkInstance instance, const VkDebugUtilsMessengerCreateInfoEXT *pCreateInfo, const VkAllocationCallbacks *pAllocator, VkDebugUtilsMessengerEXT *pDebugMessenger
 ) {
     auto func = reinterpret_cast<PFN_vkCreateDebugUtilsMessengerEXT>(vkGetInstanceProcAddr(instance, "vkCreateDebugUtilsMessengerEXT"));
     if (func != nullptr) {
         return func(instance, pCreateInfo, pAllocator, pDebugMessenger);
-    }         return VK_ERROR_EXTENSION_NOT_PRESENT;
-   
+    } else {
+        return VK_ERROR_EXTENSION_NOT_PRESENT;
+    }
 }
 
-static void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT debugMessenger, const VkAllocationCallbacks *pAllocator) {
+void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT debugMessenger, const VkAllocationCallbacks *pAllocator) {
     auto func = (PFN_vkDestroyDebugUtilsMessengerEXT)vkGetInstanceProcAddr(instance, "vkDestroyDebugUtilsMessengerEXT");
     if (func != nullptr) {
         func(instance, debugMessenger, pAllocator);
     }
 }
 
-static std::vector<char> readFile(const std::string &filename) {
+std::vector<char> readFile(const std::string &filename) {
     std::ifstream fs{filename.c_str(), std::ios::ate | std::ios::binary};
 
     if (!fs.is_open()) {
-        std::cerr << "failed to open file " << filename << '\n';
+        std::cerr << "failed to open file " << filename << std::endl;
         throw std::exception();
     }
 
@@ -116,7 +100,7 @@ VulkanRenderer::VulkanRenderer(HostPlatform &platform) : mPlatform(platform) {
 }
 
 void VulkanRenderer::initialize() {
-    std::vector<const char *> const extensions = mPlatform.enumerateRequiredInstanceExtensions();
+    std::vector<const char *> extensions = mPlatform.enumerateRequiredInstanceExtensions();
 
     mInstance = createInstance(extensions, mPlatform.enumerateValidationLayers());
     assert(mInstance);
@@ -198,7 +182,7 @@ void VulkanRenderer::renderLoop() {
     }
 }
 
-vk::ApplicationInfo VulkanRenderer::createAppInfo() {
+vk::ApplicationInfo VulkanRenderer::createAppInfo() const {
     // Identifica a la aplicacion / motor en uso, para que pueda ser (potencialmente)
     // considerado por el implementador de Hardware (nVidia, Intel, etc), para aplicar
     // ciertas optimizaciones a nivel del Driver.
@@ -215,8 +199,8 @@ vk::ApplicationInfo VulkanRenderer::createAppInfo() {
     return appInfo;
 }
 
-std::vector<const char *> VulkanRenderer::getRequiredExtensions() {
-    uint32_t extensionCount = 0;
+std::vector<const char *> VulkanRenderer::getRequiredExtensions() const {
+    uint32_t extensionCount;
     const char **extensions = glfwGetRequiredInstanceExtensions(&extensionCount);
 
     std::vector<const char *> result = {extensions, extensions + extensionCount};
@@ -226,7 +210,7 @@ std::vector<const char *> VulkanRenderer::getRequiredExtensions() {
     return result;
 }
 
-vk::DebugUtilsMessengerCreateInfoEXT VulkanRenderer::createDebugMessengerInfo() {
+vk::DebugUtilsMessengerCreateInfoEXT VulkanRenderer::createDebugMessengerInfo() const {
     vk::DebugUtilsMessengerCreateInfoEXT msgInfo;
 
     msgInfo.setMessageSeverity(
@@ -245,7 +229,7 @@ vk::DebugUtilsMessengerCreateInfoEXT VulkanRenderer::createDebugMessengerInfo() 
 vk::DebugUtilsMessengerEXT VulkanRenderer::createDebugMessenger(vk::Instance instance) const {
     const auto debugInfo = static_cast<VkDebugUtilsMessengerCreateInfoEXT>(createDebugMessengerInfo());
 
-    VkDebugUtilsMessengerEXT messenger = nullptr;
+    VkDebugUtilsMessengerEXT messenger;
     const VkResult result = CreateDebugUtilsMessengerEXT(static_cast<VkInstance>(instance), &debugInfo, nullptr, &messenger);
 
     if (result != VK_SUCCESS) {
@@ -257,12 +241,12 @@ vk::DebugUtilsMessengerEXT VulkanRenderer::createDebugMessenger(vk::Instance ins
 
 vk::Instance VulkanRenderer::createInstance(const std::vector<const char *> &extensions, const std::vector<const char *> &validationLayers) const {
 
-    std::cout << "Creating Vulkan instance with these specified features" << '\n';
+    std::cout << "Creating Vulkan instance with these specified features" << std::endl;
 
-    std::cout << '\n' << "Extensions:" << '\n';
+    std::cout << std::endl << "Extensions:" << std::endl;
     std::for_each(extensions.begin(), extensions.end(), std::puts);
 
-    std::cout << '\n' << "Validation Layers:" << '\n';
+    std::cout << std::endl << "Validation Layers:" << std::endl;
     std::for_each(validationLayers.begin(), validationLayers.end(), std::puts);
 
     const vk::ApplicationInfo appInfo = createAppInfo();
@@ -293,19 +277,19 @@ vk::PhysicalDevice VulkanRenderer::pickPhysicalDevice(const std::vector<vk::Phys
 void VulkanRenderer::showPhysicalDeviceInformation(const vk::PhysicalDevice &device) {
     const auto properties = device.getProperties();
 
-    std::cout << "\"" << properties.deviceName << "\"" << '\n';
-    std::cout << "  deviceID: " << "\"" << properties.deviceID << "\"" << '\n';
-    std::cout << "  deviceName: " << "\"" << properties.deviceName << "\"" << '\n';
-    std::cout << "  vendorID: " << "\"" << properties.vendorID << "\"" << '\n';
-    std::cout << "  apiVersion: " << "\"" << properties.apiVersion << "\"" << '\n';
-    std::cout << "  deviceType: " << "\"" << properties.deviceType << "\"" << '\n';
-    std::cout << "  driverVersion: " << "\"" << properties.driverVersion << "\"" << '\n';
+    std::cout << "\"" << properties.deviceName << "\"" << std::endl;
+    std::cout << "  deviceID: " << "\"" << properties.deviceID << "\"" << std::endl;
+    std::cout << "  deviceName: " << "\"" << properties.deviceName << "\"" << std::endl;
+    std::cout << "  vendorID: " << "\"" << properties.vendorID << "\"" << std::endl;
+    std::cout << "  apiVersion: " << "\"" << properties.apiVersion << "\"" << std::endl;
+    std::cout << "  deviceType: " << "\"" << properties.deviceType << "\"" << std::endl;
+    std::cout << "  driverVersion: " << "\"" << properties.driverVersion << "\"" << std::endl;
 
-    std::cout << '\n';
+    std::cout << std::endl;
 }
 
-std::vector<vk::DeviceQueueCreateInfo> VulkanRenderer::mapQueueCreateInfo(const QueryFamilyIndices &familyIndices) {
-    const float priority = 1.0F;
+std::vector<vk::DeviceQueueCreateInfo> VulkanRenderer::mapQueueCreateInfo(const QueryFamilyIndices &familyIndices) const {
+    const float priority = 1.0f;
 
     std::vector<vk::DeviceQueueCreateInfo> infos;
 
@@ -334,7 +318,7 @@ vk::Device VulkanRenderer::createDevice(const vk::PhysicalDevice &physicalDevice
     // set the required device extensions
     const auto deviceExtensions = mPlatform.enumerateRequiredDeviceExtensions();
 
-    if (!deviceExtensions.empty()) {
+    if (deviceExtensions.size() > 0) {
         info.setPEnabledExtensionNames(deviceExtensions);
         info.setEnabledExtensionCount(static_cast<uint32_t>(deviceExtensions.size()));
     }
@@ -342,7 +326,7 @@ vk::Device VulkanRenderer::createDevice(const vk::PhysicalDevice &physicalDevice
     // set the validation layers
     auto validationLayers = mPlatform.enumerateValidationLayers();
 
-    if (!validationLayers.empty()) {
+    if (validationLayers.size() > 0) {
         info.setPEnabledLayerNames(validationLayers);
         info.setEnabledLayerCount(static_cast<uint32_t>(validationLayers.size()));
     }
@@ -350,7 +334,7 @@ vk::Device VulkanRenderer::createDevice(const vk::PhysicalDevice &physicalDevice
     return physicalDevice.createDevice(info);
 }
 
-QueryFamilyIndices VulkanRenderer::identifyQueueFamilies(const vk::PhysicalDevice &physicalDevice, const vk::SurfaceKHR &surface) {
+QueryFamilyIndices VulkanRenderer::identifyQueueFamilies(const vk::PhysicalDevice &physicalDevice, const vk::SurfaceKHR &surface) const {
     QueryFamilyIndices familyIndices;
 
     const auto queueProperties = physicalDevice.getQueueFamilyProperties();
@@ -384,7 +368,7 @@ vk::SwapchainKHR VulkanRenderer::createSwapchain(
     const uint32_t imageCount,
     const vk::SurfaceTransformFlagBitsKHR preTransform,
     const QueryFamilyIndices &familyIndices
-) {
+) const {
     vk::SwapchainCreateInfoKHR info = {};
     info.surface = surface;
     info.minImageCount = imageCount;
@@ -414,7 +398,7 @@ vk::SwapchainKHR VulkanRenderer::createSwapchain(
     return device.createSwapchainKHR(info);
 }
 
-SwapchainDetail VulkanRenderer::querySwapchainDetail(const vk::PhysicalDevice &physicalDevice, const vk::SurfaceKHR &surface) {
+SwapchainDetail VulkanRenderer::querySwapchainDetail(const vk::PhysicalDevice &physicalDevice, const vk::SurfaceKHR &surface) const {
     SwapchainDetail detail;
 
     detail.surfaceCapabilities = physicalDevice.getSurfaceCapabilitiesKHR(surface);
@@ -425,7 +409,7 @@ SwapchainDetail VulkanRenderer::querySwapchainDetail(const vk::PhysicalDevice &p
 }
 
 //! picks an required surface format
-std::optional<vk::SurfaceFormatKHR> VulkanRenderer::pickSwapchainSurfaceFormat(const std::vector<vk::SurfaceFormatKHR> &surfaceFormats) {
+std::optional<vk::SurfaceFormatKHR> VulkanRenderer::pickSwapchainSurfaceFormat(const std::vector<vk::SurfaceFormatKHR> &surfaceFormats) const {
     for (const vk::SurfaceFormatKHR &surfaceFormat : surfaceFormats) {
         if (surfaceFormat.format == vk::Format::eB8G8R8A8Srgb && surfaceFormat.colorSpace == vk::ColorSpaceKHR::eSrgbNonlinear) {
             return surfaceFormat;
@@ -435,7 +419,7 @@ std::optional<vk::SurfaceFormatKHR> VulkanRenderer::pickSwapchainSurfaceFormat(c
     return {};
 }
 
-vk::PresentModeKHR VulkanRenderer::pickPresentMode(const std::vector<vk::PresentModeKHR> &presentModes) {
+vk::PresentModeKHR VulkanRenderer::pickPresentMode(const std::vector<vk::PresentModeKHR> &presentModes) const {
     const auto it = std::find(presentModes.begin(), presentModes.end(), vk::PresentModeKHR::eMailbox);
 
     if (it != presentModes.end()) {
@@ -445,7 +429,7 @@ vk::PresentModeKHR VulkanRenderer::pickPresentMode(const std::vector<vk::Present
     return vk::PresentModeKHR::eFifo;
 }
 
-uint32_t VulkanRenderer::chooseImageCount(const vk::SurfaceCapabilitiesKHR &caps) {
+uint32_t VulkanRenderer::chooseImageCount(const vk::SurfaceCapabilitiesKHR &caps) const {
     const uint32_t imageCount = caps.minImageCount + 1;
 
     if (caps.maxImageCount > 0 && imageCount > caps.maxImageCount) {
@@ -456,7 +440,7 @@ uint32_t VulkanRenderer::chooseImageCount(const vk::SurfaceCapabilitiesKHR &caps
 }
 
 std::vector<vk::ImageView>
-VulkanRenderer::createSwapchainImageViews(const vk::Device &device, const vk::SurfaceFormatKHR &swapchainFormat, const std::vector<vk::Image> &swapchainImages) {
+VulkanRenderer::createSwapchainImageViews(const vk::Device &device, const vk::SurfaceFormatKHR &swapchainFormat, const std::vector<vk::Image> &swapchainImages) const {
     std::vector<vk::ImageView> imageViews;
 
     imageViews.reserve(swapchainImages.size());
@@ -483,14 +467,14 @@ VulkanRenderer::createSwapchainImageViews(const vk::Device &device, const vk::Su
     return imageViews;
 }
 
-std::vector<char> VulkanRenderer::loadBinaryFile(const std::string &filename) {
+std::vector<char> VulkanRenderer::loadBinaryFile(const std::string &filename) const {
     const std::string path = XE_MEDIA_PATH + filename;
     return readFile(path);
 }
 
 vk::Pipeline VulkanRenderer::createGraphicsPipeline(const vk::Extent2D &swapchainExtent, const vk::PipelineLayout &pipelineLayout, const vk::RenderPass &renderPass) {
-    vk::ShaderModule const vertModule = createShaderModule(mDevice, loadBinaryFile("/shaders/triangle/vert.spv"));
-    vk::ShaderModule const fragModule = createShaderModule(mDevice, loadBinaryFile("/shaders/triangle/frag.spv"));
+    vk::ShaderModule vertModule = createShaderModule(mDevice, loadBinaryFile("/shaders/triangle/vert.spv"));
+    vk::ShaderModule fragModule = createShaderModule(mDevice, loadBinaryFile("/shaders/triangle/frag.spv"));
 
     vk::PipelineShaderStageCreateInfo vertexShaderStageInfo;
     vertexShaderStageInfo.stage = vk::ShaderStageFlagBits::eVertex;
@@ -506,7 +490,7 @@ vk::Pipeline VulkanRenderer::createGraphicsPipeline(const vk::Extent2D &swapchai
     const std::vector<vk::PipelineShaderStageCreateInfo> shaderStages{vertexShaderStageInfo, fragmentShaderStageInfo};
 
     // vertex binding description
-    vk::VertexInputBindingDescription const vertexBindingDesc = Vertex::createBindingDescription();
+    vk::VertexInputBindingDescription vertexBindingDesc = Vertex::createBindingDescription();
 
     // vertex attribute description
     std::array<vk::VertexInputAttributeDescription, 2> vertexAttributeDescs;
@@ -539,12 +523,12 @@ vk::Pipeline VulkanRenderer::createGraphicsPipeline(const vk::Extent2D &swapchai
     // viewport specification
     // region of the framebuffer
     vk::Viewport viewport;
-    viewport.x = 0.0F;
-    viewport.y = 0.0F;
+    viewport.x = 0.0f;
+    viewport.y = 0.0f;
     viewport.width = static_cast<float>(swapchainExtent.width);
     viewport.height = static_cast<float>(swapchainExtent.height);
-    viewport.minDepth = 0.0F;
-    viewport.maxDepth = 1.0F;
+    viewport.minDepth = 0.0f;
+    viewport.maxDepth = 1.0f;
 
     vk::Rect2D scissor;
     scissor.offset = vk::Offset2D{0, 0};
@@ -562,7 +546,7 @@ vk::Pipeline VulkanRenderer::createGraphicsPipeline(const vk::Extent2D &swapchai
     rasterizationStateInfo.depthClampEnable = VK_FALSE;
     rasterizationStateInfo.rasterizerDiscardEnable = VK_FALSE;
     rasterizationStateInfo.polygonMode = vk::PolygonMode::eFill;
-    rasterizationStateInfo.lineWidth = 1.0F;
+    rasterizationStateInfo.lineWidth = 1.0f;
     rasterizationStateInfo.cullMode = vk::CullModeFlagBits::eBack;
     rasterizationStateInfo.frontFace = vk::FrontFace::eCounterClockwise;
     rasterizationStateInfo.depthBiasEnable = VK_FALSE;
@@ -617,7 +601,7 @@ vk::Pipeline VulkanRenderer::createGraphicsPipeline(const vk::Extent2D &swapchai
     return pipelineResult.value;
 }
 
-vk::ShaderModule VulkanRenderer::createShaderModule(const vk::Device &device, const std::vector<char> &shaderCode) {
+vk::ShaderModule VulkanRenderer::createShaderModule(const vk::Device &device, const std::vector<char> &shaderCode) const {
     vk::ShaderModuleCreateInfo info;
 
     info.codeSize = shaderCode.size();
@@ -636,7 +620,7 @@ vk::PipelineLayout VulkanRenderer::createPipelineLayout(const vk::DescriptorSetL
     return mDevice.createPipelineLayout(info);
 }
 
-vk::RenderPass VulkanRenderer::createRenderPass(const vk::Device &device, const vk::Format &swapchainFormat) {
+vk::RenderPass VulkanRenderer::createRenderPass(const vk::Device &device, const vk::Format &swapchainFormat) const {
     // Color Buffer Attachment
     // its represented from by one of the images in the Swapchain
     vk::AttachmentDescription colorAttachment;
@@ -725,7 +709,7 @@ vk::RenderPass VulkanRenderer::createRenderPass(const vk::Device &device, const 
 }
 
 vk::Framebuffer
-VulkanRenderer::createFramebuffer(const vk::Device &device, const vk::ImageView &imageView, const vk::RenderPass &renderPass, const vk::Extent2D &swapchainExtent) {
+VulkanRenderer::createFramebuffer(const vk::Device &device, const vk::ImageView &imageView, const vk::RenderPass &renderPass, const vk::Extent2D &swapchainExtent) const {
     vk::FramebufferCreateInfo info;
 
     // render pass to be compatible with
@@ -745,7 +729,7 @@ VulkanRenderer::createFramebuffer(const vk::Device &device, const vk::ImageView 
     return device.createFramebuffer(info);
 }
 
-vk::CommandPool VulkanRenderer::createCommandPool(const vk::Device &device, const uint32_t queueFamily) {
+vk::CommandPool VulkanRenderer::createCommandPool(const vk::Device &device, const uint32_t queueFamily) const {
     // a commandPool is an Object that records different types of commands (like rendering and memory transfer),
     // to be executed by the GPU.
 
@@ -760,7 +744,7 @@ vk::CommandPool VulkanRenderer::createCommandPool(const vk::Device &device, cons
     return device.createCommandPool(info);
 }
 
-vk::CommandBuffer VulkanRenderer::allocateCommandBuffer(const vk::Device &device, const vk::CommandPool &commandPool) {
+vk::CommandBuffer VulkanRenderer::allocateCommandBuffer(const vk::Device &device, const vk::CommandPool &commandPool) const {
     vk::CommandBufferAllocateInfo info;
 
     info.commandPool = commandPool;
@@ -784,7 +768,7 @@ vk::CommandBuffer VulkanRenderer::allocateCommandBuffer(const vk::Device &device
 
 vk::RenderPassBeginInfo VulkanRenderer::createRenderPassBeginInfo(
     const vk::Framebuffer &framebuffer, const vk::ClearValue &clearValue, const vk::RenderPass &renderPass, const vk::Extent2D &swapchainExtent
-) {
+) const {
 
     // render pass
     vk::RenderPassBeginInfo info;
@@ -808,9 +792,9 @@ void VulkanRenderer::recordCommandBuffer(
 ) const {
 
     vk::ClearValue clearColor;
-    clearColor.color.setFloat32({0.2F, 0.2F, 0.2F, 1.0F});
+    clearColor.color.setFloat32({0.2f, 0.2f, 0.2f, 1.0f});
 
-    vk::CommandBufferBeginInfo const beginInfo;
+    vk::CommandBufferBeginInfo beginInfo;
 
     // implicitily, resets the command buffer
     commandBuffer.begin(beginInfo);
@@ -834,7 +818,7 @@ void VulkanRenderer::recordCommandBuffer(
     commandBuffer.end();
 }
 
-vk::Fence VulkanRenderer::createFence(const vk::Device &device) {
+vk::Fence VulkanRenderer::createFence(const vk::Device &device) const {
     vk::FenceCreateInfo info;
 
     info.flags = vk::FenceCreateFlagBits::eSignaled;
@@ -954,7 +938,7 @@ std::optional<uint32_t> VulkanRenderer::findMemoryType(uint32_t typeFilter, vk::
     for (uint32_t i = 0; i < properties.memoryTypeCount; i++) {
 
         // filter for the specified typeFilter
-        const bool matchTypeFilter = (typeFilter & (i << 1)) != 0u;
+        const bool matchTypeFilter = typeFilter & (i << 1);
         const bool matchPropertyFlags = (properties.memoryTypes[i].propertyFlags & propertyFlags) == propertyFlags;
 
         if (matchTypeFilter && matchPropertyFlags) {
@@ -1089,15 +1073,15 @@ void VulkanRenderer::updateUniformBuffer(const uint32_t currentImage) {
     const auto currentTime = std::chrono::high_resolution_clock::now();
     const auto diff = currentTime - startTime;
 
-    float const time = std::chrono::duration<float, std::chrono::seconds::period>(diff).count();
+    float time = std::chrono::duration<float, std::chrono::seconds::period>(diff).count();
 
     UniformBufferObject ubo{};
 
-    ubo.model = XE::mat4RotationZ(time * XE::radians(90.0F));
-    ubo.view = XE::mat4LookAtRH({2.0F, 2.0F, 2.0F}, {0.0F, 0.0F, 0.0F}, {0.0F, 0.0F, 1.0F});
+    ubo.model = XE::mat4RotationZ(time * XE::radians(90.0f));
+    ubo.view = XE::mat4LookAtRH({2.0f, 2.0f, 2.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 1.0f});
 
     const auto aspectRatio = static_cast<float>(mSwapchainExtent.width) / static_cast<float>(mSwapchainExtent.height);
-    ubo.proj = XE::mat4Perspective(XE::radians(45.0F), aspectRatio, 0.1F, 10.0F);
+    ubo.proj = XE::mat4Perspective(XE::radians(45.0f), aspectRatio, 0.1f, 10.0f);
     ubo.proj[1][1] *= -1;
 
     assert(mUniformBuffersMapped[currentImage] != nullptr);

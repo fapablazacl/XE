@@ -15,14 +15,14 @@ public:
 
     GLuint getOrCreate(const std::string &filePath, Renderer &renderer);
 
-    GLuint createTexture(Renderer &renderer, const std::string &imageTypeStr, size_t size, const void *imageData) const;
+    GLuint createTexture(Renderer &renderer, const std::string &imageTypeStr, const size_t size, const void *imageData) const;
 
 private:
     GLuint createTexture(const char *theFileName, Renderer &renderer);
 
-    static GLuint createTexture(Renderer &renderer, const ImageData &image) ;
+    GLuint createTexture(Renderer &renderer, const ImageData &image) const;
 
-
+private:
     ImageLoader &loader;
     std::map<std::string, GLuint> cachedTextureMap;
 };

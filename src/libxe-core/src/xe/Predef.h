@@ -1,6 +1,6 @@
 
 #ifndef __XE_PREDEF_HPP__
-#define XE_PREDEF_HPP_
+#define __XE_PREDEF_HPP__
 
 #include <cassert>
 #include <cstddef>
@@ -46,7 +46,7 @@
 #define XE_ASSERT(condition, message)                                                                                                                                              \
     do {                                                                                                                                                                           \
         if (!(condition)) {                                                                                                                                                        \
-            std::cerr << "Assertion failed: (" << #condition << "), " << "function " << __func__ << ", " << "file " << __FILE__ << ", " << "line " << __LINE__ << ": " << (message)  \
+            std::cerr << "Assertion failed: (" << #condition << "), " << "function " << __func__ << ", " << "file " << __FILE__ << ", " << "line " << __LINE__ << ": " << message  \
                       << std::endl;                                                                                                                                                \
             std::abort();                                                                                                                                                          \
         }                                                                                                                                                                          \

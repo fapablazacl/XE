@@ -1,6 +1,6 @@
 
 #ifndef __XE_SCENE_VIRTUALSPHERE_HPP__
-#define XE_SCENE_VIRTUALSPHERE_HPP_
+#define __XE_SCENE_VIRTUALSPHERE_HPP__
 
 #include <xe/math/Rotation.h>
 #include <xe/math/Vector.h>

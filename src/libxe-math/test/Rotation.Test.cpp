@@ -1,8 +1,8 @@
 
 #include "xe/math/Rotation.h"
-#include <gtest/gtest.h>
+#include "GoogleTestCommon.h"
 
 TEST(RotationTest, EqualsShouldComparePointsInAElementWiseFasion) {
-    XE::Rotation<float> const tri1;
+    XE::Rotation<float> tri1;
     EXPECT_EQ(true, true);
 }

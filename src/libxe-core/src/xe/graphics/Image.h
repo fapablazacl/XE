@@ -1,6 +1,6 @@
 
 #ifndef __XE_GRAPHICS_IMAGE_HPP__
-#define XE_GRAPHICS_IMAGE_HPP_
+#define __XE_GRAPHICS_IMAGE_HPP__
 
 #include <cstddef>
 #include <xe/Predef.h>

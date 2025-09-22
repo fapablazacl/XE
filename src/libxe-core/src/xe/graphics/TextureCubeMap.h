@@ -1,6 +1,6 @@
 
 #ifndef __XE_GRAPHICS_TEXTURECUBEMAP_HPP__
-#define XE_GRAPHICS_TEXTURECUBEMAP_HPP_
+#define __XE_GRAPHICS_TEXTURECUBEMAP_HPP__
 
 #include <xe/DataType.h>
 #include <xe/Predef.h>
@@ -9,7 +9,7 @@
 namespace XE {
     class TextureCubeMap : public Texture {
     public:
-        ~TextureCubeMap() override;
+        virtual ~TextureCubeMap();
 
         TextureType getType() const override {
             return TextureType::TexCubeMap;
@@ -18,10 +18,10 @@ namespace XE {
         virtual Vector2i getSize() const = 0;
 
         virtual void
-        setData(const void *surfaceData, int mipLevel, TextureCubeMapSide cubeMap, DataType surfaceDataType, PixelFormat surfaceFormat, const Recti &area) = 0;
+        setData(const void *surfaceData, const int mipLevel, TextureCubeMapSide cubeMap, const DataType surfaceDataType, const PixelFormat surfaceFormat, const Recti &area) = 0;
 
         virtual void
-        getData(void *surfaceData, int mipLevel, TextureCubeMapSide cubeMap, DataType surfaceDataType, PixelFormat surfaceFormat, const Recti &area) const = 0;
+        getData(void *surfaceData, const int mipLevel, TextureCubeMapSide cubeMap, const DataType surfaceDataType, const PixelFormat surfaceFormat, const Recti &area) const = 0;
     };
 } // namespace XE
 

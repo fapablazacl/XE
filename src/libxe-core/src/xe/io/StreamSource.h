@@ -1,6 +1,6 @@
 
 #ifndef __XE_IO_STREAMSOURCE_HPP__
-#define XE_IO_STREAMSOURCE_HPP_
+#define __XE_IO_STREAMSOURCE_HPP__
 
 #include <memory>
 #include <string>

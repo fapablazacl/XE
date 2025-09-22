@@ -1,6 +1,6 @@
 
 #ifndef __XE_GRAPHICS_WINDOWGLFW_HPP__
-#define XE_GRAPHICS_WINDOWGLFW_HPP_
+#define __XE_GRAPHICS_WINDOWGLFW_HPP__
 
 #include <memory>
 #include <string>
@@ -15,16 +15,16 @@ namespace XE {
      */
     class WindowGLFW : public IWindow {
     public:
-        ~WindowGLFW() override;
+        virtual ~WindowGLFW();
 
-        Vector2i getSizeInPixels() const override = 0;
+        virtual Vector2i getSizeInPixels() const = 0;
 
         virtual GraphicsContext *getContext() const = 0;
 
         virtual InputManager *getInputManager() const = 0;
 
-    
-        static std::unique_ptr<WindowGLFW> create(const XE::GraphicsContext::Descriptor &descriptor, const std::string &title, const Vector2i &windowSize, bool fullScreen);
+    public:
+        static std::unique_ptr<WindowGLFW> create(const XE::GraphicsContext::Descriptor &descriptor, const std::string &title, const Vector2i &windowSize, const bool fullScreen);
     };
 } // namespace XE
 

@@ -1,20 +1,18 @@
 
 #include "Platform.h"
 
-#include <GLFW/glfw3.h>
 #include <glad/glad.h>
 
 #include <cassert>
 #include <cstring>
 #include <iostream>
-#include <string>
 
 Platform::Platform() {
     glfwInit();
 }
 
 Platform::~Platform() {
-    if (window != nullptr) {
+    if (window) {
         glfwDestroyWindow(window);
     }
 
@@ -22,7 +20,7 @@ Platform::~Platform() {
 }
 
 bool Platform::initialize() {
-    auto *const monitor = glfwGetPrimaryMonitor();
+    const auto monitor = glfwGetPrimaryMonitor();
     const GLFWvidmode *mode = glfwGetVideoMode(monitor);
 
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -41,15 +39,15 @@ bool Platform::initialize() {
 
     window = glfwCreateWindow(mode->width, mode->height, "Apostate", nullptr, nullptr);
 
-    if (window == nullptr) {
-        std::cout << "Can't open a Window" << '\n';
+    if (!window) {
+        std::cout << "Can't open a Window" << std::endl;
 
         const char description[1024] = {};
         const char *desc = &description[0];
 
         glfwGetError(&desc);
 
-        std::cout << description << '\n';
+        std::cout << description << std::endl;
 
         return false;
     }

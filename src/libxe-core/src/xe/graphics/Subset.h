@@ -1,6 +1,6 @@
 
 #ifndef __XE_GRAPHICS_SUBSET_HPP__
-#define XE_GRAPHICS_SUBSET_HPP_
+#define __XE_GRAPHICS_SUBSET_HPP__
 
 #include <cstddef>
 #include <map>
@@ -102,7 +102,7 @@ namespace XE {
         /**
          * @brief Get a mutable pointer to a buffer allocated in GPU memory. This buffer stores geometric data
          */
-        virtual Buffer *getBuffer(int index) = 0;
+        virtual Buffer *getBuffer(const int index) = 0;
 
         /**
          * @brief Get a mutable pointer to a buffer allocated in GPU memory. This buffer stores indexation data
@@ -112,7 +112,7 @@ namespace XE {
         /**
          * @brief Get a constant pointer to a buffer allocated in GPU memory. This buffer stores geometric data
          */
-        virtual const Buffer *getBuffer(int index) const = 0;
+        virtual const Buffer *getBuffer(const int index) const = 0;
 
         /**
          * @brief Get a constant pointer to a buffer allocated in GPU memory. This buffer stores indexation data

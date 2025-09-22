@@ -1,6 +1,6 @@
 
 #ifndef __XE_GRAPHICS_TEXTURE3D_HPP__
-#define XE_GRAPHICS_TEXTURE3D_HPP_
+#define __XE_GRAPHICS_TEXTURE3D_HPP__
 
 #include <xe/Predef.h>
 #include <xe/graphics/Texture.h>
@@ -12,16 +12,16 @@ namespace XE {
 namespace XE {
     class Texture3D : public Texture {
     public:
-        TextureType getType() const override;
+        virtual TextureType getType() const override;
 
-    
-        ~Texture3D() override;
+    public:
+        virtual ~Texture3D();
 
         virtual Vector3i getSize() const = 0;
 
-        virtual void setData(const void *surfaceData, int mipLevel, PixelFormat surfaceFormat, DataType surfaceDataType, const Boxi &volume) = 0;
+        virtual void setData(const void *surfaceData, const int mipLevel, const PixelFormat surfaceFormat, const DataType surfaceDataType, const Boxi &volume) = 0;
 
-        virtual void getData(void *surfaceData, int mipLevel, PixelFormat surfaceFormat, DataType surfaceDataType, const Boxi &volume) const = 0;
+        virtual void getData(void *surfaceData, const int mipLevel, const PixelFormat surfaceFormat, const DataType surfaceDataType, const Boxi &volume) const = 0;
     };
 } // namespace XE
 

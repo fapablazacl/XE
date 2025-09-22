@@ -9,7 +9,7 @@ enum class HostPlatformFlagBits { None = 0x00, Debug = 0x01 };
 
 class HostPlatform {
 public:
-    explicit HostPlatform(const std::string &title, uint32_t screenWidth, uint32_t screenHeight, HostPlatformFlagBits flags);
+    explicit HostPlatform(const std::string &title, const uint32_t screenWidth, const uint32_t screenHeight, const HostPlatformFlagBits flags);
 
     ~HostPlatform();
 
@@ -21,11 +21,11 @@ public:
 
     std::vector<const char *> enumerateRequiredInstanceExtensions() const;
 
-    static std::vector<const char *> enumerateRequiredDeviceExtensions() ;
+    std::vector<const char *> enumerateRequiredDeviceExtensions() const;
 
     std::vector<const char *> enumerateValidationLayers() const;
 
-    static void pollEvents();
+    void pollEvents();
 
     vk::Extent2D pickSwapExtent(const vk::SurfaceCapabilitiesKHR &surfaceCaps) const;
 

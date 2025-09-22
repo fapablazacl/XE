@@ -1,21 +1,17 @@
 
 #include "GltfRenderer.h"
 
+#include <array>
 #include <filesystem>
-#include <iostream>
-#include <ostream>
 #include <stdexcept>
-#include <string>
-#include <vector>
 
+#include "fmt/printf.h"
 #include "xe/gl/RendererGL.h"
 
 #include "GltfDataLoader.h"
 #include "GltfProcessor.h"
 #include "xe/ImageLoader.h"
 #include "xe/Timer.h"
-#include "xe/gl/Types.h"
-#include "xe/math/Common.h"
 #include "xe/math/Matrix.h"
 
 namespace xe::gltf_view {
@@ -95,7 +91,7 @@ void main() {
         };
     }
 
-    static std::string getAssetPath(const std::string &path) {
+    std::string getAssetPath(const std::string &path) {
         return (std::filesystem::path{XE_EXTERNAL_ASSET_ROOT_PATH} / path).string();
     }
 
@@ -107,14 +103,14 @@ void main() {
         std::vector<xe::gl::Shader> shaders = {renderer->createShader(GL_VERTEX_SHADER, vertexShaderSource), renderer->createShader(GL_FRAGMENT_SHADER, fragmentShaderSource)};
 
         program = renderer->createProgram(shaders);
-        if (program.id == 0u) {
+        if (!program.id) {
             throw std::runtime_error("Failed create program.");
         }
 
         auto gltfParser = GltfDataParser{};
-        auto *gltfData = gltfParser.parse(filePath);
+        auto gltfData = gltfParser.parse(filePath);
 
-        if (gltfData == nullptr) {
+        if (!gltfData) {
             throw std::runtime_error("Failed gltfParser.parse().");
         }
 
@@ -137,7 +133,7 @@ void main() {
             throw std::runtime_error("Meshes could not be loaded.");
         }
 
-        std::cout << meshes.size() << " meshes were loaded" << '\n';
+        std::cout << meshes.size() << " meshes were loaded" << std::endl;
     }
 
     GltfRenderer::~GltfRenderer() {
@@ -145,7 +141,7 @@ void main() {
 
     void GltfRenderer::beginFrame() {
         const auto clearFlags = GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT;
-        const auto clearColor = XE::Vector4{0.2F, 0.2F, 0.8F, 1.0F};
+        const auto clearColor = XE::Vector4{0.2f, 0.2f, 0.8f, 1.0f};
 
         renderer->clear(clearFlags, clearColor, {}, {});
     }
@@ -155,12 +151,12 @@ void main() {
     }
 
     void GltfRenderer::render() {
-        uniformData.seconds = (static_cast<float>(XE::Timer::getTick()) / 1000.0F) - startSeconds;
+        uniformData.seconds = (static_cast<float>(XE::Timer::getTick()) / 1000.0f) - startSeconds;
         startSeconds = uniformData.seconds;
 
-        const auto proj = XE::mat4Perspective(XE::radians(60.0F), static_cast<float>(SCREEN_HEIGHT) / static_cast<float>(SCREEN_WIDTH), 0.001F, 1000.0F);
-        const auto view = XE::mat4LookAtRH({0.0F, 0.0F, -25.0F}, {0.0F, 0.0F, 0.0F}, {0.0F, 1.0F, 0.0F});
-        const auto model = XE::mat4RotationY(angle += 0.005F);
+        const auto proj = XE::mat4Perspective(XE::radians(60.0f), static_cast<float>(SCREEN_HEIGHT) / static_cast<float>(SCREEN_WIDTH), 0.001f, 1000.0f);
+        const auto view = XE::mat4LookAtRH({0.0f, 0.0f, -25.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f});
+        const auto model = XE::mat4RotationY(angle += 0.005f);
 
         uniformData.model = model;
         uniformData.projViewModel = proj * view * model;

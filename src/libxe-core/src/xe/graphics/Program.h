@@ -1,6 +1,6 @@
 
 #ifndef __XE_GRAPHICS_PROGRAM_HPP__
-#define XE_GRAPHICS_PROGRAM_HPP_
+#define __XE_GRAPHICS_PROGRAM_HPP__
 
 #include <string>
 #include <vector>
@@ -24,7 +24,7 @@ namespace XE {
 
         virtual int getShaderCount() const = 0;
 
-        virtual Shader *getShader(int index) = 0;
+        virtual Shader *getShader(const int index) = 0;
     };
 } // namespace XE
 

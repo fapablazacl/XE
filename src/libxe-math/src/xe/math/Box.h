@@ -1,6 +1,6 @@
 
 #ifndef __XE_MATH_BOX_HPP__
-#define XE_MATH_BOX_HPP_
+#define __XE_MATH_BOX_HPP__
 
 #include "Boundary.h"
 
@@ -18,10 +18,10 @@ namespace XE {
 
     //! Serializes the content of a Box object to an ostream.
     template <typename T> inline std::ostream &operator<<(std::ostream &os, const TBox<T> &box) {
-        os << "xe::Box<" << typeid(T).name() << ">{ " << '\n';
+        os << "xe::Box<" << typeid(T).name() << ">{ " << std::endl;
         os << "    " << box.getMinEdge() << ", " << std::endl;
         os << "    " << box.getMaxEdge() << std::endl;
-        os << "}" << '\n';
+        os << "}" << std::endl;
 
         return os;
     }

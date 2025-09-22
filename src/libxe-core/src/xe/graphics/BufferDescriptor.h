@@ -1,6 +1,6 @@
 
 #ifndef __XE_GRAPHICS_BUFFERDESCRIPTOR_HPP__
-#define XE_GRAPHICS_BUFFERDESCRIPTOR_HPP_
+#define __XE_GRAPHICS_BUFFERDESCRIPTOR_HPP__
 
 #include <cstddef>
 #include <xe/Predef.h>
