@@ -12,8 +12,6 @@ option (XE_DEV_UNIT_TEST            "Enable unit test suite" ON)
 option (XE_DEV_WARNINGS_AS_ERRORS   "Marks all warnings as errors" OFF)
 option (XE_DEV_INSTRUMENT_COVERAGE  "Instrument code for code coverage reporting during unit tests" OFF)
 option (XE_DEV_PRECOMPILED_HEADERS  "Enable precompiled headers for internal libraries, to improve build times" OFF)
-option (XE_DEV_LINT_CLANG_TIDY      "Enable linting checks with clang-tidy" OFF)
-option (XE_DEV_IWYU                 "Enable include checks with IWYU" OFF)
 option (XE_DEV_SANITIZER_ENABLE     "Enable sanitizer usage" OFF)
 
 # Which sanitizer to use
@@ -83,18 +81,11 @@ target_compile_options(${target} INTERFACE ${XE_CXXFLAGS_WALL})
 if (XE_DEV_WARNINGS_AS_ERRORS)
     target_compile_options(${target} INTERFACE ${XE_CXXFLAGS_WERROR})
 endif()
+
 if (XE_DEV_INSTRUMENT_COVERAGE)
     target_compile_options(${target} INTERFACE ${XE_CXXFLAGS_COVERAGE})
     target_link_options(${target} INTERFACE ${XE_LDFLAGS_COVERAGE})
 endif() 
-
-if (XE_DEV_LINT_CLANG_TIDY)
-    set_target_properties(${target} PROPERTIES CMAKE_CXX_CLANG_TIDY "clang-tidy")
-endif()
-
-if (XE_DEV_IWYU)
-    set_target_properties(${target} PROPERTIES CMAKE_CXX_INCLUDE_WHAT_YOU_USE "iwyu")
-endif()
 
 if (XE_DEV_SANITIZER_ENABLE)
     target_compile_options(${target} INTERFACE -fsanitize=${XE_DEV_SANITIZER})
