@@ -1,6 +1,6 @@
 
 #ifndef __XE_GRAPHICS_GRAPHICSCONTEXTGLFW_HPP__
-#define __XE_GRAPHICS_GRAPHICSCONTEXTGLFW_HPP__
+#define XE_GRAPHICS_GRAPHICSCONTEXTGLFW_HPP_
 
 #include <GLFW/glfw3.h>
 #include <xe/graphics/GraphicsContext.h>
@@ -10,7 +10,7 @@ namespace XE {
     public:
         GraphicsContextGLFW(GLFWwindow *glfwWindow, Descriptor descriptor);
 
-        ~GraphicsContextGLFW();
+        ~GraphicsContextGLFW() override;
 
         GetProcAddressGL getProcAddressFunctionGL() const override;
 

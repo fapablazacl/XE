@@ -1,4 +1,5 @@
 
+#include "xe/graphics/Texture.h"
 #include <xe/graphics/Texture2DArray.h>
 
 namespace XE {

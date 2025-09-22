@@ -4,9 +4,18 @@
 #include "../../../../apostate/src/apostate/Platform.h"
 #include "xe/Logger.h"
 
+#include <_abort.h>
 #include <cassert>
+#include <cstdarg>
+#include <cstddef>
+#include <cstdio>
+#include <cstring>
+#include <glm/ext/matrix_clip_space.hpp>
+#include <glm/ext/matrix_float4x4.hpp>
+#include <glm/ext/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 #include <iostream>
-#include <memory>
+#include <string>
 #include <vector>
 
 #include <glad/glad.h>
@@ -181,7 +190,7 @@ static std::string GLErrorToString(GLenum error) {
 #define M_Assert(Expr, Msg) ;
 #endif
 
-void __M_Assert(const char *expr_str, bool expr, const char *file, int line, const char *msg) {
+static void __M_Assert(const char *expr_str, bool expr, const char *file, int line, const char *msg) {
     if (!expr) {
         std::cerr << "Assert failed:\t" << msg << "\n"
                   << "Expected:\t" << expr_str << "\n"
@@ -217,17 +226,17 @@ struct GLErrorRAII {
 #define GL_SCOPED_ERROR_CHECK() GLErrorRAII __gl_error_raii(__FILE__, __LINE__)
 
 #if defined(GLAD_DEBUG)
-void pre_call_callback_gl(const char *name, void *funcptr, int len_args, ...) {
+static void pre_call_callback_gl(const char *name, void *funcptr, int len_args, ...) {
     (void)name;
     (void)funcptr;
     (void)len_args;
 
     if (strcmp(name, "glLinkProgram") == 0) {
-        std::cout << "pre glLinkProgram" << std::endl;
+        std::cout << "pre glLinkProgram" << '\n';
     }
 }
 
-void post_call_callback_gl(const char *name, void *funcptr, int len_args, ...) {
+static void post_call_callback_gl(const char *name, void *funcptr, int len_args, ...) {
     (void)funcptr;
 
     const GLenum error_code = glad_glGetError();
@@ -236,7 +245,7 @@ void post_call_callback_gl(const char *name, void *funcptr, int len_args, ...) {
         return;
     }
 
-    va_list valist;
+    va_list valist = nullptr;
     va_start(valist, len_args);
 
     std::cerr << name << "(";
@@ -254,8 +263,8 @@ void post_call_callback_gl(const char *name, void *funcptr, int len_args, ...) {
         std::cerr << "<unknown function arguments>";
     }
 
-    std::cerr << ")" << std::endl;
-    std::cerr << "Error: The previous command couldn't be completed, due to the error " << GLErrorToString(error_code) << std::endl;
+    std::cerr << ")" << '\n';
+    std::cerr << "Error: The previous command couldn't be completed, due to the error " << GLErrorToString(error_code) << '\n';
 
     va_end(valist);
 
@@ -267,24 +276,24 @@ Renderer::Renderer(Platform &platform) : platform{platform} {
 }
 
 bool Renderer::initialize() {
-    if (!gladLoadGLLoader((GLADloadproc)platform.getGLProcAddressProcedure())) {
-        std::cerr << "Failed to initialize extensions (via GLAD)" << std::endl;
+    if (gladLoadGLLoader((GLADloadproc)platform.getGLProcAddressProcedure()) == 0) {
+        std::cerr << "Failed to initialize extensions (via GLAD)" << '\n';
 
         return false;
     }
 
-    std::cout << "GL_VENDOR: " << glGetString(GL_VENDOR) << std::endl;
-    std::cout << "GL_VERSION: " << glGetString(GL_VERSION) << std::endl;
-    std::cout << "GL_RENDERER: " << glGetString(GL_RENDERER) << std::endl;
-    std::cout << "GL_SHADING_LANGUAGE_VERSION: " << glGetString(GL_SHADING_LANGUAGE_VERSION) << std::endl;
+    std::cout << "GL_VENDOR: " << glGetString(GL_VENDOR) << '\n';
+    std::cout << "GL_VERSION: " << glGetString(GL_VERSION) << '\n';
+    std::cout << "GL_RENDERER: " << glGetString(GL_RENDERER) << '\n';
+    std::cout << "GL_SHADING_LANGUAGE_VERSION: " << glGetString(GL_SHADING_LANGUAGE_VERSION) << '\n';
 
-    GLint extensionCount;
+    GLint extensionCount = 0;
     glGetIntegerv(GL_NUM_EXTENSIONS, &extensionCount);
 
-    std::cout << "GLAD - Initialized extensions (" << extensionCount << "): " << std::endl;
+    std::cout << "GLAD - Initialized extensions (" << extensionCount << "): " << '\n';
 
     for (int i = 0; i < extensionCount; i++) {
-        std::cout << "    " << glGetStringi(GL_EXTENSIONS, i) << std::endl;
+        std::cout << "    " << glGetStringi(GL_EXTENSIONS, i) << '\n';
     }
 
 #if defined(GLAD_DEBUG)
@@ -299,7 +308,7 @@ Renderer::~Renderer() {
 }
 
 GLuint Renderer::createShader(const std::string &source, const GLenum type) {
-    GLuint shader = glCreateShader(type);
+    GLuint const shader = glCreateShader(type);
 
     const GLchar *const sources = source.c_str();
     const GLint sourceSizes = static_cast<GLint>(source.size());
@@ -324,7 +333,7 @@ GLuint Renderer::createShader(const std::string &source, const GLenum type) {
 }
 
 GLuint Renderer::createShaderProgram(const std::vector<GLuint> &shaders) {
-    GLuint programId = glCreateProgram();
+    GLuint const programId = glCreateProgram();
 
     for (const GLuint shaderId : shaders) {
         assert(shaderId);
@@ -344,7 +353,7 @@ GLuint Renderer::createShaderProgram(const std::vector<GLuint> &shaders) {
 
         glGetProgramInfoLog(programId, 2048, &size, buffer);
         const std::string msg = buffer;
-        std::cerr << "Error: " << msg << std::endl;
+        std::cerr << "Error: " << msg << '\n';
 
         return 0;
     }
@@ -400,8 +409,8 @@ ShaderLocationMap Renderer::createShaderLocationMap(const GLuint programId) {
     return location;
 }
 
-void Renderer::beginRenderFrame() {
-    glClearColor(0.2f, 0.2f, 0.8f, 1.0f);
+void Renderer::beginRenderFrame() const {
+    glClearColor(0.2F, 0.2F, 0.8F, 1.0F);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glEnable(GL_DEPTH_TEST);
 
@@ -418,7 +427,7 @@ Mesh Renderer::createMeshVAO(const ShaderLocationMap &location, const MeshData &
 
     meshVAO.material = meshData.materialIndex;
 
-    GLuint coordBuffer = createBuffer(GL_ARRAY_BUFFER, meshData.vertexCoord, GL_STATIC_DRAW);
+    GLuint const coordBuffer = createBuffer(GL_ARRAY_BUFFER, meshData.vertexCoord, GL_STATIC_DRAW);
 
     GLuint normalBuffer = 0;
     if (!meshData.vertexNormal.empty()) {
@@ -452,14 +461,14 @@ Mesh Renderer::createMeshVAO(const ShaderLocationMap &location, const MeshData &
     glBindBuffer(GL_ARRAY_BUFFER, coordBuffer);
     glVertexAttribPointer(location.coord, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
 
-    if (normalBuffer) {
+    if (normalBuffer != 0u) {
         assert(location.normal >= 0);
         glEnableVertexAttribArray(location.normal);
         glBindBuffer(GL_ARRAY_BUFFER, normalBuffer);
         glVertexAttribPointer(location.normal, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
     }
 
-    if (texCoordBuffer) {
+    if (texCoordBuffer != 0u) {
         assert(location.texCoord >= 0);
 
         glEnableVertexAttribArray(location.texCoord);
@@ -467,7 +476,7 @@ Mesh Renderer::createMeshVAO(const ShaderLocationMap &location, const MeshData &
         glVertexAttribPointer(location.texCoord, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
     }
 
-    if (indexBuffer) {
+    if (indexBuffer != 0u) {
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer);
     }
 
@@ -520,7 +529,7 @@ void Renderer::renderLighting(const GLuint programId, const Lighting &lighting) 
 
     loc = glGetUniformLocation(programId, "uEnableLighting");
     assert(loc >= 0);
-    glUniform1i(loc, lighting.enabled == true ? 1 : 0);
+    glUniform1i(loc, lighting.enabled ? 1 : 0);
 
     loc = glGetUniformLocation(programId, "uLighting.globalAmbient");
     assert(loc >= 0);
@@ -562,9 +571,9 @@ void Renderer::renderMaterialChannel(const GLuint programId, const std::string &
     std::snprintf(name, sizeof(name), "%s.textureMapEnable", uniformPrefix.c_str());
     loc = glGetUniformLocation(programId, name);
     assert(loc >= 0);
-    glUniform1f(loc, channel.textureMap ? 1.0f : 0.0f);
+    glUniform1f(loc, (channel.textureMap != 0u) ? 1.0F : 0.0F);
 
-    if (channel.textureMap) {
+    if (channel.textureMap != 0u) {
         std::snprintf(name, sizeof(name), "%s.textureMap", uniformPrefix.c_str());
         loc = glGetUniformLocation(programId, name);
         assert(loc >= 0);

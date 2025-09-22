@@ -1,6 +1,6 @@
 
 #ifndef __XE_GRAPHICS_ELLIPSOIDGENERATOR_HPP__
-#define __XE_GRAPHICS_ELLIPSOIDGENERATOR_HPP__
+#define XE_GRAPHICS_ELLIPSOIDGENERATOR_HPP_
 
 #include <vector>
 #include <xe/math/Math.h>
@@ -10,17 +10,17 @@
 namespace XE {
     class EllipsoidGenerator : public ShapeGenerator {
     public:
-        EllipsoidGenerator(const int slices, const int stacks, const Vector3 &dimensions);
+        EllipsoidGenerator(int slices, int stacks, const Vector3 &dimensions);
 
-        virtual ~EllipsoidGenerator();
+        ~EllipsoidGenerator() override;
 
-        virtual std::vector<Vector3> generateVertexCoordinates() const override;
+        std::vector<Vector3> generateVertexCoordinates() const override;
 
-        virtual std::vector<Vector3> generateVertexNormals() const override;
+        std::vector<Vector3> generateVertexNormals() const override;
 
-        virtual std::vector<Vector2> generateVertexTexCoords() const override;
+        std::vector<Vector2> generateVertexTexCoords() const override;
 
-        virtual std::vector<int> generateIndices() const override;
+        std::vector<int> generateIndices() const override;
 
     private:
         int slices = 0;

@@ -1,6 +1,6 @@
 
 #ifndef __XE_MATH_BOUNDARY_HPP__
-#define __XE_MATH_BOUNDARY_HPP__
+#define XE_MATH_BOUNDARY_HPP_
 
 #include <array>
 #include <cassert>
@@ -24,7 +24,7 @@ namespace XE {
     public:
         static_assert(N == 2 || N == 3, "N template parameter must one of (2, 3)");
 
-    public:
+    
         template <int Base, int Exp> struct Power {
             enum { Value = Base * Power<Base, Exp - 1>::Value };
         };
@@ -33,14 +33,14 @@ namespace XE {
             enum { Value = 1 };
         };
 
-    public:
+    
         enum { SideCount = 2 * N };
 
         enum { PointCount = Power<2, N>::Value };
 
         enum { MinEdge = 0, MaxEdge = PointCount - 1 };
 
-    public:
+    
         TBoundary() {
         }
 

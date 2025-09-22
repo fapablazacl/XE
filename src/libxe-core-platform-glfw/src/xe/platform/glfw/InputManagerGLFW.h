@@ -1,6 +1,6 @@
 
 #ifndef __XE_GRAPHICS_GL_INPUTMANAGERGLFW_HPP__
-#define __XE_GRAPHICS_GL_INPUTMANAGERGLFW_HPP__
+#define XE_GRAPHICS_GL_INPUTMANAGERGLFW_HPP_
 
 #include <GLFW/glfw3.h>
 #include <xe/input/DeviceStatus.h>
@@ -11,22 +11,22 @@ namespace XE {
     public:
         explicit InputManagerGLFW(GLFWwindow *window);
 
-        virtual void poll() override;
+        void poll() override;
 
-        virtual KeyboardStatus getKeyboardStatus() override {
+        KeyboardStatus getKeyboardStatus() override {
             return m_keyboardStatus;
         }
 
-        virtual MouseStatus getMouseStatus() override;
+        MouseStatus getMouseStatus() override;
 
-        virtual int getControllerCount() override;
+        int getControllerCount() override;
 
-        virtual ControllerStatus getControllerStatus(const int index) override;
+        ControllerStatus getControllerStatus(int index) override;
 
     private:
         void fillKeyboardStatus();
 
-    private:
+    
         GLFWwindow *m_windowGLFW = nullptr;
         KeyboardStatus m_keyboardStatus = {};
     };

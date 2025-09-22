@@ -1,6 +1,6 @@
 
 #ifndef __XE_MATH_RAY_HPP__
-#define __XE_MATH_RAY_HPP__
+#define XE_MATH_RAY_HPP_
 
 #include "Vector.h"
 #include <cassert>
@@ -18,15 +18,15 @@ namespace XE {
          * direction of the ray.
          */
         TVector<T, 3> pointAt(const T t) const {
-            return position + t * direction;
+            return position + (t * direction);
         }
 
         /**
          * @brief Initializes the ray, positioned around the origin and aiming to the positive Z-axis.
          */
-        TRay() {
-            position = {T(0.0), T(0.0), T(0.0)};
-            direction = {T(0.0), T(0.0), T(1.0)};
+        TRay() : position({T(0.0), T(0.0), T(0.0)}), direction({T(0.0), T(0.0), T(1.0)}) {
+            
+            
         }
     };
 

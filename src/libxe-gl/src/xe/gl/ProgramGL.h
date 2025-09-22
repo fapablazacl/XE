@@ -1,6 +1,6 @@
 
 #ifndef __XE_GRAPHICS_GL_PROGRAMGL_HPP__
-#define __XE_GRAPHICS_GL_PROGRAMGL_HPP__
+#define XE_GRAPHICS_GL_PROGRAMGL_HPP_
 
 #include <memory>
 #include <string>
@@ -21,17 +21,17 @@ namespace XE {
     public:
         ProgramGL(const ProgramDescriptor &desc);
 
-        virtual ~ProgramGL();
+        ~ProgramGL() override;
 
-        virtual int getShaderCount() const override;
+        int getShaderCount() const override;
 
-        virtual Shader *getShader(const int index) override;
+        Shader *getShader(int index) override;
 
         GLuint GetID() const {
             return m_id;
         }
 
-    public:
+    
         int getUniformLocation(const std::string &name) const;
 
         int getAttributeLocation(const std::string &name) const;

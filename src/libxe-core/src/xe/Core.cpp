@@ -14,7 +14,7 @@
 #endif
 
 namespace XE {
-    Version Core::GetVersion() const {
+    Version Core::GetVersion() {
         return {XE_VERSION_MAJOR, XE_VERSION_MINOR, XE_VERSION_REVISION};
     }
 } // namespace XE

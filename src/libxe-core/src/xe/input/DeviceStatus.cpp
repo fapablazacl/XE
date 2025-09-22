@@ -1,4 +1,5 @@
 
+#include "xe/math/Vector.h"
 #include <xe/input/DeviceStatus.h>
 
 namespace XE {

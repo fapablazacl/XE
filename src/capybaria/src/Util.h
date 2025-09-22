@@ -6,11 +6,11 @@
 namespace demo {
     XE::ProgramDescriptor makeSimpleProgramDesc(const std::string &vs, const std::string &fs);
 
-    Mesh makeIndexedCubeMesh(const float width, const float height, const float depth);
+    Mesh makeIndexedCubeMesh(float width, float height, float depth);
 
-    Mesh makeAxisMesh(const float width, const float height, const float depth);
+    Mesh makeAxisMesh(float width, float height, float depth);
 
-    Mesh makeColoredCubeMesh(const float width, const float height, const float depth);
+    Mesh makeColoredCubeMesh(float width, float height, float depth);
 
     std::string loadTextFile(const std::string &filePath);
 
@@ -18,7 +18,7 @@ namespace demo {
 
     XE::Subset *createSubset(XE::GraphicsDevice *graphicsDevice, const Mesh &mesh);
 
-    Mesh makeGridMesh(const float tileSize, const int tilesInX, const int tilesInZ);
+    Mesh makeGridMesh(float tileSize, int tilesInX, int tilesInZ);
 
-    Mesh makeCubeMesh(const float width, const float height, const float depth);
+    Mesh makeCubeMesh(float width, float height, float depth);
 } // namespace demo

@@ -1,5 +1,6 @@
 
 #include "Vector.h"
+#include <cstdint>
 
 namespace XE {
     template struct TVector<std::int32_t, 2>;

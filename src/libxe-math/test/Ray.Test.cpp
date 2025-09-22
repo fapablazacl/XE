@@ -1,8 +1,8 @@
 
 #include "xe/math/Ray.h"
-#include "GoogleTestCommon.h"
+#include <gtest/gtest.h>
 
 TEST(RayTest, EqualsShouldComparePointsInAElementWiseFasion) {
-    XE::TRay<float> ray1;
+    XE::TRay<float> const ray1;
     EXPECT_EQ(true, true);
 }

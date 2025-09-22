@@ -46,7 +46,7 @@ namespace Sandbox {
         std::vector<int> indices;
 
         XE::SubsetEnvelope getEnvelope() const {
-            if (indices.size()) {
+            if (!indices.empty() != 0u) {
                 return {type, 0, (int)indices.size()};
             }
 

@@ -1,8 +1,13 @@
 
 #include "Model.h"
+#include "xe/gl/Renderer.h"
+#include <cstddef>
+#include <glm/ext/matrix_float4x4.hpp>
+#include <glm/ext/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 void Model::render(Renderer &renderer, const ShaderLocationMap &location) const {
-    glm::mat4 transform = glm::identity<glm::mat4>();
+    glm::mat4 const transform = glm::identity<glm::mat4>();
 
     renderNode(renderer, location, transform, rootNode);
 }

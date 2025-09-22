@@ -1,14 +1,17 @@
 
 #include "ShaderGL.h"
+#include "xe/gl/gl.h"
+#include "xe/graphics/Shader.h"
 
 #include <cassert>
 #include <stdexcept>
+#include <string>
 
 namespace XE {
     static GLenum s_shaderTypesGL[] = {GL_VERTEX_SHADER, GL_FRAGMENT_SHADER, GL_GEOMETRY_SHADER};
 
     ShaderGL::ShaderGL(const ShaderType type, const std::string &source) {
-        assert(source != "");
+        assert(!source.empty());
 
         m_type = type;
         m_source = source;
@@ -22,7 +25,7 @@ namespace XE {
         glCompileShader(m_id);
 
         // check for errors
-        GLint status;
+        GLint status = 0;
         glGetShaderiv(m_id, GL_COMPILE_STATUS, &status);
 
         if (status == static_cast<GLint>(GL_FALSE)) {
@@ -43,7 +46,7 @@ namespace XE {
     }
 
     ShaderGL::~ShaderGL() {
-        if (m_id) {
+        if (m_id != 0u) {
             glDeleteShader(m_id);
         }
     }

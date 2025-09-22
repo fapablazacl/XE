@@ -1,11 +1,15 @@
 
+#include "xe/io/Stream.h"
+#include <ios>
+#include <memory>
+#include <string>
 #include <xe/io/FileStreamSource.h>
 
 #include <fstream>
 #include <xe/io/FileStream.h>
 
 namespace XE {
-    FileStreamSource::FileStreamSource(const std::string &directory) {
+    FileStreamSource::FileStreamSource(const std::string &directory) : directory(directory) {
         /*
         fs::path path;
 
@@ -29,7 +33,7 @@ namespace XE {
         }
         */
 
-        this->directory = directory;
+        
     }
 
     std::unique_ptr<Stream> FileStreamSource::open(const std::string &path) {

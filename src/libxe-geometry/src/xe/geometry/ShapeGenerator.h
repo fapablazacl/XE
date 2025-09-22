@@ -1,6 +1,6 @@
 
 #ifndef __XE_GRAPHICS_SHAPEGENERATOR_HPP__
-#define __XE_GRAPHICS_SHAPEGENERATOR_HPP__
+#define XE_GRAPHICS_SHAPEGENERATOR_HPP_
 
 #include <vector>
 #include <xe/math/Math.h>

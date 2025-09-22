@@ -1,6 +1,6 @@
 
 #ifndef __XE_GRAPHICS_IMAGELOADER_HPP__
-#define __XE_GRAPHICS_IMAGELOADER_HPP__
+#define XE_GRAPHICS_IMAGELOADER_HPP_
 
 #include <memory>
 

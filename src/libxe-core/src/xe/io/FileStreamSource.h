@@ -1,6 +1,6 @@
 
 #ifndef __XE_IO_FILESTREAMSOURCE_HPP__
-#define __XE_IO_FILESTREAMSOURCE_HPP__
+#define XE_IO_FILESTREAMSOURCE_HPP_
 
 #include <memory>
 #include <string>
@@ -13,9 +13,9 @@ namespace XE {
     public:
         FileStreamSource(const std::string &directory);
 
-        virtual std::unique_ptr<Stream> open(const std::string &path) override;
+        std::unique_ptr<Stream> open(const std::string &path) override;
 
-        virtual bool exists(const std::string &path) const override;
+        bool exists(const std::string &path) const override;
 
     private:
         std::string directory;

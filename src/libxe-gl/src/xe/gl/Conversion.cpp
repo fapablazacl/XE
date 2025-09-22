@@ -1,13 +1,15 @@
 
 #include "Conversion.h"
+#include "xe/gl/gl.h"
 
+#include <array>
 #include <cassert>
+#include <cstddef>
 #include <xe/DataType.h>
 #include <xe/graphics/BufferDescriptor.h>
 #include <xe/graphics/Material.h>
 #include <xe/graphics/PixelFormat.h>
 #include <xe/graphics/Subset.h>
-#include <xe/graphics/TextureCubeMap.h>
 
 namespace XE {
     static const std::array<GLenum, 12> dataType{

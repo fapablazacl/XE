@@ -1,6 +1,6 @@
 
 #ifndef __XE_GRAPHICS_GL_TEXTUREBASEGL_HPP__
-#define __XE_GRAPHICS_GL_TEXTUREBASEGL_HPP__
+#define XE_GRAPHICS_GL_TEXTUREBASEGL_HPP_
 
 #include "gl.h"
 
@@ -10,11 +10,11 @@ namespace XE {
      */
     class TextureBaseGL {
     public:
-        explicit TextureBaseGL(const GLenum target);
+        explicit TextureBaseGL(GLenum target);
 
         virtual ~TextureBaseGL() = 0;
 
-    public:
+    
         GLuint GetID() const {
             return m_id;
         }

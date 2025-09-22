@@ -1,6 +1,6 @@
 
 #ifndef __XE_TIMER_HPP__
-#define __XE_TIMER_HPP__
+#define XE_TIMER_HPP_
 
 #include <cstdint>
 #include <xe/Predef.h>

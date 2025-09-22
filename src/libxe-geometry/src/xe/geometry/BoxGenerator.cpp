@@ -1,13 +1,14 @@
 
+#include "xe/math/Vector.h"
+#include <vector>
 #include <xe/geometry/BoxGenerator.h>
-#include <xe/math/Common.h>
 
 namespace XE {
     const int faceCount = 6;
 
-    BoxGenerator::BoxGenerator(const Vector3i &division, const Vector3 &size) {
-        this->division = division;
-        this->size = size;
+    BoxGenerator::BoxGenerator(const Vector3i &division, const Vector3 &size) : division(division), size(size) {
+        
+        
     }
 
     BoxGenerator::~BoxGenerator() {
@@ -37,10 +38,10 @@ namespace XE {
             for (int i = 0; i < slices; i++) {
                 for (int j = 0; j < stacks; j++) {
 
-                    const int p0 = baseIndex + (i + 0) + (j + 0) * (slices + 1);
-                    const int p1 = baseIndex + (i + 1) + (j + 0) * (slices + 1);
-                    const int p2 = baseIndex + (i + 0) + (j + 1) * (slices + 1);
-                    const int p3 = baseIndex + (i + 1) + (j + 1) * (slices + 1);
+                    const int p0 = baseIndex + (i + 0) + ((j + 0) * (slices + 1));
+                    const int p1 = baseIndex + (i + 1) + ((j + 0) * (slices + 1));
+                    const int p2 = baseIndex + (i + 0) + ((j + 1) * (slices + 1));
+                    const int p3 = baseIndex + (i + 1) + ((j + 1) * (slices + 1));
 
                     indices.push_back(p0);
                     indices.push_back(p1);

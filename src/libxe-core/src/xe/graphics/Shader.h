@@ -1,6 +1,6 @@
 
 #ifndef __XE_GRAPHICS_SHADER_HPP__
-#define __XE_GRAPHICS_SHADER_HPP__
+#define XE_GRAPHICS_SHADER_HPP_
 
 #include <string>
 

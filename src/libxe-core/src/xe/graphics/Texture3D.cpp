@@ -1,4 +1,5 @@
 
+#include "xe/graphics/Texture.h"
 #include <xe/graphics/Texture3D.h>
 
 namespace XE {

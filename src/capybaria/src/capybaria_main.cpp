@@ -1,6 +1,8 @@
 
 #include "Game.h"
 
+#include <cstdio>
+#include <cstdlib>
 #include <filesystem>
 
 int main(int /*argc*/, char * /*argv*/[]) {

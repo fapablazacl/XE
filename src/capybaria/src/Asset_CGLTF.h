@@ -35,7 +35,7 @@ namespace Sandbox {
 
         void visitScene(const cgltf_scene *scene);
 
-    private:
+    
         cgltf_data *mData = nullptr;
         SceneNodeCallback mCallback;
     };

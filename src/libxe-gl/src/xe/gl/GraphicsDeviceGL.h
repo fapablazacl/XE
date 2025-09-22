@@ -1,6 +1,6 @@
 
 #ifndef __XE_GRAPHICS_GL_GRAPHICSDEVICEGL_HPP__
-#define __XE_GRAPHICS_GL_GRAPHICSDEVICEGL_HPP__
+#define XE_GRAPHICS_GL_GRAPHICSDEVICEGL_HPP_
 
 #include <xe/graphics/GraphicsContext.h>
 #include <xe/graphics/GraphicsDevice.h>
@@ -14,22 +14,22 @@ namespace XE {
     public:
         explicit GraphicsDeviceGL(GraphicsContext *context);
 
-        ~GraphicsDeviceGL();
+        ~GraphicsDeviceGL() override;
 
         Subset *createSubset(const SubsetDescriptor &desc) override;
 
         Buffer *createBuffer(const BufferDescriptor &bufferDescriptor) override;
 
-        Texture2D *createTexture2D(const PixelFormat format, const Vector2i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void *sourceData) override;
+        Texture2D *createTexture2D(PixelFormat format, const Vector2i &size, PixelFormat sourceFormat, DataType sourceDataType, const void *sourceData) override;
 
-        Texture3D *createTexture3D(const PixelFormat format, const Vector3i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void *sourceData) override;
+        Texture3D *createTexture3D(PixelFormat format, const Vector3i &size, PixelFormat sourceFormat, DataType sourceDataType, const void *sourceData) override;
 
-        Texture2DArray *createTexture2DArray(const PixelFormat format, const Vector2i &size, const int count) override;
+        Texture2DArray *createTexture2DArray(PixelFormat format, const Vector2i &size, int count) override;
 
         TextureCubeMap *
-        createTextureCubeMap(const PixelFormat format, const Vector2i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void **sourceData) override;
+        createTextureCubeMap(PixelFormat format, const Vector2i &size, PixelFormat sourceFormat, DataType sourceDataType, const void **sourceData) override;
 
-        Program *createProgram(const ProgramDescriptor &programDescriptor) override;
+        Program *createProgram(const ProgramDescriptor &desc) override;
 
         void setMaterial(const Material *material) override;
 
@@ -39,13 +39,13 @@ namespace XE {
 
         const Program *getProgram() const override;
 
-        void applyUniform(const UniformMatrix *uniformMatrix, const size_t count, const void *data) override;
+        void applyUniform(const UniformMatrix *uniformMatrix, size_t count, const void *data) override;
 
-        void applyUniform(const Uniform *uniform, const size_t count, const void *data) override;
+        void applyUniform(const Uniform *uniform, size_t count, const void *data) override;
 
-        void beginFrame(const ClearFlags flags, const Vector4 &color, const float depth, const int stencil) override;
+        void beginFrame(ClearFlags flags, const Vector4 &color, float depth, int stencil) override;
 
-        void draw(const Subset *subset, const SubsetEnvelope *envelopes, const size_t envelopeCount) override;
+        void draw(const Subset *subset, const SubsetEnvelope *envelopes, size_t envelopeCount) override;
 
         void endFrame() override;
 
@@ -54,11 +54,11 @@ namespace XE {
         Viewport getViewport() const override;
 
     private:
-        void preRenderMaterial(const Material *material);
+        static void preRenderMaterial(const Material *material);
 
-        void postRenderMaterial(const Material *material);
+        static void postRenderMaterial(const Material *material);
 
-    private:
+    
         GraphicsContext *context = nullptr;
 
         const ProgramGL *m_program = nullptr;

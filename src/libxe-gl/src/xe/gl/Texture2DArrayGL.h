@@ -1,6 +1,6 @@
 
 #ifndef __XE_GRAPHICS_GL_TEXTURE2DARRAYGL_HPP__
-#define __XE_GRAPHICS_GL_TEXTURE2DARRAYGL_HPP__
+#define XE_GRAPHICS_GL_TEXTURE2DARRAYGL_HPP_
 
 #include <xe/graphics/Texture2DArray.h>
 
@@ -9,29 +9,29 @@
 namespace XE {
     class Texture2DArrayGL : public Texture2DArray, public TextureBaseGL {
     public:
-        Texture2DArrayGL(const PixelFormat format, const Vector2i &size, const int count);
+        Texture2DArrayGL(PixelFormat format, const Vector2i &size, int count);
 
-        virtual ~Texture2DArrayGL();
+        ~Texture2DArrayGL() override;
 
-        virtual PixelFormat getFormat() const override {
+        PixelFormat getFormat() const override {
             return m_format;
         }
 
-    public:
-        virtual Vector2i getSize() const override {
+    
+        Vector2i getSize() const override {
             return m_size;
         }
 
-        virtual int getCount() const override {
+        int getCount() const override {
             return m_count;
         }
 
-        virtual void setData(
-            const void *surfaceData, const int mipLevel, const int arrayIndex, const PixelFormat surfaceFormat, const DataType surfaceDataType, const Recti &area, int count
+        void setData(
+            const void *surfaceData, int mipLevel, int arrayIndex, PixelFormat surfaceFormat, DataType surfaceDataType, const Recti &area, int count
         ) override;
 
-        virtual void
-        getData(void *surfaceData, const int mipLevel, const int arrayIndex, const PixelFormat surfaceFormat, const DataType surfaceDataType, const Recti &area) const override;
+        void
+        getData(void *surfaceData, int mipLevel, int arrayIndex, PixelFormat surfaceFormat, DataType surfaceDataType, const Recti &area) const override;
 
     private:
         PixelFormat m_format;

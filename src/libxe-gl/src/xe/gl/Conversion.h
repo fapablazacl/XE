@@ -1,6 +1,6 @@
 
 #ifndef __XE_GRAPHICS_GL_CONVERSION_HPP__
-#define __XE_GRAPHICS_GL_CONVERSION_HPP__
+#define XE_GRAPHICS_GL_CONVERSION_HPP_
 
 #include "gl.h"
 #include <cstdint>
@@ -25,19 +25,19 @@ namespace XE {
 } // namespace XE
 
 namespace XE {
-    extern GLenum convertToGL(const DataType type);
-    extern GLenum convertToGL(const PixelFormat format);
-    extern GLenum convertToGL(const BufferType type);
-    extern GLenum convertToGL(const BufferUsage usage, const BufferAccess access);
-    extern GLenum convertToGL(const PrimitiveType type);
-    extern GLenum convertToGL(const DepthFunc func);
-    extern GLenum convertToGL(const PolygonMode mode);
-    extern GLenum convertToGL(const FrontFaceOrder order);
-    extern GLenum convertToGL(const BlendParam param);
-    extern GLenum convertToGL(const TextureFilter filter);
-    extern GLenum convertToGL(const TextureWrap wrap);
-    extern GLenum convertToGL(const TextureCubeMapSide side);
-    extern GLboolean convertToGL(const bool value);
+    extern GLenum convertToGL(DataType type);
+    extern GLenum convertToGL(PixelFormat format);
+    extern GLenum convertToGL(BufferType type);
+    extern GLenum convertToGL(BufferUsage usage, BufferAccess access);
+    extern GLenum convertToGL(PrimitiveType type);
+    extern GLenum convertToGL(DepthFunc func);
+    extern GLenum convertToGL(PolygonMode mode);
+    extern GLenum convertToGL(FrontFaceOrder order);
+    extern GLenum convertToGL(BlendParam param);
+    extern GLenum convertToGL(TextureFilter filter);
+    extern GLenum convertToGL(TextureWrap wrap);
+    extern GLenum convertToGL(TextureCubeMapSide side);
+    extern GLboolean convertToGL(bool value);
 } // namespace XE
 
 #endif

@@ -1,6 +1,6 @@
 
 #ifndef __XE_GRAPHICS_MATERIAL_HPP__
-#define __XE_GRAPHICS_MATERIAL_HPP__
+#define XE_GRAPHICS_MATERIAL_HPP_
 
 #include <array>
 #include <cstddef>
@@ -60,7 +60,7 @@ namespace XE {
         BlendParam blendSource = BlendParam::One;
         BlendParam blendDestination = BlendParam::One;
 
-        float lineWidth = 1.0f;
+        float lineWidth = 1.0F;
         DepthFunc depthFunc = DepthFunc::LesserEqual;
         FrontFaceOrder frontFace = FrontFaceOrder::Clockwise;
         int clipDistanceCount = 0;

@@ -158,11 +158,11 @@ private:
     //!
     uint32_t currentFrame = 0;
 
-    vk::ApplicationInfo createAppInfo() const;
+    static vk::ApplicationInfo createAppInfo() ;
 
-    std::vector<const char *> getRequiredExtensions() const;
+    static std::vector<const char *> getRequiredExtensions() ;
 
-    vk::DebugUtilsMessengerCreateInfoEXT createDebugMessengerInfo() const;
+    static vk::DebugUtilsMessengerCreateInfoEXT createDebugMessengerInfo() ;
 
     vk::DebugUtilsMessengerEXT createDebugMessenger(vk::Instance instance) const;
 
@@ -170,55 +170,55 @@ private:
 
     vk::PhysicalDevice pickPhysicalDevice(const std::vector<vk::PhysicalDevice> &devices);
 
-    void showPhysicalDeviceInformation(const vk::PhysicalDevice &device);
+    static void showPhysicalDeviceInformation(const vk::PhysicalDevice &device);
 
-    std::vector<vk::DeviceQueueCreateInfo> mapQueueCreateInfo(const QueryFamilyIndices &indices) const;
+    static std::vector<vk::DeviceQueueCreateInfo> mapQueueCreateInfo(const QueryFamilyIndices &indices) ;
 
     vk::Device createDevice(const vk::PhysicalDevice &physicalDevice, const QueryFamilyIndices &indices) const;
 
-    QueryFamilyIndices identifyQueueFamilies(const vk::PhysicalDevice &physicalDevice, const vk::SurfaceKHR &surface) const;
+    static QueryFamilyIndices identifyQueueFamilies(const vk::PhysicalDevice &physicalDevice, const vk::SurfaceKHR &surface) ;
 
-    vk::SwapchainKHR createSwapchain(
+    static vk::SwapchainKHR createSwapchain(
         const vk::Device &device,
         const vk::SurfaceKHR &surface,
         const vk::SurfaceFormatKHR &swapchainFormat,
         const vk::Extent2D &swapchainExtent,
-        const vk::PresentModeKHR presentMode,
-        const uint32_t imageCount,
-        const vk::SurfaceTransformFlagBitsKHR preTransform,
+        vk::PresentModeKHR presentMode,
+        uint32_t imageCount,
+        vk::SurfaceTransformFlagBitsKHR preTransform,
         const QueryFamilyIndices &indices
-    ) const;
+    ) ;
 
-    SwapchainDetail querySwapchainDetail(const vk::PhysicalDevice &physicalDevice, const vk::SurfaceKHR &surface) const;
+    static SwapchainDetail querySwapchainDetail(const vk::PhysicalDevice &physicalDevice, const vk::SurfaceKHR &surface) ;
 
     //! picks an required surface format
-    std::optional<vk::SurfaceFormatKHR> pickSwapchainSurfaceFormat(const std::vector<vk::SurfaceFormatKHR> &surfaceFormats) const;
+    static std::optional<vk::SurfaceFormatKHR> pickSwapchainSurfaceFormat(const std::vector<vk::SurfaceFormatKHR> &surfaceFormats) ;
 
-    vk::PresentModeKHR pickPresentMode(const std::vector<vk::PresentModeKHR> &presentModes) const;
+    static vk::PresentModeKHR pickPresentMode(const std::vector<vk::PresentModeKHR> &presentModes) ;
 
-    uint32_t chooseImageCount(const vk::SurfaceCapabilitiesKHR &caps) const;
+    static uint32_t chooseImageCount(const vk::SurfaceCapabilitiesKHR &caps) ;
 
-    std::vector<vk::ImageView>
-    createSwapchainImageViews(const vk::Device &device, const vk::SurfaceFormatKHR &swapchainFormat, const std::vector<vk::Image> &swapchainImages) const;
+    static std::vector<vk::ImageView>
+    createSwapchainImageViews(const vk::Device &device, const vk::SurfaceFormatKHR &swapchainFormat, const std::vector<vk::Image> &swapchainImages) ;
 
-    std::vector<char> loadBinaryFile(const std::string &filename) const;
+    static std::vector<char> loadBinaryFile(const std::string &filename) ;
 
     vk::Pipeline createGraphicsPipeline(const vk::Extent2D &swapchainExtent, const vk::PipelineLayout &pipelineLayout, const vk::RenderPass &renderPass);
 
-    vk::ShaderModule createShaderModule(const vk::Device &device, const std::vector<char> &shaderCode) const;
+    static vk::ShaderModule createShaderModule(const vk::Device &device, const std::vector<char> &shaderCode) ;
 
     vk::PipelineLayout createPipelineLayout(const vk::DescriptorSetLayout &descriptorSetLayout);
 
-    vk::RenderPass createRenderPass(const vk::Device &device, const vk::Format &swapchainFormat) const;
+    static vk::RenderPass createRenderPass(const vk::Device &device, const vk::Format &swapchainFormat) ;
 
-    vk::Framebuffer createFramebuffer(const vk::Device &device, const vk::ImageView &imageView, const vk::RenderPass &renderPass, const vk::Extent2D &swapchainExtent) const;
+    static vk::Framebuffer createFramebuffer(const vk::Device &device, const vk::ImageView &imageView, const vk::RenderPass &renderPass, const vk::Extent2D &swapchainExtent) ;
 
-    vk::CommandPool createCommandPool(const vk::Device &device, const uint32_t queueFamily) const;
+    static vk::CommandPool createCommandPool(const vk::Device &device, uint32_t queueFamily) ;
 
-    vk::CommandBuffer allocateCommandBuffer(const vk::Device &device, const vk::CommandPool &commandPool) const;
+    static vk::CommandBuffer allocateCommandBuffer(const vk::Device &device, const vk::CommandPool &commandPool) ;
 
-    vk::RenderPassBeginInfo
-    createRenderPassBeginInfo(const vk::Framebuffer &framebuffer, const vk::ClearValue &clearValue, const vk::RenderPass &renderPass, const vk::Extent2D &swapchainExtent) const;
+    static vk::RenderPassBeginInfo
+    createRenderPassBeginInfo(const vk::Framebuffer &framebuffer, const vk::ClearValue &clearValue, const vk::RenderPass &renderPass, const vk::Extent2D &swapchainExtent) ;
 
     void recordCommandBuffer(
         const vk::CommandBuffer &commandBuffer,
@@ -228,7 +228,7 @@ private:
         const vk::Pipeline &graphicsPipeline
     ) const;
 
-    vk::Fence createFence(const vk::Device &device) const;
+    static vk::Fence createFence(const vk::Device &device) ;
 
     void drawFrame();
 
@@ -241,10 +241,10 @@ private:
     std::optional<uint32_t> findMemoryType(uint32_t typeFilter, vk::MemoryPropertyFlags propertyFlags) const;
 
     // creates both a buffer and a buffer memory object, based on supplied specs
-    std::tuple<vk::Buffer, vk::DeviceMemory> createBuffer(const vk::DeviceSize size, const vk::BufferUsageFlags usage, vk::MemoryPropertyFlags properties) const;
+    std::tuple<vk::Buffer, vk::DeviceMemory> createBuffer(vk::DeviceSize size, vk::BufferUsageFlags usage, vk::MemoryPropertyFlags properties) const;
 
     //! copies data between two buffers
-    void copyBuffer(vk::Buffer srcBuffer, vk::Buffer dstBuffer, const vk::DeviceSize size);
+    void copyBuffer(vk::Buffer srcBuffer, vk::Buffer dstBuffer, vk::DeviceSize size);
 
     //! craetes a new descriptor set layout that specifies the details of every descriptor binding
     //! this needs to be called right before createGraphicsPipeline
@@ -252,7 +252,7 @@ private:
 
     void createUniformBuffers();
 
-    void updateUniformBuffer(const uint32_t currentImage);
+    void updateUniformBuffer(uint32_t currentImage);
 
     // descriptor sets must be created from a pool (like the command buffers)
     void createDescriptorPool();

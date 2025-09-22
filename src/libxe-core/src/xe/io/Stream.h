@@ -1,6 +1,6 @@
 
 #ifndef __XE_IO_STREAM_HPP__
-#define __XE_IO_STREAM_HPP__
+#define XE_IO_STREAM_HPP_
 
 namespace XE {
     enum class StreamOffset { Set, Current, End };
@@ -14,11 +14,11 @@ namespace XE {
     public:
         virtual ~Stream();
 
-        virtual int read(void *buffer, const int size, const int count) = 0;
+        virtual int read(void *buffer, int size, int count) = 0;
 
-        virtual int write(const void *buffer, const int size, const int count) = 0;
+        virtual int write(const void *buffer, int size, int count) = 0;
 
-        virtual bool seek(const int offset, const StreamOffset position) = 0;
+        virtual bool seek(int offset, StreamOffset position) = 0;
 
         virtual int tell() const = 0;
 

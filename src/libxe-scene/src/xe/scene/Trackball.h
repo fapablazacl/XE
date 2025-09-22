@@ -1,6 +1,6 @@
 
 #ifndef __XE_SCENE_TRACKBALL_HPP__
-#define __XE_SCENE_TRACKBALL_HPP__
+#define XE_SCENE_TRACKBALL_HPP_
 
 #include <xe/math/Quaternion.h>
 #include <xe/math/Rotation.h>
@@ -21,7 +21,7 @@ namespace XE {
 
         void resize(const Vector2i &size);
 
-        Rotation<float> computeRotation() const;
+        static Rotation<float> computeRotation() ;
 
         Vector2i getDragBegin() const {
             return dragBegin;
@@ -42,9 +42,9 @@ namespace XE {
     private:
         Vector2 scalePosition(const Vector2i &position) const;
 
-        Vector3 computeSpherePosition(const Vector2 &normalizedPosition) const;
+        static Vector3 computeSpherePosition(const Vector2 &scaledPosition) ;
 
-    private:
+    
         VirtualSphere vsphere;
         Vector2i dragBegin;
         Vector2i dragEnd;

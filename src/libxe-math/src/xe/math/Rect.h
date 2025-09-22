@@ -1,6 +1,6 @@
 
 #ifndef __XE_MATH_RECT_HPP__
-#define __XE_MATH_RECT_HPP__
+#define XE_MATH_RECT_HPP_
 
 #include "Boundary.h"
 

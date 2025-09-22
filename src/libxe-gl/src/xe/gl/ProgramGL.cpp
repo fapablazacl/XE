@@ -1,14 +1,17 @@
 
 #include "ProgramGL.h"
 #include "ShaderGL.h"
+#include "xe/gl/gl.h"
+#include "xe/graphics/Shader.h"
 
 #include <cassert>
 #include <iostream>
 #include <stdexcept>
+#include <string>
 
 namespace XE {
     ProgramGL::ProgramGL(const ProgramDescriptor &desc) {
-        assert(desc.sources.size() > 0);
+        assert(!desc.sources.empty());
 
         for (const auto &source : desc.sources) {
             m_shaders.emplace_back(new ShaderGL(source.type, source.text));
@@ -22,7 +25,7 @@ namespace XE {
 
         glLinkProgram(m_id);
 
-        GLint status;
+        GLint status = 0;
         glGetProgramiv(m_id, GL_LINK_STATUS, &status);
 
         if (status == static_cast<GLint>(GL_FALSE)) {
@@ -36,7 +39,7 @@ namespace XE {
                 msg += buffer;
             }
 
-            std::cerr << msg << std::endl;
+            std::cerr << msg << '\n';
 
             throw std::runtime_error(msg);
         }
@@ -45,7 +48,7 @@ namespace XE {
     ProgramGL::~ProgramGL() {
         m_shaders.clear();
 
-        if (m_id) {
+        if (m_id != 0u) {
             glDeleteProgram(m_id);
         }
     }

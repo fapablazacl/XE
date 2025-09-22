@@ -1,17 +1,34 @@
 
 #include "Game.h"
+
+#include <cstddef>
 #include "Util.h"
+#include "xe/gl/RendererGL.h"
+#include "xe/gl/Types.h"
+#include "xe/gl/span.hpp"
+#include "xe/math/Common.h"
+#include <SDL.h>
+#include <SDL_error.h>
+#include <SDL_events.h>
+#include <SDL_video.h>
+#include <cmath>
+#include <cstddef>
+#include <cstdio>
+#include <cstdlib>
+#include <map>
+#include <string>
+#include <vector>
 
 const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 480;
 
-FloorGeometry createFloorGeometry(
-    const xe::gl::RendererGL &renderer, const GLint vertCoordLoc, const GLint vertColorLoc, const int tilesInX, const int tilesInZ, const float tileSizeX, const float tileSizeZ
+static FloorGeometry createFloorGeometry(
+    const xe::gl::RendererGL &renderer, GLint vertCoordLoc, GLint vertColorLoc, int tilesInX, int tilesInZ, float tileSizeX, float tileSizeZ
 );
 
-void renderFloorGeometry(const FloorGeometry &floorGeometry, const GLint vertCoordZLoc, const GLint vertColourLoc);
+static void renderFloorGeometry(const FloorGeometry &floorGeometry, GLint vertCoordZLoc, GLint vertColourLoc);
 
-xe::gl::VertexArray createTriangleGeometry(const RendererGL &renderer, const GLint vertCoordLoc, const GLint vertColorLoc);
+static xe::gl::VertexArray createTriangleGeometry(const RendererGL &renderer, GLint vertCoordLoc, GLint vertColorLoc);
 
 Game::Game() {
 }
@@ -22,11 +39,11 @@ Game::~Game() {
 }
 
 bool Game::initialize() {
-    if (initializeSDL()) {
+    if (initializeSDL() != 0) {
         return false;
     }
 
-    if (initializeOpenGL()) {
+    if (initializeOpenGL() != 0) {
         return false;
     }
 
@@ -57,7 +74,7 @@ int Game::initializeOpenGL() {
     const int majorVersion = 4;
     const int minorVersion = 1;
 
-    std::map<SDL_GLattr, int> sdlGlAttributes = {
+    std::map<SDL_GLattr, int> const sdlGlAttributes = {
         {SDL_GL_CONTEXT_MAJOR_VERSION, majorVersion},
         {SDL_GL_CONTEXT_MINOR_VERSION, minorVersion},
         {SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE},
@@ -99,7 +116,7 @@ int Game::initializeOpenGL() {
 
     program = renderer->createProgram({shaders.data(), shaders.size()});
 
-    if (!program.id) {
+    if (program.id == 0u) {
         return EXIT_FAILURE;
     }
 
@@ -108,7 +125,7 @@ int Game::initializeOpenGL() {
     vertColorLoc = program.getAttribLocation("vertColor");
     vertCoordZLoc = program.getAttribLocation("vertCoordZ");
 
-    floor = createFloorGeometry(*renderer, vertCoordLoc, vertColorLoc, 10, 10, 1.0f, 1.0f);
+    floor = createFloorGeometry(*renderer, vertCoordLoc, vertColorLoc, 10, 10, 1.0F, 1.0F);
     triangleVao = createTriangleGeometry(*renderer, vertCoordLoc, vertColorLoc);
 
     // Use Vsync
@@ -135,7 +152,7 @@ void Game::loop() {
 bool Game::pollInput() {
     SDL_Event e;
 
-    while (SDL_PollEvent(&e)) {
+    while (SDL_PollEvent(&e) != 0) {
         actionState.update(e);
     }
 
@@ -145,8 +162,8 @@ bool Game::pollInput() {
 void Game::update() {
     camera.update(seconds, actionState.actions);
 
-    if ((angle += 30.0f * seconds) > 360.0f) {
-        angle = std::fmod(angle, 360.0f);
+    if ((angle += 30.0F * seconds) > 360.0F) {
+        angle = std::fmod(angle, 360.0F);
     }
 }
 
@@ -154,7 +171,7 @@ void Game::render() {
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LEQUAL);
 
-    renderer->clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, XE::Vector4{0.0f, 0.0f, 0.0f, 1.0f}, {1.0f}, {});
+    renderer->clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, XE::Vector4{0.0F, 0.0F, 0.0F, 1.0F}, {1.0F}, {});
     renderer->viewport({0, 0}, {SCREEN_WIDTH, SCREEN_HEIGHT});
 
     renderer->useProgram(program);
@@ -171,7 +188,7 @@ void Game::render() {
     const auto triangleMatrix = viewProj * transformation.computeModelMatrix();
 
     glUniformMatrix4fv(mvpLoc, 1, GL_FALSE, triangleMatrix.data());
-    auto triangleVaoAttribData = 0.0f;
+    auto triangleVaoAttribData = 0.0F;
     auto triangleVaoAttrib = xe::gl::Attribute{vertCoordZLoc, xe::gl::AttributeDim::_1, xe::gl::AttributeType::Float};
     triangleVaoAttrib.data = &triangleVaoAttribData;
 
@@ -201,11 +218,11 @@ FloorGeometry createFloorGeometry(
 
     std::vector<XE::Vector3> vertices{static_cast<size_t>(floorGeometry.stripVertexCount)};
 
-    int j = 0;
+    int const j = 0;
 
     for (int i = 0; i < tilesInX + 1; i++) {
-        vertices[2 * i] = XE::Vector3(i * tileSizeX, 0.0f, j * tileSizeZ);
-        vertices[2 * i + 1] = XE::Vector3(i * tileSizeX, 0.0f, (j + 1) * tileSizeZ);
+        vertices[static_cast<size_type>(2 * i)] = XE::Vector3(i * tileSizeX, 0.0F, j * tileSizeZ);
+        vertices[(2 * i) + 1] = XE::Vector3(i * tileSizeX, 0.0F, (j + 1) * tileSizeZ);
     }
 
     floorGeometry.vertexBuffer = renderer.createBuffer(GL_ARRAY_BUFFER, GL_STATIC_DRAW, {vertices.data(), vertices.size() * sizeof(XE::Vector3)});
@@ -223,8 +240,8 @@ FloorGeometry createFloorGeometry(
 void renderFloorGeometry(const FloorGeometry &floorGeometry, const GLint vertCoordZLoc, const GLint vertColourLoc) {
     glBindVertexArray(floorGeometry.vao.id);
 
-    const XE::Vector4 colorFrom = {0.2f, 0.2f, 0.2f, 1.0f};
-    const XE::Vector4 colorTo = {0.2f, 0.2f, 1.0f, 1.0f};
+    const XE::Vector4 colorFrom = {0.2F, 0.2F, 0.2F, 1.0F};
+    const XE::Vector4 colorTo = {0.2F, 0.2F, 1.0F, 1.0F};
 
     for (int k = 0; k < floorGeometry.tilesInZ; k++) {
         const float z = static_cast<float>(k) * floorGeometry.tileSizeZ;
@@ -241,21 +258,21 @@ xe::gl::VertexArray createTriangleGeometry(const RendererGL &renderer, const GLi
     // prepare buffer
     const int VERTEX_COLOUR = 3;
 
-    const GLfloat vertices[] = {0.0f, 0.5f, 0.0f, 0.5f, -0.5f, 0.0f, -0.5f, -0.5f, 0.0f};
+    const GLfloat vertices[] = {0.0F, 0.5F, 0.0F, 0.5F, -0.5F, 0.0F, -0.5F, -0.5F, 0.0F};
 
     const GLfloat colours[] = {
-        1.0f,
-        0.0f,
-        0.0f,
-        1.0f,
-        0.0f,
-        1.0f,
-        0.0f,
-        1.0f,
-        0.0f,
-        0.0f,
-        1.0f,
-        1.0f,
+        1.0F,
+        0.0F,
+        0.0F,
+        1.0F,
+        0.0F,
+        1.0F,
+        0.0F,
+        1.0F,
+        0.0F,
+        0.0F,
+        1.0F,
+        1.0F,
     };
 
     const auto vertexBuffer = renderer.createBuffer(GL_ARRAY_BUFFER, GL_STATIC_DRAW, {vertices, sizeof(GLfloat) * VERTEX_COLOUR * 3});

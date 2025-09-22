@@ -7,14 +7,17 @@
 #include "xe/gl/Renderer.h"
 
 #include <cassert>
+#include <cstddef>
 #include <iostream>
+#include <memory>
+#include <string>
 
 TextureRepository::TextureRepository(ImageLoader &loader) : loader{loader} {
 }
 
 GLuint TextureRepository::getOrCreate(const std::string &filePath, Renderer &renderer) {
     if (filePath.empty()) {
-        std::cout << "TextureRepository::getOrCreate: " << "Can't load texture with empty filepath" << std::endl;
+        std::cout << "TextureRepository::getOrCreate: " << "Can't load texture with empty filepath" << '\n';
         return 0;
     }
 
@@ -22,13 +25,13 @@ GLuint TextureRepository::getOrCreate(const std::string &filePath, Renderer &ren
         return it->second;
     }
 
-    GLuint texture = createTexture(filePath.c_str(), renderer);
-    if (!texture) {
-        std::cout << "TextureRepository::getOrCreate: " << "Texture file couldn't be loaded: '" << filePath << "'" << std::endl;
+    GLuint const texture = createTexture(filePath.c_str(), renderer);
+    if (texture == 0u) {
+        std::cout << "TextureRepository::getOrCreate: " << "Texture file couldn't be loaded: '" << filePath << "'" << '\n';
         return 0;
     }
 
-    std::cout << "TextureRepository::getOrCreate: Loaded texture '" << filePath << "'" << std::endl;
+    std::cout << "TextureRepository::getOrCreate: Loaded texture '" << filePath << "'" << '\n';
 
     cachedTextureMap[filePath] = texture;
 
@@ -37,7 +40,7 @@ GLuint TextureRepository::getOrCreate(const std::string &filePath, Renderer &ren
 
 GLuint TextureRepository::createTexture(const char *theFileName, Renderer &renderer) {
     assert(theFileName);
-    assert(std::string(theFileName) != "");
+    assert(!std::string(theFileName).empty());
 
     const std::unique_ptr<Image> image = loader.loadImage(theFileName);
 
@@ -55,7 +58,7 @@ GLuint TextureRepository::createTexture(Renderer &renderer, const std::string &i
     return createTexture(renderer, image->getData());
 }
 
-GLuint TextureRepository::createTexture(Renderer &renderer, const ImageData &image) const {
+GLuint TextureRepository::createTexture(Renderer &renderer, const ImageData &image) {
     GLenum internalFormat = GL_RGB;
     GLenum format = GL_RGB;
 

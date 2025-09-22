@@ -12,9 +12,9 @@ class ModelLoaderAssimp : public ModelLoader {
 public:
     ModelLoaderAssimp() = default;
 
-    virtual ~ModelLoaderAssimp() = default;
+    ~ModelLoaderAssimp() override = default;
 
-    Model createModel(const std::string &fileName, Renderer &renderer, TextureRepository &textureRepository, const ShaderLocationMap &location) override;
+    Model createModel(const std::string &sceneFilePath, Renderer &renderer, TextureRepository &textureRepository, const ShaderLocationMap &location) override;
 
 private:
     Model
@@ -22,10 +22,10 @@ private:
 
     MeshNode createMeshNode(const aiNode &in) const;
 
-    std::vector<uint32_t> createMeshIndices(const aiNode &node) const;
+    static std::vector<uint32_t> createMeshIndices(const aiNode &node) ;
 
-    std::vector<Mesh> createMeshArray(Renderer &renderer, const ShaderLocationMap &location, const aiScene &aiscene) const;
+    static std::vector<Mesh> createMeshArray(Renderer &renderer, const ShaderLocationMap &location, const aiScene &aiscene) ;
 
-private:
+
     Assimp::Importer importer;
 };

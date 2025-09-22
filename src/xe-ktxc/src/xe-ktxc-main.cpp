@@ -1,8 +1,14 @@
 
 #include <cassert>
+#include <cstddef>
+#include <cstdint>
+#include <cstdlib>
+#include <exception>
 #include <filesystem>
 #include <map>
+#include <optional>
 #include <span>
+#include <stdexcept>
 #include <string>
 
 #include <IL/il.h>
@@ -11,7 +17,8 @@
 #include <glad/glad.h>
 #include <iostream>
 #include <ktx.h>
-#include <vulkan/vulkan.h>
+#include <utility>
+#include <vulkan/vulkan_core.h>
 
 #include "xe/Logger.h"
 
@@ -29,7 +36,7 @@ struct ImageDesc {
     ImageSpan data;
 };
 
-inline std::string to_string(ILenum t) {
+static inline std::string to_string(ILenum t) {
     switch (t) {
     case IL_PNG:
         return "IL_PNG";
@@ -46,7 +53,7 @@ static std::map<std::string, ILenum> typeILMap = {
     {".jpeg", IL_JPG},
 };
 
-ILenum makeImageType(const std::string &ext) {
+static ILenum makeImageType(const std::string &ext) {
     if (const auto it = typeILMap.find(ext); it != typeILMap.end()) {
         return it->second;
     }
@@ -60,7 +67,7 @@ static void logDevILErrors(const char *ctx) {
     }
 }
 
-ImageDesc describeCurrentImage() {
+static ImageDesc describeCurrentImage() {
     /*
     if (!ilConvertImage(IL_RGB, IL_UNSIGNED_BYTE)) {
         logDevILErrors("ilConvertImage");
@@ -80,8 +87,8 @@ ImageDesc describeCurrentImage() {
     return image;
 }
 
-ILuint createImage(const FileSpan &fileSpan, ILenum imageType) {
-    const auto data = fileSpan.data();
+static ILuint createImage(const FileSpan &fileSpan, ILenum imageType) {
+    auto *const data = fileSpan.data();
     const auto size = fileSpan.size();
 
     ILuint id = 0;
@@ -92,9 +99,10 @@ ILuint createImage(const FileSpan &fileSpan, ILenum imageType) {
     if (imageType != 0) {
         ok = (ilLoadL(imageType, (const ILubyte *)data, (ILuint)size) == IL_TRUE);
     } else {
-        ILenum detected = ilDetermineTypeL((const ILubyte *)data, (ILuint)size);
-        if (detected != IL_TYPE_UNKNOWN)
+        ILenum const detected = ilDetermineTypeL((const ILubyte *)data, (ILuint)size);
+        if (detected != IL_TYPE_UNKNOWN) {
             ok = (ilLoadL(detected, (const ILubyte *)data, (ILuint)size) == IL_TRUE);
+}
     }
 
     if (!ok) {
@@ -106,10 +114,10 @@ ILuint createImage(const FileSpan &fileSpan, ILenum imageType) {
     return id;
 }
 
-ILuint createImage(const std::string &file) {
+static ILuint createImage(const std::string &file) {
     XE_LOG_INFO("Loading image: {}\n", file);
 
-    std::filesystem::path path{file};
+    std::filesystem::path const path{file};
     if (!std::filesystem::exists(path)) {
         XE_LOG_ERROR("Bitmap file {} doesn't exist.\n", file);
         return {};
@@ -119,7 +127,7 @@ ILuint createImage(const std::string &file) {
     ilGenImages(1, &id);
     ilBindImage(id);
 
-    if (!ilLoadImage(file.c_str())) {
+    if (ilLoadImage(file.c_str()) == 0u) {
         logDevILErrors("ilLoadImage");
         ilDeleteImages(1, &id);
         return {};
@@ -135,7 +143,7 @@ const std::map<std::pair<ILuint, ILuint>, ktx_uint32_t> vkFormatMap = {
     {{IL_RGBA, IL_UNSIGNED_BYTE}, VK_FORMAT_R8G8B8A8_UNORM},
 };
 
-ktx_uint32_t computeVkFormat(const ImageDesc &imageDesc) {
+static ktx_uint32_t computeVkFormat(const ImageDesc &imageDesc) {
     const auto key = std::make_pair(imageDesc.format, imageDesc.dataType);
 
     if (const auto it = vkFormatMap.find(key); it != vkFormatMap.end()) {
@@ -145,7 +153,7 @@ ktx_uint32_t computeVkFormat(const ImageDesc &imageDesc) {
     return VK_FORMAT_UNDEFINED;
 }
 
-void writeTextureKTX2(const std::string &fileName, const ImageDesc &image) {
+static void writeTextureKTX2(const std::string &fileName, const ImageDesc &image) {
     XE_LOG_INFO("Creating KTX2 texture\n");
     const uint32_t height = static_cast<uint32_t>(image.width);
     const uint32_t width = static_cast<uint32_t>(image.height);
@@ -207,7 +215,7 @@ void writeTextureKTX2(const std::string &fileName, const ImageDesc &image) {
     ktxTexture_WriteToNamedFile(ktxTexture(texture), fileName.c_str());
 }
 
-std::optional<ILenum> paletteTypeToFormat(ILenum paletteType) {
+static std::optional<ILenum> paletteTypeToFormat(ILenum paletteType) {
     switch (paletteType) {
     case IL_PAL_RGB24:
     case IL_PAL_RGB32:
@@ -231,7 +239,7 @@ struct KtxcOptions {
     KtxcOutputFormat outputFormat = KtxcOutputFormat::KTX2;
 };
 
-void compileImage(const KtxcOptions &options) {
+static void compileImage(const KtxcOptions &options) {
     ilInit();
     iluInit();
 
@@ -252,7 +260,7 @@ void compileImage(const KtxcOptions &options) {
             throw std::runtime_error("Could not determine output format from image description");
         }
 
-        if (!ilConvertImage(destFormatOpt.value(), IL_UNSIGNED_BYTE)) {
+        if (ilConvertImage(destFormatOpt.value(), IL_UNSIGNED_BYTE) == 0u) {
             logDevILErrors("ilConvertImage");
             throw std::runtime_error("Could not convert paletted image");
         }
@@ -276,7 +284,7 @@ void compileImage(const KtxcOptions &options) {
     ilShutDown();
 }
 
-std::optional<KtxcOptions> parseCommandLine(const int argc, char *argv[]) {
+static std::optional<KtxcOptions> parseCommandLine(const int argc, char *argv[]) {
     cxxopts::Options options("xe-ktxc", "KTX texture compiler");
 
     options.add_options()("h,help", "Print usage")("i,input-file", "Input image file", cxxopts::value<std::string>())
@@ -285,20 +293,20 @@ std::optional<KtxcOptions> parseCommandLine(const int argc, char *argv[]) {
 
     const auto parseResult = options.parse(argc, argv);
 
-    if (parseResult.count("help")) {
-        std::cout << options.help() << std::endl;
+    if (parseResult.contains("help") != 0u) {
+        std::cout << options.help() << '\n';
         return {};
     }
 
     KtxcOptions result;
 
-    if (parseResult.count("input-file")) {
+    if (parseResult.contains("input-file") != 0u) {
         result.inputImageFilePath = parseResult["input-file"].as<std::string>();
     } else {
         throw std::runtime_error("No input image file specified");
     }
 
-    if (parseResult.count("output-format")) {
+    if (parseResult.contains("output-format") != 0u) {
         const std::string outputFormat = parseResult["output-format"].as<std::string>();
         if (outputFormat == "ktx2") {
             result.outputFormat = KtxcOutputFormat::KTX2;

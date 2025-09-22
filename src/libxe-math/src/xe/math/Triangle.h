@@ -1,6 +1,6 @@
 
 #ifndef __XE_MATH_TRIANGLE_HPP__
-#define __XE_MATH_TRIANGLE_HPP__
+#define XE_MATH_TRIANGLE_HPP_
 
 #include "Plane.h"
 #include "Ray.h"
@@ -16,10 +16,10 @@ namespace XE {
         TTriangle() {
         }
 
-        TTriangle(const TVector<T, 3> &p1, const TVector<T, 3> &p2, const TVector<T, 3> &p3) {
-            P1 = p1;
-            P2 = p2;
-            P3 = p3;
+        TTriangle(const TVector<T, 3> &p1, const TVector<T, 3> &p2, const TVector<T, 3> &p3) : P1(p1), P2(p2), P3(p3) {
+            
+            
+            
         }
 
         TVector<T, 3> computeNormal() const {

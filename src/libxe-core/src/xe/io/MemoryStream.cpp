@@ -1,4 +1,6 @@
 
+#include "xe/io/Stream.h"
+#include <cstdint>
 #include <xe/io/MemoryStream.h>
 
 #include <cassert>

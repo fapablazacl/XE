@@ -2,7 +2,7 @@
 #pragma once
 
 #ifndef __XE_MATH_VECTOR_HPP__
-#define __XE_MATH_VECTOR_HPP__
+#define XE_MATH_VECTOR_HPP_
 
 #if defined(max)
 #undef max
@@ -168,9 +168,9 @@ namespace XE {
 
         TVector<T, N> operator/(const TVector<T, N> &rhs) const;
 
-        TVector<T, N> operator*(const T rhs) const;
+        TVector<T, N> operator*(T rhs) const;
 
-        TVector<T, N> operator/(const T rhs) const;
+        TVector<T, N> operator/(T rhs) const;
 
         TVector<T, N> &operator+=(const TVector<T, N> &rhs);
 
@@ -180,9 +180,9 @@ namespace XE {
 
         TVector<T, N> &operator/=(const TVector<T, N> &rhs);
 
-        TVector<T, N> &operator*=(const T rhs);
+        TVector<T, N> &operator*=(T rhs);
 
-        TVector<T, N> &operator/=(const T rhs);
+        TVector<T, N> &operator/=(T rhs);
 
         bool operator==(const TVector<T, N> &rhs) const;
 
@@ -200,11 +200,11 @@ namespace XE {
             return this->values[index];
         }
 
-        const T operator[](const int index) const {
+        T operator[](const int index) const {
             return this->values[index];
         }
 
-        inline friend TVector<T, N> operator*(const T s, const TVector<T, N> &v) {
+        friend TVector<T, N> operator*(const T s, const TVector<T, N> &v) {
             return v * s;
         }
 
@@ -240,11 +240,11 @@ namespace XE {
     }
 
     template <typename T> TVector<T, 3> cross(const TVector<T, 3> &v1, const TVector<T, 3> &v2) {
-        return {v1.Y * v2.Z - v1.Z * v2.Y, v1.Z * v2.X - v1.X * v2.Z, v1.X * v2.Y - v1.Y * v2.X};
+        return {(v1.Y * v2.Z) - (v1.Z * v2.Y), (v1.Z * v2.X) - (v1.X * v2.Z), (v1.X * v2.Y) - (v1.Y * v2.X)};
     }
 
     template <typename T> T cross(const TVector<T, 2> &v1, const TVector<T, 2> &v2) {
-        return v1.X * v2.Y - v1.Y * v2.X;
+        return (v1.X * v2.Y) - (v1.Y * v2.X);
     }
 
     template <typename T> TVector<T, 3> cross(const TVector<T, 3> &v1, const TVector<T, 3> &v2, const TVector<T, 3> &v3) {

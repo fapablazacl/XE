@@ -1,4 +1,6 @@
 
+#include "xe/math/Rotation.h"
+#include "xe/scene/VirtualSphere.h"
 #include <gtest/gtest.h>
 #include <xe/scene/Trackball.h>
 
@@ -23,7 +25,7 @@ TEST(TrackballTest, ComputeRotationGeneratesAnEmptyRotationWhenStartAndEndPoints
     trackball.beginDrag({100, 100});
     trackball.endDrag({100, 100});
 
-    XE::Rotation rotation = trackball.computeRotation();
+    XE::Rotation const rotation = trackball.computeRotation();
 
     EXPECT_EQ(rotation.angle, 0.0);
 }

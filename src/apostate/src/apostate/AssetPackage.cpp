@@ -3,9 +3,11 @@
 
 #include <cassert>
 #include <fstream>
+#include <ios>
+#include <string>
 
 namespace apostate {
-    std::string AssetPackage::loadTextFile(const std::string &fileName) const {
+    std::string AssetPackage::loadTextFile(const std::string &fileName) {
         assert(!fileName.empty());
 
         std::fstream fs;

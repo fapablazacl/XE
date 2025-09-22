@@ -1,5 +1,6 @@
 
 #include "Box.h"
+#include "xe/math/Boundary.h"
 
 namespace XE {
     template class TBoundary<float, 3>;

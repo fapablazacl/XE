@@ -1,6 +1,6 @@
 
 #ifndef __XE_GRAPHICS_GL_TEXTURE2DGL_HPP__
-#define __XE_GRAPHICS_GL_TEXTURE2DGL_HPP__
+#define XE_GRAPHICS_GL_TEXTURE2DGL_HPP_
 
 #include <xe/graphics/Texture2D.h>
 
@@ -9,22 +9,22 @@
 namespace XE {
     class Texture2DGL : public Texture2D, public TextureBaseGL {
     public:
-        Texture2DGL(const PixelFormat format, const Vector2i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void *sourceData);
+        Texture2DGL(PixelFormat format, const Vector2i &size, PixelFormat sourceFormat, DataType sourceDataType, const void *sourceData);
 
-        virtual ~Texture2DGL();
+        ~Texture2DGL() override;
 
-        virtual PixelFormat getFormat() const override {
+        PixelFormat getFormat() const override {
             return m_format;
         }
 
-    public:
-        virtual Vector2i getSize() const override {
+    
+        Vector2i getSize() const override {
             return m_size;
         }
 
-        virtual void setData(const void *surfaceData, const int mipLevel, const PixelFormat surfaceFormat, const DataType surfaceDataType, const Recti &area) override;
+        void setData(const void *surfaceData, int mipLevel, PixelFormat surfaceFormat, DataType surfaceDataType, const Recti &area) override;
 
-        virtual void getData(void *surfaceData, const int mipLevel, const PixelFormat surfaceFormat, const DataType surfaceDataType) const override;
+        void getData(void *surfaceData, int mipLevel, PixelFormat surfaceFormat, DataType surfaceDataType) const override;
 
     private:
         PixelFormat m_format;

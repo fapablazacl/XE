@@ -1,6 +1,6 @@
 
 #ifndef __XE_IO_FILESTREAM_HPP__
-#define __XE_IO_FILESTREAM_HPP__
+#define XE_IO_FILESTREAM_HPP_
 
 #include "Stream.h"
 #include <cstdio>
@@ -12,19 +12,19 @@ namespace XE {
      */
     class FileStream : public Stream {
     public:
-        FileStream(const std::string &fileName, const StreamFlags flags);
+        FileStream(const std::string &fileName, StreamFlags flags);
 
-        virtual ~FileStream();
+        ~FileStream() override;
 
-        virtual int read(void *buffer, const int size, const int count) override;
+        int read(void *buffer, int size, int count) override;
 
-        virtual int write(const void *buffer, const int size, const int count) override;
+        int write(const void *buffer, int size, int count) override;
 
-        virtual bool seek(const int offset, const StreamOffset position) override;
+        bool seek(int offset, StreamOffset position) override;
 
-        virtual int tell() const override;
+        int tell() const override;
 
-        virtual StreamFlags getFlags() const override;
+        StreamFlags getFlags() const override;
 
     private:
         std::string m_fileName;

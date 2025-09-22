@@ -1,13 +1,17 @@
 
 #include "Texture2DGL.h"
 #include "Conversion.h"
+#include "xe/gl/TextureBaseGL.h"
+#include "xe/gl/gl.h"
+#include "xe/math/Rect.h"
+#include "xe/math/Vector.h"
 
 namespace XE {
     Texture2DGL::Texture2DGL(const PixelFormat format, const Vector2i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void *sourceData)
-        : TextureBaseGL(GL_TEXTURE_2D) {
+        : TextureBaseGL(GL_TEXTURE_2D), m_format(format), m_size(size) {
 
-        m_size = size;
-        m_format = format;
+        
+        
 
         const GLenum internalFormatGL = convertToGL(m_format);
         const GLenum formatGL = convertToGL(sourceFormat);

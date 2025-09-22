@@ -4,13 +4,30 @@
 #include "MiscUtils.h"
 #include "Model.h"
 #include "xe/Logger.h"
+#include "xe/gl/Renderer.h"
+#include "xe/gl/TextureRepository.h"
 
+#include <assimp/material.h>
+#include <assimp/matrix4x4.h>
+#include <assimp/mesh.h>
+#include <assimp/postprocess.h>
+#include <assimp/scene.h>
+#include <assimp/types.h>
+#include <assimp/vector3.h>
+#include <cassert>
+#include <cstddef>
+#include <cstdint>
+#include <cstdlib>
 #include <filesystem>
+#include <glm/ext.hpp>
 #include <glm/fwd.hpp>
 #include <iostream>
+#include <map>
 #include <optional>
 #include <regex>
 #include <stdexcept>
+#include <string>
+#include <vector>
 
 namespace fs = std::filesystem;
 
@@ -49,7 +66,7 @@ inline glm::mat4 computeNodeTransformation(const aiNode* node) {
 }
 */
 
-inline std::string to_str(const aiTextureType type) {
+static inline std::string to_str(const aiTextureType type) {
     switch (type) {
     case aiTextureType_AMBIENT:
         return "aiTextureType_AMBIENT";
@@ -150,7 +167,7 @@ Model ModelLoaderAssimp::createModel(const std::string &sceneFilePath, Renderer 
     const aiScene *scene = importer.ReadFile(sceneFilePath, flags);
 
     // If the import failed, report it
-    if (!scene) {
+    if (scene == nullptr) {
         XE_LOG_ERROR("Failed to load scene at {}. Assimp error: {}\n", sceneFilePath, importer.GetErrorString());
         throw std::runtime_error(importer.GetErrorString());
     }
@@ -160,10 +177,10 @@ Model ModelLoaderAssimp::createModel(const std::string &sceneFilePath, Renderer 
     }
 
     if (scene->HasAnimations()) {
-        std::cout << "scene has animations: " << scene->mNumAnimations << std::endl;
+        std::cout << "scene has animations: " << scene->mNumAnimations << '\n';
 
         for (int i = 0; i < scene->mNumAnimations; i++) {
-            std::cout << "    " << " animation " << (i + 1) << scene->mAnimations[i]->mName.C_Str() << std::endl;
+            std::cout << "    " << " animation " << (i + 1) << scene->mAnimations[i]->mName.C_Str() << '\n';
         }
     }
 
@@ -177,25 +194,26 @@ MeshNode ModelLoaderAssimp::createMeshNode(const aiNode &in) const {
     out.meshIndices = createMeshIndices(in);
 
     for (size_t i = 0; i < in.mNumChildren; i++) {
-        MeshNode child = createMeshNode(*in.mChildren[i]);
+        MeshNode const child = createMeshNode(*in.mChildren[i]);
         out.children.push_back(child);
     }
 
     return out;
 }
 
-std::vector<uint32_t> ModelLoaderAssimp::createMeshIndices(const aiNode &node) const {
+std::vector<uint32_t> ModelLoaderAssimp::createMeshIndices(const aiNode &node) {
     std::vector<uint32_t> indices;
 
-    for (unsigned int i = 0; i < node.mNumMeshes; i++) {
+    indices.reserve(node.mNumMeshes);
+for (unsigned int i = 0; i < node.mNumMeshes; i++) {
         indices.push_back(node.mMeshes[i]);
     }
 
     return indices;
 }
 
-Mesh createMeshVAO(const ShaderLocationMap &location, Renderer &renderer, const aiMesh *mesh) {
-    if (!mesh) {
+static Mesh createMeshVAO(const ShaderLocationMap &location, Renderer &renderer, const aiMesh *mesh) {
+    if (mesh == nullptr) {
         return {};
     }
 
@@ -211,7 +229,7 @@ Mesh createMeshVAO(const ShaderLocationMap &location, Renderer &renderer, const 
 
     std::vector<glm::vec2> texCoords;
 
-    if (mesh->mTextureCoords[0]) {
+    if (mesh->mTextureCoords[0] != nullptr) {
         assert(mesh->mNumUVComponents[0] == 2);
 
         texCoords.resize(mesh->mNumVertices);
@@ -247,7 +265,7 @@ Mesh createMeshVAO(const ShaderLocationMap &location, Renderer &renderer, const 
     return renderer.createMeshVAO(location, data);
 }
 
-std::vector<Mesh> ModelLoaderAssimp::createMeshArray(Renderer &renderer, const ShaderLocationMap &location, const aiScene &aiscene) const {
+std::vector<Mesh> ModelLoaderAssimp::createMeshArray(Renderer &renderer, const ShaderLocationMap &location, const aiScene &aiscene) {
     std::vector<Mesh> meshes;
     meshes.resize(aiscene.mNumMeshes);
 
@@ -258,8 +276,8 @@ std::vector<Mesh> ModelLoaderAssimp::createMeshArray(Renderer &renderer, const S
     return meshes;
 }
 
-std::vector<Mesh> createMeshArray(const ShaderLocationMap &location, Renderer &renderer, const aiScene *aiscene) {
-    if (!aiscene) {
+static std::vector<Mesh> createMeshArray(const ShaderLocationMap &location, Renderer &renderer, const aiScene *aiscene) {
+    if (aiscene == nullptr) {
         return {};
     }
 
@@ -273,15 +291,15 @@ std::vector<Mesh> createMeshArray(const ShaderLocationMap &location, Renderer &r
     return meshes;
 }
 
-std::vector<GLuint> createTextureArray(const aiScene *scene, Renderer &renderer, TextureRepository &textureRepository) {
+static std::vector<GLuint> createTextureArray(const aiScene *scene, Renderer &renderer, TextureRepository &textureRepository) {
     assert(scene);
 
     if (!scene->HasTextures()) {
-        std::cout << "Scene \"" << scene->mName.C_Str() << "\" doesn't have global textures" << std::endl;
+        std::cout << "Scene \"" << scene->mName.C_Str() << "\" doesn't have global textures" << '\n';
         return {};
     }
 
-    std::cout << "Loading " << scene->mNumTextures << " textures for scene \"" << scene->mName.C_Str() << "\"" << std::endl;
+    std::cout << "Loading " << scene->mNumTextures << " textures for scene \"" << scene->mName.C_Str() << "\"" << '\n';
 
     std::vector<GLuint> textures;
     textures.resize(scene->mNumTextures);
@@ -301,7 +319,7 @@ std::vector<GLuint> createTextureArray(const aiScene *scene, Renderer &renderer,
         } else {
             XE_LOG_INFO("Loading texture map {} with size {}x{}", name, width, height);
 
-            const GLuint wrap = (formatHint) ? GL_REPEAT : GL_CLAMP_TO_EDGE;
+            const GLuint wrap = ((formatHint) != 0) ? GL_REPEAT : GL_CLAMP_TO_EDGE;
             textures[ti] = renderer.createTexture(GL_RGBA8, width, height, GL_BGRA, GL_UNSIGNED_BYTE, data, wrap, wrap);
         }
     }
@@ -309,52 +327,52 @@ std::vector<GLuint> createTextureArray(const aiScene *scene, Renderer &renderer,
     return textures;
 }
 
-template <typename T> T extract(std::optional<T> value, const T defaultValue) {
+template <typename T> static T extract(std::optional<T> value, const T defaultValue) {
     return value.has_value() ? value.value() : defaultValue;
 }
 
-glm::vec4 makeVector4(const aiColor3D &color, const float alpha) {
+static glm::vec4 makeVector4(const aiColor3D &color, const float alpha) {
     return glm::vec4{color.r, color.g, color.b, alpha};
 }
 
-MaterialImportedProperties extractProperties(const aiMaterial &material) {
+static MaterialImportedProperties extractProperties(const aiMaterial &material) {
     MaterialImportedProperties props;
     aiColor3D color;
 
     if (material.Get(AI_MATKEY_COLOR_AMBIENT, color) == AI_SUCCESS) {
-        props.ambient = makeVector4(color, 1.0f);
-        std::cout << "    " << "AI_MATKEY_COLOR_AMBIENT property mapped: " << glm::to_string(*props.ambient) << std::endl;
+        props.ambient = makeVector4(color, 1.0F);
+        std::cout << "    " << "AI_MATKEY_COLOR_AMBIENT property mapped: " << glm::to_string(*props.ambient) << '\n';
     }
 
     if (material.Get(AI_MATKEY_COLOR_DIFFUSE, color) == AI_SUCCESS) {
-        props.diffuse = makeVector4(color, 1.0f);
-        std::cout << "    " << "AI_MATKEY_COLOR_DIFFUSE property mapped: " << glm::to_string(*props.diffuse) << std::endl;
+        props.diffuse = makeVector4(color, 1.0F);
+        std::cout << "    " << "AI_MATKEY_COLOR_DIFFUSE property mapped: " << glm::to_string(*props.diffuse) << '\n';
     }
 
     if (material.Get(AI_MATKEY_COLOR_SPECULAR, color) == AI_SUCCESS) {
-        props.specular = makeVector4(color, 1.0f);
-        std::cout << "    " << "AI_MATKEY_COLOR_SPECULAR property mapped: " << glm::to_string(*props.specular) << std::endl;
+        props.specular = makeVector4(color, 1.0F);
+        std::cout << "    " << "AI_MATKEY_COLOR_SPECULAR property mapped: " << glm::to_string(*props.specular) << '\n';
     }
 
     if (material.Get(AI_MATKEY_COLOR_EMISSIVE, color) == AI_SUCCESS) {
-        props.emissive = makeVector4(color, 1.0f);
-        std::cout << "    " << "AI_MATKEY_COLOR_EMISSIVE property mapped: " << glm::to_string(*props.emissive) << std::endl;
+        props.emissive = makeVector4(color, 1.0F);
+        std::cout << "    " << "AI_MATKEY_COLOR_EMISSIVE property mapped: " << glm::to_string(*props.emissive) << '\n';
     }
 
     if (material.Get(AI_MATKEY_COLOR_TRANSPARENT, color) == AI_SUCCESS) {
-        props.transparent = makeVector4(color, 1.0f);
-        std::cout << "    " << "AI_MATKEY_COLOR_TRANSPARENT property mapped: " << glm::to_string(*props.transparent) << std::endl;
+        props.transparent = makeVector4(color, 1.0F);
+        std::cout << "    " << "AI_MATKEY_COLOR_TRANSPARENT property mapped: " << glm::to_string(*props.transparent) << '\n';
     }
 
     if (material.Get(AI_MATKEY_COLOR_REFLECTIVE, color) == AI_SUCCESS) {
-        props.reflective = makeVector4(color, 1.0f);
-        std::cout << "    " << "AI_MATKEY_COLOR_REFLECTIVE property mapped: " << glm::to_string(*props.reflective) << std::endl;
+        props.reflective = makeVector4(color, 1.0F);
+        std::cout << "    " << "AI_MATKEY_COLOR_REFLECTIVE property mapped: " << glm::to_string(*props.reflective) << '\n';
     }
 
     return props;
 }
 
-void setupTextureMap(Material &material, const GLuint textureMap, const aiTextureType textureType) {
+static void setupTextureMap(Material &material, const GLuint textureMap, const aiTextureType textureType) {
     switch (textureType) {
     case aiTextureType_AMBIENT:
         material.ambient.textureMap = textureMap;
@@ -377,12 +395,12 @@ void setupTextureMap(Material &material, const GLuint textureMap, const aiTextur
     }
 }
 
-void searchFilesImpl(std::vector<fs::path> &files, const fs::path &directory, const std::regex &pattern) {
+static void searchFilesImpl(std::vector<fs::path> &files, const fs::path &directory, const std::regex &pattern) {
     for (const fs::directory_entry &entry : fs::directory_iterator(directory)) {
         if (fs::is_directory(entry.status())) {
             searchFilesImpl(files, entry.path(), pattern);
         } else if (fs::is_regular_file(entry.status())) {
-            std::string filename = entry.path().filename().string();
+            std::string const filename = entry.path().filename().string();
             if (std::regex_match(filename, pattern)) {
                 files.push_back(entry.path());
             }
@@ -390,7 +408,7 @@ void searchFilesImpl(std::vector<fs::path> &files, const fs::path &directory, co
     }
 }
 
-std::vector<fs::path> searchFiles(const fs::path &directory, const std::regex &pattern) {
+static std::vector<fs::path> searchFiles(const fs::path &directory, const std::regex &pattern) {
     std::vector<fs::path> files;
 
     searchFilesImpl(files, directory, pattern);
@@ -398,7 +416,7 @@ std::vector<fs::path> searchFiles(const fs::path &directory, const std::regex &p
     return files;
 }
 
-std::optional<fs::path> locate_texture(const fs::path &parentPath, const fs::path &textureFilePath) {
+static std::optional<fs::path> locate_texture(const fs::path &parentPath, const fs::path &textureFilePath) {
     const std::vector<fs::path> combinations = {
         parentPath / textureFilePath,
         parentPath / textureFilePath.filename(),
@@ -409,7 +427,7 @@ std::optional<fs::path> locate_texture(const fs::path &parentPath, const fs::pat
     };
 
     for (const fs::path &path : combinations) {
-        std::cout << "Trying " << path.string() << std::endl;
+        std::cout << "Trying " << path.string() << '\n';
 
         if (fs::exists(path)) {
             return path;
@@ -420,11 +438,11 @@ std::optional<fs::path> locate_texture(const fs::path &parentPath, const fs::pat
     const std::regex pattern{patternStr};
     const fs::path searchPath = parentPath.parent_path().parent_path();
 
-    std::cout << "Trying to locate texture in " << searchPath << " with alias " << patternStr << std::endl;
+    std::cout << "Trying to locate texture in " << searchPath << " with alias " << patternStr << '\n';
 
     const std::vector<fs::path> foundFiles = searchFiles(searchPath, pattern);
 
-    std::cout << "Found " << foundFiles.size() << " matches" << std::endl;
+    std::cout << "Found " << foundFiles.size() << " matches" << '\n';
 
     if (foundFiles.empty()) {
         return {};
@@ -433,9 +451,9 @@ std::optional<fs::path> locate_texture(const fs::path &parentPath, const fs::pat
     return foundFiles[0];
 }
 
-Material
+static Material
 createMaterial(const std::string &parentPath, Renderer &renderer, TextureRepository &textureRepository, const aiMaterial *aimaterial, const std::vector<GLuint> &textures) {
-    if (!aimaterial) {
+    if (aimaterial == nullptr) {
         return {};
     }
 
@@ -445,10 +463,10 @@ createMaterial(const std::string &parentPath, Renderer &renderer, TextureReposit
 
     // extract material colors
     const MaterialImportedProperties props = extractProperties(*aimaterial);
-    material.ambient.color = extract(props.ambient, glm::vec4{0.0f, 0.0f, 0.0f, 1.0f});
-    material.diffuse.color = extract(props.diffuse, glm::vec4{0.0f, 0.0f, 0.0f, 1.0f});
-    material.specular.color = extract(props.specular, glm::vec4{0.0f, 0.0f, 0.0f, 1.0f});
-    material.emissive.color = extract(props.emissive, glm::vec4{0.0f, 0.0f, 0.0f, 1.0f});
+    material.ambient.color = extract(props.ambient, glm::vec4{0.0F, 0.0F, 0.0F, 1.0F});
+    material.diffuse.color = extract(props.diffuse, glm::vec4{0.0F, 0.0F, 0.0F, 1.0F});
+    material.specular.color = extract(props.specular, glm::vec4{0.0F, 0.0F, 0.0F, 1.0F});
+    material.emissive.color = extract(props.emissive, glm::vec4{0.0F, 0.0F, 0.0F, 1.0F});
 
     // extract material textures
     std::map<aiTextureType, std::string> textureMap{
@@ -484,23 +502,22 @@ createMaterial(const std::string &parentPath, Renderer &renderer, TextureReposit
 
         const std::string fileName = textureFileName.C_Str();
 
-        std::cout << "    " << "Texture type: " << to_str(textureType) << ", has this filename: \"" << fileName << "\"" << std::endl;
+        std::cout << "    " << "Texture type: " << to_str(textureType) << ", has this filename: \"" << fileName << "\"" << '\n';
         std::string filePath = join(split(fileName, "\\"), "/");
 
         if (filePath[0] == '*') {
-            std::cout << "Texture embedded directly into the scene" << std::endl;
+            std::cout << "Texture embedded directly into the scene" << '\n';
 
             const std::string indexPart = fileName.substr(1, fileName.size() - 1);
             const auto index = static_cast<size_t>(std::atoi(indexPart.c_str()));
 
             if (index < textures.size()) {
-                std::cout << "    " << "Linking texture index " << index << " in this material." << std::endl;
+                std::cout << "    " << "Linking texture index " << index << " in this material." << '\n';
 
                 setupTextureMap(material, textures[index], textureType);
                 continue;
-            } else {
-                std::cout << "    " << "Can't link texture index " << index << " in this material. Scene Textures just have " << (textures.size() + 1) << " elements" << std::endl;
-            }
+            }                 std::cout << "    " << "Can't link texture index " << index << " in this material. Scene Textures just have " << (textures.size() + 1) << " elements" << std::endl;
+           
         } else if (filePath[0] == '/') {
             if (!can_be_opened(filePath)) {
                 const std::string textureParentPath = parent_path(filePath);
@@ -508,32 +525,32 @@ createMaterial(const std::string &parentPath, Renderer &renderer, TextureReposit
                 filePath = replace_all(filePath, parent_path(filePath), parentPath);
             }
         } else {
-            std::cout << "Locating texture " << filePath << " in tree of " << parentPath << std::endl;
+            std::cout << "Locating texture " << filePath << " in tree of " << parentPath << '\n';
             const auto path = locate_texture(parentPath, filePath);
 
             if (path.has_value()) {
-                std::cout << "Texture " << filePath << " located at " << path.value().string() << std::endl;
+                std::cout << "Texture " << filePath << " located at " << path.value().string() << '\n';
 
                 filePath = path.value().string();
             } else {
-                std::cout << "Texture " << filePath << " couldn't be located" << std::endl;
+                std::cout << "Texture " << filePath << " couldn't be located" << '\n';
             }
         }
 
         if (can_be_opened(filePath)) {
             pair.second = filePath;
-            std::cout << "    " << "Normalizing path for texture: " << to_str(textureType) << " = " << fileName << " -> " << filePath << std::endl;
+            std::cout << "    " << "Normalizing path for texture: " << to_str(textureType) << " = " << fileName << " -> " << filePath << '\n';
 
             setupTextureMap(material, textureRepository.getOrCreate(filePath, renderer), textureType);
         } else {
-            std::cout << "    " << "Texture filepath normalization failed, because it cannot be opened. The generated filepath was: " << filePath << std::endl;
+            std::cout << "    " << "Texture filepath normalization failed, because it cannot be opened. The generated filepath was: " << filePath << '\n';
         }
     }
 
     return material;
 }
 
-std::vector<Material>
+static std::vector<Material>
 createMaterialArray(const std::string &parentPath, Renderer &renderer, TextureRepository &textureRepository, const aiScene *aiscene, const std::vector<GLuint> &textures) {
     std::vector<Material> materials;
 

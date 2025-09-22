@@ -1,6 +1,6 @@
 
 #ifndef __XE_GRAPHICS_GL_TEXTURE3DGL_HPP__
-#define __XE_GRAPHICS_GL_TEXTURE3DGL_HPP__
+#define XE_GRAPHICS_GL_TEXTURE3DGL_HPP_
 
 #include <xe/graphics/Texture3D.h>
 
@@ -9,22 +9,22 @@
 namespace XE {
     class Texture3DGL : public Texture3D, public TextureBaseGL {
     public:
-        Texture3DGL(const PixelFormat format, const Vector3i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void *sourceData);
+        Texture3DGL(PixelFormat format, const Vector3i &size, PixelFormat sourceFormat, DataType sourceDataType, const void *sourceData);
 
-        virtual ~Texture3DGL();
+        ~Texture3DGL() override;
 
-        virtual PixelFormat getFormat() const override {
+        PixelFormat getFormat() const override {
             return m_format;
         }
 
-    public:
-        virtual Vector3i getSize() const override {
+    
+        Vector3i getSize() const override {
             return m_size;
         }
 
-        virtual void setData(const void *surfaceData, const int mipLevel, const PixelFormat surfaceFormat, const DataType surfaceDataType, const Boxi &volume) override;
+        void setData(const void *surfaceData, int mipLevel, PixelFormat surfaceFormat, DataType surfaceDataType, const Boxi &volume) override;
 
-        virtual void getData(void *surfaceData, const int mipLevel, const PixelFormat surfaceFormat, const DataType surfaceDataType, const Boxi &volume) const override;
+        void getData(void *surfaceData, int mipLevel, PixelFormat surfaceFormat, DataType surfaceDataType, const Boxi &volume) const override;
 
     private:
         PixelFormat m_format;

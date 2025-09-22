@@ -3,15 +3,23 @@
 
 #include "GraphicsContextGLFW.h"
 #include "InputManagerGLFW.h"
+#include "xe/graphics/GraphicsAPI.h"
+#include "xe/graphics/GraphicsContext.h"
+#include "xe/graphics/PixelFormat.h"
+#include "xe/input/InputManager.h"
+#include "xe/math/Vector.h"
 #include <GLFW/glfw3.h>
+#include <OpenGL/gl.h>
 #include <memory>
 
 #include <iostream>
 #include <map>
+#include <stdexcept>
+#include <string>
 
 namespace XE {
     void static errorCallback(int error, const char *description) {
-        std::cout << "GLFW errorCallback: " << error << ": " << description << std::endl;
+        std::cout << "GLFW errorCallback: " << error << ": " << description << '\n';
     }
 
     static std::map<int, int> mapToHints(const GraphicsContext::Descriptor &descriptor) {
@@ -54,7 +62,7 @@ namespace XE {
                 glfwInit();
             }
 
-            std::cout << "[GLFW] Initializing GLFW ..." << std::endl;
+            std::cout << "[GLFW] Initializing GLFW ..." << '\n';
 
             glfwSetErrorCallback(errorCallback);
 
@@ -64,10 +72,10 @@ namespace XE {
                 glfwWindowHint(pair.first, pair.second);
             }
 
-            std::cout << "[GLFW] Creating Window/Context ..." << std::endl;
+            std::cout << "[GLFW] Creating Window/Context ..." << '\n';
             glfwWindow = glfwCreateWindow(windowSize.X, windowSize.Y, title.c_str(), fullScreen ? glfwGetPrimaryMonitor() : nullptr, nullptr);
 
-            if (!glfwWindow) {
+            if (glfwWindow == nullptr) {
                 std::string desc;
                 desc.resize(256);
 
@@ -78,15 +86,15 @@ namespace XE {
                 throw std::runtime_error(desc);
             }
 
-            std::cout << "[GLFW] Making Context current ..." << std::endl;
+            std::cout << "[GLFW] Making Context current ..." << '\n';
             glfwMakeContextCurrent(glfwWindow);
 
             graphicsContext = std::make_unique<GraphicsContextGLFW>(glfwWindow, contextDescriptor);
             inputManager = std::make_unique<InputManagerGLFW>(glfwWindow);
         }
 
-        ~WindowGLFWImpl() {
-            if (glfwWindow) {
+        ~WindowGLFWImpl() override {
+            if (glfwWindow != nullptr) {
                 glfwMakeContextCurrent(nullptr);
                 glfwDestroyWindow(glfwWindow);
             }
@@ -96,8 +104,9 @@ namespace XE {
             }
         }
 
-        virtual Vector2i getSizeInPixels() const override {
-            int width, height;
+        Vector2i getSizeInPixels() const override {
+            int width;
+            int height;
 
             glfwGetWindowSize(glfwWindow, &width, &height);
 
@@ -108,18 +117,18 @@ namespace XE {
             ::glfwSetWindowTitle(glfwWindow, title.c_str());
         }
 
-        virtual GraphicsContext *getContext() const override {
+        GraphicsContext *getContext() const override {
             return graphicsContext.get();
         }
 
-        virtual InputManager *getInputManager() const override {
+        InputManager *getInputManager() const override {
             return inputManager.get();
         }
 
     private:
         GLFWwindow *glfwWindow = nullptr;
 
-    private:
+    
         std::unique_ptr<GraphicsContextGLFW> graphicsContext;
         std::unique_ptr<InputManagerGLFW> inputManager;
         static int usageCount;

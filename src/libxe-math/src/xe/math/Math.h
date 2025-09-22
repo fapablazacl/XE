@@ -1,6 +1,6 @@
 
 #ifndef __XE_MATH_H__
-#define __XE_MATH_H__
+#define XE_MATH_H_
 
 #include "Boundary.h"
 #include "Box.h"

@@ -1,6 +1,6 @@
 
 #ifndef __XE_GRAPHICS_TEXTURE2DARRAY_HPP__
-#define __XE_GRAPHICS_TEXTURE2DARRAY_HPP__
+#define XE_GRAPHICS_TEXTURE2DARRAY_HPP_
 
 #include <xe/Predef.h>
 #include <xe/graphics/Texture.h>
@@ -13,21 +13,21 @@ namespace XE {
     class Texture2DArray : public Texture {
 
     public:
-        virtual TextureType getType() const override;
+        TextureType getType() const override;
 
-    public:
-        virtual ~Texture2DArray();
+    
+        ~Texture2DArray() override;
 
         virtual Vector2i getSize() const = 0;
 
         virtual int getCount() const = 0;
 
         virtual void setData(
-            const void *surfaceData, const int mipLevel, const int arrayIndex, const PixelFormat surfaceFormat, const DataType surfaceDataType, const Recti &area, int count
+            const void *surfaceData, int mipLevel, int arrayIndex, PixelFormat surfaceFormat, DataType surfaceDataType, const Recti &area, int count
         ) = 0;
 
         virtual void
-        getData(void *surfaceData, const int mipLevel, const int arrayIndex, const PixelFormat surfaceFormat, const DataType surfaceDataType, const Recti &area) const = 0;
+        getData(void *surfaceData, int mipLevel, int arrayIndex, PixelFormat surfaceFormat, DataType surfaceDataType, const Recti &area) const = 0;
     };
 } // namespace XE
 

@@ -3,6 +3,7 @@
 
 #include "HostPlatform.h"
 #include "VulkanRenderer.h"
+#include <cstdint>
 
 int main() {
     const uint32_t SCREEN_WIDTH = 1024;

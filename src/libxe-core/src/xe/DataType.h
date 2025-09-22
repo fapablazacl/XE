@@ -1,13 +1,13 @@
 
 #ifndef __XE_DATATYPE_HPP__
-#define __XE_DATATYPE_HPP__
+#define XE_DATATYPE_HPP_
 
 #include <cstdint>
 
 namespace XE {
-    enum class DataType : std::int16_t { MetaFirst, Unknown = MetaFirst, UInt8, UInt16, UInt32, UInt64, Int8, Int16, Int32, Int64, Float16, Float32, Float64, MetaCount };
+    enum class DataType : std::int16_t { MetaFirst = 0, Unknown = MetaFirst, UInt8 = 1, UInt16 = 2, UInt32 = 3, UInt64 = 4, Int8 = 5, Int16 = 6, Int32 = 7, Int64 = 8, Float16 = 9, Float32 = 10, Float64 = 11, MetaCount = 12 };
 
-    extern int bytesize(const DataType dataType);
+    extern int bytesize(DataType dataType);
 } // namespace XE
 
 #endif
