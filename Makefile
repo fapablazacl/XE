@@ -14,6 +14,12 @@ CLANG_TIDY := run-clang-tidy -p build/Debug/ -header-filter=.*
 CPPCHECK := cppcheck --project=build/Debug/compile_commands.json
 CTEST := ctest --test-dir build/Debug --output-on-failure
 
+IWYU_FIXES := /tmp/iwyu.out
+IWYU := iwyu_tool.py -p build/Debug
+IWYU_GEN_FIXES := $(IWYU) > $(IWYU_FIXES)
+IWYU_APPLY_FIXES := fix_includes.py < $(IWYU_FIXES)
+IWYU_CLEAR_FIXES := rm $(IWYU_FIXES)
+
 .PHONY: clean
 .PHONY: format tidy cppcheck test
 .PHONY: docker 
@@ -24,8 +30,7 @@ configure:
 	$(CONAN_INSTALL_DEBUG)
 	$(CMAKE_CONFIGURE_RELEASE)
 	$(CMAKE_CONFIGURE_DEBUG)
-	$(CP_COMPILE_COMMANDS_JSON)
-	
+
 format:
 	$(CLANG_FORMAT)
 
@@ -40,7 +45,15 @@ cppcheck:
 
 test:
 	$(CTEST)
-	
+
+iwyu:
+	$(IWYU)
+
+iwyu-fix:
+	$(IWYU_GEN_FIXES)
+	$(IWYU_APPLY_FIXES)
+	$(IWYU_CLEAR_FIXES)
+
 docker:
 	$(DOCKER) buildx build --platform=linux/amd64 -t $(IMAGE) $(BUILD_CONTEXT)
 	$(DOCKER) run --rm -v $(CURDIR)/.conan2-docker:/root/.conan2 $(IMAGE) sh -c '$(CONAN_PROFILE_DETECT)'
@@ -50,8 +63,7 @@ docker-configure:
 	$(DOCKER_CONTEXT) sh -c '$(CONAN_INSTALL_DEBUG)'
 	$(DOCKER_CONTEXT) sh -c '$(CMAKE_CONFIGURE_RELEASE)'
 	$(DOCKER_CONTEXT) sh -c '$(CMAKE_CONFIGURE_DEBUG)'
-	$(DOCKER_CONTEXT) sh -c '$(CP_COMPILE_COMMANDS_JSON)'
-	
+
 docker-format:
 	$(DOCKER_CONTEXT) sh -c '$(CLANG_FORMAT)'
 
