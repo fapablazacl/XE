@@ -2,6 +2,7 @@
 
 #include <SDL2/SDL.h>
 #include <imgui.h>
+#include <cgltf.h>
 
 class Window {
 public:
@@ -23,6 +24,8 @@ public:
     // called once per frame
     void drawUI();
 
+    void setData(cgltf_data *newData);
+
 private:
     int initializeSDL();
 
@@ -31,4 +34,5 @@ private:
     SDL_Window *window = nullptr;
     SDL_GLContext context = nullptr;
     ImGuiContext *imGuiContext = nullptr;
+    cgltf_data *data = nullptr;
 };

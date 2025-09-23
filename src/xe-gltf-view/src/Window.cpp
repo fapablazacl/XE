@@ -249,6 +249,57 @@ void process_variant(cgltf_material_variant *material_variant) {
     std::cout << "Material variant name: " << material_variant->name << '\n';
 }
 
+template <typename Func> void treeNode(const std::string &label, Func func) {
+    const ImGuiTreeNodeFlags flag = ImGuiTreeNodeFlags_DefaultOpen;
+    if (ImGui::TreeNodeEx(label.c_str(), flag)) {
+        func();
+        ImGui::TreePop();
+    }
+}
+
+void renderValue(const cgltf_scene &scene) {
+    const int x = 0;
+}
+
+void renderValue(const cgltf_light &light) {
+    const int x = 0;
+}
+
+void renderValue(const cgltf_camera &camera) {
+    const int x = 0;
+}
+
+void renderValue(const cgltf_mesh &mesh) {
+    const int x = 0;
+}
+
+void renderValue(const cgltf_animation &animation) {
+    const int x = 0;
+}
+
+void renderValue(const cgltf_skin &skin) {
+    const int x = 0;
+}
+
+void renderValue(const cgltf_texture &texture) {
+    const int x = 0;
+}
+
+void renderValue(const cgltf_image &image) {
+    const int x = 0;
+}
+
+template <typename T> void renderTreeNode(const std::string &label, const std::span<T> &values) {
+    const ImGuiTreeNodeFlags flag = ImGuiTreeNodeFlags_DefaultOpen;
+    if (ImGui::TreeNodeEx(label.c_str(), flag)) {
+        for (const T &value : values) {
+            renderValue(value);
+        }
+
+        ImGui::TreePop();
+    }
+}
+
 void treeNodeLights(cgltf_light *lights, cgltf_size lights_count) {
     std::cout << "Found " << lights_count << " lights" << '\n';
     for (cgltf_size i = 0; i < lights_count; i++) {
@@ -328,32 +379,30 @@ template <typename T> std::span<T> make_span(T *ptr, cgltf_size size) {
     return {ptr, size};
 }
 
-template <typename T> void renderTreeNode(const std::string &label, const std::span<T> & /*values*/) {
-    ImGuiTreeNodeFlags flag = ImGuiTreeNodeFlags_DefaultOpen;
-    if (ImGui::TreeNodeEx(label.c_str(), flag)) {
+void visitData(const cgltf_data &data) {
+    std::span<cgltf_scene> scenes{data.scenes, data.scenes_count};
+    renderTreeNode(std::format("Scenes ({})", scenes.size()), scenes);
 
-        ImGui::TreePop();
-    }
-}
+    std::span<cgltf_light> lights{data.lights, data.lights_count};
+    renderTreeNode(std::format("Lights ({})", lights.size()), lights);
 
-template <typename Func> void treeNode(const std::string &label, Func func) {
-    ImGuiTreeNodeFlags flag = ImGuiTreeNodeFlags_DefaultOpen;
-    if (ImGui::TreeNodeEx(label.c_str(), flag)) {
-        func();
-        ImGui::TreePop();
-    }
-}
+    std::span<cgltf_camera> cameras{data.cameras, data.cameras_count};
+    renderTreeNode(std::format("Cameras ({})", cameras.size()), cameras);
 
-void visitData(cgltf_data *data) {
-    assert(data != nullptr);
-    std::span<cgltf_scene> scenes{data->scenes, data->scenes_count};
-    std::span<cgltf_light> lights{data->lights, data->lights_count};
-    std::span<cgltf_camera> cameras{data->cameras, data->cameras_count};
-    std::span<cgltf_mesh> meshes{data->meshes, data->meshes_count};
-    std::span<cgltf_animation> animations{data->animations, data->animations_count};
-    std::span<cgltf_skin> skins{data->skins, data->skins_count};
-    std::span<cgltf_texture> textures{data->textures, data->textures_count};
-    std::span<cgltf_image> images{data->images, data->images_count};
+    std::span<cgltf_mesh> meshes{data.meshes, data.meshes_count};
+    renderTreeNode(std::format("Meshes ({})", meshes.size()), meshes);
+
+    std::span<cgltf_animation> animations{data.animations, data.animations_count};
+    renderTreeNode(std::format("Animations ({})", animations.size()), animations);
+
+    std::span<cgltf_skin> skins{data.skins, data.skins_count};
+    renderTreeNode(std::format("Skins ({})", skins.size()), skins);
+
+    std::span<cgltf_texture> textures{data.textures, data.textures_count};
+    renderTreeNode(std::format("Textures ({})", textures.size()), textures);
+
+    std::span<cgltf_image> images{data.images, data.images_count};
+    renderTreeNode(std::format("Images ({})", images.size()), images);
 }
 
 Window::Window() {
@@ -474,6 +523,14 @@ void Window::prepareUI() {
 }
 
 void Window::drawUI() {
+    ImGui::Begin("GLTF Tree");
+    if (data) {
+        treeNode("root", [this]() {
+            visitData(*data);
+        });
+    }
+    ImGui::End();
+
     ImGui::Begin("Demo window");
     ImGui::Text("Hello world!");
     if (ImGui::Button("Hello!")) {
@@ -487,4 +544,8 @@ void Window::drawUI() {
 
 void Window::swapBuffers() {
     SDL_GL_SwapWindow(window);
+}
+
+void Window::setData(cgltf_data *newData) {
+    data = newData;
 }

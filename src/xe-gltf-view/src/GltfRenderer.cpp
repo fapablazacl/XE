@@ -114,6 +114,8 @@ void main() {
             throw std::runtime_error("Failed gltfParser.parse().");
         }
 
+        data = gltfData;
+
         auto imageLoader = createImageLoader();
         auto gltfTextureLoader = GltfTextureLoader{renderer.get(), imageLoader.get()};
 

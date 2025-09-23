@@ -3,6 +3,8 @@
 
 #include "GltfMesh.h"
 #include "xe/gl/RendererGL.h"
+
+#include <cgltf.h>
 #include <memory>
 
 namespace xe::gltf_view {
@@ -35,6 +37,11 @@ namespace xe::gltf_view {
 
         void endFrame();
 
+        [[nodiscard]]
+        cgltf_data *getData() const {
+            return data;
+        }
+
     private:
         std::unique_ptr<xe::gl::RendererGL> renderer;
         ShaderProgramUniformData uniformData;
@@ -42,5 +49,6 @@ namespace xe::gltf_view {
         float angle = 0.0f;
         xe::gl::Program program;
         std::vector<GltfMesh> meshes;
+        cgltf_data *data = nullptr;
     };
 } // namespace xe::gltf_view

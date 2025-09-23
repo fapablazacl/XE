@@ -10,6 +10,8 @@ int main(int argc, char *argv[]) {
 
     GltfRenderer renderer;
 
+    window.setData(renderer.getData());
+
     while (window.pollInput()) {
         window.update();
         renderer.beginFrame();
