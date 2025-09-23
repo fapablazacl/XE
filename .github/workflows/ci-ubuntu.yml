@@ -2,24 +2,19 @@ name: CI Ubuntu
 on: [push]
 jobs:
   build:
-    runs-on: ubuntu:22.04
+    runs-on: macos-latest
     steps:
       - name: Checkout Source Code and Submodules
         uses: actions/checkout@v3
         with:
           submodules: true
-        
-      - name: Install System Dependencies
-        run: |
-          sudo apt-get upgrade
-          sudo apt-get update 
-          sudo apt-get install -y libx11-dev libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libgl-dev xorg-dev libglu1-mesa-dev pkg-config ninja-build libwayland-dev libxkbcommon-dev wayland-protocols extra-cmake-modules make
 
       - name: Install Conan
         uses: conan-io/setup-conan@v1
 
       - name: Install Conan dependencies with lockfile
-        run: conan install . --lockfile=conan.lock --lockfile-partial --lockfile-out=conan.lock --build=missing
+        #run: conan install . --lockfile=conan.lock --lockfile-partial --lockfile-out=conan.lock --build=missing
+        run: conan install .--build=missing
 
       - name: Configure
         run: cmake --preset conan-release
