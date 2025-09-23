@@ -4,8 +4,6 @@
 namespace XE {
     TextureBaseGL::TextureBaseGL(const GLenum target) : m_target(target) {
         glGenTextures(1, &m_id);
-
-        
     }
 
     TextureBaseGL::~TextureBaseGL() {

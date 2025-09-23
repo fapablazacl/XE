@@ -28,8 +28,6 @@ namespace XE {
             }
         }
         */
-
-        
     }
 
     std::unique_ptr<Stream> FileStreamSource::open(const std::string &path) {

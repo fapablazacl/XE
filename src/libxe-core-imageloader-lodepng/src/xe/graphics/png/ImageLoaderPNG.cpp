@@ -11,9 +11,6 @@ namespace XE {
     class ImagePNG : public Image {
     public:
         ImagePNG(const void *pointer, const PixelFormat format, const Vector2i size) : pointer(pointer), format(format), size(size) {
-            
-            
-            
         }
 
         ~ImagePNG() override {

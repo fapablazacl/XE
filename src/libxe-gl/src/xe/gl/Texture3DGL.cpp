@@ -4,10 +4,9 @@
 
 namespace XE {
     Texture3DGL::Texture3DGL(const PixelFormat format, const Vector3i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void *sourceData)
-        : TextureBaseGL(GL_TEXTURE_3D), m_format(format), m_size(size) {
-
-        
-        
+        : TextureBaseGL(GL_TEXTURE_3D),
+          m_format(format),
+          m_size(size) {
 
         const GLenum internalFormatGL = convertToGL(m_format);
         const GLenum formatGL = convertToGL(sourceFormat);

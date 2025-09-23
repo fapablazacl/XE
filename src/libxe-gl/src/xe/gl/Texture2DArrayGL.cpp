@@ -5,9 +5,6 @@
 namespace XE {
     Texture2DArrayGL::Texture2DArrayGL(const PixelFormat format, const Vector2i &size, const int count) : TextureBaseGL(GL_TEXTURE_2D_ARRAY), m_format(format), m_size(size) {
 
-        
-        
-
         // const GLenum internalFormatGL = convertToGL(m_format);
         const GLenum formatGL = convertToGL(format);
 

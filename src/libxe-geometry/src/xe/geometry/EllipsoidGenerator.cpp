@@ -3,9 +3,6 @@
 
 namespace XE {
     EllipsoidGenerator::EllipsoidGenerator(const int slices, const int stacks, const Vector3 &dimensions) : slices(slices), dimensions(dimensions), stacks(stacks) {
-        
-        
-        
     }
 
     EllipsoidGenerator::~EllipsoidGenerator() {

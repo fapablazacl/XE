@@ -11,9 +11,6 @@ namespace XE {
         glBindBuffer(target, m_id);
         glBufferData(target, size, data, usage);
         glBindBuffer(target, 0);
-
-        
-        
     }
 
     BufferGL::~BufferGL() {

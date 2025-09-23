@@ -188,7 +188,7 @@ std::vector<uint32_t> ModelLoaderAssimp::createMeshIndices(const aiNode &node) c
     std::vector<uint32_t> indices;
 
     indices.reserve(node.mNumMeshes);
-for (unsigned int i = 0; i < node.mNumMeshes; i++) {
+    for (unsigned int i = 0; i < node.mNumMeshes; i++) {
         indices.push_back(node.mMeshes[i]);
     }
 

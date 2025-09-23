@@ -6,8 +6,6 @@ namespace XE {
     const int faceCount = 6;
 
     BoxGenerator::BoxGenerator(const Vector3i &division, const Vector3 &size) : division(division), size(size) {
-        
-        
     }
 
     BoxGenerator::~BoxGenerator() {
