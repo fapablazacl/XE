@@ -441,8 +441,6 @@ TEST(MatrixTest, RotateXStaticFunctionShouldCreateAXAxisRotationMatrix) {
     float sin = NAN, cos = NAN;
 
     m = XE::mat4RotationX(0.0f);
-    sin = std::sin(0.0f);
-    cos = std::cos(0.0f);
     EXPECT_EQ(m.getRow(0), XE::Vector4(1.0f, 0.0f, 0.0f, 0.0f));
     EXPECT_EQ(m.getRow(1), XE::Vector4(0.0f, 1.0f, 0.0f, 0.0f));
     EXPECT_EQ(m.getRow(2), XE::Vector4(0.0f, 0.0f, 1.0f, 0.0f));
@@ -470,8 +468,6 @@ TEST(MatrixTest, RotateYStaticFunctionShouldCreateAWellConstructedRotationMatrix
     float sin = NAN, cos = NAN;
 
     m = XE::mat4RotationY(0.0f);
-    sin = std::sin(0.0f);
-    cos = std::cos(0.0f);
     EXPECT_EQ(m.getRow(0), XE::Vector4(1.0f, 0.0f, 0.0f, 0.0f));
     EXPECT_EQ(m.getRow(1), XE::Vector4(0.0f, 1.0f, 0.0f, 0.0f));
     EXPECT_EQ(m.getRow(2), XE::Vector4(0.0f, 0.0f, 1.0f, 0.0f));
@@ -499,8 +495,6 @@ TEST(MatrixTest, RotateZStaticFunctionShouldCreateAWellConstructedRotationMatrix
     float sin = NAN, cos = NAN;
 
     m = XE::mat4RotationZ(0.0f);
-    sin = std::sin(0.0f);
-    cos = std::cos(0.0f);
     EXPECT_EQ(m.getRow(0), XE::Vector4(1.0f, 0.0f, 0.0f, 0.0f));
     EXPECT_EQ(m.getRow(1), XE::Vector4(0.0f, 1.0f, 0.0f, 0.0f));
     EXPECT_EQ(m.getRow(2), XE::Vector4(0.0f, 0.0f, 1.0f, 0.0f));
