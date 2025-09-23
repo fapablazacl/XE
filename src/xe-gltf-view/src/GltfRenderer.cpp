@@ -133,7 +133,7 @@ void main() {
             throw std::runtime_error("Meshes could not be loaded.");
         }
 
-        std::cout << meshes.size() << " meshes were loaded" << std::endl;
+        std::cout << meshes.size() << " meshes were loaded" << '\n';
     }
 
     GltfRenderer::~GltfRenderer() {

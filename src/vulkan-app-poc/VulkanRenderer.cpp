@@ -52,7 +52,7 @@ vk::Bool32 debugCallback(
     void * /*pUserData*/
 ) {
 
-    std::cout << pCallbackData->pMessage << std::endl << std::endl;
+    std::cout << pCallbackData->pMessage << '\n' << '\n';
 
     return VK_FALSE;
 }
@@ -79,7 +79,7 @@ std::vector<char> readFile(const std::string &filename) {
     std::ifstream fs{filename.c_str(), std::ios::ate | std::ios::binary};
 
     if (!fs.is_open()) {
-        std::cerr << "failed to open file " << filename << std::endl;
+        std::cerr << "failed to open file " << filename << '\n';
         throw std::exception();
     }
 
@@ -200,7 +200,7 @@ vk::ApplicationInfo VulkanRenderer::createAppInfo() const {
 }
 
 std::vector<const char *> VulkanRenderer::getRequiredExtensions() const {
-    uint32_t extensionCount;
+    uint32_t extensionCount = 0;
     const char **extensions = glfwGetRequiredInstanceExtensions(&extensionCount);
 
     std::vector<const char *> result = {extensions, extensions + extensionCount};
@@ -229,7 +229,7 @@ vk::DebugUtilsMessengerCreateInfoEXT VulkanRenderer::createDebugMessengerInfo() 
 vk::DebugUtilsMessengerEXT VulkanRenderer::createDebugMessenger(vk::Instance instance) const {
     const auto debugInfo = static_cast<VkDebugUtilsMessengerCreateInfoEXT>(createDebugMessengerInfo());
 
-    VkDebugUtilsMessengerEXT messenger;
+    VkDebugUtilsMessengerEXT messenger = nullptr;
     const VkResult result = CreateDebugUtilsMessengerEXT(static_cast<VkInstance>(instance), &debugInfo, nullptr, &messenger);
 
     if (result != VK_SUCCESS) {
@@ -241,12 +241,12 @@ vk::DebugUtilsMessengerEXT VulkanRenderer::createDebugMessenger(vk::Instance ins
 
 vk::Instance VulkanRenderer::createInstance(const std::vector<const char *> &extensions, const std::vector<const char *> &validationLayers) const {
 
-    std::cout << "Creating Vulkan instance with these specified features" << std::endl;
+    std::cout << "Creating Vulkan instance with these specified features" << '\n';
 
-    std::cout << std::endl << "Extensions:" << std::endl;
+    std::cout << '\n' << "Extensions:" << '\n';
     std::for_each(extensions.begin(), extensions.end(), std::puts);
 
-    std::cout << std::endl << "Validation Layers:" << std::endl;
+    std::cout << '\n' << "Validation Layers:" << '\n';
     std::for_each(validationLayers.begin(), validationLayers.end(), std::puts);
 
     const vk::ApplicationInfo appInfo = createAppInfo();
@@ -277,15 +277,15 @@ vk::PhysicalDevice VulkanRenderer::pickPhysicalDevice(const std::vector<vk::Phys
 void VulkanRenderer::showPhysicalDeviceInformation(const vk::PhysicalDevice &device) {
     const auto properties = device.getProperties();
 
-    std::cout << "\"" << properties.deviceName << "\"" << std::endl;
-    std::cout << "  deviceID: " << "\"" << properties.deviceID << "\"" << std::endl;
-    std::cout << "  deviceName: " << "\"" << properties.deviceName << "\"" << std::endl;
-    std::cout << "  vendorID: " << "\"" << properties.vendorID << "\"" << std::endl;
-    std::cout << "  apiVersion: " << "\"" << properties.apiVersion << "\"" << std::endl;
-    std::cout << "  deviceType: " << "\"" << properties.deviceType << "\"" << std::endl;
-    std::cout << "  driverVersion: " << "\"" << properties.driverVersion << "\"" << std::endl;
+    std::cout << "\"" << properties.deviceName << "\"" << '\n';
+    std::cout << "  deviceID: " << "\"" << properties.deviceID << "\"" << '\n';
+    std::cout << "  deviceName: " << "\"" << properties.deviceName << "\"" << '\n';
+    std::cout << "  vendorID: " << "\"" << properties.vendorID << "\"" << '\n';
+    std::cout << "  apiVersion: " << "\"" << properties.apiVersion << "\"" << '\n';
+    std::cout << "  deviceType: " << "\"" << properties.deviceType << "\"" << '\n';
+    std::cout << "  driverVersion: " << "\"" << properties.driverVersion << "\"" << '\n';
 
-    std::cout << std::endl;
+    std::cout << '\n';
 }
 
 std::vector<vk::DeviceQueueCreateInfo> VulkanRenderer::mapQueueCreateInfo(const QueryFamilyIndices &familyIndices) const {

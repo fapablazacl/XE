@@ -2,10 +2,10 @@
 #include <xe/geometry/EllipsoidGenerator.h>
 
 namespace XE {
-    EllipsoidGenerator::EllipsoidGenerator(const int slices, const int stacks, const Vector3 &dimensions) {
-        this->slices = slices;
-        this->stacks = stacks;
-        this->dimensions = dimensions;
+    EllipsoidGenerator::EllipsoidGenerator(const int slices, const int stacks, const Vector3 &dimensions) : slices(slices), dimensions(dimensions), stacks(stacks) {
+        
+        
+        
     }
 
     EllipsoidGenerator::~EllipsoidGenerator() {

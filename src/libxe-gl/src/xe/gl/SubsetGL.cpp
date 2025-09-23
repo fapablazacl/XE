@@ -8,7 +8,7 @@
 namespace XE {
     SubsetGL::SubsetGL(const SubsetDescriptor &desc) : descriptor(desc) {
         for (std::size_t i = 0; i < desc.buffers.size(); i++) {
-            auto bufferGL = static_cast<const BufferGL *>(desc.buffers[i]);
+            auto bufferGL = dynamic_cast<const BufferGL *>(desc.buffers[i]);
             assert(bufferGL);
             buffers.emplace_back(bufferGL);
         }
@@ -34,7 +34,7 @@ namespace XE {
             );
         }
 
-        indexBuffer = static_cast<const BufferGL *>(desc.indexBuffer);
+        indexBuffer = dynamic_cast<const BufferGL *>(desc.indexBuffer);
 
         if (indexBuffer) {
             glBindBuffer(indexBuffer->getTarget(), indexBuffer->getID());

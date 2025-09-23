@@ -22,7 +22,7 @@ namespace XE {
 
         glLinkProgram(m_id);
 
-        GLint status;
+        GLint status = 0;
         glGetProgramiv(m_id, GL_LINK_STATUS, &status);
 
         if (status == static_cast<GLint>(GL_FALSE)) {
@@ -36,7 +36,7 @@ namespace XE {
                 msg += buffer;
             }
 
-            std::cerr << msg << std::endl;
+            std::cerr << msg << '\n';
 
             throw std::runtime_error(msg);
         }

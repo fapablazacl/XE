@@ -22,42 +22,42 @@ namespace xe::gl {
 }
 
 void process_camera(cgltf_camera *camera) {
-    std::cout << "Camera node " << camera->name << std::endl;
+    std::cout << "Camera node " << camera->name << '\n';
 }
 
 void process_light(cgltf_light *light) {
-    std::cout << "Light node" << light->name << std::endl;
+    std::cout << "Light node" << light->name << '\n';
 }
 
 void process_material(const cgltf_material *material) {
-    std::cout << "Material name " << material->name << std::endl;
+    std::cout << "Material name " << material->name << '\n';
 
-    std::cout << "Material has clearcoat " << evaluate_bool(material->has_clearcoat) << std::endl;
-    std::cout << "Material has ior " << evaluate_bool(material->has_ior) << std::endl;
-    std::cout << "Material has metallic roughness " << evaluate_bool(material->has_pbr_metallic_roughness) << std::endl;
-    std::cout << "Material has specular glossiness " << evaluate_bool(material->has_pbr_specular_glossiness) << std::endl;
-    std::cout << "Material has sheen " << evaluate_bool(material->has_sheen) << std::endl;
-    std::cout << "Material has specular " << evaluate_bool(material->has_specular) << std::endl;
-    std::cout << "Material has transmission " << evaluate_bool(material->has_transmission) << std::endl;
-    std::cout << "Material has volume " << evaluate_bool(material->has_volume) << std::endl;
+    std::cout << "Material has clearcoat " << evaluate_bool(material->has_clearcoat) << '\n';
+    std::cout << "Material has ior " << evaluate_bool(material->has_ior) << '\n';
+    std::cout << "Material has metallic roughness " << evaluate_bool(material->has_pbr_metallic_roughness) << '\n';
+    std::cout << "Material has specular glossiness " << evaluate_bool(material->has_pbr_specular_glossiness) << '\n';
+    std::cout << "Material has sheen " << evaluate_bool(material->has_sheen) << '\n';
+    std::cout << "Material has specular " << evaluate_bool(material->has_specular) << '\n';
+    std::cout << "Material has transmission " << evaluate_bool(material->has_transmission) << '\n';
+    std::cout << "Material has volume " << evaluate_bool(material->has_volume) << '\n';
 }
 
 void process_buffer_view(const cgltf_buffer_view *view) {
-    std::cout << "Buffer view name: " << (view->name ? view->name : "<noname>") << std::endl;
-    std::cout << "Buffer view type: " << view->type << std::endl;
+    std::cout << "Buffer view name: " << (view->name ? view->name : "<noname>") << '\n';
+    std::cout << "Buffer view type: " << view->type << '\n';
 }
 
 void process_accessor(const cgltf_accessor *accessor) {
-    std::cout << "Accessor name: " << sanitizeString(accessor->name) << std::endl;
-    std::cout << "Accessor count: " << accessor->count << std::endl;
-    std::cout << "Accessor type: " << accessor->type << std::endl;
-    std::cout << "Accessor component type: " << accessor->component_type << std::endl;
-    std::cout << "Accessor extensions count: " << accessor->extensions_count << std::endl;
-    std::cout << "Accessor have buffer_view: " << toBool(accessor->buffer_view) << std::endl;
-    std::cout << "Accessor has max: " << toBool(accessor->has_max) << std::endl;
-    std::cout << "Accessor has min: " << toBool(accessor->has_min) << std::endl;
-    std::cout << "Accessor is sparse: " << toBool(accessor->is_sparse) << std::endl;
-    std::cout << "Accessor normalized: " << toBool(accessor->normalized) << std::endl;
+    std::cout << "Accessor name: " << sanitizeString(accessor->name) << '\n';
+    std::cout << "Accessor count: " << accessor->count << '\n';
+    std::cout << "Accessor type: " << accessor->type << '\n';
+    std::cout << "Accessor component type: " << accessor->component_type << '\n';
+    std::cout << "Accessor extensions count: " << accessor->extensions_count << '\n';
+    std::cout << "Accessor have buffer_view: " << toBool(accessor->buffer_view) << '\n';
+    std::cout << "Accessor has max: " << toBool(accessor->has_max) << '\n';
+    std::cout << "Accessor has min: " << toBool(accessor->has_min) << '\n';
+    std::cout << "Accessor is sparse: " << toBool(accessor->is_sparse) << '\n';
+    std::cout << "Accessor normalized: " << toBool(accessor->normalized) << '\n';
 
     if (accessor->buffer_view) {
         process_buffer_view(accessor->buffer_view);
@@ -65,30 +65,30 @@ void process_accessor(const cgltf_accessor *accessor) {
 }
 
 void process_attribute(const cgltf_attribute &attribute) {
-    std::cout << "Attribute name " << attribute.name << std::endl;
-    std::cout << "Attribute index " << attribute.index << std::endl;
-    std::cout << "Attribute type " << attribute.type << std::endl;
+    std::cout << "Attribute name " << attribute.name << '\n';
+    std::cout << "Attribute index " << attribute.index << '\n';
+    std::cout << "Attribute type " << attribute.type << '\n';
     process_accessor(attribute.data);
 }
 
 // process a single mesh primitive
 void process_primitive(const cgltf_primitive &primitive) {
-    std::cout << "Primitive type " << primitive.type << std::endl;
-    std::cout << "Primitive attribute count  " << primitive.attributes_count << std::endl;
-    std::cout << "Primitive has indices " << toBool(primitive.indices) << std::endl;
-    std::cout << "Primitive has material " << toBool(primitive.material) << std::endl;
-    std::cout << "Primitive mappings count " << primitive.mappings_count << std::endl;
-    std::cout << "Primitive targets count " << primitive.targets_count << std::endl;
-    std::cout << "Primitive has draco mesh compression " << toBool(primitive.has_draco_mesh_compression) << std::endl;
-    std::cout << "Primitive extension count " << primitive.extensions_count << std::endl;
+    std::cout << "Primitive type " << primitive.type << '\n';
+    std::cout << "Primitive attribute count  " << primitive.attributes_count << '\n';
+    std::cout << "Primitive has indices " << toBool(primitive.indices) << '\n';
+    std::cout << "Primitive has material " << toBool(primitive.material) << '\n';
+    std::cout << "Primitive mappings count " << primitive.mappings_count << '\n';
+    std::cout << "Primitive targets count " << primitive.targets_count << '\n';
+    std::cout << "Primitive has draco mesh compression " << toBool(primitive.has_draco_mesh_compression) << '\n';
+    std::cout << "Primitive extension count " << primitive.extensions_count << '\n';
 
     if (primitive.indices) {
         const auto indexAccessor = primitive.indices;
         const auto indicesOffset = indexAccessor->buffer_view->offset;
         const auto indicesSize = indexAccessor->buffer_view->size;
 
-        std::cout << "Primitive indices offset " << indicesOffset << std::endl;
-        std::cout << "Primitive indices size " << indicesSize << std::endl;
+        std::cout << "Primitive indices offset " << indicesOffset << '\n';
+        std::cout << "Primitive indices size " << indicesSize << '\n';
         // process_accessor(primitive.indices);
     }
 
@@ -131,17 +131,17 @@ void process_primitive(const cgltf_primitive &primitive) {
 
     for (cgltf_size i = 0; i < primitive.targets_count; i++) {
         auto target = primitive.targets + i;
-        std::cout << "Primitive morph target " << i << " attribute count: " << target->attributes_count << std::endl;
+        std::cout << "Primitive morph target " << i << " attribute count: " << target->attributes_count << '\n';
 
         for (cgltf_size j = 0; j < target->attributes_count; j++) {
-            std::cout << "Primitive morph target " << i << " attribute " << j << " name: " << target->attributes[j].name << std::endl;
+            std::cout << "Primitive morph target " << i << " attribute " << j << " name: " << target->attributes[j].name << '\n';
         }
     }
 }
 
 void process_mesh(cgltf_mesh *mesh) {
-    std::cout << "Node mesh " << mesh->name << std::endl;
-    std::cout << "Node primitives count " << mesh->primitives_count << std::endl;
+    std::cout << "Node mesh " << mesh->name << '\n';
+    std::cout << "Node primitives count " << mesh->primitives_count << '\n';
 
     for (cgltf_size i = 0; i < mesh->primitives_count; i++) {
         process_primitive(mesh->primitives[i]);
@@ -149,11 +149,11 @@ void process_mesh(cgltf_mesh *mesh) {
 }
 
 void process_node(cgltf_node *node) {
-    std::cout << "Node name" << node->name << std::endl;
-    std::cout << "Node has matrix " << node->has_matrix << std::endl;
-    std::cout << "Node has translation " << node->has_translation << std::endl;
-    std::cout << "Node has rotation " << node->has_rotation << std::endl;
-    std::cout << "Node has scale " << node->has_scale << std::endl;
+    std::cout << "Node name" << node->name << '\n';
+    std::cout << "Node has matrix " << node->has_matrix << '\n';
+    std::cout << "Node has translation " << node->has_translation << '\n';
+    std::cout << "Node has rotation " << node->has_rotation << '\n';
+    std::cout << "Node has scale " << node->has_scale << '\n';
 
     if (node->mesh) {
         process_mesh(node->mesh);
@@ -167,15 +167,15 @@ void process_node(cgltf_node *node) {
         process_camera(node->camera);
     }
 
-    std::cout << "Node children " << node->children_count << std::endl;
+    std::cout << "Node children " << node->children_count << '\n';
     for (cgltf_size ci = 0; ci < node->children_count; ci++) {
         process_node(node->children[ci]);
     }
 }
 
 void process_scene(cgltf_data *data, cgltf_scene *scene) {
-    std::cout << "Scene name " << scene->name << std::endl;
-    std::cout << "Scene node count " << scene->nodes_count << std::endl;
+    std::cout << "Scene name " << scene->name << '\n';
+    std::cout << "Scene node count " << scene->nodes_count << '\n';
 
     for (cgltf_size ni = 0; ni < scene->nodes_count; ni++) {
         process_node(data->nodes + ni);
@@ -183,141 +183,141 @@ void process_scene(cgltf_data *data, cgltf_scene *scene) {
 }
 
 static void process_animation(cgltf_animation *animation) {
-    std::cout << "Animation name: " << evaluate_name(animation->name) << std::endl;
-    std::cout << "Animation samplers count: " << animation->samplers_count << std::endl;
-    std::cout << "Animation channels count: " << animation->channels_count << std::endl;
-    std::cout << "Animation extensions count: " << animation->extensions_count << std::endl;
+    std::cout << "Animation name: " << evaluate_name(animation->name) << '\n';
+    std::cout << "Animation samplers count: " << animation->samplers_count << '\n';
+    std::cout << "Animation channels count: " << animation->channels_count << '\n';
+    std::cout << "Animation extensions count: " << animation->extensions_count << '\n';
 }
 
 void process_skins(cgltf_skin *skin) {
-    std::cout << "Skin name: " << evaluate_name(skin->name) << std::endl;
-    std::cout << evaluate_ptr("Skin has skeleton node: ", skin->skeleton) << std::endl;
-    std::cout << "Animation joints count: " << skin->joints_count << std::endl;
-    std::cout << "Animation extensions count: " << skin->extensions_count << std::endl;
+    std::cout << "Skin name: " << evaluate_name(skin->name) << '\n';
+    std::cout << evaluate_ptr("Skin has skeleton node: ", skin->skeleton) << '\n';
+    std::cout << "Animation joints count: " << skin->joints_count << '\n';
+    std::cout << "Animation extensions count: " << skin->extensions_count << '\n';
 }
 
 void process_texture(cgltf_texture *texture) {
-    std::cout << "Texture name: " << (texture->name ? texture->name : "<noname>") << std::endl;
-    std::cout << "Texture extensions count: " << texture->extensions_count << std::endl;
-    std::cout << "Texture has sampler: " << (texture->sampler ? "true" : "false") << std::endl;
+    std::cout << "Texture name: " << (texture->name ? texture->name : "<noname>") << '\n';
+    std::cout << "Texture extensions count: " << texture->extensions_count << '\n';
+    std::cout << "Texture has sampler: " << (texture->sampler ? "true" : "false") << '\n';
 
     const cgltf_sampler *sampler = texture->sampler;
 
     if (sampler) {
-        std::cout << "Texture sampler name: " << (sampler->name ? sampler->name : "<noname>") << std::endl;
-        std::cout << "Texture mag filter: " << sampler->mag_filter << std::endl;
-        std::cout << "Texture min filter: " << sampler->min_filter << std::endl;
-        std::cout << "Texture wrap s: " << sampler->wrap_s << std::endl;
-        std::cout << "Texture wrap t: " << sampler->wrap_t << std::endl;
-        std::cout << "Texture extensions count: " << sampler->extensions_count << std::endl;
+        std::cout << "Texture sampler name: " << (sampler->name ? sampler->name : "<noname>") << '\n';
+        std::cout << "Texture mag filter: " << sampler->mag_filter << '\n';
+        std::cout << "Texture min filter: " << sampler->min_filter << '\n';
+        std::cout << "Texture wrap s: " << sampler->wrap_s << '\n';
+        std::cout << "Texture wrap t: " << sampler->wrap_t << '\n';
+        std::cout << "Texture extensions count: " << sampler->extensions_count << '\n';
     }
 
-    std::cout << "Texture has basisu: " << (texture->has_basisu ? "true" : "false") << std::endl;
+    std::cout << "Texture has basisu: " << (texture->has_basisu ? "true" : "false") << '\n';
 }
 
 void process_image(cgltf_image *image) {
-    std::cout << "Image name: " << (image->name ? image->name : "<noname>") << std::endl;
-    std::cout << "Image uri: " << (image->uri ? image->uri : "<noname>") << std::endl;
-    std::cout << "Image mime type: " << (image->mime_type ? image->mime_type : "<noname>") << std::endl;
-    std::cout << "Image has buffer view: " << (image->buffer_view ? "true" : "false") << std::endl;
-    std::cout << "Image extensions count: " << image->extensions_count << std::endl;
+    std::cout << "Image name: " << (image->name ? image->name : "<noname>") << '\n';
+    std::cout << "Image uri: " << (image->uri ? image->uri : "<noname>") << '\n';
+    std::cout << "Image mime type: " << (image->mime_type ? image->mime_type : "<noname>") << '\n';
+    std::cout << "Image has buffer view: " << (image->buffer_view ? "true" : "false") << '\n';
+    std::cout << "Image extensions count: " << image->extensions_count << '\n';
 }
 
 void process_sampler(cgltf_sampler *sampler) {
-    std::cout << "Sampler name: " << sampler->name << std::endl;
+    std::cout << "Sampler name: " << sampler->name << '\n';
 }
 
 void process_buffer(cgltf_buffer *buffer) {
-    std::cout << "Buffer name: " << sanitizeString(buffer->name) << std::endl;
-    std::cout << "Buffer uri: " << sanitizeString(buffer->uri) << std::endl;
-    std::cout << "Buffer size: " << (static_cast<float>(buffer->size) / 1024.0f / 1024.0f) << " MB" << std::endl;
+    std::cout << "Buffer name: " << sanitizeString(buffer->name) << '\n';
+    std::cout << "Buffer uri: " << sanitizeString(buffer->uri) << '\n';
+    std::cout << "Buffer size: " << (static_cast<float>(buffer->size) / 1024.0f / 1024.0f) << " MB" << '\n';
 }
 
 void process_data_extension(cgltf_extension *extension) {
-    std::cout << "Data extension name" << extension->name << std::endl;
+    std::cout << "Data extension name" << extension->name << '\n';
 }
 
 void process_extensions_required(char *str) {
-    std::cout << "Extension required " << str << std::endl;
+    std::cout << "Extension required " << str << '\n';
 }
 
 void process_extensions_used(char *str) {
-    std::cout << "Extension used " << str << std::endl;
+    std::cout << "Extension used " << str << '\n';
 }
 
 void process_variant(cgltf_material_variant *material_variant) {
-    std::cout << "Material variant name: " << material_variant->name << std::endl;
+    std::cout << "Material variant name: " << material_variant->name << '\n';
 }
 
 void treeNodeLights(cgltf_light *lights, cgltf_size lights_count) {
-    std::cout << "Found " << lights_count << " lights" << std::endl;
+    std::cout << "Found " << lights_count << " lights" << '\n';
     for (cgltf_size i = 0; i < lights_count; i++) {
         process_light(lights + i);
-        std::cout << std::endl;
+        std::cout << '\n';
     }
-    std::cout << std::endl;
+    std::cout << '\n';
 }
 
 void treeNodeCameras(cgltf_camera *cameras, cgltf_size cameras_count) {
-    std::cout << "Found " << cameras_count << " cameras" << std::endl;
+    std::cout << "Found " << cameras_count << " cameras" << '\n';
     for (cgltf_size i = 0; i < cameras_count; i++) {
         process_camera(cameras + i);
-        std::cout << std::endl;
+        std::cout << '\n';
     }
-    std::cout << std::endl;
+    std::cout << '\n';
 }
 
 void treeNodeMeshes(cgltf_mesh *meshes, cgltf_size meshes_count) {
-    std::cout << "Found " << meshes_count << " meshes" << std::endl;
+    std::cout << "Found " << meshes_count << " meshes" << '\n';
     for (cgltf_size i = 0; i < meshes_count; i++) {
         process_mesh(meshes + i);
-        std::cout << std::endl;
+        std::cout << '\n';
     }
-    std::cout << std::endl;
+    std::cout << '\n';
 }
 
 void treeNodeAnimations(cgltf_animation *animations, cgltf_size animations_count) {
-    std::cout << "Found " << animations_count << " animations" << std::endl;
+    std::cout << "Found " << animations_count << " animations" << '\n';
     for (cgltf_size i = 0; i < animations_count; i++) {
         process_animation(animations + i);
-        std::cout << std::endl;
+        std::cout << '\n';
     }
-    std::cout << std::endl;
+    std::cout << '\n';
 }
 
 void treeNodeSkins(cgltf_skin *skins, cgltf_size skins_count) {
-    std::cout << "Found " << skins_count << " skins" << std::endl;
+    std::cout << "Found " << skins_count << " skins" << '\n';
     for (cgltf_size i = 0; i < skins_count; i++) {
         process_skins(skins + i);
-        std::cout << std::endl;
+        std::cout << '\n';
     }
-    std::cout << std::endl;
+    std::cout << '\n';
 }
 
 void treeNodeTextures(cgltf_texture *textures, cgltf_size textures_count) {
-    std::cout << "Found " << textures_count << " textures" << std::endl;
+    std::cout << "Found " << textures_count << " textures" << '\n';
     for (cgltf_size i = 0; i < textures_count; i++) {
         process_texture(textures + i);
-        std::cout << std::endl;
+        std::cout << '\n';
     }
-    std::cout << std::endl;
+    std::cout << '\n';
 }
 
 void treeNodeImages(cgltf_image *images, cgltf_size images_count) {
-    std::cout << "Found " << images_count << " images" << std::endl;
+    std::cout << "Found " << images_count << " images" << '\n';
     for (cgltf_size i = 0; i < images_count; i++) {
         process_image(images + i);
-        std::cout << std::endl;
+        std::cout << '\n';
     }
-    std::cout << std::endl;
+    std::cout << '\n';
 }
 
 void treeNodeScenes(cgltf_data *data, cgltf_scene *scenes, cgltf_size scenes_count) {
-    std::cout << "Found " << scenes_count << " scenes" << std::endl;
+    std::cout << "Found " << scenes_count << " scenes" << '\n';
     for (cgltf_size i = 0; i < scenes_count; i++) {
         process_scene(data, scenes + i);
     }
-    std::cout << std::endl;
+    std::cout << '\n';
 }
 
 std::span<cgltf_light> getLightsSpan(cgltf_data *data) {

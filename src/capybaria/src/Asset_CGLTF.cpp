@@ -3,6 +3,7 @@
 
 #include <cmath>
 #include <iostream>
+#include <utility>
 #include <xe/math/Quaternion.h>
 
 #define CGLTF_IMPLEMENTATION
@@ -217,7 +218,7 @@ namespace Sandbox {
     }
 
     void Asset_CGLTF::visitDefaultScene(SceneNodeCallback callback) {
-        mCallback = callback;
+        mCallback = std::move(callback);
 
         visitScene(mData->scene);
     }

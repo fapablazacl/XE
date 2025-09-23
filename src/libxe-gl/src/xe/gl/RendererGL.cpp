@@ -90,7 +90,7 @@ namespace xe::gl {
         std::printf("GL_VERSION: %s\n", info.version.c_str());
         std::printf("GL_SHADING_LANGUAGE_VERSION: %s\n", info.shadingLanguageVersion.c_str());
 
-        GLint extensionCount;
+        GLint extensionCount = 0;
         glGetIntegerv(GL_NUM_EXTENSIONS, &extensionCount);
 
         std::printf("Supported extensions %d\n", extensionCount);
@@ -174,17 +174,17 @@ namespace xe::gl {
         glCompileShader(shaderId);
 
         // check for errors
-        GLint status;
+        GLint status = 0;
         glGetShaderiv(shaderId, GL_COMPILE_STATUS, &status);
 
         if (status == static_cast<GLint>(GL_FALSE)) {
             constexpr size_t INFO_LOG_BUFFER_SIZE = 4096;
-            std::cerr << "Error while creating shader " << type << ": " << std::endl;
+            std::cerr << "Error while creating shader " << type << ": " << '\n';
 
             char msg[INFO_LOG_BUFFER_SIZE] = {};
             glGetShaderInfoLog(shaderId, INFO_LOG_BUFFER_SIZE, nullptr, msg);
 
-            std::cerr << msg << std::endl;
+            std::cerr << msg << '\n';
 
             return {};
         }
@@ -199,7 +199,7 @@ namespace xe::gl {
 
         for (const auto &shader : shaders) {
             if (shader.id == 0) {
-                std::cerr << "Empty shader was supplied" << std::endl;
+                std::cerr << "Empty shader was supplied" << '\n';
 
                 glDeleteProgram(programId);
                 return {};
@@ -210,16 +210,16 @@ namespace xe::gl {
 
         glLinkProgram(programId);
 
-        GLint status;
+        GLint status = 0;
         glGetProgramiv(programId, GL_LINK_STATUS, &status);
 
         if (status == static_cast<GLint>(GL_FALSE)) {
             constexpr size_t INFO_LOG_BUFFER_SIZE = 4096;
 
-            std::cerr << "Shader linker error: " << std::endl;
+            std::cerr << "Shader linker error: " << '\n';
             char msg[INFO_LOG_BUFFER_SIZE] = {};
             glGetProgramInfoLog(programId, INFO_LOG_BUFFER_SIZE, nullptr, msg);
-            std::cerr << msg << std::endl;
+            std::cerr << msg << '\n';
 
             glDeleteProgram(programId);
 

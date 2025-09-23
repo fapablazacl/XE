@@ -14,7 +14,7 @@ TextureRepository::TextureRepository(ImageLoader &loader) : loader{loader} {
 
 GLuint TextureRepository::getOrCreate(const std::string &filePath, Renderer &renderer) {
     if (filePath.empty()) {
-        std::cout << "TextureRepository::getOrCreate: " << "Can't load texture with empty filepath" << std::endl;
+        std::cout << "TextureRepository::getOrCreate: " << "Can't load texture with empty filepath" << '\n';
         return 0;
     }
 
@@ -24,11 +24,11 @@ GLuint TextureRepository::getOrCreate(const std::string &filePath, Renderer &ren
 
     GLuint texture = createTexture(filePath.c_str(), renderer);
     if (!texture) {
-        std::cout << "TextureRepository::getOrCreate: " << "Texture file couldn't be loaded: '" << filePath << "'" << std::endl;
+        std::cout << "TextureRepository::getOrCreate: " << "Texture file couldn't be loaded: '" << filePath << "'" << '\n';
         return 0;
     }
 
-    std::cout << "TextureRepository::getOrCreate: Loaded texture '" << filePath << "'" << std::endl;
+    std::cout << "TextureRepository::getOrCreate: Loaded texture '" << filePath << "'" << '\n';
 
     cachedTextureMap[filePath] = texture;
 

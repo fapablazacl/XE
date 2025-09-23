@@ -340,16 +340,16 @@ namespace xe::gl {
 
         using PFNGLXABLEPROC = void (*)(GLenum pname);
 
-        PFNGLVERTEXATTRIBMXFVPROC glVertexAttribXfv[4];
-        PFNGLVERTEXATTRIBMXIVPROC glVertexAttribXiv[4];
+        PFNGLVERTEXATTRIBMXFVPROC glVertexAttribXfv[4]{};
+        PFNGLVERTEXATTRIBMXIVPROC glVertexAttribXiv[4]{};
 
-        PFNGLUNIFORMXFVPROC glUniformXfv[4];
-        PFNGLUNIFORMXIVPROC glUniformXiv[4];
-        PFNGLUNIFORMXUIVPROC glUniformXuiv[4];
+        PFNGLUNIFORMXFVPROC glUniformXfv[4]{};
+        PFNGLUNIFORMXIVPROC glUniformXiv[4]{};
+        PFNGLUNIFORMXUIVPROC glUniformXuiv[4]{};
 
-        PFNGLUNIFORMMATRIXXFVPROC glUniformMatrixXfv[9];
-        PFNGLUNIFORMMATRIXXDVPROC glUniformMatrixXdv[9];
+        PFNGLUNIFORMMATRIXXFVPROC glUniformMatrixXfv[9]{};
+        PFNGLUNIFORMMATRIXXDVPROC glUniformMatrixXdv[9]{};
 
-        PFNGLXABLEPROC glXable[2];
+        PFNGLXABLEPROC glXable[2]{};
     };
 } // namespace xe::gl

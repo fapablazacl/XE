@@ -40,14 +40,14 @@ bool Platform::initialize() {
     window = glfwCreateWindow(mode->width, mode->height, "Apostate", nullptr, nullptr);
 
     if (!window) {
-        std::cout << "Can't open a Window" << std::endl;
+        std::cout << "Can't open a Window" << '\n';
 
         const char description[1024] = {};
         const char *desc = &description[0];
 
         glfwGetError(&desc);
 
-        std::cout << description << std::endl;
+        std::cout << description << '\n';
 
         return false;
     }

@@ -11,10 +11,10 @@ namespace XE {
         const std::array<TextureCubeMapSide, 6> &sourceDataSides,
         const void **sourceData
     )
-        : TextureBaseGL(GL_TEXTURE_CUBE_MAP) {
+        : TextureBaseGL(GL_TEXTURE_CUBE_MAP), m_format(format), m_size(size) {
 
-        m_size = size;
-        m_format = format;
+        
+        
 
         const GLenum internalFormatGL = convertToGL(m_format);
         const GLenum formatGL = convertToGL(sourceFormat);

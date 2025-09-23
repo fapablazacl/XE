@@ -29,7 +29,7 @@ inline std::optional<GLenum> mapBppToInternalFormat(const int bpp) {
 }
 
 xe::gl::Texture GltfTextureLoader::createTexture(const cgltf_texture_view &textureView) const {
-    std::cout << "Creating texture " << sanitizeString(textureView.texture->name) << std::endl;
+    std::cout << "Creating texture " << sanitizeString(textureView.texture->name) << '\n';
 
     const auto mimeType = textureView.texture->image->mime_type;
     const auto buffer = textureView.texture->image->buffer_view->buffer->data;
@@ -38,7 +38,7 @@ xe::gl::Texture GltfTextureLoader::createTexture(const cgltf_texture_view &textu
     const auto imageFormat = parseImageFormat(mimeType);
 
     if (!imageFormat.has_value()) {
-        std::cerr << "Failed to parse image format " << mimeType << std::endl;
+        std::cerr << "Failed to parse image format " << mimeType << '\n';
         return {};
     }
 
@@ -103,7 +103,7 @@ std::vector<GltfMesh> GltfDataLoader::loadAllMeshes() {
         const auto mesh = createMesh(data->meshes + i);
 
         if (mesh.primitives.empty()) {
-            std::cerr << "Could not create mesh" << std::endl;
+            std::cerr << "Could not create mesh" << '\n';
             return {};
         }
 
@@ -114,31 +114,31 @@ std::vector<GltfMesh> GltfDataLoader::loadAllMeshes() {
 }
 
 void process_animation(cgltf_animation *animation) {
-    std::cout << "Animation name: " << evaluate_name(animation->name) << std::endl;
-    std::cout << "Animation samplers count: " << animation->samplers_count << std::endl;
-    std::cout << "Animation channels count: " << animation->channels_count << std::endl;
-    std::cout << "Animation extensions count: " << animation->extensions_count << std::endl;
+    std::cout << "Animation name: " << evaluate_name(animation->name) << '\n';
+    std::cout << "Animation samplers count: " << animation->samplers_count << '\n';
+    std::cout << "Animation channels count: " << animation->channels_count << '\n';
+    std::cout << "Animation extensions count: " << animation->extensions_count << '\n';
 
     for (cgltf_size i = 0; i < animation->samplers_count; i++) {
         const auto sampler = animation->samplers + i;
-        std::cout << "Animation Sampler Intepolation Type " << sampler->interpolation << std::endl;
+        std::cout << "Animation Sampler Intepolation Type " << sampler->interpolation << '\n';
     }
-    std::cout << std::endl;
+    std::cout << '\n';
 
     for (cgltf_size i = 0; i < animation->channels_count; i++) {
         const auto channel = animation->channels + i;
-        std::cout << "Animation Channel Target Path " << channel->target_path << std::endl;
+        std::cout << "Animation Channel Target Path " << channel->target_path << '\n';
     }
-    std::cout << std::endl;
+    std::cout << '\n';
 }
 
 void GltfDataLoader::loadAllAnimations() {
-    std::cout << "Found " << data->animations_count << " animations" << std::endl;
+    std::cout << "Found " << data->animations_count << " animations" << '\n';
     for (cgltf_size i = 0; i < data->animations_count; i++) {
         process_animation(data->animations + i);
-        std::cout << std::endl;
+        std::cout << '\n';
     }
-    std::cout << std::endl;
+    std::cout << '\n';
 }
 
 GltfMeshPrimitive GltfDataLoader::createMeshPrimitive(const cgltf_primitive &primitive) {
@@ -152,7 +152,7 @@ GltfMeshPrimitive GltfDataLoader::createMeshPrimitive(const cgltf_primitive &pri
     const auto vao = createVertexArray(primitive, vertexBuffer, indexBuffer);
 
     if (!vao.id) {
-        std::cerr << "Could not create vertex array." << std::endl;
+        std::cerr << "Could not create vertex array." << '\n';
         return {};
     }
 
@@ -179,7 +179,7 @@ GltfMesh GltfDataLoader::createMesh(const cgltf_mesh *mesh) {
         const auto meshPrimitive = createMeshPrimitive(mesh->primitives[i]);
 
         if (!meshPrimitive.vao.id) {
-            std::cerr << "Could not create mesh primitive array." << std::endl;
+            std::cerr << "Could not create mesh primitive array." << '\n';
             return {};
         }
 
@@ -213,7 +213,7 @@ xe::gl::Buffer GltfDataLoader::createVertexBuffer(const cgltf_primitive &primiti
 GLint GltfDataLoader::computeAttributeLocation(const std::string &gltfAttributeName) {
     const auto it = attributeMap.find(gltfAttributeName);
     if (it == attributeMap.end()) {
-        std::cout << "Ignoring unused gltf attribute '" << gltfAttributeName << std::endl;
+        std::cout << "Ignoring unused gltf attribute '" << gltfAttributeName << '\n';
         return -1;
     }
 
@@ -222,7 +222,7 @@ GLint GltfDataLoader::computeAttributeLocation(const std::string &gltfAttributeN
 
     if (shaderAttrib.required && location == -1) {
         const auto msg = "Shader Attribute '" + shaderAttrib.name + "' does not exists";
-        std::cerr << msg << std::endl;
+        std::cerr << msg << '\n';
         throw std::runtime_error(msg);
     }
 
@@ -241,13 +241,13 @@ xe::gl::VertexArray GltfDataLoader::createVertexArray(const cgltf_primitive &pri
 
         auto dataTypeGL = mapToAttributeDataType(accessor.component_type);
         if (!dataTypeGL) {
-            std::cerr << "Could not map attribute " << attribute.name << " with accessor component type " << accessor.component_type << std::endl;
+            std::cerr << "Could not map attribute " << attribute.name << " with accessor component type " << accessor.component_type << '\n';
             return {};
         }
 
         auto attribDimGL = mapToAttribDim(accessor.type);
         if (!attribDimGL) {
-            std::cerr << "Could not map attribute" << accessor.name << " with accessor type " << accessor.type << std::endl;
+            std::cerr << "Could not map attribute" << accessor.name << " with accessor type " << accessor.type << '\n';
             return {};
         }
 

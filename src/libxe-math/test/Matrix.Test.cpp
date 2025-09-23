@@ -1,4 +1,6 @@
 
+#include <math.h>
+
 #include "GoogleTestCommon.h"
 
 #include "xe/math/Common.h"
@@ -436,7 +438,7 @@ TEST(MatrixTest, CreateTranslationStaticFunctionShouldCreateAValidTranslateMatri
 
 TEST(MatrixTest, RotateXStaticFunctionShouldCreateAXAxisRotationMatrix) {
     XE::Matrix4 m;
-    float sin, cos;
+    float sin = NAN, cos = NAN;
 
     m = XE::mat4RotationX(0.0f);
     sin = std::sin(0.0f);
@@ -465,7 +467,7 @@ TEST(MatrixTest, RotateXStaticFunctionShouldCreateAXAxisRotationMatrix) {
 
 TEST(MatrixTest, RotateYStaticFunctionShouldCreateAWellConstructedRotationMatrix) {
     XE::Matrix4 m;
-    float sin, cos;
+    float sin = NAN, cos = NAN;
 
     m = XE::mat4RotationY(0.0f);
     sin = std::sin(0.0f);
@@ -494,7 +496,7 @@ TEST(MatrixTest, RotateYStaticFunctionShouldCreateAWellConstructedRotationMatrix
 
 TEST(MatrixTest, RotateZStaticFunctionShouldCreateAWellConstructedRotationMatrix) {
     XE::Matrix4 m;
-    float sin, cos;
+    float sin = NAN, cos = NAN;
 
     m = XE::mat4RotationZ(0.0f);
     sin = std::sin(0.0f);

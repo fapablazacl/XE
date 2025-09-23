@@ -79,7 +79,7 @@ int main(int argc, char **argv) {
     try {
         std::filesystem::create_directories(std::filesystem::path(outputPath).parent_path());
     } catch (...) {
-        std::cerr << "Unknown error while create directories" << std::endl;
+        std::cerr << "Unknown error while create directories" << '\n';
     }
 
     aiReturn ret = exporter.Export(scene, targetFormatId, outputPath, 0);

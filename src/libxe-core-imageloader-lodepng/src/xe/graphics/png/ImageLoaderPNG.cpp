@@ -10,24 +10,24 @@
 namespace XE {
     class ImagePNG : public Image {
     public:
-        ImagePNG(const void *pointer, const PixelFormat format, const Vector2i size) {
-            this->pointer = pointer;
-            this->format = format;
-            this->size = size;
+        ImagePNG(const void *pointer, const PixelFormat format, const Vector2i size) : pointer(pointer), format(format), size(size) {
+            
+            
+            
         }
 
-        virtual ~ImagePNG() {
+        ~ImagePNG() override {
         }
 
-        virtual const void *getPointer() const override {
+        const void *getPointer() const override {
             return pointer;
         }
 
-        virtual PixelFormat getFormat() const override {
+        PixelFormat getFormat() const override {
             return format;
         }
 
-        virtual Vector2i getSize() const override {
+        Vector2i getSize() const override {
             return size;
         }
 
@@ -46,7 +46,7 @@ namespace XE {
 
         const std::uint32_t bufferLength = 512;
 
-        std::uint32_t readed;
+        std::uint32_t readed = 0;
         std::uint8_t buffer[bufferLength];
 
         std::vector<std::uint8_t> imageBuffer;
@@ -63,12 +63,12 @@ namespace XE {
 
         LodePNGState state = {};
 
-        std::cout << "[INFO] ImageLoaderPNG::load: PNG File has " << imageBuffer.size() << " byte(s)." << std::endl;
+        std::cout << "[INFO] ImageLoaderPNG::load: PNG File has " << imageBuffer.size() << " byte(s)." << '\n';
 
         unsigned int error = lodepng_decode(&pixels, &width, &height, &state, imageBuffer.data(), imageBuffer.size());
 
         if (error) {
-            std::cout << "ImageLoaderPNG::load: Error at loading texture from Stream (error:" << lodepng_error_text(error) << ")" << std::endl;
+            std::cout << "ImageLoaderPNG::load: Error at loading texture from Stream (error:" << lodepng_error_text(error) << ")" << '\n';
             assert(false);
             return {};
         }

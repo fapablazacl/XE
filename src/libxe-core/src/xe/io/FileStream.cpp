@@ -3,9 +3,9 @@
 #include <xe/io/FileStream.h>
 
 namespace XE {
-    FileStream::FileStream(const std::string &fileName, const StreamFlags flags) {
-        m_fileName = fileName;
-        m_flags = flags;
+    FileStream::FileStream(const std::string &fileName, const StreamFlags flags) : m_fileName(fileName), m_flags(flags) {
+        
+        
 
         switch (flags) {
         case StreamFlags::Readable:

@@ -22,7 +22,7 @@ namespace XE {
         glCompileShader(m_id);
 
         // check for errors
-        GLint status;
+        GLint status = 0;
         glGetShaderiv(m_id, GL_COMPILE_STATUS, &status);
 
         if (status == static_cast<GLint>(GL_FALSE)) {

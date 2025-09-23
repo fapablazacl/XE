@@ -58,8 +58,8 @@ static GLuint createProgram(Renderer &renderer, AssetPackage &assetPackage, cons
 }
 
 int main(int argc, char **argv) {
-    std::cout << "Apostate Project" << std::endl;
-    std::cout << "Copyright(c) 2022 Felipe Apablaza" << std::endl;
+    std::cout << "Apostate Project" << '\n';
+    std::cout << "Copyright(c) 2022 Felipe Apablaza" << '\n';
 
     /*
     if (argc < 2) {
@@ -100,13 +100,13 @@ int main(int argc, char **argv) {
 
     Platform platform;
     if (!platform.initialize()) {
-        std::cerr << "Failed platform initialization." << std::endl;
+        std::cerr << "Failed platform initialization." << '\n';
         return EXIT_FAILURE;
     }
 
     Renderer renderer{platform};
     if (!renderer.initialize()) {
-        std::cerr << "Failed renderer initialization." << std::endl;
+        std::cerr << "Failed renderer initialization." << '\n';
         return EXIT_FAILURE;
     }
 
@@ -114,7 +114,7 @@ int main(int argc, char **argv) {
 
     const GLuint program = createProgram(renderer, assetPackage, "assets/gouraud.vert", "assets/gouraud.frag");
     if (!program) {
-        std::cerr << "Failed to initialize Gouraud shader" << std::endl;
+        std::cerr << "Failed to initialize Gouraud shader" << '\n';
         return EXIT_FAILURE;
     }
 

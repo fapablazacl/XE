@@ -1,5 +1,7 @@
 
 #include "Game.h"
+
+#include <cstddef>
 #include "Util.h"
 
 const int SCREEN_WIDTH = 640;
@@ -201,11 +203,11 @@ FloorGeometry createFloorGeometry(
 
     std::vector<XE::Vector3> vertices{static_cast<size_t>(floorGeometry.stripVertexCount)};
 
-    int j = 0;
+    size_t j = 0;
 
-    for (int i = 0; i < tilesInX + 1; i++) {
+    for (size_t i = 0; i < static_cast<size_t>(tilesInX + 1); i++) {
         vertices[2 * i] = XE::Vector3(i * tileSizeX, 0.0f, j * tileSizeZ);
-        vertices[2 * i + 1] = XE::Vector3(i * tileSizeX, 0.0f, (j + 1) * tileSizeZ);
+        vertices[2 * i + 1] = XE::Vector3(i * tileSizeX, 0.0f, static_cast<float>(j + 1) * tileSizeZ);
     }
 
     floorGeometry.vertexBuffer = renderer.createBuffer(GL_ARRAY_BUFFER, GL_STATIC_DRAW, {vertices.data(), vertices.size() * sizeof(XE::Vector3)});

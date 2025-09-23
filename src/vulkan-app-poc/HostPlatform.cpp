@@ -52,7 +52,7 @@ std::vector<const char *> HostPlatform::enumerateRequiredInstanceExtensions() co
     result.push_back("VK_KHR_portability_enumeration");
 #endif
 
-    std::cout << "These " << result.size() << " extensions are required:" << std::endl;
+    std::cout << "These " << result.size() << " extensions are required:" << '\n';
     std::for_each(result.begin(), result.end(), std::puts);
 
     return result;
@@ -89,7 +89,7 @@ vk::Extent2D HostPlatform::pickSwapExtent(const vk::SurfaceCapabilitiesKHR &surf
         return surfaceCaps.currentExtent;
     }
 
-    int width, height;
+    int width = 0, height = 0;
     glfwGetFramebufferSize(mWindow, &width, &height);
 
     const vk::Extent2D actualExtent = {static_cast<uint32_t>(width), static_cast<uint32_t>(height)};
@@ -101,7 +101,7 @@ vk::Extent2D HostPlatform::pickSwapExtent(const vk::SurfaceCapabilitiesKHR &surf
 }
 
 vk::SurfaceKHR HostPlatform::createSurface(vk::Instance &instance) const {
-    VkSurfaceKHR rawsurf;
+    VkSurfaceKHR rawsurf = nullptr;
 
     if (glfwCreateWindowSurface(instance, mWindow, nullptr, &rawsurf) != VK_SUCCESS) {
         return {};

@@ -67,11 +67,11 @@ namespace XE {
         GLenum err = glGetError();
 
         if (err != GL_NO_ERROR) {
-            std::cerr << "GraphicsDeviceGL: Error while calling function " << name << std::endl;
-            std::cerr << "GraphicsDeviceGL: Errors generated:" << std::endl;
+            std::cerr << "GraphicsDeviceGL: Error while calling function " << name << '\n';
+            std::cerr << "GraphicsDeviceGL: Errors generated:" << '\n';
 
             while (err != GL_NO_ERROR) {
-                std::cerr << "GraphicsDeviceGL:" << stringval(err) << std::endl;
+                std::cerr << "GraphicsDeviceGL:" << stringval(err) << '\n';
                 err = glGetError();
             }
 
@@ -82,7 +82,7 @@ namespace XE {
     GraphicsDeviceGL::GraphicsDeviceGL(GraphicsContext *context) : context(context) {
         assert(context);
 
-        std::cout << "[GL] Loading OpenGL Extensions ..." << std::endl;
+        std::cout << "[GL] Loading OpenGL Extensions ..." << '\n';
         gladLoadGL();
 
 #ifndef NDEBUG
@@ -140,7 +140,7 @@ namespace XE {
         assert(envelopes);
         assert(envelopeCount > 0);
 
-        auto subsetGL = static_cast<const SubsetGL *>(subset);
+        auto subsetGL = dynamic_cast<const SubsetGL *>(subset);
 
         glBindVertexArray(subsetGL->getID());
 
@@ -300,7 +300,7 @@ namespace XE {
     }
 
     void GraphicsDeviceGL::setProgram(const Program *program) {
-        m_program = static_cast<const ProgramGL *>(program);
+        m_program = dynamic_cast<const ProgramGL *>(program);
 
         if (m_program) {
             glUseProgram(m_program->GetID());

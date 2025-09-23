@@ -29,15 +29,15 @@ static uint64_t monotonicTimeNanos() {
             return (high << 32) + highRem + low;
         }
 
-        Data(uint64_t bias_) : bias(bias_) {
-            mtiStatus = mach_timebase_info(&tb);
+        Data(uint64_t bias_) : bias(bias_), mtiStatus(mach_timebase_info(&tb)) {
+            
         }
 
         uint64_t scale(uint64_t i) {
             return scaleHighPrecision(i - bias, tb.numer, tb.denom);
         }
 
-        mach_timebase_info_data_t tb;
+        mach_timebase_info_data_t tb{};
         uint64_t bias;
         kern_return_t mtiStatus;
 

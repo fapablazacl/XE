@@ -223,7 +223,7 @@ void pre_call_callback_gl(const char *name, void *funcptr, int len_args, ...) {
     (void)len_args;
 
     if (strcmp(name, "glLinkProgram") == 0) {
-        std::cout << "pre glLinkProgram" << std::endl;
+        std::cout << "pre glLinkProgram" << '\n';
     }
 }
 
@@ -236,7 +236,7 @@ void post_call_callback_gl(const char *name, void *funcptr, int len_args, ...) {
         return;
     }
 
-    va_list valist;
+    va_list valist = nullptr;
     va_start(valist, len_args);
 
     std::cerr << name << "(";
@@ -254,8 +254,8 @@ void post_call_callback_gl(const char *name, void *funcptr, int len_args, ...) {
         std::cerr << "<unknown function arguments>";
     }
 
-    std::cerr << ")" << std::endl;
-    std::cerr << "Error: The previous command couldn't be completed, due to the error " << GLErrorToString(error_code) << std::endl;
+    std::cerr << ")" << '\n';
+    std::cerr << "Error: The previous command couldn't be completed, due to the error " << GLErrorToString(error_code) << '\n';
 
     va_end(valist);
 
@@ -268,23 +268,23 @@ Renderer::Renderer(Platform &platform) : platform{platform} {
 
 bool Renderer::initialize() {
     if (!gladLoadGLLoader((GLADloadproc)platform.getGLProcAddressProcedure())) {
-        std::cerr << "Failed to initialize extensions (via GLAD)" << std::endl;
+        std::cerr << "Failed to initialize extensions (via GLAD)" << '\n';
 
         return false;
     }
 
-    std::cout << "GL_VENDOR: " << glGetString(GL_VENDOR) << std::endl;
-    std::cout << "GL_VERSION: " << glGetString(GL_VERSION) << std::endl;
-    std::cout << "GL_RENDERER: " << glGetString(GL_RENDERER) << std::endl;
-    std::cout << "GL_SHADING_LANGUAGE_VERSION: " << glGetString(GL_SHADING_LANGUAGE_VERSION) << std::endl;
+    std::cout << "GL_VENDOR: " << glGetString(GL_VENDOR) << '\n';
+    std::cout << "GL_VERSION: " << glGetString(GL_VERSION) << '\n';
+    std::cout << "GL_RENDERER: " << glGetString(GL_RENDERER) << '\n';
+    std::cout << "GL_SHADING_LANGUAGE_VERSION: " << glGetString(GL_SHADING_LANGUAGE_VERSION) << '\n';
 
-    GLint extensionCount;
+    GLint extensionCount = 0;
     glGetIntegerv(GL_NUM_EXTENSIONS, &extensionCount);
 
-    std::cout << "GLAD - Initialized extensions (" << extensionCount << "): " << std::endl;
+    std::cout << "GLAD - Initialized extensions (" << extensionCount << "): " << '\n';
 
     for (int i = 0; i < extensionCount; i++) {
-        std::cout << "    " << glGetStringi(GL_EXTENSIONS, i) << std::endl;
+        std::cout << "    " << glGetStringi(GL_EXTENSIONS, i) << '\n';
     }
 
 #if defined(GLAD_DEBUG)
@@ -344,7 +344,7 @@ GLuint Renderer::createShaderProgram(const std::vector<GLuint> &shaders) {
 
         glGetProgramInfoLog(programId, 2048, &size, buffer);
         const std::string msg = buffer;
-        std::cerr << "Error: " << msg << std::endl;
+        std::cerr << "Error: " << msg << '\n';
 
         return 0;
     }

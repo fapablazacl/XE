@@ -286,7 +286,7 @@ std::optional<KtxcOptions> parseCommandLine(const int argc, char *argv[]) {
     const auto parseResult = options.parse(argc, argv);
 
     if (parseResult.count("help")) {
-        std::cout << options.help() << std::endl;
+        std::cout << options.help() << '\n';
         return {};
     }
 
