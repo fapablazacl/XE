@@ -2,7 +2,12 @@ name: CI Ubuntu
 on: [push]
 jobs:
   build:
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/fapablazacl/cpp-archlinux:latest
+      credentials:
+      username: ${{ github.actor }}
+      password: ${{ secrets.GH_PACKAGE_REGISTRY }}
     steps:
       - name: Checkout Source Code and Submodules
         uses: actions/checkout@v3
