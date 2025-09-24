@@ -14,7 +14,7 @@ jobs:
 
       - name: Install Conan dependencies with lockfile
         #run: conan install . --lockfile=conan.lock --lockfile-partial --lockfile-out=conan.lock --build=missing
-        run: conan install .--build=missing
+        run: conan install . --build=missing
 
       - name: Configure
         run: cmake --preset conan-release

@@ -5,6 +5,7 @@
 #include <iostream>
 #include <map>
 #include <span>
+#include <format>
 
 #include "GltfUtil.h"
 #include "cgltf.h"
