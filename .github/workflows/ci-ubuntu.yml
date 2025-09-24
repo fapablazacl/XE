@@ -7,7 +7,7 @@ jobs:
       image: ghcr.io/fapablazacl/cpp-archlinux:latest
       credentials:
         username: ${{ github.actor }}
-        password: ${{ secrets.GH_PACKAGE_REGISTRY }}
+        password: ${{ secrets.GH_PACKAGE_REGISTRY_TOKEN }}
     steps:
       - name: Checkout Source Code and Submodules
         uses: actions/checkout@v3
