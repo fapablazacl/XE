@@ -2,19 +2,23 @@ name: CI Ubuntu
 on: [push]
 jobs:
   build:
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/fapablazacl/cpp-archlinux:latest
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ secrets.GH_PACKAGE_REGISTRY_TOKEN }}
     steps:
       - name: Checkout Source Code and Submodules
         uses: actions/checkout@v3
         with:
           submodules: true
 
-      - name: Install Conan
-        uses: conan-io/setup-conan@v1
-
       - name: Install Conan dependencies with lockfile
         #run: conan install . --lockfile=conan.lock --lockfile-partial --lockfile-out=conan.lock --build=missing
-        run: conan install .--build=missing
+        run: |
+          conan profile detect
+          conan install . --build=missing
 
       - name: Configure
         run: cmake --preset conan-release
