@@ -21,6 +21,11 @@ namespace xe::gl {
     class RendererGL;
 }
 
+static const char *stringOr(const char *value, const char *defaultValue = "<null>") {
+    assert(defaultValue != nullptr);
+    return value ? value : defaultValue;
+}
+
 void process_camera(cgltf_camera *camera) {
     std::cout << "Camera node " << camera->name << '\n';
 }
@@ -148,81 +153,6 @@ void process_mesh(cgltf_mesh *mesh) {
     }
 }
 
-void process_node(cgltf_node *node) {
-    std::cout << "Node name" << node->name << '\n';
-    std::cout << "Node has matrix " << node->has_matrix << '\n';
-    std::cout << "Node has translation " << node->has_translation << '\n';
-    std::cout << "Node has rotation " << node->has_rotation << '\n';
-    std::cout << "Node has scale " << node->has_scale << '\n';
-
-    if (node->mesh) {
-        process_mesh(node->mesh);
-    }
-
-    if (node->light) {
-        process_light(node->light);
-    }
-
-    if (node->camera) {
-        process_camera(node->camera);
-    }
-
-    std::cout << "Node children " << node->children_count << '\n';
-    for (cgltf_size ci = 0; ci < node->children_count; ci++) {
-        process_node(node->children[ci]);
-    }
-}
-
-void process_scene(cgltf_data *data, cgltf_scene *scene) {
-    std::cout << "Scene name " << scene->name << '\n';
-    std::cout << "Scene node count " << scene->nodes_count << '\n';
-
-    for (cgltf_size ni = 0; ni < scene->nodes_count; ni++) {
-        process_node(data->nodes + ni);
-    }
-}
-
-static void process_animation(cgltf_animation *animation) {
-    std::cout << "Animation name: " << evaluate_name(animation->name) << '\n';
-    std::cout << "Animation samplers count: " << animation->samplers_count << '\n';
-    std::cout << "Animation channels count: " << animation->channels_count << '\n';
-    std::cout << "Animation extensions count: " << animation->extensions_count << '\n';
-}
-
-void process_skins(cgltf_skin *skin) {
-    std::cout << "Skin name: " << evaluate_name(skin->name) << '\n';
-    std::cout << evaluate_ptr("Skin has skeleton node: ", skin->skeleton) << '\n';
-    std::cout << "Animation joints count: " << skin->joints_count << '\n';
-    std::cout << "Animation extensions count: " << skin->extensions_count << '\n';
-}
-
-void process_texture(cgltf_texture *texture) {
-    std::cout << "Texture name: " << (texture->name ? texture->name : "<noname>") << '\n';
-    std::cout << "Texture extensions count: " << texture->extensions_count << '\n';
-    std::cout << "Texture has sampler: " << (texture->sampler ? "true" : "false") << '\n';
-
-    const cgltf_sampler *sampler = texture->sampler;
-
-    if (sampler) {
-        std::cout << "Texture sampler name: " << (sampler->name ? sampler->name : "<noname>") << '\n';
-        std::cout << "Texture mag filter: " << sampler->mag_filter << '\n';
-        std::cout << "Texture min filter: " << sampler->min_filter << '\n';
-        std::cout << "Texture wrap s: " << sampler->wrap_s << '\n';
-        std::cout << "Texture wrap t: " << sampler->wrap_t << '\n';
-        std::cout << "Texture extensions count: " << sampler->extensions_count << '\n';
-    }
-
-    std::cout << "Texture has basisu: " << (texture->has_basisu ? "true" : "false") << '\n';
-}
-
-void process_image(cgltf_image *image) {
-    std::cout << "Image name: " << (image->name ? image->name : "<noname>") << '\n';
-    std::cout << "Image uri: " << (image->uri ? image->uri : "<noname>") << '\n';
-    std::cout << "Image mime type: " << (image->mime_type ? image->mime_type : "<noname>") << '\n';
-    std::cout << "Image has buffer view: " << (image->buffer_view ? "true" : "false") << '\n';
-    std::cout << "Image extensions count: " << image->extensions_count << '\n';
-}
-
 void process_sampler(cgltf_sampler *sampler) {
     std::cout << "Sampler name: " << sampler->name << '\n';
 }
@@ -249,6 +179,14 @@ void process_variant(cgltf_material_variant *material_variant) {
     std::cout << "Material variant name: " << material_variant->name << '\n';
 }
 
+std::string itemLabel(const std::string &label, std::optional<size_t> i = {}) {
+    if (!i.has_value()) {
+        return label;
+    }
+
+    return std::format("{} {}", label, i.value());
+}
+
 template <typename Func> void treeNode(const std::string &label, Func func) {
     const ImGuiTreeNodeFlags flag = ImGuiTreeNodeFlags_DefaultOpen;
     if (ImGui::TreeNodeEx(label.c_str(), flag)) {
@@ -257,126 +195,134 @@ template <typename Func> void treeNode(const std::string &label, Func func) {
     }
 }
 
-void renderValue(const cgltf_scene &scene) {
-    const int x = 0;
-}
-
-void renderValue(const cgltf_light &light) {
-    const int x = 0;
-}
-
-void renderValue(const cgltf_camera &camera) {
-    const int x = 0;
-}
-
-void renderValue(const cgltf_mesh &mesh) {
-    const int x = 0;
-}
-
-void renderValue(const cgltf_animation &animation) {
-    const int x = 0;
-}
-
-void renderValue(const cgltf_skin &skin) {
-    const int x = 0;
-}
-
-void renderValue(const cgltf_texture &texture) {
-    const int x = 0;
-}
-
-void renderValue(const cgltf_image &image) {
-    const int x = 0;
-}
-
 template <typename T> void renderTreeNode(const std::string &label, const std::span<T> &values) {
     const ImGuiTreeNodeFlags flag = ImGuiTreeNodeFlags_DefaultOpen;
     if (ImGui::TreeNodeEx(label.c_str(), flag)) {
-        for (const T &value : values) {
-            renderValue(value);
+        for (size_t i = 0; i < values.size(); i++) {
+            const T &value = values[i];
+            renderValue(value, i);
+        }
+        ImGui::TreePop();
+    }
+}
+
+
+void renderValue(cgltf_node *node, std::optional<size_t> i = {}) {
+    if (ImGui::TreeNodeEx(itemLabel("Node", i).c_str())) {
+        ImGui::Text("Node name: %s", stringOr(node->name));
+        ImGui::Text("Node has matrix: %s", (node->has_matrix ? "true" : "false"));
+        ImGui::Text("Node has translation: %s", (node->has_translation ? "true" : "false"));
+        ImGui::Text("Node has rotation: %s", (node->has_rotation ? "true" : "false"));
+        ImGui::Text("Node has scale: %s", (node->has_scale ? "true" : "false"));
+
+        /*
+        if (node->mesh) {
+            process_mesh(node->mesh);
+        }
+
+        if (node->light) {
+            process_light(node->light);
+        }
+
+        if (node->camera) {
+            process_camera(node->camera);
+        }
+        */
+
+        std::span<cgltf_node*> nodes{node->children, node->children_count};
+        renderTreeNode(std::format("Children nodes ({})", nodes.size()), nodes);
+
+        for (cgltf_size ci = 0; ci < node->children_count; ci++) {
+            renderValue(node->children[ci], ci);
         }
 
         ImGui::TreePop();
     }
 }
 
-void treeNodeLights(cgltf_light *lights, cgltf_size lights_count) {
-    std::cout << "Found " << lights_count << " lights" << '\n';
-    for (cgltf_size i = 0; i < lights_count; i++) {
-        process_light(lights + i);
-        std::cout << '\n';
+void renderValue(const cgltf_scene &value, std::optional<size_t> i = {}) {
+    if (ImGui::TreeNodeEx(itemLabel("Scene", i).c_str())) {
+        ImGui::Text("Name: %s", (stringOr(value.name)));
+        ImGui::Text("Extensions count: %d", value.extensions_count);
+
+        std::span<cgltf_node*> nodes{value.nodes, value.nodes_count};
+        renderTreeNode(std::format("Children nodes ({})", nodes.size()), nodes);
+
+        ImGui::TreePop();
     }
-    std::cout << '\n';
 }
 
-void treeNodeCameras(cgltf_camera *cameras, cgltf_size cameras_count) {
-    std::cout << "Found " << cameras_count << " cameras" << '\n';
-    for (cgltf_size i = 0; i < cameras_count; i++) {
-        process_camera(cameras + i);
-        std::cout << '\n';
+void renderValue(const cgltf_light &light, std::optional<size_t> i = {}) {
+    ImGui::Text(stringOr(light.name, "<noname>"));
+}
+
+void renderValue(const cgltf_camera &camera, std::optional<size_t> i = {}) {
+    ImGui::Text(stringOr(camera.name, "<noname>"));
+}
+
+void renderValue(const cgltf_mesh &mesh, std::optional<size_t> i = {}) {
+    ImGui::Text(stringOr(mesh.name, "<noname>"));
+}
+
+void renderValue(const cgltf_animation &value, std::optional<size_t> i = {}) {
+    if (ImGui::TreeNodeEx(itemLabel("Animation", i).c_str())) {
+        ImGui::Text("Name: %s", (stringOr(value.name)));
+        ImGui::Text("Samplers count: %d", value.samplers_count);
+        ImGui::Text("Channels count: %d", value.channels_count);
+        ImGui::Text("Extensions count: %d", value.extensions_count);
+
+        ImGui::TreePop();
     }
-    std::cout << '\n';
 }
 
-void treeNodeMeshes(cgltf_mesh *meshes, cgltf_size meshes_count) {
-    std::cout << "Found " << meshes_count << " meshes" << '\n';
-    for (cgltf_size i = 0; i < meshes_count; i++) {
-        process_mesh(meshes + i);
-        std::cout << '\n';
+void renderValue(const cgltf_skin &value, std::optional<size_t> i = {}) {
+    if (ImGui::TreeNodeEx(itemLabel("Skin", i).c_str())) {
+        ImGui::Text("Name: %s", (stringOr(value.name)));
+        ImGui::Text("Has skeleton?: %s", value.skeleton ? "true" : "false");
+        ImGui::Text("Joint count: %d", value.joints_count);
+        ImGui::Text("Extensions count: %d", value.extensions_count);
+
+        ImGui::TreePop();
     }
-    std::cout << '\n';
 }
 
-void treeNodeAnimations(cgltf_animation *animations, cgltf_size animations_count) {
-    std::cout << "Found " << animations_count << " animations" << '\n';
-    for (cgltf_size i = 0; i < animations_count; i++) {
-        process_animation(animations + i);
-        std::cout << '\n';
+void renderValue(const cgltf_sampler &value, std::optional<size_t> i = {}) {
+    if (ImGui::TreeNodeEx(itemLabel("Sampler", i).c_str())) {
+        ImGui::Text("Sampler name: %s", (stringOr(value.name)));
+        ImGui::Text("Sampler mag filter: %d", value.mag_filter);
+        ImGui::Text("Sampler min filter: %d", value.min_filter);
+        ImGui::Text("Sampler wrap s: %d", value.wrap_s);
+        ImGui::Text("Sampler wrap t: %d", value.wrap_t);
+        ImGui::Text("Sampler extensions count: %d", value.extensions_count);
+
+        ImGui::TreePop();
     }
-    std::cout << '\n';
 }
 
-void treeNodeSkins(cgltf_skin *skins, cgltf_size skins_count) {
-    std::cout << "Found " << skins_count << " skins" << '\n';
-    for (cgltf_size i = 0; i < skins_count; i++) {
-        process_skins(skins + i);
-        std::cout << '\n';
+void renderValue(const cgltf_texture &value, std::optional<size_t> i = {}) {
+    if (ImGui::TreeNodeEx(itemLabel("Texture", i).c_str())) {
+        ImGui::Text("Name: %s", stringOr(value.name));
+        ImGui::Text("Extensions count: %d", value.extensions_count);
+        ImGui::Text("Has BasisU: %s", value.has_basisu ? "true" : "false");
+        ImGui::Text("Sampler: %s", value.sampler ? "true" : "false");
+
+        if (value.sampler) {
+            renderValue(*value.sampler);
+        }
+
+        ImGui::TreePop();
     }
-    std::cout << '\n';
 }
 
-void treeNodeTextures(cgltf_texture *textures, cgltf_size textures_count) {
-    std::cout << "Found " << textures_count << " textures" << '\n';
-    for (cgltf_size i = 0; i < textures_count; i++) {
-        process_texture(textures + i);
-        std::cout << '\n';
+void renderValue(const cgltf_image &value, std::optional<size_t> i = {}) {
+    if (ImGui::TreeNodeEx(itemLabel("Image", i).c_str())) {
+        ImGui::Text("Name: %s", stringOr(value.name));
+        ImGui::Text("URI: %s", stringOr(value.uri));
+        ImGui::Text("MIME type: %s", stringOr(value.mime_type));
+        ImGui::Text("Extensions count: %d", value.extensions_count);
+        ImGui::Text("Buffer view: %s", value.buffer_view ? "true" : "false");
+        ImGui::TreePop();
     }
-    std::cout << '\n';
-}
-
-void treeNodeImages(cgltf_image *images, cgltf_size images_count) {
-    std::cout << "Found " << images_count << " images" << '\n';
-    for (cgltf_size i = 0; i < images_count; i++) {
-        process_image(images + i);
-        std::cout << '\n';
-    }
-    std::cout << '\n';
-}
-
-void treeNodeScenes(cgltf_data *data, cgltf_scene *scenes, cgltf_size scenes_count) {
-    std::cout << "Found " << scenes_count << " scenes" << '\n';
-    for (cgltf_size i = 0; i < scenes_count; i++) {
-        process_scene(data, scenes + i);
-    }
-    std::cout << '\n';
-}
-
-std::span<cgltf_light> getLightsSpan(cgltf_data *data) {
-    return {data->lights, data->lights_count};
-}
-
-template <typename T> std::span<T> make_span(T *ptr, cgltf_size size) {
-    return {ptr, size};
 }
 
 void visitData(const cgltf_data &data) {
@@ -525,9 +471,7 @@ void Window::prepareUI() {
 void Window::drawUI() {
     ImGui::Begin("GLTF Tree");
     if (data) {
-        treeNode("root", [this]() {
-            visitData(*data);
-        });
+        treeNode("root", [this]() { visitData(*data); });
     }
     ImGui::End();
 
