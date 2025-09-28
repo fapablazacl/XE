@@ -197,7 +197,7 @@ template <typename Func> void treeNode(const std::string &label, Func func) {
 }
 
 template <typename T> void renderTreeNode(const std::string &label, const std::span<T> &values) {
-    const ImGuiTreeNodeFlags flag = ImGuiTreeNodeFlags_DefaultOpen;
+    const ImGuiTreeNodeFlags flag = values.size() > 1 ? ImGuiTreeNodeFlags_None : ImGuiTreeNodeFlags_DefaultOpen;
     if (ImGui::TreeNodeEx(label.c_str(), flag)) {
         for (size_t i = 0; i < values.size(); i++) {
             const T &value = values[i];
@@ -210,11 +210,12 @@ template <typename T> void renderTreeNode(const std::string &label, const std::s
 
 void renderValue(cgltf_node *node, std::optional<size_t> i = {}) {
     if (ImGui::TreeNodeEx(itemLabel("Node", i).c_str())) {
-        ImGui::Text("Node name: %s", stringOr(node->name));
-        ImGui::Text("Node has matrix: %s", (node->has_matrix ? "true" : "false"));
-        ImGui::Text("Node has translation: %s", (node->has_translation ? "true" : "false"));
-        ImGui::Text("Node has rotation: %s", (node->has_rotation ? "true" : "false"));
-        ImGui::Text("Node has scale: %s", (node->has_scale ? "true" : "false"));
+        ImGui::Text("Name: %s", stringOr(node->name));
+        ImGui::Text("Has matrix: %s", (node->has_matrix ? "true" : "false"));
+        ImGui::Text("Has translation: %s", (node->has_translation ? "true" : "false"));
+        ImGui::Text("Has rotation: %s", (node->has_rotation ? "true" : "false"));
+        ImGui::Text("Has scale: %s", (node->has_scale ? "true" : "false"));
+        ImGui::Text("Weights count: %d", node->weights_count);
 
         /*
         if (node->mesh) {
@@ -230,11 +231,12 @@ void renderValue(cgltf_node *node, std::optional<size_t> i = {}) {
         }
         */
 
-        std::span<cgltf_node*> nodes{node->children, node->children_count};
-        renderTreeNode(std::format("Children nodes ({})", nodes.size()), nodes);
-
-        for (cgltf_size ci = 0; ci < node->children_count; ci++) {
-            renderValue(node->children[ci], ci);
+        if (node->children_count) {
+            std::span<cgltf_node*> nodes{node->children, node->children_count};
+            renderTreeNode(std::format("Children ({})", nodes.size()), nodes);
+        }
+        else {
+            ImGui::Text("Children (0)");
         }
 
         ImGui::TreePop();
