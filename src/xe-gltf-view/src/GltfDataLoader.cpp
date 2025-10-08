@@ -162,7 +162,9 @@ GltfMeshPrimitive GltfDataLoader::createMeshPrimitive(const cgltf_primitive &pri
     meshPrimitive.vao = vao;
     meshPrimitive.count = count;
 
-    meshPrimitive.material.texture = textureLoader->createTexture(primitive.material->pbr_metallic_roughness.base_color_texture);
+    if (primitive.material) {
+        meshPrimitive.material.texture = textureLoader->createTexture(primitive.material->pbr_metallic_roughness.base_color_texture);
+    }
 
     if (indexBuffer.id != 0) {
         meshPrimitive.indexData = {indexBuffer, indexType};

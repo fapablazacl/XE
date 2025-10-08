@@ -57,6 +57,7 @@ namespace xe::gl {
         if (const GLenum error_code = glad_glGetError(); error_code) {
             const auto errorCodeString = errorCodeToString(error_code);
             std::fprintf(stderr, "Error %s generated while executing command %s\n", name, errorCodeString.c_str());
+			abort();
         }
     }
 #endif
@@ -474,10 +475,11 @@ namespace xe::gl {
         for (uint32_t i = 0; i < layers.size(); i++) {
             const auto &layer = layers[i];
 
-            glActiveTexture(GL_TEXTURE0 + i);
-            glBindTexture(layer.texture.target, layer.texture.id);
-
-            bindRenderState(layer.texture.target, layer.parameters);
+            if (layer.texture) {
+				glActiveTexture(GL_TEXTURE0 + i);
+				glBindTexture(layer.texture.target, layer.texture.id);
+                bindRenderState(layer.texture.target, layer.parameters);
+            }
         }
     }
 

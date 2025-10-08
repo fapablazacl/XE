@@ -41,6 +41,20 @@ namespace xe::gl {
     };
     */
 
+    struct CheckedEnum {
+        GLenum value = {};
+        CheckedEnum() = default;
+
+        CheckedEnum(GLenum value) {
+            this->value = value;
+        }
+
+        operator GLenum() const {
+			assert(value);
+            return value;
+		}
+    };
+
     struct buffer_tag {};
     struct texture_tag {};
     struct shader_tag {};
@@ -48,7 +62,7 @@ namespace xe::gl {
     struct vertex_array_tag {};
 
     struct Buffer : TaggedType<buffer_tag, GLuint> {
-        GLenum target = {};
+        CheckedEnum target = {};
 
         Buffer() = default;
 
@@ -59,7 +73,7 @@ namespace xe::gl {
     };
 
     struct Texture : TaggedType<texture_tag, GLuint> {
-        GLenum target = {};
+        CheckedEnum target = {};
 
         Texture() = default;
 
@@ -67,6 +81,10 @@ namespace xe::gl {
             this->id = id;
             this->target = target;
         }
+
+        operator bool() const {
+            return id != 0 && target;
+		}
     };
 
     using Shader = TaggedType<shader_tag, GLuint>;

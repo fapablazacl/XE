@@ -6,6 +6,7 @@
 
 #include <cgltf.h>
 #include <memory>
+#include <map>
 
 namespace xe::gltf_view {
     struct ShaderProgramUniformData {
@@ -43,6 +44,16 @@ namespace xe::gltf_view {
         }
 
     private:
+		void renderScene(const cgltf_scene& scene);
+
+		void renderNode(const XE::Matrix4 &parentTransformation, const cgltf_node& node);
+
+        void renderCamera(const cgltf_camera& camera);
+
+		void renderMesh(const cgltf_mesh& mesh);
+
+		std::map<const cgltf_mesh*, GltfMesh> meshMap;
+
         std::unique_ptr<xe::gl::RendererGL> renderer;
         ShaderProgramUniformData uniformData;
         float startSeconds = 0.0f;
@@ -50,5 +61,7 @@ namespace xe::gltf_view {
         xe::gl::Program program;
         std::vector<GltfMesh> meshes;
         cgltf_data *data = nullptr;
+
+		XE::Matrix4 projection = XE::mat4Identity();
     };
 } // namespace xe::gltf_view
