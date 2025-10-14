@@ -28,12 +28,12 @@ class xeRecipe(ConanFile):
         cmake_layout(self)
 
     def requirements(self):
-        self.requires("assimp/5.4.3")
         self.requires("gtest/1.17.0")
+        self.requires("imgui/1.92.2b")
+        self.requires("assimp/5.4.3")
         self.requires("glfw/3.4")
         self.requires("cgltf/1.13")
         self.requires("fmt/10.2.1")
-        self.requires("sdl/2.32.8")
         self.requires("lodepng/cci.20230410")
         self.requires("ms-gsl/4.2.0")
         self.requires("devil/1.8.0")
@@ -41,9 +41,11 @@ class xeRecipe(ConanFile):
         self.requires("nlohmann_json/3.12.0")
         self.requires("vulkan-loader/1.4.313.0")
         self.requires("glad/0.1.36", options={"spec": "gl", "gl_profile": "core", "gl_version": "4.6"})
-        self.requires("imgui/1.92.2b")
         self.requires("ktx/4.3.2")
         self.requires("cxxopts/3.3.1")
+
+        # sdl2 and sdl3 both don't build under ArchLinux
+        self.requires("sdl/3.2.20")
 
     def generate(self):
         deps = CMakeDeps(self)
