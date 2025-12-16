@@ -100,6 +100,9 @@ void main() {
     }
 
     std::string getAssetPath(const std::string &path) {
+#ifndef XE_EXTERNAL_ASSET_ROOT_PATH
+#warning XE_EXTERNAL_ASSET_ROOT_PATH is not defined. Define it to get the root assets path.
+#endif
         return (std::filesystem::path{XE_EXTERNAL_ASSET_ROOT_PATH} / path).string();
     }
 
