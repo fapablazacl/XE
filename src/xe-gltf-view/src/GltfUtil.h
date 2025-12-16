@@ -208,6 +208,14 @@ template <typename IntegerLike> void *addPointerOffset(void *ptr, IntegerLike of
     return static_cast<std::byte *>(ptr) + offset;
 }
 
+inline std::optional<std::string> to_string(const char *str) {
+    if (str) {
+        return str;
+    }
+
+    return {};
+}
+
 /**
  * Maps a cgltf_primitive_type enum to a GL primitive enum.
  * Should be future-proof, as we are assuming that the cgltf_primitive_type enum values
@@ -246,6 +254,9 @@ constexpr std::optional<xe::gl::AttributeType> mapToAttributeDataType(const cglt
 
     case cgltf_component_type_r_8u:
         return xe::gl::AttributeType::UnsignedByte;
+
+    case cgltf_component_type_r_16u:
+        return xe::gl::AttributeType::UnsignedShort;
 
     case cgltf_component_type_r_32u:
         return xe::gl::AttributeType::UnsignedInt;

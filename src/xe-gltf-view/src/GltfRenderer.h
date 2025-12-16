@@ -28,7 +28,7 @@ namespace xe::gltf_view {
 
     class GltfRenderer {
     public:
-        explicit GltfRenderer();
+        explicit GltfRenderer(const std::string &filePath);
 
         ~GltfRenderer();
 

@@ -11,6 +11,7 @@ set (headers
 	"src/xe/Core.h"
 	"src/xe/Timer.h"
 	"src/xe/FPSCounter.h"
+		"src/xe/FileUtil.h"
 	"src/xe/Logger.h"
 	"src/xe/graphics/Graphics.h"
 	"src/xe/graphics/IWindow.h"
@@ -63,6 +64,8 @@ set (sources
 	"src/xe/Core.cpp"
 	"src/xe/Timer.cpp"
 	"src/xe/FPSCounter.cpp"
+		"src/xe/FileUtil.cpp"
+		"src/xe/Logger.cpp"
 
 	"src/xe/graphics/IWindow.cpp"	
 	"src/xe/graphics/GraphicsDevice.cpp"

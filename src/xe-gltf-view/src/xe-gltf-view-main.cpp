@@ -1,15 +1,36 @@
 
+#include "GltfDataLoader.h"
 #include "GltfRenderer.h"
 #include "Window.h"
 
-int main(int argc, char *argv[]) {
+#include <iostream>
+#include <span>
+
+struct GltfViewParams {
+    std::string gltfPath;
+};
+
+GltfViewParams parseArgs(std::span<char*> args) {
+    GltfViewParams result;
+
+    if (args.size() < 2) {
+        throw std::runtime_error("Usage: xe-gltf-view <gltf-file>");
+    }
+
+    result.gltfPath = args[1];
+
+    return result;
+}
+
+int gltf_view_main(const std::span<char*> &args) {
     using xe::gltf_view::GltfRenderer;
+
+    const GltfViewParams params = parseArgs(args);
 
     Window window;
     window.initialize();
 
-    GltfRenderer renderer;
-
+    GltfRenderer renderer{params.gltfPath};
     window.setData(renderer.getData());
 
     while (window.pollInput()) {
@@ -28,5 +49,19 @@ int main(int argc, char *argv[]) {
         window.swapBuffers();
     }
 
-    return 0;
+    return EXIT_SUCCESS;
+}
+
+int main(int argc, char *argv[]) {
+    const std::span<char*> args {argv, static_cast<size_t>(argc)};
+
+    return gltf_view_main(args);
+
+    try {
+        return gltf_view_main(args);
+    }
+    catch (const std::exception &e) {
+        std::cerr << e.what() << std::endl;
+        return EXIT_FAILURE;
+    }
 }

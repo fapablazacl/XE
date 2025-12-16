@@ -1,6 +1,8 @@
 
 #include "GltfDataLoader.h"
 
+#include <span>
+
 #include "xe/Logger.h"
 
 GltfTextureLoader::GltfTextureLoader(const xe::gl::RendererGL *renderer, ImageLoader *imageLoader) : renderer(renderer), imageLoader(imageLoader) {
@@ -29,18 +31,28 @@ inline std::optional<GLenum> mapBppToInternalFormat(const int bpp) {
 }
 
 xe::gl::Texture GltfTextureLoader::createTexture(const cgltf_texture_view &textureView) const {
-    std::cout << "Creating texture " << sanitizeString(textureView.texture->name) << '\n';
+    if (!textureView.texture) {
+        XE::logWarning(std::format("Texture does not contain data"));
+        return {};
+    }
+
+    XE::logInfo(std::format("Loading texture"));
 
     const auto mimeType = textureView.texture->image->mime_type;
+    if (!mimeType) {
+        XE::logWarning(std::format("Texture MIME type is null"));
+        return {};
+    }
+
+    const auto imageFormat = parseImageFormat(mimeType);
+    if (!imageFormat.has_value()) {
+        XE::logWarning(std::format("Failed to parse Texture image format from MIME type {}", to_string(mimeType).value_or("<noMimeType>")));
+        return {};
+    }
+
     const auto buffer = textureView.texture->image->buffer_view->buffer->data;
     const auto offset = textureView.texture->image->buffer_view->offset;
     const auto size = textureView.texture->image->buffer_view->size;
-    const auto imageFormat = parseImageFormat(mimeType);
-
-    if (!imageFormat.has_value()) {
-        std::cerr << "Failed to parse image format " << mimeType << '\n';
-        return {};
-    }
 
     auto image = imageLoader->loadImage(addPointerOffset(buffer, offset), size, imageFormat.value());
     auto imageData = image->getData();
@@ -236,20 +248,20 @@ xe::gl::VertexArray GltfDataLoader::createVertexArray(const cgltf_primitive &pri
 
     std::vector<xe::gl::Attribute> attributesGL;
 
-    for (cgltf_size i = 0; i < primitive.attributes_count; i++) {
-        const auto &attribute = primitive.attributes[i];
+    const std::span<cgltf_attribute> attributes = {primitive.attributes, primitive.attributes_count};
+    for (const cgltf_attribute &attribute : attributes) {
         const auto &accessor = *attribute.data;
         const auto &bufferView = *accessor.buffer_view;
 
         auto dataTypeGL = mapToAttributeDataType(accessor.component_type);
         if (!dataTypeGL) {
-            std::cerr << "Could not map attribute " << attribute.name << " with accessor component type " << accessor.component_type << '\n';
+            XE::logError(std::format("Could not map attribute {} with accessor component type {}", to_string(accessor.name).value_or("<noname>"), to_string(accessor.component_type)));
             return {};
         }
 
         auto attribDimGL = mapToAttribDim(accessor.type);
         if (!attribDimGL) {
-            std::cerr << "Could not map attribute" << accessor.name << " with accessor type " << accessor.type << '\n';
+            XE::logError(std::format("Could not map attribute {} with accessor type {}", to_string(accessor.name).value_or("<noname>"), to_string(accessor.type)));
             return {};
         }
 

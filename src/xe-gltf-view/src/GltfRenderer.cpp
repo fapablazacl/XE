@@ -9,6 +9,7 @@
 #include "fmt/printf.h"
 #include "xe/gl/RendererGL.h"
 #include "xe/Logger.h"
+#include "xe/FileUtil.h"
 
 #include "GltfDataLoader.h"
 #include "GltfProcessor.h"
@@ -26,65 +27,6 @@ namespace xe::gltf_view {
 	template<typename T>
     const T SCREEN_HEIGHT = T{480};
 
-    const auto vertexShaderSource = R"(
-#version 330 core
-
-uniform mat4 modelViewProj;
-uniform mat4 model;
-
-uniform float seconds;
-
-in vec3 vertCoord;
-in vec3 vertNormal;
-in vec2 vertTexCoord;
-
-out vec4 fragColor;
-out vec2 fragTexCoord;
-
-float fmod(float x, float y) {
-    return x - y * floor(x / y);
-}
-
-float wave(float seconds) {
-    return (cos(seconds) + 1.0) / 2.0 * 0.5 + 0.5;
-}
-
-vec3 computeLightingColour() {
-    return vec3(wave(seconds), wave(seconds + 0.5), wave(seconds - 0.5));
-}
-
-void main() {
-    vec3 lightDirection[4];
-    lightDirection[0] = normalize(vec3(0.5, 0.3, 0.4));
-    lightDirection[1] = normalize(vec3(-0.5, 0.3, -0.4));
-    lightDirection[2] = normalize(vec3(0.5, -0.3, 0.4));
-    lightDirection[3] = normalize(vec3(-0.5, -0.3, -0.4));
-
-    gl_Position = vec4(vertCoord, 1.0) * modelViewProj;
-
-    vec4 color = vec4(0.0);
-    for (int i = 0; i < 4; i++) {
-        color += vec4(computeLightingColour() * max(dot(lightDirection[i], vertNormal), 0.0), 1.0);
-    }
-    fragColor = color;
-
-    fragTexCoord = vertTexCoord;
-})";
-
-    const auto fragmentShaderSource = R"(
-#version 330 core
-
-uniform sampler2D diffuseTexture;
-
-in vec4 fragColor;
-in vec2 fragTexCoord;
-
-out vec4 color;
-
-void main() {
-    color = fragColor * texture(diffuseTexture, fragTexCoord);
-})";
-
     std::vector<xe::gl::UniformMatrix> ShaderProgramUniformData::mapMatrixUniforms(xe::gl::Program shaderProgram) const {
         return {
             xe::gl::makeUniform(shaderProgram.getUniformLocation("modelViewProj"), projViewModel),
@@ -99,20 +41,14 @@ void main() {
         };
     }
 
-    std::string getAssetPath(const std::string &path) {
-#ifndef XE_EXTERNAL_ASSET_ROOT_PATH
-#warning XE_EXTERNAL_ASSET_ROOT_PATH is not defined. Define it to get the root assets path.
-#endif
-        return (std::filesystem::path{XE_EXTERNAL_ASSET_ROOT_PATH} / path).string();
-    }
-
-    GltfRenderer::GltfRenderer() {
-        // const std::string filePath = getAssetPath("GameDev/Capybaria/raw-assets/models/capybara-01/capybara.glb");
-        const std::string filePath = getAssetPath("GameDev/Capybaria/minimal-animation.gltf");
-
+    GltfRenderer::GltfRenderer(const std::string &filePath) {
         renderer = xe::gl::RendererGL::create();
 
-        std::vector<xe::gl::Shader> shaders = {renderer->createShader(GL_VERTEX_SHADER, vertexShaderSource), renderer->createShader(GL_FRAGMENT_SHADER, fragmentShaderSource)};
+        const std::filesystem::path internalAssetsPath = XE_GLTF_VIEW_SOURCE_FOLDER;
+        const std::string vertexShaderSource = XE::loadTextFile( internalAssetsPath / "shaders/gltf-view.vert" );
+        const std::string fragmentShaderSource = XE::loadTextFile( internalAssetsPath / "shaders/gltf-view.frag" );
+
+        std::vector<xe::gl::Shader> shaders = {renderer->createShader(GL_VERTEX_SHADER, vertexShaderSource.c_str()), renderer->createShader(GL_FRAGMENT_SHADER, fragmentShaderSource.c_str())};
 
         program = renderer->createProgram(shaders);
         if (!program.id) {

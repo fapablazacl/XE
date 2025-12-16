@@ -56,9 +56,10 @@ namespace xe::gl {
 
         if (const GLenum error_code = glad_glGetError(); error_code) {
             const auto errorCodeString = errorCodeToString(error_code);
-            std::fprintf(stderr, "Error %s generated while executing command %s\n", name, errorCodeString.c_str());
-			abort();
+            std::fprintf(stderr, "Error %s generated while executing command %s\n", errorCodeString.c_str(), name);
         }
+
+        assert(glad_glGetError() == GL_NO_ERROR);
     }
 #endif
 
@@ -274,6 +275,10 @@ namespace xe::gl {
 
                 case AttributeType::UnsignedByte:
                     type = GL_UNSIGNED_BYTE;
+                    break;
+
+                case AttributeType::UnsignedShort:
+                    type = GL_UNSIGNED_SHORT;
                     break;
                 }
 
