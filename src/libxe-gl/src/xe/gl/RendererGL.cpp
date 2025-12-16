@@ -1,6 +1,8 @@
 
 #include "RendererGL.h"
 
+#include "xe/Logger.h"
+
 #include <iostream>
 
 namespace xe::gl {
@@ -57,9 +59,9 @@ namespace xe::gl {
         if (const GLenum error_code = glad_glGetError(); error_code) {
             const auto errorCodeString = errorCodeToString(error_code);
             std::fprintf(stderr, "Error %s generated while executing command %s\n", errorCodeString.c_str(), name);
-        }
 
-        assert(glad_glGetError() == GL_NO_ERROR);
+            assert(error_code == GL_NO_ERROR);
+        }
     }
 #endif
 
@@ -248,13 +250,13 @@ namespace xe::gl {
         XE_GL_SCOPED_ERROR_CHECK();
 
         VertexArray vao;
-        auto &id = vao.id;
 
-        glGenVertexArrays(1, &id);
-        glBindVertexArray(id);
+        glGenVertexArrays(1, &vao.id);
+        glBindVertexArray(vao.id);
 
         for (const auto &attr : attributes) {
             if (attr.buffer.id != 0) {
+                XE::logInfo(std::format("Enabling vertex attribute array {}", attr.index));
                 glBindBuffer(attr.buffer.target, attr.buffer.id);
                 glEnableVertexAttribArray(attr.index);
 
@@ -285,6 +287,7 @@ namespace xe::gl {
                 const auto ptr = reinterpret_cast<const void *>(static_cast<long long>(attr.offset));
                 glVertexAttribPointer(attr.index, static_cast<GLint>(attr.size) + 1, type, attr.normalized, attr.stride, ptr);
             } else {
+                XE::logInfo(std::format("Disabling vertex attribute array {}", attr.index));
                 glDisableVertexAttribArray(attr.index);
             }
         }

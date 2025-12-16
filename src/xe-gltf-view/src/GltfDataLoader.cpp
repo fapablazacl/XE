@@ -154,14 +154,20 @@ void GltfDataLoader::loadAllAnimations() {
 }
 
 GltfMeshPrimitive GltfDataLoader::createMeshPrimitive(const cgltf_primitive &primitive) {
-    const auto primitiveType = mapToPrimitive(primitive.type);
-    const auto vertexBuffer = createVertexBuffer(primitive);
-    const auto indexBuffer = primitive.indices ? createIndexBuffer(*primitive.indices) : xe::gl::Buffer();
-    const auto indexType = primitive.indices ? mapToGLDataType(primitive.indices->component_type).value_or(GL_NONE) : GL_NONE;
+    const GLenum primitiveType = mapToPrimitive(primitive.type);
+    const xe::gl::Buffer vertexBuffer = createVertexBuffer(primitive);
+
+    std::optional<GltfIndexData> indexData;
+
+    if (primitive.indices) {
+        const GLenum indexType = mapToGLDataType(primitive.indices->component_type).value();
+        const xe::gl::Buffer indexBuffer = createIndexBuffer(*primitive.indices);
+        indexData = std::make_optional<GltfIndexData>(indexBuffer, indexType);
+    }
 
     // FIXME: Assuming that all of the attributes are referencing the same count of vertices
     const auto count = static_cast<GLsizei>(primitive.indices ? primitive.indices->count : primitive.attributes[0].data->count);
-    const auto vao = createVertexArray(primitive, vertexBuffer, indexBuffer);
+    const auto vao = createVertexArray(primitive, vertexBuffer, indexData ? indexData->buffer : xe::gl::Buffer());
 
     if (!vao.id) {
         std::cerr << "Could not create vertex array." << '\n';
@@ -178,9 +184,7 @@ GltfMeshPrimitive GltfDataLoader::createMeshPrimitive(const cgltf_primitive &pri
         meshPrimitive.material.texture = textureLoader->createTexture(primitive.material->pbr_metallic_roughness.base_color_texture);
     }
 
-    if (indexBuffer.id != 0) {
-        meshPrimitive.indexData = {indexBuffer, indexType};
-    }
+    meshPrimitive.indexData = indexData;
 
     return meshPrimitive;
 }
