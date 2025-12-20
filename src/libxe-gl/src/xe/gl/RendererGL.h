@@ -21,6 +21,15 @@ struct RendererInfo {
 };
 
 namespace xe::gl {
+    enum class Primitive {
+        Points,
+        Lines,
+        LineStrip,
+        Triangles,
+        TriangleStrip,
+        TriangleFan,
+    };
+
     struct CapabilityStatus {
         GLenum capability = {};
         GLboolean enabled = GL_FALSE;
@@ -220,6 +229,15 @@ namespace xe::gl {
         std::optional<int> stencil;
     };
 
+    enum class DataType { Double, Float, Int, UnsignedInt, UnsignedByte, UnsignedShort, Short, Byte };
+
+    enum class PixelFormat {
+        Luminance,
+        LuminanceAlpha,
+        RGB,
+        RGBA,
+    };
+
     struct ClientTextureImage1D {
         int size = 0;
         GLenum format = GL_RGBA;
@@ -319,7 +337,7 @@ namespace xe::gl {
         // Draws an indexed geometry
         void draw(VertexArray vertexArray, GLenum primitiveType, const tcb::span<const VertexArrayPrimitive> &primitives, GLenum dataType) const;
 
-        void clear(const GLenum flags, std::optional<XE::Vector4> color, std::optional<float> depth, std::optional<int> stencil) const;
+        void clear(GLenum flags, std::optional<XE::Vector4> color, std::optional<float> depth, std::optional<int> stencil) const;
 
         void flush() const;
 

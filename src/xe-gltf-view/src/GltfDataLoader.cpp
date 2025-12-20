@@ -189,22 +189,26 @@ GltfMeshPrimitive GltfDataLoader::createMeshPrimitive(const cgltf_primitive &pri
     return meshPrimitive;
 }
 
+// hola laurita
+// eres mi hermosa capi <3
 GltfMesh GltfDataLoader::createMesh(const cgltf_mesh *mesh) {
-    std::vector<GltfMeshPrimitive> primitives = {};
-    primitives.reserve(mesh->primitives_count);
+    GltfMesh result;
 
-    for (cgltf_size i = 0; i < mesh->primitives_count; i++) {
-        const auto meshPrimitive = createMeshPrimitive(mesh->primitives[i]);
+    result.name = sanitizeString(mesh->name);
+
+    const std::span meshPrimitives = {mesh->primitives, mesh->primitives_count};
+    for (const cgltf_primitive &primitive : meshPrimitives) {
+        const auto meshPrimitive = createMeshPrimitive(primitive);
 
         if (!meshPrimitive.vao.id) {
             std::cerr << "Could not create mesh primitive array." << '\n';
             return {};
         }
 
-        primitives.push_back(meshPrimitive);
+        result.primitives.push_back(meshPrimitive);
     }
 
-    return {sanitizeString(mesh->name), primitives};
+    return result;
 }
 
 xe::gl::Buffer GltfDataLoader::createIndexBuffer(const cgltf_accessor &accessor) {

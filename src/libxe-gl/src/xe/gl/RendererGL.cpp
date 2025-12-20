@@ -347,7 +347,7 @@ namespace xe::gl {
                 break;
 
             default:
-                fprintf(stderr, "Non float vertex attribute support is missing.");
+                fprintf(stderr, "Non-float vertex attribute support is missing.");
                 abort();
             }
         }

@@ -105,8 +105,13 @@ namespace xe::gltf_view {
         uniformData.seconds = (static_cast<float>(XE::Timer::getTick()) / 1000.0f) - startSeconds;
         startSeconds = uniformData.seconds;
 
-        const auto proj = XE::mat4Perspective(XE::radians(60.0f), SCREEN_HEIGHT<float> / SCREEN_WIDTH<float>, 0.001f, 1000.0f);
-        const auto view = XE::mat4LookAtRH({0.0f, 0.0f, -25.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f});
+        const float aspect = SCREEN_HEIGHT<float> / SCREEN_WIDTH<float>;
+        const auto proj = XE::mat4Perspective(XE::radians(60.0f), aspect, 0.001f, 1000.0f);
+
+        const XE::Vector3 eye = {0.0f, 0.0f, -25.0f};
+        const XE::Vector3 at = {0.0f, 0.0f, 0.0f};
+        const XE::Vector3 up = {0.0f, 1.0f, 0.0f};
+        const auto view = XE::mat4LookAtRH(eye, at, up);
         const auto model = XE::mat4RotationY(angle += 0.005f);
 
         uniformData.model = model;
