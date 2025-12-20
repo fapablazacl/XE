@@ -484,8 +484,8 @@ namespace xe::gl {
             const auto &layer = layers[i];
 
             if (layer.texture) {
-				glActiveTexture(GL_TEXTURE0 + i);
-				glBindTexture(layer.texture.target, layer.texture.id);
+                glActiveTexture(GL_TEXTURE0 + i);
+                glBindTexture(layer.texture.target, layer.texture.id);
                 bindRenderState(layer.texture.target, layer.parameters);
             }
         }

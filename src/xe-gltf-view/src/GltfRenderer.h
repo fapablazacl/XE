@@ -44,15 +44,15 @@ namespace xe::gltf_view {
         }
 
     private:
-		void renderScene(const cgltf_scene& scene);
+        void renderScene(const cgltf_scene &scene);
 
-		void renderNode(const XE::Matrix4 &parentTransformation, const cgltf_node& node);
+        void renderNode(const XE::Matrix4 &parentTransformation, const cgltf_node &node);
 
-        void renderCamera(const cgltf_camera& camera);
+        void renderCamera(const cgltf_camera &camera);
 
-		void renderMesh(const cgltf_mesh& mesh);
+        void renderMesh(const cgltf_mesh &mesh);
 
-		std::map<const cgltf_mesh*, GltfMesh> meshMap;
+        std::map<const cgltf_mesh *, GltfMesh> meshMap;
 
         std::unique_ptr<xe::gl::RendererGL> renderer;
         ShaderProgramUniformData uniformData;
@@ -62,6 +62,6 @@ namespace xe::gltf_view {
         std::vector<GltfMesh> meshes;
         cgltf_data *data = nullptr;
 
-		XE::Matrix4 projection = XE::mat4Identity();
+        XE::Matrix4 projection = XE::mat4Identity();
     };
 } // namespace xe::gltf_view

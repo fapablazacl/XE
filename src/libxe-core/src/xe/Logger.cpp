@@ -15,4 +15,4 @@ namespace XE {
     void logError(const std::string &msg) {
         std::cout << "[ERROR] " << msg << std::endl;
     }
-}
+} // namespace XE

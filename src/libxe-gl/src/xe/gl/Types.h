@@ -50,9 +50,9 @@ namespace xe::gl {
         }
 
         operator GLenum() const {
-			assert(value);
+            assert(value);
             return value;
-		}
+        }
     };
 
     struct buffer_tag {};
@@ -84,7 +84,7 @@ namespace xe::gl {
 
         operator bool() const {
             return id != 0 && target;
-		}
+        }
     };
 
     using Shader = TaggedType<shader_tag, GLuint>;

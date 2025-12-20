@@ -207,7 +207,6 @@ template <typename T> void renderTreeNode(const std::string &label, const std::s
     }
 }
 
-
 void renderValue(cgltf_node *node, std::optional<size_t> i = {}) {
     if (ImGui::TreeNodeEx(itemLabel("Node", i).c_str())) {
         ImGui::Text("Name: %s", stringOr(node->name));
@@ -232,10 +231,9 @@ void renderValue(cgltf_node *node, std::optional<size_t> i = {}) {
         */
 
         if (node->children_count) {
-            std::span<cgltf_node*> nodes{node->children, node->children_count};
+            std::span<cgltf_node *> nodes{node->children, node->children_count};
             renderTreeNode(std::format("Children ({})", nodes.size()), nodes);
-        }
-        else {
+        } else {
             ImGui::Text("Children (0)");
         }
 
@@ -248,7 +246,7 @@ void renderValue(const cgltf_scene &value, std::optional<size_t> i = {}) {
         ImGui::Text("Name: %s", (stringOr(value.name)));
         ImGui::Text("Extensions count: %d", value.extensions_count);
 
-        std::span<cgltf_node*> nodes{value.nodes, value.nodes_count};
+        std::span<cgltf_node *> nodes{value.nodes, value.nodes_count};
         renderTreeNode(std::format("Children nodes ({})", nodes.size()), nodes);
 
         ImGui::TreePop();
