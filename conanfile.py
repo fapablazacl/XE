@@ -28,7 +28,7 @@ class xeRecipe(ConanFile):
         cmake_layout(self)
 
     def requirements(self):
-        self.requires("gtest/1.17.0")
+        # self.requires("gtest/1.17.0")
         self.requires("imgui/1.92.2b")
         self.requires("assimp/5.4.3")
         self.requires("glfw/3.4")
@@ -44,9 +44,9 @@ class xeRecipe(ConanFile):
         self.requires("ktx/4.3.2")
         self.requires("cxxopts/3.3.1")
 
-        # sdl2 and sdl3 both don't build under ArchLinux
-        self.requires("sdl/3.2.20")
-
+        # NOTE: sdl2 and sdl3 both don't build under ArchLinux
+        self.requires("sdl/2.32.10")
+        
     def generate(self):
         deps = CMakeDeps(self)
         deps.generate()

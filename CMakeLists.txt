@@ -7,7 +7,7 @@ option (XE_PLUGIN_GL            "Include OpenGL 3+ support" ON)
 option (XE_PLUGIN_GL_GLFW       "Include GLFW-based Window and Context creation support (requires 'XE_PLUGIN_GL')" ON)
 
 # options suited for development
-option (XE_DEV_UNIT_TEST            "Enable unit test suite" ON)
+option (XE_DEV_UNIT_TEST            "Enable unit test suite" OFF)
 option (XE_DEV_WARNINGS_AS_ERRORS   "Marks all warnings as errors" OFF)
 option (XE_DEV_INSTRUMENT_COVERAGE  "Instrument code for code coverage reporting during unit tests" OFF)
 option (XE_DEV_PRECOMPILED_HEADERS  "Enable precompiled headers for internal libraries, to improve build times" OFF)
