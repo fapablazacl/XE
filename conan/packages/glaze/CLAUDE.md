@@ -48,10 +48,23 @@ python3 glaze_cli.py generate --api gl 4.6 --api gles1 1.0 --lang c --lang cpp -
 python3 glaze_cli.py list-apis
 ```
 
-### Build and run tests
+### Lint, format, and type-check
 
 ```bash
-# Build the header-only test
+ruff check glaze/ glaze_cli.py
+ruff format glaze/ glaze_cli.py
+mypy glaze/ glaze_cli.py
+```
+
+### Run Python unit tests
+
+```bash
+pytest tests/python/ -v
+```
+
+### Build and run C/C++ integration tests
+
+```bash
 cd tests/test-runtime
 cmake -B build && cmake --build build
 ```
@@ -66,5 +79,6 @@ cmake -B build && cmake --build build
 
 | Test | What it validates |
 |------|------------------|
+| `tests/python/` | Python unit tests for parser, model, generators, string utils, and CLI |
 | `tests/test-build/` | Generated C++ header compiles.|
 | `tests/test-runtime/` | Full integration: GLFW window, GL 3.3 core profile, dynamic loading, `glGetError()` |

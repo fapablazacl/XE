@@ -1,7 +1,7 @@
-from typing import Dict, List, Optional, Tuple
+from typing import ClassVar
 
 from glaze.generators.base import Generator
-from glaze.model import Registry, Command, CommandParam, Enum
+from glaze.model import Command, CommandParam, Enum, Registry
 from glaze.utils.string_utils import split_capitalized
 
 
@@ -24,21 +24,25 @@ def _is_string_return_command(command: Command) -> bool:
     return rt.is_const and rt.is_pointer and rt.name in ("GLubyte", "GLchar")
 
 
-def _find_string_output_param(command: Command) -> Optional[CommandParam]:
+def _find_string_output_param(command: Command) -> CommandParam | None:
     """Return the GLchar* non-const output param whose len= references another param, or None."""
     param_names = {p.name for p in command.params}
     for param in command.params:
-        if (param.type == "GLchar" and param.is_pointer and not param.is_const
-                and param.len and param.len in param_names):
+        if (
+            param.type == "GLchar"
+            and param.is_pointer
+            and not param.is_const
+            and param.len
+            and param.len in param_names
+        ):
             return param
     return None
 
 
-def _find_length_param(command: Command) -> Optional[CommandParam]:
+def _find_length_param(command: Command) -> CommandParam | None:
     """Return the GLsizei* length-output param (len='1'), or None."""
     for param in command.params:
-        if (param.type == "GLsizei" and param.is_pointer
-                and not param.is_const and param.len == "1"):
+        if param.type == "GLsizei" and param.is_pointer and not param.is_const and param.len == "1":
             return param
     return None
 
@@ -48,20 +52,43 @@ def _find_length_param(command: Command) -> Optional[CommandParam]:
 # Known vendor/extension suffixes that appear at the end of XML group names.
 # Ordered longest-first so e.g. "MESA" is tried before any single-letter suffix.
 _VENDOR_SUFFIXES = (
-    "MESA", "INTEL", "APPLE", "SGIS", "SGIX", "SUNX", "QCOM", "3DFX",
-    "INGR", "REND", "WIN", "ARB", "EXT", "NVX", "KHR", "OES", "AMD",
-    "ATI", "IBM", "SUN", "NV", "HP", "IMG", "VIV", "DMP", "FJ",
+    "MESA",
+    "INTEL",
+    "APPLE",
+    "SGIS",
+    "SGIX",
+    "SUNX",
+    "QCOM",
+    "3DFX",
+    "INGR",
+    "REND",
+    "WIN",
+    "ARB",
+    "EXT",
+    "NVX",
+    "KHR",
+    "OES",
+    "AMD",
+    "ATI",
+    "IBM",
+    "SUN",
+    "NV",
+    "HP",
+    "IMG",
+    "VIV",
+    "DMP",
+    "FJ",
 )
 
 
-def _build_group_rename(group_set: set) -> Dict[str, str]:
+def _build_group_rename(group_set: set) -> dict[str, str]:
     """Return a mapping old_name → clean_name for every group whose suffix can be stripped
     without colliding with another group already in group_set."""
-    rename: Dict[str, str] = {}
+    rename: dict[str, str] = {}
     for name in group_set:
         for suffix in _VENDOR_SUFFIXES:
             if name.endswith(suffix) and len(name) > len(suffix):
-                clean = name[:-len(suffix)]
+                clean = name[: -len(suffix)]
                 # Only rename if the clean name is not already taken by another group
                 if clean not in group_set:
                     rename[name] = clean
@@ -71,33 +98,41 @@ def _build_group_rename(group_set: set) -> Dict[str, str]:
 
 # ── Location-type detection (name-based, no XML annotation available) ─────────
 
-_UNIFORM_LOCATION_RETURN: frozenset = frozenset({
-    "glGetUniformLocation",
-    "glGetFragDataLocation",
-    "glGetFragDataIndex",
-})
+_UNIFORM_LOCATION_RETURN: frozenset = frozenset(
+    {
+        "glGetUniformLocation",
+        "glGetFragDataLocation",
+        "glGetFragDataIndex",
+    }
+)
 
-_ATTRIB_LOCATION_RETURN: frozenset = frozenset({
-    "glGetAttribLocation",
-})
+_ATTRIB_LOCATION_RETURN: frozenset = frozenset(
+    {
+        "glGetAttribLocation",
+    }
+)
 
 
 def _is_uniform_location_param(command: Command, param: CommandParam) -> bool:
     """True if this GLint 'location' param is a uniform location."""
-    return (param.type == "GLint" and param.name == "location"
-            and (command.name.startswith("glUniform")
-                 or command.name.startswith("glProgramUniform")))
+    return (
+        param.type == "GLint"
+        and param.name == "location"
+        and (command.name.startswith("glUniform") or command.name.startswith("glProgramUniform"))
+    )
 
 
 def _is_attrib_location_param(command: Command, param: CommandParam) -> bool:
     """True if this GLuint 'index' param is a vertex-attrib location."""
-    return (param.type == "GLuint" and param.name == "index"
-            and ("VertexAttrib" in command.name
-                 or command.name == "glBindAttribLocation"))
+    return (
+        param.type == "GLuint"
+        and param.name == "index"
+        and ("VertexAttrib" in command.name or command.name == "glBindAttribLocation")
+    )
 
 
 class _Capitalizer:
-    _EXCLUDED = {"1D", "2D", "3D"}
+    _EXCLUDED: ClassVar[set[str]] = {"1D", "2D", "3D"}
 
     def capitalize(self, value: str) -> str:
         if value in self._EXCLUDED:
@@ -137,14 +172,14 @@ class CppGenerator(Generator):
     def __init__(self, registry: Registry):
         super().__init__(registry)
         self._capitalizer = _Capitalizer()
-        self._handle_classes: Dict[str, str] = {}  # class_ string → CamelCase handle name
-        self._group_rename: Dict[str, str] = {}     # xml group name → clean C++ type name
+        self._handle_classes: dict[str, str] = {}  # class_ string → CamelCase handle name
+        self._group_rename: dict[str, str] = {}  # xml group name → clean C++ type name
 
     @property
     def name(self) -> str:
         return "cpp"
 
-    def generate(self, api: str, version: str) -> Dict[str, str]:
+    def generate(self, api: str, version: str) -> dict[str, str]:
         self._check_api_version(api, version)
         consolidated = self.registry.consolidate(api, version)
 
@@ -171,7 +206,7 @@ class CppGenerator(Generator):
             if name in clean_group_names:
                 self._handle_classes[cls] = name + "Id"
 
-        handle_types: List[Tuple[str, str]] = [
+        handle_types: list[tuple[str, str]] = [
             (n, n) for n in sorted(set(self._handle_classes.values()))
         ]
 
@@ -191,13 +226,15 @@ class CppGenerator(Generator):
             if cmd is None:
                 continue
             if cmd.name in _UNIFORM_LOCATION_RETURN or any(
-                    _is_uniform_location_param(cmd, p) for p in cmd.params):
+                _is_uniform_location_param(cmd, p) for p in cmd.params
+            ):
                 need_uniform_location = True
             if cmd.name in _ATTRIB_LOCATION_RETURN or any(
-                    _is_attrib_location_param(cmd, p) for p in cmd.params):
+                _is_attrib_location_param(cmd, p) for p in cmd.params
+            ):
                 need_attrib_location = True
 
-        location_types: List[Tuple[str, str]] = []
+        location_types: list[tuple[str, str]] = []
         if need_attrib_location:
             location_types.append(("AttribLocation", "AttribLocation"))
         if need_uniform_location:
@@ -232,8 +269,8 @@ class CppGenerator(Generator):
 
     def _build_functors(self, functions: list) -> list:
         """Group function contexts by func_name; each group becomes one functor struct."""
-        seen: Dict[str, dict] = {}
-        order: List[str] = []
+        seen: dict[str, dict] = {}
+        order: list[str] = []
         for fn in functions:
             fname = fn["func_name"]
             if fname not in seen:
@@ -245,26 +282,30 @@ class CppGenerator(Generator):
                     "overloads": [],
                 }
                 order.append(fname)
-            seen[fname]["overloads"].append({
-                "return_type": fn["return_type"],
-                "params_str": fn["params_str"],
-                "call_args_str": fn.get("call_args_str", ""),
-                "body": fn.get("body"),
-            })
+            seen[fname]["overloads"].append(
+                {
+                    "return_type": fn["return_type"],
+                    "params_str": fn["params_str"],
+                    "call_args_str": fn.get("call_args_str", ""),
+                    "body": fn.get("body"),
+                }
+            )
         return [seen[n] for n in order]
 
     # ----------------------------------------------------------------- checks
 
-    def _check_api_version(self, api: str, version: str):
+    def _check_api_version(self, api: str, version: str) -> None:
         available = self.registry.available_apis()
         if api not in available:
             raise ValueError(f"API '{api}' not found. Available: {list(available.keys())}")
         if version not in available[api]:
-            raise ValueError(f"Version '{version}' not found for '{api}'. Available: {available[api]}")
+            raise ValueError(
+                f"Version '{version}' not found for '{api}'. Available: {available[api]}"
+            )
 
     # --------------------------------------------------------------- contexts
 
-    def _enum_class_context(self, group_name: str, enums: List[Enum]) -> dict:
+    def _enum_class_context(self, group_name: str, enums: list[Enum]) -> dict:
         clean_name = self._group_rename.get(group_name, group_name)
         base_type = "GLboolean" if clean_name == "Boolean" else "GLenum"
         converter = _EnumIdentifierConverter(clean_name, self._capitalizer)
@@ -295,13 +336,23 @@ class CppGenerator(Generator):
         # Location return types
         if command.name in _UNIFORM_LOCATION_RETURN:
             body = f"return UniformLocation({command.name}({call_args_str}));"
-            return {"return_type": "UniformLocation", "func_name": func_name,
-                    "params_str": params_str, "gl_name": command.name, "body": body}
+            return {
+                "return_type": "UniformLocation",
+                "func_name": func_name,
+                "params_str": params_str,
+                "gl_name": command.name,
+                "body": body,
+            }
 
         if command.name in _ATTRIB_LOCATION_RETURN:
             body = f"return AttribLocation({command.name}({call_args_str}));"
-            return {"return_type": "AttribLocation", "func_name": func_name,
-                    "params_str": params_str, "gl_name": command.name, "body": body}
+            return {
+                "return_type": "AttribLocation",
+                "func_name": func_name,
+                "params_str": params_str,
+                "gl_name": command.name,
+                "body": body,
+            }
 
         return {
             "return_type": return_type_str,
@@ -312,15 +363,16 @@ class CppGenerator(Generator):
             "body": None,
         }
 
-    def _string_overload_context(self, command: Command,
-                                  string_param: CommandParam,
-                                  length_param: Optional[CommandParam]) -> dict:
+    def _string_overload_context(
+        self, command: Command, string_param: CommandParam, length_param: CommandParam | None
+    ) -> dict:
         """Build a std::string-returning overload for Pattern B string-output commands."""
         func_name = self._convert_function_name(command.name)
 
         # Overload params: all original params except the GLchar* buffer and GLsizei* length
-        overload_params = [p for p in command.params
-                           if p is not string_param and p is not length_param]
+        overload_params = [
+            p for p in command.params if p is not string_param and p is not length_param
+        ]
         params_str = ", ".join(self._generate_param_decl(p, command) for p in overload_params)
 
         # Build call args for the underlying C function, substituting the dropped params
@@ -355,12 +407,12 @@ class CppGenerator(Generator):
         # glClearColor → clearColor
         return gl_name[2:3].lower() + gl_name[3:]
 
-    def _generate_param_decl(self, param: CommandParam,
-                              command: Optional[Command] = None) -> str:
+    def _generate_param_decl(self, param: CommandParam, command: Command | None = None) -> str:
         return f"{self._param_type_str(param, command=command)} {param.name}"
 
-    def _param_type_str(self, param: CommandParam, ignore_group: bool = False,
-                        command: Optional[Command] = None) -> str:
+    def _param_type_str(
+        self, param: CommandParam, ignore_group: bool = False, command: Command | None = None
+    ) -> str:
         """Reconstruct the parameter type string, substituting enum class or handle name if applicable."""
         # Location type substitution (name-based heuristic)
         if command:
@@ -381,11 +433,7 @@ class CppGenerator(Generator):
             return " ".join(parts)
 
         use_type = param.type
-        if (
-            not ignore_group
-            and param.has_group()
-            and param.group in self.registry.group_to_enums
-        ):
+        if not ignore_group and param.has_group() and param.group in self.registry.group_to_enums:
             use_type = self._group_rename.get(param.group, param.group)
 
         parts = []
@@ -396,8 +444,7 @@ class CppGenerator(Generator):
                 parts.append(part)
         return " ".join(parts)
 
-    def _generate_call_arg(self, param: CommandParam,
-                            command: Optional[Command] = None) -> str:
+    def _generate_call_arg(self, param: CommandParam, command: Command | None = None) -> str:
         """Generate the argument expression for the call to the underlying GL function."""
         # Location types: extract .loc; attrib locations need a cast to GLuint.
         if command:
@@ -429,7 +476,4 @@ class CppGenerator(Generator):
         return param.name
 
     def _type_must_change(self, param: CommandParam) -> bool:
-        return (
-            param.has_group()
-            and param.group in self.registry.group_to_enums
-        )
+        return param.has_group() and param.group in self.registry.group_to_enums

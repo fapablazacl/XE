@@ -1,8 +1,8 @@
-def is_capitalized(value):
-    if value == '':
+def is_capitalized(value: str) -> bool:
+    if value == "":
         return False
 
-    state = 0   # 0: initial uppercase run, 1: lowercase part
+    state = 0  # 0: initial uppercase run, 1: lowercase part
 
     for ch in value:
         if state == 0:
@@ -17,24 +17,23 @@ def is_capitalized(value):
                 state = 2
             else:
                 return False
-        elif state == 2:
-            if not str.islower(ch):
-                return False
+        elif state == 2 and not str.islower(ch):
+            return False
 
     return True
 
 
-def split_capitalized(value):
+def split_capitalized(value: str) -> list[str]:
     entries = []
 
-    current = ''
+    current = ""
     current_i = 0
     for i in range(len(value)):
         ch = value[i]
 
         if is_capitalized(current) and not is_capitalized(current + ch):
             entries.append(current)
-            current = ''
+            current = ""
             current_i = i
 
         current += ch
@@ -44,5 +43,5 @@ def split_capitalized(value):
     return entries
 
 
-def camel_case(class_name):
-    return ''.join([item.title() for item in class_name.split(' ')])
+def camel_case(class_name: str) -> str:
+    return "".join([item.title() for item in class_name.split(" ")])

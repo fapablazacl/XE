@@ -1,10 +1,8 @@
 from abc import ABC, abstractmethod
-from typing import Dict
 
 import jinja2
 
 from glaze.model import Registry
-
 
 _env = jinja2.Environment(
     loader=jinja2.PackageLoader("glaze", "templates"),
@@ -25,7 +23,7 @@ class Generator(ABC):
         self.registry = registry
 
     @abstractmethod
-    def generate(self, api: str, version: str) -> Dict[str, str]:
+    def generate(self, api: str, version: str) -> dict[str, str]:
         """Generate output for the given API and version.
 
         Returns a dict mapping relative file paths to their string contents.
@@ -42,4 +40,5 @@ class Generator(ABC):
     def _render_template(self, template_path: str, context: dict) -> str:
         """Render a Jinja2 template from glaze/templates/ with the given context."""
         template = _env.get_template(template_path)
-        return template.render(**context)
+        result: str = template.render(**context)
+        return result

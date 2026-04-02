@@ -12,13 +12,12 @@ import argparse
 import os
 import sys
 
-from glaze.parser import RegistryParser
 from glaze.generators.c_generator import CGenerator
 from glaze.generators.cpp_generator import CppGenerator
+from glaze.model import Registry
+from glaze.parser import RegistryParser
 
-DEFAULT_REGISTRY = os.path.join(
-    os.path.dirname(__file__), "OpenGL-Registry", "xml", "gl.xml"
-)
+DEFAULT_REGISTRY = os.path.join(os.path.dirname(__file__), "OpenGL-Registry", "xml", "gl.xml")
 
 GENERATORS = {
     "c": CGenerator,
@@ -26,16 +25,19 @@ GENERATORS = {
 }
 
 
-def cmd_generate(args):
+def cmd_generate(args: argparse.Namespace) -> None:
     registry = _load_registry(args.registry)
 
     if not args.lang:
         print("error: at least one --lang must be specified", file=sys.stderr)
         sys.exit(1)
 
-    unknown = [l for l in args.lang if l not in GENERATORS]
+    unknown = [lang_name for lang_name in args.lang if lang_name not in GENERATORS]
     if unknown:
-        print(f"error: unknown language(s): {unknown}. Choose from: {list(GENERATORS.keys())}", file=sys.stderr)
+        print(
+            f"error: unknown language(s): {unknown}. Choose from: {list(GENERATORS.keys())}",
+            file=sys.stderr,
+        )
         sys.exit(1)
 
     output_dir = args.output_dir or "."
@@ -58,7 +60,7 @@ def cmd_generate(args):
                 print(f"  [{lang} {api_name}] wrote {out_path}")
 
 
-def cmd_list_apis(args):
+def cmd_list_apis(args: argparse.Namespace) -> None:
     registry = _load_registry(args.registry)
     apis = registry.available_apis()
     print("Available APIs and versions:")
@@ -67,7 +69,7 @@ def cmd_list_apis(args):
         print(f"  {api}: {versions}")
 
 
-def _load_registry(registry_path: str):
+def _load_registry(registry_path: str) -> Registry:
     if not os.path.isfile(registry_path):
         print(f"error: registry file not found: {registry_path}", file=sys.stderr)
         sys.exit(1)
@@ -124,7 +126,7 @@ def build_parser() -> argparse.ArgumentParser:
     return root
 
 
-def main():
+def main() -> None:
     parser = build_parser()
     args = parser.parse_args()
     args.func(args)

@@ -1,10 +1,21 @@
 import xml.dom.minidom
 from xml.dom.minidom import Node
-from typing import List, Optional
 
 from glaze.model import (
-    Type, Enum, EnumGroup, TypeDecl, CommandParam, Command,
-    TypeRef, EnumRef, CommandRef, Require, Remove, Feature, Extension, Registry,
+    Command,
+    CommandParam,
+    CommandRef,
+    Enum,
+    EnumGroup,
+    EnumRef,
+    Extension,
+    Feature,
+    Registry,
+    Remove,
+    Require,
+    Type,
+    TypeDecl,
+    TypeRef,
 )
 
 
@@ -33,7 +44,7 @@ class RegistryParser:
 
     # ------------------------------------------------------------------ types
 
-    def _parse_types(self, root: Node) -> List[Type]:
+    def _parse_types(self, root: Node) -> list[Type]:
         types_node = self._find_child(root, "types")
         if types_node is None:
             return []
@@ -47,7 +58,7 @@ class RegistryParser:
                 result.append(t)
         return result
 
-    def _parse_type(self, node: Node) -> Optional[Type]:
+    def _parse_type(self, node: Node) -> Type | None:
         name = self._type_name_from_child(node) or self._attr(node, "name")
         if not name:
             return None
@@ -58,7 +69,7 @@ class RegistryParser:
 
         return Type(name=name, c_definition=c_definition, requires=requires, comment=comment)
 
-    def _type_name_from_child(self, node: Node) -> Optional[str]:
+    def _type_name_from_child(self, node: Node) -> str | None:
         for child in node.childNodes:
             if child.nodeType == Node.ELEMENT_NODE and child.tagName == "name":
                 return child.firstChild.data.strip() if child.firstChild else None
@@ -76,7 +87,7 @@ class RegistryParser:
 
     # ----------------------------------------------------------------- enums
 
-    def _parse_enum_groups(self, root: Node) -> List[EnumGroup]:
+    def _parse_enum_groups(self, root: Node) -> list[EnumGroup]:
         result = []
         for child in root.childNodes:
             if child.nodeType == Node.ELEMENT_NODE and child.tagName == "enums":
@@ -115,7 +126,7 @@ class RegistryParser:
 
     # --------------------------------------------------------------- commands
 
-    def _parse_commands(self, root: Node) -> List[Command]:
+    def _parse_commands(self, root: Node) -> list[Command]:
         result = []
         for commands_node in root.childNodes:
             if commands_node.nodeType != Node.ELEMENT_NODE or commands_node.tagName != "commands":
@@ -144,7 +155,7 @@ class RegistryParser:
             namespace=namespace,
         )
 
-    def _parse_return_type(self, proto: Node):
+    def _parse_return_type(self, proto: Node) -> tuple[TypeDecl, str]:
         """Returns (TypeDecl, return_type_str) from a <proto> node."""
         type_parts = []
 
@@ -186,7 +197,7 @@ class RegistryParser:
 
     # --------------------------------------------------------------- features
 
-    def _parse_features(self, root: Node) -> List[Feature]:
+    def _parse_features(self, root: Node) -> list[Feature]:
         result = []
         for child in root.childNodes:
             if child.nodeType == Node.ELEMENT_NODE and child.tagName == "feature":
@@ -208,7 +219,9 @@ class RegistryParser:
             elif child.tagName == "remove":
                 remove_list.append(self._parse_remove(child))
 
-        return Feature(api=api, name=name, number=number, require_list=require_list, remove_list=remove_list)
+        return Feature(
+            api=api, name=name, number=number, require_list=require_list, remove_list=remove_list
+        )
 
     def _parse_require(self, node: Node) -> Require:
         types, enums, commands = [], [], []
@@ -242,7 +255,7 @@ class RegistryParser:
 
     # ------------------------------------------------------------- extensions
 
-    def _parse_extensions(self, root: Node) -> List[Extension]:
+    def _parse_extensions(self, root: Node) -> list[Extension]:
         extensions_node = self._find_child(root, "extensions")
         if extensions_node is None:
             return []
@@ -265,13 +278,13 @@ class RegistryParser:
 
     # ----------------------------------------------------------------- helpers
 
-    def _find_child(self, node: Node, tag: str) -> Optional[Node]:
+    def _find_child(self, node: Node, tag: str) -> Node | None:
         for child in node.childNodes:
             if child.nodeType == Node.ELEMENT_NODE and child.tagName == tag:
                 return child
         return None
 
-    def _find_child_text(self, node: Optional[Node], tag: str) -> Optional[str]:
+    def _find_child_text(self, node: Node | None, tag: str) -> str | None:
         if node is None:
             return None
         child = self._find_child(node, tag)
