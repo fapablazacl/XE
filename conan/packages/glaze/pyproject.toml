@@ -48,5 +48,5 @@ module = "glaze.parser"
 disable_error_code = ["attr-defined", "union-attr", "arg-type", "no-any-return"]
 
 [tool.pytest.ini_options]
-testpaths = ["tests/python"]
+testpaths = ["tests"]
 pythonpath = ["."]
