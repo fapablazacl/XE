@@ -73,8 +73,8 @@ int main() {
     gl::genBuffers(1, &vbo);
 
     gl::bindVertexArray(vao);
-    gl::bindBuffer(gl::BufferTargetARB::eArray, vbo);
-    gl::bufferData(gl::BufferTargetARB::eArray, sizeof(verts), verts, gl::BufferUsageARB::eStaticDraw);
+    gl::bindBuffer(gl::BufferTarget::eArray, vbo);
+    gl::bufferData(gl::BufferTarget::eArray, sizeof(verts), verts, gl::BufferUsage::eStaticDraw);
     gl::vertexAttribPointer(gl::AttribLocation(0), 2, gl::VertexAttribPointerType::eFloat, GL_FALSE, 0, nullptr);
     gl::enableVertexAttribArray(gl::AttribLocation(0));
     gl::bindVertexArray(gl::VertexArray{});
@@ -89,10 +89,10 @@ int main() {
     gl::linkProgram(prog);
 
     GLint ok = 0;
-    gl::getProgramiv(prog, gl::ProgramPropertyARB::eLinkStatus, &ok);
+    gl::getProgramiv(prog, gl::ProgramProperty::eLinkStatus, &ok);
     if (!ok) {
         GLint logLen = 0;
-        gl::getProgramiv(prog, gl::ProgramPropertyARB::eInfoLogLength, &logLen);
+        gl::getProgramiv(prog, gl::ProgramProperty::eInfoLogLength, &logLen);
         std::cerr << "Link error:\n" << gl::getProgramInfoLog(prog, logLen) << std::endl;
         return -1;
     }

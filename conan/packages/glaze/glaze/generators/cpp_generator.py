@@ -43,6 +43,32 @@ def _find_length_param(command: Command) -> Optional[CommandParam]:
     return None
 
 
+# ── Vendor-suffix stripping for group names ───────────────────────────────────
+
+# Known vendor/extension suffixes that appear at the end of XML group names.
+# Ordered longest-first so e.g. "MESA" is tried before any single-letter suffix.
+_VENDOR_SUFFIXES = (
+    "MESA", "INTEL", "APPLE", "SGIS", "SGIX", "SUNX", "QCOM", "3DFX",
+    "INGR", "REND", "WIN", "ARB", "EXT", "NVX", "KHR", "OES", "AMD",
+    "ATI", "IBM", "SUN", "NV", "HP", "IMG", "VIV", "DMP", "FJ",
+)
+
+
+def _build_group_rename(group_set: set) -> Dict[str, str]:
+    """Return a mapping old_name → clean_name for every group whose suffix can be stripped
+    without colliding with another group already in group_set."""
+    rename: Dict[str, str] = {}
+    for name in group_set:
+        for suffix in _VENDOR_SUFFIXES:
+            if name.endswith(suffix) and len(name) > len(suffix):
+                clean = name[:-len(suffix)]
+                # Only rename if the clean name is not already taken by another group
+                if clean not in group_set:
+                    rename[name] = clean
+                break  # try only the first matching suffix
+    return rename
+
+
 # ── Location-type detection (name-based, no XML annotation available) ─────────
 
 _UNIFORM_LOCATION_RETURN: frozenset = frozenset({
@@ -112,6 +138,7 @@ class CppGenerator(Generator):
         super().__init__(registry)
         self._capitalizer = _Capitalizer()
         self._handle_classes: Dict[str, str] = {}  # class_ string → CamelCase handle name
+        self._group_rename: Dict[str, str] = {}     # xml group name → clean C++ type name
 
     @property
     def name(self) -> str:
@@ -134,9 +161,14 @@ class CppGenerator(Generator):
                 if param.has_group() and param.group in self.registry.group_to_enums:
                     group_set.add(param.group)
 
+        # Strip vendor suffixes from group names (e.g. BufferTargetARB → BufferTarget)
+        self._group_rename = _build_group_rename(group_set)
+
         # Resolve name conflicts between handle types and enum class names
+        # Check against both original and cleaned group names
+        clean_group_names = set(self._group_rename.values()) | (group_set - set(self._group_rename))
         for cls, name in list(self._handle_classes.items()):
-            if name in group_set:
+            if name in clean_group_names:
                 self._handle_classes[cls] = name + "Id"
 
         handle_types: List[Tuple[str, str]] = [
@@ -206,10 +238,11 @@ class CppGenerator(Generator):
     # --------------------------------------------------------------- contexts
 
     def _enum_class_context(self, group_name: str, enums: List[Enum]) -> dict:
-        base_type = "GLboolean" if group_name == "Boolean" else "GLenum"
-        converter = _EnumIdentifierConverter(group_name, self._capitalizer)
+        clean_name = self._group_rename.get(group_name, group_name)
+        base_type = "GLboolean" if clean_name == "Boolean" else "GLenum"
+        converter = _EnumIdentifierConverter(clean_name, self._capitalizer)
         entries = [{"name": converter.convert(e.name), "value": e.name} for e in enums]
-        return {"group_name": group_name, "base_type": base_type, "entries": entries}
+        return {"group_name": clean_name, "base_type": base_type, "entries": entries}
 
     def _function_context(self, command: Command) -> dict:
         return_type_str = command.return_type_str or command.return_type.to_c_string()
@@ -326,7 +359,7 @@ class CppGenerator(Generator):
             and param.has_group()
             and param.group in self.registry.group_to_enums
         ):
-            use_type = param.group
+            use_type = self._group_rename.get(param.group, param.group)
 
         parts = []
         for part in param.type_parts:
