@@ -148,13 +148,14 @@ class _EnumIdentifierConverter:
         self._enum_name_parts = split_capitalized(enum_name)
         self._capitalizer = capitalizer
 
-    def convert(self, constant: str) -> str:
+    def convert(self, constant: str, skip_filter: bool = False) -> str:
         parts = constant.replace("GL_", "").split("_")
         parts = [self._capitalizer.capitalize(p) for p in parts]
 
-        filtered = [p for p in parts if p not in self._enum_name_parts]
-        if filtered:
-            parts = filtered
+        if not skip_filter:
+            filtered = [p for p in parts if p not in self._enum_name_parts]
+            if filtered:
+                parts = filtered
 
         return "e" + "".join(parts)
 
@@ -315,6 +316,9 @@ class CppGenerator(Generator):
         entries = []
         for e in enums:
             name = converter.convert(e.name)
+            if name in seen_names:
+                # Collision: retry without filtering group-name parts
+                name = converter.convert(e.name, skip_filter=True)
             if name not in seen_names:
                 seen_names.add(name)
                 entries.append({"name": name, "value": e.name})

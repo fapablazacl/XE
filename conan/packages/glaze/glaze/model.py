@@ -195,6 +195,11 @@ class Registry:
                             self.group_to_enums[group] = []
                         self.group_to_enums[group].append(enum)
 
+        self.bitmask_groups: set[str] = set()
+        for eg in self.enum_groups:
+            if eg.group and eg.enum_group_type == "bitmask":
+                self.bitmask_groups.add(eg.group)
+
         self.features_by_api: dict[str, list[Feature]] = {}
         for feat in self.features_list:
             if feat.api not in self.features_by_api:

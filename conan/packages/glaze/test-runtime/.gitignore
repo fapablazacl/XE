@@ -3,3 +3,4 @@ build
 cmake-build-*
 .cmake/
 src/gl.c
+src/*.c

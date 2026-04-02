@@ -4,11 +4,20 @@
 #define __GLAZE_{{ api | upper }}_HPP__
 
 #include <string>
+#include <type_traits>
 #include <cassert>
 
 #include "{{ api }}.h"
 
-namespace gl {
+#ifndef GLAZE_INLINE
+#if __cplusplus >= 201703L
+#define GLAZE_INLINE inline
+#else 
+#define GLAZE_INLINE
+#endif
+#endif
+
+namespace {{ api }} {
 
 // ── Strong handle types ──────────────────────────────────────────────────────
 template<typename Tag>
@@ -17,6 +26,7 @@ struct Handle {
     Handle() : id(0) {}
     explicit Handle(GLuint id) : id(id) {}
     explicit operator GLuint() const { return id; }
+    bool operator<(Handle o) const { return id < o.id; }
     bool operator==(Handle o) const { return id == o.id; }
     bool operator!=(Handle o) const { return id != o.id; }
     explicit operator bool() const { return id != 0; }
@@ -59,6 +69,31 @@ struct _GlErrorScope {
 #define GLAZE_GL_CHECK ((void)0)
 #endif
 
+// ── Type-safe bitmask flags ──────────────────────────────────────────────────
+template<typename E>
+class Flags {
+    using underlying = typename std::underlying_type<E>::type;
+    underlying m_value;
+public:
+    Flags() : m_value(0) {}
+    Flags(E bit) : m_value(static_cast<underlying>(bit)) {}
+    explicit Flags(underlying v) : m_value(v) {}
+
+    underlying value() const { return m_value; }
+    explicit operator bool() const { return m_value != 0; }
+    explicit operator underlying() const { return m_value; }
+
+    Flags operator|(Flags rhs) const { return Flags(m_value | rhs.m_value); }
+    Flags operator&(Flags rhs) const { return Flags(m_value & rhs.m_value); }
+    Flags operator^(Flags rhs) const { return Flags(m_value ^ rhs.m_value); }
+    Flags operator~() const { return Flags(~m_value); }
+    Flags& operator|=(Flags rhs) { m_value |= rhs.m_value; return *this; }
+    Flags& operator&=(Flags rhs) { m_value &= rhs.m_value; return *this; }
+    Flags& operator^=(Flags rhs) { m_value ^= rhs.m_value; return *this; }
+    bool operator==(Flags rhs) const { return m_value == rhs.m_value; }
+    bool operator!=(Flags rhs) const { return m_value != rhs.m_value; }
+};
+
 // ── Enum classes ─────────────────────────────────────────────────────────────
 {% for ec in enum_classes %}
 enum class {{ ec.group_name }} : {{ ec.base_type }} {
@@ -84,11 +119,8 @@ struct _{{ fn.struct_name }} {
     }
 {% endfor %}
 };
-#if __cplusplus >= 201703L
-inline constexpr _{{ fn.struct_name }} {{ fn.func_name }};
-#else
-constexpr _{{ fn.struct_name }} {{ fn.func_name }};
-#endif
+
+GLAZE_INLINE constexpr _{{ fn.struct_name }} {{ fn.func_name }};
 
 {% endfor %}
 } // namespace gl
