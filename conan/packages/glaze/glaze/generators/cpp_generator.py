@@ -43,6 +43,33 @@ def _find_length_param(command: Command) -> Optional[CommandParam]:
     return None
 
 
+# ── Location-type detection (name-based, no XML annotation available) ─────────
+
+_UNIFORM_LOCATION_RETURN: frozenset = frozenset({
+    "glGetUniformLocation",
+    "glGetFragDataLocation",
+    "glGetFragDataIndex",
+})
+
+_ATTRIB_LOCATION_RETURN: frozenset = frozenset({
+    "glGetAttribLocation",
+})
+
+
+def _is_uniform_location_param(command: Command, param: CommandParam) -> bool:
+    """True if this GLint 'location' param is a uniform location."""
+    return (param.type == "GLint" and param.name == "location"
+            and (command.name.startswith("glUniform")
+                 or command.name.startswith("glProgramUniform")))
+
+
+def _is_attrib_location_param(command: Command, param: CommandParam) -> bool:
+    """True if this GLuint 'index' param is a vertex-attrib location."""
+    return (param.type == "GLuint" and param.name == "index"
+            and ("VertexAttrib" in command.name
+                 or command.name == "glBindAttribLocation"))
+
+
 class _Capitalizer:
     _EXCLUDED = {"1D", "2D", "3D"}
 
@@ -124,6 +151,26 @@ class CppGenerator(Generator):
             if filtered:
                 enum_classes.append(self._enum_class_context(group_name, filtered))
 
+        # Collect location types used by included commands
+        need_uniform_location = False
+        need_attrib_location = False
+        for command_name in consolidated.commands:
+            cmd = self.registry.command_by_name.get(command_name)
+            if cmd is None:
+                continue
+            if cmd.name in _UNIFORM_LOCATION_RETURN or any(
+                    _is_uniform_location_param(cmd, p) for p in cmd.params):
+                need_uniform_location = True
+            if cmd.name in _ATTRIB_LOCATION_RETURN or any(
+                    _is_attrib_location_param(cmd, p) for p in cmd.params):
+                need_attrib_location = True
+
+        location_types: List[Tuple[str, str]] = []
+        if need_attrib_location:
+            location_types.append(("AttribLocation", "AttribLocation"))
+        if need_uniform_location:
+            location_types.append(("UniformLocation", "UniformLocation"))
+
         # Build inline function context
         functions = []
         for command_name in sorted(consolidated.commands):
@@ -141,6 +188,7 @@ class CppGenerator(Generator):
         context = {
             "api": api,
             "handle_types": handle_types,
+            "location_types": location_types,
             "enum_classes": enum_classes,
             "functions": functions,
         }
@@ -166,8 +214,8 @@ class CppGenerator(Generator):
     def _function_context(self, command: Command) -> dict:
         return_type_str = command.return_type_str or command.return_type.to_c_string()
         func_name = self._convert_function_name(command.name)
-        params_str = ", ".join(self._generate_param_decl(p) for p in command.params)
-        call_args_str = ", ".join(self._generate_call_arg(p) for p in command.params)
+        params_str = ", ".join(self._generate_param_decl(p, command) for p in command.params)
+        call_args_str = ", ".join(self._generate_call_arg(p, command) for p in command.params)
 
         # Pattern A: const GLubyte* / const GLchar* returns → wrap to std::string
         if _is_string_return_command(command):
@@ -183,6 +231,17 @@ class CppGenerator(Generator):
                 "gl_name": command.name,
                 "body": body,
             }
+
+        # Location return types
+        if command.name in _UNIFORM_LOCATION_RETURN:
+            body = f"    return UniformLocation({command.name}({call_args_str}));"
+            return {"return_type": "UniformLocation", "func_name": func_name,
+                    "params_str": params_str, "gl_name": command.name, "body": body}
+
+        if command.name in _ATTRIB_LOCATION_RETURN:
+            body = f"    return AttribLocation({command.name}({call_args_str}));"
+            return {"return_type": "AttribLocation", "func_name": func_name,
+                    "params_str": params_str, "gl_name": command.name, "body": body}
 
         return {
             "return_type": return_type_str,
@@ -202,7 +261,7 @@ class CppGenerator(Generator):
         # Overload params: all original params except the GLchar* buffer and GLsizei* length
         overload_params = [p for p in command.params
                            if p is not string_param and p is not length_param]
-        params_str = ", ".join(self._generate_param_decl(p) for p in overload_params)
+        params_str = ", ".join(self._generate_param_decl(p, command) for p in overload_params)
 
         # Build call args for the underlying C function, substituting the dropped params
         call_parts = []
@@ -212,7 +271,7 @@ class CppGenerator(Generator):
             elif p is length_param:
                 call_parts.append("&length")
             else:
-                call_parts.append(self._generate_call_arg(p))
+                call_parts.append(self._generate_call_arg(p, command))
         call_args_str = ", ".join(call_parts)
 
         body = (
@@ -236,11 +295,20 @@ class CppGenerator(Generator):
         # glClearColor → clearColor
         return gl_name[2:3].lower() + gl_name[3:]
 
-    def _generate_param_decl(self, param: CommandParam) -> str:
-        return f"{self._param_type_str(param)} {param.name}"
+    def _generate_param_decl(self, param: CommandParam,
+                              command: Optional[Command] = None) -> str:
+        return f"{self._param_type_str(param, command=command)} {param.name}"
 
-    def _param_type_str(self, param: CommandParam, ignore_group: bool = False) -> str:
+    def _param_type_str(self, param: CommandParam, ignore_group: bool = False,
+                        command: Optional[Command] = None) -> str:
         """Reconstruct the parameter type string, substituting enum class or handle name if applicable."""
+        # Location type substitution (name-based heuristic)
+        if command:
+            if _is_uniform_location_param(command, param):
+                return "UniformLocation"
+            if _is_attrib_location_param(command, param):
+                return "AttribLocation"
+
         # Strong handle substitution: GLuint → Texture / Buffer / etc.
         if param.class_ and _is_uint_handle(param) and param.class_ in self._handle_classes:
             handle_name = self._handle_classes[param.class_]
@@ -268,8 +336,16 @@ class CppGenerator(Generator):
                 parts.append(part)
         return " ".join(parts)
 
-    def _generate_call_arg(self, param: CommandParam) -> str:
+    def _generate_call_arg(self, param: CommandParam,
+                            command: Optional[Command] = None) -> str:
         """Generate the argument expression for the call to the underlying GL function."""
+        # Location types: extract .loc; attrib locations need a cast to GLuint.
+        if command:
+            if _is_uniform_location_param(command, param):
+                return f"{param.name}.loc"
+            if _is_attrib_location_param(command, param):
+                return f"static_cast<GLuint>({param.name}.loc)"
+
         # Strong handle types: extract .id for value params; reinterpret_cast for pointer params.
         # Handle<Tag> is standard-layout (single GLuint member), so the cast is well-defined.
         if param.class_ and _is_uint_handle(param) and param.class_ in self._handle_classes:

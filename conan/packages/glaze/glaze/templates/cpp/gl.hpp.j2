@@ -22,6 +22,25 @@ struct {{ tag }}Tag {};
 using {{ alias }} = Handle<{{ tag }}Tag>;
 {% endfor %}
 
+// ── Location types (uniform / attrib) ────────────────────────────────────────
+{% if location_types %}
+template<typename Tag>
+struct Location {
+    GLint loc;
+    Location() : loc(-1) {}
+    explicit Location(GLint loc) : loc(loc) {}
+    explicit operator GLint() const { return loc; }
+    bool operator==(Location o) const { return loc == o.loc; }
+    bool operator!=(Location o) const { return loc != o.loc; }
+    explicit operator bool() const { return loc >= 0; }
+};
+
+{% for tag, alias in location_types %}
+struct {{ tag }}Tag {};
+using {{ alias }} = Location<{{ tag }}Tag>;
+{% endfor %}
+{% endif %}
+
 // ── Enum classes ─────────────────────────────────────────────────────────────
 {% for ec in enum_classes %}
 enum class {{ ec.group_name }} : {{ ec.base_type }} {

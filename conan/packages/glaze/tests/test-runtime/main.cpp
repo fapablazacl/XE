@@ -75,8 +75,8 @@ int main() {
     gl::bindVertexArray(vao);
     gl::bindBuffer(gl::BufferTargetARB::eArray, vbo);
     gl::bufferData(gl::BufferTargetARB::eArray, sizeof(verts), verts, gl::BufferUsageARB::eStaticDraw);
-    gl::vertexAttribPointer(0, 2, gl::VertexAttribPointerType::eFloat, GL_FALSE, 0, nullptr);
-    gl::enableVertexAttribArray(0);
+    gl::vertexAttribPointer(gl::AttribLocation(0), 2, gl::VertexAttribPointerType::eFloat, GL_FALSE, 0, nullptr);
+    gl::enableVertexAttribArray(gl::AttribLocation(0));
     gl::bindVertexArray(gl::VertexArray{});
 
     // Shader program
@@ -100,7 +100,7 @@ int main() {
     gl::deleteShader(vert);
     gl::deleteShader(frag);
 
-    GLint angleLoc = gl::getUniformLocation(prog, "angle");
+    gl::UniformLocation angleLoc = gl::getUniformLocation(prog, "angle");
 
     while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();
