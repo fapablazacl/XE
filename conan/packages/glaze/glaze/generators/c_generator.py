@@ -8,10 +8,10 @@ class CGenerator(Generator):
     """Generates C dynamic-loading bindings.
 
     Output files:
-      include/oglhpp/gl.h — type definitions, enum macros, function pointer
+      include/glaze/gl.h — type definitions, enum macros, function pointer
                             typedefs and extern declarations, loader prototype.
       src/gl.c            — function pointer variable definitions and a single
-                            oglhpp_load_functions() implementation.
+                            glaze_load_functions() implementation.
     """
 
     def __init__(self, registry: Registry):
@@ -27,7 +27,7 @@ class CGenerator(Generator):
         type_name_set = self._collect_param_types(features)
 
         return {
-            "include/oglhpp/gl.h": self._generate_header(features, type_name_set),
+            "include/glaze/gl.h": self._generate_header(features, type_name_set),
             "src/gl.c": self._generate_source(features),
         }
 
@@ -62,9 +62,9 @@ class CGenerator(Generator):
         code = self._header_prologue()
 
         code += "/* loader declarations */\n"
-        code += "typedef void (*OGLHPP_PROC)(void);\n"
-        code += "typedef OGLHPP_PROC (*OGLHPP_GETPROCADDRESS)(const char *name);\n"
-        code += "extern void oglhpp_load_functions(OGLHPP_GETPROCADDRESS getProcAddress);\n\n"
+        code += "typedef void (*GLAZE_PROC)(void);\n"
+        code += "typedef GLAZE_PROC (*GLAZE_GETPROCADDRESS)(const char *name);\n"
+        code += "extern void glaze_load_functions(GLAZE_GETPROCADDRESS getProcAddress);\n\n"
 
         code += "/* data type definitions */\n"
         code += self._generate_types(type_name_set)
@@ -81,8 +81,8 @@ class CGenerator(Generator):
         return """\
 #pragma once
 
-#ifndef __OGLHPP_GL_H__
-#define __OGLHPP_GL_H__
+#ifndef __GLAZE_GL_H__
+#define __GLAZE_GL_H__
 
 #include <KHR/khrplatform.h>
 
@@ -147,7 +147,7 @@ extern "C" {
     # ----------------------------------------------------------------- source
 
     def _generate_source(self, features: List[Feature]) -> str:
-        code = "#include <oglhpp/gl.h>\n\n"
+        code = "#include <glaze/gl.h>\n\n"
 
         all_commands: List[Command] = []
 
@@ -168,7 +168,7 @@ extern "C" {
         return code
 
     def _generate_loader(self, commands: List[Command]) -> str:
-        code = "void oglhpp_load_functions(OGLHPP_GETPROCADDRESS getProcAddress) {\n"
+        code = "void glaze_load_functions(GLAZE_GETPROCADDRESS getProcAddress) {\n"
         for command in commands:
             ptr_type = self._command_ptr_type_name(command.name)
             ptr_var = command.name

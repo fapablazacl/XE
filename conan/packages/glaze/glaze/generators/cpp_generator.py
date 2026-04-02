@@ -36,11 +36,11 @@ class _EnumIdentifierConverter:
 class CppGenerator(Generator):
     """Generates a C++11 header with type-safe enum classes and inline wrappers.
 
-    The generated header depends on the C-generated <oglhpp/gl.h> rather than
+    The generated header depends on the C-generated <glaze/gl.h> rather than
     GLAD, so it wraps the dynamic-loading function pointers from the C bindings.
 
     Output file:
-      {api}{version_nodot}.hpp  (e.g., gl33.hpp for GL 3.3)
+      {api}.hpp
     """
 
     def __init__(self, registry: Registry):
@@ -79,8 +79,7 @@ class CppGenerator(Generator):
                 continue
             command_blocks.append(self._generate_inline_function(command))
 
-        version_nodot = version.replace(".", "")
-        filename = f"{api}{version_nodot}.hpp"
+        filename = f"include/glaze/{api}.hpp"
         content = self._render_header(enum_blocks, command_blocks)
         return {filename: content}
 
@@ -101,7 +100,7 @@ class CppGenerator(Generator):
         return (
             "#ifndef __gl_hpp__\n"
             "#define __gl_hpp__\n"
-            "#include <oglhpp/gl.h>\n"
+            "#include <glaze/gl.h>\n"
             "\n"
             "namespace gl {\n"
             f"{enums_str}\n"
