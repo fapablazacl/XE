@@ -121,7 +121,7 @@ class CppGenerator(Generator):
         entries = []
         for enum in enums:
             entry_name = converter.convert(enum.name)
-            entries.append(f"    {entry_name} = {enum.value}")
+            entries.append(f"    {entry_name} = {enum.name}")
 
         entries_str = ",\n".join(entries)
         return f"enum class {group_name} : {base_type} {{\n{entries_str}\n}};\n"
