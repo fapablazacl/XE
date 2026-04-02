@@ -5,7 +5,7 @@ set(CMAKE_CXX_STANDARD 11)
 
 find_package(glfw3 REQUIRED)
 
-add_executable(test-dynamicLoading "main.cpp" "include/KHR/khrplatform.h" "include/oglhpp/gl.h" "src/gl.c")
+add_executable(test-dynamicLoading "main.cpp" "include/KHR/khrplatform.h" "include/glaze/gl.h" "include/glaze/gl.hpp" "src/gl.c")
 target_include_directories(test-dynamicLoading PUBLIC "include/")
 target_link_libraries(test-dynamicLoading PRIVATE glfw)
 target_include_directories(test-dynamicLoading PRIVATE ${GLFW_INCLUDE_DIRS})

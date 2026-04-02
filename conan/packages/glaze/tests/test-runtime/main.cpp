@@ -4,12 +4,10 @@
 #include <iostream>
 #include <cassert>
 
-
 // GLFW error callback
 void errorCallback(int error, const char* description) {
     std::cerr << "GLFW Error: " << description << std::endl;
 }
-
 
 int main() {
     // Initialize GLFW
@@ -50,7 +48,6 @@ int main() {
     // Set GLFW error callback
     glfwSetErrorCallback(errorCallback);
 
-
     float vertices[] = {
         -0.5f, -0.5f, 0.0f,
          0.5f, -0.5f, 0.0f,
@@ -64,6 +61,7 @@ int main() {
         glClearColor(0.2f, 0.4f, 0.8f, 1.0f);
         assert(glGetError() == GL_NO_ERROR);
 
+        /*
         glClear(GL_COLOR_BUFFER_BIT);
         assert(glGetError() == GL_NO_ERROR);
         
@@ -72,9 +70,8 @@ int main() {
         glVertex3f(-0.5f, 0.0f, 0.0f);
         glVertex3f(0.5f, 0.0f, 0.0f);
         glEnd();
+        */
         
-        assert(glGetError() == GL_NO_ERROR);
-
         glFlush();
         glfwSwapBuffers(window);
     }
