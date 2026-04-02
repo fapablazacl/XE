@@ -25,8 +25,14 @@ python3 glaze_cli.py generate --api gl --version 1.0 --lang cpp --output-dir tes
 ### Build and run tests
 
 ```bash
-# Build the header-only test (requires GLAD)
-cd tests/test-gl10
+# Build the header-only test
+cd tests/test-build
+cmake -B build && cmake --build build
+```
+
+```bash
+# Builds a test program
+cd tests/test-runtime
 cmake -B build && cmake --build build
 ```
 
