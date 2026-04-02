@@ -27,8 +27,8 @@ class CGenerator(Generator):
         type_name_set = self._collect_param_types(features)
 
         return {
-            "include/glaze/gl.h": self._generate_header(features, type_name_set),
-            "src/gl.c": self._generate_source(features),
+            "include/glaze/gl.h": self._render_template("c/gl.h.j2", self._header_context(features, type_name_set)),
+            "src/gl.c": self._render_template("c/gl.c.j2", self._source_context(features)),
         }
 
     # ----------------------------------------------------------------- checks
@@ -56,125 +56,60 @@ class CGenerator(Generator):
                             type_name_set.add(param.data_type)
         return type_name_set
 
-    # ----------------------------------------------------------------- header
+    # --------------------------------------------------------------- contexts
 
-    def _generate_header(self, features: List[Feature], type_name_set: set) -> str:
-        code = self._header_prologue()
-
-        code += "/* loader declarations */\n"
-        code += "typedef void (*GLAZE_PROC)(void);\n"
-        code += "typedef GLAZE_PROC (*GLAZE_GETPROCADDRESS)(const char *name);\n"
-        code += "extern void glazeLoadFunctions(GLAZE_GETPROCADDRESS getProcAddress);\n\n"
-
-        code += "/* data type definitions */\n"
-        code += self._generate_types(type_name_set)
-        code += "\n"
-
-        for feature in features:
-            code += self._generate_header_feature(feature)
-            code += "\n"
-
-        code += self._header_epilogue()
-        return code
-
-    def _header_prologue(self) -> str:
-        return """\
-#pragma once
-
-#ifndef __GLAZE_GL_H__
-#define __GLAZE_GL_H__
-
-#include <KHR/khrplatform.h>
-
-#if defined(__gl_h_) || defined(__GL_H__)
-  #error please include this header instead
-#endif
-
-#define __gl_h_
-#define __GL_H__
-
-#if _WIN32
-  #define GLAPI
-  #define GLCALLCONV __stdcall
-#else
-  #define GLAPI
-  #define GLCALLCONV
-#endif
-
-#if defined(__cplusplus)
-extern "C" {
-#endif
-
-"""
-
-    def _header_epilogue(self) -> str:
-        return """\
-#if defined(__cplusplus)
-}
-#endif
-
-#endif
-"""
-
-    def _generate_types(self, type_name_set: set) -> str:
-        code = ""
-        for type_name in type_name_set:
+    def _header_context(self, features: List[Feature], type_name_set: set) -> dict:
+        types = []
+        for type_name in sorted(type_name_set):
             t = self.registry.type_by_name.get(type_name)
             if t is not None:
-                code += f"{t.c_definition}\n"
-        return code
+                types.append(t.c_definition)
 
-    def _generate_header_feature(self, feature: Feature) -> str:
-        code = f"/* {feature.name} definitions */\n"
-        for require in feature.require_list:
-            for type_ref in require.types:
-                t = self.registry.type_by_name.get(type_ref.name)
-                if t is not None:
-                    code += f"{t.c_definition}\n"
-            for enum_ref in require.enums:
-                enum = self.registry.enum_by_name.get(enum_ref.name)
-                if enum is not None:
-                    code += f"{self._generate_enum(enum)}\n"
-            for command_ref in require.commands:
-                command = self.registry.command_by_name.get(command_ref.name)
-                if command is None:
-                    continue
-                code += f"{self._generate_command_ptr_typedef(command)}\n"
-                code += f"{self._generate_command_ptr_extern(command)}\n"
-                code += "\n"
-        return code
+        feature_list = []
+        for feature in features:
+            enums = []
+            commands = []
+            for require in feature.require_list:
+                for type_ref in require.types:
+                    t = self.registry.type_by_name.get(type_ref.name)
+                    if t is not None:
+                        types.append(t.c_definition)
+                for enum_ref in require.enums:
+                    enum = self.registry.enum_by_name.get(enum_ref.name)
+                    if enum is not None:
+                        enums.append({"name": enum.name, "value": enum.value})
+                for command_ref in require.commands:
+                    command = self.registry.command_by_name.get(command_ref.name)
+                    if command is None:
+                        continue
+                    commands.append({
+                        "typedef": self._generate_command_ptr_typedef(command),
+                        "extern": self._generate_command_ptr_extern(command),
+                    })
+            feature_list.append({"name": feature.name, "enums": enums, "commands": commands})
 
-    # ----------------------------------------------------------------- source
+        return {"types": types, "features": feature_list}
 
-    def _generate_source(self, features: List[Feature]) -> str:
-        code = "#include <glaze/gl.h>\n\n"
-
-        all_commands: List[Command] = []
+    def _source_context(self, features: List[Feature]) -> dict:
+        feature_list = []
+        loader_entries = []
 
         for feature in features:
-            feature_commands: List[Command] = []
-            code += f"/* {feature.name} function pointer variables */\n"
+            definitions = []
             for require in feature.require_list:
                 for command_ref in require.commands:
                     command = self.registry.command_by_name.get(command_ref.name)
                     if command is None:
                         continue
-                    code += f"{self._generate_command_ptr_definition(command)}\n"
-                    feature_commands.append(command)
-            code += "\n"
-            all_commands.extend(feature_commands)
+                    definitions.append(self._generate_command_ptr_definition(command))
+                    loader_entries.append({
+                        "ptr_var": command.name,
+                        "ptr_type": self._command_ptr_type_name(command.name),
+                        "gl_name": command.name,
+                    })
+            feature_list.append({"name": feature.name, "definitions": definitions})
 
-        code += self._generate_loader(all_commands)
-        return code
-
-    def _generate_loader(self, commands: List[Command]) -> str:
-        code = "void glazeLoadFunctions(GLAZE_GETPROCADDRESS getProcAddress) {\n"
-        for command in commands:
-            ptr_type = self._command_ptr_type_name(command.name)
-            ptr_var = command.name
-            code += f'    {ptr_var} = ({ptr_type})getProcAddress("{command.name}");\n'
-        code += "}\n"
-        return code
+        return {"features": feature_list, "loader_entries": loader_entries}
 
     # ----------------------------------------------------------- command helpers
 

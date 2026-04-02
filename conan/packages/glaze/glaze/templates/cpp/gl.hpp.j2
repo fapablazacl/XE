@@ -1,0 +1,22 @@
+#ifndef __gl_hpp__
+#define __gl_hpp__
+#include <glaze/gl.h>
+
+namespace gl {
+{% for ec in enum_classes %}
+enum class {{ ec.group_name }} : {{ ec.base_type }} {
+{% for entry in ec.entries %}
+    {{ entry.name }} = {{ entry.value }}{% if not loop.last %},{% endif %}
+
+{% endfor %}
+};
+
+{% endfor %}
+{% for fn in functions %}
+inline {{ fn.return_type }} {{ fn.func_name }}({{ fn.params_str }}) {
+    return {{ fn.gl_name }}({{ fn.call_args_str }});
+}
+
+{% endfor %}
+} // namespace gl
+#endif

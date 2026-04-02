@@ -65,26 +65,25 @@ class CppGenerator(Generator):
                 if param.has_group() and param.group in self.registry.group_to_enums:
                     group_set.add(param.group)
 
-        # Generate enum class blocks — only include enums in the consolidated set
-        # to avoid including extension-only values that may cause name collisions.
-        enum_blocks: List[str] = []
+        # Build enum class context — only include enums in the consolidated set
+        enum_classes = []
         for group_name in sorted(group_set):
             all_enums = self.registry.group_to_enums[group_name]
             filtered = [e for e in all_enums if e.name in consolidated.enums]
             if filtered:
-                enum_blocks.append(self._generate_enum_class(group_name, filtered))
+                enum_classes.append(self._enum_class_context(group_name, filtered))
 
-        # Generate inline wrapper functions
-        command_blocks: List[str] = []
+        # Build inline function context
+        functions = []
         for command_name in sorted(consolidated.commands):
             command = self.registry.command_by_name.get(command_name)
             if command is None:
                 continue
-            command_blocks.append(self._generate_inline_function(command))
+            functions.append(self._function_context(command))
 
         filename = f"include/glaze/{api}.hpp"
-        content = self._render_header(enum_blocks, command_blocks)
-        return {filename: content}
+        context = {"api": api, "enum_classes": enum_classes, "functions": functions}
+        return {filename: self._render_template("cpp/gl.hpp.j2", context)}
 
     # ----------------------------------------------------------------- checks
 
@@ -95,50 +94,28 @@ class CppGenerator(Generator):
         if version not in available[api]:
             raise ValueError(f"Version '{version}' not found for '{api}'. Available: {available[api]}")
 
-    # -------------------------------------------------------------- rendering
+    # --------------------------------------------------------------- contexts
 
-    def _render_header(self, enum_blocks: List[str], command_blocks: List[str]) -> str:
-        enums_str = "\n".join(enum_blocks)
-        commands_str = "\n".join(command_blocks)
-        return (
-            "#ifndef __gl_hpp__\n"
-            "#define __gl_hpp__\n"
-            "#include <glaze/gl.h>\n"
-            "\n"
-            "namespace gl {\n"
-            f"{enums_str}\n"
-            f"{commands_str}\n"
-            "}\n"
-            "#endif\n"
-        )
-
-    # ----------------------------------------------------------- enum classes
-
-    def _generate_enum_class(self, group_name: str, enums: List[Enum]) -> str:
+    def _enum_class_context(self, group_name: str, enums: List[Enum]) -> dict:
         base_type = "GLboolean" if group_name == "Boolean" else "GLenum"
         converter = _EnumIdentifierConverter(group_name, self._capitalizer)
+        entries = [{"name": converter.convert(e.name), "value": e.name} for e in enums]
+        return {"group_name": group_name, "base_type": base_type, "entries": entries}
 
-        entries = []
-        for enum in enums:
-            entry_name = converter.convert(enum.name)
-            entries.append(f"    {entry_name} = {enum.name}")
-
-        entries_str = ",\n".join(entries)
-        return f"enum class {group_name} : {base_type} {{\n{entries_str}\n}};\n"
-
-    # ------------------------------------------------------- inline functions
-
-    def _generate_inline_function(self, command: Command) -> str:
+    def _function_context(self, command: Command) -> dict:
         return_type_str = command.return_type_str or command.return_type.to_c_string()
         func_name = self._convert_function_name(command.name)
         params_str = ", ".join(self._generate_param_decl(p) for p in command.params)
         call_args_str = ", ".join(self._generate_call_arg(p) for p in command.params)
+        return {
+            "return_type": return_type_str,
+            "func_name": func_name,
+            "params_str": params_str,
+            "call_args_str": call_args_str,
+            "gl_name": command.name,
+        }
 
-        return (
-            f"inline {return_type_str} {func_name}({params_str}) {{\n"
-            f"    return {command.name}({call_args_str});\n"
-            f"}}\n"
-        )
+    # ----------------------------------------------------------- param helpers
 
     def _convert_function_name(self, gl_name: str) -> str:
         # glClearColor → clearColor

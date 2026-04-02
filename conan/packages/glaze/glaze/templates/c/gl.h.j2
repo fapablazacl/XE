@@ -1,0 +1,53 @@
+#pragma once
+
+#ifndef __GLAZE_GL_H__
+#define __GLAZE_GL_H__
+
+#include <KHR/khrplatform.h>
+
+#if defined(__gl_h_) || defined(__GL_H__)
+  #error please include this header instead
+#endif
+
+#define __gl_h_
+#define __GL_H__
+
+#if _WIN32
+  #define GLAPI
+  #define GLCALLCONV __stdcall
+#else
+  #define GLAPI
+  #define GLCALLCONV
+#endif
+
+#if defined(__cplusplus)
+extern "C" {
+#endif
+
+/* loader declarations */
+typedef void (*GLAZE_PROC)(void);
+typedef GLAZE_PROC (*GLAZE_GETPROCADDRESS)(const char *name);
+extern void glazeLoadFunctions(GLAZE_GETPROCADDRESS getProcAddress);
+
+/* data type definitions */
+{% for typedef in types %}
+{{ typedef }}
+{% endfor %}
+
+{% for feature in features %}
+/* {{ feature.name }} definitions */
+{% for enum in feature.enums %}
+#define {{ enum.name }} {{ enum.value }}
+{% endfor %}
+{% for cmd in feature.commands %}
+{{ cmd.typedef }}
+{{ cmd.extern }}
+
+{% endfor %}
+{% endfor %}
+
+#if defined(__cplusplus)
+}
+#endif
+
+#endif

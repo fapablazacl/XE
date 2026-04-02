@@ -1,7 +1,17 @@
 from abc import ABC, abstractmethod
 from typing import Dict
 
+import jinja2
+
 from glaze.model import Registry
+
+
+_env = jinja2.Environment(
+    loader=jinja2.PackageLoader("glaze", "templates"),
+    trim_blocks=True,
+    lstrip_blocks=True,
+    keep_trailing_newline=True,
+)
 
 
 class Generator(ABC):
@@ -28,3 +38,8 @@ class Generator(ABC):
     def name(self) -> str:
         """Human-readable generator name (e.g., 'c', 'cpp')."""
         ...
+
+    def _render_template(self, template_path: str, context: dict) -> str:
+        """Render a Jinja2 template from glaze/templates/ with the given context."""
+        template = _env.get_template(template_path)
+        return template.render(**context)
