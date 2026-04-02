@@ -129,9 +129,8 @@ class CGenerator(Generator):
         return f"{self._command_ptr_type_name(command.name)} {command.name};"
 
     def _generate_param(self, param) -> str:
-        if param.is_void:
-            return f'{"const " if param.is_const else ""}void{"*" * param.pointer_indirection} {param.name}'
-        return f'{"const " if param.is_const else ""}{param.data_type}{"*" * param.pointer_indirection} {param.name}'
+        type_str = " ".join(part for part in param.type_parts if part)
+        return f"{type_str} {param.name}"
 
     def _generate_enum(self, enum: Enum) -> str:
         return f"#define {enum.name} {enum.value}"
