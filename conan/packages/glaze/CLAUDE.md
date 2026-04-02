@@ -4,7 +4,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Purpose
 
-OpenGL-Hpp is a **code generator** that produces language-specific headers and source files for the OpenGL API from the official Khronos XML registry (`OpenGL-Registry/xml/gl.xml`). It supports GL 1.0–4.6 and GLES 1.0–3.2.
+glaze is a **code generator** that produces language-specific headers and source files for the OpenGL API from the official Khronos XML registry (`OpenGL-Registry/xml/gl.xml`). It supports GL 1.0–4.6 and GLES 1.0–3.2.
+
+Initially both C and C++11 bindings should be generated.
 
 ## Commands
 
@@ -33,11 +35,11 @@ cd tests/test-dynamicLoading
 cmake -B build && cmake --build build
 ```
 
-## Architecture
+## Legacy Architecture
 
 The project has two parallel generation pipelines:
 
-### Legacy C++ pipeline (`main.py`)
+### C++ pipeline (`main.py`)
 ```
 OpenGL-Registry/xml/gl.xml
   → oglhpp/glregistry.py  (GLXMLParser → Repository data model)
@@ -46,7 +48,7 @@ OpenGL-Registry/xml/gl.xml
 ```
 Produces a single `.hpp` with inline functions, `enum class`, strong typedefs, and `std::span` support. All symbols live in the `gl` namespace.
 
-### Modern C pipeline (`main2.py`)
+### C pipeline (`main2.py`)
 ```
 OpenGL-Registry/xml/gl.xml
   → oglhppgen/model.py  (RegistryFactory → Registry data model)
@@ -71,8 +73,3 @@ Produces a header declaring function pointers and a source file implementing `og
 | `tests/test-gl10/` | Generated C++ header compiles and links with GLAD |
 | `tests/test-dynamicLoading/` | Full integration: GLFW window, GL 3.3 core profile, dynamic loading, `glGetError()` |
 
-## Design goals (relevant when extending the generator)
-
-- **Generated code** must have zero runtime overhead (inline functions in C++), no external dependencies, and catch errors at build time via `enum class` and strong typedefs.
-- **Generator code** is intentionally simple and hackable; prefer clarity over abstraction.
-- The C++ API style is close to raw OpenGL but inspired by Vulkan-Hpp (namespace, enum classes, span).

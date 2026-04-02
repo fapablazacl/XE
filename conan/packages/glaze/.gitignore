@@ -2,3 +2,5 @@
 .vscode/*
 OpenGL-Registry/*
 .idea/*
+OpenGL-Refpages/*
+glad/*
