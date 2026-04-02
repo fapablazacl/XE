@@ -53,7 +53,7 @@ class GlazeConan(ConanFile):
         cmake_content = ["cmake_minimum_required(VERSION 3.15)", "project(glaze_apis C)"]
         
         langs_args = []
-        if self.options.language in ("c", "both"):
+        if self.options.language in ("c", "cpp", "both"):
             langs_args.extend(["--lang", "c"])
         if self.options.language in ("cpp", "both"):
             langs_args.extend(["--lang", "cpp"])
