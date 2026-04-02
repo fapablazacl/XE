@@ -16,22 +16,16 @@ See @README.md for more information.
 
 ```bash
 # Generate C header + source (include/glaze/gl.h + src/gl.c)
-python3 glaze_cli.py generate --api gl --version 1.0 --lang c --output-dir tests/test-gl10
+python3 glaze_cli.py generate --api gl --version 1.0 --lang c --output-dir tests/test-runtime
 
 # Generate C++ header (include/glaze/gl.hpp)
-python3 glaze_cli.py generate --api gl --version 1.0 --lang cpp --output-dir tests/test-gl10
+python3 glaze_cli.py generate --api gl --version 1.0 --lang cpp --output-dir tests/test-runtime
 
 ```
 ### Build and run tests
 
 ```bash
 # Build the header-only test
-cd tests/test-build
-cmake -B build && cmake --build build
-```
-
-```bash
-# Builds a test program
 cd tests/test-runtime
 cmake -B build && cmake --build build
 ```
@@ -46,5 +40,5 @@ cmake -B build && cmake --build build
 
 | Test | What it validates |
 |------|------------------|
-| `tests/test-gl10/` | Generated C++ header compiles and links with GLAD |
-| `tests/test-dynamicLoading/` | Full integration: GLFW window, GL 3.3 core profile, dynamic loading, `glGetError()` |
+| `tests/test-build/` | Generated C++ header compiles.|
+| `tests/test-runtime/` | Full integration: GLFW window, GL 3.3 core profile, dynamic loading, `glGetError()` |
