@@ -1,5 +1,4 @@
 import os
-import shutil
 from conan import ConanFile
 from conan.tools.cmake import CMake, CMakeToolchain, cmake_layout
 from conan.tools.files import copy
@@ -11,9 +10,7 @@ class GlazeConan(ConanFile):
     exports_sources = (
         "glaze_cli.py",
         "glaze/*",
-        "OpenGL-Registry/*",
-        "templates/*",
-        "requirements.txt"
+        "requirements.txt",
     )
 
     settings = "os", "compiler", "build_type", "arch"
@@ -27,6 +24,23 @@ class GlazeConan(ConanFile):
         "apis": "gl:3.3",
         "language": "cpp"
     }
+
+    def source(self):
+        from conan.tools.scm import Git
+
+        git_registry = Git(self, folder="OpenGL-Registry")
+        git_registry.clone(
+            url="https://github.com/KhronosGroup/OpenGL-Registry.git",
+            target=".",
+            args=["--depth", "1"],
+        )
+
+        git_refpages = Git(self, folder="OpenGL-Refpages")
+        git_refpages.clone(
+            url="https://github.com/KhronosGroup/OpenGL-Refpages.git",
+            target=".",
+            args=["--depth", "1"],
+        )
 
     def layout(self):
         cmake_layout(self)
@@ -75,11 +89,11 @@ class GlazeConan(ConanFile):
                 cmake_content.append(f"target_include_directories(glaze_{api_name} INTERFACE $<INSTALL_INTERFACE:include>)")
 
         if self.options.language in ("c", "both"):
-            with open(os.path.join(self.source_folder, "CMakeLists.txt"), "w") as f:
+            with open(os.path.join(self.build_folder, "CMakeLists.txt"), "w") as f:
                 f.write("\n".join(cmake_content) + "\n")
-                
+
             cmake = CMake(self)
-            cmake.configure()
+            cmake.configure(build_script_folder=self.build_folder)
             cmake.build()
 
     def package(self):
