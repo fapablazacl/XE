@@ -1,6 +1,7 @@
 #ifndef __gl_hpp__
 #define __gl_hpp__
 #include <glaze/gl.h>
+#include <string>
 
 namespace gl {
 
@@ -33,7 +34,11 @@ enum class {{ ec.group_name }} : {{ ec.base_type }} {
 {% endfor %}
 {% for fn in functions %}
 inline {{ fn.return_type }} {{ fn.func_name }}({{ fn.params_str }}) {
+{% if fn.body %}
+{{ fn.body }}
+{% else %}
     return {{ fn.gl_name }}({{ fn.call_args_str }});
+{% endif %}
 }
 
 {% endfor %}

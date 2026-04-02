@@ -32,9 +32,9 @@ static gl::Shader compileShader(gl::ShaderType type, const char* src) {
     GLint ok = 0;
     gl::getShaderiv(shader, gl::ShaderParameterName::eCompileStatus, &ok);
     if (!ok) {
-        char log[512];
-        gl::getShaderInfoLog(shader, sizeof(log), nullptr, log);
-        std::cerr << "Shader compile error:\n" << log << std::endl;
+        GLint logLen = 0;
+        gl::getShaderiv(shader, gl::ShaderParameterName::eInfoLogLength, &logLen);
+        std::cerr << "Shader compile error:\n" << gl::getShaderInfoLog(shader, logLen) << std::endl;
         std::exit(1);
     }
     return shader;
@@ -91,9 +91,9 @@ int main() {
     GLint ok = 0;
     gl::getProgramiv(prog, gl::ProgramPropertyARB::eLinkStatus, &ok);
     if (!ok) {
-        char log[512];
-        gl::getProgramInfoLog(prog, sizeof(log), nullptr, log);
-        std::cerr << "Link error:\n" << log << std::endl;
+        GLint logLen = 0;
+        gl::getProgramiv(prog, gl::ProgramPropertyARB::eInfoLogLength, &logLen);
+        std::cerr << "Link error:\n" << gl::getProgramInfoLog(prog, logLen) << std::endl;
         return -1;
     }
 

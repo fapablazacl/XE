@@ -18,6 +18,31 @@ def _is_uint_handle(param: CommandParam) -> bool:
     return param.type == "GLuint"
 
 
+def _is_string_return_command(command: Command) -> bool:
+    """Return True if the command returns a C string (const GLubyte* or const GLchar*)."""
+    rt = command.return_type
+    return rt.is_const and rt.is_pointer and rt.name in ("GLubyte", "GLchar")
+
+
+def _find_string_output_param(command: Command) -> Optional[CommandParam]:
+    """Return the GLchar* non-const output param whose len= references another param, or None."""
+    param_names = {p.name for p in command.params}
+    for param in command.params:
+        if (param.type == "GLchar" and param.is_pointer and not param.is_const
+                and param.len and param.len in param_names):
+            return param
+    return None
+
+
+def _find_length_param(command: Command) -> Optional[CommandParam]:
+    """Return the GLsizei* length-output param (len='1'), or None."""
+    for param in command.params:
+        if (param.type == "GLsizei" and param.is_pointer
+                and not param.is_const and param.len == "1"):
+            return param
+    return None
+
+
 class _Capitalizer:
     _EXCLUDED = {"1D", "2D", "3D"}
 
@@ -106,6 +131,11 @@ class CppGenerator(Generator):
             if command is None:
                 continue
             functions.append(self._function_context(command))
+            # For Pattern B (void + GLchar* output buffer), add a std::string overload
+            string_param = _find_string_output_param(command)
+            if string_param:
+                length_param = _find_length_param(command)
+                functions.append(self._string_overload_context(command, string_param, length_param))
 
         filename = f"include/glaze/{api}.hpp"
         context = {
@@ -138,12 +168,66 @@ class CppGenerator(Generator):
         func_name = self._convert_function_name(command.name)
         params_str = ", ".join(self._generate_param_decl(p) for p in command.params)
         call_args_str = ", ".join(self._generate_call_arg(p) for p in command.params)
+
+        # Pattern A: const GLubyte* / const GLchar* returns → wrap to std::string
+        if _is_string_return_command(command):
+            raw_type = command.return_type.name
+            body = (
+                f"    const {raw_type}* raw = {command.name}({call_args_str});\n"
+                "    return raw ? reinterpret_cast<const char*>(raw) : std::string{};"
+            )
+            return {
+                "return_type": "std::string",
+                "func_name": func_name,
+                "params_str": params_str,
+                "gl_name": command.name,
+                "body": body,
+            }
+
         return {
             "return_type": return_type_str,
             "func_name": func_name,
             "params_str": params_str,
             "call_args_str": call_args_str,
             "gl_name": command.name,
+            "body": None,
+        }
+
+    def _string_overload_context(self, command: Command,
+                                  string_param: CommandParam,
+                                  length_param: Optional[CommandParam]) -> dict:
+        """Build a std::string-returning overload for Pattern B string-output commands."""
+        func_name = self._convert_function_name(command.name)
+
+        # Overload params: all original params except the GLchar* buffer and GLsizei* length
+        overload_params = [p for p in command.params
+                           if p is not string_param and p is not length_param]
+        params_str = ", ".join(self._generate_param_decl(p) for p in overload_params)
+
+        # Build call args for the underlying C function, substituting the dropped params
+        call_parts = []
+        for p in command.params:
+            if p is string_param:
+                call_parts.append("&result[0]")
+            elif p is length_param:
+                call_parts.append("&length")
+            else:
+                call_parts.append(self._generate_call_arg(p))
+        call_args_str = ", ".join(call_parts)
+
+        body = (
+            f"    std::string result(static_cast<std::size_t>({string_param.len}), '\\0');\n"
+            "    GLsizei length = 0;\n"
+            f"    {command.name}({call_args_str});\n"
+            "    result.resize(static_cast<std::size_t>(length));\n"
+            "    return result;"
+        )
+        return {
+            "return_type": "std::string",
+            "func_name": func_name,
+            "params_str": params_str,
+            "gl_name": command.name,
+            "body": body,
         }
 
     # ----------------------------------------------------------- param helpers
