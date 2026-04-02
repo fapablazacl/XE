@@ -311,7 +311,13 @@ class CppGenerator(Generator):
         clean_name = self._group_rename.get(group_name, group_name)
         base_type = "GLboolean" if clean_name == "Boolean" else "GLenum"
         converter = _EnumIdentifierConverter(clean_name, self._capitalizer)
-        entries = [{"name": converter.convert(e.name), "value": e.name} for e in enums]
+        seen_names: set[str] = set()
+        entries = []
+        for e in enums:
+            name = converter.convert(e.name)
+            if name not in seen_names:
+                seen_names.add(name)
+                entries.append({"name": name, "value": e.name})
         return {"group_name": clean_name, "base_type": base_type, "entries": entries}
 
     def _function_context(self, command: Command) -> dict:
