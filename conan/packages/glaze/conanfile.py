@@ -1,4 +1,5 @@
 import os
+import shutil
 from conan import ConanFile
 from conan.tools.cmake import CMake, CMakeToolchain, cmake_layout
 from conan.tools.files import copy
@@ -28,19 +29,16 @@ class GlazeConan(ConanFile):
     def source(self):
         from conan.tools.scm import Git
 
-        git_registry = Git(self, folder="OpenGL-Registry")
-        git_registry.clone(
-            url="https://github.com/KhronosGroup/OpenGL-Registry.git",
-            target=".",
-            args=["--depth", "1"],
-        )
+        repos = [
+            ("OpenGL-Registry", "https://github.com/KhronosGroup/OpenGL-Registry.git"),
+            ("OpenGL-Refpages", "https://github.com/KhronosGroup/OpenGL-Refpages.git"),
+            ("EGL-Registry", "https://github.com/KhronosGroup/EGL-Registry.git"),
+        ]
 
-        git_refpages = Git(self, folder="OpenGL-Refpages")
-        git_refpages.clone(
-            url="https://github.com/KhronosGroup/OpenGL-Refpages.git",
-            target=".",
-            args=["--depth", "1"],
-        )
+        for folder, url in repos:
+            if not os.path.isdir(os.path.join(self.source_folder, folder)):
+                git = Git(self, folder=folder)
+                git.clone(url=url, target=".", args=["--depth", "1"])
 
     def layout(self):
         cmake_layout(self)
@@ -87,6 +85,11 @@ class GlazeConan(ConanFile):
                 cmake_content.append(f"add_library(glaze_{api_name} STATIC {out_dir}/src/{api_name}.c)")
                 cmake_content.append(f"target_include_directories(glaze_{api_name} PUBLIC $<BUILD_INTERFACE:{out_dir}/include>)")
                 cmake_content.append(f"target_include_directories(glaze_{api_name} INTERFACE $<INSTALL_INTERFACE:include>)")
+
+        khr_src = os.path.join(self.source_folder, "EGL-Registry", "api", "KHR", "khrplatform.h")
+        khr_dst_dir = os.path.join(out_dir, "include", "KHR")
+        os.makedirs(khr_dst_dir, exist_ok=True)
+        shutil.copy2(khr_src, khr_dst_dir)
 
         if self.options.language in ("c", "both"):
             with open(os.path.join(self.build_folder, "CMakeLists.txt"), "w") as f:

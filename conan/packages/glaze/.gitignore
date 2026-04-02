@@ -4,6 +4,7 @@ __pycache__/
 OpenGL-Registry
 .idea/*
 OpenGL-Refpages
+EGL-Registry
 glad/*
 .ruff_cache/
 .mypy_cache/
