@@ -216,15 +216,42 @@ class CppGenerator(Generator):
                 length_param = _find_length_param(command)
                 functions.append(self._string_overload_context(command, string_param, length_param))
 
+        functors = self._build_functors(functions)
+
         filename = f"include/glaze/{api}.hpp"
         context = {
             "api": api,
             "handle_types": handle_types,
             "location_types": location_types,
             "enum_classes": enum_classes,
-            "functions": functions,
+            "functors": functors,
         }
         return {filename: self._render_template("cpp/gl.hpp.j2", context)}
+
+    # --------------------------------------------------------------- functors
+
+    def _build_functors(self, functions: list) -> list:
+        """Group function contexts by func_name; each group becomes one functor struct."""
+        seen: Dict[str, dict] = {}
+        order: List[str] = []
+        for fn in functions:
+            fname = fn["func_name"]
+            if fname not in seen:
+                struct_name = fname[0].upper() + fname[1:] + "Fn"
+                seen[fname] = {
+                    "struct_name": struct_name,
+                    "func_name": fname,
+                    "gl_name": fn["gl_name"],
+                    "overloads": [],
+                }
+                order.append(fname)
+            seen[fname]["overloads"].append({
+                "return_type": fn["return_type"],
+                "params_str": fn["params_str"],
+                "call_args_str": fn.get("call_args_str", ""),
+                "body": fn.get("body"),
+            })
+        return [seen[n] for n in order]
 
     # ----------------------------------------------------------------- checks
 
@@ -254,8 +281,8 @@ class CppGenerator(Generator):
         if _is_string_return_command(command):
             raw_type = command.return_type.name
             body = (
-                f"    const {raw_type}* raw = {command.name}({call_args_str});\n"
-                "    return raw ? reinterpret_cast<const char*>(raw) : std::string{};"
+                f"const {raw_type}* raw = {command.name}({call_args_str});\n"
+                "return raw ? reinterpret_cast<const char*>(raw) : std::string{};"
             )
             return {
                 "return_type": "std::string",
@@ -267,12 +294,12 @@ class CppGenerator(Generator):
 
         # Location return types
         if command.name in _UNIFORM_LOCATION_RETURN:
-            body = f"    return UniformLocation({command.name}({call_args_str}));"
+            body = f"return UniformLocation({command.name}({call_args_str}));"
             return {"return_type": "UniformLocation", "func_name": func_name,
                     "params_str": params_str, "gl_name": command.name, "body": body}
 
         if command.name in _ATTRIB_LOCATION_RETURN:
-            body = f"    return AttribLocation({command.name}({call_args_str}));"
+            body = f"return AttribLocation({command.name}({call_args_str}));"
             return {"return_type": "AttribLocation", "func_name": func_name,
                     "params_str": params_str, "gl_name": command.name, "body": body}
 
@@ -308,11 +335,11 @@ class CppGenerator(Generator):
         call_args_str = ", ".join(call_parts)
 
         body = (
-            f"    std::string result(static_cast<std::size_t>({string_param.len}), '\\0');\n"
-            "    GLsizei length = 0;\n"
-            f"    {command.name}({call_args_str});\n"
-            "    result.resize(static_cast<std::size_t>(length));\n"
-            "    return result;"
+            f"std::string result(static_cast<std::size_t>({string_param.len}), '\\0');\n"
+            "GLsizei length = 0;\n"
+            f"{command.name}({call_args_str});\n"
+            "result.resize(static_cast<std::size_t>(length));\n"
+            "return result;"
         )
         return {
             "return_type": "std::string",

@@ -65,15 +65,26 @@ enum class {{ ec.group_name }} : {{ ec.base_type }} {
 };
 
 {% endfor %}
-{% for fn in functions %}
-inline {{ fn.return_type }} {{ fn.func_name }}({{ fn.params_str }}) {
-    GLAZE_GL_CHECK;
-{% if fn.body %}
-{{ fn.body }}
+{% for fn in functors %}
+struct _{{ fn.struct_name }} {
+    constexpr _{{ fn.struct_name }}() noexcept = default;
+    explicit operator bool() const noexcept { return ::{{ fn.gl_name }} != nullptr; }
+{% for ov in fn.overloads %}
+    {{ ov.return_type }} operator()({{ ov.params_str }}) const {
+        GLAZE_GL_CHECK;
+{% if ov.body %}
+        {{ ov.body | replace('\n', '\n        ') }}
 {% else %}
-    return {{ fn.gl_name }}({{ fn.call_args_str }});
+        return ::{{ fn.gl_name }}({{ ov.call_args_str }});
 {% endif %}
-}
+    }
+{% endfor %}
+};
+#if __cplusplus >= 201703L
+inline constexpr _{{ fn.struct_name }} {{ fn.func_name }};
+#else
+constexpr _{{ fn.struct_name }} {{ fn.func_name }};
+#endif
 
 {% endfor %}
 } // namespace gl

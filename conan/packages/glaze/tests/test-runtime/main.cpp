@@ -27,7 +27,9 @@ void main() {
 static gl::Shader compileShader(gl::ShaderType type, const char* src) {
     gl::Shader shader(gl::createShader(type));
     gl::shaderSource(shader, 1, &src, nullptr);
-    gl::compileShader(shader);
+    
+    if (gl::compileShader)
+        gl::compileShader(shader);
 
     GLint ok = 0;
     gl::getShaderiv(shader, gl::ShaderParameterName::eCompileStatus, &ok);
