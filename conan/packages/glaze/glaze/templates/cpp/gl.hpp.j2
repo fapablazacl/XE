@@ -3,6 +3,25 @@
 #include <glaze/gl.h>
 
 namespace gl {
+
+// ── Strong handle types ──────────────────────────────────────────────────────
+template<typename Tag>
+struct Handle {
+    GLuint id;
+    Handle() : id(0) {}
+    explicit Handle(GLuint id) : id(id) {}
+    explicit operator GLuint() const { return id; }
+    bool operator==(Handle o) const { return id == o.id; }
+    bool operator!=(Handle o) const { return id != o.id; }
+    explicit operator bool() const { return id != 0; }
+};
+
+{% for tag, alias in handle_types %}
+struct {{ tag }}Tag {};
+using {{ alias }} = Handle<{{ tag }}Tag>;
+{% endfor %}
+
+// ── Enum classes ─────────────────────────────────────────────────────────────
 {% for ec in enum_classes %}
 enum class {{ ec.group_name }} : {{ ec.base_type }} {
 {% for entry in ec.entries %}

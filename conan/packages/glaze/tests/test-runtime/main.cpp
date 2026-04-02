@@ -24,16 +24,16 @@ void main() {
 }
 )glsl";
 
-static GLuint compileShader(gl::ShaderType type, const char* src) {
-    GLuint shader = gl::createShader(type);
+static gl::Shader compileShader(gl::ShaderType type, const char* src) {
+    gl::Shader shader(gl::createShader(type));
     gl::shaderSource(shader, 1, &src, nullptr);
     gl::compileShader(shader);
 
     GLint ok = 0;
-    glGetShaderiv(shader, GL_COMPILE_STATUS, &ok);
+    gl::getShaderiv(shader, gl::ShaderParameterName::eCompileStatus, &ok);
     if (!ok) {
         char log[512];
-        glGetShaderInfoLog(shader, sizeof(log), nullptr, log);
+        gl::getShaderInfoLog(shader, sizeof(log), nullptr, log);
         std::cerr << "Shader compile error:\n" << log << std::endl;
         std::exit(1);
     }
@@ -67,7 +67,8 @@ int main() {
          0.433f, -0.25f,
     };
 
-    GLuint vao, vbo;
+    gl::VertexArray vao;
+    gl::BufferId vbo;
     gl::genVertexArrays(1, &vao);
     gl::genBuffers(1, &vbo);
 
@@ -76,13 +77,13 @@ int main() {
     gl::bufferData(gl::BufferTargetARB::eArray, sizeof(verts), verts, gl::BufferUsageARB::eStaticDraw);
     gl::vertexAttribPointer(0, 2, gl::VertexAttribPointerType::eFloat, GL_FALSE, 0, nullptr);
     gl::enableVertexAttribArray(0);
-    gl::bindVertexArray(0);
+    gl::bindVertexArray(gl::VertexArray{});
 
     // Shader program
-    GLuint vert = compileShader(gl::ShaderType::eVertex,   VERT_SRC);
-    GLuint frag = compileShader(gl::ShaderType::eFragment, FRAG_SRC);
+    gl::Shader vert = compileShader(gl::ShaderType::eVertex,   VERT_SRC);
+    gl::Shader frag = compileShader(gl::ShaderType::eFragment, FRAG_SRC);
 
-    GLuint prog = gl::createProgram();
+    gl::Program prog(gl::createProgram());
     gl::attachShader(prog, vert);
     gl::attachShader(prog, frag);
     gl::linkProgram(prog);
@@ -117,7 +118,7 @@ int main() {
 
         gl::bindVertexArray(vao);
         gl::drawArrays(gl::PrimitiveType::eTriangles, 0, 3);
-        gl::bindVertexArray(0);
+        gl::bindVertexArray(gl::VertexArray{});
 
         glfwSwapBuffers(window);
     }

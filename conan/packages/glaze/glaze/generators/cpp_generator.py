@@ -1,8 +1,21 @@
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Tuple
 
 from glaze.generators.base import Generator
 from glaze.model import Registry, Command, CommandParam, Enum
 from glaze.utils.string_utils import split_capitalized
+
+
+def _to_handle_name(class_str: str) -> str:
+    """Convert a GL object class string to a CamelCase type name.
+
+    e.g. 'texture' -> 'Texture', 'program pipeline' -> 'ProgramPipeline'
+    """
+    return "".join(word.capitalize() for word in class_str.split())
+
+
+def _is_uint_handle(param: CommandParam) -> bool:
+    """Return True if param's base GL type is GLuint (a potential object handle)."""
+    return param.type == "GLuint"
 
 
 class _Capitalizer:
@@ -46,6 +59,7 @@ class CppGenerator(Generator):
     def __init__(self, registry: Registry):
         super().__init__(registry)
         self._capitalizer = _Capitalizer()
+        self._handle_classes: Dict[str, str] = {}  # class_ string → CamelCase handle name
 
     @property
     def name(self) -> str:
@@ -55,15 +69,27 @@ class CppGenerator(Generator):
         self._check_api_version(api, version)
         consolidated = self.registry.consolidate(api, version)
 
-        # Collect enum groups referenced by the commands in this version
+        # Single pass: collect handle classes and enum groups from all included commands
+        self._handle_classes = {}
         group_set: set = set()
         for command_name in consolidated.commands:
             command = self.registry.command_by_name.get(command_name)
             if command is None:
                 continue
             for param in command.params:
+                if param.class_ and _is_uint_handle(param):
+                    self._handle_classes[param.class_] = _to_handle_name(param.class_)
                 if param.has_group() and param.group in self.registry.group_to_enums:
                     group_set.add(param.group)
+
+        # Resolve name conflicts between handle types and enum class names
+        for cls, name in list(self._handle_classes.items()):
+            if name in group_set:
+                self._handle_classes[cls] = name + "Id"
+
+        handle_types: List[Tuple[str, str]] = [
+            (n, n) for n in sorted(set(self._handle_classes.values()))
+        ]
 
         # Build enum class context — only include enums in the consolidated set
         enum_classes = []
@@ -82,7 +108,12 @@ class CppGenerator(Generator):
             functions.append(self._function_context(command))
 
         filename = f"include/glaze/{api}.hpp"
-        context = {"api": api, "enum_classes": enum_classes, "functions": functions}
+        context = {
+            "api": api,
+            "handle_types": handle_types,
+            "enum_classes": enum_classes,
+            "functions": functions,
+        }
         return {filename: self._render_template("cpp/gl.hpp.j2", context)}
 
     # ----------------------------------------------------------------- checks
@@ -125,7 +156,18 @@ class CppGenerator(Generator):
         return f"{self._param_type_str(param)} {param.name}"
 
     def _param_type_str(self, param: CommandParam, ignore_group: bool = False) -> str:
-        """Reconstruct the parameter type string, substituting enum class name if applicable."""
+        """Reconstruct the parameter type string, substituting enum class or handle name if applicable."""
+        # Strong handle substitution: GLuint → Texture / Buffer / etc.
+        if param.class_ and _is_uint_handle(param) and param.class_ in self._handle_classes:
+            handle_name = self._handle_classes[param.class_]
+            parts = []
+            for part in param.type_parts:
+                if part == "GLuint":
+                    parts.append(handle_name)
+                elif part:
+                    parts.append(part)
+            return " ".join(parts)
+
         use_type = param.type
         if (
             not ignore_group
@@ -144,6 +186,14 @@ class CppGenerator(Generator):
 
     def _generate_call_arg(self, param: CommandParam) -> str:
         """Generate the argument expression for the call to the underlying GL function."""
+        # Strong handle types: extract .id for value params; reinterpret_cast for pointer params.
+        # Handle<Tag> is standard-layout (single GLuint member), so the cast is well-defined.
+        if param.class_ and _is_uint_handle(param) and param.class_ in self._handle_classes:
+            if param.is_pointer:
+                const_str = "const " if param.is_const else ""
+                return f"reinterpret_cast<{const_str}GLuint*>({param.name})"
+            return f"{param.name}.id"
+
         if param.has_group() and param.group == "Boolean" and param.is_pointer:
             raw_type_str = self._param_type_str(param, ignore_group=True)
             return f"reinterpret_cast<{raw_type_str}>({param.name})"
