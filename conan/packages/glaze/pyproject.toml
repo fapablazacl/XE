@@ -1,0 +1,52 @@
+[project]
+name = "glaze"
+version = "0.1.0"
+requires-python = ">=3.10"
+dependencies = ["Jinja2>=3.0"]
+
+[project.scripts]
+glaze = "glaze_cli:main"
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0", "ruff>=0.4", "mypy>=1.10"]
+
+[tool.ruff]
+target-version = "py310"
+line-length = 100
+
+[tool.ruff.lint]
+select = [
+    "E",      # pycodestyle errors
+    "W",      # pycodestyle warnings
+    "F",      # pyflakes
+    "I",      # isort
+    "UP",     # pyupgrade
+    "B",      # flake8-bugbear
+    "SIM",    # flake8-simplify
+    "RUF",    # ruff-specific
+]
+ignore = [
+    "E501",   # line too long (handled by formatter)
+]
+
+[tool.ruff.lint.isort]
+known-first-party = ["glaze"]
+
+[tool.mypy]
+python_version = "3.10"
+disallow_untyped_defs = true
+warn_return_any = true
+check_untyped_defs = true
+
+[[tool.mypy.overrides]]
+module = "jinja2.*"
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "glaze.parser"
+# xml.dom.minidom has imprecise type stubs (Node vs Element, etc.)
+disable_error_code = ["attr-defined", "union-attr", "arg-type", "no-any-return"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests/python"]
+pythonpath = ["."]
