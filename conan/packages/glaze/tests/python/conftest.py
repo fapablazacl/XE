@@ -1,0 +1,124 @@
+"""Shared fixtures for glaze unit tests."""
+
+import xml.dom.minidom
+
+import pytest
+
+from glaze.model import Registry
+from glaze.parser import RegistryParser
+
+# Minimal OpenGL registry XML for testing.
+# Contains types, enums (with groups), commands, features (with require/remove), and an extension.
+MINI_XML = """\
+<?xml version="1.0" encoding="UTF-8"?>
+<registry>
+  <types>
+    <type>typedef unsigned int <name>GLuint</name>;</type>
+    <type>typedef unsigned int <name>GLenum</name>;</type>
+    <type>typedef int <name>GLint</name>;</type>
+    <type>typedef int <name>GLsizei</name>;</type>
+    <type>typedef unsigned int <name>GLbitfield</name>;</type>
+    <type>typedef void <name>GLvoid</name>;</type>
+    <type>typedef unsigned char <name>GLubyte</name>;</type>
+  </types>
+
+  <enums namespace="GL" group="BufferTargetARB" type="enum">
+    <enum value="0x8892" name="GL_ARRAY_BUFFER" group="BufferTargetARB"/>
+    <enum value="0x8893" name="GL_ELEMENT_ARRAY_BUFFER" group="BufferTargetARB"/>
+  </enums>
+
+  <enums namespace="GL" group="ClearBufferMask" type="bitmask">
+    <enum value="0x00004000" name="GL_COLOR_BUFFER_BIT" group="ClearBufferMask"/>
+    <enum value="0x00000100" name="GL_DEPTH_BUFFER_BIT" group="ClearBufferMask"/>
+  </enums>
+
+  <enums namespace="GL">
+    <enum value="0" name="GL_FALSE"/>
+    <enum value="1" name="GL_TRUE"/>
+    <enum value="0x1406" name="GL_FLOAT"/>
+  </enums>
+
+  <commands namespace="GL">
+    <command>
+      <proto>void <name>glClear</name></proto>
+      <param group="ClearBufferMask"><ptype>GLbitfield</ptype> <name>mask</name></param>
+    </command>
+    <command>
+      <proto>void <name>glBindBuffer</name></proto>
+      <param group="BufferTargetARB"><ptype>GLenum</ptype> <name>target</name></param>
+      <param class="buffer"><ptype>GLuint</ptype> <name>buffer</name></param>
+    </command>
+    <command>
+      <proto>const <ptype>GLubyte</ptype> *<name>glGetString</name></proto>
+      <param><ptype>GLenum</ptype> <name>name</name></param>
+    </command>
+    <command>
+      <proto>void <name>glGenBuffers</name></proto>
+      <param><ptype>GLsizei</ptype> <name>n</name></param>
+      <param class="buffer"><ptype>GLuint</ptype> *<name>buffers</name></param>
+    </command>
+    <command>
+      <proto>void <name>glDeleteBuffers</name></proto>
+      <param><ptype>GLsizei</ptype> <name>n</name></param>
+      <param class="buffer">const <ptype>GLuint</ptype> *<name>buffers</name></param>
+    </command>
+  </commands>
+
+  <feature api="gl" name="GL_VERSION_1_0" number="1.0">
+    <require>
+      <enum name="GL_COLOR_BUFFER_BIT"/>
+      <enum name="GL_DEPTH_BUFFER_BIT"/>
+      <enum name="GL_FALSE"/>
+      <enum name="GL_TRUE"/>
+      <enum name="GL_FLOAT"/>
+      <command name="glClear"/>
+      <command name="glGetString"/>
+    </require>
+  </feature>
+
+  <feature api="gl" name="GL_VERSION_1_5" number="1.5">
+    <require>
+      <enum name="GL_ARRAY_BUFFER"/>
+      <enum name="GL_ELEMENT_ARRAY_BUFFER"/>
+      <command name="glBindBuffer"/>
+      <command name="glGenBuffers"/>
+      <command name="glDeleteBuffers"/>
+    </require>
+  </feature>
+
+  <feature api="gl" name="GL_VERSION_3_1" number="3.1">
+    <require>
+    </require>
+    <remove profile="core">
+      <enum name="GL_FLOAT"/>
+    </remove>
+  </feature>
+
+  <feature api="gles2" name="GL_ES_VERSION_2_0" number="2.0">
+    <require>
+      <enum name="GL_COLOR_BUFFER_BIT"/>
+      <command name="glClear"/>
+    </require>
+  </feature>
+
+  <extensions>
+    <extension name="GL_ARB_buffer_storage" supported="gl|gles2">
+      <require>
+        <enum name="GL_ARRAY_BUFFER"/>
+      </require>
+    </extension>
+  </extensions>
+</registry>
+"""
+
+
+def _parse_xml_string(xml_str: str) -> Registry:
+    """Parse an XML string into a Registry."""
+    doc = xml.dom.minidom.parseString(xml_str)
+    return RegistryParser().parse(doc.documentElement)
+
+
+@pytest.fixture
+def mini_registry() -> Registry:
+    """A minimal Registry parsed from MINI_XML."""
+    return _parse_xml_string(MINI_XML)
