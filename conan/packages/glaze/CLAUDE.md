@@ -8,6 +8,8 @@ glaze is a **code generator** that produces language-specific headers and source
 
 Initially both C and C++11 bindings should be generated.
 
+See @README.md for more information.
+
 ## Commands
 
 ### Generate code
