@@ -45,7 +45,7 @@ class CGenerator(Generator):
     # ------------------------------------------------------- type collection
 
     def _collect_param_types(self, features: list[Feature]) -> set:
-        """Collect the set of GL type names used by command parameters."""
+        """Collect the set of GL type names used by command parameters and return types."""
         type_name_set: set = set()
         for feature in features:
             for require in feature.require_list:
@@ -53,6 +53,8 @@ class CGenerator(Generator):
                     command = self.registry.command_by_name.get(command_ref.name)
                     if command is None:
                         continue
+                    if command.return_type.name not in ("void",):
+                        type_name_set.add(command.return_type.name)
                     for param in command.params:
                         if param.data_type is not None:
                             type_name_set.add(param.data_type)
@@ -61,10 +63,17 @@ class CGenerator(Generator):
     # --------------------------------------------------------------- contexts
 
     def _header_context(self, features: list[Feature], type_name_set: set, api: str) -> dict:
+        # Collect all required type names: from command params/returns and <require><type> entries
+        all_type_names: set = set(type_name_set)
+        for feature in features:
+            for require in feature.require_list:
+                for type_ref in require.types:
+                    all_type_names.add(type_ref.name)
+
+        # Emit in registry order (gl.xml declaration order) to respect dependencies
         types = []
-        for type_name in sorted(type_name_set):
-            t = self.registry.type_by_name.get(type_name)
-            if t is not None:
+        for t in self.registry.types_list:
+            if t.name in all_type_names:
                 types.append(t.c_definition)
 
         feature_list = []
@@ -72,10 +81,6 @@ class CGenerator(Generator):
             enums = []
             commands = []
             for require in feature.require_list:
-                for type_ref in require.types:
-                    t = self.registry.type_by_name.get(type_ref.name)
-                    if t is not None:
-                        types.append(t.c_definition)
                 for enum_ref in require.enums:
                     enum = self.registry.enum_by_name.get(enum_ref.name)
                     if enum is not None:

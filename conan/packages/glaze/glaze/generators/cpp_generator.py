@@ -211,12 +211,14 @@ class CppGenerator(Generator):
         ]
 
         # Build enum class context — only include enums in the consolidated set
+        self._emitted_groups: set = set()
         enum_classes = []
         for group_name in sorted(group_set):
             all_enums = self.registry.group_to_enums[group_name]
             filtered = [e for e in all_enums if e.name in consolidated.enums]
             if filtered:
                 enum_classes.append(self._enum_class_context(group_name, filtered))
+                self._emitted_groups.add(group_name)
 
         # Collect location types used by included commands
         need_uniform_location = False
@@ -433,7 +435,7 @@ class CppGenerator(Generator):
             return " ".join(parts)
 
         use_type = param.type
-        if not ignore_group and param.has_group() and param.group in self.registry.group_to_enums:
+        if not ignore_group and param.has_group() and param.group in self._emitted_groups:
             use_type = self._group_rename.get(param.group, param.group)
 
         parts = []
