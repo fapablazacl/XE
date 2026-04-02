@@ -1,5 +1,5 @@
 
-#include <oglhpp/gl.h>
+#include <glaze/gl.hpp>
 #include <GLFW/glfw3.h>
 #include <iostream>
 #include <cassert>
@@ -45,7 +45,7 @@ int main() {
     glfwMakeContextCurrent(window);
 
     //initialize extensions here
-    oglhpp_load_functions(glfwGetProcAddress);
+    glazeLoadFunctions(glfwGetProcAddress);
 
     // Set GLFW error callback
     glfwSetErrorCallback(errorCallback);
@@ -67,13 +67,12 @@ int main() {
         glClear(GL_COLOR_BUFFER_BIT);
         assert(glGetError() == GL_NO_ERROR);
         
-        /*
         glBegin(GL_TRIANGLE_STRIP);
         glVertex3f(0.0f, 0.5f, 0.0f);        
         glVertex3f(-0.5f, 0.0f, 0.0f);
         glVertex3f(0.5f, 0.0f, 0.0f);
         glEnd();
-        */
+        
         assert(glGetError() == GL_NO_ERROR);
 
         glFlush();

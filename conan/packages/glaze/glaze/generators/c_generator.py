@@ -11,7 +11,7 @@ class CGenerator(Generator):
       include/glaze/gl.h — type definitions, enum macros, function pointer
                             typedefs and extern declarations, loader prototype.
       src/gl.c            — function pointer variable definitions and a single
-                            glaze_load_functions() implementation.
+                            glazeLoadFunctions() implementation.
     """
 
     def __init__(self, registry: Registry):
@@ -64,7 +64,7 @@ class CGenerator(Generator):
         code += "/* loader declarations */\n"
         code += "typedef void (*GLAZE_PROC)(void);\n"
         code += "typedef GLAZE_PROC (*GLAZE_GETPROCADDRESS)(const char *name);\n"
-        code += "extern void glaze_load_functions(GLAZE_GETPROCADDRESS getProcAddress);\n\n"
+        code += "extern void glazeLoadFunctions(GLAZE_GETPROCADDRESS getProcAddress);\n\n"
 
         code += "/* data type definitions */\n"
         code += self._generate_types(type_name_set)
@@ -168,7 +168,7 @@ extern "C" {
         return code
 
     def _generate_loader(self, commands: List[Command]) -> str:
-        code = "void glaze_load_functions(GLAZE_GETPROCADDRESS getProcAddress) {\n"
+        code = "void glazeLoadFunctions(GLAZE_GETPROCADDRESS getProcAddress) {\n"
         for command in commands:
             ptr_type = self._command_ptr_type_name(command.name)
             ptr_var = command.name
