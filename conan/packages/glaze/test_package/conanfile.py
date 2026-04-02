@@ -21,5 +21,6 @@ class GlazeTestConan(ConanFile):
 
     def test(self):
         if can_run(self):
-            cmd = os.path.join(self.cpp.build.bindir, "test_glaze")
-            self.run(cmd, env="conanrun")
+            for name in ("test_gl", "test_gles1", "test_gles2", "test_glsc2"):
+                cmd = os.path.join(self.cpp.build.bindir, name)
+                self.run(cmd, env="conanrun")

@@ -1,9 +1,9 @@
 *.pyc
 __pycache__/
 .vscode/*
-OpenGL-Registry/*
+OpenGL-Registry
 .idea/*
-OpenGL-Refpages/*
+OpenGL-Refpages
 glad/*
 .ruff_cache/
 .mypy_cache/
