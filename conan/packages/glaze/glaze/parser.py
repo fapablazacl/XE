@@ -150,14 +150,14 @@ class RegistryParser:
 
         for child in proto.childNodes:
             if child.nodeType == Node.TEXT_NODE:
-                type_parts.append(child.data.strip())
+                type_parts.extend(child.data.split())
             elif child.nodeType == Node.ELEMENT_NODE and child.tagName == "ptype":
                 type_parts.append(child.firstChild.data.strip() if child.firstChild else "")
 
         return_type_str = " ".join(p for p in type_parts if p)
 
         is_const = "const" in type_parts
-        is_pointer = any("*" in p for p in type_parts)
+        is_pointer = "*" in type_parts or "**" in type_parts
         name = next(
             (p for p in type_parts if p and p not in ("const", "*", "**", "void")),
             "void",
@@ -175,7 +175,7 @@ class RegistryParser:
 
         for child in node.childNodes:
             if child.nodeType == Node.TEXT_NODE:
-                type_parts.append(child.data.strip())
+                type_parts.extend(child.data.split())
             elif child.nodeType == Node.ELEMENT_NODE:
                 if child.tagName == "ptype":
                     type_parts.append(child.firstChild.data.strip() if child.firstChild else "")

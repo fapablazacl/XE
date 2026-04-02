@@ -65,11 +65,14 @@ class CppGenerator(Generator):
                 if param.has_group() and param.group in self.registry.group_to_enums:
                     group_set.add(param.group)
 
-        # Generate enum class blocks
+        # Generate enum class blocks — only include enums in the consolidated set
+        # to avoid including extension-only values that may cause name collisions.
         enum_blocks: List[str] = []
         for group_name in sorted(group_set):
-            enums = self.registry.group_to_enums[group_name]
-            enum_blocks.append(self._generate_enum_class(group_name, enums))
+            all_enums = self.registry.group_to_enums[group_name]
+            filtered = [e for e in all_enums if e.name in consolidated.enums]
+            if filtered:
+                enum_blocks.append(self._generate_enum_class(group_name, filtered))
 
         # Generate inline wrapper functions
         command_blocks: List[str] = []
