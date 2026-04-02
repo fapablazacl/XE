@@ -1,16 +1,16 @@
 #pragma once
 
-#ifndef __GLAZE_GL_H__
-#define __GLAZE_GL_H__
+#ifndef __GLAZE_{{ api | upper }}_H__
+#define __GLAZE_{{ api | upper }}_H__
 
 #include <KHR/khrplatform.h>
 
-#if defined(__gl_h_) || defined(__GL_H__)
+#if defined(__{{ api }}_h_) || defined(__{{ api | upper }}_H__)
   #error please include this header instead
 #endif
 
-#define __gl_h_
-#define __GL_H__
+#define __{{ api }}_h_
+#define __{{ api | upper }}_H__
 
 #if _WIN32
   #define GLAPI

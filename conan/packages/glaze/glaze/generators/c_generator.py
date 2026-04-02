@@ -27,8 +27,8 @@ class CGenerator(Generator):
         type_name_set = self._collect_param_types(features)
 
         return {
-            "include/glaze/gl.h": self._render_template("c/gl.h.j2", self._header_context(features, type_name_set)),
-            "src/gl.c": self._render_template("c/gl.c.j2", self._source_context(features)),
+            f"include/glaze/{api}.h": self._render_template("c/gl.h.j2", self._header_context(features, type_name_set, api)),
+            f"src/{api}.c": self._render_template("c/gl.c.j2", self._source_context(features, api)),
         }
 
     # ----------------------------------------------------------------- checks
@@ -58,7 +58,7 @@ class CGenerator(Generator):
 
     # --------------------------------------------------------------- contexts
 
-    def _header_context(self, features: List[Feature], type_name_set: set) -> dict:
+    def _header_context(self, features: List[Feature], type_name_set: set, api: str) -> dict:
         types = []
         for type_name in sorted(type_name_set):
             t = self.registry.type_by_name.get(type_name)
@@ -88,9 +88,9 @@ class CGenerator(Generator):
                     })
             feature_list.append({"name": feature.name, "enums": enums, "commands": commands})
 
-        return {"types": types, "features": feature_list}
+        return {"types": types, "features": feature_list, "api": api}
 
-    def _source_context(self, features: List[Feature]) -> dict:
+    def _source_context(self, features: List[Feature], api: str) -> dict:
         feature_list = []
         loader_entries = []
 
@@ -109,7 +109,7 @@ class CGenerator(Generator):
                     })
             feature_list.append({"name": feature.name, "definitions": definitions})
 
-        return {"features": feature_list, "loader_entries": loader_entries}
+        return {"features": feature_list, "loader_entries": loader_entries, "api": api}
 
     # ----------------------------------------------------------- command helpers
 

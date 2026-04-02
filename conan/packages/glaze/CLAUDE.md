@@ -36,13 +36,13 @@ Output rendering is done exclusively through Jinja2 templates; no inline string 
 
 ```bash
 # Generate C header + source
-python3 glaze_cli.py generate --api gl --version 3.3 --lang c --output-dir out/
+python3 glaze_cli.py generate --api gl 3.3 --lang c --output-dir out/
 
 # Generate C++ header
-python3 glaze_cli.py generate --api gl --version 3.3 --lang cpp --output-dir out/
+python3 glaze_cli.py generate --api gl 3.3 --lang cpp --output-dir out/
 
 # Generate both languages in one invocation (--lang is repeatable)
-python3 glaze_cli.py generate --api gl --version 4.6 --lang c --lang cpp --output-dir out/
+python3 glaze_cli.py generate --api gl 4.6 --api gles1 1.0 --lang c --lang cpp --output-dir out/
 
 # List all available APIs and versions from the registry
 python3 glaze_cli.py list-apis

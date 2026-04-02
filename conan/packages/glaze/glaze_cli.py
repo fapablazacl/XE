@@ -42,19 +42,20 @@ def cmd_generate(args):
     os.makedirs(output_dir, exist_ok=True)
 
     for lang in args.lang:
-        gen = GENERATORS[lang](registry)
-        try:
-            files = gen.generate(args.api, args.version)
-        except ValueError as e:
-            print(f"error: {e}", file=sys.stderr)
-            sys.exit(1)
+        for api_name, api_version in args.api:
+            gen = GENERATORS[lang](registry)
+            try:
+                files = gen.generate(api_name, api_version)
+            except ValueError as e:
+                print(f"error: {e}", file=sys.stderr)
+                sys.exit(1)
 
-        for rel_path, content in files.items():
-            out_path = os.path.join(output_dir, rel_path)
-            os.makedirs(os.path.dirname(out_path), exist_ok=True)
-            with open(out_path, "w", encoding="utf-8") as f:
-                f.write(content)
-            print(f"  [{lang}] wrote {out_path}")
+            for rel_path, content in files.items():
+                out_path = os.path.join(output_dir, rel_path)
+                os.makedirs(os.path.dirname(out_path), exist_ok=True)
+                with open(out_path, "w", encoding="utf-8") as f:
+                    f.write(content)
+                print(f"  [{lang} {api_name}] wrote {out_path}")
 
 
 def cmd_list_apis(args):
@@ -92,13 +93,11 @@ def build_parser() -> argparse.ArgumentParser:
     )
     gen_p.add_argument(
         "--api",
+        nargs=2,
+        action="append",
+        metavar=("API_NAME", "VERSION"),
         required=True,
-        help="GL API to target: gl, gles1, gles2, glsc2",
-    )
-    gen_p.add_argument(
-        "--version",
-        required=True,
-        help="Version number, e.g. 3.3 or 4.6",
+        help="GL API to target and its version. Can be repeated. e.g. --api gl 3.3 --api gles1 1.0",
     )
     gen_p.add_argument(
         "--lang",
