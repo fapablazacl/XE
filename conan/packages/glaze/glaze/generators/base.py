@@ -48,6 +48,17 @@ class Generator(ABC):
             f"API: {api} {version} | Language: {lang} | Generated: {timestamp}"
         )
 
+    def _build_command_version_map(self, api: str, version: str) -> dict[str, str]:
+        """Map each command name to the earliest API version that required it."""
+        features = self.registry.collect_features(api, version)
+        cmd_version: dict[str, str] = {}
+        for feature in features:
+            for require in feature.require_list:
+                for cmd_ref in require.commands:
+                    if cmd_ref.name not in cmd_version:
+                        cmd_version[cmd_ref.name] = feature.number
+        return cmd_version
+
     def _render_template(self, template_path: str, context: dict) -> str:
         """Render a Jinja2 template from glaze/templates/ with the given context."""
         template = _env.get_template(template_path)

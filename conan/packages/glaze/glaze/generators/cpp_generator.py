@@ -293,7 +293,8 @@ class CppGenerator(Generator):
                 data_param, size_param = upload_params
                 functions.append(self._array_view_overload_context(command, data_param, size_param))
 
-        functors = self._build_functors(functions)
+        cmd_version_map = self._build_command_version_map(api, version)
+        functors = self._build_functors(functions, api, cmd_version_map)
 
         # Build DSA object classes
         dsa_classes = self._build_dsa_classes(consolidated, api)
@@ -312,7 +313,7 @@ class CppGenerator(Generator):
 
     # --------------------------------------------------------------- functors
 
-    def _build_functors(self, functions: list) -> list:
+    def _build_functors(self, functions: list, api: str, cmd_version_map: dict[str, str]) -> list:
         """Group function contexts by func_name; each group becomes one functor struct."""
         seen: dict[str, dict] = {}
         order: list[str] = []
@@ -321,12 +322,16 @@ class CppGenerator(Generator):
             if fname not in seen:
                 struct_name = fname[0].upper() + fname[1:] + "Fn"
                 doc = self.doc_index.get(fn["gl_name"])
+                gl_name = fn["gl_name"]
+                ver = cmd_version_map.get(gl_name)
+                ver_tag = f" [{api.upper()} {ver}]" if ver else ""
+                doc_brief = f"{doc.brief}{ver_tag}" if doc else (ver_tag.strip() if ver_tag else None)
                 seen[fname] = {
                     "struct_name": struct_name,
                     "func_name": fname,
-                    "gl_name": fn["gl_name"],
+                    "gl_name": gl_name,
                     "overloads": [],
-                    "doc_brief": doc.brief if doc else None,
+                    "doc_brief": doc_brief,
                     "doc_params": doc.params if doc else {},
                 }
                 order.append(fname)

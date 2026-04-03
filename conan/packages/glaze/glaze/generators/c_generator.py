@@ -93,11 +93,13 @@ class CGenerator(Generator):
                     if command is None:
                         continue
                     doc = self.doc_index.get(command.name)
+                    ver_tag = f" [{api.upper()} {feature.number}]"
+                    doc_brief = f"{doc.brief}{ver_tag}" if doc else ver_tag.strip()
                     commands.append(
                         {
                             "typedef": self._generate_command_ptr_typedef(command),
                             "extern": self._generate_command_ptr_extern(command),
-                            "doc_brief": doc.brief if doc else None,
+                            "doc_brief": doc_brief,
                             "doc_params": doc.params if doc else {},
                         }
                     )

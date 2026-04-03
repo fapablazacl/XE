@@ -166,6 +166,15 @@ class TestCppGeneratorTimestamp:
         assert "DO NOT EDIT" in content
 
 
+class TestCppGeneratorVersionTag:
+    def test_version_tag_in_brief(self, mini_registry: Registry) -> None:
+        gen = CppGenerator(mini_registry)
+        files = gen.generate("gl", "1.5")
+        content = next(iter(files.values()))
+        assert "[GL 1.0]" in content
+        assert "[GL 1.5]" in content
+
+
 class TestCppGeneratorFlags:
     def test_flags_template_present(self, mini_registry: Registry) -> None:
         gen = CppGenerator(mini_registry)

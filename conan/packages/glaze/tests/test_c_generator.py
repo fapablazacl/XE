@@ -63,6 +63,15 @@ class TestCGeneratorOutput:
         assert "glClear" in source
 
 
+class TestCGeneratorVersionTag:
+    def test_version_tag_in_brief(self, mini_registry: Registry) -> None:
+        gen = CGenerator(mini_registry)
+        files = gen.generate("gl", "1.5")
+        header = files["include/glaze/gl.h"]
+        assert "[GL 1.0]" in header
+        assert "[GL 1.5]" in header
+
+
 class TestCGeneratorTimestamp:
     def test_header_contains_generation_header(self, mini_registry: Registry) -> None:
         gen = CGenerator(mini_registry)
