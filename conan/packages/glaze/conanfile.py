@@ -19,13 +19,27 @@ class GlazeConan(ConanFile):
 
     options = {
         "apis": ["ANY"],
-        "language": ["c", "cpp", "both"]
+        "language": ["c", "cpp", "both"],
+        "shared": [True, False],
+        "fPIC": [True, False],
+        "with_docs": [True, False],
     }
 
     default_options = {
         "apis": "gl:3.3,gles1:1.0,gles2:3.2,glsc2:2.0",
-        "language": "cpp"
+        "language": "cpp",
+        "shared": False,
+        "fPIC": True,
+        "with_docs": True,
     }
+
+    def config_options(self):
+        if self.settings.os == "Windows":
+            del self.options.fPIC
+
+    def configure(self):
+        if self.options.shared:
+            self.options.rm_safe("fPIC")
 
     def source(self):
         from conan.tools.scm import Git
@@ -35,9 +49,13 @@ class GlazeConan(ConanFile):
              ["xml/gl.xml"]),
             ("EGL-Registry", "https://github.com/KhronosGroup/EGL-Registry.git",
              ["api/KHR"]),
-            ("OpenGL-Refpages", "https://github.com/KhronosGroup/OpenGL-Refpages.git",
-             ["gl4", "es1.1", "es3.0"]),
         ]
+
+        if self.options.with_docs:
+            repos.append(
+                ("OpenGL-Refpages", "https://github.com/KhronosGroup/OpenGL-Refpages.git",
+                 ["gl4", "es1.1", "es3.0"]),
+            )
 
         for folder, url, sparse_paths in repos:
             dest = os.path.join(self.source_folder, folder)
@@ -80,12 +98,17 @@ class GlazeConan(ConanFile):
         
         self.prepare_python(self.get_python())
 
+        refpages_dir = os.path.join(self.source_folder, "OpenGL-Refpages")
+        refpages_args = []
+        if self.options.with_docs and os.path.isdir(refpages_dir):
+            refpages_args = ["--refpages", refpages_dir]
+
         cmd = [
             self.get_python(),
             os.path.join(self.source_folder, "glaze_cli.py"),
             "generate",
             "--output-dir", out_dir
-        ] + langs_args
+        ] + langs_args + refpages_args
 
         for api_item in api_list:
             parts = api_item.split(":")
@@ -101,9 +124,12 @@ class GlazeConan(ConanFile):
             api_name = parts[0]
             
             if self.options.language in ("c", "both"):
-                cmake_content.append(f"add_library(glaze_{api_name} STATIC {out_dir}/src/{api_name}.c)")
+                lib_type = "SHARED" if self.options.shared else "STATIC"
+                cmake_content.append(f"add_library(glaze_{api_name} {lib_type} {out_dir}/src/{api_name}.c)")
                 cmake_content.append(f"target_include_directories(glaze_{api_name} PUBLIC $<BUILD_INTERFACE:{out_dir}/include>)")
                 cmake_content.append(f"target_include_directories(glaze_{api_name} INTERFACE $<INSTALL_INTERFACE:include>)")
+                if self.options.shared:
+                    cmake_content.append(f"target_compile_definitions(glaze_{api_name} PRIVATE GLAZE_BUILD_DLL)")
 
         khr_src = os.path.join(self.source_folder, "EGL-Registry", "api", "KHR", "khrplatform.h")
         khr_dst_dir = os.path.join(out_dir, "include", "KHR")
@@ -131,6 +157,9 @@ class GlazeConan(ConanFile):
         if self.options.language in ("c", "both"):
             copy(self, "*.a", src=self.build_folder, dst=os.path.join(self.package_folder, "lib"), keep_path=False)
             copy(self, "*.lib", src=self.build_folder, dst=os.path.join(self.package_folder, "lib"), keep_path=False)
+            copy(self, "*.so*", src=self.build_folder, dst=os.path.join(self.package_folder, "lib"), keep_path=False)
+            copy(self, "*.dylib", src=self.build_folder, dst=os.path.join(self.package_folder, "lib"), keep_path=False)
+            copy(self, "*.dll", src=self.build_folder, dst=os.path.join(self.package_folder, "bin"), keep_path=False)
 
     def package_info(self):
         self.cpp_info.set_property("cmake_file_name", "glaze")
@@ -144,6 +173,8 @@ class GlazeConan(ConanFile):
             
             if self.options.language in ("c", "both"):
                 comp.libs = [f"glaze_{api_name}"]
+                if self.options.shared:
+                    comp.defines = ["GLAZE_DLL"]
             else:
                 comp.bindirs = []
                 comp.libdirs = []

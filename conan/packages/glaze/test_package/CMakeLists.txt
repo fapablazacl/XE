@@ -1,8 +1,9 @@
 cmake_minimum_required(VERSION 3.15)
-project(test_glaze CXX)
+project(test_glaze C CXX)
 
 find_package(glaze REQUIRED)
 
+# C++ header-only tests
 add_executable(test_gl test_gl.cpp)
 target_link_libraries(test_gl PRIVATE glaze::gl)
 
@@ -14,3 +15,16 @@ target_link_libraries(test_gles2 PRIVATE glaze::gles2)
 
 add_executable(test_glsc2 test_glsc2.cpp)
 target_link_libraries(test_glsc2 PRIVATE glaze::glsc2)
+
+# C linkage tests (static and DLL)
+add_executable(test_gl_c test_gl_c.c)
+target_link_libraries(test_gl_c PRIVATE glaze::gl)
+
+add_executable(test_gles1_c test_gles1_c.c)
+target_link_libraries(test_gles1_c PRIVATE glaze::gles1)
+
+add_executable(test_gles2_c test_gles2_c.c)
+target_link_libraries(test_gles2_c PRIVATE glaze::gles2)
+
+add_executable(test_glsc2_c test_glsc2_c.c)
+target_link_libraries(test_glsc2_c PRIVATE glaze::glsc2)

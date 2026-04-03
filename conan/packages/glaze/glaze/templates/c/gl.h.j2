@@ -15,12 +15,18 @@
 #define __{{ api }}_h_
 #define __{{ api | upper }}_H__
 
-#if _WIN32
-  #define GLAPI
+#if defined(_WIN32)
   #define GLCALLCONV __stdcall
+  #if defined(GLAZE_BUILD_DLL)
+    #define GLAZE_API __declspec(dllexport)
+  #elif defined(GLAZE_DLL)
+    #define GLAZE_API __declspec(dllimport)
+  #else
+    #define GLAZE_API
+  #endif
 #else
-  #define GLAPI
   #define GLCALLCONV
+  #define GLAZE_API
 #endif
 
 #if defined(__cplusplus)
@@ -30,7 +36,7 @@ extern "C" {
 /* loader declarations */
 typedef void (*GLAZE_PROC)(void);
 typedef GLAZE_PROC (*GLAZE_GETPROCADDRESS)(const char *name);
-extern void glazeLoadFunctions(GLAZE_GETPROCADDRESS getProcAddress);
+GLAZE_API void glazeLoadFunctions(GLAZE_GETPROCADDRESS getProcAddress);
 
 /* data type definitions */
 {% for typedef in types %}

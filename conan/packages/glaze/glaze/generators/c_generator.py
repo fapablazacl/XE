@@ -149,13 +149,13 @@ class CGenerator(Generator):
         return_type_str = command.return_type.to_c_string()
         params_str = ", ".join(self._generate_param(p) for p in command.params)
         ptr_type = self._command_ptr_type_name(command.name)
-        return f"typedef GLAPI {return_type_str} (GLCALLCONV *{ptr_type})({params_str});"
+        return f"typedef {return_type_str} (GLCALLCONV *{ptr_type})({params_str});"
 
     def _generate_command_ptr_extern(self, command: Command) -> str:
-        return f"extern {self._command_ptr_type_name(command.name)} {command.name};"
+        return f"extern GLAZE_API {self._command_ptr_type_name(command.name)} {command.name};"
 
     def _generate_command_ptr_definition(self, command: Command) -> str:
-        return f"{self._command_ptr_type_name(command.name)} {command.name};"
+        return f"GLAZE_API {self._command_ptr_type_name(command.name)} {command.name};"
 
     def _generate_param(self, param: CommandParam) -> str:
         type_str = " ".join(part for part in param.type_parts if part)

@@ -10,7 +10,7 @@
 {% endfor %}
 
 {% endfor %}
-void glazeLoadFunctions(GLAZE_GETPROCADDRESS getProcAddress) {
+GLAZE_API void glazeLoadFunctions(GLAZE_GETPROCADDRESS getProcAddress) {
 {% for entry in loader_entries %}
     {{ entry.ptr_var }} = ({{ entry.ptr_type }})getProcAddress("{{ entry.gl_name }}");
 {% endfor %}
