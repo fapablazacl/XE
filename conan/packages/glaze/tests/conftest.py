@@ -63,6 +63,13 @@ MINI_XML = """\
       <param class="buffer">const <ptype>GLuint</ptype> *<name>buffers</name></param>
     </command>
     <command>
+      <proto><ptype>GLuint</ptype> <name>glCreateProgram</name></proto>
+    </command>
+    <command>
+      <proto><ptype>GLuint</ptype> <name>glCreateShader</name></proto>
+      <param><ptype>GLenum</ptype> <name>type</name></param>
+    </command>
+    <command>
       <proto>void <name>glNamedBufferData</name></proto>
       <param class="buffer"><ptype>GLuint</ptype> <name>buffer</name></param>
       <param><ptype>GLsizei</ptype> <name>size</name></param>
@@ -97,6 +104,13 @@ MINI_XML = """\
       <command name="glBindBuffer"/>
       <command name="glGenBuffers"/>
       <command name="glDeleteBuffers"/>
+    </require>
+  </feature>
+
+  <feature api="gl" name="GL_VERSION_2_0" number="2.0">
+    <require>
+      <command name="glCreateProgram"/>
+      <command name="glCreateShader"/>
     </require>
   </feature>
 

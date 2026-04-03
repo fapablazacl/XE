@@ -54,6 +54,52 @@ def _find_data_upload_params(
     return None
 
 
+def _find_object_deletion_params(
+    command: Command,
+) -> tuple[CommandParam, CommandParam] | None:
+    """Return (count_param, input_param) if command is a multi-object Delete pattern."""
+    if not command.name.startswith("glDelete"):
+        return None
+    count_param = None
+    input_param = None
+    for param in command.params:
+        if param.type == "GLsizei" and not param.is_pointer:
+            count_param = param
+        if (
+            param.type == "GLuint"
+            and param.is_pointer
+            and param.is_const
+            and param.class_
+        ):
+            input_param = param
+    if count_param and input_param:
+        return count_param, input_param
+    return None
+
+
+def _find_object_creation_params(
+    command: Command,
+) -> tuple[CommandParam, CommandParam] | None:
+    """Return (count_param, output_param) if command is a Gen/Create pattern."""
+    if not (command.name.startswith("glGen") or command.name.startswith("glCreate")):
+        return None
+    count_param = None
+    output_param = None
+    for param in command.params:
+        if param.type == "GLsizei" and not param.is_pointer:
+            count_param = param
+        if (
+            param.type == "GLuint"
+            and param.is_pointer
+            and not param.is_const
+            and param.class_
+        ):
+            output_param = param
+    if count_param and output_param:
+        return count_param, output_param
+    return None
+
+
 def _find_string_output_param(command: Command) -> CommandParam | None:
     """Return the GLchar* non-const output param whose len= references another param, or None."""
     param_names = {p.name for p in command.params}
@@ -292,6 +338,22 @@ class CppGenerator(Generator):
             if upload_params:
                 data_param, size_param = upload_params
                 functions.append(self._array_view_overload_context(command, data_param, size_param))
+            # For object-creation functions (glGen*/glCreate*), add a singular convenience functor
+            creation_params = _find_object_creation_params(command)
+            if creation_params:
+                count_param, output_param = creation_params
+                if output_param.class_ in self._handle_classes:
+                    functions.append(
+                        self._single_object_creation_context(command, count_param, output_param)
+                    )
+            # For object-deletion functions (glDelete*), add a singular convenience functor
+            deletion_params = _find_object_deletion_params(command)
+            if deletion_params:
+                count_param, input_param = deletion_params
+                if input_param.class_ in self._handle_classes:
+                    functions.append(
+                        self._single_object_deletion_context(command, count_param, input_param)
+                    )
 
         cmd_version_map = self._build_command_version_map(api, version)
         functors = self._build_functors(functions, api, cmd_version_map)
@@ -486,6 +548,18 @@ class CppGenerator(Generator):
                 "body": body,
             }
 
+        # Handle-returning create commands: glCreateProgram() -> Program
+        handle_type = self._detect_handle_return(command)
+        if handle_type:
+            body = f"return {handle_type}({command.name}({call_args_str}));"
+            return {
+                "return_type": handle_type,
+                "func_name": func_name,
+                "params_str": params_str,
+                "gl_name": command.name,
+                "body": body,
+            }
+
         return {
             "return_type": return_type_str,
             "func_name": func_name,
@@ -566,6 +640,106 @@ class CppGenerator(Generator):
             "body": body,
             "template_prefix": "template<typename T>",
         }
+
+    def _single_object_creation_context(
+        self, command: Command, count_param: CommandParam, output_param: CommandParam
+    ) -> dict:
+        """Build a singular convenience functor for object-creation commands.
+
+        Turns glGenBuffers(n, buffers) into genBuffer() -> BufferId.
+        """
+        handle_name = self._handle_classes[output_param.class_]
+        # Singular func name: strip trailing 's' (genBuffers → genBuffer)
+        plural_name = self._convert_function_name(command.name)
+        func_name = plural_name.rstrip("s") if plural_name.endswith("s") else plural_name
+
+        # Extra params: anything that isn't the count or the output pointer
+        extra_params = [
+            p for p in command.params if p is not count_param and p is not output_param
+        ]
+        params_str = ", ".join(self._generate_param_decl(p, command) for p in extra_params)
+
+        # Build call args: 1 for count, &obj for output, pass-through for extras
+        call_parts = []
+        for p in command.params:
+            if p is count_param:
+                call_parts.append("1")
+            elif p is output_param:
+                call_parts.append("reinterpret_cast<GLuint*>(&obj)")
+            else:
+                call_parts.append(self._generate_call_arg(p, command))
+        call_args_str = ", ".join(call_parts)
+
+        body = (
+            f"{handle_name} obj;\n"
+            f"::{command.name}({call_args_str});\n"
+            "return obj;"
+        )
+        return {
+            "return_type": handle_name,
+            "func_name": func_name,
+            "params_str": params_str,
+            "gl_name": command.name,
+            "body": body,
+        }
+
+    def _single_object_deletion_context(
+        self, command: Command, count_param: CommandParam, input_param: CommandParam
+    ) -> dict:
+        """Build a singular convenience functor for object-deletion commands.
+
+        Turns glDeleteBuffers(n, buffers) into deleteBuffer(BufferId obj) -> void.
+        """
+        handle_name = self._handle_classes[input_param.class_]
+        plural_name = self._convert_function_name(command.name)
+        func_name = plural_name.rstrip("s") if plural_name.endswith("s") else plural_name
+
+        # Extra params: anything that isn't the count or the input pointer
+        extra_params = [
+            p for p in command.params if p is not count_param and p is not input_param
+        ]
+        param_decls = [self._generate_param_decl(p, command) for p in extra_params]
+        param_decls.append(f"{handle_name} obj")
+        params_str = ", ".join(param_decls)
+
+        # Build call args
+        call_parts = []
+        for p in command.params:
+            if p is count_param:
+                call_parts.append("1")
+            elif p is input_param:
+                call_parts.append("reinterpret_cast<const GLuint*>(&obj)")
+            else:
+                call_parts.append(self._generate_call_arg(p, command))
+        call_args_str = ", ".join(call_parts)
+
+        body = f"::{command.name}({call_args_str});"
+        return {
+            "return_type": "void",
+            "func_name": func_name,
+            "params_str": params_str,
+            "gl_name": command.name,
+            "body": body,
+        }
+
+    def _detect_handle_return(self, command: Command) -> str | None:
+        """Detect if a command returns a GLuint that should be wrapped as a handle type.
+
+        Matches commands like glCreateProgram() -> GLuint where 'Program' maps to a known handle.
+        """
+        rt = command.return_type
+        if rt.name != "GLuint" or rt.is_pointer:
+            return None
+        if not command.name.startswith("glCreate"):
+            return None
+        # Extract the object name from glCreate<Name>
+        suffix = command.name[len("glCreate"):]
+        # Match against known handle classes (case-insensitive)
+        for class_str, handle_name in self._handle_classes.items():
+            class_camel = _to_handle_name(class_str)
+            if suffix == class_camel:
+                return handle_name
+        return None
 
     # ----------------------------------------------------------- param helpers
 

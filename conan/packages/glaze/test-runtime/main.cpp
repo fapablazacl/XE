@@ -25,7 +25,7 @@ void main() {
 )glsl";
 
 static gl::Shader compileShader(gl::ShaderType type, const char* src) {
-    gl::Shader shader(gl::createShader(type));
+    gl::Shader shader = gl::createShader(type);
     gl::shaderSource(shader, 1, &src, nullptr);
     
     if (gl::compileShader)
@@ -69,11 +69,8 @@ int main() {
          0.433f, -0.25f,
     };
 
-    gl::VertexArray vao;
-    gl::BufferId vbo;
-    gl::genVertexArrays(1, &vao);
-    gl::genBuffers(1, &vbo);
-
+    gl::VertexArray vao = gl::genVertexArray();
+    gl::BufferId vbo = gl::genBuffer();
     gl::bindVertexArray(vao);
     gl::bindBuffer(gl::BufferTarget::eArray, vbo);
     gl::bufferData(gl::BufferTarget::eArray, sizeof(verts), verts, gl::BufferUsage::eStaticDraw);
@@ -85,7 +82,7 @@ int main() {
     gl::Shader vert = compileShader(gl::ShaderType::eVertex,   VERT_SRC);
     gl::Shader frag = compileShader(gl::ShaderType::eFragment, FRAG_SRC);
 
-    gl::Program prog(gl::createProgram());
+    gl::Program prog = gl::createProgram();
     gl::attachShader(prog, vert);
     gl::attachShader(prog, frag);
     gl::linkProgram(prog);
@@ -125,8 +122,8 @@ int main() {
         glfwSwapBuffers(window);
     }
 
-    gl::deleteVertexArrays(1, &vao);
-    gl::deleteBuffers(1, &vbo);
+    gl::deleteVertexArray(vao);
+    gl::deleteBuffer(vbo);
     gl::deleteProgram(prog);
 
     glfwDestroyWindow(window);

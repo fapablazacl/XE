@@ -265,6 +265,37 @@ class TestCppGeneratorArrayView:
         assert "data.size_bytes()" in content
 
 
+class TestCppGeneratorSingleObjectCreation:
+    def test_singular_gen_functor_present(self, mini_registry: Registry) -> None:
+        gen = CppGenerator(mini_registry)
+        files = gen.generate("gl", "1.5")
+        content = next(iter(files.values()))
+        assert "genBuffer" in content
+        assert "::glGenBuffers(1," in content
+
+    def test_singular_delete_functor_present(self, mini_registry: Registry) -> None:
+        gen = CppGenerator(mini_registry)
+        files = gen.generate("gl", "1.5")
+        content = next(iter(files.values()))
+        assert "deleteBuffer" in content
+        assert "::glDeleteBuffers(1," in content
+
+    def test_create_program_returns_handle(self, mini_registry: Registry) -> None:
+        gen = CppGenerator(mini_registry)
+        files = gen.generate("gl", "2.0")
+        content = next(iter(files.values()))
+        # glCreateProgram should return Program, not GLuint
+        assert "Program" in content
+        assert "::glCreateProgram()" in content
+
+    def test_create_shader_returns_handle(self, mini_registry: Registry) -> None:
+        gen = CppGenerator(mini_registry)
+        files = gen.generate("gl", "2.0")
+        content = next(iter(files.values()))
+        assert "Shader" in content
+        assert "::glCreateShader(" in content
+
+
 class TestConvertFunctionName:
     def test_standard_conversion(self, mini_registry: Registry) -> None:
         gen = CppGenerator(mini_registry)
