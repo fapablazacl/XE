@@ -12,12 +12,14 @@ import argparse
 import os
 import sys
 
+from glaze.doc_parser import parse_refpages
 from glaze.generators.c_generator import CGenerator
 from glaze.generators.cpp_generator import CppGenerator
 from glaze.model import Registry
 from glaze.parser import RegistryParser
 
 DEFAULT_REGISTRY = os.path.join(os.path.dirname(__file__), "OpenGL-Registry", "xml", "gl.xml")
+DEFAULT_REFPAGES = os.path.join(os.path.dirname(__file__), "OpenGL-Refpages")
 
 GENERATORS = {
     "c": CGenerator,
@@ -43,9 +45,19 @@ def cmd_generate(args: argparse.Namespace) -> None:
     output_dir = args.output_dir or "."
     os.makedirs(output_dir, exist_ok=True)
 
+    # Parse refpages documentation if available
+    refpages_dir = getattr(args, "refpages", None)
+    doc_indices: dict[str, dict] = {}
+    if refpages_dir and os.path.isdir(refpages_dir):
+        for api_name, _ in args.api:
+            if api_name not in doc_indices:
+                doc_indices[api_name] = parse_refpages(refpages_dir, api_name)
+                print(f"  Parsed {len(doc_indices[api_name])} doc entries for {api_name}")
+
     for lang in args.lang:
         for api_name, api_version in args.api:
-            gen = GENERATORS[lang](registry)
+            doc_index = doc_indices.get(api_name, {})
+            gen = GENERATORS[lang](registry, doc_index=doc_index)
             try:
                 files = gen.generate(api_name, api_version)
             except ValueError as e:
@@ -111,6 +123,11 @@ def build_parser() -> argparse.ArgumentParser:
         "--output-dir",
         default=".",
         help="Directory to write generated files into (default: current dir)",
+    )
+    gen_p.add_argument(
+        "--refpages",
+        default=DEFAULT_REFPAGES,
+        help=f"Path to OpenGL-Refpages directory (default: {DEFAULT_REFPAGES})",
     )
     gen_p.set_defaults(func=cmd_generate)
 

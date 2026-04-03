@@ -173,11 +173,11 @@ namespace dsa {
 
 {% for cls in dsa_classes %}
 class {{ cls.class_name }} {
-    {{ cls.handle_type }} m_id;
+    ::{{ api }}::{{ cls.handle_type }} m_id;
 public:
     {{ cls.class_name }}() = default;
-    explicit {{ cls.class_name }}({{ cls.handle_type }} id) : m_id(id) {}
-    {{ cls.handle_type }} id() const { return m_id; }
+    explicit {{ cls.class_name }}(::{{ api }}::{{ cls.handle_type }} id) : m_id(id) {}
+    ::{{ api }}::{{ cls.handle_type }} id() const { return m_id; }
 {% for method in cls.methods %}
     {{ method.return_type }} {{ method.name }}({{ method.params_str }}) const {
         GLAZE_GL_CHECK;

@@ -5,6 +5,16 @@ from glaze.generators.base import Generator
 from glaze.model import Command, CommandParam, Enum, Registry
 from glaze.utils.string_utils import split_capitalized
 
+_CPP_KEYWORDS: frozenset = frozenset({
+    "delete", "new", "class", "template", "operator", "return",
+    "switch", "case", "default", "break", "continue", "if", "else",
+    "for", "while", "do", "void", "int", "float", "double", "bool",
+    "char", "namespace", "using", "static", "const", "virtual",
+    "public", "private", "protected", "struct", "enum", "union",
+    "typedef", "extern", "inline", "volatile", "register", "auto",
+    "throw", "try", "catch", "this", "sizeof", "true", "false",
+})
+
 
 def _to_handle_name(class_str: str) -> str:
     """Convert a GL object class string to a CamelCase type name.
@@ -286,7 +296,7 @@ class CppGenerator(Generator):
         functors = self._build_functors(functions)
 
         # Build DSA object classes
-        dsa_classes = self._build_dsa_classes(consolidated)
+        dsa_classes = self._build_dsa_classes(consolidated, api)
 
         filename = f"include/glaze/{api}.hpp"
         context = {
@@ -333,7 +343,7 @@ class CppGenerator(Generator):
 
     # ------------------------------------------------------------ DSA classes
 
-    def _build_dsa_classes(self, consolidated: object) -> list:
+    def _build_dsa_classes(self, consolidated: object, api: str) -> list:
         """Build context dicts for DSA wrapper classes from object_dict."""
         dsa_classes = []
         for class_str in sorted(self.registry.object_dict):
@@ -350,10 +360,12 @@ class CppGenerator(Generator):
             methods = []
             for cmd in sorted(filtered, key=lambda c: c.name):
                 method_name = self._dsa_method_name(cmd.name, class_str)
+                if method_name in _CPP_KEYWORDS:
+                    method_name = method_name + "_"
                 # Skip the first param (the handle)
                 method_params = cmd.params[1:]
                 params_str = ", ".join(
-                    self._generate_param_decl(p, cmd) for p in method_params
+                    self._generate_dsa_param_decl(p, cmd, api) for p in method_params
                 )
                 call_args = ["m_id.id"] + [
                     self._generate_call_arg(p, cmd) for p in method_params
@@ -559,16 +571,38 @@ class CppGenerator(Generator):
     def _generate_param_decl(self, param: CommandParam, command: Command | None = None) -> str:
         return f"{self._param_type_str(param, command=command)} {param.name}"
 
-    def _param_type_str(
-        self, param: CommandParam, ignore_group: bool = False, command: Command | None = None
+    def _generate_dsa_param_decl(
+        self, param: CommandParam, command: Command, api: str
     ) -> str:
-        """Reconstruct the parameter type string, substituting enum class or handle name if applicable."""
+        """Like _generate_param_decl but fully qualifies types that could collide in the dsa namespace."""
+        needs_qualify = (
+            (param.class_ and _is_uint_handle(param) and param.class_ in self._handle_classes)
+            or (param.has_group() and param.group in self._emitted_groups)
+        )
+        if needs_qualify:
+            type_str = self._param_type_str(param, command=command, namespace_prefix=f"::{api}::")
+        else:
+            type_str = self._param_type_str(param, command=command)
+        return f"{type_str} {param.name}"
+
+    def _param_type_str(
+        self,
+        param: CommandParam,
+        ignore_group: bool = False,
+        command: Command | None = None,
+        namespace_prefix: str = "",
+    ) -> str:
+        """Reconstruct the parameter type string, substituting enum class or handle name if applicable.
+
+        When namespace_prefix is set (e.g. '::gl::'), it is prepended to the
+        substituted type name only — not to const/pointer qualifiers.
+        """
         # Location type substitution (name-based heuristic)
         if command:
             if _is_uniform_location_param(command, param):
-                return "UniformLocation"
+                return f"{namespace_prefix}UniformLocation"
             if _is_attrib_location_param(command, param):
-                return "AttribLocation"
+                return f"{namespace_prefix}AttribLocation"
 
         # Strong handle substitution: GLuint → Texture / Buffer / etc.
         if param.class_ and _is_uint_handle(param) and param.class_ in self._handle_classes:
@@ -576,7 +610,7 @@ class CppGenerator(Generator):
             parts = []
             for part in param.type_parts:
                 if part == "GLuint":
-                    parts.append(handle_name)
+                    parts.append(f"{namespace_prefix}{handle_name}")
                 elif part:
                     parts.append(part)
             return " ".join(parts)
@@ -585,9 +619,9 @@ class CppGenerator(Generator):
         if not ignore_group and param.has_group() and param.group in self._emitted_groups:
             clean = self._group_rename.get(param.group, param.group)
             if param.group in self._emitted_bitmask_groups and not param.is_pointer:
-                use_type = f"Flags<{clean}>"
+                use_type = f"Flags<{clean}>" if not namespace_prefix else f"{namespace_prefix}Flags<{namespace_prefix}{clean}>"
             else:
-                use_type = clean
+                use_type = f"{namespace_prefix}{clean}" if namespace_prefix else clean
 
         parts = []
         for part in param.type_parts:
