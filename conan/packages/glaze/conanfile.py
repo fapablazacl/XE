@@ -31,15 +31,25 @@ class GlazeConan(ConanFile):
         from conan.tools.scm import Git
 
         repos = [
-            ("OpenGL-Registry", "https://github.com/KhronosGroup/OpenGL-Registry.git"),
-            ("OpenGL-Refpages", "https://github.com/KhronosGroup/OpenGL-Refpages.git"),
-            ("EGL-Registry", "https://github.com/KhronosGroup/EGL-Registry.git"),
+            ("OpenGL-Registry", "https://github.com/KhronosGroup/OpenGL-Registry.git",
+             ["xml/gl.xml"]),
+            ("EGL-Registry", "https://github.com/KhronosGroup/EGL-Registry.git",
+             ["api/KHR"]),
+            ("OpenGL-Refpages", "https://github.com/KhronosGroup/OpenGL-Refpages.git",
+             ["gl4", "es1.1", "es3.0"]),
         ]
 
-        for folder, url in repos:
-            if not os.path.isdir(os.path.join(self.source_folder, folder)):
-                git = Git(self, folder=folder)
-                git.clone(url=url, target=".", args=["--depth", "1"])
+        for folder, url, sparse_paths in repos:
+            dest = os.path.join(self.source_folder, folder)
+            if os.path.isdir(dest):
+                continue
+            os.makedirs(dest, exist_ok=True)
+            git = Git(self, folder=folder)
+            git.run("init")
+            git.run("remote add origin " + url)
+            git.run("sparse-checkout init --cone")
+            git.run("sparse-checkout set " + " ".join(sparse_paths))
+            git.run("pull --depth 1 origin main")
 
     def build_requirements(self):
         self.tool_requires("cpython/3.10.14", options={"shared": True})
