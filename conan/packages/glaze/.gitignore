@@ -9,3 +9,4 @@ glad/*
 .ruff_cache/
 .mypy_cache/
 .pytest_cache/
+glaze.egg-info/

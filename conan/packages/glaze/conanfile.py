@@ -1,3 +1,4 @@
+
 import os
 import shutil
 from conan import ConanFile
@@ -40,8 +41,8 @@ class GlazeConan(ConanFile):
                 git = Git(self, folder=folder)
                 git.clone(url=url, target=".", args=["--depth", "1"])
 
-    def tool_requires(self):
-        self.tool_requires("python/3.10.14")
+    def build_requirements(self):
+        self.tool_requires("cpython/3.10.14", options={"shared": True})
 
     def layout(self):
         cmake_layout(self)
@@ -50,6 +51,9 @@ class GlazeConan(ConanFile):
         tc = CMakeToolchain(self)
         tc.generate()
 
+    def get_python(self):
+        return self.dependencies.build["cpython"].conf_info.get("user.cpython:python")
+        
     def build(self):
         api_list = [api.strip() for api in str(self.options.apis).split(",") if api.strip()]
         
@@ -63,9 +67,11 @@ class GlazeConan(ConanFile):
         
         out_dir = os.path.join(self.build_folder, "generated")
         os.makedirs(out_dir, exist_ok=True)
-            
+        
+        self.prepare_python(self.get_python())
+
         cmd = [
-            "python3",
+            self.get_python(),
             os.path.join(self.source_folder, "glaze_cli.py"),
             "generate",
             "--output-dir", out_dir
@@ -101,6 +107,11 @@ class GlazeConan(ConanFile):
             cmake = CMake(self)
             cmake.configure(build_script_folder=self.build_folder)
             cmake.build()
+
+    def prepare_python(self, python):
+        site_pkgs = os.path.join(self.build_folder, "site-packages")
+        self.run(f'"{python}" -m pip install --target "{site_pkgs}" "{self.source_folder}"')
+        os.environ["PYTHONPATH"] = site_pkgs + os.pathsep + os.environ.get("PYTHONPATH", "")
 
     def package(self):
         out_dir = os.path.join(self.build_folder, "generated")
