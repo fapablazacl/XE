@@ -1,3 +1,4 @@
+from glaze.doc_parser import FunctionDoc
 from glaze.generators.base import Generator
 from glaze.model import Command, CommandParam, Enum, Feature, Registry
 
@@ -12,8 +13,8 @@ class CGenerator(Generator):
                             glazeLoadFunctions() implementation.
     """
 
-    def __init__(self, registry: Registry):
-        super().__init__(registry)
+    def __init__(self, registry: Registry, doc_index: dict[str, FunctionDoc] | None = None):
+        super().__init__(registry, doc_index)
 
     @property
     def name(self) -> str:
@@ -26,9 +27,11 @@ class CGenerator(Generator):
 
         return {
             f"include/glaze/{api}.h": self._render_template(
-                "c/gl.h.j2", self._header_context(features, type_name_set, api)
+                "c/gl.h.j2", self._header_context(features, type_name_set, api, version)
             ),
-            f"src/{api}.c": self._render_template("c/gl.c.j2", self._source_context(features, api)),
+            f"src/{api}.c": self._render_template(
+                "c/gl.c.j2", self._source_context(features, api, version)
+            ),
         }
 
     # ----------------------------------------------------------------- checks
@@ -62,7 +65,7 @@ class CGenerator(Generator):
 
     # --------------------------------------------------------------- contexts
 
-    def _header_context(self, features: list[Feature], type_name_set: set, api: str) -> dict:
+    def _header_context(self, features: list[Feature], type_name_set: set, api: str, version: str) -> dict:
         # Collect all required type names: from command params/returns and <require><type> entries
         all_type_names: set = set(type_name_set)
         for feature in features:
@@ -89,17 +92,25 @@ class CGenerator(Generator):
                     command = self.registry.command_by_name.get(command_ref.name)
                     if command is None:
                         continue
+                    doc = self.doc_index.get(command.name)
                     commands.append(
                         {
                             "typedef": self._generate_command_ptr_typedef(command),
                             "extern": self._generate_command_ptr_extern(command),
+                            "doc_brief": doc.brief if doc else None,
+                            "doc_params": doc.params if doc else {},
                         }
                     )
             feature_list.append({"name": feature.name, "enums": enums, "commands": commands})
 
-        return {"types": types, "features": feature_list, "api": api}
+        return {
+            "types": types,
+            "features": feature_list,
+            "api": api,
+            "generation_header": self._generation_header(api, version, "C"),
+        }
 
-    def _source_context(self, features: list[Feature], api: str) -> dict:
+    def _source_context(self, features: list[Feature], api: str, version: str) -> dict:
         feature_list = []
         loader_entries = []
 
@@ -120,7 +131,12 @@ class CGenerator(Generator):
                     )
             feature_list.append({"name": feature.name, "definitions": definitions})
 
-        return {"features": feature_list, "loader_entries": loader_entries, "api": api}
+        return {
+            "features": feature_list,
+            "loader_entries": loader_entries,
+            "api": api,
+            "generation_header": self._generation_header(api, version, "C"),
+        }
 
     # ----------------------------------------------------------- command helpers
 

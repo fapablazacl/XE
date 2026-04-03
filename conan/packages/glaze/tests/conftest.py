@@ -62,6 +62,20 @@ MINI_XML = """\
       <param><ptype>GLsizei</ptype> <name>n</name></param>
       <param class="buffer">const <ptype>GLuint</ptype> *<name>buffers</name></param>
     </command>
+    <command>
+      <proto>void <name>glNamedBufferData</name></proto>
+      <param class="buffer"><ptype>GLuint</ptype> <name>buffer</name></param>
+      <param><ptype>GLsizei</ptype> <name>size</name></param>
+      <param len="size">const void *<name>data</name></param>
+      <param group="BufferUsageARB"><ptype>GLenum</ptype> <name>usage</name></param>
+    </command>
+    <command>
+      <proto>void <name>glNamedBufferSubData</name></proto>
+      <param class="buffer"><ptype>GLuint</ptype> <name>buffer</name></param>
+      <param><ptype>GLsizei</ptype> <name>offset</name></param>
+      <param><ptype>GLsizei</ptype> <name>size</name></param>
+      <param>const void *<name>data</name></param>
+    </command>
   </commands>
 
   <feature api="gl" name="GL_VERSION_1_0" number="1.0">
@@ -92,6 +106,13 @@ MINI_XML = """\
     <remove profile="core">
       <enum name="GL_FLOAT"/>
     </remove>
+  </feature>
+
+  <feature api="gl" name="GL_VERSION_4_5" number="4.5">
+    <require>
+      <command name="glNamedBufferData"/>
+      <command name="glNamedBufferSubData"/>
+    </require>
   </feature>
 
   <feature api="gles2" name="GL_ES_VERSION_2_0" number="2.0">

@@ -1,4 +1,7 @@
 #pragma once
+/*
+ * {{ generation_header | replace('\n', '\n * ') }}
+ */
 
 #ifndef __GLAZE_{{ api | upper }}_HPP__
 #define __GLAZE_{{ api | upper }}_HPP__
@@ -94,6 +97,23 @@ public:
     bool operator!=(Flags rhs) const { return m_value != rhs.m_value; }
 };
 
+// ── Array view for data upload helpers ───────────────────────────────────────
+template<typename T>
+struct ArrayView {
+    const T* m_data;
+    std::size_t m_size;
+
+    ArrayView(const T* data, std::size_t count) : m_data(data), m_size(count) {}
+    template<std::size_t N>
+    ArrayView(const T (&arr)[N]) : m_data(arr), m_size(N) {}
+
+    const T* data() const { return m_data; }
+    std::size_t size() const { return m_size; }
+    std::size_t size_bytes() const { return m_size * sizeof(T); }
+    const T* begin() const { return m_data; }
+    const T* end() const { return m_data + m_size; }
+};
+
 // ── Enum classes ─────────────────────────────────────────────────────────────
 {% for ec in enum_classes %}
 enum class {{ ec.group_name }} : {{ ec.base_type }} {
@@ -103,12 +123,36 @@ enum class {{ ec.group_name }} : {{ ec.base_type }} {
 {% endfor %}
 };
 
+{% if ec.is_bitmask %}
+inline Flags<{{ ec.group_name }}> operator|({{ ec.group_name }} a, {{ ec.group_name }} b) {
+    return Flags<{{ ec.group_name }}>(a) | Flags<{{ ec.group_name }}>(b);
+}
+inline Flags<{{ ec.group_name }}> operator&({{ ec.group_name }} a, {{ ec.group_name }} b) {
+    return Flags<{{ ec.group_name }}>(a) & Flags<{{ ec.group_name }}>(b);
+}
+inline Flags<{{ ec.group_name }}> operator^({{ ec.group_name }} a, {{ ec.group_name }} b) {
+    return Flags<{{ ec.group_name }}>(a) ^ Flags<{{ ec.group_name }}>(b);
+}
+inline Flags<{{ ec.group_name }}> operator~({{ ec.group_name }} a) {
+    return ~Flags<{{ ec.group_name }}>(a);
+}
+{% endif %}
+
 {% endfor %}
 {% for fn in functors %}
+{% if fn.doc_brief %}
+/// @brief {{ fn.doc_brief }}
+{% for pname, pdesc in fn.doc_params.items() %}
+/// @param {{ pname }} {{ pdesc }}
+{% endfor %}
+{% endif %}
 struct _{{ fn.struct_name }} {
     constexpr _{{ fn.struct_name }}() noexcept = default;
     explicit operator bool() const noexcept { return ::{{ fn.gl_name }} != nullptr; }
 {% for ov in fn.overloads %}
+{% if ov.template_prefix %}
+    {{ ov.template_prefix }}
+{% endif %}
     {{ ov.return_type }} operator()({{ ov.params_str }}) const {
         GLAZE_GL_CHECK;
 {% if ov.body %}
@@ -123,5 +167,27 @@ struct _{{ fn.struct_name }} {
 GLAZE_INLINE constexpr _{{ fn.struct_name }} {{ fn.func_name }};
 
 {% endfor %}
+{% if dsa_classes %}
+// ── DSA object classes ──────────────────────────────────────────────────────
+namespace dsa {
+
+{% for cls in dsa_classes %}
+class {{ cls.class_name }} {
+    {{ cls.handle_type }} m_id;
+public:
+    {{ cls.class_name }}() = default;
+    explicit {{ cls.class_name }}({{ cls.handle_type }} id) : m_id(id) {}
+    {{ cls.handle_type }} id() const { return m_id; }
+{% for method in cls.methods %}
+    {{ method.return_type }} {{ method.name }}({{ method.params_str }}) const {
+        GLAZE_GL_CHECK;
+        return ::{{ method.gl_name }}({{ method.call_args_str }});
+    }
+{% endfor %}
+};
+
+{% endfor %}
+} // namespace dsa
+{% endif %}
 } // namespace gl
 #endif

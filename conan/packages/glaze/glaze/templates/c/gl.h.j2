@@ -1,4 +1,7 @@
 #pragma once
+/*
+ * {{ generation_header | replace('\n', '\n * ') }}
+ */
 
 #ifndef __GLAZE_{{ api | upper }}_H__
 #define __GLAZE_{{ api | upper }}_H__
@@ -40,6 +43,13 @@ extern void glazeLoadFunctions(GLAZE_GETPROCADDRESS getProcAddress);
 #define {{ enum.name }} {{ enum.value }}
 {% endfor %}
 {% for cmd in feature.commands %}
+{% if cmd.doc_brief %}
+/** @brief {{ cmd.doc_brief }}
+{% for pname, pdesc in cmd.doc_params.items() %}
+ *  @param {{ pname }} {{ pdesc }}
+{% endfor %}
+ */
+{% endif %}
 {{ cmd.typedef }}
 {{ cmd.extern }}
 

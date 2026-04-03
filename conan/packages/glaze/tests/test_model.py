@@ -169,6 +169,12 @@ class TestRegistry:
         names = [e.name for e in mini_registry.group_to_enums["BufferTargetARB"]]
         assert "GL_ARRAY_BUFFER" in names
 
+    def test_bitmask_groups_populated(self, mini_registry: Registry) -> None:
+        assert "ClearBufferMask" in mini_registry.bitmask_groups
+
+    def test_bitmask_groups_excludes_non_bitmask(self, mini_registry: Registry) -> None:
+        assert "BufferTargetARB" not in mini_registry.bitmask_groups
+
     def test_object_dict(self, mini_registry: Registry) -> None:
         # object_dict is keyed by get_class(), which checks only the first param.
         # In our mini XML, glBindBuffer's first param is 'target' (no class),

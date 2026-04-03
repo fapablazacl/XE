@@ -1,5 +1,6 @@
 from typing import ClassVar
 
+from glaze.doc_parser import FunctionDoc
 from glaze.generators.base import Generator
 from glaze.model import Command, CommandParam, Enum, Registry
 from glaze.utils.string_utils import split_capitalized
@@ -22,6 +23,25 @@ def _is_string_return_command(command: Command) -> bool:
     """Return True if the command returns a C string (const GLubyte* or const GLchar*)."""
     rt = command.return_type
     return rt.is_const and rt.is_pointer and rt.name in ("GLubyte", "GLchar")
+
+
+def _find_data_upload_params(
+    command: Command,
+) -> tuple[CommandParam, CommandParam] | None:
+    """Return (data_param, size_param) if command has a const void* data param with len referencing a size param."""
+    param_by_name = {p.name: p for p in command.params}
+    for param in command.params:
+        if (
+            param.is_void
+            and param.is_pointer
+            and param.is_const
+            and param.len
+            and param.len in param_by_name
+        ):
+            size_param = param_by_name[param.len]
+            if size_param.type in ("GLsizei", "GLsizeiptr") and not size_param.is_pointer:
+                return param, size_param
+    return None
 
 
 def _find_string_output_param(command: Command) -> CommandParam | None:
@@ -170,8 +190,8 @@ class CppGenerator(Generator):
       {api}.hpp
     """
 
-    def __init__(self, registry: Registry):
-        super().__init__(registry)
+    def __init__(self, registry: Registry, doc_index: dict[str, FunctionDoc] | None = None):
+        super().__init__(registry, doc_index)
         self._capitalizer = _Capitalizer()
         self._handle_classes: dict[str, str] = {}  # class_ string → CamelCase handle name
         self._group_rename: dict[str, str] = {}  # xml group name → clean C++ type name
@@ -221,6 +241,8 @@ class CppGenerator(Generator):
                 enum_classes.append(self._enum_class_context(group_name, filtered))
                 self._emitted_groups.add(group_name)
 
+        self._emitted_bitmask_groups: set = self._emitted_groups & self.registry.bitmask_groups
+
         # Collect location types used by included commands
         need_uniform_location = False
         need_attrib_location = False
@@ -255,16 +277,26 @@ class CppGenerator(Generator):
             if string_param:
                 length_param = _find_length_param(command)
                 functions.append(self._string_overload_context(command, string_param, length_param))
+            # For data upload functions (const void* + size), add an ArrayView<T> overload
+            upload_params = _find_data_upload_params(command)
+            if upload_params:
+                data_param, size_param = upload_params
+                functions.append(self._array_view_overload_context(command, data_param, size_param))
 
         functors = self._build_functors(functions)
+
+        # Build DSA object classes
+        dsa_classes = self._build_dsa_classes(consolidated)
 
         filename = f"include/glaze/{api}.hpp"
         context = {
             "api": api,
+            "generation_header": self._generation_header(api, version, "C++"),
             "handle_types": handle_types,
             "location_types": location_types,
             "enum_classes": enum_classes,
             "functors": functors,
+            "dsa_classes": dsa_classes,
         }
         return {filename: self._render_template("cpp/gl.hpp.j2", context)}
 
@@ -278,11 +310,14 @@ class CppGenerator(Generator):
             fname = fn["func_name"]
             if fname not in seen:
                 struct_name = fname[0].upper() + fname[1:] + "Fn"
+                doc = self.doc_index.get(fn["gl_name"])
                 seen[fname] = {
                     "struct_name": struct_name,
                     "func_name": fname,
                     "gl_name": fn["gl_name"],
                     "overloads": [],
+                    "doc_brief": doc.brief if doc else None,
+                    "doc_params": doc.params if doc else {},
                 }
                 order.append(fname)
             seen[fname]["overloads"].append(
@@ -291,9 +326,76 @@ class CppGenerator(Generator):
                     "params_str": fn["params_str"],
                     "call_args_str": fn.get("call_args_str", ""),
                     "body": fn.get("body"),
+                    "template_prefix": fn.get("template_prefix"),
                 }
             )
         return [seen[n] for n in order]
+
+    # ------------------------------------------------------------ DSA classes
+
+    def _build_dsa_classes(self, consolidated: object) -> list:
+        """Build context dicts for DSA wrapper classes from object_dict."""
+        dsa_classes = []
+        for class_str in sorted(self.registry.object_dict):
+            if class_str not in self._handle_classes:
+                continue
+            handle_name = self._handle_classes[class_str]
+            class_name = _to_handle_name(class_str)
+            commands = self.registry.object_dict[class_str]
+            # Only include commands in the consolidated set
+            filtered = [cmd for cmd in commands if cmd.name in consolidated.commands]
+            if not filtered:
+                continue
+
+            methods = []
+            for cmd in sorted(filtered, key=lambda c: c.name):
+                method_name = self._dsa_method_name(cmd.name, class_str)
+                # Skip the first param (the handle)
+                method_params = cmd.params[1:]
+                params_str = ", ".join(
+                    self._generate_param_decl(p, cmd) for p in method_params
+                )
+                call_args = ["m_id.id"] + [
+                    self._generate_call_arg(p, cmd) for p in method_params
+                ]
+                call_args_str = ", ".join(call_args)
+                return_type_str = cmd.return_type_str or cmd.return_type.to_c_string()
+                methods.append({
+                    "name": method_name,
+                    "return_type": return_type_str,
+                    "params_str": params_str,
+                    "gl_name": cmd.name,
+                    "call_args_str": call_args_str,
+                })
+
+            dsa_classes.append({
+                "class_name": class_name,
+                "handle_type": handle_name,
+                "methods": methods,
+            })
+        return dsa_classes
+
+    def _dsa_method_name(self, gl_name: str, class_str: str) -> str:
+        """Convert a GL command name to a DSA method name.
+
+        Examples:
+            glNamedBufferData + "buffer" → "data"
+            glNamedBufferSubData + "buffer" → "subData"
+            glClearNamedBufferData + "buffer" → "clearData"
+        """
+        # Strip 'gl' prefix
+        name = gl_name[2:]
+        # Remove 'Named' (DSA marker)
+        name = name.replace("Named", "")
+        # Remove class name (capitalized words)
+        class_camel = _to_handle_name(class_str)
+        if name.startswith(class_camel):
+            name = name[len(class_camel):]
+        elif class_camel in name:
+            name = name.replace(class_camel, "", 1)
+        # Lowercase first letter
+        name = name[0].lower() + name[1:] if name else self._convert_function_name(gl_name)
+        return name
 
     # ----------------------------------------------------------------- checks
 
@@ -322,7 +424,8 @@ class CppGenerator(Generator):
             if name not in seen_names:
                 seen_names.add(name)
                 entries.append({"name": name, "value": e.name})
-        return {"group_name": clean_name, "base_type": base_type, "entries": entries}
+        is_bitmask = group_name in self.registry.bitmask_groups
+        return {"group_name": clean_name, "base_type": base_type, "entries": entries, "is_bitmask": is_bitmask}
 
     def _function_context(self, command: Command) -> dict:
         return_type_str = command.return_type_str or command.return_type.to_c_string()
@@ -413,6 +516,40 @@ class CppGenerator(Generator):
             "body": body,
         }
 
+    def _array_view_overload_context(
+        self, command: Command, data_param: CommandParam, size_param: CommandParam
+    ) -> dict:
+        """Build an ArrayView<T>-accepting overload for data upload commands."""
+        func_name = self._convert_function_name(command.name)
+
+        # Overload params: replace data and size params with a single ArrayView<T>
+        overload_params = [p for p in command.params if p is not data_param and p is not size_param]
+        param_decls = [self._generate_param_decl(p, command) for p in overload_params]
+        param_decls.append("const ArrayView<T>& data")
+        params_str = ", ".join(param_decls)
+
+        # Build call args: substitute size with data.size_bytes() and data ptr with data.data()
+        call_parts = []
+        for p in command.params:
+            if p is size_param:
+                call_parts.append(f"static_cast<{size_param.type}>(data.size_bytes())")
+            elif p is data_param:
+                call_parts.append("data.data()")
+            else:
+                call_parts.append(self._generate_call_arg(p, command))
+        call_args_str = ", ".join(call_parts)
+
+        return_type_str = command.return_type_str or command.return_type.to_c_string()
+        body = f"return ::{command.name}({call_args_str});"
+        return {
+            "return_type": return_type_str,
+            "func_name": func_name,
+            "params_str": params_str,
+            "gl_name": command.name,
+            "body": body,
+            "template_prefix": "template<typename T>",
+        }
+
     # ----------------------------------------------------------- param helpers
 
     def _convert_function_name(self, gl_name: str) -> str:
@@ -446,7 +583,11 @@ class CppGenerator(Generator):
 
         use_type = param.type
         if not ignore_group and param.has_group() and param.group in self._emitted_groups:
-            use_type = self._group_rename.get(param.group, param.group)
+            clean = self._group_rename.get(param.group, param.group)
+            if param.group in self._emitted_bitmask_groups and not param.is_pointer:
+                use_type = f"Flags<{clean}>"
+            else:
+                use_type = clean
 
         parts = []
         for part in param.type_parts:
@@ -479,6 +620,8 @@ class CppGenerator(Generator):
 
         if param.has_group() and not param.is_pointer:
             raw_type = param.type
+            if param.group in self._emitted_bitmask_groups:
+                return f"static_cast<{raw_type}>({param.name}.value())"
             return f"static_cast<{raw_type}>({param.name})"
 
         if self._type_must_change(param) and param.is_pointer:
