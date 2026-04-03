@@ -40,6 +40,9 @@ class GlazeConan(ConanFile):
                 git = Git(self, folder=folder)
                 git.clone(url=url, target=".", args=["--depth", "1"])
 
+    def tool_requires(self):
+        self.tool_requires("python/3.10.14")
+
     def layout(self):
         cmake_layout(self)
 
