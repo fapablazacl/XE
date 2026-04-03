@@ -1,6 +1,8 @@
 
 import os
 import shutil
+
+import jinja2
 from conan import ConanFile
 from conan.tools.cmake import CMake, CMakeToolchain, cmake_layout
 from conan.tools.files import copy
@@ -49,13 +51,9 @@ class GlazeConan(ConanFile):
              ["xml/gl.xml"]),
             ("EGL-Registry", "https://github.com/KhronosGroup/EGL-Registry.git",
              ["api/KHR"]),
+            ("OpenGL-Refpages", "https://github.com/KhronosGroup/OpenGL-Refpages.git",
+             ["gl4", "es1.1", "es3.0"]),
         ]
-
-        if self.options.with_docs:
-            repos.append(
-                ("OpenGL-Refpages", "https://github.com/KhronosGroup/OpenGL-Refpages.git",
-                 ["gl4", "es1.1", "es3.0"]),
-            )
 
         for folder, url, sparse_paths in repos:
             dest = os.path.join(self.source_folder, folder)
@@ -84,18 +82,16 @@ class GlazeConan(ConanFile):
         
     def build(self):
         api_list = [api.strip() for api in str(self.options.apis).split(",") if api.strip()]
-        
-        cmake_content = ["cmake_minimum_required(VERSION 3.15)", "project(glaze_apis C)"]
-        
+
         langs_args = []
         if self.options.language in ("c", "cpp", "both"):
             langs_args.extend(["--lang", "c"])
         if self.options.language in ("cpp", "both"):
             langs_args.extend(["--lang", "cpp"])
-        
+
         out_dir = os.path.join(self.build_folder, "generated")
         os.makedirs(out_dir, exist_ok=True)
-        
+
         self.prepare_python(self.get_python())
 
         refpages_dir = os.path.join(self.source_folder, "OpenGL-Refpages")
@@ -115,21 +111,11 @@ class GlazeConan(ConanFile):
             api_name = parts[0]
             api_version = parts[1] if len(parts) > 1 else 'latest'
             cmd.extend(["--api", api_name, api_version])
-            
+
         self.output.info(f"Running generator for APIs: {' '.join(cmd)}")
         self.run(" ".join(cmd))
-        
-        for api_item in api_list:
-            parts = api_item.split(":")
-            api_name = parts[0]
-            
-            if self.options.language in ("c", "both"):
-                lib_type = "SHARED" if self.options.shared else "STATIC"
-                cmake_content.append(f"add_library(glaze_{api_name} {lib_type} {out_dir}/src/{api_name}.c)")
-                cmake_content.append(f"target_include_directories(glaze_{api_name} PUBLIC $<BUILD_INTERFACE:{out_dir}/include>)")
-                cmake_content.append(f"target_include_directories(glaze_{api_name} INTERFACE $<INSTALL_INTERFACE:include>)")
-                if self.options.shared:
-                    cmake_content.append(f"target_compile_definitions(glaze_{api_name} PRIVATE GLAZE_BUILD_DLL)")
+
+        api_names = [api_item.split(":")[0] for api_item in api_list]
 
         khr_src = os.path.join(self.source_folder, "EGL-Registry", "api", "KHR", "khrplatform.h")
         khr_dst_dir = os.path.join(out_dir, "include", "KHR")
@@ -137,8 +123,22 @@ class GlazeConan(ConanFile):
         shutil.copy2(khr_src, khr_dst_dir)
 
         if self.options.language in ("c", "both"):
+            env = jinja2.Environment(
+                loader=jinja2.PackageLoader("glaze", "templates"),
+                trim_blocks=True,
+                lstrip_blocks=True,
+                keep_trailing_newline=True,
+            )
+            template = env.get_template("cmake/CMakeLists.txt.j2")
+            cmake_content = template.render(
+                apis=api_names,
+                lib_type="SHARED" if self.options.shared else "STATIC",
+                shared=bool(self.options.shared),
+                out_dir=out_dir,
+            )
+
             with open(os.path.join(self.build_folder, "CMakeLists.txt"), "w") as f:
-                f.write("\n".join(cmake_content) + "\n")
+                f.write(cmake_content)
 
             cmake = CMake(self)
             cmake.configure(build_script_folder=self.build_folder)
