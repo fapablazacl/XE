@@ -23,15 +23,25 @@
 namespace {{ api }} {
 
 // ── Strong handle types ──────────────────────────────────────────────────────
+
+/// @brief Type-safe wrapper for OpenGL object names (GLuint handles).
+/// @tparam Tag Empty tag type that distinguishes unrelated handle kinds at compile time.
+///
+/// Prevents accidental mixing of, e.g., a Buffer handle with a Texture handle.
+/// Conversion to/from the raw GLuint is always explicit.
 template<typename Tag>
 struct Handle {
-    GLuint id;
+    GLuint id; ///< Raw OpenGL object name.
+    /// @brief Constructs a null handle (id == 0).
     Handle() : id(0) {}
+    /// @brief Constructs a handle from a raw OpenGL name.
     explicit Handle(GLuint id) : id(id) {}
+    /// @brief Extracts the raw GLuint (explicit to prevent silent conversions).
     explicit operator GLuint() const { return id; }
     bool operator<(Handle o) const { return id < o.id; }
     bool operator==(Handle o) const { return id == o.id; }
     bool operator!=(Handle o) const { return id != o.id; }
+    /// @brief Returns true if the handle refers to a valid object (id != 0).
     explicit operator bool() const { return id != 0; }
 };
 
@@ -42,14 +52,24 @@ using {{ alias }} = Handle<{{ tag }}Tag>;
 
 // ── Location types (uniform / attrib) ────────────────────────────────────────
 {% if location_types %}
+
+/// @brief Type-safe wrapper for shader variable locations (GLint).
+/// @tparam Tag Empty tag type that distinguishes uniform locations from attribute locations.
+///
+/// A default-constructed Location holds -1 (invalid). The bool conversion
+/// returns true only for non-negative (valid) locations.
 template<typename Tag>
 struct Location {
-    GLint loc;
+    GLint loc; ///< Raw location index (-1 == invalid).
+    /// @brief Constructs an invalid location (loc == -1).
     Location() : loc(-1) {}
+    /// @brief Constructs a location from a raw GLint.
     explicit Location(GLint loc) : loc(loc) {}
+    /// @brief Extracts the raw GLint (explicit to prevent silent conversions).
     explicit operator GLint() const { return loc; }
     bool operator==(Location o) const { return loc == o.loc; }
     bool operator!=(Location o) const { return loc != o.loc; }
+    /// @brief Returns true if the location is valid (loc >= 0).
     explicit operator bool() const { return loc >= 0; }
 };
 
@@ -73,16 +93,29 @@ struct _GlErrorScope {
 #endif
 
 // ── Type-safe bitmask flags ──────────────────────────────────────────────────
+
+/// @brief Type-safe bitmask wrapper for enum classes marked as bitfields.
+/// @tparam E An enum class whose values represent individual bit flags.
+///
+/// Supports all bitwise operators (`|`, `&`, `^`, `~`) and their
+/// compound-assignment variants. A single enum value converts implicitly
+/// to Flags, so `ClearBufferMask::eColor | ClearBufferMask::eDepth` works
+/// out of the box.
 template<typename E>
 class Flags {
     using underlying = typename std::underlying_type<E>::type;
     underlying m_value;
 public:
+    /// @brief Constructs an empty flag set (no bits set).
     Flags() : m_value(0) {}
+    /// @brief Implicit conversion from a single enum bit value.
     Flags(E bit) : m_value(static_cast<underlying>(bit)) {}
+    /// @brief Constructs from a raw underlying integer (explicit).
     explicit Flags(underlying v) : m_value(v) {}
 
+    /// @brief Returns the raw underlying integer value.
     underlying value() const { return m_value; }
+    /// @brief Returns true if any bit is set.
     explicit operator bool() const { return m_value != 0; }
     explicit operator underlying() const { return m_value; }
 
@@ -98,17 +131,29 @@ public:
 };
 
 // ── Array view for data upload helpers ───────────────────────────────────────
+
+/// @brief Lightweight non-owning view over a contiguous array of T.
+/// @tparam T Element type.
+///
+/// Used by data-upload overloads (e.g. bufferData) to accept typed arrays
+/// instead of raw `void*` + byte-size pairs. Implicitly constructible from
+/// C arrays and from pointer + count.
 template<typename T>
 struct ArrayView {
-    const T* m_data;
-    std::size_t m_size;
+    const T* m_data; ///< Pointer to the first element.
+    std::size_t m_size; ///< Number of elements (not bytes).
 
+    /// @brief Constructs a view from a pointer and element count.
     ArrayView(const T* data, std::size_t count) : m_data(data), m_size(count) {}
+    /// @brief Constructs a view from a C array, deducing the count automatically.
     template<std::size_t N>
     ArrayView(const T (&arr)[N]) : m_data(arr), m_size(N) {}
 
+    /// @brief Returns a pointer to the first element.
     const T* data() const { return m_data; }
+    /// @brief Returns the number of elements.
     std::size_t size() const { return m_size; }
+    /// @brief Returns the total size in bytes (`size() * sizeof(T)`).
     std::size_t size_bytes() const { return m_size * sizeof(T); }
     const T* begin() const { return m_data; }
     const T* end() const { return m_data + m_size; }
