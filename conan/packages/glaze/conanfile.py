@@ -12,7 +12,7 @@ class GlazeConan(ConanFile):
     exports_sources = (
         "glaze_cli.py",
         "glaze/*",
-        "requirements.txt",
+        "pyproject.toml",
     )
 
     settings = "os", "compiler", "build_type", "arch"
