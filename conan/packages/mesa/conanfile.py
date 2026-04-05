@@ -31,9 +31,9 @@ class MesaConan(ConanFile):
         "fPIC": True,
         "with_llvmpipe": True,
         "with_lavapipe": True,
-        "with_osmesa": False,
-        "with_egl": True,
-        "with_glx": True,
+        "with_osmesa": True,
+        "with_egl": False,
+        "with_glx": False,
     }
 
     def config_options(self):
@@ -58,7 +58,14 @@ class MesaConan(ConanFile):
                 "At least one driver must be enabled (with_llvmpipe, with_lavapipe, or with_osmesa)"
             )
 
+    def requirements(self):
+        self.requires("zlib/[>=1.2.11 <2]")
+        self.requires("expat/[>=2.0 <3]")
+        if self.settings.os in ("Linux", "FreeBSD"):
+            self.requires("libdrm/[>=2.4.0]")
+
     def build_requirements(self):
+        self.tool_requires("cpython/3.10.14", options={"shared": True, "with_tkinter": False})
         self.tool_requires("meson/[>=1.1.0]")
         self.tool_requires("ninja/[>=1.11.0]")
         self.tool_requires("flex/[>=2.6.0]")
@@ -80,7 +87,7 @@ class MesaConan(ConanFile):
 
         gallium_drivers = []
         if self.options.with_llvmpipe:
-            gallium_drivers.append("swrast")
+            gallium_drivers.append("llvmpipe")
 
         vulkan_drivers = []
         if self.options.with_lavapipe:
@@ -91,18 +98,22 @@ class MesaConan(ConanFile):
 
         tc.project_options["osmesa"] = "true" if self.options.with_osmesa else "false"
 
+        want_egl = self.options.get_safe("with_egl", False)
+        want_glx = self.options.get_safe("with_glx", False)
+
         if self.settings.os != "Windows":
-            tc.project_options["egl"] = (
-                "enabled" if self.options.get_safe("with_egl") else "disabled"
-            )
+            tc.project_options["egl"] = "enabled" if want_egl else "disabled"
         else:
             tc.project_options["egl"] = "disabled"
 
         if self.settings.os == "Linux":
-            tc.project_options["glx"] = (
-                "xlib" if self.options.get_safe("with_glx") else "disabled"
-            )
-            tc.project_options["platforms"] = "x11" if self.options.get_safe("with_glx") else ""
+            if want_glx and want_egl:
+                tc.project_options["glx"] = "dri"
+            elif want_glx:
+                tc.project_options["glx"] = "xlib"
+            else:
+                tc.project_options["glx"] = "disabled"
+            tc.project_options["platforms"] = "x11" if want_glx else ""
         else:
             tc.project_options["glx"] = "disabled"
             tc.project_options["platforms"] = ""
@@ -124,7 +135,17 @@ class MesaConan(ConanFile):
 
         tc.generate()
 
+    def _get_python(self):
+        return self.dependencies.build["cpython"].conf_info.get("user.cpython:python")
+
+    def _install_python_deps(self):
+        python = self._get_python()
+        site_pkgs = os.path.join(self.build_folder, "site-packages")
+        self.run(f'"{python}" -m pip install --target "{site_pkgs}" mako PyYAML')
+        os.environ["PYTHONPATH"] = site_pkgs + os.pathsep + os.environ.get("PYTHONPATH", "")
+
     def build(self):
+        self._install_python_deps()
         meson = Meson(self)
         meson.configure()
         meson.build()
@@ -141,8 +162,9 @@ class MesaConan(ConanFile):
     def package_info(self):
         self.cpp_info.set_property("cmake_file_name", "mesa")
 
-        # GL component (llvmpipe software renderer)
-        if self.options.with_llvmpipe:
+        # GL component requires GLX (on Linux) to produce libGL
+        want_glx = self.options.get_safe("with_glx", False)
+        if self.options.with_llvmpipe and (want_glx or self.settings.os != "Linux"):
             gl = self.cpp_info.components["GL"]
             gl.set_property("cmake_target_name", "mesa::GL")
             gl.libs = ["GL"]
@@ -160,12 +182,13 @@ class MesaConan(ConanFile):
                 egl.system_libs = ["pthread", "dl"]
 
         # GLESv2 component
-        glesv2 = self.cpp_info.components["GLESv2"]
-        glesv2.set_property("cmake_target_name", "mesa::GLESv2")
-        glesv2.libs = ["GLESv2"]
-        glesv2.includedirs = ["include"]
-        if self.settings.os in ("Linux", "FreeBSD"):
-            glesv2.system_libs = ["pthread", "dl", "m"]
+        if self.options.get_safe("with_egl") or want_glx:
+            glesv2 = self.cpp_info.components["GLESv2"]
+            glesv2.set_property("cmake_target_name", "mesa::GLESv2")
+            glesv2.libs = ["GLESv2"]
+            glesv2.includedirs = ["include"]
+            if self.settings.os in ("Linux", "FreeBSD"):
+                glesv2.system_libs = ["pthread", "dl", "m"]
 
         # OSMesa component
         if self.options.with_osmesa:

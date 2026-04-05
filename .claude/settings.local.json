@@ -1,7 +1,26 @@
 {
   "permissions": {
     "allow": [
-      "Bash(ls -d C:/Users/fapablaza/Desktop/nativedevcl/XE/conan/packages/glaze/OpenGL-Refpages/*/)"
+      "Bash(ls -d C:/Users/fapablaza/Desktop/nativedevcl/XE/conan/packages/glaze/OpenGL-Refpages/*/)",
+      "Bash(head -50 /home/user/Desktop/nativedevcl/XE/src/libxe-core/src/*.cpp /home/user/Desktop/nativedevcl/XE/src/libxe-core/src/*.hpp)",
+      "Bash(git -C /home/user/Desktop/nativedevcl/XE log --oneline --all)",
+      "Bash(git:*)",
+      "WebSearch",
+      "WebFetch(domain:docs.mesa3d.org)",
+      "WebFetch(domain:chromium.googlesource.com)",
+      "WebFetch(domain:github.com)",
+      "Bash(curl -sL \"https://archive.mesa3d.org/mesa-24.3.4.tar.xz\")",
+      "Bash(curl -sL \"https://archive.mesa3d.org/mesa-24.2.8.tar.xz\")",
+      "Bash(curl -sL \"https://archive.mesa3d.org/mesa-24.0.3.tar.xz\")",
+      "Bash(curl -sL \"https://github.com/google/angle/archive/refs/heads/chromium/6943.tar.gz\")",
+      "Bash(curl -sL \"https://github.com/google/angle/archive/refs/heads/chromium/6834.tar.gz\")",
+      "Bash(curl -sL \"https://github.com/google/angle/archive/refs/heads/chromium/6709.tar.gz\")",
+      "Bash(conan create:*)",
+      "Bash(pip3 list:*)",
+      "Bash(python3 -c \"import mako\")",
+      "Bash(dpkg -l)",
+      "Bash(pip3 install:*)",
+      "Bash(python3 -m pip install mako PyYAML)"
     ]
   }
 }
