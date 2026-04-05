@@ -25,7 +25,17 @@
       "Bash(apt list:*)",
       "Bash(sudo apt-get:*)",
       "Bash(apt-cache search:*)",
-      "Bash(tar xz:*)"
+      "Bash(tar xz:*)",
+      "Bash(grep \"\\\\.gn$\\\\|\\\\.gn \" /tmp/angle-full-6943/.gn)",
+      "Bash(dpkg -l pkg-config)",
+      "Bash(mkdir -p /tmp/angle_bin)",
+      "Bash(ln -sf /home/user/.conan2/p/pkgcoa6060d80b51cc/p/bin/pkgconf /tmp/angle_bin/pkg-config)",
+      "Bash(export PATH=\"/tmp/angle_bin:$SRC/buildtools/linux64:$SRC/depot_tools:$PATH\")",
+      "Bash(export DEPOT_TOOLS_UPDATE=0)",
+      "Bash(gn gen:*)",
+      "Bash(ninja -C /home/user/.conan2/p/b/angle51ef37f3dc094/b/src/out/Conan libEGL libGLESv2)",
+      "Bash(find /home/user/.conan2/p/ninja* -name \"ninja\" -type f -executable)",
+      "Bash(export PATH=\"/tmp/angle_bin:/home/user/.conan2/p/ninja7c42328b4bc42/p/bin:$SRC/buildtools/linux64:$SRC/depot_tools:$PATH\")"
     ]
   }
 }

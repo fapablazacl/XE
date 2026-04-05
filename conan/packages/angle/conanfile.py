@@ -2,8 +2,9 @@ import os
 
 from conan import ConanFile
 from conan.errors import ConanInvalidConfiguration
-from conan.tools.cmake import CMake, CMakeToolchain, CMakeDeps, cmake_layout
-from conan.tools.files import get, copy, rmdir
+from conan.tools.env import Environment
+from conan.tools.files import copy, save
+from conan.tools.scm import Git
 
 
 class AngleConan(ConanFile):
@@ -61,66 +62,133 @@ class AngleConan(ConanFile):
                 "(with_vulkan, with_gl, with_d3d11, or with_metal)"
             )
 
-    def requirements(self):
-        if self.options.with_vulkan:
-            self.requires("vulkan-headers/[>=1.3.0]")
-            self.requires("vulkan-loader/[>=1.3.0]")
-
     def build_requirements(self):
-        self.tool_requires("cmake/[>=3.20]")
         self.tool_requires("ninja/[>=1.11.0]")
+        self.tool_requires("pkgconf/[>=2.0.0]")
+
+    def _chromium_branch(self):
+        return self.version.replace("_", "/")
+
+    def _depot_tools_dir(self):
+        return os.path.join(self.source_folder, "depot_tools")
+
+    def _apply_depot_env(self):
+        depot_dir = self._depot_tools_dir()
+        # gn binary lives in buildtools/<platform>
+        buildtools_bin = os.path.join(self.source_folder, "buildtools", "linux64")
+        path = os.environ.get("PATH", "")
+        for d in (buildtools_bin, depot_dir):
+            if d not in path:
+                path = d + os.pathsep + path
+        os.environ["PATH"] = path
+        os.environ["DEPOT_TOOLS_UPDATE"] = "0"
+        os.environ["GCLIENT_PY3"] = "1"
 
     def source(self):
-        get(self, **self.conan_data["sources"][self.version], strip_root=True)
+        branch = self._chromium_branch()
+        git = Git(self)
+        git.clone(url="https://chromium.googlesource.com/angle/angle",
+                  target=".", args=["--depth", "1", "--branch", branch])
+
+        depot_git = Git(self, folder="depot_tools")
+        depot_git.clone(url="https://chromium.googlesource.com/chromium/tools/depot_tools.git",
+                        target=".", args=["--depth", "1"])
+
+        gclient_content = (
+            'solutions = [{\n'
+            '  "name": ".",\n'
+            '  "url": "https://chromium.googlesource.com/angle/angle.git",\n'
+            '  "managed": False,\n'
+            '  "custom_deps": {},\n'
+            '}]\n'
+        )
+        save(self, os.path.join(self.source_folder, ".gclient"), gclient_content)
+
+        self._apply_depot_env()
+        self.run("gclient sync --no-history --shallow")
 
     def layout(self):
-        cmake_layout(self)
+        self.folders.source = "src"
+        self.folders.build = "build"
 
-    def generate(self):
-        deps = CMakeDeps(self)
-        deps.generate()
+    def _gn_args(self):
+        args = []
 
-        tc = CMakeToolchain(self)
+        is_debug = str(self.settings.build_type) == "Debug"
+        args.append(f"is_debug={'true' if is_debug else 'false'}")
 
-        tc.cache_variables["ANGLE_ENABLE_VULKAN"] = bool(self.options.with_vulkan)
-        tc.cache_variables["ANGLE_ENABLE_OPENGL"] = bool(self.options.with_gl)
-        tc.cache_variables["ANGLE_ENABLE_D3D9"] = False
-        tc.cache_variables["ANGLE_ENABLE_D3D11"] = bool(self.options.get_safe("with_d3d11", False))
-        tc.cache_variables["ANGLE_ENABLE_METAL"] = bool(self.options.get_safe("with_metal", False))
-        tc.cache_variables["ANGLE_ENABLE_NULL"] = False
-        tc.cache_variables["ANGLE_ENABLE_ESSL"] = True
-        tc.cache_variables["ANGLE_ENABLE_GLSL"] = True
+        args.append(f"angle_enable_vulkan={'true' if self.options.with_vulkan else 'false'}")
+        args.append(f"angle_enable_gl={'true' if self.options.with_gl else 'false'}")
+        args.append("angle_enable_d3d9=false")
+        args.append(f"angle_enable_d3d11={'true' if self.options.get_safe('with_d3d11', False) else 'false'}")
+        args.append(f"angle_enable_metal={'true' if self.options.get_safe('with_metal', False) else 'false'}")
+        args.append("angle_enable_null=false")
+        args.append("angle_enable_swiftshader=false")
 
-        tc.cache_variables["BUILD_SHARED_LIBS"] = bool(self.options.shared)
+        args.append("build_angle_deqp_tests=false")
+        args.append("angle_build_all=false")
 
-        tc.generate()
+        # Use chromium's bundled clang (ANGLE is designed for it)
+        args.append("is_clang=true")
+        args.append("use_custom_libcxx=false")
+        args.append("treat_warnings_as_errors=false")
+
+        args.append(f'install_prefix="{self.package_folder}"')
+
+        return " ".join(args)
 
     def build(self):
-        cmake = CMake(self)
-        cmake.configure()
-        cmake.build()
+        self._apply_depot_env()
+
+        # Bootstrap depot_tools in the build folder (needed after Conan copies sources)
+        depot_dir = self._depot_tools_dir()
+        bootstrap = os.path.join(depot_dir, "ensure_bootstrap")
+        if os.path.isfile(bootstrap):
+            self.run(f'"{bootstrap}"')
+
+        # Create a pkg-config symlink so GN's build scripts can find it
+        bin_dir = os.path.join(self.build_folder, "bin")
+        os.makedirs(bin_dir, exist_ok=True)
+        pkg_config_link = os.path.join(bin_dir, "pkg-config")
+        if not os.path.exists(pkg_config_link):
+            pkgconf_bin = self.dependencies.build["pkgconf"].cpp_info.bindir
+            pkgconf_path = os.path.join(pkgconf_bin, "pkgconf")
+            os.symlink(pkgconf_path, pkg_config_link)
+        os.environ["PATH"] = bin_dir + os.pathsep + os.environ.get("PATH", "")
+
+        out_dir = os.path.join(self.source_folder, "out", "Conan")
+        gn_args = self._gn_args()
+
+        self.output.info(f"GN args: {gn_args}")
+        self.run(f'gn gen "{out_dir}" --root="{self.source_folder}" --args=\'{gn_args}\'')
+        self.run(f'ninja -C "{out_dir}" libEGL libGLESv2')
 
     def package(self):
-        copy(self, "LICENSE", src=self.source_folder, dst=os.path.join(self.package_folder, "licenses"))
+        copy(self, "LICENSE", src=self.source_folder,
+             dst=os.path.join(self.package_folder, "licenses"))
 
-        copy(self, "*.h", src=os.path.join(self.source_folder, "include"),
-             dst=os.path.join(self.package_folder, "include"))
+        include_src = os.path.join(self.source_folder, "include")
+        include_dst = os.path.join(self.package_folder, "include")
+        for subdir in ("EGL", "GLES", "GLES2", "GLES3", "KHR"):
+            copy(self, "*.h", src=os.path.join(include_src, subdir),
+                 dst=os.path.join(include_dst, subdir))
+        copy(self, "angle_gl.h", src=include_src, dst=include_dst)
+        copy(self, "export.h", src=include_src, dst=include_dst)
 
-        for pattern in ("*.a", "*.lib"):
-            copy(self, pattern, src=self.build_folder,
+        out_dir = os.path.join(self.source_folder, "out", "Conan")
+        for pattern in ("libEGL.so*", "libGLESv2.so*", "libEGL.dylib", "libGLESv2.dylib"):
+            copy(self, pattern, src=out_dir,
                  dst=os.path.join(self.package_folder, "lib"), keep_path=False)
-        for pattern in ("*.so", "*.so.*", "*.dylib"):
-            copy(self, pattern, src=self.build_folder,
+        for pattern in ("libEGL.a", "libGLESv2.a", "*.lib"):
+            copy(self, pattern, src=out_dir,
                  dst=os.path.join(self.package_folder, "lib"), keep_path=False)
-        copy(self, "*.dll", src=self.build_folder,
-             dst=os.path.join(self.package_folder, "bin"), keep_path=False)
-
-        rmdir(self, os.path.join(self.package_folder, "lib", "pkgconfig"))
+        for pattern in ("libEGL.dll", "libGLESv2.dll"):
+            copy(self, pattern, src=out_dir,
+                 dst=os.path.join(self.package_folder, "bin"), keep_path=False)
 
     def package_info(self):
         self.cpp_info.set_property("cmake_file_name", "angle")
 
-        # EGL component
         egl = self.cpp_info.components["EGL"]
         egl.set_property("cmake_target_name", "angle::EGL")
         egl.libs = ["EGL"]
@@ -130,7 +198,6 @@ class AngleConan(ConanFile):
         elif self.settings.os == "Windows":
             egl.system_libs = ["d3d9", "dxguid", "gdi32", "user32"]
 
-        # GLESv2 component
         glesv2 = self.cpp_info.components["GLESv2"]
         glesv2.set_property("cmake_target_name", "angle::GLESv2")
         glesv2.libs = ["GLESv2"]
