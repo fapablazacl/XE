@@ -123,6 +123,7 @@ class AngleConan(ConanFile):
         args.append(f"angle_enable_d3d11={'true' if self.options.get_safe('with_d3d11', False) else 'false'}")
         args.append(f"angle_enable_metal={'true' if self.options.get_safe('with_metal', False) else 'false'}")
         args.append("angle_enable_null=false")
+        args.append("angle_enable_wgpu=false")
         args.append("angle_enable_swiftshader=false")
 
         args.append("build_angle_deqp_tests=false")
@@ -137,6 +138,28 @@ class AngleConan(ConanFile):
 
         return " ".join(args)
 
+    def _setup_build_tools(self):
+        """Create a bin/ dir with pkg-config symlink and ensure ninja/gn are findable."""
+        bin_dir = os.path.join(self.build_folder, "bin")
+        os.makedirs(bin_dir, exist_ok=True)
+
+        # Create a pkg-config symlink pointing to Conan's pkgconf
+        pkg_config_link = os.path.join(bin_dir, "pkg-config")
+        if not os.path.exists(pkg_config_link):
+            pkgconf_info = self.dependencies.build["pkgconf"]
+            pkgconf_path = os.path.join(pkgconf_info.package_folder, "bin", "pkgconf")
+            os.symlink(pkgconf_path, pkg_config_link)
+
+        # Create a ninja symlink pointing to Conan's ninja (depot_tools' wrapper won't find it)
+        ninja_link = os.path.join(bin_dir, "ninja")
+        if not os.path.exists(ninja_link):
+            ninja_info = self.dependencies.build["ninja"]
+            ninja_path = os.path.join(ninja_info.package_folder, "bin", "ninja")
+            os.symlink(ninja_path, ninja_link)
+
+        # Put our bin/ first so pkg-config and ninja are found before depot_tools wrappers
+        os.environ["PATH"] = bin_dir + os.pathsep + os.environ.get("PATH", "")
+
     def build(self):
         self._apply_depot_env()
 
@@ -146,15 +169,7 @@ class AngleConan(ConanFile):
         if os.path.isfile(bootstrap):
             self.run(f'"{bootstrap}"')
 
-        # Create a pkg-config symlink so GN's build scripts can find it
-        bin_dir = os.path.join(self.build_folder, "bin")
-        os.makedirs(bin_dir, exist_ok=True)
-        pkg_config_link = os.path.join(bin_dir, "pkg-config")
-        if not os.path.exists(pkg_config_link):
-            pkgconf_bin = self.dependencies.build["pkgconf"].cpp_info.bindir
-            pkgconf_path = os.path.join(pkgconf_bin, "pkgconf")
-            os.symlink(pkgconf_path, pkg_config_link)
-        os.environ["PATH"] = bin_dir + os.pathsep + os.environ.get("PATH", "")
+        self._setup_build_tools()
 
         out_dir = os.path.join(self.source_folder, "out", "Conan")
         gn_args = self._gn_args()
