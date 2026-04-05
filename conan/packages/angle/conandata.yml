@@ -1,10 +1,10 @@
 sources:
-  "chromium/6943":
+  "chromium_6943":
     url: "https://github.com/google/angle/archive/refs/heads/chromium/6943.tar.gz"
     sha256: "2f649d9389af710ea4a7efa94e52f36daa1e8418e80224bcd3ab00dbab187932"
-  "chromium/6834":
+  "chromium_6834":
     url: "https://github.com/google/angle/archive/refs/heads/chromium/6834.tar.gz"
     sha256: "a1aa13b35105728953aa9d5fa07f2d8ddb47809c448d4d79a61892f4232d73a5"
-  "chromium/6709":
+  "chromium_6709":
     url: "https://github.com/google/angle/archive/refs/heads/chromium/6709.tar.gz"
     sha256: "37b9b7bfc146b84c9c26f87222a248490e11aceef552a406e9aa5e09b0267d4c"

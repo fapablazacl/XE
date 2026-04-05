@@ -20,7 +20,12 @@
       "Bash(python3 -c \"import mako\")",
       "Bash(dpkg -l)",
       "Bash(pip3 install:*)",
-      "Bash(python3 -m pip install mako PyYAML)"
+      "Bash(python3 -m pip install mako PyYAML)",
+      "Bash(dpkg -l libx11-dev)",
+      "Bash(apt list:*)",
+      "Bash(sudo apt-get:*)",
+      "Bash(apt-cache search:*)",
+      "Bash(tar xz:*)"
     ]
   }
 }
