@@ -34,17 +34,6 @@ class CGenerator(Generator):
             ),
         }
 
-    # ----------------------------------------------------------------- checks
-
-    def _check_api_version(self, api: str, version: str) -> None:
-        available = self.registry.available_apis()
-        if api not in available:
-            raise ValueError(f"API '{api}' not found. Available: {list(available.keys())}")
-        if version not in available[api]:
-            raise ValueError(
-                f"Version '{version}' not found for '{api}'. Available: {available[api]}"
-            )
-
     # ------------------------------------------------------- type collection
 
     def _collect_param_types(self, features: list[Feature]) -> set:

@@ -478,15 +478,6 @@ class CppGenerator(Generator):
 
     # ----------------------------------------------------------------- checks
 
-    def _check_api_version(self, api: str, version: str) -> None:
-        available = self.registry.available_apis()
-        if api not in available:
-            raise ValueError(f"API '{api}' not found. Available: {list(available.keys())}")
-        if version not in available[api]:
-            raise ValueError(
-                f"Version '{version}' not found for '{api}'. Available: {available[api]}"
-            )
-
     # --------------------------------------------------------------- contexts
 
     def _enum_class_context(self, group_name: str, enums: list[Enum]) -> dict:

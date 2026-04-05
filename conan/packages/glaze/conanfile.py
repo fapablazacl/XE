@@ -28,7 +28,7 @@ class GlazeConan(ConanFile):
     }
 
     default_options = {
-        "apis": "gl:3.3,gles1:1.0,gles2:3.2,glsc2:2.0",
+        "apis": "gl:3.3,gl_compat:2.1,gles1:1.0,gles2:3.2,glsc2:2.0",
         "language": "cpp",
         "shared": False,
         "fPIC": True,

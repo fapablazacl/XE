@@ -1,5 +1,11 @@
 from dataclasses import dataclass, field
 
+# Virtual API aliases: maps virtual api name → (registry_api, max_version)
+# These APIs don't exist in gl.xml but are resolved to a real API with a version cap.
+API_ALIASES: dict[str, tuple[str, str]] = {
+    "gl_compat": ("gl", "2.1"),
+}
+
 
 @dataclass
 class TypeDecl:
@@ -215,16 +221,41 @@ class Registry:
                     self.object_dict[cls] = []
                 self.object_dict[cls].append(cmd)
 
+    def resolve_api(self, api: str) -> tuple[str, str | None]:
+        """Resolve a possibly-virtual API name to (registry_api, max_version_or_None).
+
+        For real APIs (e.g. "gl", "gles2"), returns (api, None).
+        For virtual APIs (e.g. "gl_compat"), returns the underlying registry API
+        and the maximum allowed version.
+        """
+        if api in API_ALIASES:
+            return API_ALIASES[api]
+        return (api, None)
+
     def available_apis(self) -> dict[str, list[str]]:
-        """Returns a dict of api → sorted list of version numbers."""
+        """Returns a dict of api → sorted list of version numbers.
+
+        Includes virtual APIs defined in API_ALIASES.
+        """
         result: dict[str, list[str]] = {}
         for api, features in self.features_by_api.items():
             result[api] = sorted([f.number for f in features])
+
+        # Add virtual APIs with their capped version lists
+        for alias, (registry_api, max_version) in API_ALIASES.items():
+            if registry_api in result:
+                result[alias] = [v for v in result[registry_api] if v <= max_version]
+
         return result
 
     def consolidate(self, api: str, number: str) -> ConsolidatedRequire:
         """Flatten all features up to `number` for `api` into sets of names."""
-        features = self.features_by_api.get(api, [])
+        registry_api, max_version = self.resolve_api(api)
+        if max_version and number > max_version:
+            raise ValueError(
+                f"Version '{number}' exceeds maximum '{max_version}' for API '{api}'"
+            )
+        features = self.features_by_api.get(registry_api, [])
 
         enum_names: set = set()
         command_names: set = set()
@@ -251,7 +282,12 @@ class Registry:
 
     def collect_features(self, api: str, number: str) -> list[Feature]:
         """Return features for `api` up to and including `number`, in order."""
-        features = self.features_by_api.get(api, [])
+        registry_api, max_version = self.resolve_api(api)
+        if max_version and number > max_version:
+            raise ValueError(
+                f"Version '{number}' exceeds maximum '{max_version}' for API '{api}'"
+            )
+        features = self.features_by_api.get(registry_api, [])
         result = []
         for feature in features:
             if feature.number <= number:

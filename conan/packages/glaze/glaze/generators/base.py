@@ -59,6 +59,16 @@ class Generator(ABC):
                         cmd_version[cmd_ref.name] = feature.number
         return cmd_version
 
+    def _check_api_version(self, api: str, version: str) -> None:
+        """Validate that the given API and version are available."""
+        available = self.registry.available_apis()
+        if api not in available:
+            raise ValueError(f"API '{api}' not found. Available: {list(available.keys())}")
+        if version not in available[api]:
+            raise ValueError(
+                f"Version '{version}' not found for '{api}'. Available: {available[api]}"
+            )
+
     def _render_template(self, template_path: str, context: dict) -> str:
         """Render a Jinja2 template from glaze/templates/ with the given context."""
         template = _env.get_template(template_path)

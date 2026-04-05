@@ -1,5 +1,7 @@
 """Tests for glaze.model dataclasses and Registry methods."""
 
+import pytest
+
 from glaze.model import (
     Command,
     CommandParam,
@@ -182,3 +184,44 @@ class TestRegistry:
         # This test verifies the dict is built correctly from commands
         # whose first param has a class attribute.
         assert isinstance(mini_registry.object_dict, dict)
+
+    # ── gl_compat virtual API ────────────────────────────────────────────
+
+    def test_available_apis_includes_gl_compat(self, mini_registry: Registry) -> None:
+        apis = mini_registry.available_apis()
+        assert "gl_compat" in apis
+        # Mini registry has gl 1.0, 1.5, 2.0, 3.1, 4.5 — gl_compat caps at 2.1
+        assert apis["gl_compat"] == ["1.0", "1.5", "2.0"]
+
+    def test_gl_compat_collect_features(self, mini_registry: Registry) -> None:
+        features = mini_registry.collect_features("gl_compat", "2.0")
+        names = [f.name for f in features]
+        assert "GL_VERSION_1_0" in names
+        assert "GL_VERSION_1_5" in names
+        assert "GL_VERSION_2_0" in names
+        assert "GL_VERSION_3_1" not in names
+
+    def test_gl_compat_consolidate(self, mini_registry: Registry) -> None:
+        cons = mini_registry.consolidate("gl_compat", "2.0")
+        assert "glClear" in cons.commands
+        assert "glCreateProgram" in cons.commands
+        # GL_FLOAT should NOT be removed (removal is in 3.1 which is beyond 2.0)
+        assert "GL_FLOAT" in cons.enums
+
+    def test_gl_compat_rejects_version_above_max(self, mini_registry: Registry) -> None:
+        with pytest.raises(ValueError, match="exceeds maximum"):
+            mini_registry.consolidate("gl_compat", "3.1")
+
+    def test_gl_compat_collect_features_rejects_above_max(self, mini_registry: Registry) -> None:
+        with pytest.raises(ValueError, match="exceeds maximum"):
+            mini_registry.collect_features("gl_compat", "3.1")
+
+    def test_resolve_api_real(self, mini_registry: Registry) -> None:
+        api, max_ver = mini_registry.resolve_api("gl")
+        assert api == "gl"
+        assert max_ver is None
+
+    def test_resolve_api_alias(self, mini_registry: Registry) -> None:
+        api, max_ver = mini_registry.resolve_api("gl_compat")
+        assert api == "gl"
+        assert max_ver == "2.1"
