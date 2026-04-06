@@ -68,7 +68,7 @@ class GlazeConan(ConanFile):
             git.run("pull --depth 1 origin main")
 
     def build_requirements(self):
-        self.tool_requires("cpython/3.10.14", options={"shared": True})
+        self.tool_requires("cpython/3.10.14", options={"shared": True, "with_tkinter": False})
 
     def layout(self):
         cmake_layout(self)
