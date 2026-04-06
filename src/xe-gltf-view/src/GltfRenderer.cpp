@@ -43,8 +43,8 @@ namespace xe::gltf_view {
         renderer = xe::gl::RendererGL::create();
 
         const std::filesystem::path internalAssetsPath = XE_GLTF_VIEW_SOURCE_FOLDER;
-        const std::string vertexShaderSource = xe::loadTextFile(internalAssetsPath / "shaders/gltf-view.vert");
-        const std::string fragmentShaderSource = xe::loadTextFile(internalAssetsPath / "shaders/gltf-view.frag");
+        const std::string vertexShaderSource = xe::loadTextFile((internalAssetsPath / "shaders/gltf-view.vert").string());
+        const std::string fragmentShaderSource = xe::loadTextFile((internalAssetsPath / "shaders/gltf-view.frag").string());
 
         std::vector<xe::gl::Shader> shaders = {
             renderer->createShader(GL_VERTEX_SHADER, vertexShaderSource.c_str()),
