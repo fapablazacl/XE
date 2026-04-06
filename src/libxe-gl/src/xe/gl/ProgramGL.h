@@ -10,12 +10,12 @@
 
 #include "gl.h"
 
-namespace XE {
+namespace xe {
     enum class ShaderType;
     struct ProgramDescriptor;
 } // namespace xe
 
-namespace XE {
+namespace xe {
     class ShaderGL;
     class ProgramGL : public Program {
     public:
@@ -27,7 +27,9 @@ namespace XE {
 
         virtual Shader *getShader(const int index) override;
 
-        GLuint GetID() const { return m_id; }
+        GLuint GetID() const {
+            return m_id;
+        }
 
     public:
         int getUniformLocation(const std::string &name) const;

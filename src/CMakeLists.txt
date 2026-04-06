@@ -6,8 +6,14 @@ add_subdirectory ("libxe-math")
 add_subdirectory ("libxe-scene")
 add_subdirectory ("libxe-geometry")
 add_subdirectory ("libxe-app")
-add_subdirectory ("libxe-gltf")
 add_subdirectory ("libxe-imageloader")
+
+add_subdirectory ("xe-gltf-view")
+add_subdirectory ("xe-gltfc")
+
+if (XE_PLUGIN_KTX)
+    add_subdirectory ("xe-ktxc")
+endif()
 
 if (XE_PLUGIN_PNG)
     add_subdirectory("libxe-core-imageloader-lodepng")
@@ -19,10 +25,6 @@ endif ()
 
 if (XE_PLUGIN_GL_GLFW)
     add_subdirectory("libxe-core-platform-glfw")
-endif()
-
-if (XE_PLUGIN_ES2)
-    add_subdirectory ("libxe-core-graphicsdevice-gles")
 endif()
 
 add_subdirectory("apostate")

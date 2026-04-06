@@ -6,7 +6,7 @@
 #include <cstdio>
 #include <string>
 
-namespace XE {
+namespace xe {
     /**
      * @brief Streaming for binary data
      */

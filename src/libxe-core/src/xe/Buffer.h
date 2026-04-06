@@ -5,7 +5,7 @@
 #include <cstddef>
 #include <xe/Predef.h>
 
-namespace XE {
+namespace xe {
     /**
      * @brief Memory area abstraction
      */

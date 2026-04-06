@@ -53,8 +53,14 @@ TEST(RangeTest, ExpandShouldMutateTheRangeIfTheSuppliedValueIsOutsideTheRange) {
 TEST(RangeTest, PartialOverlapShouldReturnTrueWhenOverlapsWithTheSuppliedRange) {
     XE::TRange<float> subject;
 
-    const XE::TRange<float> ranges[] = {XE::TRange<float>{0.5f, 1.5f},   XE::TRange<float>{-1.5f, 0.5f},  XE::TRange<float>{0.25f, 1.5f},
-                                        XE::TRange<float>{-1.5f, 0.75f}, XE::TRange<float>{-10.5f, 0.1f}, XE::TRange<float>{-1.5f, 2.0f}};
+    const XE::TRange<float> ranges[] = {
+        XE::TRange<float>{0.5f, 1.5f},
+        XE::TRange<float>{-1.5f, 0.5f},
+        XE::TRange<float>{0.25f, 1.5f},
+        XE::TRange<float>{-1.5f, 0.75f},
+        XE::TRange<float>{-10.5f, 0.1f},
+        XE::TRange<float>{-1.5f, 2.0f}
+    };
 
     for (const auto &range : ranges) {
         EXPECT_EQ(subject.partialOverlap(range), true);
@@ -65,8 +71,15 @@ TEST(RangeTest, OverlapShouldReturnTrueWhenTheCurrentRangeOverlapsWithTheSupplie
     XE::TRange<float> subject;
 
     const XE::TRange<float> ranges[] = {
-        XE::TRange<float>{0.5f, 1.5f},  XE::TRange<float>{-1.5f, 0.5f}, XE::TRange<float>{0.25f, 1.5f}, XE::TRange<float>{-1.5f, 0.75f}, XE::TRange<float>{-10.5f, 0.1f},
-        XE::TRange<float>{-1.5f, 2.0f}, XE::TRange<float>{-1.0f, 1.0f}, XE::TRange<float>{0.0f, 1.0f},  XE::TRange<float>{-2.0f, 2.0f},
+        XE::TRange<float>{0.5f, 1.5f},
+        XE::TRange<float>{-1.5f, 0.5f},
+        XE::TRange<float>{0.25f, 1.5f},
+        XE::TRange<float>{-1.5f, 0.75f},
+        XE::TRange<float>{-10.5f, 0.1f},
+        XE::TRange<float>{-1.5f, 2.0f},
+        XE::TRange<float>{-1.0f, 1.0f},
+        XE::TRange<float>{0.0f, 1.0f},
+        XE::TRange<float>{-2.0f, 2.0f},
     };
 
     for (const auto &range : ranges) {

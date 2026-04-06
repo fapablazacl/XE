@@ -1,6 +1,7 @@
 
 #include <xe/graphics/GraphicsDevice.h>
 
-namespace XE {
-    GraphicsDevice::~GraphicsDevice() {}
+namespace xe {
+    GraphicsDevice::~GraphicsDevice() {
+    }
 } // namespace xe

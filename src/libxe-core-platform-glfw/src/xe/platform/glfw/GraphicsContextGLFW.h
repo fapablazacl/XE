@@ -5,7 +5,7 @@
 #include <GLFW/glfw3.h>
 #include <xe/graphics/GraphicsContext.h>
 
-namespace XE {
+namespace xe {
     class GraphicsContextGLFW : public GraphicsContext {
     public:
         GraphicsContextGLFW(GLFWwindow *glfwWindow, Descriptor descriptor);

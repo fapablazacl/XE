@@ -4,7 +4,7 @@
 
 #include "gl.h"
 
-namespace XE {
+namespace xe {
     /**
      * @brief Structural base class for textures
      */
@@ -15,9 +15,13 @@ namespace XE {
         virtual ~TextureBaseGL() = 0;
 
     public:
-        GLuint GetID() const { return m_id; }
+        GLuint GetID() const {
+            return m_id;
+        }
 
-        GLenum GetTarget() const { return m_target; }
+        GLenum GetTarget() const {
+            return m_target;
+        }
 
     protected:
         GLuint m_id = 0;

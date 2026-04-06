@@ -1,13 +1,8 @@
 
-#pragma once 
+#pragma once
 
-
-namespace XE {
+namespace xe {
     class MessageBus {
     public:
-
-
-
-
     };
-}
+} // namespace xe

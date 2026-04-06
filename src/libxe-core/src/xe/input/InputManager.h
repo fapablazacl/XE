@@ -2,7 +2,7 @@
 #ifndef __XE_INPUT_INPUTMANAGER_HPP__
 #define __XE_INPUT_INPUTMANAGER_HPP__
 
-namespace XE {
+namespace xe {
     class KeyboardStatus;
     class MouseStatus;
     class ControllerStatus;

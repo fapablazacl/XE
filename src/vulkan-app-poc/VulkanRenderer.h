@@ -2,8 +2,8 @@
 #pragma once
 
 #include <xe/Predef.h>
-#include <xe/math/Vector.h>
 #include <xe/math/Matrix.h>
+#include <xe/math/Vector.h>
 
 #if defined(_MSC_VER)
 #pragma warning(push, 0)
@@ -26,8 +26,8 @@
 #include "HostPlatform.h"
 
 struct Vertex {
-    XE::Vector2 pos;
-    XE::Vector3 color;
+    xe::Vector2 pos;
+    xe::Vector3 color;
 
     static vk::VertexInputBindingDescription createBindingDescription() {
         vk::VertexInputBindingDescription desc;
@@ -49,7 +49,9 @@ struct QueryFamilyIndices {
     std::optional<uint32_t> graphicsFamily;
     std::optional<uint32_t> presentFamily;
 
-    bool isComplete() const { return graphicsFamily.has_value() && presentFamily.has_value(); }
+    bool isComplete() const {
+        return graphicsFamily.has_value() && presentFamily.has_value();
+    }
 
     std::set<uint32_t> uniques() const {
         return {
@@ -74,15 +76,15 @@ struct SwapchainDetail {
 //! struct used to transfer data from the host to the shader program
 //! all the descriptor stuff will be used for that
 struct UniformBufferObject {
-    XE::Matrix4 model;
-    XE::Matrix4 view;
-    XE::Matrix4 proj;
+    xe::Matrix4 model;
+    xe::Matrix4 view;
+    xe::Matrix4 proj;
 };
 
 class HostPlatform;
 class VulkanRenderer {
 public:
-    explicit VulkanRenderer(HostPlatform& platform);
+    explicit VulkanRenderer(HostPlatform &platform);
 
     void initialize();
 
@@ -138,7 +140,7 @@ private:
 
     std::vector<vk::Buffer> mUniformBuffers;
     std::vector<vk::DeviceMemory> mUniformBuffersMemory;
-    std::vector<void*> mUniformBuffersMapped;
+    std::vector<void *> mUniformBuffersMapped;
 
     //! allocation object for descriptor sets
     vk::DescriptorPool mDescriptorPool;
@@ -158,66 +160,78 @@ private:
 
     vk::ApplicationInfo createAppInfo() const;
 
-    std::vector<const char*> getRequiredExtensions() const;
+    std::vector<const char *> getRequiredExtensions() const;
 
     vk::DebugUtilsMessengerCreateInfoEXT createDebugMessengerInfo() const;
 
     vk::DebugUtilsMessengerEXT createDebugMessenger(vk::Instance instance) const;
 
-    vk::Instance createInstance(const std::vector<const char*>& extensions, const std::vector<const char*>& validationLayers) const;
+    vk::Instance createInstance(const std::vector<const char *> &extensions, const std::vector<const char *> &validationLayers) const;
 
-    vk::PhysicalDevice pickPhysicalDevice(const std::vector<vk::PhysicalDevice>& devices);
+    vk::PhysicalDevice pickPhysicalDevice(const std::vector<vk::PhysicalDevice> &devices);
 
-    void showPhysicalDeviceInformation(const vk::PhysicalDevice& device);
+    void showPhysicalDeviceInformation(const vk::PhysicalDevice &device);
 
-    std::vector<vk::DeviceQueueCreateInfo> mapQueueCreateInfo(const QueryFamilyIndices& indices) const;
+    std::vector<vk::DeviceQueueCreateInfo> mapQueueCreateInfo(const QueryFamilyIndices &indices) const;
 
-    vk::Device createDevice(const vk::PhysicalDevice& physicalDevice, const QueryFamilyIndices& indices) const;
+    vk::Device createDevice(const vk::PhysicalDevice &physicalDevice, const QueryFamilyIndices &indices) const;
 
-    QueryFamilyIndices identifyQueueFamilies(const vk::PhysicalDevice& physicalDevice, const vk::SurfaceKHR& surface) const;
+    QueryFamilyIndices identifyQueueFamilies(const vk::PhysicalDevice &physicalDevice, const vk::SurfaceKHR &surface) const;
 
-    vk::SwapchainKHR createSwapchain(const vk::Device& device, const vk::SurfaceKHR& surface, const vk::SurfaceFormatKHR& swapchainFormat, const vk::Extent2D& swapchainExtent,
-        const vk::PresentModeKHR presentMode, const uint32_t imageCount, const vk::SurfaceTransformFlagBitsKHR preTransform,
-        const QueryFamilyIndices& indices) const;
+    vk::SwapchainKHR createSwapchain(
+        const vk::Device &device,
+        const vk::SurfaceKHR &surface,
+        const vk::SurfaceFormatKHR &swapchainFormat,
+        const vk::Extent2D &swapchainExtent,
+        const vk::PresentModeKHR presentMode,
+        const uint32_t imageCount,
+        const vk::SurfaceTransformFlagBitsKHR preTransform,
+        const QueryFamilyIndices &indices
+    ) const;
 
-    SwapchainDetail querySwapchainDetail(const vk::PhysicalDevice& physicalDevice, const vk::SurfaceKHR& surface) const;
+    SwapchainDetail querySwapchainDetail(const vk::PhysicalDevice &physicalDevice, const vk::SurfaceKHR &surface) const;
 
     //! picks an required surface format
-    std::optional<vk::SurfaceFormatKHR> pickSwapchainSurfaceFormat(const std::vector<vk::SurfaceFormatKHR>& surfaceFormats) const;
+    std::optional<vk::SurfaceFormatKHR> pickSwapchainSurfaceFormat(const std::vector<vk::SurfaceFormatKHR> &surfaceFormats) const;
 
-    vk::PresentModeKHR pickPresentMode(const std::vector<vk::PresentModeKHR>& presentModes) const;
+    vk::PresentModeKHR pickPresentMode(const std::vector<vk::PresentModeKHR> &presentModes) const;
 
-    uint32_t chooseImageCount(const vk::SurfaceCapabilitiesKHR& caps) const;
+    uint32_t chooseImageCount(const vk::SurfaceCapabilitiesKHR &caps) const;
 
-    std::vector<vk::ImageView> createSwapchainImageViews(const vk::Device& device, const vk::SurfaceFormatKHR& swapchainFormat,
-        const std::vector<vk::Image>& swapchainImages) const;
+    std::vector<vk::ImageView>
+    createSwapchainImageViews(const vk::Device &device, const vk::SurfaceFormatKHR &swapchainFormat, const std::vector<vk::Image> &swapchainImages) const;
 
-    std::vector<char> loadBinaryFile(const std::string& filename) const;
+    std::vector<char> loadBinaryFile(const std::string &filename) const;
 
-    vk::Pipeline createGraphicsPipeline(const vk::Extent2D& swapchainExtent, const vk::PipelineLayout& pipelineLayout, const vk::RenderPass& renderPass);
+    vk::Pipeline createGraphicsPipeline(const vk::Extent2D &swapchainExtent, const vk::PipelineLayout &pipelineLayout, const vk::RenderPass &renderPass);
 
-    vk::ShaderModule createShaderModule(const vk::Device& device, const std::vector<char>& shaderCode) const;
+    vk::ShaderModule createShaderModule(const vk::Device &device, const std::vector<char> &shaderCode) const;
 
     vk::PipelineLayout createPipelineLayout(const vk::DescriptorSetLayout &descriptorSetLayout);
 
-    vk::RenderPass createRenderPass(const vk::Device& device, const vk::Format& swapchainFormat) const;
+    vk::RenderPass createRenderPass(const vk::Device &device, const vk::Format &swapchainFormat) const;
 
-    vk::Framebuffer createFramebuffer(const vk::Device& device, const vk::ImageView& imageView, const vk::RenderPass& renderPass, const vk::Extent2D& swapchainExtent) const;
+    vk::Framebuffer createFramebuffer(const vk::Device &device, const vk::ImageView &imageView, const vk::RenderPass &renderPass, const vk::Extent2D &swapchainExtent) const;
 
-    vk::CommandPool createCommandPool(const vk::Device& device, const uint32_t queueFamily) const;
+    vk::CommandPool createCommandPool(const vk::Device &device, const uint32_t queueFamily) const;
 
-    vk::CommandBuffer allocateCommandBuffer(const vk::Device& device, const vk::CommandPool& commandPool) const;
+    vk::CommandBuffer allocateCommandBuffer(const vk::Device &device, const vk::CommandPool &commandPool) const;
 
-    vk::RenderPassBeginInfo createRenderPassBeginInfo(const vk::Framebuffer& framebuffer, const vk::ClearValue& clearValue, const vk::RenderPass& renderPass,
-        const vk::Extent2D& swapchainExtent) const;
+    vk::RenderPassBeginInfo
+    createRenderPassBeginInfo(const vk::Framebuffer &framebuffer, const vk::ClearValue &clearValue, const vk::RenderPass &renderPass, const vk::Extent2D &swapchainExtent) const;
 
-    void recordCommandBuffer(const vk::CommandBuffer& commandBuffer, const vk::Framebuffer& framebuffer, const vk::RenderPass& renderPass, const vk::Extent2D& swapchainExtent,
-        const vk::Pipeline& graphicsPipeline) const;
+    void recordCommandBuffer(
+        const vk::CommandBuffer &commandBuffer,
+        const vk::Framebuffer &framebuffer,
+        const vk::RenderPass &renderPass,
+        const vk::Extent2D &swapchainExtent,
+        const vk::Pipeline &graphicsPipeline
+    ) const;
 
-    vk::Fence createFence(const vk::Device& device) const;
+    vk::Fence createFence(const vk::Device &device) const;
 
     void drawFrame();
-    
+
     void createVertexBuffer();
 
     void createIndexBuffer();

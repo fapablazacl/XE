@@ -1,0 +1,12 @@
+*.pyc
+__pycache__/
+.vscode/*
+OpenGL-Registry
+.idea/*
+OpenGL-Refpages
+EGL-Registry
+glad/*
+.ruff_cache/
+.mypy_cache/
+.pytest_cache/
+glaze.egg-info/

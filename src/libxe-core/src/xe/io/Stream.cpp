@@ -1,6 +1,7 @@
 
 #include <xe/io/Stream.h>
 
-namespace XE {
-    Stream::~Stream() {}
+namespace xe {
+    Stream::~Stream() {
+    }
 } // namespace xe

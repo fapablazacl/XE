@@ -4,7 +4,7 @@
 
 #include "Boundary.h"
 
-namespace XE {
+namespace xe {
     typedef TBoundary<float, 2> Rectf;
     typedef TBoundary<int, 2> Recti;
 

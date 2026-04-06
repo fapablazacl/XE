@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 
-namespace XE {
+namespace xe {
     enum class ShaderType;
 
     struct ProgramSource {

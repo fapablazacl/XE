@@ -3,11 +3,11 @@
 #include "xe/gl/TextureRepository.h"
 
 #include "AssetPackage.h"
-#include "xe/ImageLoader.h"
-#include "xe/Logger.h"
 #include "Model.h"
 #include "ModelLoaderAssimp.h"
 #include "Platform.h"
+#include "xe/ImageLoader.h"
+#include "xe/Logger.h"
 
 #include <iostream>
 #include <map>
@@ -18,7 +18,6 @@
 
 using namespace apostate;
 
-
 struct GameState {
     float angle = 0.0f;
     glm::vec3 playerPosition = {0.0f, 5.25f, 10.0f};
@@ -27,8 +26,7 @@ struct GameState {
     void updateOrientation(const bool turnLeft, const bool turnRight) {
         if (turnLeft) {
             angle += 0.02f;
-        }
-        else if (turnRight) {
+        } else if (turnRight) {
             angle -= 0.02f;
         }
     }
@@ -36,34 +34,32 @@ struct GameState {
     void updatePosition(const bool moveForward, const bool moveBackward) {
         // compute player direction
         const glm::mat4 rotationY = glm::rotate(glm::identity<glm::mat4>(), angle, glm::vec3{0.0f, 1.0f, 0.0f});
-        
+
         playerDirection = rotationY * glm::vec4{0.0f, 0.0f, -1.0f, 0.0f};
 
         // compute player movement
-        if (! (moveForward && moveBackward)) {
+        if (!(moveForward && moveBackward)) {
             if (moveForward) {
                 playerPosition += 0.075f * playerDirection;
-            }
-            else if (moveBackward) {
+            } else if (moveBackward) {
                 playerPosition -= 0.075f * playerDirection;
             }
         }
     }
 };
 
-static GLuint createProgram(Renderer& renderer, AssetPackage &assetPackage, const std::string &vertFile, const std::string &fragFile) {
-    const std::vector<GLuint> shaders {
-        renderer.createShader(assetPackage.loadTextFile(vertFile), GL_VERTEX_SHADER), 
+static GLuint createProgram(Renderer &renderer, AssetPackage &assetPackage, const std::string &vertFile, const std::string &fragFile) {
+    const std::vector<GLuint> shaders{
+        renderer.createShader(assetPackage.loadTextFile(vertFile), GL_VERTEX_SHADER),
         renderer.createShader(assetPackage.loadTextFile(fragFile), GL_FRAGMENT_SHADER)
     };
 
     return renderer.createShaderProgram(shaders);
 }
 
-
 int main(int argc, char **argv) {
-    std::cout << "Apostate Project" << std::endl;
-    std::cout << "Copyright(c) 2022 Felipe Apablaza" << std::endl;
+    std::cout << "Apostate Project" << '\n';
+    std::cout << "Copyright(c) 2022 Felipe Apablaza" << '\n';
 
     /*
     if (argc < 2) {
@@ -104,22 +100,21 @@ int main(int argc, char **argv) {
 
     Platform platform;
     if (!platform.initialize()) {
-        std::cerr << "Failed platform initialization." << std::endl;
+        std::cerr << "Failed platform initialization." << '\n';
         return EXIT_FAILURE;
     }
 
     Renderer renderer{platform};
     if (!renderer.initialize()) {
-        std::cerr << "Failed renderer initialization." << std::endl;
+        std::cerr << "Failed renderer initialization." << '\n';
         return EXIT_FAILURE;
     }
 
     AssetPackage assetPackage;
 
-    const GLuint
-    program = createProgram(renderer, assetPackage, "assets/gouraud.vert", "assets/gouraud.frag");
-    if (! program) {
-        std::cerr << "Failed to initialize Gouraud shader" << std::endl;
+    const GLuint program = createProgram(renderer, assetPackage, "assets/gouraud.vert", "assets/gouraud.frag");
+    if (!program) {
+        std::cerr << "Failed to initialize Gouraud shader" << '\n';
         return EXIT_FAILURE;
     }
 
@@ -143,23 +138,10 @@ int main(int argc, char **argv) {
     }
 
     const Lighting lighting = {
-        {0.1f, 0.1f, 0.1f, 0.1f}, {
-            Light {
-                glm::normalize(glm::vec3{0.5f, 1.0f, 0.25f}),
-                glm::vec4{0.2f, 0.2f, 0.2f, 1.0f},
-                glm::vec4{0.8f, 0.8f, 0.8f, 0.8f}
-            },
-            Light {
-                glm::normalize(glm::vec3{-0.5f, -0.1f, 0.25f}),
-                glm::vec4{0.0f, 0.0f, 0.0f, 1.0f},
-                glm::vec4{0.8f, 0.8f, 0.8f, 0.8f}
-            },
-            Light {
-                glm::normalize(glm::vec3{0.0f, 0.0f, -1.0f}),
-                glm::vec4{0.2f, 0.2f, 0.2f, 1.0f},
-                glm::vec4{0.8f, 0.8f, 0.8f, 0.8f}
-            }
-        }
+        {0.1f, 0.1f, 0.1f, 0.1f},
+        {Light{glm::normalize(glm::vec3{0.5f, 1.0f, 0.25f}), glm::vec4{0.2f, 0.2f, 0.2f, 1.0f}, glm::vec4{0.8f, 0.8f, 0.8f, 0.8f}},
+         Light{glm::normalize(glm::vec3{-0.5f, -0.1f, 0.25f}), glm::vec4{0.0f, 0.0f, 0.0f, 1.0f}, glm::vec4{0.8f, 0.8f, 0.8f, 0.8f}},
+         Light{glm::normalize(glm::vec3{0.0f, 0.0f, -1.0f}), glm::vec4{0.2f, 0.2f, 0.2f, 1.0f}, glm::vec4{0.8f, 0.8f, 0.8f, 0.8f}}}
     };
 
     bool running = true;
@@ -223,7 +205,7 @@ int main(int argc, char **argv) {
 
         renderer.endRenderFrame();
 
-        fpsCount ++;
+        fpsCount++;
     }
 
     return EXIT_SUCCESS;

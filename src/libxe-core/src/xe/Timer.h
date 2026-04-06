@@ -5,7 +5,7 @@
 #include <cstdint>
 #include <xe/Predef.h>
 
-namespace XE {
+namespace xe {
     class XE_API Timer {
     public:
         Timer() = delete;

@@ -3,10 +3,10 @@ find_package(Microsoft.GSL CONFIG REQUIRED)
 find_package(fmt CONFIG REQUIRED)
 find_package(glm REQUIRED)
 find_package(glfw3 CONFIG REQUIRED)
+find_package(glaze CONFIG REQUIRED)
+find_package(Backport CONFIG REQUIRED)
 
-add_subdirectory("dependencies/glad-gl4")
-
-set (target "XE.GL")
+set (target "xe-gl")
 
 set (headers
 	"src/xe/GL.h"
@@ -50,20 +50,22 @@ set (sources
 ) 
 
 add_library (${target} ${sources})
+add_library(xe::gl ALIAS ${target})
 
 if (XE_DEV_PRECOMPILED_HEADERS)
 	target_precompile_headers (${target} PRIVATE ${headers})
 endif()
 
 target_include_directories (${target} PUBLIC "src")
-target_link_libraries (${target} 
-	PUBLIC XE.Core
-		PUBLIC libxe-imageloader
-	PUBLIC glad-gl4
-	PRIVATE XE.Interface
+target_link_libraries (${target}
+	PUBLIC xe::core
+	PUBLIC xe::imageloader
+	PUBLIC glaze::gl
+	PRIVATE xe::interface
 	PUBLIC fmt::fmt
 	PUBLIC glm::glm
 	PUBLIC glfw
+	PUBLIC Backport::Backport
 )
 
 if (XE_DEV_UNIT_TEST)

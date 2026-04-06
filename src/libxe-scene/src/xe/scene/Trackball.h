@@ -7,7 +7,7 @@
 #include <xe/math/Vector.h>
 #include <xe/scene/VirtualSphere.h>
 
-namespace XE {
+namespace xe {
     /**
      * @brief Generate rotation information
      */
@@ -23,13 +23,21 @@ namespace XE {
 
         Rotation<float> computeRotation() const;
 
-        Vector2i getDragBegin() const { return dragBegin; }
+        Vector2i getDragBegin() const {
+            return dragBegin;
+        }
 
-        Vector2i getDragEnd() const { return dragEnd; }
+        Vector2i getDragEnd() const {
+            return dragEnd;
+        }
 
-        Vector2i getDragCurrent() const { return dragCurrent; }
+        Vector2i getDragCurrent() const {
+            return dragCurrent;
+        }
 
-        VirtualSphere getVirtualSphere() const { return vsphere; }
+        VirtualSphere getVirtualSphere() const {
+            return vsphere;
+        }
 
     private:
         Vector2 scalePosition(const Vector2i &position) const;

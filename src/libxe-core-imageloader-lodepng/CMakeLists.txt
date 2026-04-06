@@ -1,17 +1,18 @@
 
 find_package(lodepng CONFIG REQUIRED)
 
-set (target "XE.Graphics.PNG")
+set (target "xe-graphics-png")
 set (sources 
     "src/xe/graphics/png/ImageLoaderPNG.h"
     "src/xe/graphics/png/ImageLoaderPNG.cpp"
 )
 
 add_library(${target} ${sources})
+add_library(xe::graphics-png ALIAS ${target})
 
 target_include_directories(${target} PUBLIC "src")
-target_link_libraries(${target} 
-    PUBLIC XE.Core 
+target_link_libraries(${target}
+    PUBLIC xe::core
     PRIVATE lodepng::lodepng
-    PRIVATE XE.Interface
+    PRIVATE xe::interface
 )

@@ -6,7 +6,7 @@
 
 #include "gl.h"
 
-namespace XE {
+namespace xe {
     class ShaderGL : public Shader {
     public:
         ShaderGL(const ShaderType type, const std::string &source);
@@ -17,7 +17,9 @@ namespace XE {
 
         virtual std::string getSource() const override;
 
-        GLuint GetID() const { return m_id; }
+        GLuint GetID() const {
+            return m_id;
+        }
 
     private:
         ShaderType m_type;

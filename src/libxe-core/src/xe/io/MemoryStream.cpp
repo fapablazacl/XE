@@ -4,13 +4,14 @@
 #include <cassert>
 #include <cstring>
 
-namespace XE {
+namespace xe {
     MemoryStream::MemoryStream(std::uint8_t *data, const std::size_t size) : m_data(data), m_size(size) {
         assert(m_data);
         assert(m_size);
     }
 
-    MemoryStream::~MemoryStream() {}
+    MemoryStream::~MemoryStream() {
+    }
 
     int MemoryStream::read(void *bufferOut, const int size, const int count) {
         assert(m_data);
@@ -50,7 +51,11 @@ namespace XE {
         return true;
     }
 
-    int MemoryStream::tell() const { return m_offset; }
+    int MemoryStream::tell() const {
+        return m_offset;
+    }
 
-    StreamFlags MemoryStream::getFlags() const { return StreamFlags::Readable; }
+    StreamFlags MemoryStream::getFlags() const {
+        return StreamFlags::Readable;
+    }
 } // namespace xe

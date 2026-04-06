@@ -12,7 +12,7 @@
 
 #include "PixelFormat.h"
 
-namespace XE {
+namespace xe {
     class Buffer;
 
     /**
@@ -58,16 +58,16 @@ namespace XE {
 
         virtual Buffer *createBuffer(const BufferDescriptor &bufferDescriptor) = 0;
 
-        virtual Texture2D *createTexture2D(const PixelFormat format, const Vector2i &size, const PixelFormat sourceFormat, const DataType sourceDataType,
-                                           const void *sourceData) = 0;
+        virtual Texture2D *
+        createTexture2D(const PixelFormat format, const Vector2i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void *sourceData) = 0;
 
-        virtual Texture3D *createTexture3D(const PixelFormat format, const Vector3i &size, const PixelFormat sourceFormat, const DataType sourceDataType,
-                                           const void *sourceData) = 0;
+        virtual Texture3D *
+        createTexture3D(const PixelFormat format, const Vector3i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void *sourceData) = 0;
 
         virtual Texture2DArray *createTexture2DArray(const PixelFormat format, const Vector2i &size, const int count) = 0;
 
-        virtual TextureCubeMap *createTextureCubeMap(const PixelFormat format, const Vector2i &size, const PixelFormat sourceFormat, const DataType sourceDataType,
-                                                     const void **sourceData) = 0;
+        virtual TextureCubeMap *
+        createTextureCubeMap(const PixelFormat format, const Vector2i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void **sourceData) = 0;
 
         virtual Program *createProgram(const ProgramDescriptor &programDescriptor) = 0;
 
@@ -89,7 +89,9 @@ namespace XE {
 
         virtual void draw(const Subset *subset, const SubsetEnvelope *envelopes, const std::size_t envelopeCount) = 0;
 
-        void beginFrame(const ClearFlags flags, const Vector4 &color) { beginFrame(flags, color, 1.0f, 0); }
+        void beginFrame(const ClearFlags flags, const Vector4 &color) {
+            beginFrame(flags, color, 1.0f, 0);
+        }
 
         virtual void beginFrame(const ClearFlags flags, const Vector4 &color, const float depth, const int stencil) = 0;
 

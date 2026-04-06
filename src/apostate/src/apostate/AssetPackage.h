@@ -1,5 +1,5 @@
 
-#pragma once 
+#pragma once
 
 #include <string>
 
@@ -8,4 +8,4 @@ namespace apostate {
     public:
         std::string loadTextFile(const std::string &fileName) const;
     };
-}
+} // namespace apostate

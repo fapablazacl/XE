@@ -4,7 +4,7 @@
 
 #include "Vector.h"
 
-namespace XE {
+namespace xe {
     template <typename T> struct Rotation {
         T angle;
         TVector<T, 3> axis;

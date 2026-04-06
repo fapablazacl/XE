@@ -1,13 +1,12 @@
 
-#include "Conversion.h"
 #include "Texture2DGL.h"
+#include "Conversion.h"
 
-namespace XE {
+namespace xe {
     Texture2DGL::Texture2DGL(const PixelFormat format, const Vector2i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void *sourceData)
-        : TextureBaseGL(GL_TEXTURE_2D) {
-
-        m_size = size;
-        m_format = format;
+        : TextureBaseGL(GL_TEXTURE_2D),
+          m_format(format),
+          m_size(size) {
 
         const GLenum internalFormatGL = convertToGL(m_format);
         const GLenum formatGL = convertToGL(sourceFormat);
@@ -18,7 +17,8 @@ namespace XE {
         glBindTexture(GL_TEXTURE_2D, 0);
     }
 
-    Texture2DGL::~Texture2DGL() {}
+    Texture2DGL::~Texture2DGL() {
+    }
 
     void Texture2DGL::setData(const void *surfaceData, const int mipLevel, const PixelFormat surfaceFormat, const DataType surfaceDataType, const Recti &area) {
         const Vector2i offset = area.getMinEdge();

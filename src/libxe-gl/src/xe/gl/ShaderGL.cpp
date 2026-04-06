@@ -4,7 +4,7 @@
 #include <cassert>
 #include <stdexcept>
 
-namespace XE {
+namespace xe {
     static GLenum s_shaderTypesGL[] = {GL_VERTEX_SHADER, GL_FRAGMENT_SHADER, GL_GEOMETRY_SHADER};
 
     ShaderGL::ShaderGL(const ShaderType type, const std::string &source) {
@@ -22,7 +22,7 @@ namespace XE {
         glCompileShader(m_id);
 
         // check for errors
-        GLint status;
+        GLint status = 0;
         glGetShaderiv(m_id, GL_COMPILE_STATUS, &status);
 
         if (status == static_cast<GLint>(GL_FALSE)) {
@@ -48,7 +48,11 @@ namespace XE {
         }
     }
 
-    ShaderType ShaderGL::getType() const { return m_type; }
+    ShaderType ShaderGL::getType() const {
+        return m_type;
+    }
 
-    std::string ShaderGL::getSource() const { return m_source; }
+    std::string ShaderGL::getSource() const {
+        return m_source;
+    }
 } // namespace xe

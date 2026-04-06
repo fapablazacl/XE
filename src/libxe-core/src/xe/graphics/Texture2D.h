@@ -7,7 +7,7 @@
 #include <xe/Predef.h>
 #include <xe/graphics/Texture.h>
 
-namespace XE {
+namespace xe {
     enum class DataType : std::int16_t;
 
     class Texture2D : public Texture {

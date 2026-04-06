@@ -10,10 +10,10 @@ add_executable(${target} ${src})
 target_include_directories(${target} PUBLIC ${Vulkan_INCLUDE_DIRS})
 
 target_link_libraries(
-  ${target} 
-  PUBLIC XE.Core 
-  PUBLIC XE.Math
+  ${target}
+  PUBLIC xe::core
+  PUBLIC xe::math
   PUBLIC glfw
-  PRIVATE XE.Interface
+  PRIVATE xe::interface
   PUBLIC Vulkan::Vulkan
 )

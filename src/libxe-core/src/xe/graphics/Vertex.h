@@ -4,7 +4,7 @@
 
 #include <xe/math/Vector.h>
 
-namespace XE {
+namespace xe {
     struct Vertex {
         Vector3 position;
         Vector3 Normal;

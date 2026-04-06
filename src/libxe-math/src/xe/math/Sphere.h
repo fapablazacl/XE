@@ -7,7 +7,7 @@
 #include <cassert>
 #include <limits>
 
-namespace XE {
+namespace xe {
     /**
      * @brief Sphere in the 3-space
      */
@@ -15,17 +15,22 @@ namespace XE {
         TVector<T, 3> center;
         T radius = static_cast<T>(1);
 
-        TSphere() : center({static_cast<T>(0), static_cast<T>(0), static_cast<T>(0)}), radius(static_cast<T>(1)) {}
+        TSphere() : center({static_cast<T>(0), static_cast<T>(0), static_cast<T>(0)}), radius(static_cast<T>(1)) {
+        }
 
         /**
          * @brief Initializes a sphere in the origin with the specified radius
          */
-        explicit TSphere(T radius) : radius(radius) { assert(radius >= static_cast<T>(0)); }
+        explicit TSphere(T radius) : radius(radius) {
+            assert(radius >= static_cast<T>(0));
+        }
 
         /**
          * @brief Initializes a Sphere from the given center and radius
          */
-        TSphere(const TVector<T, 3> &center, T radius) : center(center), radius(radius) { assert(radius >= static_cast<T>(0)); }
+        TSphere(const TVector<T, 3> &center, T radius) : center(center), radius(radius) {
+            assert(radius >= static_cast<T>(0));
+        }
     };
 
     using Sphere = TSphere<float>;

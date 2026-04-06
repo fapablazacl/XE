@@ -7,23 +7,35 @@
 #include "TextureBaseGL.h"
 #include <array>
 
-namespace XE {
+namespace xe {
     class TextureCubeMapGL : public TextureCubeMap, public TextureBaseGL {
     public:
-        TextureCubeMapGL(const PixelFormat format, const Vector2i &size, const PixelFormat sourceFormat, const DataType sourceDataType,
-                         const std::array<TextureCubeMapSide, 6> &sourceDataSides, const void **sourceData);
+        TextureCubeMapGL(
+            const PixelFormat format,
+            const Vector2i &size,
+            const PixelFormat sourceFormat,
+            const DataType sourceDataType,
+            const std::array<TextureCubeMapSide, 6> &sourceDataSides,
+            const void **sourceData
+        );
 
         virtual ~TextureCubeMapGL();
 
-        PixelFormat getFormat() const override { return m_format; }
+        PixelFormat getFormat() const override {
+            return m_format;
+        }
 
-        Vector2i getSize() const override { return m_size; }
+        Vector2i getSize() const override {
+            return m_size;
+        }
 
-        void setData(const void *surfaceData, const int mipLevel, TextureCubeMapSide cubeMap, const DataType surfaceDataType, const PixelFormat surfaceFormat,
-                     const Recti &area) override;
+        void setData(
+            const void *surfaceData, const int mipLevel, TextureCubeMapSide cubeMap, const DataType surfaceDataType, const PixelFormat surfaceFormat, const Recti &area
+        ) override;
 
-        void getData(void *surfaceData, const int mipLevel, TextureCubeMapSide cubeMap, const DataType surfaceDataType, const PixelFormat surfaceFormat,
-                     const Recti &area) const override;
+        void getData(
+            void *surfaceData, const int mipLevel, TextureCubeMapSide cubeMap, const DataType surfaceDataType, const PixelFormat surfaceFormat, const Recti &area
+        ) const override;
 
     private:
         PixelFormat m_format;

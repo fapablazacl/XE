@@ -6,14 +6,16 @@
 #include <xe/input/DeviceStatus.h>
 #include <xe/input/InputManager.h>
 
-namespace XE {
+namespace xe {
     class InputManagerGLFW : public InputManager {
     public:
         explicit InputManagerGLFW(GLFWwindow *window);
 
         virtual void poll() override;
 
-        virtual KeyboardStatus getKeyboardStatus() override { return m_keyboardStatus; }
+        virtual KeyboardStatus getKeyboardStatus() override {
+            return m_keyboardStatus;
+        }
 
         virtual MouseStatus getMouseStatus() override;
 

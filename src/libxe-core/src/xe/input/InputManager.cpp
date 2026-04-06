@@ -1,6 +1,7 @@
 
 #include <xe/input/InputManager.h>
 
-namespace XE {
-    InputManager::~InputManager() {}
+namespace xe {
+    InputManager::~InputManager() {
+    }
 } // namespace xe

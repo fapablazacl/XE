@@ -4,8 +4,8 @@
 #include <fstream>
 #include <xe/io/FileStream.h>
 
-namespace XE {
-    FileStreamSource::FileStreamSource(const std::string &directory) {
+namespace xe {
+    FileStreamSource::FileStreamSource(const std::string &directory) : directory(directory) {
         /*
         fs::path path;
 
@@ -28,8 +28,6 @@ namespace XE {
             }
         }
         */
-
-        this->directory = directory;
     }
 
     std::unique_ptr<Stream> FileStreamSource::open(const std::string &path) {

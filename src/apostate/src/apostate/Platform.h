@@ -1,9 +1,9 @@
 
-#pragma once 
+#pragma once
 
-#include <string>
-#include <glad/glad.h>
+#include <glaze/gl.h>
 #include <GLFW/glfw3.h>
+#include <string>
 
 struct InputState {
     bool keyLeftPress = false;
@@ -13,8 +13,7 @@ struct InputState {
     bool keyEscPress = false;
 };
 
-typedef void (*GLproc)(void);
-typedef GLproc (*PlatformGetProcAddress)(const char* procname);
+typedef GLAZE_PROC (*PlatformGetProcAddress)(const char *procname);
 
 class Platform {
 public:

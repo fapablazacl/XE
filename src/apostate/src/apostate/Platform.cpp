@@ -1,12 +1,11 @@
 
 #include "Platform.h"
 
-#include <glad/glad.h>
+#include <glaze/gl.h>
 
-#include <iostream>
 #include <cassert>
 #include <cstring>
-
+#include <iostream>
 
 Platform::Platform() {
     glfwInit();
@@ -22,7 +21,7 @@ Platform::~Platform() {
 
 bool Platform::initialize() {
     const auto monitor = glfwGetPrimaryMonitor();
-    const GLFWvidmode* mode = glfwGetVideoMode(monitor);
+    const GLFWvidmode *mode = glfwGetVideoMode(monitor);
 
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -37,18 +36,18 @@ bool Platform::initialize() {
     glfwWindowHint(GLFW_GREEN_BITS, mode->greenBits);
     glfwWindowHint(GLFW_BLUE_BITS, mode->blueBits);
     glfwWindowHint(GLFW_REFRESH_RATE, mode->refreshRate);
-    
+
     window = glfwCreateWindow(mode->width, mode->height, "Apostate", nullptr, nullptr);
-    
+
     if (!window) {
-        std::cout << "Can't open a Window" << std::endl;
-        
+        std::cout << "Can't open a Window" << '\n';
+
         const char description[1024] = {};
         const char *desc = &description[0];
-        
+
         glfwGetError(&desc);
-        
-        std::cout << description << std::endl;
+
+        std::cout << description << '\n';
 
         return false;
     }
@@ -80,7 +79,6 @@ void Platform::setTitle(const std::string &title) {
 void Platform::swapBuffers() {
     glfwSwapBuffers(window);
 }
-
 
 PlatformGetProcAddress Platform::getGLProcAddressProcedure() {
     return (PlatformGetProcAddress)glfwGetProcAddress;

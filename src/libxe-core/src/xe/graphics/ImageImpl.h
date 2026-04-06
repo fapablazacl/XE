@@ -4,7 +4,7 @@
 
 #include "Image.h"
 
-namespace XE {
+namespace xe {
     /**
      * @brief Image implementation class.
      */

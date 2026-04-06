@@ -7,7 +7,7 @@
 
 #include "Stream.h"
 
-namespace XE {
+namespace xe {
     class MemoryStream : public Stream {
     public:
         MemoryStream(std::uint8_t *data, const std::size_t size);

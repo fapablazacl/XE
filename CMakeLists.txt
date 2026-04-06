@@ -4,16 +4,18 @@ project (XE)
 
 option (XE_PLUGIN_PNG           "Include PNG image support via LodePNG" ON)
 option (XE_PLUGIN_GL            "Include OpenGL 3+ support" ON)
-option (XE_PLUGIN_ES2           "Include OpenGL ES 2 support" OFF)
 option (XE_PLUGIN_GL_GLFW       "Include GLFW-based Window and Context creation support (requires 'XE_PLUGIN_GL')" ON)
+option (XE_PLUGIN_KTX           "Include KTX image support" ON)
 
 # options suited for development
 option (XE_DEV_UNIT_TEST            "Enable unit test suite" ON)
 option (XE_DEV_WARNINGS_AS_ERRORS   "Marks all warnings as errors" OFF)
 option (XE_DEV_INSTRUMENT_COVERAGE  "Instrument code for code coverage reporting during unit tests" OFF)
 option (XE_DEV_PRECOMPILED_HEADERS  "Enable precompiled headers for internal libraries, to improve build times" OFF)
-option (XE_DEV_LINT_CLANG_TIDY      "Enable linting checks with clang-tidy" OFF)
-option (XE_DEV_IWYU                 "Enable include checks with IWYU" OFF)
+option (XE_DEV_SANITIZER_ENABLE     "Enable sanitizer usage" OFF)
+
+# Which sanitizer to use
+set (XE_DEV_SANITIZER "" CACHE STRING "")
 
 # Options for external assets location
 if (NOT XE_EXTERNAL_ASSET_ROOT_PATH)
@@ -21,7 +23,8 @@ if (NOT XE_EXTERNAL_ASSET_ROOT_PATH)
     set (XE_EXTERNAL_ASSET_ROOT_PATH "")
 endif()
 
-set (CMAKE_CXX_STANDARD             20)
+set (CMAKE_EXPORT_COMPILE_COMMANDS  ON)
+set (CMAKE_CXX_STANDARD             17)
 set (CMAKE_CXX_STANDARD_REQUIRED    ON)
 set (CMAKE_CXX_EXTENSIONS           OFF)
 
@@ -42,16 +45,21 @@ if (XE_DEV_UNIT_TEST)
 endif()
 
 if (CMAKE_BUILD_TYPE MATCHES "Debug")
-    # this macro is required by Glad.
     add_definitions (-D_DEBUG)
+
+    # FIXME:
+    # Usage of this macro should be removed, because should be detected
+    # by GLAZE automatically.
+    add_definitions (-DGLAZE_DEBUG)
 endif ()
 
 add_definitions (-DXE_VERSION_MAJOR=${XE_VERSION_MAJOR})
 add_definitions (-DXE_VERSION_MINOR=${XE_VERSION_MINOR})
 add_definitions (-DXE_VERSION_REVISION=${XE_VERSION_REVISION})
 
-set (target XE.Interface)
+set (target xe-interface)
 add_library(${target} INTERFACE)
+add_library(xe::interface ALIAS ${target})
 
 if (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
     set (XE_CXXFLAGS_WALL -Wall -Wextra)
@@ -78,17 +86,15 @@ target_compile_options(${target} INTERFACE ${XE_CXXFLAGS_WALL})
 if (XE_DEV_WARNINGS_AS_ERRORS)
     target_compile_options(${target} INTERFACE ${XE_CXXFLAGS_WERROR})
 endif()
+
 if (XE_DEV_INSTRUMENT_COVERAGE)
     target_compile_options(${target} INTERFACE ${XE_CXXFLAGS_COVERAGE})
     target_link_options(${target} INTERFACE ${XE_LDFLAGS_COVERAGE})
 endif() 
 
-if (XE_DEV_LINT_CLANG_TIDY)
-    set_target_properties(${target} PROPERTIES CMAKE_CXX_CLANG_TIDY "clang-tidy")
-endif()
-
-if (XE_DEV_IWYU)
-    set_target_properties(${target} PROPERTIES CMAKE_CXX_INCLUDE_WHAT_YOU_USE "iwyu")
+if (XE_DEV_SANITIZER_ENABLE)
+    target_compile_options(${target} INTERFACE -fsanitize=${XE_DEV_SANITIZER})
+    target_link_options(${target} INTERFACE -fsanitize=${XE_DEV_SANITIZER})
 endif()
 
 add_subdirectory ("src")

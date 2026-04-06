@@ -4,7 +4,7 @@
 
 #include <xe/Predef.h>
 
-namespace XE {
+namespace xe {
     struct Version {
         int major, minor, revision;
     };

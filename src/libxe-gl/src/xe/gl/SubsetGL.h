@@ -7,7 +7,7 @@
 #include "BufferGL.h"
 #include "gl.h"
 
-namespace XE {
+namespace xe {
     class SubsetGL : public Subset {
     public:
         explicit SubsetGL(const SubsetDescriptor &desc);
@@ -25,7 +25,9 @@ namespace XE {
         virtual const BufferGL *getIndexBuffer() const override;
 
     public:
-        GLuint getID() const { return id; }
+        GLuint getID() const {
+            return id;
+        }
 
     private:
         GLuint id = 0;

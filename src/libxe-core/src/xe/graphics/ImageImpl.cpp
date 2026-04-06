@@ -4,16 +4,25 @@
 #include <cassert>
 #include <cstdlib>
 
-namespace XE {
-    ImageImpl::ImageImpl() {}
+namespace xe {
+    ImageImpl::ImageImpl() {
+    }
 
-    ImageImpl::~ImageImpl() { this->free(); }
+    ImageImpl::~ImageImpl() {
+        this->free();
+    }
 
-    const void *ImageImpl::getPointer() const { return pixels; }
+    const void *ImageImpl::getPointer() const {
+        return pixels;
+    }
 
-    PixelFormat ImageImpl::getFormat() const { return format; }
+    PixelFormat ImageImpl::getFormat() const {
+        return format;
+    }
 
-    Vector2i ImageImpl::getSize() const { return size; }
+    Vector2i ImageImpl::getSize() const {
+        return size;
+    }
 
     void ImageImpl::allocate(const PixelFormat newFormat, const Vector2i &newSize) {
         this->free();

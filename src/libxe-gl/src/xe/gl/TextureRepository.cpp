@@ -9,34 +9,33 @@
 #include <cassert>
 #include <iostream>
 
-TextureRepository::TextureRepository(ImageLoader &loader) : loader{loader} {}
-
+TextureRepository::TextureRepository(ImageLoader &loader) : loader{loader} {
+}
 
 GLuint TextureRepository::getOrCreate(const std::string &filePath, Renderer &renderer) {
     if (filePath.empty()) {
-        std::cout << "TextureRepository::getOrCreate: " <<  "Can't load texture with empty filepath" << std::endl;
+        std::cout << "TextureRepository::getOrCreate: " << "Can't load texture with empty filepath" << '\n';
         return 0;
     }
-    
+
     if (auto it = cachedTextureMap.find(filePath); it != cachedTextureMap.end()) {
         return it->second;
     }
-    
+
     GLuint texture = createTexture(filePath.c_str(), renderer);
-    if (! texture) {
-        std::cout << "TextureRepository::getOrCreate: " <<  "Texture file couldn't be loaded: '" << filePath << "'" << std::endl;
+    if (!texture) {
+        std::cout << "TextureRepository::getOrCreate: " << "Texture file couldn't be loaded: '" << filePath << "'" << '\n';
         return 0;
     }
-    
-    std::cout << "TextureRepository::getOrCreate: Loaded texture '" << filePath << "'" << std::endl;
-    
+
+    std::cout << "TextureRepository::getOrCreate: Loaded texture '" << filePath << "'" << '\n';
+
     cachedTextureMap[filePath] = texture;
-    
+
     return texture;
 }
 
-
-GLuint TextureRepository::createTexture(const char* theFileName, Renderer &renderer) {
+GLuint TextureRepository::createTexture(const char *theFileName, Renderer &renderer) {
     assert(theFileName);
     assert(std::string(theFileName) != "");
 
@@ -50,7 +49,6 @@ GLuint TextureRepository::createTexture(const char* theFileName, Renderer &rende
 
     return createTexture(renderer, imageData);
 }
-
 
 GLuint TextureRepository::createTexture(Renderer &renderer, const std::string &imageTypeStr, const size_t size, const void *imageData) const {
     const auto image = loader.loadImage(imageData, size, imageTypeStr);
@@ -74,6 +72,6 @@ GLuint TextureRepository::createTexture(Renderer &renderer, const ImageData &ima
     default:
         XE_LOG_WARNING("TextureRepository::createTexture: Unsupported image bpp {}. Defaulting to GL_RGB\n", image.bpp);
     }
-    
+
     return renderer.createTexture(internalFormat, image.width, image.height, format, GL_UNSIGNED_BYTE, image.pixels);
 }

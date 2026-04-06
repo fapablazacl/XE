@@ -3,24 +3,19 @@
 
 #include <algorithm>
 #include <cassert>
+#include <chrono>
 #include <fstream>
 #include <functional>
 #include <iostream>
 #include <stdexcept>
-#include <chrono>
 
 constexpr int MAX_FRAMES_IN_FLIGHT = 2;
 
 const std::vector<Vertex> vertices{
-    {{-0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}},
-    {{0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}},
-    {{0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}},
-    {{-0.5f, 0.5f}, {0.0f, 0.0f, 0.0f}}
+    {{-0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}}, {{0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}}, {{0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}}, {{-0.5f, 0.5f}, {0.0f, 0.0f, 0.0f}}
 };
 
-const std::vector<uint16_t>  indices{
-    0, 1, 2, 2, 3, 0
-};
+const std::vector<uint16_t> indices{0, 1, 2, 2, 3, 0};
 
 static std::ostream &operator<<(std::ostream &os, const vk::PhysicalDeviceType deviceType) {
     switch (deviceType) {
@@ -50,16 +45,21 @@ static std::ostream &operator<<(std::ostream &os, const vk::PhysicalDeviceType d
     return os;
 }
 
-static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT /*severity*/, VkDebugUtilsMessageTypeFlagsEXT /*type*/,
-                                                    const VkDebugUtilsMessengerCallbackDataEXT *pCallbackData, void * /*pUserData*/) {
+vk::Bool32 debugCallback(
+    vk::DebugUtilsMessageSeverityFlagBitsEXT /*messageSeverity*/,
+    vk::DebugUtilsMessageTypeFlagsEXT /*messageTypes*/,
+    const vk::DebugUtilsMessengerCallbackDataEXT *pCallbackData,
+    void * /*pUserData*/
+) {
 
-    std::cout << pCallbackData->pMessage << std::endl << std::endl;
+    std::cout << pCallbackData->pMessage << '\n' << '\n';
 
     return VK_FALSE;
 }
 
-VkResult CreateDebugUtilsMessengerEXT(VkInstance instance, const VkDebugUtilsMessengerCreateInfoEXT *pCreateInfo, const VkAllocationCallbacks *pAllocator,
-                                      VkDebugUtilsMessengerEXT *pDebugMessenger) {
+VkResult CreateDebugUtilsMessengerEXT(
+    VkInstance instance, const VkDebugUtilsMessengerCreateInfoEXT *pCreateInfo, const VkAllocationCallbacks *pAllocator, VkDebugUtilsMessengerEXT *pDebugMessenger
+) {
     auto func = reinterpret_cast<PFN_vkCreateDebugUtilsMessengerEXT>(vkGetInstanceProcAddr(instance, "vkCreateDebugUtilsMessengerEXT"));
     if (func != nullptr) {
         return func(instance, pCreateInfo, pAllocator, pDebugMessenger);
@@ -79,7 +79,7 @@ std::vector<char> readFile(const std::string &filename) {
     std::ifstream fs{filename.c_str(), std::ios::ate | std::ios::binary};
 
     if (!fs.is_open()) {
-        std::cerr << "failed to open file " << filename << std::endl;
+        std::cerr << "failed to open file " << filename << '\n';
         throw std::exception();
     }
 
@@ -96,8 +96,8 @@ std::vector<char> readFile(const std::string &filename) {
     return buffer;
 }
 
-
-VulkanRenderer::VulkanRenderer(HostPlatform &platform) : mPlatform(platform) {}
+VulkanRenderer::VulkanRenderer(HostPlatform &platform) : mPlatform(platform) {
+}
 
 void VulkanRenderer::initialize() {
     std::vector<const char *> extensions = mPlatform.enumerateRequiredInstanceExtensions();
@@ -133,8 +133,16 @@ void VulkanRenderer::initialize() {
     mSwapchainFormat = surfaceFormat.value();
     mSwapchainExtent = mPlatform.pickSwapExtent(swapchainDetail.surfaceCapabilities);
 
-    mSwapchain = createSwapchain(mDevice, mSurface, mSwapchainFormat, mSwapchainExtent, pickPresentMode(swapchainDetail.surfacePresentModes), imageCount,
-                                 swapchainDetail.surfaceCapabilities.currentTransform, mFamilies);
+    mSwapchain = createSwapchain(
+        mDevice,
+        mSurface,
+        mSwapchainFormat,
+        mSwapchainExtent,
+        pickPresentMode(swapchainDetail.surfacePresentModes),
+        imageCount,
+        swapchainDetail.surfaceCapabilities.currentTransform,
+        mFamilies
+    );
     assert(mSwapchain);
 
     mSwapchainImages = mDevice.getSwapchainImagesKHR(mSwapchain);
@@ -152,7 +160,7 @@ void VulkanRenderer::initialize() {
 
     mCommandPool = createCommandPool(mDevice, mFamilies.graphicsFamily.value());
     mCommandBuffer = allocateCommandBuffer(mDevice, mCommandPool);
-    
+
     createVertexBuffer();
     createIndexBuffer();
     createUniformBuffers();
@@ -164,7 +172,8 @@ void VulkanRenderer::initialize() {
     mInFlightFence = createFence(mDevice);
 }
 
-void VulkanRenderer::terminate() {}
+void VulkanRenderer::terminate() {
+}
 
 void VulkanRenderer::renderLoop() {
     while (!mPlatform.closeWasRequested()) {
@@ -191,7 +200,7 @@ vk::ApplicationInfo VulkanRenderer::createAppInfo() const {
 }
 
 std::vector<const char *> VulkanRenderer::getRequiredExtensions() const {
-    uint32_t extensionCount;
+    uint32_t extensionCount = 0;
     const char **extensions = glfwGetRequiredInstanceExtensions(&extensionCount);
 
     std::vector<const char *> result = {extensions, extensions + extensionCount};
@@ -204,11 +213,12 @@ std::vector<const char *> VulkanRenderer::getRequiredExtensions() const {
 vk::DebugUtilsMessengerCreateInfoEXT VulkanRenderer::createDebugMessengerInfo() const {
     vk::DebugUtilsMessengerCreateInfoEXT msgInfo;
 
-    msgInfo.setMessageSeverity(vk::DebugUtilsMessageSeverityFlagBitsEXT::eError | vk::DebugUtilsMessageSeverityFlagBitsEXT::eVerbose |
-                               vk::DebugUtilsMessageSeverityFlagBitsEXT::eWarning | vk::DebugUtilsMessageSeverityFlagBitsEXT::eInfo);
+    msgInfo.setMessageSeverity(
+        vk::DebugUtilsMessageSeverityFlagBitsEXT::eError | vk::DebugUtilsMessageSeverityFlagBitsEXT::eVerbose | vk::DebugUtilsMessageSeverityFlagBitsEXT::eWarning |
+        vk::DebugUtilsMessageSeverityFlagBitsEXT::eInfo
+    );
 
-    msgInfo.setMessageType(vk::DebugUtilsMessageTypeFlagBitsEXT::eGeneral | vk::DebugUtilsMessageTypeFlagBitsEXT::ePerformance |
-                           vk::DebugUtilsMessageTypeFlagBitsEXT::eValidation);
+    msgInfo.setMessageType(vk::DebugUtilsMessageTypeFlagBitsEXT::eGeneral | vk::DebugUtilsMessageTypeFlagBitsEXT::ePerformance | vk::DebugUtilsMessageTypeFlagBitsEXT::eValidation);
 
     msgInfo.pfnUserCallback = debugCallback;
     msgInfo.pUserData = nullptr;
@@ -219,7 +229,7 @@ vk::DebugUtilsMessengerCreateInfoEXT VulkanRenderer::createDebugMessengerInfo() 
 vk::DebugUtilsMessengerEXT VulkanRenderer::createDebugMessenger(vk::Instance instance) const {
     const auto debugInfo = static_cast<VkDebugUtilsMessengerCreateInfoEXT>(createDebugMessengerInfo());
 
-    VkDebugUtilsMessengerEXT messenger;
+    VkDebugUtilsMessengerEXT messenger = nullptr;
     const VkResult result = CreateDebugUtilsMessengerEXT(static_cast<VkInstance>(instance), &debugInfo, nullptr, &messenger);
 
     if (result != VK_SUCCESS) {
@@ -231,18 +241,18 @@ vk::DebugUtilsMessengerEXT VulkanRenderer::createDebugMessenger(vk::Instance ins
 
 vk::Instance VulkanRenderer::createInstance(const std::vector<const char *> &extensions, const std::vector<const char *> &validationLayers) const {
 
-    std::cout << "Creating Vulkan instance with these specified features" << std::endl;
+    std::cout << "Creating Vulkan instance with these specified features" << '\n';
 
-    std::cout << std::endl << "Extensions:" << std::endl;
+    std::cout << '\n' << "Extensions:" << '\n';
     std::for_each(extensions.begin(), extensions.end(), std::puts);
 
-    std::cout << std::endl << "Validation Layers:" << std::endl;
+    std::cout << '\n' << "Validation Layers:" << '\n';
     std::for_each(validationLayers.begin(), validationLayers.end(), std::puts);
 
     const vk::ApplicationInfo appInfo = createAppInfo();
 
     // crear la instancia con una seria de extensiones / capas de validacion requeridas
-    vk::InstanceCreateInfo info {};
+    vk::InstanceCreateInfo info{};
     info.setPApplicationInfo(&appInfo);
     // establecer que requerimos layers referentes a la validacion del uso de la API
     info.setPEnabledLayerNames(validationLayers);
@@ -267,21 +277,15 @@ vk::PhysicalDevice VulkanRenderer::pickPhysicalDevice(const std::vector<vk::Phys
 void VulkanRenderer::showPhysicalDeviceInformation(const vk::PhysicalDevice &device) {
     const auto properties = device.getProperties();
 
-    std::cout << "\"" << properties.deviceName << "\"" << std::endl;
-    std::cout << "  deviceID: "
-              << "\"" << properties.deviceID << "\"" << std::endl;
-    std::cout << "  deviceName: "
-              << "\"" << properties.deviceName << "\"" << std::endl;
-    std::cout << "  vendorID: "
-              << "\"" << properties.vendorID << "\"" << std::endl;
-    std::cout << "  apiVersion: "
-              << "\"" << properties.apiVersion << "\"" << std::endl;
-    std::cout << "  deviceType: "
-              << "\"" << properties.deviceType << "\"" << std::endl;
-    std::cout << "  driverVersion: "
-              << "\"" << properties.driverVersion << "\"" << std::endl;
+    std::cout << "\"" << properties.deviceName << "\"" << '\n';
+    std::cout << "  deviceID: " << "\"" << properties.deviceID << "\"" << '\n';
+    std::cout << "  deviceName: " << "\"" << properties.deviceName << "\"" << '\n';
+    std::cout << "  vendorID: " << "\"" << properties.vendorID << "\"" << '\n';
+    std::cout << "  apiVersion: " << "\"" << properties.apiVersion << "\"" << '\n';
+    std::cout << "  deviceType: " << "\"" << properties.deviceType << "\"" << '\n';
+    std::cout << "  driverVersion: " << "\"" << properties.driverVersion << "\"" << '\n';
 
-    std::cout << std::endl;
+    std::cout << '\n';
 }
 
 std::vector<vk::DeviceQueueCreateInfo> VulkanRenderer::mapQueueCreateInfo(const QueryFamilyIndices &familyIndices) const {
@@ -355,9 +359,16 @@ QueryFamilyIndices VulkanRenderer::identifyQueueFamilies(const vk::PhysicalDevic
     return familyIndices;
 }
 
-vk::SwapchainKHR VulkanRenderer::createSwapchain(const vk::Device &device, const vk::SurfaceKHR &surface, const vk::SurfaceFormatKHR &swapchainFormat, const vk::Extent2D &swapchainExtent,
-                                 const vk::PresentModeKHR presentMode, const uint32_t imageCount, const vk::SurfaceTransformFlagBitsKHR preTransform,
-                                 const QueryFamilyIndices &familyIndices) const {
+vk::SwapchainKHR VulkanRenderer::createSwapchain(
+    const vk::Device &device,
+    const vk::SurfaceKHR &surface,
+    const vk::SurfaceFormatKHR &swapchainFormat,
+    const vk::Extent2D &swapchainExtent,
+    const vk::PresentModeKHR presentMode,
+    const uint32_t imageCount,
+    const vk::SurfaceTransformFlagBitsKHR preTransform,
+    const QueryFamilyIndices &familyIndices
+) const {
     vk::SwapchainCreateInfoKHR info = {};
     info.surface = surface;
     info.minImageCount = imageCount;
@@ -428,8 +439,8 @@ uint32_t VulkanRenderer::chooseImageCount(const vk::SurfaceCapabilitiesKHR &caps
     return imageCount;
 }
 
-std::vector<vk::ImageView> VulkanRenderer::createSwapchainImageViews(const vk::Device &device, const vk::SurfaceFormatKHR &swapchainFormat,
-                                                     const std::vector<vk::Image> &swapchainImages) const {
+std::vector<vk::ImageView>
+VulkanRenderer::createSwapchainImageViews(const vk::Device &device, const vk::SurfaceFormatKHR &swapchainFormat, const std::vector<vk::Image> &swapchainImages) const {
     std::vector<vk::ImageView> imageViews;
 
     imageViews.reserve(swapchainImages.size());
@@ -556,7 +567,7 @@ vk::Pipeline VulkanRenderer::createGraphicsPipeline(const vk::Extent2D &swapchai
     colorBlendStateInfo.attachmentCount = 1;
     colorBlendStateInfo.pAttachments = &colorBlendAttachment;
 
-    vk::GraphicsPipelineCreateInfo pipelineInfo {};
+    vk::GraphicsPipelineCreateInfo pipelineInfo{};
 
     // reference all the description states, created earlier in this method
 
@@ -697,7 +708,8 @@ vk::RenderPass VulkanRenderer::createRenderPass(const vk::Device &device, const 
     return device.createRenderPass(renderPassInfo);
 }
 
-vk::Framebuffer VulkanRenderer::createFramebuffer(const vk::Device &device, const vk::ImageView &imageView, const vk::RenderPass &renderPass, const vk::Extent2D &swapchainExtent) const {
+vk::Framebuffer
+VulkanRenderer::createFramebuffer(const vk::Device &device, const vk::ImageView &imageView, const vk::RenderPass &renderPass, const vk::Extent2D &swapchainExtent) const {
     vk::FramebufferCreateInfo info;
 
     // render pass to be compatible with
@@ -754,8 +766,9 @@ vk::CommandBuffer VulkanRenderer::allocateCommandBuffer(const vk::Device &device
     return commandBuffer;
 }
 
-vk::RenderPassBeginInfo VulkanRenderer::createRenderPassBeginInfo(const vk::Framebuffer &framebuffer, const vk::ClearValue &clearValue, const vk::RenderPass &renderPass,
-                                                  const vk::Extent2D &swapchainExtent) const {
+vk::RenderPassBeginInfo VulkanRenderer::createRenderPassBeginInfo(
+    const vk::Framebuffer &framebuffer, const vk::ClearValue &clearValue, const vk::RenderPass &renderPass, const vk::Extent2D &swapchainExtent
+) const {
 
     // render pass
     vk::RenderPassBeginInfo info;
@@ -770,8 +783,13 @@ vk::RenderPassBeginInfo VulkanRenderer::createRenderPassBeginInfo(const vk::Fram
     return info;
 }
 
-void VulkanRenderer::recordCommandBuffer(const vk::CommandBuffer &commandBuffer, const vk::Framebuffer &framebuffer, const vk::RenderPass &renderPass, const vk::Extent2D &swapchainExtent,
-                         const vk::Pipeline &graphicsPipeline) const {
+void VulkanRenderer::recordCommandBuffer(
+    const vk::CommandBuffer &commandBuffer,
+    const vk::Framebuffer &framebuffer,
+    const vk::RenderPass &renderPass,
+    const vk::Extent2D &swapchainExtent,
+    const vk::Pipeline &graphicsPipeline
+) const {
 
     vk::ClearValue clearColor;
     clearColor.color.setFloat32({0.2f, 0.2f, 0.2f, 1.0f});
@@ -784,18 +802,18 @@ void VulkanRenderer::recordCommandBuffer(const vk::CommandBuffer &commandBuffer,
     commandBuffer.bindPipeline(vk::PipelineBindPoint::eGraphics, graphicsPipeline);
 
     // bind the vertex buffer
-    const vk::Buffer vertexBuffers[] = { mVertexBuffer };
-    const vk::DeviceSize offsets[] = { 0 };
+    const vk::Buffer vertexBuffers[] = {mVertexBuffer};
+    const vk::DeviceSize offsets[] = {0};
     commandBuffer.bindVertexBuffers(0, 1, vertexBuffers, offsets);
 
     // bind the index buffer
     commandBuffer.bindIndexBuffer(mIndexBuffer, 0, vk::IndexType::eUint16);
 
-    // render 
+    // render
     // commandBuffer.draw(3, 1, 0, 0);
     commandBuffer.bindDescriptorSets(vk::PipelineBindPoint::eGraphics, mPipelineLayout, 0, 1, &mDescriptorSets[imageIndex], 0, nullptr);
     commandBuffer.drawIndexed(static_cast<uint32_t>(indices.size()), 1, 0, 0, 0);
-    
+
     commandBuffer.endRenderPass();
     commandBuffer.end();
 }
@@ -886,7 +904,6 @@ void VulkanRenderer::drawFrame() {
     }
 }
 
-
 void VulkanRenderer::createVertexBuffer() {
     const vk::DeviceSize bufferSize = sizeof(vertices[0]) * vertices.size();
 
@@ -896,7 +913,7 @@ void VulkanRenderer::createVertexBuffer() {
     auto [stagingBuffer, stagingBufferMemory] = createBuffer(bufferSize, stagingBufferUsage, stagingMemoryProperties);
 
     // copy the vertex data to the staging buffer
-    void* data = mDevice.mapMemory(stagingBufferMemory, 0, VK_WHOLE_SIZE);
+    void *data = mDevice.mapMemory(stagingBufferMemory, 0, VK_WHOLE_SIZE);
     std::memcpy(data, vertices.data(), sizeof(vertices[0]) * vertices.size());
     mDevice.unmapMemory(stagingBufferMemory);
 
@@ -932,9 +949,8 @@ std::optional<uint32_t> VulkanRenderer::findMemoryType(uint32_t typeFilter, vk::
     return {};
 }
 
-
 std::tuple<vk::Buffer, vk::DeviceMemory> VulkanRenderer::createBuffer(const vk::DeviceSize size, const vk::BufferUsageFlags usage, vk::MemoryPropertyFlags properties) const {
-    vk::BufferCreateInfo bufferInfo {};
+    vk::BufferCreateInfo bufferInfo{};
     bufferInfo.size = size;
     bufferInfo.usage = usage;
 
@@ -948,7 +964,7 @@ std::tuple<vk::Buffer, vk::DeviceMemory> VulkanRenderer::createBuffer(const vk::
     auto requirements = mDevice.getBufferMemoryRequirements(buffer);
 
     // allocate the memory
-    vk::MemoryAllocateInfo allocInfo {};
+    vk::MemoryAllocateInfo allocInfo{};
     allocInfo.allocationSize = requirements.size;
     allocInfo.memoryTypeIndex = findMemoryType(requirements.memoryTypeBits, properties).value();
 
@@ -956,12 +972,11 @@ std::tuple<vk::Buffer, vk::DeviceMemory> VulkanRenderer::createBuffer(const vk::
 
     mDevice.bindBufferMemory(buffer, memory, 0);
 
-    return { buffer, memory };
+    return {buffer, memory};
 }
 
-
 void VulkanRenderer::copyBuffer(vk::Buffer srcBuffer, vk::Buffer dstBuffer, const vk::DeviceSize size) {
-    vk::CommandBufferAllocateInfo allocInfo {};
+    vk::CommandBufferAllocateInfo allocInfo{};
 
     allocInfo.level = vk::CommandBufferLevel::ePrimary; // will be executed directly by a command queue
     allocInfo.commandPool = mCommandPool;
@@ -970,26 +985,25 @@ void VulkanRenderer::copyBuffer(vk::Buffer srcBuffer, vk::Buffer dstBuffer, cons
     const auto commandBuffers = mDevice.allocateCommandBuffers(allocInfo);
     const auto &commandBuffer = commandBuffers[0];
 
-    vk::CommandBufferBeginInfo beginInfo {};
+    vk::CommandBufferBeginInfo beginInfo{};
     beginInfo.flags = vk::CommandBufferUsageFlagBits::eOneTimeSubmit;
 
     commandBuffer.begin(beginInfo);
-    const auto regions = std::array<vk::BufferCopy, 1>{ vk::BufferCopy{ 0, 0, size } };
+    const auto regions = std::array<vk::BufferCopy, 1>{vk::BufferCopy{0, 0, size}};
     commandBuffer.copyBuffer(srcBuffer, dstBuffer, regions);
     commandBuffer.end();
 
     // submit the command buffer for immediate execution
-    vk::SubmitInfo submitInfo {};
+    vk::SubmitInfo submitInfo{};
     submitInfo.commandBufferCount = 1;
     submitInfo.pCommandBuffers = &commandBuffer;
 
     mGraphicsQueue.submit(submitInfo);
-    
+
     mGraphicsQueue.waitIdle();
 
     mDevice.freeCommandBuffers(mCommandPool, commandBuffer);
 }
-
 
 void VulkanRenderer::createIndexBuffer() {
     const vk::DeviceSize size = indices.size() * sizeof(indices[0]);
@@ -998,7 +1012,7 @@ void VulkanRenderer::createIndexBuffer() {
 
     auto [stagingBuffer, stagingBufferMemory] = createBuffer(size, stagingUsageFlags, stagingMemoryProperties);
 
-    void* data = mDevice.mapMemory(stagingBufferMemory, 0, size);
+    void *data = mDevice.mapMemory(stagingBufferMemory, 0, size);
     std::memcpy(data, indices.data(), size);
     mDevice.unmapMemory(stagingBufferMemory);
 
@@ -1013,7 +1027,7 @@ void VulkanRenderer::createIndexBuffer() {
 }
 
 vk::DescriptorSetLayout VulkanRenderer::createDescriptorSetLayout() {
-    vk::DescriptorSetLayoutBinding layout {};
+    vk::DescriptorSetLayoutBinding layout{};
 
     // binding location. must match the one indicated in the shader
     layout.binding = 0;
@@ -1052,7 +1066,6 @@ void VulkanRenderer::createUniformBuffers() {
     assert(!mUniformBuffers.empty());
 }
 
-
 void VulkanRenderer::updateUniformBuffer(const uint32_t currentImage) {
     assert(currentImage < MAX_FRAMES_IN_FLIGHT);
 
@@ -1062,29 +1075,28 @@ void VulkanRenderer::updateUniformBuffer(const uint32_t currentImage) {
 
     float time = std::chrono::duration<float, std::chrono::seconds::period>(diff).count();
 
-    UniformBufferObject ubo {};
+    UniformBufferObject ubo{};
 
-    ubo.model = XE::mat4RotationZ(time * XE::radians(90.0f));
-    ubo.view = XE::mat4LookAtRH({ 2.0f, 2.0f, 2.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 1.0f });
+    ubo.model = xe::mat4RotationZ(time * xe::radians(90.0f));
+    ubo.view = xe::mat4LookAtRH({2.0f, 2.0f, 2.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 1.0f});
 
     const auto aspectRatio = static_cast<float>(mSwapchainExtent.width) / static_cast<float>(mSwapchainExtent.height);
-    ubo.proj = XE::mat4Perspective(XE::radians(45.0f), aspectRatio, 0.1f, 10.0f);
+    ubo.proj = xe::mat4Perspective(xe::radians(45.0f), aspectRatio, 0.1f, 10.0f);
     ubo.proj[1][1] *= -1;
 
     assert(mUniformBuffersMapped[currentImage] != nullptr);
     std::memcpy(mUniformBuffersMapped[currentImage], &ubo, sizeof(ubo));
 }
 
-
 void VulkanRenderer::createDescriptorPool() {
-    vk::DescriptorPoolSize poolSize {};
+    vk::DescriptorPoolSize poolSize{};
     poolSize.type = vk::DescriptorType::eUniformBuffer;
-    poolSize.descriptorCount = static_cast<uint32_t> (MAX_FRAMES_IN_FLIGHT);
+    poolSize.descriptorCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT);
 
-    vk::DescriptorPoolCreateInfo poolCreateInfo {};
+    vk::DescriptorPoolCreateInfo poolCreateInfo{};
     poolCreateInfo.poolSizeCount = 1;
     poolCreateInfo.pPoolSizes = &poolSize;
-    poolCreateInfo.maxSets = static_cast<uint32_t> (MAX_FRAMES_IN_FLIGHT);
+    poolCreateInfo.maxSets = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT);
 
     mDescriptorPool = mDevice.createDescriptorPool(poolCreateInfo);
 }
@@ -1094,9 +1106,9 @@ void VulkanRenderer::createDescriptorSets() {
 
     std::vector<vk::DescriptorSetLayout> layouts(MAX_FRAMES_IN_FLIGHT, mDescriptorSetLayout);
 
-    vk::DescriptorSetAllocateInfo allocInfo {};
-    allocInfo.descriptorPool = mDescriptorPool;                                     // we will allocate from mDescriptorPool
-    allocInfo.descriptorSetCount = static_cast<uint32_t> (MAX_FRAMES_IN_FLIGHT);
+    vk::DescriptorSetAllocateInfo allocInfo{};
+    allocInfo.descriptorPool = mDescriptorPool; // we will allocate from mDescriptorPool
+    allocInfo.descriptorSetCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT);
     allocInfo.pSetLayouts = layouts.data();
 
     mDescriptorSets = mDevice.allocateDescriptorSets(allocInfo);
@@ -1104,12 +1116,12 @@ void VulkanRenderer::createDescriptorSets() {
     assert(mDescriptorSets[0]);
 
     for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
-        vk::DescriptorBufferInfo info {};
+        vk::DescriptorBufferInfo info{};
         info.buffer = mUniformBuffers[i];
         info.offset = 0;
         info.range = sizeof(UniformBufferObject); // or VK_WHOLE_SIZE
 
-        vk::WriteDescriptorSet descriptorWrite {};
+        vk::WriteDescriptorSet descriptorWrite{};
         descriptorWrite.dstSet = mDescriptorSets[i];
         descriptorWrite.dstBinding = 0;
         descriptorWrite.dstArrayElement = 0;

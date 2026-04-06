@@ -8,7 +8,8 @@
 namespace TestApp {
     class ComResultChecker {
     public:
-        ComResultChecker() {}
+        ComResultChecker() {
+        }
 
         ComResultChecker(HRESULT hr) {
             if (FAILED(hr)) {
@@ -32,7 +33,9 @@ namespace TestApp {
             }
         }
 
-        operator HRESULT() const { return m_hr; }
+        operator HRESULT() const {
+            return m_hr;
+        }
 
     private:
         HRESULT m_hr = 0;
@@ -51,9 +54,12 @@ namespace TestApp {
         D3D_FEATURE_LEVEL_10_0,
     };
 
-    Renderer::Renderer() {}
+    Renderer::Renderer() {
+    }
 
-    Renderer::~Renderer() { this->Terminate(); }
+    Renderer::~Renderer() {
+        this->Terminate();
+    }
 
     void Renderer::Initialize(HWND hWnd) {
         m_hWnd = hWnd;
@@ -86,8 +92,20 @@ namespace TestApp {
         ComResultChecker resultChecker = 0;
 
         for (auto driverType : g_driverTypes) {
-            resultChecker = D3D11CreateDeviceAndSwapChain(nullptr, driverType, 0, creationFlags, g_featureLevels.data(), static_cast<UINT>(g_featureLevels.size()),
-                                                          D3D11_SDK_VERSION, &swapChainDesc, &m_swapChain, &m_device, &m_featureLevel, &m_context);
+            resultChecker = D3D11CreateDeviceAndSwapChain(
+                nullptr,
+                driverType,
+                0,
+                creationFlags,
+                g_featureLevels.data(),
+                static_cast<UINT>(g_featureLevels.size()),
+                D3D11_SDK_VERSION,
+                &swapChainDesc,
+                &m_swapChain,
+                &m_device,
+                &m_featureLevel,
+                &m_context
+            );
 
             if (resultChecker.Succeeded()) {
                 m_driverType = driverType;

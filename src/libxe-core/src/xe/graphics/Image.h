@@ -7,7 +7,7 @@
 #include <xe/graphics/PixelFormat.h>
 #include <xe/math/Vector.h>
 
-namespace XE {
+namespace xe {
     /**
      * @brief Abstract image class with basic image manipulation.
      */

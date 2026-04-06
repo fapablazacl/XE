@@ -1,7 +1,7 @@
 
 #include "Ellipsoid.h"
 
-namespace XE {
+namespace xe {
     template struct TEllipsoid<float>;
     template struct TEllipsoid<double>;
 } // namespace xe

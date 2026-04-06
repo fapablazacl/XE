@@ -3,7 +3,7 @@
 
 #include <cassert>
 
-namespace XE {
+namespace xe {
     GraphicsContextGLFW::GraphicsContextGLFW(GLFWwindow *glfwWindow, Descriptor descriptor) {
         assert(glfwWindow);
 
@@ -11,11 +11,18 @@ namespace XE {
         this->descriptor = descriptor;
     }
 
-    GraphicsContextGLFW::~GraphicsContextGLFW() {}
+    GraphicsContextGLFW::~GraphicsContextGLFW() {
+    }
 
-    GraphicsContext::GetProcAddressGL GraphicsContextGLFW::getProcAddressFunctionGL() const { return (GraphicsContext::GetProcAddressGL)glfwGetProcAddress; }
+    GraphicsContext::GetProcAddressGL GraphicsContextGLFW::getProcAddressFunctionGL() const {
+        return (GraphicsContext::GetProcAddressGL)glfwGetProcAddress;
+    }
 
-    GraphicsContext::Descriptor GraphicsContextGLFW::getDescriptor() const { return descriptor; }
+    GraphicsContext::Descriptor GraphicsContextGLFW::getDescriptor() const {
+        return descriptor;
+    }
 
-    void GraphicsContextGLFW::present() { glfwSwapBuffers(glfwWindow); }
+    void GraphicsContextGLFW::present() {
+        glfwSwapBuffers(glfwWindow);
+    }
 } // namespace xe

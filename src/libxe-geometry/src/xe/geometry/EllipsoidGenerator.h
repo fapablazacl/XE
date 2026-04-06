@@ -7,7 +7,7 @@
 
 #include "ShapeGenerator.h"
 
-namespace XE {
+namespace xe {
     class EllipsoidGenerator : public ShapeGenerator {
     public:
         EllipsoidGenerator(const int slices, const int stacks, const Vector3 &dimensions);

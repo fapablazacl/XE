@@ -4,7 +4,7 @@
 
 #include <tuple>
 
-namespace XE {
+namespace xe {
     enum class PixelFormat { MetaFirst, Unknown = MetaFirst, R8G8B8, R8G8B8A8, MetaCount };
 
     inline std::tuple<int, int, int, int> get_color_bit_count(const PixelFormat format) {

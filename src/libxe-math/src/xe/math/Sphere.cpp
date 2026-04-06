@@ -1,7 +1,7 @@
 
 #include "Sphere.h"
 
-namespace XE {
+namespace xe {
     template struct TSphere<float>;
     template struct TSphere<double>;
 } // namespace xe

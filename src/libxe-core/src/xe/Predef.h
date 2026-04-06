@@ -2,10 +2,9 @@
 #ifndef __XE_PREDEF_HPP__
 #define __XE_PREDEF_HPP__
 
+#include <cassert>
 #include <cstddef>
 #include <cstdint>
-#include <cassert>
-
 
 //! API export/import definition.
 //! Defined when we are using a DLL/Shared Object/DYLIB.
@@ -39,21 +38,19 @@
 #pragma message "Unknown OS isn't Supported. You are on your own.'"
 #endif
 
-
 #ifdef NDEBUG
-#define XE_ASSERT(condition, message) do {} while (false)
+#define XE_ASSERT(condition, message)                                                                                                                                              \
+    do {                                                                                                                                                                           \
+    } while (false)
 #else
-#define XE_ASSERT(condition, message) \
-  do { \
-    if (!(condition)) { \
-      std::cerr << "Assertion failed: (" << #condition << "), " \
-                << "function " << __func__ << ", " \
-                << "file " << __FILE__ << ", " \
-                << "line " << __LINE__ << ": " \
-                << message << std::endl; \
-      std::abort(); \
-    } \
-  } while (false)
+#define XE_ASSERT(condition, message)                                                                                                                                              \
+    do {                                                                                                                                                                           \
+        if (!(condition)) {                                                                                                                                                        \
+            std::cerr << "Assertion failed: (" << #condition << "), " << "function " << __func__ << ", " << "file " << __FILE__ << ", " << "line " << __LINE__ << ": " << message  \
+                      << std::endl;                                                                                                                                                \
+            std::abort();                                                                                                                                                          \
+        }                                                                                                                                                                          \
+    } while (false)
 #endif
 
 #endif

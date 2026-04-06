@@ -7,7 +7,7 @@
 
 #include "ShapeGenerator.h"
 
-namespace XE {
+namespace xe {
     /**
      * @brief Generate a geometry mesh that forms a Box-Like shape
      */

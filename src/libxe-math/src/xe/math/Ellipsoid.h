@@ -6,7 +6,7 @@
 
 #include <limits>
 
-namespace XE {
+namespace xe {
     /**
      * @brief Ellipsoid in the 3-space
      */
@@ -15,10 +15,12 @@ namespace XE {
         TVector<T, 3> size;
 
         //! Initializes an Ellipsoid at the origin with radius 1, 1, 1.
-        TEllipsoid() : center{T(0), T(0), T(0)}, size{T(1), T(1), T(1)} {}
+        TEllipsoid() : center{T(0), T(0), T(0)}, size{T(1), T(1), T(1)} {
+        }
 
         //! Initializes a Ellipsoid from the given center and radius
-        TEllipsoid(const TVector<T, 3> &center, const TVector<T, 3> &size) : center(center), size(size) {}
+        TEllipsoid(const TVector<T, 3> &center, const TVector<T, 3> &size) : center(center), size(size) {
+        }
     };
 
     //! Serializes the content of a Box object to an ostream.

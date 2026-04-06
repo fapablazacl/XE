@@ -2,7 +2,7 @@
 #ifndef __XE_IO_STREAM_HPP__
 #define __XE_IO_STREAM_HPP__
 
-namespace XE {
+namespace xe {
     enum class StreamOffset { Set, Current, End };
 
     enum class StreamFlags { Readable = 1, Writtable = 2, Both = Readable | Writtable };

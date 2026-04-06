@@ -1,7 +1,7 @@
 
 find_package(fmt CONFIG REQUIRED)
 
-set (target "XE.Core")
+set (target "xe-core")
 
 set (headers 
 	"src/xe/XE.h"
@@ -11,6 +11,7 @@ set (headers
 	"src/xe/Core.h"
 	"src/xe/Timer.h"
 	"src/xe/FPSCounter.h"
+		"src/xe/FileUtil.h"
 	"src/xe/Logger.h"
 	"src/xe/graphics/Graphics.h"
 	"src/xe/graphics/IWindow.h"
@@ -63,6 +64,8 @@ set (sources
 	"src/xe/Core.cpp"
 	"src/xe/Timer.cpp"
 	"src/xe/FPSCounter.cpp"
+		"src/xe/FileUtil.cpp"
+		"src/xe/Logger.cpp"
 
 	"src/xe/graphics/IWindow.cpp"	
 	"src/xe/graphics/GraphicsDevice.cpp"
@@ -94,6 +97,7 @@ set (sources
 )
 
 add_library (${target} ${sources})
+add_library(xe::core ALIAS ${target})
 
 if (XE_DEV_PRECOMPILED_HEADERS)
 	target_precompile_headers(${target} PRIVATE ${headers})
@@ -101,7 +105,7 @@ endif()
 
 target_include_directories(${target} PUBLIC "src")
 target_link_libraries(${target}
-		PUBLIC XE.Math
-		PRIVATE XE.Interface
+		PUBLIC xe::math
+		PRIVATE xe::interface
 		PUBLIC fmt::fmt
 )

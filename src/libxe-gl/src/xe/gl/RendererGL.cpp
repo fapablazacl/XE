@@ -1,16 +1,24 @@
 
 #include "RendererGL.h"
 
+#include "xe/Logger.h"
+
+#include <fmt/format.h>
 #include <iostream>
 
 namespace xe::gl {
     static std::string errorCodeToString(GLenum error) {
         switch (error) {
-        case GL_INVALID_ENUM: return "GL_INVALID_ENUM";
-        case GL_INVALID_VALUE: return "GL_INVALID_VALUE";
-        case GL_INVALID_OPERATION: return "GL_INVALID_OPERATION";
-        case GL_OUT_OF_MEMORY: return "GL_OUT_OF_MEMORY";
-        default: return "<Unknown Error Value: " + std::to_string(error) + ">";
+        case GL_INVALID_ENUM:
+            return "GL_INVALID_ENUM";
+        case GL_INVALID_VALUE:
+            return "GL_INVALID_VALUE";
+        case GL_INVALID_OPERATION:
+            return "GL_INVALID_OPERATION";
+        case GL_OUT_OF_MEMORY:
+            return "GL_OUT_OF_MEMORY";
+        default:
+            return "<Unknown Error Value: " + std::to_string(error) + ">";
         }
     }
 
@@ -36,23 +44,24 @@ namespace xe::gl {
         const int line;
     };
 
-
 #define XE_GL_SCOPED_ERROR_CHECK() GLScopedErrorChecker __gl_error_raii(__FILE__, __LINE__)
 
-#if defined(GLAD_DEBUG)
+#if defined(GLAZE_DEBUG)
     void pre_call_callback_gl(const char *name, void *funcptr, int len_args, ...) {
-        (void) name;
-        (void) funcptr;
-        (void) len_args;
+        (void)name;
+        (void)funcptr;
+        (void)len_args;
     }
 
     void post_call_callback_gl(const char *name, void *funcptr, int len_args, ...) {
-        (void) funcptr;
-        (void) len_args;
+        (void)funcptr;
+        (void)len_args;
 
-        if (const GLenum error_code = glad_glGetError(); error_code) {
+        if (const GLenum error_code = glaze_glGetError(); error_code) {
             const auto errorCodeString = errorCodeToString(error_code);
-            std::fprintf(stderr, "Error %s generated while executing command %s\n", name, errorCodeString.c_str());
+            std::fprintf(stderr, "Error %s generated while executing command %s\n", errorCodeString.c_str(), name);
+
+            assert(error_code == GL_NO_ERROR);
         }
     }
 #endif
@@ -62,17 +71,16 @@ namespace xe::gl {
     }
 
     std::unique_ptr<RendererGL> RendererGL::create(GetProcAddress getProcAddress) {
-        const auto loadproc = reinterpret_cast<GLADloadproc>(getProcAddress);
-        const int result = getProcAddress ? gladLoadGLLoader(loadproc) : gladLoadGL();
-
-        if (!result) {
-            std::fprintf(stderr, "GLAD: Couldn't load GL functions. Error code %d \n", result);
+        if (!getProcAddress) {
+            std::fprintf(stderr, "Glaze: No proc address loader provided\n");
             return {};
         }
 
-#if defined(GLAD_DEBUG)
-        glad_set_pre_callback_gl(pre_call_callback_gl);
-        glad_set_post_callback_gl(post_call_callback_gl);
+        glazeLoadFunctions(reinterpret_cast<GLAZE_GETPROCADDRESS>(getProcAddress));
+
+#if defined(GLAZE_DEBUG)
+        glazeSetPreCallback(pre_call_callback_gl);
+        glazeSetPostCallback(post_call_callback_gl);
 #endif
 
         return std::unique_ptr<RendererGL>{new RendererGL()};
@@ -86,14 +94,14 @@ namespace xe::gl {
         std::printf("GL_VERSION: %s\n", info.version.c_str());
         std::printf("GL_SHADING_LANGUAGE_VERSION: %s\n", info.shadingLanguageVersion.c_str());
 
-        GLint extensionCount;
+        GLint extensionCount = 0;
         glGetIntegerv(GL_NUM_EXTENSIONS, &extensionCount);
 
         std::printf("Supported extensions %d\n", extensionCount);
 
         for (int i = 0; i < extensionCount; i++) {
             const auto str = glGetStringi(GL_EXTENSIONS, i);
-            const auto cstr = reinterpret_cast<const char*>(str);
+            const auto cstr = reinterpret_cast<const char *>(str);
 
             std::printf("%s ", cstr);
         }
@@ -152,7 +160,7 @@ namespace xe::gl {
     RendererInfo RendererGL::getInfo() const {
         RendererInfo info;
 
-        info.vendor = reinterpret_cast<const char*>(glGetString(GL_VENDOR));
+        info.vendor = reinterpret_cast<const char *>(glGetString(GL_VENDOR));
         info.renderer = reinterpret_cast<const char *>(glGetString(GL_RENDERER));
         info.version = reinterpret_cast<const char *>(glGetString(GL_VERSION));
         info.shadingLanguageVersion = reinterpret_cast<const char *>(glGetString(GL_SHADING_LANGUAGE_VERSION));
@@ -170,17 +178,17 @@ namespace xe::gl {
         glCompileShader(shaderId);
 
         // check for errors
-        GLint status;
+        GLint status = 0;
         glGetShaderiv(shaderId, GL_COMPILE_STATUS, &status);
 
         if (status == static_cast<GLint>(GL_FALSE)) {
             constexpr size_t INFO_LOG_BUFFER_SIZE = 4096;
-            std::cerr << "Error while creating shader " << type << ": " << std::endl;
+            std::cerr << "Error while creating shader " << type << ": " << '\n';
 
             char msg[INFO_LOG_BUFFER_SIZE] = {};
             glGetShaderInfoLog(shaderId, INFO_LOG_BUFFER_SIZE, nullptr, msg);
 
-            std::cerr << msg << std::endl;
+            std::cerr << msg << '\n';
 
             return {};
         }
@@ -188,15 +196,14 @@ namespace xe::gl {
         return {shaderId};
     }
 
-
-    Program RendererGL::createProgram(const tcb::span<Shader> &shaders) const {
+    Program RendererGL::createProgram(const bpstd::span<Shader> &shaders) const {
         XE_GL_SCOPED_ERROR_CHECK();
 
         const auto programId = glCreateProgram();
 
         for (const auto &shader : shaders) {
             if (shader.id == 0) {
-                std::cerr << "Empty shader was supplied" << std::endl;
+                std::cerr << "Empty shader was supplied" << '\n';
 
                 glDeleteProgram(programId);
                 return {};
@@ -207,25 +214,24 @@ namespace xe::gl {
 
         glLinkProgram(programId);
 
-        GLint status;
+        GLint status = 0;
         glGetProgramiv(programId, GL_LINK_STATUS, &status);
 
         if (status == static_cast<GLint>(GL_FALSE)) {
             constexpr size_t INFO_LOG_BUFFER_SIZE = 4096;
 
-            std::cerr << "Shader linker error: " << std::endl;
+            std::cerr << "Shader linker error: " << '\n';
             char msg[INFO_LOG_BUFFER_SIZE] = {};
             glGetProgramInfoLog(programId, INFO_LOG_BUFFER_SIZE, nullptr, msg);
-            std::cerr << msg << std::endl;
+            std::cerr << msg << '\n';
 
             glDeleteProgram(programId);
 
             return {};
         }
 
-        return Program {programId};
+        return Program{programId};
     }
-
 
     Buffer RendererGL::createBuffer(const GLenum target, const GLenum usage, const MemoryRegion &memory) const {
         XE_GL_SCOPED_ERROR_CHECK();
@@ -240,32 +246,31 @@ namespace xe::gl {
         return {bufferId, target};
     }
 
-
-    VertexArray RendererGL::createVertexArray(const tcb::span<const Attribute> &attributes, Buffer elementArrayBuffer) const {
+    VertexArray RendererGL::createVertexArray(const bpstd::span<const Attribute> &attributes, Buffer elementArrayBuffer) const {
         XE_GL_SCOPED_ERROR_CHECK();
 
         VertexArray vao;
-        auto &id = vao.id;
 
-        glGenVertexArrays(1, &id);
-        glBindVertexArray(id);
+        glGenVertexArrays(1, &vao.id);
+        glBindVertexArray(vao.id);
 
         for (const auto &attr : attributes) {
             if (attr.buffer.id != 0) {
+                xe::logInfo(fmt::format("Enabling vertex attribute array {}", attr.index));
                 glBindBuffer(attr.buffer.target, attr.buffer.id);
                 glEnableVertexAttribArray(attr.index);
 
                 GLenum type = GL_FLOAT;
 
-                switch (attr.type) { 
+                switch (attr.type) {
                 case AttributeType::Float:
                     type = GL_FLOAT;
-                    break; 
+                    break;
 
                 case AttributeType::Int:
                     type = GL_INT;
-                    break; 
-                    
+                    break;
+
                 case AttributeType::UnsignedInt:
                     type = GL_UNSIGNED_INT;
                     break;
@@ -273,11 +278,16 @@ namespace xe::gl {
                 case AttributeType::UnsignedByte:
                     type = GL_UNSIGNED_BYTE;
                     break;
+
+                case AttributeType::UnsignedShort:
+                    type = GL_UNSIGNED_SHORT;
+                    break;
                 }
 
-                glVertexAttribPointer(attr.index, static_cast<GLint>(attr.size) + 1, type, attr.normalized, attr.stride, reinterpret_cast<const void *>(attr.offset));
-            }
-            else {
+                const auto ptr = reinterpret_cast<const void *>(static_cast<long long>(attr.offset));
+                glVertexAttribPointer(attr.index, static_cast<GLint>(attr.size) + 1, type, attr.normalized, attr.stride, ptr);
+            } else {
+                xe::logInfo(fmt::format("Disabling vertex attribute array {}", attr.index));
                 glDisableVertexAttribArray(attr.index);
             }
         }
@@ -290,7 +300,7 @@ namespace xe::gl {
         return vao;
     }
 
-    void RendererGL::draw(VertexArray vertexArray, GLenum primitiveType, const tcb::span<const VertexArrayPrimitive> &primitives) const {
+    void RendererGL::draw(VertexArray vertexArray, GLenum primitiveType, const bpstd::span<const VertexArrayPrimitive> &primitives) const {
         XE_GL_SCOPED_ERROR_CHECK();
         assert(!primitives.empty());
         assert(vertexArray.id);
@@ -311,13 +321,13 @@ namespace xe::gl {
         glMultiDrawArrays(primitiveType, multiDraw.start, multiDraw.count, multiDraw.drawCount);
     }
 
-    void RendererGL::draw(VertexArray vertexArray, GLenum primitiveType, const tcb::span<const VertexArrayPrimitive> &primitives, GLenum dataType) const {
+    void RendererGL::draw(VertexArray vertexArray, GLenum primitiveType, const bpstd::span<const VertexArrayPrimitive> &primitives, GLenum dataType) const {
         XE_GL_SCOPED_ERROR_CHECK();
 
         glBindVertexArray(vertexArray.id);
 
         for (const auto &primitive : primitives) {
-            const auto indices = reinterpret_cast<const void*>(primitive.start);
+            const auto indices = reinterpret_cast<const void *>(static_cast<long long>(primitive.start));
 
             bindRenderState(primitive.attribs);
 
@@ -325,7 +335,7 @@ namespace xe::gl {
         }
     }
 
-    void RendererGL::bindRenderState(const tcb::span<const Attribute> &attribs) const {
+    void RendererGL::bindRenderState(const bpstd::span<const Attribute> &attribs) const {
         XE_GL_SCOPED_ERROR_CHECK();
 
         for (const auto &attrib : attribs) {
@@ -337,13 +347,13 @@ namespace xe::gl {
                 break;
 
             default:
-                fprintf(stderr, "Non float vertex attribute support is missing.");
+                fprintf(stderr, "Non-float vertex attribute support is missing.");
                 abort();
             }
         }
     }
 
-    void RendererGL::bindRenderState(const tcb::span<const Uniform> &uniforms) const {
+    void RendererGL::bindRenderState(const bpstd::span<const Uniform> &uniforms) const {
         XE_GL_SCOPED_ERROR_CHECK();
 
         for (const auto &uniform : uniforms) {
@@ -352,21 +362,21 @@ namespace xe::gl {
 
             switch (type) {
             case UniformType::Float:
-                glUniformXfv[dim](location, count, static_cast<const GLfloat*>(data));
+                glUniformXfv[dim](location, count, static_cast<const GLfloat *>(data));
                 break;
 
             case UniformType::Int:
-                glUniformXiv[dim](location, count, static_cast<const GLint*>(data));
+                glUniformXiv[dim](location, count, static_cast<const GLint *>(data));
                 break;
 
             case UniformType::UnsignedInt:
-                glUniformXuiv[dim](location, count, static_cast<const GLuint*>(data));
+                glUniformXuiv[dim](location, count, static_cast<const GLuint *>(data));
                 break;
             }
         }
     }
 
-    void RendererGL::bindRenderState(const tcb::span<const UniformMatrix> &uniforms) const {
+    void RendererGL::bindRenderState(const bpstd::span<const UniformMatrix> &uniforms) const {
         XE_GL_SCOPED_ERROR_CHECK();
 
         for (const auto &[location, type, dim, transpose, count, data] : uniforms) {
@@ -378,16 +388,15 @@ namespace xe::gl {
 
             switch (type) {
             case UniformMatrixType::Float:
-                glUniformMatrixXfv[index](location, count, transpose, static_cast<const GLfloat*>(data));
+                glUniformMatrixXfv[index](location, count, transpose, static_cast<const GLfloat *>(data));
                 break;
 
             case UniformMatrixType::Double:
-                glUniformMatrixXdv[index](location, count, transpose, static_cast<const GLdouble*>(data));
+                glUniformMatrixXdv[index](location, count, transpose, static_cast<const GLdouble *>(data));
                 break;
             }
         }
     }
-
 
     Texture RendererGL::createTexture(GLenum target, GLenum internalFormat, const ClientTextureImage1D &image, const CreateTextureOptions &options) const {
         XE_GL_SCOPED_ERROR_CHECK();
@@ -410,8 +419,7 @@ namespace xe::gl {
         return {textureId, target};
     }
 
-
-    Texture RendererGL::createTexture(GLenum target, GLenum internalFormat, const ClientTextureImage2D &image, const CreateTextureOptions &options ) const {
+    Texture RendererGL::createTexture(GLenum target, GLenum internalFormat, const ClientTextureImage2D &image, const CreateTextureOptions &options) const {
         XE_GL_SCOPED_ERROR_CHECK();
 
         GLuint textureId = 0;
@@ -453,7 +461,7 @@ namespace xe::gl {
         return {textureId, target};
     }
 
-    void RendererGL::bindRenderState(GLenum textureTarget, const tcb::span<const TextureParameter> &parameters) const {
+    void RendererGL::bindRenderState(GLenum textureTarget, const bpstd::span<const TextureParameter> &parameters) const {
         XE_GL_SCOPED_ERROR_CHECK();
 
         for (const auto &parameter : parameters) {
@@ -461,7 +469,7 @@ namespace xe::gl {
         }
     }
 
-    void RendererGL::bindRenderState(const tcb::span<const CapabilityStatus> &capabilities) const {
+    void RendererGL::bindRenderState(const bpstd::span<const CapabilityStatus> &capabilities) const {
         XE_GL_SCOPED_ERROR_CHECK();
 
         for (const auto &[capability, enabled] : capabilities) {
@@ -469,20 +477,21 @@ namespace xe::gl {
         }
     }
 
-    void RendererGL::bindRenderState(const tcb::span<const TextureLayer> &layers) const {
+    void RendererGL::bindRenderState(const bpstd::span<const TextureLayer> &layers) const {
         XE_GL_SCOPED_ERROR_CHECK();
 
         for (uint32_t i = 0; i < layers.size(); i++) {
             const auto &layer = layers[i];
 
-            glActiveTexture(GL_TEXTURE0 + i);
-            glBindTexture(layer.texture.target, layer.texture.id);
-
-            bindRenderState(layer.texture.target, layer.parameters);
+            if (layer.texture) {
+                glActiveTexture(GL_TEXTURE0 + i);
+                glBindTexture(layer.texture.target, layer.texture.id);
+                bindRenderState(layer.texture.target, layer.parameters);
+            }
         }
     }
 
-    void RendererGL::clear(const GLenum flags, std::optional<XE::Vector4> color, std::optional<float> depth, std::optional<int> stencil) const {
+    void RendererGL::clear(const GLenum flags, std::optional<xe::Vector4> color, std::optional<float> depth, std::optional<int> stencil) const {
         if (color.has_value()) {
             glClearColor(color->X, color->Y, color->Z, color->W);
         }
@@ -506,7 +515,7 @@ namespace xe::gl {
         glFlush();
     }
 
-    void RendererGL::viewport(const XE::Vector2i &pos, const XE::Vector2i &size) const {
+    void RendererGL::viewport(const xe::Vector2i &pos, const xe::Vector2i &size) const {
         XE_GL_SCOPED_ERROR_CHECK();
 
         glViewport(pos.X, pos.Y, size.X, size.Y);
@@ -517,4 +526,4 @@ namespace xe::gl {
 
         glUseProgram(program.id);
     }
-}
+} // namespace xe::gl

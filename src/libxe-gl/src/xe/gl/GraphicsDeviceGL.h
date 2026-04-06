@@ -6,7 +6,7 @@
 #include <xe/graphics/GraphicsDevice.h>
 #include <xe/graphics/Viewport.h>
 
-namespace XE {
+namespace xe {
     class ProgramGL;
     class SubsetGL;
 
@@ -26,8 +26,8 @@ namespace XE {
 
         Texture2DArray *createTexture2DArray(const PixelFormat format, const Vector2i &size, const int count) override;
 
-        TextureCubeMap *createTextureCubeMap(const PixelFormat format, const Vector2i &size, const PixelFormat sourceFormat, const DataType sourceDataType,
-                                             const void **sourceData) override;
+        TextureCubeMap *
+        createTextureCubeMap(const PixelFormat format, const Vector2i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void **sourceData) override;
 
         Program *createProgram(const ProgramDescriptor &programDescriptor) override;
 

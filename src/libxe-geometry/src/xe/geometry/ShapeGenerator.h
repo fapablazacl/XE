@@ -5,7 +5,7 @@
 #include <vector>
 #include <xe/math/Math.h>
 
-namespace XE {
+namespace xe {
     class ShapeGenerator {
     public:
         virtual ~ShapeGenerator();

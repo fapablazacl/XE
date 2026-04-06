@@ -6,7 +6,7 @@
 #include <cstddef>
 #include <xe/Predef.h>
 
-namespace XE {
+namespace xe {
     class Texture;
 
     enum class TextureFilter { Nearest, Linear };

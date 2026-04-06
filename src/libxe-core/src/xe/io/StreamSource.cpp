@@ -1,6 +1,7 @@
 
 #include <xe/io/StreamSource.h>
 
-namespace XE {
-    StreamSource::~StreamSource() {}
+namespace xe {
+    StreamSource::~StreamSource() {
+    }
 } // namespace xe

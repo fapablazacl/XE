@@ -5,7 +5,7 @@
 #include <xe/math/Rotation.h>
 #include <xe/math/Vector.h>
 
-namespace XE {
+namespace xe {
     /**
      * @brief Virtual sphere tied into a screen. Used as an utility in the Trackball class.
      */
@@ -15,7 +15,9 @@ namespace XE {
 
         VirtualSphere(const Vector2i &screenSize);
 
-        Vector2i getScreenSize() const { return screenSize; }
+        Vector2i getScreenSize() const {
+            return screenSize;
+        }
 
         void setScreenSize(const Vector2i &value);
 
@@ -23,7 +25,9 @@ namespace XE {
 
         bool operator==(const VirtualSphere &rhs) const;
 
-        bool operator!=(const VirtualSphere &rhs) const { return !(*this == rhs); }
+        bool operator!=(const VirtualSphere &rhs) const {
+            return !(*this == rhs);
+        }
 
     private:
         Vector2i screenSize;

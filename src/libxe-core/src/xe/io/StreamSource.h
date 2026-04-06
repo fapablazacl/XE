@@ -5,7 +5,7 @@
 #include <memory>
 #include <string>
 
-namespace XE {
+namespace xe {
     class Stream;
     class StreamSource {
     public:

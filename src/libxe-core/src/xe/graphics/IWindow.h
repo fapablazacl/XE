@@ -2,10 +2,10 @@
 #ifndef __XE_GRAPHICS_IWINDOW_HPP__
 #define __XE_GRAPHICS_IWINDOW_HPP__
 
-#include <xe/math/Vector.h>
 #include <string>
+#include <xe/math/Vector.h>
 
-namespace XE {
+namespace xe {
     /**
      * @brief The 'Window' that is beign used as the render target for the graphics device contents
      */
@@ -18,7 +18,7 @@ namespace XE {
          */
         virtual Vector2i getSizeInPixels() const = 0;
 
-        virtual void setTitle(const std::string& title) = 0;
+        virtual void setTitle(const std::string &title) = 0;
     };
 
 } // namespace xe

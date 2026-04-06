@@ -4,7 +4,6 @@
 #include <cassert>
 #include <fstream>
 
-
 namespace apostate {
     std::string AssetPackage::loadTextFile(const std::string &fileName) const {
         assert(!fileName.empty());
@@ -17,7 +16,7 @@ namespace apostate {
         std::string content;
         std::string line;
 
-        while(fs.good()) {
+        while (fs.good()) {
             std::getline(fs, line);
             line += "\n";
             content += line;
@@ -25,4 +24,4 @@ namespace apostate {
 
         return content;
     }
-}
+} // namespace apostate

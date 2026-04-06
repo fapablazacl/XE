@@ -3,24 +3,35 @@
 #include <xe/math/Vector.h>
 
 namespace TestApp {
-    using namespace XE;
+    using namespace xe;
 
     struct VertexType {
         Vector3 position;
         Vector4 color;
     };
 
-    Mesh::Mesh() {}
+    Mesh::Mesh() {
+    }
 
-    Mesh::~Mesh() { this->Shutdown(); }
+    Mesh::~Mesh() {
+        this->Shutdown();
+    }
 
-    bool Mesh::Initialize(ID3D11Device *device) { return this->InitializeBuffers(device); }
+    bool Mesh::Initialize(ID3D11Device *device) {
+        return this->InitializeBuffers(device);
+    }
 
-    void Mesh::Shutdown() { this->ShutdownBuffers(); }
+    void Mesh::Shutdown() {
+        this->ShutdownBuffers();
+    }
 
-    void Mesh::Render(ID3D11DeviceContext *context) { this->RenderBuffers(context); }
+    void Mesh::Render(ID3D11DeviceContext *context) {
+        this->RenderBuffers(context);
+    }
 
-    int Mesh::GetIndexCount() const { return indexCount; }
+    int Mesh::GetIndexCount() const {
+        return indexCount;
+    }
 
     bool Mesh::InitializeBuffers(ID3D11Device *device) {
         VertexType vertices[] = {{{-1.0f, -1.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 1.0f}}, {{0.0f, 1.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 1.0f}}, {{1.0f, -1.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 1.0f}}};

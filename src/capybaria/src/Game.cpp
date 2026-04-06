@@ -1,19 +1,23 @@
 
 #include "Game.h"
+
+#include <cstddef>
+#include <bpstd/span.hpp>
 #include "Util.h"
 
 const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 480;
 
-FloorGeometry createFloorGeometry(const xe::gl::RendererGL &renderer, const GLint vertCoordLoc, const GLint vertColorLoc, const int tilesInX, const int tilesInZ, const float tileSizeX,
-                                  const float tileSizeZ);
+FloorGeometry createFloorGeometry(
+    const xe::gl::RendererGL &renderer, const GLint vertCoordLoc, const GLint vertColorLoc, const int tilesInX, const int tilesInZ, const float tileSizeX, const float tileSizeZ
+);
 
 void renderFloorGeometry(const FloorGeometry &floorGeometry, const GLint vertCoordZLoc, const GLint vertColourLoc);
 
 xe::gl::VertexArray createTriangleGeometry(const RendererGL &renderer, const GLint vertCoordLoc, const GLint vertColorLoc);
 
-
-Game::Game() {}
+Game::Game() {
+}
 
 Game::~Game() {
     SDL_DestroyWindow(window);
@@ -41,9 +45,9 @@ int Game::initializeSDL() {
     }
 
     std::printf("Creating diplay window with 640 x 480 mode, windowed mode\n");
-    window = SDL_CreateWindow( "Capybaria", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL );
-    if( window == nullptr ) {
-        std::printf( "Error while creating Window. SDL_Error: %s\n", SDL_GetError() );
+    window = SDL_CreateWindow("Capybaria", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL);
+    if (window == nullptr) {
+        std::printf("Error while creating Window. SDL_Error: %s\n", SDL_GetError());
 
         return EXIT_FAILURE;
     }
@@ -69,7 +73,7 @@ int Game::initializeOpenGL() {
         {SDL_GL_DOUBLEBUFFER, 1}
     };
 
-    for (const auto& pair : sdlGlAttributes) {
+    for (const auto &pair : sdlGlAttributes) {
         SDL_GL_SetAttribute(pair.first, pair.second);
     }
 
@@ -77,14 +81,14 @@ int Game::initializeOpenGL() {
 
     context = SDL_GL_CreateContext(window);
     if (context == nullptr) {
-        std::printf( "Error while creating OpenGL context. SDL_Error: %s\n", SDL_GetError() );
+        std::printf("Error while creating OpenGL context. SDL_Error: %s\n", SDL_GetError());
 
         return EXIT_FAILURE;
     }
 
     const int makeCurrentResult = SDL_GL_MakeCurrent(window, context);
     if (makeCurrentResult < 0) {
-        std::printf( "Error while making OpenGL context current. SDL_Error: %s\n", SDL_GetError() );
+        std::printf("Error while making OpenGL context current. SDL_Error: %s\n", SDL_GetError());
         return EXIT_FAILURE;
     }
 
@@ -94,12 +98,9 @@ int Game::initializeOpenGL() {
 
     renderer = RendererGL::create();
 
-    std::vector<xe::gl::Shader> shaders = {
-        renderer->createShader(GL_VERTEX_SHADER, vertexShader.c_str()),
-        renderer->createShader(GL_FRAGMENT_SHADER, fragmentShader.c_str())
-    };
+    std::vector<xe::gl::Shader> shaders = {renderer->createShader(GL_VERTEX_SHADER, vertexShader.c_str()), renderer->createShader(GL_FRAGMENT_SHADER, fragmentShader.c_str())};
 
-    program = renderer->createProgram({shaders.data(), shaders.size()});
+    program = renderer->createProgram(bpstd::span<xe::gl::Shader>(shaders.data(), shaders.size()));
 
     if (!program.id) {
         return EXIT_FAILURE;
@@ -113,15 +114,14 @@ int Game::initializeOpenGL() {
     floor = createFloorGeometry(*renderer, vertCoordLoc, vertColorLoc, 10, 10, 1.0f, 1.0f);
     triangleVao = createTriangleGeometry(*renderer, vertCoordLoc, vertColorLoc);
 
-    //Use Vsync
+    // Use Vsync
     std::printf("Configuring swap interval\n");
-    if( SDL_GL_SetSwapInterval( 1 ) < 0 ) {
-        std::printf( "Warning: Unable to set VSync! SDL Error: %s\n", SDL_GetError() );
+    if (SDL_GL_SetSwapInterval(1) < 0) {
+        std::printf("Warning: Unable to set VSync! SDL Error: %s\n", SDL_GetError());
     }
 
     return 0;
 }
-
 
 void Game::loop() {
     std::printf("Entering main loop\n");
@@ -135,11 +135,10 @@ void Game::loop() {
     }
 }
 
-
 bool Game::pollInput() {
     SDL_Event e;
 
-    while( SDL_PollEvent( &e ) ) {
+    while (SDL_PollEvent(&e)) {
         actionState.update(e);
     }
 
@@ -154,24 +153,23 @@ void Game::update() {
     }
 }
 
-
 void Game::render() {
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LEQUAL);
 
-    renderer->clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, XE::Vector4{0.0f, 0.0f, 0.0f, 1.0f}, {1.0f}, {});
+    renderer->clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, xe::Vector4{0.0f, 0.0f, 0.0f, 1.0f}, {1.0f}, {});
     renderer->viewport({0, 0}, {SCREEN_WIDTH, SCREEN_HEIGHT});
 
     renderer->useProgram(program);
 
-    const int mvpLoc = program.getUniformLocation( "uMvp");
+    const int mvpLoc = program.getUniformLocation("uMvp");
     const auto viewProj = camera.getViewProj(SCREEN_WIDTH, SCREEN_HEIGHT);
 
     // render triangle
     Transformation transformation;
-    transformation.rotation.X = XE::radians(angle);
-    transformation.rotation.Y = XE::radians(angle);
-    transformation.rotation.Z = XE::radians(angle);
+    transformation.rotation.X = xe::radians(angle);
+    transformation.rotation.Y = xe::radians(angle);
+    transformation.rotation.Z = xe::radians(angle);
 
     const auto triangleMatrix = viewProj * transformation.computeModelMatrix();
 
@@ -180,8 +178,8 @@ void Game::render() {
     auto triangleVaoAttrib = xe::gl::Attribute{vertCoordZLoc, xe::gl::AttributeDim::_1, xe::gl::AttributeType::Float};
     triangleVaoAttrib.data = &triangleVaoAttribData;
 
-    auto triangleVaoPrimitive = xe::gl::VertexArrayPrimitive{0, 3, {&triangleVaoAttrib, 1}};
-    auto triangleVaoPrimitiveMem = tcb::span<xe::gl::VertexArrayPrimitive>{&triangleVaoPrimitive, 1};
+    auto triangleVaoPrimitive = xe::gl::VertexArrayPrimitive{0, 3, bpstd::span<const xe::gl::Attribute>(&triangleVaoAttrib, static_cast<size_t>(1))};
+    auto triangleVaoPrimitiveMem = bpstd::span<const xe::gl::VertexArrayPrimitive>(&triangleVaoPrimitive, static_cast<size_t>(1));
     renderer->draw(triangleVao, GL_TRIANGLE_STRIP, triangleVaoPrimitiveMem);
 
     // render floor geometry
@@ -194,9 +192,9 @@ void Game::render() {
     SDL_GL_SwapWindow(window);
 }
 
-
-FloorGeometry createFloorGeometry(const xe::gl::RendererGL &renderer, const GLint vertCoordLoc, const GLint vertColorLoc, const int tilesInX, const int tilesInZ, const float tileSizeX,
-                                  const float tileSizeZ) {
+FloorGeometry createFloorGeometry(
+    const xe::gl::RendererGL &renderer, const GLint vertCoordLoc, const GLint vertColorLoc, const int tilesInX, const int tilesInZ, const float tileSizeX, const float tileSizeZ
+) {
     FloorGeometry floorGeometry;
     floorGeometry.tilesInX = tilesInX;
     floorGeometry.tilesInZ = tilesInZ;
@@ -204,45 +202,43 @@ FloorGeometry createFloorGeometry(const xe::gl::RendererGL &renderer, const GLin
     floorGeometry.tileSizeZ = tileSizeZ;
     floorGeometry.stripVertexCount = 2 * (tilesInX + 1);
 
-    std::vector<XE::Vector3> vertices{static_cast<size_t>(floorGeometry.stripVertexCount)};
+    std::vector<xe::Vector3> vertices{static_cast<size_t>(floorGeometry.stripVertexCount)};
 
-    int j = 0;
+    size_t j = 0;
 
-    for (int i = 0; i < tilesInX + 1; i++) {
-        vertices[2 * i] = XE::Vector3(i * tileSizeX, 0.0f, j * tileSizeZ);
-        vertices[2 * i + 1] = XE::Vector3(i * tileSizeX, 0.0f, (j + 1) * tileSizeZ);
+    for (size_t i = 0; i < static_cast<size_t>(tilesInX + 1); i++) {
+        vertices[2 * i] = xe::Vector3(i * tileSizeX, 0.0f, j * tileSizeZ);
+        vertices[2 * i + 1] = xe::Vector3(i * tileSizeX, 0.0f, static_cast<float>(j + 1) * tileSizeZ);
     }
 
-    floorGeometry.vertexBuffer = renderer.createBuffer(GL_ARRAY_BUFFER, GL_STATIC_DRAW, { vertices.data(), vertices.size() * sizeof(XE::Vector3) });
+    floorGeometry.vertexBuffer = renderer.createBuffer(GL_ARRAY_BUFFER, GL_STATIC_DRAW, {vertices.data(), vertices.size() * sizeof(xe::Vector3)});
 
     xe::gl::Attribute attribs[] = {
         xe::gl::Attribute{vertCoordLoc, xe::gl::AttributeDim::_3, xe::gl::AttributeType::Float, GL_FALSE, 0, floorGeometry.vertexBuffer, 0},
         xe::gl::Attribute{vertColorLoc, xe::gl::AttributeDim::_3, xe::gl::AttributeType::Float, GL_FALSE, 0, {}, 0}
     };
 
-    floorGeometry.vao = renderer.createVertexArray({attribs, 1}, {});
+    floorGeometry.vao = renderer.createVertexArray(bpstd::span<const xe::gl::Attribute>(attribs, static_cast<size_t>(1)), {});
 
     return floorGeometry;
 }
 
-
 void renderFloorGeometry(const FloorGeometry &floorGeometry, const GLint vertCoordZLoc, const GLint vertColourLoc) {
     glBindVertexArray(floorGeometry.vao.id);
 
-    const XE::Vector4 colorFrom = {0.2f, 0.2f, 0.2f, 1.0f};
-    const XE::Vector4 colorTo = {0.2f, 0.2f, 1.0f, 1.0f};
+    const xe::Vector4 colorFrom = {0.2f, 0.2f, 0.2f, 1.0f};
+    const xe::Vector4 colorTo = {0.2f, 0.2f, 1.0f, 1.0f};
 
     for (int k = 0; k < floorGeometry.tilesInZ; k++) {
         const float z = static_cast<float>(k) * floorGeometry.tileSizeZ;
         const float s = static_cast<float>(k) / static_cast<float>((floorGeometry.tilesInZ - 1));
-        const XE::Vector4 color = XE::lerp(colorFrom, colorTo, s);
+        const xe::Vector4 color = xe::lerp(colorFrom, colorTo, s);
 
         glVertexAttrib4fv(vertColourLoc, color.data());
         glVertexAttrib1f(vertCoordZLoc, z);
         glDrawArrays(GL_TRIANGLE_STRIP, 0, floorGeometry.stripVertexCount);
     }
 }
-
 
 xe::gl::VertexArray createTriangleGeometry(const RendererGL &renderer, const GLint vertCoordLoc, const GLint vertColorLoc) {
     // prepare buffer
@@ -251,7 +247,18 @@ xe::gl::VertexArray createTriangleGeometry(const RendererGL &renderer, const GLi
     const GLfloat vertices[] = {0.0f, 0.5f, 0.0f, 0.5f, -0.5f, 0.0f, -0.5f, -0.5f, 0.0f};
 
     const GLfloat colours[] = {
-        1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f,
+        1.0f,
+        0.0f,
+        0.0f,
+        1.0f,
+        0.0f,
+        1.0f,
+        0.0f,
+        1.0f,
+        0.0f,
+        0.0f,
+        1.0f,
+        1.0f,
     };
 
     const auto vertexBuffer = renderer.createBuffer(GL_ARRAY_BUFFER, GL_STATIC_DRAW, {vertices, sizeof(GLfloat) * VERTEX_COLOUR * 3});
@@ -262,5 +269,5 @@ xe::gl::VertexArray createTriangleGeometry(const RendererGL &renderer, const GLi
         xe::gl::Attribute{vertColorLoc, xe::gl::AttributeDim::_3, xe::gl::AttributeType::Float, GL_FALSE, 0, colourBuffer, 0}
     };
 
-    return renderer.createVertexArray({attribs, 1}, {});
+    return renderer.createVertexArray(bpstd::span<const xe::gl::Attribute>(attribs, static_cast<size_t>(1)), {});
 }

@@ -13,15 +13,15 @@
 #include "TextureCubeMapGL.h"
 #include "UtilGL.h"
 
-#include <../../../../libxe-core/src/xe/graphics/Material.h>
-#include <../../../../libxe-core/src/xe/graphics/Subset.h>
-#include <../../../../libxe-core/src/xe/graphics/Texture2DArray.h>
-#include <../../../../libxe-core/src/xe/graphics/Texture3D.h>
-#include <../../../../libxe-core/src/xe/graphics/TextureCubeMap.h>
-#include <../../../../libxe-core/src/xe/graphics/Uniform.h>
 #include <iostream>
+#include <xe/graphics/Material.h>
+#include <xe/graphics/Subset.h>
+#include <xe/graphics/Texture2DArray.h>
+#include <xe/graphics/Texture3D.h>
+#include <xe/graphics/TextureCubeMap.h>
+#include <xe/graphics/Uniform.h>
 
-namespace XE {
+namespace xe {
     static std::string hexstr(const GLenum value) {
         std::string str;
         str.resize(16, ' ');
@@ -67,11 +67,11 @@ namespace XE {
         GLenum err = glGetError();
 
         if (err != GL_NO_ERROR) {
-            std::cerr << "GraphicsDeviceGL: Error while calling function " << name << std::endl;
-            std::cerr << "GraphicsDeviceGL: Errors generated:" << std::endl;
+            std::cerr << "GraphicsDeviceGL: Error while calling function " << name << '\n';
+            std::cerr << "GraphicsDeviceGL: Errors generated:" << '\n';
 
             while (err != GL_NO_ERROR) {
-                std::cerr << "GraphicsDeviceGL:" << stringval(err) << std::endl;
+                std::cerr << "GraphicsDeviceGL:" << stringval(err) << '\n';
                 err = glGetError();
             }
 
@@ -82,52 +82,64 @@ namespace XE {
     GraphicsDeviceGL::GraphicsDeviceGL(GraphicsContext *context) : context(context) {
         assert(context);
 
-        std::cout << "[GL] Loading OpenGL Extensions ..." << std::endl;
-        gladLoadGL();
+        std::cout << "[GL] Loading OpenGL Extensions ..." << '\n';
+        glazeLoadFunctions(reinterpret_cast<GLAZE_GETPROCADDRESS>(context->getProcAddressFunctionGL()));
 
-#ifndef NDEBUG
-        glad_set_post_callback_gl(GraphicsDeviceGL_callback);
-        glad_set_post_callback(GraphicsDeviceGL_callback);
+#if defined(GLAZE_DEBUG)
+        glazeSetPostCallback(GraphicsDeviceGL_callback);
 #endif
     }
 
-    GraphicsDeviceGL::~GraphicsDeviceGL() {}
+    GraphicsDeviceGL::~GraphicsDeviceGL() {
+    }
 
-    Subset *GraphicsDeviceGL::createSubset(const SubsetDescriptor &desc) { return new SubsetGL(desc); }
+    Subset *GraphicsDeviceGL::createSubset(const SubsetDescriptor &desc) {
+        return new SubsetGL(desc);
+    }
 
-    Buffer *GraphicsDeviceGL::createBuffer(const BufferDescriptor &desc) { return nullptr; }
+    Buffer *GraphicsDeviceGL::createBuffer(const BufferDescriptor & /*desc*/) {
+        return nullptr;
+    }
 
-    Texture2D *GraphicsDeviceGL::createTexture2D(const PixelFormat format, const Vector2i &size, const PixelFormat sourceFormat, const DataType sourceDataType,
-                                                 const void *sourceData) {
+    Texture2D *
+    GraphicsDeviceGL::createTexture2D(const PixelFormat format, const Vector2i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void *sourceData) {
         return new Texture2DGL(format, size, sourceFormat, sourceDataType, sourceData);
     }
 
-    Texture3D *GraphicsDeviceGL::createTexture3D(const PixelFormat format, const Vector3i &size, const PixelFormat sourceFormat, const DataType sourceDataType,
-                                                 const void *sourceData) {
+    Texture3D *
+    GraphicsDeviceGL::createTexture3D(const PixelFormat format, const Vector3i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void *sourceData) {
         return new Texture3DGL(format, size, sourceFormat, sourceDataType, sourceData);
     }
 
-    Texture2DArray *GraphicsDeviceGL::createTexture2DArray(const PixelFormat format, const Vector2i &size, const int count) { return new Texture2DArrayGL(format, size, count); }
+    Texture2DArray *GraphicsDeviceGL::createTexture2DArray(const PixelFormat format, const Vector2i &size, const int count) {
+        return new Texture2DArrayGL(format, size, count);
+    }
 
-    TextureCubeMap *GraphicsDeviceGL::createTextureCubeMap(const PixelFormat format, const Vector2i &size, const PixelFormat sourceFormat, const DataType sourceDataType,
-                                                           const void **sourceData) {
+    TextureCubeMap *
+    GraphicsDeviceGL::createTextureCubeMap(const PixelFormat format, const Vector2i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void **sourceData) {
 
         const std::array<TextureCubeMapSide, 6> sides = {
-            TextureCubeMapSide::PositiveX, TextureCubeMapSide::PositiveY, TextureCubeMapSide::PositiveZ,
-            TextureCubeMapSide::NegativeX, TextureCubeMapSide::NegativeY, TextureCubeMapSide::NegativeZ,
+            TextureCubeMapSide::PositiveX,
+            TextureCubeMapSide::PositiveY,
+            TextureCubeMapSide::PositiveZ,
+            TextureCubeMapSide::NegativeX,
+            TextureCubeMapSide::NegativeY,
+            TextureCubeMapSide::NegativeZ,
         };
 
         return new TextureCubeMapGL(format, size, sourceFormat, sourceDataType, sides, sourceData);
     }
 
-    Program *GraphicsDeviceGL::createProgram(const ProgramDescriptor &desc) { return new ProgramGL(desc); }
+    Program *GraphicsDeviceGL::createProgram(const ProgramDescriptor &desc) {
+        return new ProgramGL(desc);
+    }
 
     void GraphicsDeviceGL::draw(const Subset *subset, const SubsetEnvelope *envelopes, const size_t envelopeCount) {
         assert(subset);
         assert(envelopes);
         assert(envelopeCount > 0);
 
-        auto subsetGL = static_cast<const SubsetGL *>(subset);
+        auto subsetGL = dynamic_cast<const SubsetGL *>(subset);
 
         glBindVertexArray(subsetGL->getID());
 
@@ -287,7 +299,7 @@ namespace XE {
     }
 
     void GraphicsDeviceGL::setProgram(const Program *program) {
-        m_program = static_cast<const ProgramGL *>(program);
+        m_program = dynamic_cast<const ProgramGL *>(program);
 
         if (m_program) {
             glUseProgram(m_program->GetID());
@@ -296,7 +308,9 @@ namespace XE {
         }
     }
 
-    const Program *GraphicsDeviceGL::getProgram() const { return m_program; }
+    const Program *GraphicsDeviceGL::getProgram() const {
+        return m_program;
+    }
 
     void GraphicsDeviceGL::applyUniform(const UniformMatrix *uniformMatrix, const size_t count, const void *data) {
         // TODO: Add support for matrix transposition
@@ -487,7 +501,11 @@ namespace XE {
         m_viewport = viewport;
     }
 
-    Viewport GraphicsDeviceGL::getViewport() const { return m_viewport; }
+    Viewport GraphicsDeviceGL::getViewport() const {
+        return m_viewport;
+    }
 
-    const Material *GraphicsDeviceGL::getMaterial() const { return m_material; }
+    const Material *GraphicsDeviceGL::getMaterial() const {
+        return m_material;
+    }
 } // namespace xe

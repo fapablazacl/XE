@@ -5,7 +5,7 @@
 #include <cassert>
 #include <ostream>
 
-namespace XE {
+namespace xe {
     /**
      * @brief Mathematical Range pair implementation.
      *
@@ -18,18 +18,24 @@ namespace XE {
         T min = static_cast<T>(0);
         T max = static_cast<T>(1);
 
-        TRange() {}
+        TRange() {
+        }
 
-        explicit TRange(const T value) : min(value), max(value) {}
+        explicit TRange(const T value) : min(value), max(value) {
+        }
 
-        explicit TRange(const T value1, const T value2) : TRange(value1) { expand(value2); }
+        explicit TRange(const T value1, const T value2) : TRange(value1) {
+            expand(value2);
+        }
 
         void expand(const T value) {
             min = std::min(min, value);
             max = std::max(max, value);
         }
 
-        bool overlap(const TRange<T> &other) const { return partialOverlap(other) || other.partialOverlap(*this); }
+        bool overlap(const TRange<T> &other) const {
+            return partialOverlap(other) || other.partialOverlap(*this);
+        }
 
         /**
          * @brief Checks if the current Projection overlaps with the supplied Projection.

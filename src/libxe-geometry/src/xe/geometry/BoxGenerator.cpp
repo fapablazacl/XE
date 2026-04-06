@@ -2,21 +2,26 @@
 #include <xe/geometry/BoxGenerator.h>
 #include <xe/math/Common.h>
 
-namespace XE {
+namespace xe {
     const int faceCount = 6;
 
-    BoxGenerator::BoxGenerator(const Vector3i &division, const Vector3 &size) {
-        this->division = division;
-        this->size = size;
+    BoxGenerator::BoxGenerator(const Vector3i &division, const Vector3 &size) : division(division), size(size) {
     }
 
-    BoxGenerator::~BoxGenerator() {}
+    BoxGenerator::~BoxGenerator() {
+    }
 
-    std::vector<Vector3> BoxGenerator::generateVertexCoordinates() const { return {}; }
+    std::vector<Vector3> BoxGenerator::generateVertexCoordinates() const {
+        return {};
+    }
 
-    std::vector<Vector3> BoxGenerator::generateVertexNormals() const { return {}; }
+    std::vector<Vector3> BoxGenerator::generateVertexNormals() const {
+        return {};
+    }
 
-    std::vector<Vector2> BoxGenerator::generateVertexTexCoords() const { return {}; }
+    std::vector<Vector2> BoxGenerator::generateVertexTexCoords() const {
+        return {};
+    }
 
     std::vector<int> BoxGenerator::generateIndices() const {
         const int slices = division.X;

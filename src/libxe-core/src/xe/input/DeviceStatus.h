@@ -4,7 +4,7 @@
 
 #include <xe/math/Vector.h>
 
-namespace XE {
+namespace xe {
     enum class BinaryState { Press, Release };
 
     enum class KeyCode {
@@ -84,9 +84,13 @@ namespace XE {
 
         void setState(const KeyCode code, const BinaryState state);
 
-        bool isPressed(const KeyCode code) const { return getState(code) == BinaryState::Press; }
+        bool isPressed(const KeyCode code) const {
+            return getState(code) == BinaryState::Press;
+        }
 
-        bool isReleased(const KeyCode code) const { return getState(code) == BinaryState::Release; }
+        bool isReleased(const KeyCode code) const {
+            return getState(code) == BinaryState::Release;
+        }
 
     private:
         BinaryState m_keys[static_cast<int>(KeyCode::Max)] = {};

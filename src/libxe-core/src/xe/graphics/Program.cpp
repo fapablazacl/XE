@@ -1,6 +1,7 @@
 
 #include <xe/graphics/Program.h>
 
-namespace XE {
-    Program::~Program() {}
+namespace xe {
+    Program::~Program() {
+    }
 } // namespace xe

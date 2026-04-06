@@ -5,7 +5,7 @@
 #include <cstddef>
 #include <xe/Predef.h>
 
-namespace XE {
+namespace xe {
     enum class BufferAccess { Static, Dynamic, Stream };
 
     enum class BufferUsage { Copy, Read, Write };

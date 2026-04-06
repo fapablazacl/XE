@@ -1,11 +1,12 @@
 
 #pragma once
 
-namespace XE {
+namespace xe {
     class GraphicsDevice;
     class GraphicsDeviceFactory {
     public:
-        virtual ~GraphicsDeviceFactory() {}
+        virtual ~GraphicsDeviceFactory() {
+        }
 
         virtual GraphicsDevice *createDevice();
     };

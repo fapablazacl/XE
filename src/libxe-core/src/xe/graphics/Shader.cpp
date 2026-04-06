@@ -1,6 +1,7 @@
 
 #include <xe/graphics/Shader.h>
 
-namespace XE {
-    Shader::~Shader() {}
+namespace xe {
+    Shader::~Shader() {
+    }
 } // namespace xe

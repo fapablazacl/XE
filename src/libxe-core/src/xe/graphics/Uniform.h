@@ -6,7 +6,7 @@
 #include <vector>
 #include <xe/DataType.h>
 
-namespace XE {
+namespace xe {
     enum class UniformDimension : int { D1 = 1, D2, D3, D4 };
 
     /**

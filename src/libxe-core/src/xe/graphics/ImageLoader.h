@@ -4,11 +4,11 @@
 
 #include <memory>
 
-namespace XE {
+namespace xe {
     class Stream;
 }
 
-namespace XE {
+namespace xe {
     class Image;
 
     /**

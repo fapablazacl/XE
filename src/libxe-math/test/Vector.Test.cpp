@@ -176,7 +176,6 @@ TEST(VectorTest, DotProductShouldComputeASumOfProductsOfEachComponent) {
     EXPECT_FLOAT_EQ(dot(v2, v1), 146.0f);
 }
 
-
 TEST(VectorTest, TripleDotProductFromUnitAxisComputesOne) {
     const XE::Vector3 v1 = {1.0f, 0.0f, 0.0f};
     const XE::Vector3 v2 = {0.0f, 1.0f, 0.0f};
@@ -187,7 +186,6 @@ TEST(VectorTest, TripleDotProductFromUnitAxisComputesOne) {
     EXPECT_FLOAT_EQ(result, 1.0f);
 }
 
-
 TEST(VectorTest, TripleDotProductFromCoplanarVectorComputesZero) {
     const XE::Vector3 v1 = {1.0f, 0.0f, 0.0f};
     const XE::Vector3 v2 = {0.0f, 1.0f, 0.0f};
@@ -195,7 +193,6 @@ TEST(VectorTest, TripleDotProductFromCoplanarVectorComputesZero) {
 
     EXPECT_FLOAT_EQ(XE::dot(v1, v2, v3), 0.0f);
 }
-
 
 TEST(VectorTest, TripleDotProductFromArbitraryAxesComputesSeven) {
     const XE::Vector3 v1 = {1.0f, -1.0f, 1.0f};
@@ -207,7 +204,6 @@ TEST(VectorTest, TripleDotProductFromArbitraryAxesComputesSeven) {
     EXPECT_FLOAT_EQ(result, -7.0f);
 }
 
-
 TEST(VectorTest, TripleDotProductDontChangeFromCircularRotationOfParameters) {
     const XE::Vector3 v1 = {1.0f, -1.0f, 1.0f};
     const XE::Vector3 v2 = {2.0f, 1.0f, 1.0f};
@@ -216,7 +212,6 @@ TEST(VectorTest, TripleDotProductDontChangeFromCircularRotationOfParameters) {
     EXPECT_FLOAT_EQ(XE::dot(v1, v2, v3), XE::dot(v3, v1, v2));
     EXPECT_FLOAT_EQ(XE::dot(v1, v2, v3), XE::dot(v2, v3, v1));
 }
-
 
 TEST(VectorTest, TripleDotProductChangesSignFromParameterSwapping) {
     const XE::Vector3 v1 = {1.0f, -1.0f, 1.0f};
@@ -227,7 +222,6 @@ TEST(VectorTest, TripleDotProductChangesSignFromParameterSwapping) {
     EXPECT_FLOAT_EQ(XE::dot(v1, v2, v3), -XE::dot(v1, v3, v2));
 }
 
-
 TEST(VectorTest, TwoDimensionalCrossProductShouldReturnCrossVectorLength) {
     const XE::Vector2 v1 = {2.0f, 0.0f};
     const XE::Vector2 v2 = {0.0f, 2.0f};
@@ -236,7 +230,6 @@ TEST(VectorTest, TwoDimensionalCrossProductShouldReturnCrossVectorLength) {
     EXPECT_EQ(cross(v1, v2), 4.0f);
     EXPECT_EQ(cross(v1, v3), -2.0f);
 }
-
 
 TEST(VectorTest, ThreeDimensionalCrossProductShouldPerformCorrectlyForUnitVectors) {
     const XE::Vector3 v1 = {1.0f, 0.0f, 0.0f};
@@ -257,7 +250,6 @@ TEST(VectorTest, ThreeDimensionalCrossProductShouldPerformCorrectlyForUnitVector
     EXPECT_EQ(cross(v3, v3), XE::Vector3(0.0f));
 }
 
-
 TEST(VectorTest, TripleCrossProductComputesACB_Minus_ABC_Product) {
     const XE::Vector3 v1 = {1.0f, 0.0f, 0.0f};
     const XE::Vector3 v2 = {0.0f, 1.0f, 0.0f};
@@ -265,7 +257,6 @@ TEST(VectorTest, TripleCrossProductComputesACB_Minus_ABC_Product) {
 
     EXPECT_EQ(cross(v1, v2, v3), dot(v1, v3) * v2 - dot(v1, v2) * v3);
 }
-
 
 TEST(VectorTest, MinimizeShouldReturnMinimunValuesBetweenTwoVectors) {
     const XE::Vector3 v1 = {1.0f, -2.0f, -1.3f};

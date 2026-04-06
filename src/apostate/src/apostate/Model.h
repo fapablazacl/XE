@@ -1,5 +1,5 @@
 
-#pragma once 
+#pragma once
 
 #include "../../../libxe-gl/src/xe/gl/Renderer.h"
 
@@ -12,16 +12,10 @@ struct MeshNode {
 struct Model {
     void render(Renderer &renderer, const ShaderLocationMap &location) const;
 
-    void renderNode(
-        Renderer &renderer, 
-        const ShaderLocationMap &location,
-        const glm::mat4 &parentTransform,
-        const MeshNode &node
-    ) const;
+    void renderNode(Renderer &renderer, const ShaderLocationMap &location, const glm::mat4 &parentTransform, const MeshNode &node) const;
 
     MeshNode rootNode;
     std::vector<Mesh> meshes;
     std::vector<GLuint> textures;
     std::vector<Material> materials;
 };
-

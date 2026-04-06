@@ -6,7 +6,7 @@
 
 #include <ostream>
 
-namespace XE {
+namespace xe {
     enum class PlaneSide { Front, Back, Inside };
 
     /**
@@ -21,18 +21,23 @@ namespace XE {
         T c = T(0);
         T d = T(0);
 
-        explicit TPlane() {}
+        explicit TPlane() {
+        }
 
-        explicit TPlane(const T a, const T b, const T c, const T d) : a(a), b(b), c(c), d(d) {}
+        explicit TPlane(const T a, const T b, const T c, const T d) : a(a), b(b), c(c), d(d) {
+        }
 
-        explicit TPlane(const TVector3<T> &n, const T d) : a(n.X), b(n.Y), c(n.Z), d(d) {}
+        explicit TPlane(const TVector3<T> &n, const T d) : a(n.X), b(n.Y), c(n.Z), d(d) {
+        }
 
         /**
          * @brief Returns the current normal vector
          *
          * @return TVector3<T>
          */
-        TVector3<T> normal() const { return {a, b, c}; }
+        TVector3<T> normal() const {
+            return {a, b, c};
+        }
 
         /**
          * @brief Evaluate the point coordinates in the scalar Plane equation.
@@ -48,11 +53,17 @@ namespace XE {
          * @param point The point to evaluate in 3-space.
          * @return T
          */
-        T evaluate(const TVector3<T> &point) const { return dot(normal(), point) - d; }
+        T evaluate(const TVector3<T> &point) const {
+            return dot(normal(), point) - d;
+        }
 
-        bool operator==(const TPlane<T> &rhs) const { return (a == rhs.a && b == rhs.b && c == rhs.c && d == rhs.d); }
+        bool operator==(const TPlane<T> &rhs) const {
+            return (a == rhs.a && b == rhs.b && c == rhs.c && d == rhs.d);
+        }
 
-        bool operator!=(const TPlane<T> &rhs) const { return !(*this == rhs); }
+        bool operator!=(const TPlane<T> &rhs) const {
+            return !(*this == rhs);
+        }
 
         /**
          * @brief Determines whenever two planes intersects or not.
@@ -94,14 +105,18 @@ namespace XE {
          *
          * @return T*
          */
-        T *data() { return &a; }
+        T *data() {
+            return &a;
+        }
 
         /**
          * @brief Returns a pointer to the raw data in the Plane.
          *
          * @return const T*
          */
-        const T *data() const { return &a; }
+        const T *data() const {
+            return &a;
+        }
     };
 
     /**
@@ -111,7 +126,9 @@ namespace XE {
      * @param position
      * @return Plane<T>
      */
-    template <typename T = float> TPlane<T> planeVectorial(const TVector3<T> &normal, const TVector3<T> &position) { return TPlane<T>{normalize(normal), dot(position, normal)}; }
+    template <typename T = float> TPlane<T> planeVectorial(const TVector3<T> &normal, const TVector3<T> &position) {
+        return TPlane<T>{normalize(normal), dot(position, normal)};
+    }
 
     /**
      * @brief Initializes a plane from three points
@@ -133,21 +150,27 @@ namespace XE {
      *
      * @return Plane<T>
      */
-    template <typename T = float> TPlane<T> planeYZ() { return TPlane<T>{T(1), T(0), T(0), T(0)}; }
+    template <typename T = float> TPlane<T> planeYZ() {
+        return TPlane<T>{T(1), T(0), T(0), T(0)};
+    }
 
     /**
      * @brief Creates a Plane aligned at the XZ-Plane
      *
      * @return Plane<T>
      */
-    template <typename T = float> TPlane<T> planeXZ() { return TPlane<T>{T(0), T(1), T(0), T(0)}; }
+    template <typename T = float> TPlane<T> planeXZ() {
+        return TPlane<T>{T(0), T(1), T(0), T(0)};
+    }
 
     /**
      * @brief Creates a Plane aligned at the XY-Plane
      *
      * @return Plane<T>
      */
-    template <typename T = float> TPlane<T> planeXY() { return TPlane<T>{T(0), T(0), T(1), T(0)}; }
+    template <typename T = float> TPlane<T> planeXY() {
+        return TPlane<T>{T(0), T(0), T(1), T(0)};
+    }
 
     /**
      * @brief Creates a Plane aligned at the YZ-Plane, at the specified position
@@ -155,7 +178,9 @@ namespace XE {
      * @param position
      * @return Plane<T>
      */
-    template <typename T = float> TPlane<T> planeYZ(const TVector3<T> &position) { return TPlane<T>{T(1), T(0), T(0), position.X}; }
+    template <typename T = float> TPlane<T> planeYZ(const TVector3<T> &position) {
+        return TPlane<T>{T(1), T(0), T(0), position.X};
+    }
 
     /**
      * @brief Creates a Plane aligned at the XZ-Plane, at the specified position
@@ -163,7 +188,9 @@ namespace XE {
      * @param position
      * @return Plane<T>
      */
-    template <typename T = float> TPlane<T> planeXZ(const TVector3<T> &position) { return TPlane<T>{T(0), T(1), T(0), position.Y}; }
+    template <typename T = float> TPlane<T> planeXZ(const TVector3<T> &position) {
+        return TPlane<T>{T(0), T(1), T(0), position.Y};
+    }
 
     /**
      * @brief Creates a Plane aligned at the XY-Plane, at the specified position
@@ -171,7 +198,9 @@ namespace XE {
      * @param position
      * @return Plane<T>
      */
-    template <typename T = float> TPlane<T> planeXY(const TVector3<T> &position) { return TPlane<T>{T(0), T(0), T(1), position.Z}; }
+    template <typename T = float> TPlane<T> planeXY(const TVector3<T> &position) {
+        return TPlane<T>{T(0), T(0), T(1), position.Z};
+    }
 
     /**
      * @brief Returns a inverted Plane, with the Normal part negated.
@@ -180,7 +209,9 @@ namespace XE {
      * @param plane
      * @return Plane<T>
      */
-    template <typename T> TPlane<T> invert(const TPlane<T> &plane) { return {-plane.a, -plane.b, -plane.c, plane.d}; }
+    template <typename T> TPlane<T> invert(const TPlane<T> &plane) {
+        return {-plane.a, -plane.b, -plane.c, plane.d};
+    }
 
     template <typename T> struct TRay;
 

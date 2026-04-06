@@ -3,9 +3,9 @@
 
 #include "TextureRepository.h"
 
-#include <glad/glad.h>
 #include <algorithm>
 #include <fstream>
+#include <glaze/gl.h>
 #include <glm/ext.hpp>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -48,14 +48,12 @@ struct MaterialChannel {
     GLuint textureMap = 0;
 };
 
-
 struct Material {
     MaterialChannel ambient;
     MaterialChannel diffuse;
     MaterialChannel specular;
     MaterialChannel emissive;
 };
-
 
 struct Light {
     glm::vec3 direction = glm::normalize(glm::vec3{0.5f, 1.0f, 0.25f});
@@ -82,39 +80,38 @@ struct ShaderLocationMap {
     GLint coord = -1;
     GLint normal = -1;
     GLint texCoord = -1;
-    
+
     GLint uModel = -1;
     GLint uView = -1;
     GLint uProj = -1;
-    
+
     GLint uMaterialDiffuseSamplerEnable = -1;
     GLint uMaterialDiffuseSampler = -1;
     GLint uMaterialAmbient = -1;
     GLint uMaterialDiffuse = -1;
     GLint uMaterialSpecular = -1;
-    
+
     GLint uLightAmbient = -1;
     GLint uLightDirection = -1;
     GLint uLightDiffuse = -1;
 };
 
-
 struct Mesh {
     GLuint vao = 0;
     GLenum primitiveType = GL_TRIANGLES;
     bool indexed = false;
-    unsigned int count = 0;
+    size_t count = 0;
     GLenum indexDataType = GL_UNSIGNED_INT;
-    
-    int material = -1;
-    
-    Mesh() {}
-    
+
+    std::optional<size_t> material;
+
+    Mesh() {
+    }
+
     bool empty() const {
         return vao == 0;
     }
 };
-
 
 struct MeshAttribute {
     void *data = nullptr;
@@ -136,7 +133,6 @@ struct MeshData {
     size_t materialIndex = 0;
 };
 
-
 class Platform;
 class Renderer {
 public:
@@ -156,10 +152,9 @@ public:
         return createBuffer(target, attrib.size, attrib.data, usage);
     }
 
-    template<class ArrayLike>
-    GLuint createBuffer(const GLenum target, const ArrayLike &values, GLenum usage) {
+    template <class ArrayLike> GLuint createBuffer(const GLenum target, const ArrayLike &values, GLenum usage) {
         using T = typename ArrayLike::value_type;
-        
+
         return createBuffer(target, sizeof(T) * values.size(), values.data(), usage);
     }
 
@@ -173,11 +168,11 @@ public:
 
     GLuint createTexture(GLenum internalFormat, const unsigned width, const unsigned height, const GLenum format, const GLenum type, const void *data);
 
-    GLuint createTexture(GLenum internalFormat, const unsigned width, const unsigned height, const GLenum format, const GLenum type, const void *data, const GLuint wrapS, const GLuint wrapT);
+    GLuint createTexture(
+        GLenum internalFormat, const unsigned width, const unsigned height, const GLenum format, const GLenum type, const void *data, const GLuint wrapS, const GLuint wrapT
+    );
 
     void renderCamera(const ShaderLocationMap &location, const Camera &camera);
-
-    void renderLight(const ShaderLocationMap &location, const Light &light);
 
     void renderLighting(const GLuint programId, const Lighting &lighting);
 

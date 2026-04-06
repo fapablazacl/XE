@@ -6,7 +6,7 @@
 #include <xe/math/Matrix.h>
 
 namespace TestApp {
-    using namespace XE;
+    using namespace xe;
 
     class Shader {
     public:

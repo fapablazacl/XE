@@ -5,7 +5,7 @@
 #include "Vector.h"
 #include <cassert>
 
-namespace XE {
+namespace xe {
     /**
      * @brief Ray with normalized direction in the 3-space
      */
@@ -17,7 +17,9 @@ namespace XE {
          * @brief Computes the point of the ray at 't' distance from the starting point, to the
          * direction of the ray.
          */
-        TVector<T, 3> pointAt(const T t) const { return position + t * direction; }
+        TVector<T, 3> pointAt(const T t) const {
+            return position + t * direction;
+        }
 
         /**
          * @brief Initializes the ray, positioned around the origin and aiming to the positive Z-axis.

@@ -4,7 +4,7 @@
 #if defined(XE_OS_WINDOWS)
 #include <Windows.h>
 
-namespace XE {
+namespace xe {
     uint32_t Timer::getTick() {
         const DWORD dwTickCount = ::GetTickCount();
         return dwTickCount;
@@ -29,22 +29,27 @@ static uint64_t monotonicTimeNanos() {
             return (high << 32) + highRem + low;
         }
 
-        Data(uint64_t bias_) : bias(bias_) { mtiStatus = mach_timebase_info(&tb); }
+        Data(uint64_t bias_) : bias(bias_), mtiStatus(mach_timebase_info(&tb)) {
+        }
 
-        uint64_t scale(uint64_t i) { return scaleHighPrecision(i - bias, tb.numer, tb.denom); }
+        uint64_t scale(uint64_t i) {
+            return scaleHighPrecision(i - bias, tb.numer, tb.denom);
+        }
 
-        mach_timebase_info_data_t tb;
+        mach_timebase_info_data_t tb{};
         uint64_t bias;
         kern_return_t mtiStatus;
 
-        bool valid() const { return mtiStatus == KERN_SUCCESS; }
+        bool valid() const {
+            return mtiStatus == KERN_SUCCESS;
+        }
 
     } data(now);
 
     return data.scale(now);
 }
 
-namespace XE {
+namespace xe {
     uint32_t Timer::getTick() {
         const uint64_t nanos = monotonicTimeNanos();
         return nanos / 1000000;
@@ -54,7 +59,7 @@ namespace XE {
 #elif defined(__linux__)
 #include <time.h>
 
-namespace XE {
+namespace xe {
     uint32_t Timer::getTick() {
         timespec ts;
         clock_gettime(CLOCK_MONOTONIC, &ts);

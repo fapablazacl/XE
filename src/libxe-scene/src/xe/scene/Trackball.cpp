@@ -1,18 +1,30 @@
 
 #include <xe/scene/Trackball.h>
 
-namespace XE {
-    Trackball::Trackball(const Vector2i &size) { this->resize(size); }
+namespace xe {
+    Trackball::Trackball(const Vector2i &size) {
+        this->resize(size);
+    }
 
-    void Trackball::beginDrag(const Vector2i &position) { dragBegin = position; }
+    void Trackball::beginDrag(const Vector2i &position) {
+        dragBegin = position;
+    }
 
-    void Trackball::drag(const Vector2i &position) { dragCurrent = position; }
+    void Trackball::drag(const Vector2i &position) {
+        dragCurrent = position;
+    }
 
-    void Trackball::endDrag(const Vector2i &position) { dragEnd = position; }
+    void Trackball::endDrag(const Vector2i &position) {
+        dragEnd = position;
+    }
 
-    void Trackball::resize(const Vector2i &size) { vsphere.setScreenSize(size); }
+    void Trackball::resize(const Vector2i &size) {
+        vsphere.setScreenSize(size);
+    }
 
-    Rotation<float> Trackball::computeRotation() const { return {0.0f, {0.0f, 0.0f, 0.0f}}; }
+    Rotation<float> Trackball::computeRotation() const {
+        return {0.0f, {0.0f, 0.0f, 0.0f}};
+    }
 
     Vector2 Trackball::scalePosition(const Vector2i &position) const {
         // map position to the [-1, 1]^2 range domain

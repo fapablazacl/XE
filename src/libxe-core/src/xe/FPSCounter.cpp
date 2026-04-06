@@ -4,9 +4,9 @@
 
 #include "FPSCounter.h"
 
-namespace XE {
+namespace xe {
     bool FPSCounter::frame() {
-        const int milliseconds = XE::Timer::getTick() - lastTime;
+        const int milliseconds = xe::Timer::getTick() - lastTime;
 
         if (milliseconds < 1000) {
             currentFrames++;
@@ -15,9 +15,9 @@ namespace XE {
         } else {
             fps = currentFrames;
             currentFrames = 0;
-            lastTime = XE::Timer::getTick();
+            lastTime = xe::Timer::getTick();
 
             return true;
         }
     }
-}
+} // namespace xe

@@ -5,11 +5,14 @@
 #include <iostream>
 
 namespace TestApp {
-    using namespace XE;
+    using namespace xe;
 
-    Shader::Shader() {}
+    Shader::Shader() {
+    }
 
-    Shader::~Shader() { this->Shutdown(); }
+    Shader::~Shader() {
+        this->Shutdown();
+    }
 
     bool Shader::Initialize(ID3D11Device *device, HWND hWnd) {
         LPCWSTR vertexShaderPath = L"src/xe.Graphics.D3D11.TestApp/xe/Graphics/D3D11/TestApp/Color.vs";
@@ -18,7 +21,9 @@ namespace TestApp {
         return this->InitializeShader(device, hWnd, vertexShaderPath, pixelShaderPath);
     }
 
-    void Shader::Shutdown() { this->ShutdownShader(); }
+    void Shader::Shutdown() {
+        this->ShutdownShader();
+    }
 
     bool Shader::Render(ID3D11DeviceContext *context, int indexCount, const Matrix4 &world, const Matrix4 &view, const Matrix4 &projection) {
         if (!this->SetShaderParameters(context, world, view, projection)) {
