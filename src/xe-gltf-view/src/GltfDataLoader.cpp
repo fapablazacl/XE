@@ -3,6 +3,8 @@
 
 #include <span>
 
+#include <fmt/format.h>
+
 #include "xe/Logger.h"
 
 GltfTextureLoader::GltfTextureLoader(const xe::gl::RendererGL *renderer, ImageLoader *imageLoader) : renderer(renderer), imageLoader(imageLoader) {
@@ -32,21 +34,21 @@ inline std::optional<GLenum> mapBppToInternalFormat(const int bpp) {
 
 xe::gl::Texture GltfTextureLoader::createTexture(const cgltf_texture_view &textureView) const {
     if (!textureView.texture) {
-        xe::logWarning(std::format("Texture does not contain data"));
+        xe::logWarning(fmt::format("Texture does not contain data"));
         return {};
     }
 
-    xe::logInfo(std::format("Loading texture"));
+    xe::logInfo(fmt::format("Loading texture"));
 
     const auto mimeType = textureView.texture->image->mime_type;
     if (!mimeType) {
-        xe::logWarning(std::format("Texture MIME type is null"));
+        xe::logWarning(fmt::format("Texture MIME type is null"));
         return {};
     }
 
     const auto imageFormat = parseImageFormat(mimeType);
     if (!imageFormat.has_value()) {
-        xe::logWarning(std::format("Failed to parse Texture image format from MIME type {}", to_string(mimeType).value_or("<noMimeType>")));
+        xe::logWarning(fmt::format("Failed to parse Texture image format from MIME type {}", to_string(mimeType).value_or("<noMimeType>")));
         return {};
     }
 
@@ -264,14 +266,14 @@ xe::gl::VertexArray GltfDataLoader::createVertexArray(const cgltf_primitive &pri
         auto dataTypeGL = mapToAttributeDataType(accessor.component_type);
         if (!dataTypeGL) {
             xe::logError(
-                std::format("Could not map attribute {} with accessor component type {}", to_string(accessor.name).value_or("<noname>"), to_string(accessor.component_type))
+                fmt::format("Could not map attribute {} with accessor component type {}", to_string(accessor.name).value_or("<noname>"), to_string(accessor.component_type))
             );
             return {};
         }
 
         auto attribDimGL = mapToAttribDim(accessor.type);
         if (!attribDimGL) {
-            xe::logError(std::format("Could not map attribute {} with accessor type {}", to_string(accessor.name).value_or("<noname>"), to_string(accessor.type)));
+            xe::logError(fmt::format("Could not map attribute {} with accessor type {}", to_string(accessor.name).value_or("<noname>"), to_string(accessor.type)));
             return {};
         }
 

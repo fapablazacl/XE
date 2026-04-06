@@ -26,7 +26,6 @@ class xeRecipe(ConanFile):
         cmake_layout(self)
 
     def requirements(self):
-        # self.requires("gtest/1.17.0")
         self.requires("imgui/1.92.2b")
         self.requires("assimp/6.0.2")
         self.requires("glfw/3.4")
