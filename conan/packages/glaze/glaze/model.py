@@ -1,9 +1,24 @@
 from dataclasses import dataclass, field
 
-# Virtual API aliases: maps virtual api name → (registry_api, max_version)
-# These APIs don't exist in gl.xml but are resolved to a real API with a version cap.
-API_ALIASES: dict[str, tuple[str, str]] = {
-    "gl_compat": ("gl", "2.1"),
+
+@dataclass
+class ApiProfile:
+    """Defines a virtual API profile that maps to a real registry API.
+
+    registry_api: the real API name in gl.xml (e.g. "gl")
+    skip_remove_profiles: set of profile names whose <remove> entries are ignored.
+        For example, the compatibility profile skips "core" removals, keeping
+        deprecated functions that the core profile strips.
+    """
+
+    registry_api: str
+    skip_remove_profiles: frozenset[str] = frozenset()
+
+
+# Virtual API profiles: maps virtual api name → ApiProfile.
+# These APIs don't exist in gl.xml but are resolved to a real API with profile behavior.
+API_PROFILES: dict[str, ApiProfile] = {
+    "gl_compat": ApiProfile(registry_api="gl", skip_remove_profiles=frozenset({"core"})),
 }
 
 
@@ -221,40 +236,40 @@ class Registry:
                     self.object_dict[cls] = []
                 self.object_dict[cls].append(cmd)
 
-    def resolve_api(self, api: str) -> tuple[str, str | None]:
-        """Resolve a possibly-virtual API name to (registry_api, max_version_or_None).
+    def resolve_api(self, api: str) -> ApiProfile | None:
+        """Resolve a possibly-virtual API name to its ApiProfile, or None for real APIs."""
+        return API_PROFILES.get(api)
 
-        For real APIs (e.g. "gl", "gles2"), returns (api, None).
-        For virtual APIs (e.g. "gl_compat"), returns the underlying registry API
-        and the maximum allowed version.
-        """
-        if api in API_ALIASES:
-            return API_ALIASES[api]
-        return (api, None)
+    def _registry_api(self, api: str) -> str:
+        """Return the real registry API name for a given (possibly virtual) API."""
+        profile = self.resolve_api(api)
+        return profile.registry_api if profile else api
 
     def available_apis(self) -> dict[str, list[str]]:
         """Returns a dict of api → sorted list of version numbers.
 
-        Includes virtual APIs defined in API_ALIASES.
+        Includes virtual APIs defined in API_PROFILES.
         """
         result: dict[str, list[str]] = {}
         for api, features in self.features_by_api.items():
             result[api] = sorted([f.number for f in features])
 
-        # Add virtual APIs with their capped version lists
-        for alias, (registry_api, max_version) in API_ALIASES.items():
-            if registry_api in result:
-                result[alias] = [v for v in result[registry_api] if v <= max_version]
+        # Add virtual APIs that share the same version list as their registry API
+        for alias, profile in API_PROFILES.items():
+            if profile.registry_api in result:
+                result[alias] = list(result[profile.registry_api])
 
         return result
 
     def consolidate(self, api: str, number: str) -> ConsolidatedRequire:
-        """Flatten all features up to `number` for `api` into sets of names."""
-        registry_api, max_version = self.resolve_api(api)
-        if max_version and number > max_version:
-            raise ValueError(
-                f"Version '{number}' exceeds maximum '{max_version}' for API '{api}'"
-            )
+        """Flatten all features up to `number` for `api` into sets of names.
+
+        For virtual APIs (e.g. gl_compat), removals whose profile is in
+        skip_remove_profiles are ignored, preserving deprecated symbols.
+        """
+        profile = self.resolve_api(api)
+        registry_api = profile.registry_api if profile else api
+        skip_profiles = profile.skip_remove_profiles if profile else frozenset()
         features = self.features_by_api.get(registry_api, [])
 
         enum_names: set = set()
@@ -273,6 +288,8 @@ class Registry:
             if feature.number > number:
                 continue
             for remove in feature.remove_list:
+                if remove.profile in skip_profiles:
+                    continue
                 for enum_ref in remove.enums:
                     enum_names.discard(enum_ref.name)
                 for cmd_ref in remove.commands:
@@ -282,12 +299,7 @@ class Registry:
 
     def collect_features(self, api: str, number: str) -> list[Feature]:
         """Return features for `api` up to and including `number`, in order."""
-        registry_api, max_version = self.resolve_api(api)
-        if max_version and number > max_version:
-            raise ValueError(
-                f"Version '{number}' exceeds maximum '{max_version}' for API '{api}'"
-            )
-        features = self.features_by_api.get(registry_api, [])
+        features = self.features_by_api.get(self._registry_api(api), [])
         result = []
         for feature in features:
             if feature.number <= number:

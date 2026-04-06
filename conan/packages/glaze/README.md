@@ -4,7 +4,7 @@ Glaze is a generator for both a classic C API and a type-safe C++11 API wrapper 
 
 It supports the following OpenGL versions:
 - OpenGL ( 1.0, 1.1, 1.2, 1.3, 1.4, 2.0, 2.1, 3.0, 3.1, 3.2, 3.3, 4.0, 4.1, 4.2, 4.3, 4.4, 4.5, 4.6)
-- OpenGL Compat (1.0, 1.1, 1.2, 1.3, 1.4, 2.0, 2.1) — legacy compatibility profile, capped at GL 2.1
+- OpenGL Compat (1.0, 1.1, 1.2, 1.3, 1.4, 2.0, 2.1, 3.0, 3.1, 3.2, 3.3, 4.0, 4.1, 4.2, 4.3, 4.4, 4.5, 4.6) — compatibility profile, keeps deprecated symbols removed in core
 - OpenGL ES (1.0, 1.1, 2.0, 3.0, 3.1, 3.2)
 
 ## Design goals (relevant when extending the generator)

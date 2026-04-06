@@ -90,23 +90,24 @@ class TestCGeneratorTimestamp:
 class TestCGeneratorGlCompat:
     def test_gl_compat_generates_files(self, mini_registry: Registry) -> None:
         gen = CGenerator(mini_registry)
-        files = gen.generate("gl_compat", "2.0")
+        files = gen.generate("gl_compat", "4.5")
         assert "include/glaze/gl_compat.h" in files
         assert "src/gl_compat.c" in files
 
-    def test_gl_compat_includes_up_to_version(self, mini_registry: Registry) -> None:
+    def test_gl_compat_includes_all_versions(self, mini_registry: Registry) -> None:
         gen = CGenerator(mini_registry)
-        files = gen.generate("gl_compat", "2.0")
+        files = gen.generate("gl_compat", "4.5")
         header = files["include/glaze/gl_compat.h"]
         assert "glClear" in header
         assert "glCreateProgram" in header
-        # glNamedBufferData is 4.5, should not be present
-        assert "glNamedBufferData" not in header
+        assert "glNamedBufferData" in header
 
-    def test_gl_compat_rejects_high_version(self, mini_registry: Registry) -> None:
+    def test_gl_compat_keeps_deprecated_enums(self, mini_registry: Registry) -> None:
+        """Compat profile keeps GL_FLOAT even though core removes it in 3.1."""
         gen = CGenerator(mini_registry)
-        with pytest.raises(ValueError, match="Version '3.1' not found"):
-            gen.generate("gl_compat", "3.1")
+        files = gen.generate("gl_compat", "4.5")
+        header = files["include/glaze/gl_compat.h"]
+        assert "GL_FLOAT" in header
 
 
 class TestCommandPtrTypeName:

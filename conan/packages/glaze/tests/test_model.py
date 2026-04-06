@@ -190,8 +190,8 @@ class TestRegistry:
     def test_available_apis_includes_gl_compat(self, mini_registry: Registry) -> None:
         apis = mini_registry.available_apis()
         assert "gl_compat" in apis
-        # Mini registry has gl 1.0, 1.5, 2.0, 3.1, 4.5 — gl_compat caps at 2.1
-        assert apis["gl_compat"] == ["1.0", "1.5", "2.0"]
+        # gl_compat shares all versions with gl
+        assert apis["gl_compat"] == apis["gl"]
 
     def test_gl_compat_collect_features(self, mini_registry: Registry) -> None:
         features = mini_registry.collect_features("gl_compat", "2.0")
@@ -201,27 +201,31 @@ class TestRegistry:
         assert "GL_VERSION_2_0" in names
         assert "GL_VERSION_3_1" not in names
 
-    def test_gl_compat_consolidate(self, mini_registry: Registry) -> None:
-        cons = mini_registry.consolidate("gl_compat", "2.0")
-        assert "glClear" in cons.commands
-        assert "glCreateProgram" in cons.commands
-        # GL_FLOAT should NOT be removed (removal is in 3.1 which is beyond 2.0)
+    def test_gl_compat_collect_features_all(self, mini_registry: Registry) -> None:
+        """gl_compat supports all GL versions up to 4.5 (in the mini registry)."""
+        features = mini_registry.collect_features("gl_compat", "4.5")
+        names = [f.name for f in features]
+        assert "GL_VERSION_1_0" in names
+        assert "GL_VERSION_4_5" in names
+
+    def test_gl_compat_skips_core_removals(self, mini_registry: Registry) -> None:
+        """gl_compat keeps symbols removed by <remove profile='core'>."""
+        cons = mini_registry.consolidate("gl_compat", "3.1")
+        # GL_FLOAT is removed in 3.1 with profile="core" — compat keeps it
         assert "GL_FLOAT" in cons.enums
+        assert "glClear" in cons.commands
 
-    def test_gl_compat_rejects_version_above_max(self, mini_registry: Registry) -> None:
-        with pytest.raises(ValueError, match="exceeds maximum"):
-            mini_registry.consolidate("gl_compat", "3.1")
-
-    def test_gl_compat_collect_features_rejects_above_max(self, mini_registry: Registry) -> None:
-        with pytest.raises(ValueError, match="exceeds maximum"):
-            mini_registry.collect_features("gl_compat", "3.1")
+    def test_gl_core_applies_removals(self, mini_registry: Registry) -> None:
+        """Regular gl (core profile) does apply <remove profile='core'>."""
+        cons = mini_registry.consolidate("gl", "3.1")
+        assert "GL_FLOAT" not in cons.enums
 
     def test_resolve_api_real(self, mini_registry: Registry) -> None:
-        api, max_ver = mini_registry.resolve_api("gl")
-        assert api == "gl"
-        assert max_ver is None
+        result = mini_registry.resolve_api("gl")
+        assert result is None
 
     def test_resolve_api_alias(self, mini_registry: Registry) -> None:
-        api, max_ver = mini_registry.resolve_api("gl_compat")
-        assert api == "gl"
-        assert max_ver == "2.1"
+        profile = mini_registry.resolve_api("gl_compat")
+        assert profile is not None
+        assert profile.registry_api == "gl"
+        assert "core" in profile.skip_remove_profiles
