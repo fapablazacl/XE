@@ -7,7 +7,7 @@ option (XE_PLUGIN_GL            "Include OpenGL 3+ support" ON)
 option (XE_PLUGIN_GL_GLFW       "Include GLFW-based Window and Context creation support (requires 'XE_PLUGIN_GL')" ON)
 
 # options suited for development
-option (XE_DEV_UNIT_TEST            "Enable unit test suite" OFF)
+option (XE_DEV_UNIT_TEST            "Enable unit test suite" ON)
 option (XE_DEV_WARNINGS_AS_ERRORS   "Marks all warnings as errors" OFF)
 option (XE_DEV_INSTRUMENT_COVERAGE  "Instrument code for code coverage reporting during unit tests" OFF)
 option (XE_DEV_PRECOMPILED_HEADERS  "Enable precompiled headers for internal libraries, to improve build times" OFF)
@@ -23,7 +23,7 @@ if (NOT XE_EXTERNAL_ASSET_ROOT_PATH)
 endif()
 
 set (CMAKE_EXPORT_COMPILE_COMMANDS  ON)
-set (CMAKE_CXX_STANDARD             20)
+set (CMAKE_CXX_STANDARD             17)
 set (CMAKE_CXX_STANDARD_REQUIRED    ON)
 set (CMAKE_CXX_EXTENSIONS           OFF)
 
@@ -45,6 +45,10 @@ endif()
 
 if (CMAKE_BUILD_TYPE MATCHES "Debug")
     add_definitions (-D_DEBUG)
+
+    # FIXME:
+    # Usage of this macro should be removed, because should be detected
+    # by GLAZE automatically.
     add_definitions (-DGLAZE_DEBUG)
 endif ()
 

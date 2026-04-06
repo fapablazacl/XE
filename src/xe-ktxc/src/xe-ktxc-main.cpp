@@ -2,7 +2,7 @@
 #include <cassert>
 #include <filesystem>
 #include <map>
-#include <span>
+#include <bpstd/span.hpp>
 #include <string>
 
 #include <IL/il.h>
@@ -15,8 +15,8 @@
 
 #include "xe/Logger.h"
 
-using ImageSpan = std::span<uint8_t>;
-using FileSpan = std::span<uint8_t>;
+using ImageSpan = bpstd::span<uint8_t>;
+using FileSpan = bpstd::span<uint8_t>;
 
 struct ImageDesc {
     int width = 0;

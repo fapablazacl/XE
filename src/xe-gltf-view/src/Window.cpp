@@ -4,7 +4,7 @@
 #include <cstdio>
 #include <iostream>
 #include <map>
-#include <span>
+#include <bpstd/span.hpp>
 #include <fmt/format.h>
 
 #include "GltfUtil.h"
@@ -196,7 +196,7 @@ template <typename Func> void treeNode(const std::string &label, Func func) {
     }
 }
 
-template <typename T> void renderTreeNode(const std::string &label, const std::span<T> &values) {
+template <typename T> void renderTreeNode(const std::string &label, const bpstd::span<T> &values) {
     const ImGuiTreeNodeFlags flag = values.size() > 1 ? ImGuiTreeNodeFlags_None : ImGuiTreeNodeFlags_DefaultOpen;
     if (ImGui::TreeNodeEx(label.c_str(), flag)) {
         for (size_t i = 0; i < values.size(); i++) {
@@ -231,7 +231,7 @@ void renderValue(cgltf_node *node, std::optional<size_t> i = {}) {
         */
 
         if (node->children_count) {
-            std::span<cgltf_node *> nodes{node->children, node->children_count};
+            bpstd::span<cgltf_node *> nodes{node->children, node->children_count};
             renderTreeNode(fmt::format("Children ({})", nodes.size()), nodes);
         } else {
             ImGui::Text("Children (0)");
@@ -246,7 +246,7 @@ void renderValue(const cgltf_scene &value, std::optional<size_t> i = {}) {
         ImGui::Text("Name: %s", (stringOr(value.name)));
         ImGui::Text("Extensions count: %d", value.extensions_count);
 
-        std::span<cgltf_node *> nodes{value.nodes, value.nodes_count};
+        bpstd::span<cgltf_node *> nodes{value.nodes, value.nodes_count};
         renderTreeNode(fmt::format("Children nodes ({})", nodes.size()), nodes);
 
         ImGui::TreePop();
@@ -327,28 +327,28 @@ void renderValue(const cgltf_image &value, std::optional<size_t> i = {}) {
 }
 
 void visitData(const cgltf_data &data) {
-    std::span<cgltf_scene> scenes{data.scenes, data.scenes_count};
+    bpstd::span<cgltf_scene> scenes{data.scenes, data.scenes_count};
     renderTreeNode(fmt::format("Scenes ({})", scenes.size()), scenes);
 
-    std::span<cgltf_light> lights{data.lights, data.lights_count};
+    bpstd::span<cgltf_light> lights{data.lights, data.lights_count};
     renderTreeNode(fmt::format("Lights ({})", lights.size()), lights);
 
-    std::span<cgltf_camera> cameras{data.cameras, data.cameras_count};
+    bpstd::span<cgltf_camera> cameras{data.cameras, data.cameras_count};
     renderTreeNode(fmt::format("Cameras ({})", cameras.size()), cameras);
 
-    std::span<cgltf_mesh> meshes{data.meshes, data.meshes_count};
+    bpstd::span<cgltf_mesh> meshes{data.meshes, data.meshes_count};
     renderTreeNode(fmt::format("Meshes ({})", meshes.size()), meshes);
 
-    std::span<cgltf_animation> animations{data.animations, data.animations_count};
+    bpstd::span<cgltf_animation> animations{data.animations, data.animations_count};
     renderTreeNode(fmt::format("Animations ({})", animations.size()), animations);
 
-    std::span<cgltf_skin> skins{data.skins, data.skins_count};
+    bpstd::span<cgltf_skin> skins{data.skins, data.skins_count};
     renderTreeNode(fmt::format("Skins ({})", skins.size()), skins);
 
-    std::span<cgltf_texture> textures{data.textures, data.textures_count};
+    bpstd::span<cgltf_texture> textures{data.textures, data.textures_count};
     renderTreeNode(fmt::format("Textures ({})", textures.size()), textures);
 
-    std::span<cgltf_image> images{data.images, data.images_count};
+    bpstd::span<cgltf_image> images{data.images, data.images_count};
     renderTreeNode(fmt::format("Images ({})", images.size()), images);
 }
 

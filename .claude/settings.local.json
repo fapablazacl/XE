@@ -35,7 +35,13 @@
       "Bash(gn gen:*)",
       "Bash(ninja -C /home/user/.conan2/p/b/angle51ef37f3dc094/b/src/out/Conan libEGL libGLESv2)",
       "Bash(find /home/user/.conan2/p/ninja* -name \"ninja\" -type f -executable)",
-      "Bash(export PATH=\"/tmp/angle_bin:/home/user/.conan2/p/ninja7c42328b4bc42/p/bin:$SRC/buildtools/linux64:$SRC/depot_tools:$PATH\")"
+      "Bash(export PATH=\"/tmp/angle_bin:/home/user/.conan2/p/ninja7c42328b4bc42/p/bin:$SRC/buildtools/linux64:$SRC/depot_tools:$PATH\")",
+      "Bash(xargs grep:*)",
+      "Bash(grep -rn \"#include.*span\\\\\\\\.hpp\" /c/Users/fapablaza/Desktop/nativedevcl/XE/src --include=\"*.h\" --include=\"*.hpp\" --include=\"*.cpp\")",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "Bash(conan install:*)",
+      "Bash(cmake --preset conan-default)",
+      "Bash(cmake --build build)"
     ]
   }
 }

@@ -39,6 +39,7 @@ class xeRecipe(ConanFile):
         self.requires("vulkan-loader/1.4.313.0")
         self.requires("ktx/4.4.2")
         self.requires("cxxopts/3.3.1")
+        self.requires("backport-cpp/1.2.0")
         self.requires("glaze/1.0.0", options={"language": "both", "apis": "gl:4.6,gles2:3.2,gl_compat:2.1"})
 
         # NOTE: sdl2 and sdl3 both don't build under ArchLinux

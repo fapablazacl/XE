@@ -4,6 +4,7 @@ find_package(fmt CONFIG REQUIRED)
 find_package(glm REQUIRED)
 find_package(glfw3 CONFIG REQUIRED)
 find_package(glaze CONFIG REQUIRED)
+find_package(Backport CONFIG REQUIRED)
 
 set (target "xe-gl")
 
@@ -64,6 +65,7 @@ target_link_libraries (${target}
 	PUBLIC fmt::fmt
 	PUBLIC glm::glm
 	PUBLIC glfw
+	PUBLIC Backport::Backport
 )
 
 if (XE_DEV_UNIT_TEST)

@@ -4,7 +4,7 @@
 #include <array>
 #include <filesystem>
 #include <stdexcept>
-#include <span>
+#include <bpstd/span.hpp>
 
 #include "fmt/printf.h"
 #include "xe/gl/RendererGL.h"
@@ -165,7 +165,7 @@ namespace xe::gltf_view {
     }
 
     void GltfRenderer::renderScene(const cgltf_scene &scene) {
-        std::span<cgltf_node *> nodes{scene.nodes, scene.nodes_count};
+        bpstd::span<cgltf_node *> nodes{scene.nodes, scene.nodes_count};
 
         for (const cgltf_node *node : nodes) {
             if (node) {
@@ -186,7 +186,7 @@ namespace xe::gltf_view {
             renderMesh(*node.mesh);
         }
 
-        std::span<cgltf_node *> children{node.children, node.children_count};
+        bpstd::span<cgltf_node *> children{node.children, node.children_count};
 
         for (const cgltf_node *child : children) {
             if (child) {

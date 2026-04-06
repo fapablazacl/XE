@@ -196,7 +196,7 @@ namespace xe::gl {
         return {shaderId};
     }
 
-    Program RendererGL::createProgram(const tcb::span<Shader> &shaders) const {
+    Program RendererGL::createProgram(const bpstd::span<Shader> &shaders) const {
         XE_GL_SCOPED_ERROR_CHECK();
 
         const auto programId = glCreateProgram();
@@ -246,7 +246,7 @@ namespace xe::gl {
         return {bufferId, target};
     }
 
-    VertexArray RendererGL::createVertexArray(const tcb::span<const Attribute> &attributes, Buffer elementArrayBuffer) const {
+    VertexArray RendererGL::createVertexArray(const bpstd::span<const Attribute> &attributes, Buffer elementArrayBuffer) const {
         XE_GL_SCOPED_ERROR_CHECK();
 
         VertexArray vao;
@@ -300,7 +300,7 @@ namespace xe::gl {
         return vao;
     }
 
-    void RendererGL::draw(VertexArray vertexArray, GLenum primitiveType, const tcb::span<const VertexArrayPrimitive> &primitives) const {
+    void RendererGL::draw(VertexArray vertexArray, GLenum primitiveType, const bpstd::span<const VertexArrayPrimitive> &primitives) const {
         XE_GL_SCOPED_ERROR_CHECK();
         assert(!primitives.empty());
         assert(vertexArray.id);
@@ -321,7 +321,7 @@ namespace xe::gl {
         glMultiDrawArrays(primitiveType, multiDraw.start, multiDraw.count, multiDraw.drawCount);
     }
 
-    void RendererGL::draw(VertexArray vertexArray, GLenum primitiveType, const tcb::span<const VertexArrayPrimitive> &primitives, GLenum dataType) const {
+    void RendererGL::draw(VertexArray vertexArray, GLenum primitiveType, const bpstd::span<const VertexArrayPrimitive> &primitives, GLenum dataType) const {
         XE_GL_SCOPED_ERROR_CHECK();
 
         glBindVertexArray(vertexArray.id);
@@ -335,7 +335,7 @@ namespace xe::gl {
         }
     }
 
-    void RendererGL::bindRenderState(const tcb::span<const Attribute> &attribs) const {
+    void RendererGL::bindRenderState(const bpstd::span<const Attribute> &attribs) const {
         XE_GL_SCOPED_ERROR_CHECK();
 
         for (const auto &attrib : attribs) {
@@ -353,7 +353,7 @@ namespace xe::gl {
         }
     }
 
-    void RendererGL::bindRenderState(const tcb::span<const Uniform> &uniforms) const {
+    void RendererGL::bindRenderState(const bpstd::span<const Uniform> &uniforms) const {
         XE_GL_SCOPED_ERROR_CHECK();
 
         for (const auto &uniform : uniforms) {
@@ -376,7 +376,7 @@ namespace xe::gl {
         }
     }
 
-    void RendererGL::bindRenderState(const tcb::span<const UniformMatrix> &uniforms) const {
+    void RendererGL::bindRenderState(const bpstd::span<const UniformMatrix> &uniforms) const {
         XE_GL_SCOPED_ERROR_CHECK();
 
         for (const auto &[location, type, dim, transpose, count, data] : uniforms) {
@@ -461,7 +461,7 @@ namespace xe::gl {
         return {textureId, target};
     }
 
-    void RendererGL::bindRenderState(GLenum textureTarget, const tcb::span<const TextureParameter> &parameters) const {
+    void RendererGL::bindRenderState(GLenum textureTarget, const bpstd::span<const TextureParameter> &parameters) const {
         XE_GL_SCOPED_ERROR_CHECK();
 
         for (const auto &parameter : parameters) {
@@ -469,7 +469,7 @@ namespace xe::gl {
         }
     }
 
-    void RendererGL::bindRenderState(const tcb::span<const CapabilityStatus> &capabilities) const {
+    void RendererGL::bindRenderState(const bpstd::span<const CapabilityStatus> &capabilities) const {
         XE_GL_SCOPED_ERROR_CHECK();
 
         for (const auto &[capability, enabled] : capabilities) {
@@ -477,7 +477,7 @@ namespace xe::gl {
         }
     }
 
-    void RendererGL::bindRenderState(const tcb::span<const TextureLayer> &layers) const {
+    void RendererGL::bindRenderState(const bpstd::span<const TextureLayer> &layers) const {
         XE_GL_SCOPED_ERROR_CHECK();
 
         for (uint32_t i = 0; i < layers.size(); i++) {

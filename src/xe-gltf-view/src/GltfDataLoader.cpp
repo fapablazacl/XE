@@ -1,7 +1,7 @@
 
 #include "GltfDataLoader.h"
 
-#include <span>
+#include <bpstd/span.hpp>
 
 #include <fmt/format.h>
 
@@ -198,7 +198,7 @@ GltfMesh GltfDataLoader::createMesh(const cgltf_mesh *mesh) {
 
     result.name = sanitizeString(mesh->name);
 
-    const std::span meshPrimitives = {mesh->primitives, mesh->primitives_count};
+    const bpstd::span<cgltf_primitive> meshPrimitives = {mesh->primitives, mesh->primitives_count};
     for (const cgltf_primitive &primitive : meshPrimitives) {
         const auto meshPrimitive = createMeshPrimitive(primitive);
 
@@ -258,7 +258,7 @@ xe::gl::VertexArray GltfDataLoader::createVertexArray(const cgltf_primitive &pri
 
     std::vector<xe::gl::Attribute> attributesGL;
 
-    const std::span<cgltf_attribute> attributes = {primitive.attributes, primitive.attributes_count};
+    const bpstd::span<cgltf_attribute> attributes = {primitive.attributes, primitive.attributes_count};
     for (const cgltf_attribute &attribute : attributes) {
         const auto &accessor = *attribute.data;
         const auto &bufferView = *accessor.buffer_view;

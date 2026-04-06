@@ -178,7 +178,7 @@ void Game::render() {
     triangleVaoAttrib.data = &triangleVaoAttribData;
 
     auto triangleVaoPrimitive = xe::gl::VertexArrayPrimitive{0, 3, {&triangleVaoAttrib, 1}};
-    auto triangleVaoPrimitiveMem = tcb::span<xe::gl::VertexArrayPrimitive>{&triangleVaoPrimitive, 1};
+    auto triangleVaoPrimitiveMem = bpstd::span<xe::gl::VertexArrayPrimitive>{&triangleVaoPrimitive, 1};
     renderer->draw(triangleVao, GL_TRIANGLE_STRIP, triangleVaoPrimitiveMem);
 
     // render floor geometry
