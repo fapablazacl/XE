@@ -44,8 +44,8 @@ if (XE_DEV_UNIT_TEST)
 endif()
 
 if (CMAKE_BUILD_TYPE MATCHES "Debug")
-    # this macro is required by Glad.
     add_definitions (-D_DEBUG)
+    add_definitions (-DGLAZE_DEBUG)
 endif ()
 
 add_definitions (-DXE_VERSION_MAJOR=${XE_VERSION_MAJOR})

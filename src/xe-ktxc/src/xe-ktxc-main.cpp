@@ -8,7 +8,7 @@
 #include <IL/il.h>
 #include <IL/ilu.h>
 #include <cxxopts.hpp>
-#include <glad/glad.h>
+#include <glaze/gl.h>
 #include <iostream>
 #include <ktx.h>
 #include <vulkan/vulkan.h>

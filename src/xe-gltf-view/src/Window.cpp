@@ -10,7 +10,7 @@
 #include "GltfUtil.h"
 #include "cgltf.h"
 #include "xe/gl/RendererGL.h"
-#include <glad/glad.h>
+#include <glaze/gl.h>
 
 #include "bindings/imgui_impl_opengl3.h"
 #include "bindings/imgui_impl_sdl2.h"

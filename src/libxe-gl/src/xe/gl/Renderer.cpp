@@ -9,7 +9,7 @@
 #include <memory>
 #include <vector>
 
-#include <glad/glad.h>
+#include <glaze/gl.h>
 
 #if 0
 
@@ -216,7 +216,7 @@ struct GLErrorRAII {
 
 #define GL_SCOPED_ERROR_CHECK() GLErrorRAII __gl_error_raii(__FILE__, __LINE__)
 
-#if defined(GLAD_DEBUG)
+#if defined(GLAZE_DEBUG)
 void pre_call_callback_gl(const char *name, void *funcptr, int len_args, ...) {
     (void)name;
     (void)funcptr;
@@ -230,7 +230,7 @@ void pre_call_callback_gl(const char *name, void *funcptr, int len_args, ...) {
 void post_call_callback_gl(const char *name, void *funcptr, int len_args, ...) {
     (void)funcptr;
 
-    const GLenum error_code = glad_glGetError();
+    const GLenum error_code = glaze_glGetError();
 
     if (error_code == GL_NO_ERROR) {
         return;
@@ -267,11 +267,7 @@ Renderer::Renderer(Platform &platform) : platform{platform} {
 }
 
 bool Renderer::initialize() {
-    if (!gladLoadGLLoader((GLADloadproc)platform.getGLProcAddressProcedure())) {
-        std::cerr << "Failed to initialize extensions (via GLAD)" << '\n';
-
-        return false;
-    }
+    glazeLoadFunctions(reinterpret_cast<GLAZE_GETPROCADDRESS>(platform.getGLProcAddressProcedure()));
 
     std::cout << "GL_VENDOR: " << glGetString(GL_VENDOR) << '\n';
     std::cout << "GL_VERSION: " << glGetString(GL_VERSION) << '\n';
@@ -281,15 +277,15 @@ bool Renderer::initialize() {
     GLint extensionCount = 0;
     glGetIntegerv(GL_NUM_EXTENSIONS, &extensionCount);
 
-    std::cout << "GLAD - Initialized extensions (" << extensionCount << "): " << '\n';
+    std::cout << "Glaze - Initialized extensions (" << extensionCount << "): " << '\n';
 
     for (int i = 0; i < extensionCount; i++) {
         std::cout << "    " << glGetStringi(GL_EXTENSIONS, i) << '\n';
     }
 
-#if defined(GLAD_DEBUG)
-    glad_set_pre_callback_gl(pre_call_callback_gl);
-    glad_set_post_callback_gl(post_call_callback_gl);
+#if defined(GLAZE_DEBUG)
+    glazeSetPreCallback(pre_call_callback_gl);
+    glazeSetPostCallback(post_call_callback_gl);
 #endif
 
     return true;

@@ -83,11 +83,10 @@ namespace xe {
         assert(context);
 
         std::cout << "[GL] Loading OpenGL Extensions ..." << '\n';
-        gladLoadGL();
+        glazeLoadFunctions(reinterpret_cast<GLAZE_GETPROCADDRESS>(context->getProcAddressFunctionGL()));
 
-#ifndef NDEBUG
-        glad_set_post_callback_gl(GraphicsDeviceGL_callback);
-        glad_set_post_callback(GraphicsDeviceGL_callback);
+#if defined(GLAZE_DEBUG)
+        glazeSetPostCallback(GraphicsDeviceGL_callback);
 #endif
     }
 

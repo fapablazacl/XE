@@ -122,9 +122,11 @@ class GlazeConan(ConanFile):
         os.makedirs(khr_dst_dir, exist_ok=True)
         shutil.copy2(khr_src, khr_dst_dir)
 
-        if self.options.language in ("c", "both"):
+        # Always build the C library — the C++ API depends on C function pointers
+        if self.options.language in ("c", "cpp", "both"):
+            templates_dir = os.path.join(self.source_folder, "glaze", "templates")
             env = jinja2.Environment(
-                loader=jinja2.PackageLoader("glaze", "templates"),
+                loader=jinja2.FileSystemLoader(templates_dir),
                 trim_blocks=True,
                 lstrip_blocks=True,
                 keep_trailing_newline=True,
@@ -134,7 +136,7 @@ class GlazeConan(ConanFile):
                 apis=api_names,
                 lib_type="SHARED" if self.options.shared else "STATIC",
                 shared=bool(self.options.shared),
-                out_dir=out_dir,
+                out_dir=out_dir.replace("\\", "/"),
             )
 
             with open(os.path.join(self.build_folder, "CMakeLists.txt"), "w") as f:
@@ -154,7 +156,8 @@ class GlazeConan(ConanFile):
         copy(self, "*.h", src=os.path.join(out_dir, "include"), dst=os.path.join(self.package_folder, "include"))
         copy(self, "*.hpp", src=os.path.join(out_dir, "include"), dst=os.path.join(self.package_folder, "include"))
             
-        if self.options.language in ("c", "both"):
+        # Always package the C library — the C++ API depends on C function pointers
+        if self.options.language in ("c", "cpp", "both"):
             copy(self, "*.a", src=self.build_folder, dst=os.path.join(self.package_folder, "lib"), keep_path=False)
             copy(self, "*.lib", src=self.build_folder, dst=os.path.join(self.package_folder, "lib"), keep_path=False)
             copy(self, "*.so*", src=self.build_folder, dst=os.path.join(self.package_folder, "lib"), keep_path=False)
@@ -171,7 +174,8 @@ class GlazeConan(ConanFile):
             comp.set_property("cmake_target_name", f"glaze::{api_name}")
             comp.includedirs = ["include"]
             
-            if self.options.language in ("c", "both"):
+            # Always provide the C library — the C++ API depends on C function pointers
+            if self.options.language in ("c", "cpp", "both"):
                 comp.libs = [f"glaze_{api_name}"]
                 if self.options.shared:
                     comp.defines = ["GLAZE_DLL"]

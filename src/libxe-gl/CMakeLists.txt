@@ -3,7 +3,7 @@ find_package(Microsoft.GSL CONFIG REQUIRED)
 find_package(fmt CONFIG REQUIRED)
 find_package(glm REQUIRED)
 find_package(glfw3 CONFIG REQUIRED)
-find_package(glad CONFIG REQUIRED)
+find_package(glaze CONFIG REQUIRED)
 
 set (target "xe-gl")
 
@@ -59,7 +59,7 @@ target_include_directories (${target} PUBLIC "src")
 target_link_libraries (${target}
 	PUBLIC xe::core
 	PUBLIC xe::imageloader
-	PUBLIC glad::glad
+	PUBLIC glaze::gl
 	PRIVATE xe::interface
 	PUBLIC fmt::fmt
 	PUBLIC glm::glm

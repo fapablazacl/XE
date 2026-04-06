@@ -38,6 +38,11 @@ typedef void (*GLAZE_PROC)(void);
 typedef GLAZE_PROC (*GLAZE_GETPROCADDRESS)(const char *name);
 GLAZE_API void glazeLoadFunctions(GLAZE_GETPROCADDRESS getProcAddress);
 
+/* debug callback declarations */
+typedef void (*GLAZE_CALLBACK)(const char *name, void *funcptr, int len_args, ...);
+GLAZE_API void glazeSetPreCallback(GLAZE_CALLBACK callback);
+GLAZE_API void glazeSetPostCallback(GLAZE_CALLBACK callback);
+
 /* data type definitions */
 {% for typedef in types %}
 {{ typedef }}
@@ -57,7 +62,13 @@ GLAZE_API void glazeLoadFunctions(GLAZE_GETPROCADDRESS getProcAddress);
  */
 {% endif %}
 {{ cmd.typedef }}
-{{ cmd.extern }}
+{{ cmd.extern_raw }}
+#if defined(GLAZE_DEBUG)
+{{ cmd.debug_decl }}
+{{ cmd.debug_alias }}
+#else
+{{ cmd.release_alias }}
+#endif
 
 {% endfor %}
 {% endfor %}

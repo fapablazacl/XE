@@ -45,7 +45,7 @@ namespace xe::gl {
 
 #define XE_GL_SCOPED_ERROR_CHECK() GLScopedErrorChecker __gl_error_raii(__FILE__, __LINE__)
 
-#if defined(GLAD_DEBUG)
+#if defined(GLAZE_DEBUG)
     void pre_call_callback_gl(const char *name, void *funcptr, int len_args, ...) {
         (void)name;
         (void)funcptr;
@@ -56,7 +56,7 @@ namespace xe::gl {
         (void)funcptr;
         (void)len_args;
 
-        if (const GLenum error_code = glad_glGetError(); error_code) {
+        if (const GLenum error_code = glaze_glGetError(); error_code) {
             const auto errorCodeString = errorCodeToString(error_code);
             std::fprintf(stderr, "Error %s generated while executing command %s\n", errorCodeString.c_str(), name);
 
@@ -70,17 +70,16 @@ namespace xe::gl {
     }
 
     std::unique_ptr<RendererGL> RendererGL::create(GetProcAddress getProcAddress) {
-        const auto loadproc = reinterpret_cast<GLADloadproc>(getProcAddress);
-        const int result = getProcAddress ? gladLoadGLLoader(loadproc) : gladLoadGL();
-
-        if (!result) {
-            std::fprintf(stderr, "GLAD: Couldn't load GL functions. Error code %d \n", result);
+        if (!getProcAddress) {
+            std::fprintf(stderr, "Glaze: No proc address loader provided\n");
             return {};
         }
 
-#if defined(GLAD_DEBUG)
-        glad_set_pre_callback_gl(pre_call_callback_gl);
-        glad_set_post_callback_gl(post_call_callback_gl);
+        glazeLoadFunctions(reinterpret_cast<GLAZE_GETPROCADDRESS>(getProcAddress));
+
+#if defined(GLAZE_DEBUG)
+        glazeSetPreCallback(pre_call_callback_gl);
+        glazeSetPostCallback(post_call_callback_gl);
 #endif
 
         return std::unique_ptr<RendererGL>{new RendererGL()};
