@@ -3,7 +3,7 @@
 #include <xe/math/Vector.h>
 
 namespace TestApp {
-    using namespace XE;
+    using namespace xe;
 
     struct VertexType {
         Vector3 position;

@@ -5,7 +5,7 @@
 #include <string>
 #include <xe/math/Vector.h>
 
-namespace XE {
+namespace xe {
     /**
      * @brief The 'Window' that is beign used as the render target for the graphics device contents
      */
@@ -21,6 +21,6 @@ namespace XE {
         virtual void setTitle(const std::string &title) = 0;
     };
 
-} // namespace XE
+} // namespace xe
 
 #endif

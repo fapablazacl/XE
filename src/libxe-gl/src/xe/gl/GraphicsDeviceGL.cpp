@@ -21,7 +21,7 @@
 #include <xe/graphics/TextureCubeMap.h>
 #include <xe/graphics/Uniform.h>
 
-namespace XE {
+namespace xe {
     static std::string hexstr(const GLenum value) {
         std::string str;
         str.resize(16, ' ');
@@ -509,4 +509,4 @@ namespace XE {
     const Material *GraphicsDeviceGL::getMaterial() const {
         return m_material;
     }
-} // namespace XE
+} // namespace xe

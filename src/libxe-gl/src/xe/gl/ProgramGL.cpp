@@ -6,7 +6,7 @@
 #include <iostream>
 #include <stdexcept>
 
-namespace XE {
+namespace xe {
     ProgramGL::ProgramGL(const ProgramDescriptor &desc) {
         assert(desc.sources.size() > 0);
 
@@ -65,4 +65,4 @@ namespace XE {
     int ProgramGL::getAttributeLocation(const std::string &name) const {
         return glGetAttribLocation(m_id, name.c_str());
     }
-} // namespace XE
+} // namespace xe

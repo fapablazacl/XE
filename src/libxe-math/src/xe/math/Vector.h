@@ -23,7 +23,7 @@
 #pragma warning(disable : 4201) // non-standard extension used: nameless struct/union
 #endif
 
-namespace XE {
+namespace xe {
     template <typename T, int N> struct VectorBase {
         T values[N] = {};
 
@@ -479,7 +479,7 @@ namespace XE {
     extern template struct TVector<double, 2>;
     extern template struct TVector<double, 3>;
     extern template struct TVector<double, 4>;
-} // namespace XE
+} // namespace xe
 
 #if defined(_MSC_VER)
 #pragma warning(pop)

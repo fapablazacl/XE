@@ -156,7 +156,7 @@ void Game::render() {
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LEQUAL);
 
-    renderer->clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, XE::Vector4{0.0f, 0.0f, 0.0f, 1.0f}, {1.0f}, {});
+    renderer->clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, xe::Vector4{0.0f, 0.0f, 0.0f, 1.0f}, {1.0f}, {});
     renderer->viewport({0, 0}, {SCREEN_WIDTH, SCREEN_HEIGHT});
 
     renderer->useProgram(program);
@@ -166,9 +166,9 @@ void Game::render() {
 
     // render triangle
     Transformation transformation;
-    transformation.rotation.X = XE::radians(angle);
-    transformation.rotation.Y = XE::radians(angle);
-    transformation.rotation.Z = XE::radians(angle);
+    transformation.rotation.X = xe::radians(angle);
+    transformation.rotation.Y = xe::radians(angle);
+    transformation.rotation.Z = xe::radians(angle);
 
     const auto triangleMatrix = viewProj * transformation.computeModelMatrix();
 
@@ -201,16 +201,16 @@ FloorGeometry createFloorGeometry(
     floorGeometry.tileSizeZ = tileSizeZ;
     floorGeometry.stripVertexCount = 2 * (tilesInX + 1);
 
-    std::vector<XE::Vector3> vertices{static_cast<size_t>(floorGeometry.stripVertexCount)};
+    std::vector<xe::Vector3> vertices{static_cast<size_t>(floorGeometry.stripVertexCount)};
 
     size_t j = 0;
 
     for (size_t i = 0; i < static_cast<size_t>(tilesInX + 1); i++) {
-        vertices[2 * i] = XE::Vector3(i * tileSizeX, 0.0f, j * tileSizeZ);
-        vertices[2 * i + 1] = XE::Vector3(i * tileSizeX, 0.0f, static_cast<float>(j + 1) * tileSizeZ);
+        vertices[2 * i] = xe::Vector3(i * tileSizeX, 0.0f, j * tileSizeZ);
+        vertices[2 * i + 1] = xe::Vector3(i * tileSizeX, 0.0f, static_cast<float>(j + 1) * tileSizeZ);
     }
 
-    floorGeometry.vertexBuffer = renderer.createBuffer(GL_ARRAY_BUFFER, GL_STATIC_DRAW, {vertices.data(), vertices.size() * sizeof(XE::Vector3)});
+    floorGeometry.vertexBuffer = renderer.createBuffer(GL_ARRAY_BUFFER, GL_STATIC_DRAW, {vertices.data(), vertices.size() * sizeof(xe::Vector3)});
 
     xe::gl::Attribute attribs[] = {
         xe::gl::Attribute{vertCoordLoc, xe::gl::AttributeDim::_3, xe::gl::AttributeType::Float, GL_FALSE, 0, floorGeometry.vertexBuffer, 0},
@@ -225,13 +225,13 @@ FloorGeometry createFloorGeometry(
 void renderFloorGeometry(const FloorGeometry &floorGeometry, const GLint vertCoordZLoc, const GLint vertColourLoc) {
     glBindVertexArray(floorGeometry.vao.id);
 
-    const XE::Vector4 colorFrom = {0.2f, 0.2f, 0.2f, 1.0f};
-    const XE::Vector4 colorTo = {0.2f, 0.2f, 1.0f, 1.0f};
+    const xe::Vector4 colorFrom = {0.2f, 0.2f, 0.2f, 1.0f};
+    const xe::Vector4 colorTo = {0.2f, 0.2f, 1.0f, 1.0f};
 
     for (int k = 0; k < floorGeometry.tilesInZ; k++) {
         const float z = static_cast<float>(k) * floorGeometry.tileSizeZ;
         const float s = static_cast<float>(k) / static_cast<float>((floorGeometry.tilesInZ - 1));
-        const XE::Vector4 color = XE::lerp(colorFrom, colorTo, s);
+        const xe::Vector4 color = xe::lerp(colorFrom, colorTo, s);
 
         glVertexAttrib4fv(vertColourLoc, color.data());
         glVertexAttrib1f(vertCoordZLoc, z);

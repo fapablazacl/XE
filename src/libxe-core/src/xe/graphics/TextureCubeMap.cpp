@@ -1,7 +1,7 @@
 
 #include <xe/graphics/TextureCubeMap.h>
 
-namespace XE {
+namespace xe {
     TextureCubeMap::~TextureCubeMap() {
     }
-} // namespace XE
+} // namespace xe

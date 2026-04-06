@@ -7,7 +7,7 @@
 #include <cassert>
 #include <limits>
 
-namespace XE {
+namespace xe {
     /**
      * @brief Sphere in the 3-space
      */
@@ -73,6 +73,6 @@ namespace XE {
             return std::numeric_limits<T>::quiet_NaN();
         }
     }
-} // namespace XE
+} // namespace xe
 
 #endif

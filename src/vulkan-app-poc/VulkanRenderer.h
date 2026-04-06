@@ -26,8 +26,8 @@
 #include "HostPlatform.h"
 
 struct Vertex {
-    XE::Vector2 pos;
-    XE::Vector3 color;
+    xe::Vector2 pos;
+    xe::Vector3 color;
 
     static vk::VertexInputBindingDescription createBindingDescription() {
         vk::VertexInputBindingDescription desc;
@@ -76,9 +76,9 @@ struct SwapchainDetail {
 //! struct used to transfer data from the host to the shader program
 //! all the descriptor stuff will be used for that
 struct UniformBufferObject {
-    XE::Matrix4 model;
-    XE::Matrix4 view;
-    XE::Matrix4 proj;
+    xe::Matrix4 model;
+    xe::Matrix4 view;
+    xe::Matrix4 proj;
 };
 
 class HostPlatform;

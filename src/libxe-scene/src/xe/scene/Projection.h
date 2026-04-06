@@ -6,7 +6,7 @@
 #include <xe/math/Matrix.h>
 #include <xe/math/Vector.h>
 
-namespace XE {
+namespace xe {
     /**
      * @brief Transforms a four-dimensional vector from World coordinates to Screen coordinates.
      */
@@ -46,6 +46,6 @@ namespace XE {
 
         return world;
     }
-} // namespace XE
+} // namespace xe
 
 #endif

@@ -1,7 +1,7 @@
 
 find_package(fmt CONFIG REQUIRED)
 
-set (target "XE.Core")
+set (target "xe-core")
 
 set (headers 
 	"src/xe/XE.h"
@@ -97,6 +97,7 @@ set (sources
 )
 
 add_library (${target} ${sources})
+add_library(xe::core ALIAS ${target})
 
 if (XE_DEV_PRECOMPILED_HEADERS)
 	target_precompile_headers(${target} PRIVATE ${headers})
@@ -104,7 +105,7 @@ endif()
 
 target_include_directories(${target} PUBLIC "src")
 target_link_libraries(${target}
-		PUBLIC XE.Math
-		PRIVATE XE.Interface
+		PUBLIC xe::math
+		PRIVATE xe::interface
 		PUBLIC fmt::fmt
 )

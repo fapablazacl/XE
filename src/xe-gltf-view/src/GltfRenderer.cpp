@@ -43,8 +43,8 @@ namespace xe::gltf_view {
         renderer = xe::gl::RendererGL::create();
 
         const std::filesystem::path internalAssetsPath = XE_GLTF_VIEW_SOURCE_FOLDER;
-        const std::string vertexShaderSource = XE::loadTextFile(internalAssetsPath / "shaders/gltf-view.vert");
-        const std::string fragmentShaderSource = XE::loadTextFile(internalAssetsPath / "shaders/gltf-view.frag");
+        const std::string vertexShaderSource = xe::loadTextFile(internalAssetsPath / "shaders/gltf-view.vert");
+        const std::string fragmentShaderSource = xe::loadTextFile(internalAssetsPath / "shaders/gltf-view.frag");
 
         std::vector<xe::gl::Shader> shaders = {
             renderer->createShader(GL_VERTEX_SHADER, vertexShaderSource.c_str()),
@@ -92,7 +92,7 @@ namespace xe::gltf_view {
 
     void GltfRenderer::beginFrame() {
         const auto clearFlags = GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT;
-        const auto clearColor = XE::Vector4{0.2f, 0.2f, 0.8f, 1.0f};
+        const auto clearColor = xe::Vector4{0.2f, 0.2f, 0.8f, 1.0f};
 
         renderer->clear(clearFlags, clearColor, {}, {});
     }
@@ -102,17 +102,17 @@ namespace xe::gltf_view {
     }
 
     void GltfRenderer::render() {
-        uniformData.seconds = (static_cast<float>(XE::Timer::getTick()) / 1000.0f) - startSeconds;
+        uniformData.seconds = (static_cast<float>(xe::Timer::getTick()) / 1000.0f) - startSeconds;
         startSeconds = uniformData.seconds;
 
         const float aspect = SCREEN_HEIGHT<float> / SCREEN_WIDTH<float>;
-        const auto proj = XE::mat4Perspective(XE::radians(60.0f), aspect, 0.001f, 1000.0f);
+        const auto proj = xe::mat4Perspective(xe::radians(60.0f), aspect, 0.001f, 1000.0f);
 
-        const XE::Vector3 eye = {0.0f, 0.0f, -25.0f};
-        const XE::Vector3 at = {0.0f, 0.0f, 0.0f};
-        const XE::Vector3 up = {0.0f, 1.0f, 0.0f};
-        const auto view = XE::mat4LookAtRH(eye, at, up);
-        const auto model = XE::mat4RotationY(angle += 0.005f);
+        const xe::Vector3 eye = {0.0f, 0.0f, -25.0f};
+        const xe::Vector3 at = {0.0f, 0.0f, 0.0f};
+        const xe::Vector3 up = {0.0f, 1.0f, 0.0f};
+        const auto view = xe::mat4LookAtRH(eye, at, up);
+        const auto model = xe::mat4RotationY(angle += 0.005f);
 
         uniformData.model = model;
         uniformData.projViewModel = proj * view * model;
@@ -142,26 +142,26 @@ namespace xe::gltf_view {
         }
     }
 
-    XE::Matrix4 computeLocalTransformation(const cgltf_node &node) {
+    xe::Matrix4 computeLocalTransformation(const cgltf_node &node) {
         if (node.has_matrix) {
-            return XE::Matrix4(node.matrix);
+            return xe::Matrix4(node.matrix);
         }
 
         if (node.has_rotation) {
             XE_LOG_ERROR("Node rotation is not supported. Defaulting to Identity");
-            // transform = XE::Quat(node.rotation);
-            return XE::mat4Identity();
+            // transform = xe::Quat(node.rotation);
+            return xe::mat4Identity();
         }
 
         if (node.has_scale) {
-            return XE::mat4Scaling(XE::Vector4(XE::Vector3(node.scale), 1.0f));
+            return xe::mat4Scaling(xe::Vector4(xe::Vector3(node.scale), 1.0f));
         }
 
         if (node.has_translation) {
-            return XE::mat4Translation(XE::Vector3(node.translation));
+            return xe::mat4Translation(xe::Vector3(node.translation));
         }
 
-        return XE::mat4Identity();
+        return xe::mat4Identity();
     }
 
     void GltfRenderer::renderScene(const cgltf_scene &scene) {
@@ -169,14 +169,14 @@ namespace xe::gltf_view {
 
         for (const cgltf_node *node : nodes) {
             if (node) {
-                const XE::Matrix4 transformation = XE::mat4Identity();
+                const xe::Matrix4 transformation = xe::mat4Identity();
                 renderNode(transformation, *node);
             }
         }
     }
 
-    void GltfRenderer::renderNode(const XE::Matrix4 &parentTransformation, const cgltf_node &node) {
-        const XE::Matrix4 transformation = parentTransformation * computeLocalTransformation(node);
+    void GltfRenderer::renderNode(const xe::Matrix4 &parentTransformation, const cgltf_node &node) {
+        const xe::Matrix4 transformation = parentTransformation * computeLocalTransformation(node);
 
         if (node.camera) {
             renderCamera(*node.camera);
@@ -199,7 +199,7 @@ namespace xe::gltf_view {
         switch (camera.type) {
         case cgltf_camera_type_perspective: {
             const cgltf_camera_perspective &pers = camera.data.perspective;
-            projection = XE::mat4Perspective(pers.yfov, pers.aspect_ratio, pers.znear, pers.zfar);
+            projection = xe::mat4Perspective(pers.yfov, pers.aspect_ratio, pers.znear, pers.zfar);
             break;
         }
 

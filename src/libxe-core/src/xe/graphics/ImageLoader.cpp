@@ -1,7 +1,7 @@
 
 #include <xe/graphics/ImageLoader.h>
 
-namespace XE {
+namespace xe {
     ImageLoader::~ImageLoader() {
     }
-} // namespace XE
+} // namespace xe

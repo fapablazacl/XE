@@ -2,7 +2,7 @@
 #include <stdexcept>
 #include <xe/io/FileStream.h>
 
-namespace XE {
+namespace xe {
     FileStream::FileStream(const std::string &fileName, const StreamFlags flags) : m_fileName(fileName), m_flags(flags) {
 
         switch (flags) {
@@ -60,4 +60,4 @@ namespace XE {
     StreamFlags FileStream::getFlags() const {
         return m_flags;
     }
-} // namespace XE
+} // namespace xe

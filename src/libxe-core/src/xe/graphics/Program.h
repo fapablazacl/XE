@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 
-namespace XE {
+namespace xe {
     enum class ShaderType;
 
     struct ProgramSource {
@@ -26,6 +26,6 @@ namespace XE {
 
         virtual Shader *getShader(const int index) = 0;
     };
-} // namespace XE
+} // namespace xe
 
 #endif

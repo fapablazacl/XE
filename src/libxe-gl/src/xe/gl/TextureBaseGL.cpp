@@ -1,7 +1,7 @@
 
 #include "TextureBaseGL.h"
 
-namespace XE {
+namespace xe {
     TextureBaseGL::TextureBaseGL(const GLenum target) : m_target(target) {
         glGenTextures(1, &m_id);
     }
@@ -11,4 +11,4 @@ namespace XE {
             glDeleteTextures(1, &m_id);
         }
     }
-} // namespace XE
+} // namespace xe

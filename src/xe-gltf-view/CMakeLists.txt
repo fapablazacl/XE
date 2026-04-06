@@ -24,4 +24,4 @@ set (sources
 add_executable(${target} ${sources})
 target_compile_definitions(${target} PRIVATE XE_GLTF_VIEW_SOURCE_FOLDER="${CMAKE_CURRENT_SOURCE_DIR}")
 target_include_directories(${target} PUBLIC include)
-target_link_libraries(${target} PRIVATE XE.Interface PUBLIC XE.Core PUBLIC XE.GL PUBLIC XE.App PUBLIC cgltf::cgltf PRIVATE SDL2::SDL2 SDL2::SDL2main PUBLIC glad::glad PUBLIC imgui::imgui)
+target_link_libraries(${target} PRIVATE xe::interface PUBLIC xe::core PUBLIC xe::gl PUBLIC xe::app PUBLIC cgltf::cgltf PRIVATE SDL2::SDL2 SDL2::SDL2main PUBLIC glad::glad PUBLIC imgui::imgui)

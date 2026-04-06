@@ -6,7 +6,7 @@
 
 #include "TextureBaseGL.h"
 
-namespace XE {
+namespace xe {
     class Texture2DArrayGL : public Texture2DArray, public TextureBaseGL {
     public:
         Texture2DArrayGL(const PixelFormat format, const Vector2i &size, const int count);
@@ -38,6 +38,6 @@ namespace XE {
         Vector2i m_size = {0, 0};
         int m_count = 0;
     };
-} // namespace XE
+} // namespace xe
 
 #endif

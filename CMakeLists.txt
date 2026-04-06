@@ -52,8 +52,9 @@ add_definitions (-DXE_VERSION_MAJOR=${XE_VERSION_MAJOR})
 add_definitions (-DXE_VERSION_MINOR=${XE_VERSION_MINOR})
 add_definitions (-DXE_VERSION_REVISION=${XE_VERSION_REVISION})
 
-set (target XE.Interface)
+set (target xe-interface)
 add_library(${target} INTERFACE)
+add_library(xe::interface ALIAS ${target})
 
 if (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
     set (XE_CXXFLAGS_WALL -Wall -Wextra)

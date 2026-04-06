@@ -7,7 +7,7 @@
 #include "GraphicsAPI.h"
 #include "PixelFormat.h"
 
-namespace XE {
+namespace xe {
     class GraphicsContext {
     public:
         struct Descriptor {
@@ -35,4 +35,4 @@ namespace XE {
 
         virtual Descriptor getDescriptor() const = 0;
     };
-} // namespace XE
+} // namespace xe

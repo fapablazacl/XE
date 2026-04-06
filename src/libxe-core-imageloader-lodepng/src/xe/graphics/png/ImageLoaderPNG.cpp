@@ -7,7 +7,7 @@
 #include <iostream>
 #include <vector>
 
-namespace XE {
+namespace xe {
     class ImagePNG : public Image {
     public:
         ImagePNG(const void *pointer, const PixelFormat format, const Vector2i size) : pointer(pointer), format(format), size(size) {
@@ -72,4 +72,4 @@ namespace XE {
 
         return std::make_unique<ImagePNG>((const void *)pixels, PixelFormat::R8G8B8A8, Vector2i(int(width), int(height)));
     }
-} // namespace XE
+} // namespace xe

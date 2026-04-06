@@ -15,7 +15,7 @@
 #include <cmath>
 #include <functional>
 
-namespace XE {
+namespace xe {
     /**
      * @brief Computes the sum of all
      */
@@ -122,6 +122,6 @@ namespace XE {
     template <typename VectorExprLeft, typename VectorExprRight> auto operator/(VectorExprLeft left, VectorExprRight right) {
         return VectorBinaryExpr<VectorExprLeft, VectorExprRight, std::divides<typename VectorExprLeft::vector_type::type>>(left, right);
     }
-} // namespace XE
+} // namespace xe
 
 #endif

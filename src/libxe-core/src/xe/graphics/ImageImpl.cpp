@@ -4,7 +4,7 @@
 #include <cassert>
 #include <cstdlib>
 
-namespace XE {
+namespace xe {
     ImageImpl::ImageImpl() {
     }
 
@@ -46,4 +46,4 @@ namespace XE {
             size = {0, 0};
         }
     }
-} // namespace XE
+} // namespace xe

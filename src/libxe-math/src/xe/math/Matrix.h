@@ -12,7 +12,7 @@
 #include "Common.h"
 #include "Vector.h"
 
-namespace XE {
+namespace xe {
     template <typename T, int R, int C> struct TMatrix;
 
     template <typename T, int R, int C> TMatrix<T, R, C> transpose(const TMatrix<T, R, C> &m);
@@ -452,7 +452,7 @@ namespace XE {
                 }
             }
 
-            return XE::transpose(result);
+            return xe::transpose(result);
         }
     }
 
@@ -748,7 +748,7 @@ namespace XE {
         }
     }
 
-    template <typename T, int R, int C> std::ostream &operator<<(std::ostream &os, const XE::TMatrix<T, R, C> &m) {
+    template <typename T, int R, int C> std::ostream &operator<<(std::ostream &os, const xe::TMatrix<T, R, C> &m) {
         os << "xe::TMatrix<" << typeid(T).name() << ", " << R << ", " << C << "> {" << std::endl;
 
         for (int i = 0; i < R; ++i) {
@@ -774,6 +774,6 @@ namespace XE {
 
         return os;
     }
-} // namespace XE
+} // namespace xe
 
 #endif

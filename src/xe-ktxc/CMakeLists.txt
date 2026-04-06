@@ -12,4 +12,4 @@ set (sources
 
 add_executable(${target} ${sources})
 target_include_directories(${target} PUBLIC include)
-target_link_libraries(${target} PRIVATE XE.Interface PUBLIC XE.Core PUBLIC XE.GL PUBLIC XE.App PUBLIC glad::glad PUBLIC DevIL::IL PUBLIC KTX::ktx PUBLIC Vulkan::Vulkan PUBLIC cxxopts::cxxopts)
+target_link_libraries(${target} PRIVATE xe::interface PUBLIC xe::core PUBLIC xe::gl PUBLIC xe::app PUBLIC glad::glad PUBLIC DevIL::IL PUBLIC KTX::ktx PUBLIC Vulkan::Vulkan PUBLIC cxxopts::cxxopts)

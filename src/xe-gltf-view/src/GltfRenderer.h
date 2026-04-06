@@ -10,9 +10,9 @@
 
 namespace xe::gltf_view {
     struct ShaderProgramUniformData {
-        XE::Matrix4 projViewModel = XE::mat4Identity();
+        xe::Matrix4 projViewModel = xe::mat4Identity();
 
-        XE::Matrix4 model = XE::mat4Identity();
+        xe::Matrix4 model = xe::mat4Identity();
 
         // The Texture Unit which contains the diffuse texture
         GLint diffuseTexture = 0;
@@ -46,7 +46,7 @@ namespace xe::gltf_view {
     private:
         void renderScene(const cgltf_scene &scene);
 
-        void renderNode(const XE::Matrix4 &parentTransformation, const cgltf_node &node);
+        void renderNode(const xe::Matrix4 &parentTransformation, const cgltf_node &node);
 
         void renderCamera(const cgltf_camera &camera);
 
@@ -62,6 +62,6 @@ namespace xe::gltf_view {
         std::vector<GltfMesh> meshes;
         cgltf_data *data = nullptr;
 
-        XE::Matrix4 projection = XE::mat4Identity();
+        xe::Matrix4 projection = xe::mat4Identity();
     };
 } // namespace xe::gltf_view

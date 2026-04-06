@@ -1,7 +1,7 @@
 
 #include <xe/graphics/Texture.h>
 
-namespace XE {
+namespace xe {
     Texture::~Texture() {
     }
-} // namespace XE
+} // namespace xe

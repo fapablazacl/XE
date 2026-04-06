@@ -6,7 +6,7 @@
 #include <xe/Predef.h>
 #include <xe/graphics/Texture.h>
 
-namespace XE {
+namespace xe {
     class TextureCubeMap : public Texture {
     public:
         virtual ~TextureCubeMap();
@@ -23,6 +23,6 @@ namespace XE {
         virtual void
         getData(void *surfaceData, const int mipLevel, TextureCubeMapSide cubeMap, const DataType surfaceDataType, const PixelFormat surfaceFormat, const Recti &area) const = 0;
     };
-} // namespace XE
+} // namespace xe
 
 #endif

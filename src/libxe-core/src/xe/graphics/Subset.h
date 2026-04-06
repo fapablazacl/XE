@@ -12,11 +12,11 @@
 #include <xe/DataType.h>
 #include <xe/Predef.h>
 
-namespace XE {
+namespace xe {
     class Buffer;
 }
 
-namespace XE {
+namespace xe {
     /**
      * @brief Geometric Primitive Shape basis for rendering
      */
@@ -119,6 +119,6 @@ namespace XE {
          */
         virtual const Buffer *getIndexBuffer() const = 0;
     };
-} // namespace XE
+} // namespace xe
 
 #endif

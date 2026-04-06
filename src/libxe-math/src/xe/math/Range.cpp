@@ -1,8 +1,8 @@
 
 #include "Range.h"
 
-namespace XE {
+namespace xe {
     template struct TRange<float>;
     template struct TRange<double>;
     template struct TRange<int>;
-} // namespace XE
+} // namespace xe

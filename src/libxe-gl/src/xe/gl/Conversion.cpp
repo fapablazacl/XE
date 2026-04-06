@@ -9,7 +9,7 @@
 #include <xe/graphics/Subset.h>
 #include <xe/graphics/TextureCubeMap.h>
 
-namespace XE {
+namespace xe {
     static const std::array<GLenum, 12> dataType{
         static_cast<GLenum>(0),
         GL_UNSIGNED_BYTE,
@@ -153,4 +153,4 @@ namespace XE {
             return GL_INVALID_ENUM;
         }
     }
-} // namespace XE
+} // namespace xe

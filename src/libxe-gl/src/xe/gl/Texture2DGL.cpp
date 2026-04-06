@@ -2,7 +2,7 @@
 #include "Texture2DGL.h"
 #include "Conversion.h"
 
-namespace XE {
+namespace xe {
     Texture2DGL::Texture2DGL(const PixelFormat format, const Vector2i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void *sourceData)
         : TextureBaseGL(GL_TEXTURE_2D),
           m_format(format),
@@ -39,4 +39,4 @@ namespace XE {
         glGetTexImage(GL_TEXTURE_2D, mipLevel, formatGL, dataTypeGL, surfaceData);
         glBindTexture(GL_TEXTURE_2D, 0);
     }
-} // namespace XE
+} // namespace xe

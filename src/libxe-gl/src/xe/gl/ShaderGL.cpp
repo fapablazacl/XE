@@ -4,7 +4,7 @@
 #include <cassert>
 #include <stdexcept>
 
-namespace XE {
+namespace xe {
     static GLenum s_shaderTypesGL[] = {GL_VERTEX_SHADER, GL_FRAGMENT_SHADER, GL_GEOMETRY_SHADER};
 
     ShaderGL::ShaderGL(const ShaderType type, const std::string &source) {
@@ -55,4 +55,4 @@ namespace XE {
     std::string ShaderGL::getSource() const {
         return m_source;
     }
-} // namespace XE
+} // namespace xe

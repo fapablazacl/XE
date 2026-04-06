@@ -4,7 +4,7 @@
 
 #include <xe/math/Vector.h>
 
-namespace XE {
+namespace xe {
     enum class BinaryState { Press, Release };
 
     enum class KeyCode {
@@ -131,6 +131,6 @@ namespace XE {
         BinaryState m_buttons[static_cast<int>(ControllerButton::Max)];
         Vector2 m_joysticks[static_cast<int>(ControllerJoystick::Max)];
     };
-} // namespace XE
+} // namespace xe
 
 #endif

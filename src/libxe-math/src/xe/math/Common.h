@@ -12,7 +12,7 @@
 #include <sstream>
 #include <string>
 
-namespace XE {
+namespace xe {
     template <typename T> inline const T DEFAULT_EPSILON = T{0.000001};
 
     //! Perform a safe comparison between two floating point using the default reference "infinitesimal" epsilon
@@ -42,6 +42,6 @@ namespace XE {
     template <typename T, typename S> T lerp(const T v1, const T v2, const S s) {
         return v1 + (v2 - v1) * s;
     }
-} // namespace XE
+} // namespace xe
 
 #endif

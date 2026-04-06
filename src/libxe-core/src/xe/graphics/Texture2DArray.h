@@ -5,11 +5,11 @@
 #include <xe/Predef.h>
 #include <xe/graphics/Texture.h>
 
-namespace XE {
+namespace xe {
     enum class DataType : std::int16_t;
 }
 
-namespace XE {
+namespace xe {
     class Texture2DArray : public Texture {
 
     public:
@@ -29,6 +29,6 @@ namespace XE {
         virtual void
         getData(void *surfaceData, const int mipLevel, const int arrayIndex, const PixelFormat surfaceFormat, const DataType surfaceDataType, const Recti &area) const = 0;
     };
-} // namespace XE
+} // namespace xe
 
 #endif

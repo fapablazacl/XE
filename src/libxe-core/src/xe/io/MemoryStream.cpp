@@ -4,7 +4,7 @@
 #include <cassert>
 #include <cstring>
 
-namespace XE {
+namespace xe {
     MemoryStream::MemoryStream(std::uint8_t *data, const std::size_t size) : m_data(data), m_size(size) {
         assert(m_data);
         assert(m_size);
@@ -58,4 +58,4 @@ namespace XE {
     StreamFlags MemoryStream::getFlags() const {
         return StreamFlags::Readable;
     }
-} // namespace XE
+} // namespace xe

@@ -7,7 +7,7 @@
 #include "BufferGL.h"
 #include "gl.h"
 
-namespace XE {
+namespace xe {
     class SubsetGL : public Subset {
     public:
         explicit SubsetGL(const SubsetDescriptor &desc);
@@ -35,6 +35,6 @@ namespace XE {
         const BufferGL *indexBuffer = nullptr;
         SubsetDescriptor descriptor;
     };
-} // namespace XE
+} // namespace xe
 
 #endif

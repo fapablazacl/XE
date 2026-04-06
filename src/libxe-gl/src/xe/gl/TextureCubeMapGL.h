@@ -7,7 +7,7 @@
 #include "TextureBaseGL.h"
 #include <array>
 
-namespace XE {
+namespace xe {
     class TextureCubeMapGL : public TextureCubeMap, public TextureBaseGL {
     public:
         TextureCubeMapGL(
@@ -41,6 +41,6 @@ namespace XE {
         PixelFormat m_format;
         Vector2i m_size;
     };
-} // namespace XE
+} // namespace xe
 
 #endif

@@ -2,7 +2,7 @@
 #ifndef __XE_INPUT_INPUTMANAGER_HPP__
 #define __XE_INPUT_INPUTMANAGER_HPP__
 
-namespace XE {
+namespace xe {
     class KeyboardStatus;
     class MouseStatus;
     class ControllerStatus;
@@ -29,6 +29,6 @@ namespace XE {
 
         virtual ControllerStatus getControllerStatus(const int index) = 0;
     };
-} // namespace XE
+} // namespace xe
 
 #endif

@@ -3,7 +3,7 @@
 
 #include <cassert>
 
-namespace XE {
+namespace xe {
     GraphicsContextGLFW::GraphicsContextGLFW(GLFWwindow *glfwWindow, Descriptor descriptor) {
         assert(glfwWindow);
 
@@ -25,4 +25,4 @@ namespace XE {
     void GraphicsContextGLFW::present() {
         glfwSwapBuffers(glfwWindow);
     }
-} // namespace XE
+} // namespace xe

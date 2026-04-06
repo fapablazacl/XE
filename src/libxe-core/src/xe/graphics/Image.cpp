@@ -1,7 +1,7 @@
 
 #include <xe/graphics/Image.h>
 
-namespace XE {
+namespace xe {
     Image::~Image() {
     }
-} // namespace XE
+} // namespace xe

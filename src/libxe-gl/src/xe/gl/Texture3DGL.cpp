@@ -2,7 +2,7 @@
 #include "Texture3DGL.h"
 #include "Conversion.h"
 
-namespace XE {
+namespace xe {
     Texture3DGL::Texture3DGL(const PixelFormat format, const Vector3i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void *sourceData)
         : TextureBaseGL(GL_TEXTURE_3D),
           m_format(format),
@@ -39,4 +39,4 @@ namespace XE {
         glGetTexImage(GL_TEXTURE_3D, mipLevel, formatGL, dataTypeGL, surfaceData);
         glBindTexture(GL_TEXTURE_3D, 0);
     }
-} // namespace XE
+} // namespace xe

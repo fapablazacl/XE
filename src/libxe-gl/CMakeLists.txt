@@ -5,7 +5,7 @@ find_package(glm REQUIRED)
 find_package(glfw3 CONFIG REQUIRED)
 find_package(glad CONFIG REQUIRED)
 
-set (target "XE.GL")
+set (target "xe-gl")
 
 set (headers
 	"src/xe/GL.h"
@@ -49,17 +49,18 @@ set (sources
 ) 
 
 add_library (${target} ${sources})
+add_library(xe::gl ALIAS ${target})
 
 if (XE_DEV_PRECOMPILED_HEADERS)
 	target_precompile_headers (${target} PRIVATE ${headers})
 endif()
 
 target_include_directories (${target} PUBLIC "src")
-target_link_libraries (${target} 
-	PUBLIC XE.Core
-		PUBLIC libxe-imageloader
+target_link_libraries (${target}
+	PUBLIC xe::core
+	PUBLIC xe::imageloader
 	PUBLIC glad::glad
-	PRIVATE XE.Interface
+	PRIVATE xe::interface
 	PUBLIC fmt::fmt
 	PUBLIC glm::glm
 	PUBLIC glfw

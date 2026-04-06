@@ -6,7 +6,7 @@
 
 #include <ostream>
 
-namespace XE {
+namespace xe {
     enum class PlaneSide { Front, Back, Inside };
 
     /**
@@ -257,6 +257,6 @@ namespace XE {
 
     //! Plane specialization with the double data type
     using Planed = TPlane<double>;
-} // namespace XE
+} // namespace xe
 
 #endif

@@ -3,7 +3,7 @@
 
 #include <tuple>
 
-namespace XE {
+namespace xe {
     enum class GraphicsBackend { Auto, GL_41, GL_ES_2 };
 
     inline std::tuple<int, int> get_version(const GraphicsBackend backend) {
@@ -16,4 +16,4 @@ namespace XE {
             return {0, 0};
         }
     }
-} // namespace XE
+} // namespace xe

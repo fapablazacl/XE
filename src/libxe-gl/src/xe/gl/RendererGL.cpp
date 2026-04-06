@@ -256,7 +256,7 @@ namespace xe::gl {
 
         for (const auto &attr : attributes) {
             if (attr.buffer.id != 0) {
-                XE::logInfo(std::format("Enabling vertex attribute array {}", attr.index));
+                xe::logInfo(std::format("Enabling vertex attribute array {}", attr.index));
                 glBindBuffer(attr.buffer.target, attr.buffer.id);
                 glEnableVertexAttribArray(attr.index);
 
@@ -287,7 +287,7 @@ namespace xe::gl {
                 const auto ptr = reinterpret_cast<const void *>(static_cast<long long>(attr.offset));
                 glVertexAttribPointer(attr.index, static_cast<GLint>(attr.size) + 1, type, attr.normalized, attr.stride, ptr);
             } else {
-                XE::logInfo(std::format("Disabling vertex attribute array {}", attr.index));
+                xe::logInfo(std::format("Disabling vertex attribute array {}", attr.index));
                 glDisableVertexAttribArray(attr.index);
             }
         }
@@ -491,7 +491,7 @@ namespace xe::gl {
         }
     }
 
-    void RendererGL::clear(const GLenum flags, std::optional<XE::Vector4> color, std::optional<float> depth, std::optional<int> stencil) const {
+    void RendererGL::clear(const GLenum flags, std::optional<xe::Vector4> color, std::optional<float> depth, std::optional<int> stencil) const {
         if (color.has_value()) {
             glClearColor(color->X, color->Y, color->Z, color->W);
         }
@@ -515,7 +515,7 @@ namespace xe::gl {
         glFlush();
     }
 
-    void RendererGL::viewport(const XE::Vector2i &pos, const XE::Vector2i &size) const {
+    void RendererGL::viewport(const xe::Vector2i &pos, const xe::Vector2i &size) const {
         XE_GL_SCOPED_ERROR_CHECK();
 
         glViewport(pos.X, pos.Y, size.X, size.Y);

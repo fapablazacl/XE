@@ -146,7 +146,7 @@ namespace xe::gl {
         const void *data = nullptr;
     };
 
-    template <typename Type, int Rows, int Cols> UniformMatrix makeUniform(GLint location, const XE::TMatrix<Type, Rows, Cols> &matrix, const bool transpose = false) {
+    template <typename Type, int Rows, int Cols> UniformMatrix makeUniform(GLint location, const xe::TMatrix<Type, Rows, Cols> &matrix, const bool transpose = false) {
         UniformMatrix uniform;
 
         uniform.location = location;
@@ -224,7 +224,7 @@ namespace xe::gl {
     enum class ClearFlags { Color = 0x01, Depth = 0x02, Stencil = 0x04 };
 
     struct ClearParams {
-        std::optional<XE::Vector4> color;
+        std::optional<xe::Vector4> color;
         std::optional<float> depth;
         std::optional<int> stencil;
     };
@@ -246,14 +246,14 @@ namespace xe::gl {
     };
 
     struct ClientTextureImage2D {
-        XE::Vector2i size = {0, 0};
+        xe::Vector2i size = {0, 0};
         GLenum format = GL_RGBA;
         GLenum type = GL_UNSIGNED_BYTE;
         const void *pixels = nullptr;
     };
 
     struct ClientTextureImage3D {
-        XE::Vector3i size = {0, 0, 0};
+        xe::Vector3i size = {0, 0, 0};
         GLenum format = GL_RGBA;
         GLenum type = GL_UNSIGNED_BYTE;
         const void *pixels = nullptr;
@@ -337,11 +337,11 @@ namespace xe::gl {
         // Draws an indexed geometry
         void draw(VertexArray vertexArray, GLenum primitiveType, const tcb::span<const VertexArrayPrimitive> &primitives, GLenum dataType) const;
 
-        void clear(GLenum flags, std::optional<XE::Vector4> color, std::optional<float> depth, std::optional<int> stencil) const;
+        void clear(GLenum flags, std::optional<xe::Vector4> color, std::optional<float> depth, std::optional<int> stencil) const;
 
         void flush() const;
 
-        void viewport(const XE::Vector2i &pos, const XE::Vector2i &size) const;
+        void viewport(const xe::Vector2i &pos, const xe::Vector2i &size) const;
 
         void useProgram(const Program &program) const;
 

@@ -5,7 +5,7 @@
 #include <xe/math/Rotation.h>
 #include <xe/math/Vector.h>
 
-namespace XE {
+namespace xe {
     /**
      * @brief Virtual sphere tied into a screen. Used as an utility in the Trackball class.
      */
@@ -32,6 +32,6 @@ namespace XE {
     private:
         Vector2i screenSize;
     };
-} // namespace XE
+} // namespace xe
 
 #endif

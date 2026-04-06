@@ -3,6 +3,6 @@
 
 #include <string>
 
-namespace XE {
+namespace xe {
     std::string loadTextFile(const std::string &filePath);
 }

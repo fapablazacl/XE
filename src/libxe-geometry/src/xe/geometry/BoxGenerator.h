@@ -7,7 +7,7 @@
 
 #include "ShapeGenerator.h"
 
-namespace XE {
+namespace xe {
     /**
      * @brief Generate a geometry mesh that forms a Box-Like shape
      */
@@ -36,6 +36,6 @@ namespace XE {
         Vector3i division;
         Vector3 size;
     };
-} // namespace XE
+} // namespace xe
 
 #endif

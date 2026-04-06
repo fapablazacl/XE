@@ -12,7 +12,7 @@
 
 #include "PixelFormat.h"
 
-namespace XE {
+namespace xe {
     class Buffer;
 
     /**
@@ -97,6 +97,6 @@ namespace XE {
 
         virtual void endFrame() = 0;
     };
-} // namespace XE
+} // namespace xe
 
 #endif

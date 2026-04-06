@@ -32,21 +32,21 @@ inline std::optional<GLenum> mapBppToInternalFormat(const int bpp) {
 
 xe::gl::Texture GltfTextureLoader::createTexture(const cgltf_texture_view &textureView) const {
     if (!textureView.texture) {
-        XE::logWarning(std::format("Texture does not contain data"));
+        xe::logWarning(std::format("Texture does not contain data"));
         return {};
     }
 
-    XE::logInfo(std::format("Loading texture"));
+    xe::logInfo(std::format("Loading texture"));
 
     const auto mimeType = textureView.texture->image->mime_type;
     if (!mimeType) {
-        XE::logWarning(std::format("Texture MIME type is null"));
+        xe::logWarning(std::format("Texture MIME type is null"));
         return {};
     }
 
     const auto imageFormat = parseImageFormat(mimeType);
     if (!imageFormat.has_value()) {
-        XE::logWarning(std::format("Failed to parse Texture image format from MIME type {}", to_string(mimeType).value_or("<noMimeType>")));
+        xe::logWarning(std::format("Failed to parse Texture image format from MIME type {}", to_string(mimeType).value_or("<noMimeType>")));
         return {};
     }
 
@@ -263,7 +263,7 @@ xe::gl::VertexArray GltfDataLoader::createVertexArray(const cgltf_primitive &pri
 
         auto dataTypeGL = mapToAttributeDataType(accessor.component_type);
         if (!dataTypeGL) {
-            XE::logError(
+            xe::logError(
                 std::format("Could not map attribute {} with accessor component type {}", to_string(accessor.name).value_or("<noname>"), to_string(accessor.component_type))
             );
             return {};
@@ -271,7 +271,7 @@ xe::gl::VertexArray GltfDataLoader::createVertexArray(const cgltf_primitive &pri
 
         auto attribDimGL = mapToAttribDim(accessor.type);
         if (!attribDimGL) {
-            XE::logError(std::format("Could not map attribute {} with accessor type {}", to_string(accessor.name).value_or("<noname>"), to_string(accessor.type)));
+            xe::logError(std::format("Could not map attribute {} with accessor type {}", to_string(accessor.name).value_or("<noname>"), to_string(accessor.type)));
             return {};
         }
 

@@ -1,5 +1,5 @@
 
-set (target "XE.Math")
+set (target "xe-math")
 
 set (headers
     "src/xe/math/Math.h"
@@ -16,6 +16,9 @@ set (headers
     "src/xe/math/Sphere.h"
     "src/xe/math/Triangle.h"
     "src/xe/math/Ellipsoid.h"
+    "src/xe/math/Rotation.h"
+    "src/xe/math/Range.h"
+    "src/xe/math/Boundary.h"
     "src/xe/math/VectorExpr.h")
 
 set (sources
@@ -33,13 +36,14 @@ set (sources
         src/xe/math/Triangle.cpp)
 
 add_library (${target} ${sources})
+add_library(xe::math ALIAS ${target})
 
 if (XE_DEV_PRECOMPILED_HEADERS)
     target_precompile_headers(${target} PRIVATE ${headers})
 endif()
 
 target_include_directories(${target} PUBLIC "src")
-target_link_libraries(${target} PRIVATE XE.Interface)
+target_link_libraries(${target} PRIVATE xe::interface)
 
 if (XE_DEV_UNIT_TEST)
     add_subdirectory("test")

@@ -45,10 +45,10 @@ enum GAME_ACTION {
 struct Camera {
     const float turnSpeed = 25.0f;
     const float movementSpeed = 1.0f;
-    const XE::Vector3 up = {0.0f, 1.0f, 0.0f};
-    XE::Vector3 position;
-    XE::Vector3 lookAt;
-    XE::Vector3 direction = {0.0f, 0.0f, -1.0f};
+    const xe::Vector3 up = {0.0f, 1.0f, 0.0f};
+    xe::Vector3 position;
+    xe::Vector3 lookAt;
+    xe::Vector3 direction = {0.0f, 0.0f, -1.0f};
     float yaw = 0.0f;
     float pitch = 0.0f;
 
@@ -78,8 +78,8 @@ struct Camera {
         }
 
         // direction = xe::mat3RotationX(xe::radians(pitch)) * xe::mat3RotationY(xe::radians(yaw)) * xe::Vector3(0.0f, 0.0f, -1.0f);
-        direction = XE::mat3Rotation(XE::radians(pitch), {1.0f, 0.0f, 0.0f}) * XE::mat3RotationY(XE::radians(yaw)) * XE::Vector3(0.0f, 0.0f, -1.0f);
-        const auto cameraRight = XE::normalize(XE::cross(direction, up));
+        direction = xe::mat3Rotation(xe::radians(pitch), {1.0f, 0.0f, 0.0f}) * xe::mat3RotationY(xe::radians(yaw)) * xe::Vector3(0.0f, 0.0f, -1.0f);
+        const auto cameraRight = xe::normalize(xe::cross(direction, up));
 
         if (actions & GAME_ACTION_CAMERA_MOVE_FORWARD) {
             position += seconds * movementSpeed * direction;
@@ -102,10 +102,10 @@ struct Camera {
         lookAt = position + direction;
     }
 
-    XE::Matrix4 getViewProj(const int screenWidth, const int screenHeight) const {
+    xe::Matrix4 getViewProj(const int screenWidth, const int screenHeight) const {
         const auto aspectRatio = screenHeight / static_cast<float>(screenWidth);
-        const auto proj = XE::mat4Perspective(XE::radians(60.0f), aspectRatio, 0.0001f, 1000.0f);
-        const auto view = XE::mat4LookAtRH(position, lookAt, up);
+        const auto proj = xe::mat4Perspective(xe::radians(60.0f), aspectRatio, 0.0001f, 1000.0f);
+        const auto view = xe::mat4LookAtRH(position, lookAt, up);
 
         std::printf("cameraPos: %0.2f, %0.2f, %0.2f\n", position.X, position.Y, position.Z);
         std::printf("cameraDir: %0.2f, %0.2f, %0.2f\n", direction.X, direction.Y, direction.Z);
@@ -115,12 +115,12 @@ struct Camera {
 };
 
 struct Transformation {
-    XE::Vector3 scale = {1.0f, 1.0f, 1.0f};
-    XE::Vector3 position;
-    XE::Vector3 rotation;
+    xe::Vector3 scale = {1.0f, 1.0f, 1.0f};
+    xe::Vector3 position;
+    xe::Vector3 rotation;
 
-    XE::Matrix4 computeModelMatrix() const {
-        return XE::mat4Translation(position) * XE::mat4RotationX(rotation.X) * XE::mat4RotationY(rotation.Y) * XE::mat4RotationZ(rotation.Z);
+    xe::Matrix4 computeModelMatrix() const {
+        return xe::mat4Translation(position) * xe::mat4RotationX(rotation.X) * xe::mat4RotationY(rotation.Y) * xe::mat4RotationZ(rotation.Z);
     }
 };
 

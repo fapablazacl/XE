@@ -9,7 +9,7 @@
 #include <iostream>
 #include <map>
 
-namespace XE {
+namespace xe {
     void static errorCallback(int error, const char *description) {
         std::cout << "GLFW errorCallback: " << error << ": " << description << '\n';
     }
@@ -134,4 +134,4 @@ namespace XE {
     WindowGLFW::create(const GraphicsContext::Descriptor &contextDescriptor, const std::string &title, const Vector2i &windowSize, const bool fullScreen) {
         return std::make_unique<WindowGLFWImpl>(contextDescriptor, title, windowSize, fullScreen);
     }
-} // namespace XE
+} // namespace xe
