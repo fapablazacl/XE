@@ -3,7 +3,7 @@
 
 #include <map>
 
-namespace XE {
+namespace xe {
     static std::map<int, KeyCode> s_keyMapping = {
         {GLFW_KEY_ESCAPE, KeyCode::KeyEsc},
         {GLFW_KEY_LEFT, KeyCode::KeyLeft},
@@ -188,4 +188,4 @@ namespace XE {
         // assert(index == 0);
         return {};
     }
-} // namespace XE
+} // namespace xe

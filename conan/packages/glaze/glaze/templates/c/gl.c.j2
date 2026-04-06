@@ -1,0 +1,57 @@
+/*
+ * {{ generation_header | replace('\n', '\n * ') }}
+ */
+#include <glaze/{{ api }}.h>
+
+/* debug callback storage */
+static GLAZE_CALLBACK glaze_pre_callback = 0;
+static GLAZE_CALLBACK glaze_post_callback = 0;
+
+GLAZE_API void glazeSetPreCallback(GLAZE_CALLBACK callback) {
+    glaze_pre_callback = callback;
+}
+
+GLAZE_API void glazeSetPostCallback(GLAZE_CALLBACK callback) {
+    glaze_post_callback = callback;
+}
+
+{% for feature in features %}
+/* {{ feature.name }} function pointer variables */
+{% for defn in feature.definitions %}
+{{ defn }}
+{% endfor %}
+
+{% endfor %}
+
+#if defined(GLAZE_DEBUG)
+/* debug wrapper functions */
+{% for w in debug_wrappers %}
+GLAZE_API {{ w.return_type }} GLCALLCONV {{ w.debug_name }}({{ w.params_str }}) {
+{% if w.args_str %}
+    if (glaze_pre_callback) glaze_pre_callback("{{ w.name }}", (void*){{ w.raw_name }}, {{ w.param_count }}, {{ w.args_str }});
+{% else %}
+    if (glaze_pre_callback) glaze_pre_callback("{{ w.name }}", (void*){{ w.raw_name }}, 0);
+{% endif %}
+{% if w.is_void %}
+    {{ w.raw_name }}({{ w.args_str }});
+{% else %}
+    {{ w.return_type }} ret = {{ w.raw_name }}({{ w.args_str }});
+{% endif %}
+{% if w.args_str %}
+    if (glaze_post_callback) glaze_post_callback("{{ w.name }}", (void*){{ w.raw_name }}, {{ w.param_count }}, {{ w.args_str }});
+{% else %}
+    if (glaze_post_callback) glaze_post_callback("{{ w.name }}", (void*){{ w.raw_name }}, 0);
+{% endif %}
+{% if not w.is_void %}
+    return ret;
+{% endif %}
+}
+
+{% endfor %}
+#endif
+
+GLAZE_API void glazeLoadFunctions(GLAZE_GETPROCADDRESS getProcAddress) {
+{% for entry in loader_entries %}
+    {{ entry.ptr_var }} = ({{ entry.ptr_type }})getProcAddress("{{ entry.gl_name }}");
+{% endfor %}
+}

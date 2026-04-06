@@ -5,7 +5,7 @@
 
 #include <cassert>
 
-namespace XE {
+namespace xe {
     SubsetGL::SubsetGL(const SubsetDescriptor &desc) : descriptor(desc) {
         for (std::size_t i = 0; i < desc.buffers.size(); i++) {
             auto bufferGL = dynamic_cast<const BufferGL *>(desc.buffers[i]);
@@ -68,4 +68,4 @@ namespace XE {
     const BufferGL *SubsetGL::getIndexBuffer() const {
         return indexBuffer;
     }
-} // namespace XE
+} // namespace xe

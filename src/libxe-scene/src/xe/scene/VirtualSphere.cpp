@@ -1,7 +1,7 @@
 
 #include <xe/scene/VirtualSphere.h>
 
-namespace XE {
+namespace xe {
     VirtualSphere::VirtualSphere() {
     }
 
@@ -32,4 +32,4 @@ namespace XE {
     bool VirtualSphere::operator==(const VirtualSphere &rhs) const {
         return screenSize == rhs.screenSize;
     }
-} // namespace XE
+} // namespace xe

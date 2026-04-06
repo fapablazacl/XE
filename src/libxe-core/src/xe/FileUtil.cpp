@@ -4,7 +4,7 @@
 #include <cassert>
 #include <fstream>
 
-namespace XE {
+namespace xe {
     std::string loadTextFile(const std::string &filePath) {
         assert(filePath != "");
 
@@ -22,4 +22,4 @@ namespace XE {
 
         return content;
     }
-} // namespace XE
+} // namespace xe

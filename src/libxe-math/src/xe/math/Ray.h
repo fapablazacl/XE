@@ -5,7 +5,7 @@
 #include "Vector.h"
 #include <cassert>
 
-namespace XE {
+namespace xe {
     /**
      * @brief Ray with normalized direction in the 3-space
      */
@@ -35,6 +35,6 @@ namespace XE {
 
     extern template struct TRay<float>;
     extern template struct TRay<double>;
-} // namespace XE
+} // namespace xe
 
 #endif

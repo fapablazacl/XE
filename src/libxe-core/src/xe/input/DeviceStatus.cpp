@@ -1,7 +1,7 @@
 
 #include <xe/input/DeviceStatus.h>
 
-namespace XE {
+namespace xe {
     BinaryState KeyboardStatus::getState(KeyCode code) const {
         return m_keys[static_cast<int>(code)];
     }
@@ -41,4 +41,4 @@ namespace XE {
     void ControllerStatus::setState(const ControllerJoystick joystick, const Vector2 &state) {
         m_joysticks[static_cast<int>(joystick)] = state;
     }
-} // namespace XE
+} // namespace xe

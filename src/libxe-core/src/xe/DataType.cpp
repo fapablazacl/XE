@@ -1,7 +1,7 @@
 
 #include <xe/DataType.h>
 
-namespace XE {
+namespace xe {
     int bytesize(DataType dataType) {
         switch (dataType) {
         case DataType::UInt8:
@@ -27,4 +27,4 @@ namespace XE {
             return 0;
         }
     }
-} // namespace XE
+} // namespace xe

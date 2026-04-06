@@ -1,7 +1,7 @@
 
 #include <xe/app/Platform.h>
 
-#include <glad/glad.h>
+#include <glaze/gl.h>
 
 #include <cassert>
 #include <cstring>

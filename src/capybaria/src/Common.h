@@ -15,21 +15,21 @@
 
 namespace demo {
     struct Vertex {
-        XE::Vector3 coord;
-        XE::Vector3 normal;
-        XE::Vector4 color;
+        xe::Vector3 coord;
+        xe::Vector3 normal;
+        xe::Vector4 color;
 
         Vertex() {
         }
 
-        Vertex(XE::Vector3 coord, XE::Vector3 normal, XE::Vector4 color) : coord(coord), normal(normal), color(color) {
+        Vertex(xe::Vector3 coord, xe::Vector3 normal, xe::Vector4 color) : coord(coord), normal(normal), color(color) {
         }
     };
 
     struct Mesh {
         std::vector<Vertex> vertices;
         std::vector<uint32_t> indices;
-        XE::PrimitiveType primitive;
+        xe::PrimitiveType primitive;
     };
 } // namespace demo
 
@@ -38,14 +38,14 @@ namespace Sandbox {
 
     struct MeshPrimitive {
         const Material *material = nullptr;
-        XE::PrimitiveType type = XE::PrimitiveType::PointList;
-        std::vector<XE::Vector3> coords;
-        std::vector<XE::Vector3> normals;
-        std::vector<XE::Vector4> colors;
-        std::vector<XE::Vector2> texCoords;
+        xe::PrimitiveType type = xe::PrimitiveType::PointList;
+        std::vector<xe::Vector3> coords;
+        std::vector<xe::Vector3> normals;
+        std::vector<xe::Vector4> colors;
+        std::vector<xe::Vector2> texCoords;
         std::vector<int> indices;
 
-        XE::SubsetEnvelope getEnvelope() const {
+        xe::SubsetEnvelope getEnvelope() const {
             if (indices.size()) {
                 return {type, 0, (int)indices.size()};
             }
@@ -61,7 +61,7 @@ namespace Sandbox {
 
     struct SceneNode {
         std::string name;
-        XE::Matrix4 localMatrix = XE::mat4Identity();
+        xe::Matrix4 localMatrix = xe::mat4Identity();
         std::vector<SceneNode> children;
 
         std::string meshName;
@@ -87,10 +87,10 @@ namespace Sandbox {
         return os;
     }
 
-    inline XE::Matrix4 makeMatrix(const float *data) {
+    inline xe::Matrix4 makeMatrix(const float *data) {
         assert(data);
 
-        XE::Matrix4 matrix;
+        xe::Matrix4 matrix;
 
         std::memcpy(matrix.data(), data, 16 * sizeof(float));
 

@@ -4,7 +4,7 @@
 
 #include <xe/Predef.h>
 
-namespace XE {
+namespace xe {
     struct Version {
         int major, minor, revision;
     };
@@ -16,6 +16,6 @@ namespace XE {
     public:
         Version GetVersion() const;
     };
-} // namespace XE
+} // namespace xe
 
 #endif

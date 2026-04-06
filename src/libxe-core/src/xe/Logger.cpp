@@ -3,7 +3,7 @@
 
 #include <iostream>
 
-namespace XE {
+namespace xe {
     void logInfo(const std::string &msg) {
         std::cout << "[INFO] " << msg << std::endl;
     }
@@ -15,4 +15,4 @@ namespace XE {
     void logError(const std::string &msg) {
         std::cout << "[ERROR] " << msg << std::endl;
     }
-} // namespace XE
+} // namespace xe

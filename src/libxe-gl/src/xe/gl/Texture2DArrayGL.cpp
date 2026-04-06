@@ -2,7 +2,7 @@
 #include "Texture2DArrayGL.h"
 #include "Conversion.h"
 
-namespace XE {
+namespace xe {
     Texture2DArrayGL::Texture2DArrayGL(const PixelFormat format, const Vector2i &size, const int count) : TextureBaseGL(GL_TEXTURE_2D_ARRAY), m_format(format), m_size(size) {
 
         // const GLenum internalFormatGL = convertToGL(m_format);
@@ -37,4 +37,4 @@ namespace XE {
         glGetTexImage(GL_TEXTURE_2D_ARRAY, mipLevel, formatGL, dataTypeGL, surfaceData);
         glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
     }
-} // namespace XE
+} // namespace xe

@@ -10,12 +10,12 @@
 
 #include "gl.h"
 
-namespace XE {
+namespace xe {
     enum class ShaderType;
     struct ProgramDescriptor;
-} // namespace XE
+} // namespace xe
 
-namespace XE {
+namespace xe {
     class ShaderGL;
     class ProgramGL : public Program {
     public:
@@ -40,6 +40,6 @@ namespace XE {
         GLuint m_id;
         std::vector<std::unique_ptr<ShaderGL>> m_shaders;
     };
-} // namespace XE
+} // namespace xe
 
 #endif

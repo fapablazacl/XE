@@ -1077,11 +1077,11 @@ void VulkanRenderer::updateUniformBuffer(const uint32_t currentImage) {
 
     UniformBufferObject ubo{};
 
-    ubo.model = XE::mat4RotationZ(time * XE::radians(90.0f));
-    ubo.view = XE::mat4LookAtRH({2.0f, 2.0f, 2.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 1.0f});
+    ubo.model = xe::mat4RotationZ(time * xe::radians(90.0f));
+    ubo.view = xe::mat4LookAtRH({2.0f, 2.0f, 2.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 1.0f});
 
     const auto aspectRatio = static_cast<float>(mSwapchainExtent.width) / static_cast<float>(mSwapchainExtent.height);
-    ubo.proj = XE::mat4Perspective(XE::radians(45.0f), aspectRatio, 0.1f, 10.0f);
+    ubo.proj = xe::mat4Perspective(xe::radians(45.0f), aspectRatio, 0.1f, 10.0f);
     ubo.proj[1][1] *= -1;
 
     assert(mUniformBuffersMapped[currentImage] != nullptr);

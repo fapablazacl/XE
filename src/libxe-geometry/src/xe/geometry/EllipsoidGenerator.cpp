@@ -1,7 +1,7 @@
 
 #include <xe/geometry/EllipsoidGenerator.h>
 
-namespace XE {
+namespace xe {
     EllipsoidGenerator::EllipsoidGenerator(const int slices, const int stacks, const Vector3 &dimensions) : slices(slices), dimensions(dimensions), stacks(stacks) {
     }
 
@@ -23,4 +23,4 @@ namespace XE {
     std::vector<int> EllipsoidGenerator::generateIndices() const {
         return {};
     }
-} // namespace XE
+} // namespace xe

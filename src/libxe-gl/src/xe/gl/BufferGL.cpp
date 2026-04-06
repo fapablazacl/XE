@@ -5,7 +5,7 @@
 #include <cassert>
 #include <cstdint>
 
-namespace XE {
+namespace xe {
     BufferGL::BufferGL(GLenum target, GLenum usage, const void *data, GLsizei size) : m_target(target), m_size(size) {
         glGenBuffers(1, &m_id);
         glBindBuffer(target, m_id);
@@ -40,4 +40,4 @@ namespace XE {
         glBufferSubData(m_target, offset, finalSize, &ptr[sourceOffset]);
         glBindBuffer(m_target, 0);
     }
-} // namespace XE
+} // namespace xe

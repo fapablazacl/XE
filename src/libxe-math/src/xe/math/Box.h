@@ -4,7 +4,7 @@
 
 #include "Boundary.h"
 
-namespace XE {
+namespace xe {
     extern template class TBoundary<float, 3>;
     extern template class TBoundary<double, 3>;
     extern template class TBoundary<int, 3>;
@@ -25,6 +25,6 @@ namespace XE {
 
         return os;
     }
-} // namespace XE
+} // namespace xe
 
 #endif

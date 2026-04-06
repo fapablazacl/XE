@@ -1,0 +1,80 @@
+#pragma once
+/*
+ * {{ generation_header | replace('\n', '\n * ') }}
+ */
+
+#ifndef __GLAZE_{{ api | upper }}_H__
+#define __GLAZE_{{ api | upper }}_H__
+
+#include <KHR/khrplatform.h>
+
+#if defined(__{{ api }}_h_) || defined(__{{ api | upper }}_H__)
+  #error please include this header instead
+#endif
+
+#define __{{ api }}_h_
+#define __{{ api | upper }}_H__
+
+#if defined(_WIN32)
+  #define GLCALLCONV __stdcall
+  #if defined(GLAZE_BUILD_DLL)
+    #define GLAZE_API __declspec(dllexport)
+  #elif defined(GLAZE_DLL)
+    #define GLAZE_API __declspec(dllimport)
+  #else
+    #define GLAZE_API
+  #endif
+#else
+  #define GLCALLCONV
+  #define GLAZE_API
+#endif
+
+#if defined(__cplusplus)
+extern "C" {
+#endif
+
+/* loader declarations */
+typedef void (*GLAZE_PROC)(void);
+typedef GLAZE_PROC (*GLAZE_GETPROCADDRESS)(const char *name);
+GLAZE_API void glazeLoadFunctions(GLAZE_GETPROCADDRESS getProcAddress);
+
+/* debug callback declarations */
+typedef void (*GLAZE_CALLBACK)(const char *name, void *funcptr, int len_args, ...);
+GLAZE_API void glazeSetPreCallback(GLAZE_CALLBACK callback);
+GLAZE_API void glazeSetPostCallback(GLAZE_CALLBACK callback);
+
+/* data type definitions */
+{% for typedef in types %}
+{{ typedef }}
+{% endfor %}
+
+{% for feature in features %}
+/* {{ feature.name }} definitions */
+{% for enum in feature.enums %}
+#define {{ enum.name }} {{ enum.value }}
+{% endfor %}
+{% for cmd in feature.commands %}
+{% if cmd.doc_brief %}
+/** @brief {{ cmd.doc_brief }}
+{% for pname, pdesc in cmd.doc_params.items() %}
+ *  @param {{ pname }} {{ pdesc }}
+{% endfor %}
+ */
+{% endif %}
+{{ cmd.typedef }}
+{{ cmd.extern_raw }}
+#if defined(GLAZE_DEBUG)
+{{ cmd.debug_decl }}
+{{ cmd.debug_alias }}
+#else
+{{ cmd.release_alias }}
+#endif
+
+{% endfor %}
+{% endfor %}
+
+#if defined(__cplusplus)
+}
+#endif
+
+#endif

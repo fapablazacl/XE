@@ -2,7 +2,7 @@
 #include <xe/geometry/BoxGenerator.h>
 #include <xe/math/Common.h>
 
-namespace XE {
+namespace xe {
     const int faceCount = 6;
 
     BoxGenerator::BoxGenerator(const Vector3i &division, const Vector3 &size) : division(division), size(size) {
@@ -55,7 +55,7 @@ namespace XE {
 
         return indices;
     }
-} // namespace XE
+} // namespace xe
 
 /*
     //! TODO: Replace with a quaternion object

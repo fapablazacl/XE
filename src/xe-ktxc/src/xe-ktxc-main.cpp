@@ -2,21 +2,21 @@
 #include <cassert>
 #include <filesystem>
 #include <map>
-#include <span>
+#include <bpstd/span.hpp>
 #include <string>
 
 #include <IL/il.h>
 #include <IL/ilu.h>
 #include <cxxopts.hpp>
-#include <glad/glad.h>
+#include <glaze/gl.h>
 #include <iostream>
 #include <ktx.h>
 #include <vulkan/vulkan.h>
 
 #include "xe/Logger.h"
 
-using ImageSpan = std::span<uint8_t>;
-using FileSpan = std::span<uint8_t>;
+using ImageSpan = bpstd::span<uint8_t>;
+using FileSpan = bpstd::span<uint8_t>;
 
 struct ImageDesc {
     int width = 0;

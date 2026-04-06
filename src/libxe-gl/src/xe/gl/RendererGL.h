@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include <glad/glad.h>
+#include <glaze/gl.h>
 #include <string>
 #include <vector>
 
@@ -11,7 +11,7 @@
 
 #include <optional>
 
-#include "span.hpp"
+#include <bpstd/span.hpp>
 
 struct RendererInfo {
     std::string vendor;
@@ -146,7 +146,7 @@ namespace xe::gl {
         const void *data = nullptr;
     };
 
-    template <typename Type, int Rows, int Cols> UniformMatrix makeUniform(GLint location, const XE::TMatrix<Type, Rows, Cols> &matrix, const bool transpose = false) {
+    template <typename Type, int Rows, int Cols> UniformMatrix makeUniform(GLint location, const xe::TMatrix<Type, Rows, Cols> &matrix, const bool transpose = false) {
         UniformMatrix uniform;
 
         uniform.location = location;
@@ -191,14 +191,14 @@ namespace xe::gl {
         GLsizei count = 0;
 
         //! attributes to set prior making the rendering call
-        tcb::span<Attribute> attribs;
+        bpstd::span<const Attribute> attribs;
 
         VertexArrayPrimitive(GLint start, GLsizei count) {
             this->start = start;
             this->count = count;
         }
 
-        VertexArrayPrimitive(GLint start, GLsizei count, const tcb::span<Attribute> &attribs) {
+        VertexArrayPrimitive(GLint start, GLsizei count, const bpstd::span<const Attribute> &attribs) {
             this->start = start;
             this->count = count;
             this->attribs = attribs;
@@ -218,13 +218,13 @@ namespace xe::gl {
 
     struct TextureLayer {
         Texture texture = {};
-        tcb::span<TextureParameter> parameters;
+        bpstd::span<const TextureParameter> parameters;
     };
 
     enum class ClearFlags { Color = 0x01, Depth = 0x02, Stencil = 0x04 };
 
     struct ClearParams {
-        std::optional<XE::Vector4> color;
+        std::optional<xe::Vector4> color;
         std::optional<float> depth;
         std::optional<int> stencil;
     };
@@ -246,14 +246,14 @@ namespace xe::gl {
     };
 
     struct ClientTextureImage2D {
-        XE::Vector2i size = {0, 0};
+        xe::Vector2i size = {0, 0};
         GLenum format = GL_RGBA;
         GLenum type = GL_UNSIGNED_BYTE;
         const void *pixels = nullptr;
     };
 
     struct ClientTextureImage3D {
-        XE::Vector3i size = {0, 0, 0};
+        xe::Vector3i size = {0, 0, 0};
         GLenum format = GL_RGBA;
         GLenum type = GL_UNSIGNED_BYTE;
         const void *pixels = nullptr;
@@ -275,7 +275,7 @@ namespace xe::gl {
 
     struct CreateTextureOptions {
         CreateTextureFlags flags = None;
-        tcb::span<TextureParameter> parameters;
+        bpstd::span<const TextureParameter> parameters;
     };
 
     /**
@@ -298,13 +298,13 @@ namespace xe::gl {
         Shader createShader(GLenum type, const char *source) const;
 
         [[nodiscard]]
-        Program createProgram(const tcb::span<Shader> &shaders) const;
+        Program createProgram(const bpstd::span<Shader> &shaders) const;
 
         [[nodiscard]]
         Buffer createBuffer(GLenum target, GLenum usage, const MemoryRegion &memory) const;
 
         [[nodiscard]]
-        VertexArray createVertexArray(const tcb::span<const Attribute> &attributes, Buffer elementArrayBuffer) const;
+        VertexArray createVertexArray(const bpstd::span<const Attribute> &attributes, Buffer elementArrayBuffer) const;
 
         [[nodiscard]]
         RendererInfo getInfo() const;
@@ -318,30 +318,30 @@ namespace xe::gl {
         [[nodiscard]]
         Texture createTexture(GLenum target, GLenum internalFormat, const ClientTextureImage3D &image, const CreateTextureOptions &options = {}) const;
 
-        void bindRenderState(const tcb::span<const CapabilityStatus> &capabilities) const;
+        void bindRenderState(const bpstd::span<const CapabilityStatus> &capabilities) const;
 
-        void bindRenderState(const tcb::span<const TextureLayer> &layers) const;
+        void bindRenderState(const bpstd::span<const TextureLayer> &layers) const;
 
-        void bindRenderState(GLenum textureTarget, const tcb::span<const TextureParameter> &parameters) const;
+        void bindRenderState(GLenum textureTarget, const bpstd::span<const TextureParameter> &parameters) const;
 
-        void bindRenderState(const tcb::span<const Attribute> &attribs) const;
+        void bindRenderState(const bpstd::span<const Attribute> &attribs) const;
 
-        void bindRenderState(const tcb::span<const Uniform> &uniforms) const;
+        void bindRenderState(const bpstd::span<const Uniform> &uniforms) const;
 
-        void bindRenderState(const tcb::span<const UniformMatrix> &uniforms) const;
+        void bindRenderState(const bpstd::span<const UniformMatrix> &uniforms) const;
 
         void draw(VertexArray vertexArray, GLenum primitiveType, const VertexArrayMultiDraw &multiDraw) const;
 
-        void draw(VertexArray vertexArray, GLenum primitiveType, const tcb::span<const VertexArrayPrimitive> &primitives) const;
+        void draw(VertexArray vertexArray, GLenum primitiveType, const bpstd::span<const VertexArrayPrimitive> &primitives) const;
 
         // Draws an indexed geometry
-        void draw(VertexArray vertexArray, GLenum primitiveType, const tcb::span<const VertexArrayPrimitive> &primitives, GLenum dataType) const;
+        void draw(VertexArray vertexArray, GLenum primitiveType, const bpstd::span<const VertexArrayPrimitive> &primitives, GLenum dataType) const;
 
-        void clear(GLenum flags, std::optional<XE::Vector4> color, std::optional<float> depth, std::optional<int> stencil) const;
+        void clear(GLenum flags, std::optional<xe::Vector4> color, std::optional<float> depth, std::optional<int> stencil) const;
 
         void flush() const;
 
-        void viewport(const XE::Vector2i &pos, const XE::Vector2i &size) const;
+        void viewport(const xe::Vector2i &pos, const xe::Vector2i &size) const;
 
         void useProgram(const Program &program) const;
 

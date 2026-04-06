@@ -7,7 +7,7 @@
 #include <xe/Predef.h>
 #include <xe/graphics/Texture.h>
 
-namespace XE {
+namespace xe {
     enum class DataType : std::int16_t;
 
     class Texture2D : public Texture {
@@ -23,6 +23,6 @@ namespace XE {
 
         virtual void getData(void *surfaceData, const int mipLevel, const PixelFormat surfaceFormat, const DataType surfaceDataType) const = 0;
     };
-} // namespace XE
+} // namespace xe
 
 #endif

@@ -1,7 +1,7 @@
 
 #include <xe/Buffer.h>
 
-namespace XE {
+namespace xe {
     Buffer::~Buffer() {
     }
-} // namespace XE
+} // namespace xe

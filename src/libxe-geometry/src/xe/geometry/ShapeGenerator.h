@@ -5,7 +5,7 @@
 #include <vector>
 #include <xe/math/Math.h>
 
-namespace XE {
+namespace xe {
     class ShapeGenerator {
     public:
         virtual ~ShapeGenerator();
@@ -18,6 +18,6 @@ namespace XE {
 
         virtual std::vector<int> generateIndices() const = 0;
     };
-} // namespace XE
+} // namespace xe
 
 #endif

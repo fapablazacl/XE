@@ -1,7 +1,7 @@
 
 #include "Plane.h"
 
-namespace XE {
+namespace xe {
     template struct TPlane<float>;
     template struct TPlane<double>;
-} // namespace XE
+} // namespace xe

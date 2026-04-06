@@ -6,7 +6,7 @@
 
 #include "Timer.h"
 
-namespace XE {
+namespace xe {
     class FPSCounter {
     public:
         //! must be called once per frame
@@ -17,10 +17,10 @@ namespace XE {
         }
 
     private:
-        int lastTime = XE::Timer::getTick();
+        int lastTime = xe::Timer::getTick();
         int currentFrames = 0;
         int fps = 0;
     };
-} // namespace XE
+} // namespace xe
 
 #endif // XE_FPSCOUNTER_H

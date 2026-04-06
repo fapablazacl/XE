@@ -6,7 +6,7 @@
 
 #include <limits>
 
-namespace XE {
+namespace xe {
     /**
      * @brief Ellipsoid in the 3-space
      */
@@ -38,6 +38,6 @@ namespace XE {
 
     using Ellipsoid = TEllipsoid<float>;
     using Ellipsoidd = TEllipsoid<double>;
-} // namespace XE
+} // namespace xe
 
 #endif

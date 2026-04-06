@@ -5,13 +5,13 @@
 #include <cstdint>
 #include <xe/Predef.h>
 
-namespace XE {
+namespace xe {
     class XE_API Timer {
     public:
         Timer() = delete;
 
         static uint32_t getTick();
     };
-} // namespace XE
+} // namespace xe
 
 #endif

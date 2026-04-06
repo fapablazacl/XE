@@ -1,7 +1,7 @@
 
 #include <xe/graphics/Material.h>
 
-namespace XE {
+namespace xe {
     Material::~Material() {
     }
-} // namespace XE
+} // namespace xe

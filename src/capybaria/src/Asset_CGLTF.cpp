@@ -12,7 +12,7 @@
 #include "Common.h"
 
 namespace Sandbox {
-    static XE::Matrix4 computeNodeMatrix(const cgltf_node *node);
+    static xe::Matrix4 computeNodeMatrix(const cgltf_node *node);
 
     /*
     static void visitAttribute(const int indentation, const cgltf_attribute &attrib) { Sandbox::indent(std::cout, indentation) << " visitAttribute: " << attrib.name << std::endl; }
@@ -72,11 +72,11 @@ namespace Sandbox {
         // map primitive type
         switch (primitive.type) {
         case cgltf_primitive_type_triangles:
-            meshPrimitive.type = XE::PrimitiveType::TriangleList;
+            meshPrimitive.type = xe::PrimitiveType::TriangleList;
             break;
 
         default:
-            meshPrimitive.type = XE::PrimitiveType::PointList;
+            meshPrimitive.type = xe::PrimitiveType::PointList;
         }
 
         // map indices
@@ -108,7 +108,7 @@ namespace Sandbox {
                 cgltf_size offset = 0;
 
                 for (cgltf_size j = 0; j < accessor->count; j++) {
-                    const XE::Vector3 *elementData = (const XE::Vector3 *)((uint8_t *)buffer->data + bufferView->offset + accessor->offset + offset);
+                    const xe::Vector3 *elementData = (const xe::Vector3 *)((uint8_t *)buffer->data + bufferView->offset + accessor->offset + offset);
 
                     meshPrimitive.coords.push_back(*elementData);
 
@@ -118,7 +118,7 @@ namespace Sandbox {
                 cgltf_size offset = 0;
 
                 for (cgltf_size j = 0; j < accessor->count; j++) {
-                    const XE::Vector3 *elementData = (const XE::Vector3 *)((uint8_t *)buffer->data + bufferView->offset + accessor->offset + offset);
+                    const xe::Vector3 *elementData = (const xe::Vector3 *)((uint8_t *)buffer->data + bufferView->offset + accessor->offset + offset);
 
                     meshPrimitive.normals.push_back(*elementData);
 
@@ -129,7 +129,7 @@ namespace Sandbox {
                 cgltf_size offset = 0;
 
                 for (cgltf_size j = 0; j < accessor->count; j++) {
-                    const XE::Vector2 *elementData = (const XE::Vector2 *)((uint8_t *)buffer->data + bufferView->offset + accessor->offset + offset);
+                    const xe::Vector2 *elementData = (const xe::Vector2 *)((uint8_t *)buffer->data + bufferView->offset + accessor->offset + offset);
 
                     meshPrimitive.texCoords.push_back(*elementData);
 
@@ -237,49 +237,49 @@ namespace Sandbox {
         return meshes;
     }
 
-    static XE::Matrix4 computeNodeMatrix(const cgltf_node *node) {
+    static xe::Matrix4 computeNodeMatrix(const cgltf_node *node) {
         assert(node);
 
-        auto nodeMatrix = XE::mat4Identity();
+        auto nodeMatrix = xe::mat4Identity();
 
         if (node->has_matrix == 1) {
             nodeMatrix = Sandbox::makeMatrix(node->matrix);
         } else {
             if (node->has_translation) {
                 // TODO: Untested translation
-                const auto t = XE::Vector3{node->translation};
-                nodeMatrix *= XE::mat4Translation(t);
+                const auto t = xe::Vector3{node->translation};
+                nodeMatrix *= xe::mat4Translation(t);
             }
 
             if (node->has_rotation) {
                 // TODO: Untested rotation
                 // TODO: Add missing cases for angle = 0 and = 180º.
-                const auto q = XE::TQuaternion<float>{node->rotation};
+                const auto q = xe::TQuaternion<float>{node->rotation};
 
                 const float radians = std::acos(q.W);
                 const float inv_denom = 1.0f / std::sqrt(1.0f - q.W * q.W);
 
                 if (radians > 0.0f) {
-                    const XE::Vector3 axis = q.V * inv_denom;
+                    const xe::Vector3 axis = q.V * inv_denom;
 
-                    nodeMatrix *= XE::mat4Rotation(radians, axis);
+                    nodeMatrix *= xe::mat4Rotation(radians, axis);
                 }
             }
 
             if (node->has_scale) {
                 // TODO: Untested scale
-                const auto s = XE::Vector3{node->scale};
-                nodeMatrix *= XE::mat4Scaling({s, 1.0f});
+                const auto s = xe::Vector3{node->scale};
+                nodeMatrix *= xe::mat4Scaling({s, 1.0f});
             }
         }
 
         return nodeMatrix;
     }
 
-    void Asset_CGLTF::visitNode(const XE::Matrix4 &matrix, const cgltf_node *node) {
+    void Asset_CGLTF::visitNode(const xe::Matrix4 &matrix, const cgltf_node *node) {
         assert(node);
 
-        const XE::Matrix4 nodeMatrix = matrix * computeNodeMatrix(node);
+        const xe::Matrix4 nodeMatrix = matrix * computeNodeMatrix(node);
 
         if (node->mesh) {
             mCallback(nodeMatrix, node->mesh->name);
@@ -295,7 +295,7 @@ namespace Sandbox {
     }
 
     void Asset_CGLTF::visitScene(const cgltf_scene *scene) {
-        auto transformMatrix = XE::mat4Identity();
+        auto transformMatrix = xe::mat4Identity();
 
         for (cgltf_size i = 0; i < scene->nodes_count; i++) {
             visitNode(transformMatrix, scene->nodes[i]);

@@ -5,7 +5,7 @@
 #include <memory>
 #include <string>
 
-namespace XE {
+namespace xe {
     class Stream;
     class StreamSource {
     public:
@@ -15,6 +15,6 @@ namespace XE {
 
         virtual bool exists(const std::string &path) const = 0;
     };
-} // namespace XE
+} // namespace xe
 
 #endif

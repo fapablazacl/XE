@@ -1,7 +1,9 @@
 
 #include "GltfDataLoader.h"
 
-#include <span>
+#include <bpstd/span.hpp>
+
+#include <fmt/format.h>
 
 #include "xe/Logger.h"
 
@@ -32,21 +34,21 @@ inline std::optional<GLenum> mapBppToInternalFormat(const int bpp) {
 
 xe::gl::Texture GltfTextureLoader::createTexture(const cgltf_texture_view &textureView) const {
     if (!textureView.texture) {
-        XE::logWarning(std::format("Texture does not contain data"));
+        xe::logWarning(fmt::format("Texture does not contain data"));
         return {};
     }
 
-    XE::logInfo(std::format("Loading texture"));
+    xe::logInfo(fmt::format("Loading texture"));
 
     const auto mimeType = textureView.texture->image->mime_type;
     if (!mimeType) {
-        XE::logWarning(std::format("Texture MIME type is null"));
+        xe::logWarning(fmt::format("Texture MIME type is null"));
         return {};
     }
 
     const auto imageFormat = parseImageFormat(mimeType);
     if (!imageFormat.has_value()) {
-        XE::logWarning(std::format("Failed to parse Texture image format from MIME type {}", to_string(mimeType).value_or("<noMimeType>")));
+        xe::logWarning(fmt::format("Failed to parse Texture image format from MIME type {}", to_string(mimeType).value_or("<noMimeType>")));
         return {};
     }
 
@@ -76,7 +78,7 @@ xe::gl::Texture GltfTextureLoader::createTexture(const cgltf_texture_view &textu
         parameters.push_back({GL_TEXTURE_MIN_FILTER, sampler->min_filter});
         parameters.push_back({GL_TEXTURE_WRAP_S, sampler->wrap_s});
         parameters.push_back({GL_TEXTURE_WRAP_T, sampler->wrap_t});
-        options.parameters = parameters;
+        options.parameters = bpstd::span<const xe::gl::TextureParameter>(parameters.data(), parameters.size());
     }
 
     return renderer->createTexture(GL_TEXTURE_2D, *internalFormat, clientImage, options);
@@ -162,7 +164,7 @@ GltfMeshPrimitive GltfDataLoader::createMeshPrimitive(const cgltf_primitive &pri
     if (primitive.indices) {
         const GLenum indexType = mapToGLDataType(primitive.indices->component_type).value();
         const xe::gl::Buffer indexBuffer = createIndexBuffer(*primitive.indices);
-        indexData = std::make_optional<GltfIndexData>(indexBuffer, indexType);
+        indexData = GltfIndexData{indexBuffer, indexType};
     }
 
     // FIXME: Assuming that all of the attributes are referencing the same count of vertices
@@ -196,7 +198,7 @@ GltfMesh GltfDataLoader::createMesh(const cgltf_mesh *mesh) {
 
     result.name = sanitizeString(mesh->name);
 
-    const std::span meshPrimitives = {mesh->primitives, mesh->primitives_count};
+    const bpstd::span<cgltf_primitive> meshPrimitives = {mesh->primitives, mesh->primitives_count};
     for (const cgltf_primitive &primitive : meshPrimitives) {
         const auto meshPrimitive = createMeshPrimitive(primitive);
 
@@ -256,22 +258,22 @@ xe::gl::VertexArray GltfDataLoader::createVertexArray(const cgltf_primitive &pri
 
     std::vector<xe::gl::Attribute> attributesGL;
 
-    const std::span<cgltf_attribute> attributes = {primitive.attributes, primitive.attributes_count};
+    const bpstd::span<cgltf_attribute> attributes = {primitive.attributes, primitive.attributes_count};
     for (const cgltf_attribute &attribute : attributes) {
         const auto &accessor = *attribute.data;
         const auto &bufferView = *accessor.buffer_view;
 
         auto dataTypeGL = mapToAttributeDataType(accessor.component_type);
         if (!dataTypeGL) {
-            XE::logError(
-                std::format("Could not map attribute {} with accessor component type {}", to_string(accessor.name).value_or("<noname>"), to_string(accessor.component_type))
+            xe::logError(
+                fmt::format("Could not map attribute {} with accessor component type {}", to_string(accessor.name).value_or("<noname>"), to_string(accessor.component_type))
             );
             return {};
         }
 
         auto attribDimGL = mapToAttribDim(accessor.type);
         if (!attribDimGL) {
-            XE::logError(std::format("Could not map attribute {} with accessor type {}", to_string(accessor.name).value_or("<noname>"), to_string(accessor.type)));
+            xe::logError(fmt::format("Could not map attribute {} with accessor type {}", to_string(accessor.name).value_or("<noname>"), to_string(accessor.type)));
             return {};
         }
 
@@ -290,5 +292,5 @@ xe::gl::VertexArray GltfDataLoader::createVertexArray(const cgltf_primitive &pri
         }
     }
 
-    return renderer->createVertexArray({attributesGL.data(), attributesGL.size()}, indexBuffer);
+    return renderer->createVertexArray(bpstd::span<const xe::gl::Attribute>(attributesGL.data(), attributesGL.size()), indexBuffer);
 }

@@ -1,7 +1,7 @@
 
 #include <xe/graphics/IWindow.h>
 
-namespace XE {
+namespace xe {
     IWindow::~IWindow() {
     }
-} // namespace XE
+} // namespace xe

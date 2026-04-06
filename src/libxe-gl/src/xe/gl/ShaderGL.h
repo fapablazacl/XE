@@ -6,7 +6,7 @@
 
 #include "gl.h"
 
-namespace XE {
+namespace xe {
     class ShaderGL : public Shader {
     public:
         ShaderGL(const ShaderType type, const std::string &source);
@@ -28,6 +28,6 @@ namespace XE {
         GLuint m_id;
         GLenum m_typeGL;
     };
-} // namespace XE
+} // namespace xe
 
 #endif

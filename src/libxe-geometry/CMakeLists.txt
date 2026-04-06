@@ -1,5 +1,5 @@
 
-set (target XE.Geometry)
+set (target xe-geometry)
 
 set (sources
     "src/xe/geometry/ShapeGenerator.h"
@@ -12,6 +12,7 @@ set (sources
 )
 
 add_library(${target} ${sources})
+add_library(xe::geometry ALIAS ${target})
 
 target_include_directories(${target} PUBLIC "src")
-target_link_libraries(${target} XE.Core)
+target_link_libraries(${target} xe::core)

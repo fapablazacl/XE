@@ -6,7 +6,7 @@
 
 #include "TextureBaseGL.h"
 
-namespace XE {
+namespace xe {
     class Texture2DGL : public Texture2D, public TextureBaseGL {
     public:
         Texture2DGL(const PixelFormat format, const Vector2i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void *sourceData);
@@ -30,6 +30,6 @@ namespace XE {
         PixelFormat m_format;
         Vector2i m_size;
     };
-} // namespace XE
+} // namespace xe
 
 #endif

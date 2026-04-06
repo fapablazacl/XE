@@ -1,7 +1,7 @@
 
 #pragma once
 
-namespace XE {
+namespace xe {
     class GraphicsDevice;
     class GraphicsDeviceFactory;
 
@@ -37,4 +37,4 @@ namespace XE {
          */
         GraphicsDevice *createDevice();
     };
-} // namespace XE
+} // namespace xe

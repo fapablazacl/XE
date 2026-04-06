@@ -5,11 +5,11 @@
 #include "gl.h"
 #include <cstdint>
 
-namespace XE {
+namespace xe {
     enum class DataType : std::int16_t;
 }
 
-namespace XE {
+namespace xe {
     enum class PixelFormat;
     enum class BufferType;
     enum class BufferUsage;
@@ -22,9 +22,9 @@ namespace XE {
     enum class TextureFilter;
     enum class TextureWrap;
     enum class TextureCubeMapSide;
-} // namespace XE
+} // namespace xe
 
-namespace XE {
+namespace xe {
     extern GLenum convertToGL(const DataType type);
     extern GLenum convertToGL(const PixelFormat format);
     extern GLenum convertToGL(const BufferType type);
@@ -38,6 +38,6 @@ namespace XE {
     extern GLenum convertToGL(const TextureWrap wrap);
     extern GLenum convertToGL(const TextureCubeMapSide side);
     extern GLboolean convertToGL(const bool value);
-} // namespace XE
+} // namespace xe
 
 #endif

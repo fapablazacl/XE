@@ -4,13 +4,13 @@
 #include "Window.h"
 
 #include <iostream>
-#include <span>
+#include <bpstd/span.hpp>
 
 struct GltfViewParams {
     std::string gltfPath;
 };
 
-GltfViewParams parseArgs(std::span<char *> args) {
+GltfViewParams parseArgs(bpstd::span<char *> args) {
     GltfViewParams result;
 
     if (args.size() < 2) {
@@ -22,7 +22,7 @@ GltfViewParams parseArgs(std::span<char *> args) {
     return result;
 }
 
-int gltf_view_main(const std::span<char *> &args) {
+int gltf_view_main(const bpstd::span<char *> &args) {
     using xe::gltf_view::GltfRenderer;
 
     const GltfViewParams params = parseArgs(args);
@@ -53,7 +53,7 @@ int gltf_view_main(const std::span<char *> &args) {
 }
 
 int main(int argc, char *argv[]) {
-    const std::span<char *> args{argv, static_cast<size_t>(argc)};
+    const bpstd::span<char *> args{argv, static_cast<size_t>(argc)};
 
     return gltf_view_main(args);
 

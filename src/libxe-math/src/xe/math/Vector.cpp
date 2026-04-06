@@ -1,7 +1,7 @@
 
 #include "Vector.h"
 
-namespace XE {
+namespace xe {
     template struct TVector<std::int32_t, 2>;
     template struct TVector<std::int32_t, 3>;
     template struct TVector<std::int32_t, 4>;
@@ -13,4 +13,4 @@ namespace XE {
     template struct TVector<double, 2>;
     template struct TVector<double, 3>;
     template struct TVector<double, 4>;
-} // namespace XE
+} // namespace xe

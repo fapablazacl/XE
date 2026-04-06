@@ -17,7 +17,7 @@
 #pragma warning(disable : 4201) // non-standard extension used: nameless struct/union
 #endif
 
-namespace XE {
+namespace xe {
     template <typename T> struct TQuaternion {
         union {
             struct {
@@ -332,7 +332,7 @@ namespace XE {
 
     extern template struct TQuaternion<float>;
     extern template struct TQuaternion<double>;
-} // namespace XE
+} // namespace xe
 
 #if defined(_MSC_VER)
 #pragma warning(pop)

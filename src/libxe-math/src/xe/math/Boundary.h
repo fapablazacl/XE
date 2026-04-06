@@ -9,7 +9,7 @@
 #include "Range.h"
 #include "Vector.h"
 
-namespace XE {
+namespace xe {
     /**
      * @brief N-dimensional boundary class
      *
@@ -216,6 +216,6 @@ namespace XE {
         TVector<T, N> minEdge;
         TVector<T, N> maxEdge;
     };
-} // namespace XE
+} // namespace xe
 
 #endif

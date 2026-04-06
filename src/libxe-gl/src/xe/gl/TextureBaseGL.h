@@ -4,7 +4,7 @@
 
 #include "gl.h"
 
-namespace XE {
+namespace xe {
     /**
      * @brief Structural base class for textures
      */
@@ -27,6 +27,6 @@ namespace XE {
         GLuint m_id = 0;
         GLenum m_target;
     };
-} // namespace XE
+} // namespace xe
 
 #endif

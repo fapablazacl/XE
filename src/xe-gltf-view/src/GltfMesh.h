@@ -3,7 +3,7 @@
 #pragma once
 
 #include "xe/gl/RendererGL.h"
-#include <glad/glad.h>
+#include <glaze/gl.h>
 #include <vector>
 
 struct GltfMaterial {

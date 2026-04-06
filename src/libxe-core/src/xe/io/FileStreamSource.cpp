@@ -4,7 +4,7 @@
 #include <fstream>
 #include <xe/io/FileStream.h>
 
-namespace XE {
+namespace xe {
     FileStreamSource::FileStreamSource(const std::string &directory) : directory(directory) {
         /*
         fs::path path;
@@ -44,4 +44,4 @@ namespace XE {
 
         return fs.is_open();
     }
-} // namespace XE
+} // namespace xe

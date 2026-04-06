@@ -6,7 +6,7 @@
 #include <xe/graphics/GraphicsDevice.h>
 #include <xe/graphics/Viewport.h>
 
-namespace XE {
+namespace xe {
     class ProgramGL;
     class SubsetGL;
 
@@ -66,6 +66,6 @@ namespace XE {
 
         Viewport m_viewport;
     };
-} // namespace XE
+} // namespace xe
 
 #endif

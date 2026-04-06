@@ -6,7 +6,7 @@
 #include <xe/input/DeviceStatus.h>
 #include <xe/input/InputManager.h>
 
-namespace XE {
+namespace xe {
     class InputManagerGLFW : public InputManager {
     public:
         explicit InputManagerGLFW(GLFWwindow *window);
@@ -30,6 +30,6 @@ namespace XE {
         GLFWwindow *m_windowGLFW = nullptr;
         KeyboardStatus m_keyboardStatus = {};
     };
-} // namespace XE
+} // namespace xe
 
 #endif

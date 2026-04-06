@@ -7,7 +7,7 @@
 
 #include "StreamSource.h"
 
-namespace XE {
+namespace xe {
     class Stream;
     class FileStreamSource : public StreamSource {
     public:
@@ -20,6 +20,6 @@ namespace XE {
     private:
         std::string directory;
     };
-} // namespace XE
+} // namespace xe
 
 #endif

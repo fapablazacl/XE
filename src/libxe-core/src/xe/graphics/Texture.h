@@ -7,7 +7,7 @@
 #include <xe/math/Rect.h>
 #include <xe/math/Vector.h>
 
-namespace XE {
+namespace xe {
     enum class TextureType { Unknown, Tex2D, Tex3D, TexCubeMap, Tex2DArray };
 
     enum class TextureCubeMapSide { Unknown, PositiveX, NegativeX, PositiveY, NegativeY, PositiveZ, NegativeZ };
@@ -21,6 +21,6 @@ namespace XE {
         virtual TextureType getType() const = 0;
     };
 
-} // namespace XE
+} // namespace xe
 
 #endif

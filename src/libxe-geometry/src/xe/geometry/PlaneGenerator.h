@@ -7,7 +7,7 @@
 
 #include "ShapeGenerator.h"
 
-namespace XE {
+namespace xe {
     template <typename FloatT> inline FloatT ratio(const int a, const int b) {
         return static_cast<FloatT>(a) / static_cast<FloatT>(b);
     }
@@ -133,6 +133,6 @@ namespace XE {
         int vertexCount;
         int indexCount;
     };
-} // namespace XE
+} // namespace xe
 
 #endif

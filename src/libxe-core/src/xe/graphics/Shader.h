@@ -4,7 +4,7 @@
 
 #include <string>
 
-namespace XE {
+namespace xe {
     enum class ShaderType {
         Vertex,
         Fragment,
@@ -19,6 +19,6 @@ namespace XE {
 
         virtual std::string getSource() const = 0;
     };
-} // namespace XE
+} // namespace xe
 
 #endif

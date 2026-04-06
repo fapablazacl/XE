@@ -29,6 +29,6 @@ target_link_libraries(
     assimp::assimp
     glfw
     nlohmann_json::nlohmann_json
-        XE.GL
-        libxe-imageloader
+    xe::gl
+    xe::imageloader
 )

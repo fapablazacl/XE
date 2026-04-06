@@ -4,11 +4,11 @@
 
 #include <xe/math/Vector.h>
 
-namespace XE {
+namespace xe {
     struct Viewport {
         Vector2i position;
         Vector2i size;
     };
-} // namespace XE
+} // namespace xe
 
 #endif

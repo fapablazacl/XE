@@ -4,13 +4,13 @@
 
 #include <xe/graphics/ImageLoader.h>
 
-namespace XE {
+namespace xe {
     class ImageLoaderPNG : public ImageLoader {
     public:
         virtual ~ImageLoaderPNG();
 
         virtual std::unique_ptr<Image> load(Stream *inputStream) override;
     };
-} // namespace XE
+} // namespace xe
 
 #endif

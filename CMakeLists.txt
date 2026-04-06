@@ -7,7 +7,7 @@ option (XE_PLUGIN_GL            "Include OpenGL 3+ support" ON)
 option (XE_PLUGIN_GL_GLFW       "Include GLFW-based Window and Context creation support (requires 'XE_PLUGIN_GL')" ON)
 
 # options suited for development
-option (XE_DEV_UNIT_TEST            "Enable unit test suite" OFF)
+option (XE_DEV_UNIT_TEST            "Enable unit test suite" ON)
 option (XE_DEV_WARNINGS_AS_ERRORS   "Marks all warnings as errors" OFF)
 option (XE_DEV_INSTRUMENT_COVERAGE  "Instrument code for code coverage reporting during unit tests" OFF)
 option (XE_DEV_PRECOMPILED_HEADERS  "Enable precompiled headers for internal libraries, to improve build times" OFF)
@@ -44,16 +44,21 @@ if (XE_DEV_UNIT_TEST)
 endif()
 
 if (CMAKE_BUILD_TYPE MATCHES "Debug")
-    # this macro is required by Glad.
     add_definitions (-D_DEBUG)
+
+    # FIXME:
+    # Usage of this macro should be removed, because should be detected
+    # by GLAZE automatically.
+    add_definitions (-DGLAZE_DEBUG)
 endif ()
 
 add_definitions (-DXE_VERSION_MAJOR=${XE_VERSION_MAJOR})
 add_definitions (-DXE_VERSION_MINOR=${XE_VERSION_MINOR})
 add_definitions (-DXE_VERSION_REVISION=${XE_VERSION_REVISION})
 
-set (target XE.Interface)
+set (target xe-interface)
 add_library(${target} INTERFACE)
+add_library(xe::interface ALIAS ${target})
 
 if (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
     set (XE_CXXFLAGS_WALL -Wall -Wextra)

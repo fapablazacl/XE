@@ -5,7 +5,7 @@
 #include <iostream>
 
 namespace TestApp {
-    using namespace XE;
+    using namespace xe;
 
     Shader::Shader() {
     }

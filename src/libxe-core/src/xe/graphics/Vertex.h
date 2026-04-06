@@ -4,12 +4,12 @@
 
 #include <xe/math/Vector.h>
 
-namespace XE {
+namespace xe {
     struct Vertex {
         Vector3 position;
         Vector3 Normal;
         Vector2 TexCoord;
     };
-} // namespace XE
+} // namespace xe
 
 #endif

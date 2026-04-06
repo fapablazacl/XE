@@ -4,11 +4,11 @@
 
 #include <memory>
 
-namespace XE {
+namespace xe {
     class Stream;
 }
 
-namespace XE {
+namespace xe {
     class Image;
 
     /**
@@ -23,6 +23,6 @@ namespace XE {
          */
         virtual std::unique_ptr<Image> load(Stream *inputStream) = 0;
     };
-} // namespace XE
+} // namespace xe
 
 #endif

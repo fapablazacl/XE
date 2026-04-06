@@ -5,7 +5,7 @@
 #include <cassert>
 #include <ostream>
 
-namespace XE {
+namespace xe {
     /**
      * @brief Mathematical Range pair implementation.
      *
@@ -79,4 +79,4 @@ namespace XE {
     extern template struct TRange<float>;
     extern template struct TRange<double>;
     extern template struct TRange<int>;
-} // namespace XE
+} // namespace xe

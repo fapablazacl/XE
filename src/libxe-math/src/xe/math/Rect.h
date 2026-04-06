@@ -4,13 +4,13 @@
 
 #include "Boundary.h"
 
-namespace XE {
+namespace xe {
     typedef TBoundary<float, 2> Rectf;
     typedef TBoundary<int, 2> Recti;
 
     extern template class TBoundary<float, 2>;
     extern template class TBoundary<double, 2>;
     extern template class TBoundary<int, 2>;
-} // namespace XE
+} // namespace xe
 
 #endif

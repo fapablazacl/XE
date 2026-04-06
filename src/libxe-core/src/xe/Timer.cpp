@@ -4,12 +4,12 @@
 #if defined(XE_OS_WINDOWS)
 #include <Windows.h>
 
-namespace XE {
+namespace xe {
     uint32_t Timer::getTick() {
         const DWORD dwTickCount = ::GetTickCount();
         return dwTickCount;
     }
-} // namespace XE
+} // namespace xe
 
 #elif defined(__APPLE__)
 #include <cassert>
@@ -49,24 +49,24 @@ static uint64_t monotonicTimeNanos() {
     return data.scale(now);
 }
 
-namespace XE {
+namespace xe {
     uint32_t Timer::getTick() {
         const uint64_t nanos = monotonicTimeNanos();
         return nanos / 1000000;
     }
-} // namespace XE
+} // namespace xe
 
 #elif defined(__linux__)
 #include <time.h>
 
-namespace XE {
+namespace xe {
     uint32_t Timer::getTick() {
         timespec ts;
         clock_gettime(CLOCK_MONOTONIC, &ts);
 
         return 1000 * ts.tv_sec + ts.tv_nsec / 1000000;
     }
-} // namespace XE
+} // namespace xe
 
 #else
 #error "Unsupported platform"

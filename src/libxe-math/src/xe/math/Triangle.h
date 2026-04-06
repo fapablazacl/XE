@@ -7,7 +7,7 @@
 #include "Vector.h"
 #include <array>
 
-namespace XE {
+namespace xe {
     template <typename T> struct TTriangle {
         TVector<T, 3> P1;
         TVector<T, 3> P2;
@@ -70,6 +70,6 @@ namespace XE {
         }
     }
      */
-} // namespace XE
+} // namespace xe
 
 #endif

@@ -2,7 +2,7 @@
 #include "TextureCubeMapGL.h"
 #include "Conversion.h"
 
-namespace XE {
+namespace xe {
     TextureCubeMapGL::TextureCubeMapGL(
         const PixelFormat format,
         const Vector2i &size,
@@ -58,4 +58,4 @@ namespace XE {
         glGetTexImage(sideGL, mipLevel, formatGL, dataTypeGL, surfaceData);
         glBindTexture(GL_TEXTURE_2D, 0);
     }
-} // namespace XE
+} // namespace xe

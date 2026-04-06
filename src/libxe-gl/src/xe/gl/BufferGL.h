@@ -7,7 +7,7 @@
 
 #include <cstddef>
 
-namespace XE {
+namespace xe {
     /**
      * A Wrapper for a Buffer
      */
@@ -50,7 +50,7 @@ namespace XE {
         GLsizei m_size;
     };
 
-} // namespace XE
+} // namespace xe
 
 namespace xe::gl {
     template <GLenum Target> class Buffer {

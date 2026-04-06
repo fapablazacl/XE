@@ -1,7 +1,7 @@
 
 #include <xe/scene/Trackball.h>
 
-namespace XE {
+namespace xe {
     Trackball::Trackball(const Vector2i &size) {
         this->resize(size);
     }
@@ -45,4 +45,4 @@ namespace XE {
 
         return {sp, std::sqrt(1.0f - sp_length_squared)};
     }
-} // namespace XE
+} // namespace xe

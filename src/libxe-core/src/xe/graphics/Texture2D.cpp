@@ -1,11 +1,11 @@
 
 #include <xe/graphics/Texture2D.h>
 
-namespace XE {
+namespace xe {
     Texture2D::~Texture2D() {
     }
 
     TextureType Texture2D::getType() const {
         return TextureType::Tex2D;
     }
-} // namespace XE
+} // namespace xe

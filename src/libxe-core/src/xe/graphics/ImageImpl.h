@@ -4,7 +4,7 @@
 
 #include "Image.h"
 
-namespace XE {
+namespace xe {
     /**
      * @brief Image implementation class.
      */
@@ -29,6 +29,6 @@ namespace XE {
         PixelFormat format = PixelFormat::Unknown;
         Vector2i size = {0, 0};
     };
-} // namespace XE
+} // namespace xe
 
 #endif

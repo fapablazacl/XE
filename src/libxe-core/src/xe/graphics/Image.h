@@ -7,7 +7,7 @@
 #include <xe/graphics/PixelFormat.h>
 #include <xe/math/Vector.h>
 
-namespace XE {
+namespace xe {
     /**
      * @brief Abstract image class with basic image manipulation.
      */
@@ -30,6 +30,6 @@ namespace XE {
          */
         virtual Vector2i getSize() const = 0;
     };
-} // namespace XE
+} // namespace xe
 
 #endif

@@ -1,7 +1,7 @@
 
 #include <xe/graphics/Subset.h>
 
-namespace XE {
+namespace xe {
     Subset::~Subset() {
     }
-} // namespace XE
+} // namespace xe

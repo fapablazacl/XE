@@ -21,7 +21,7 @@
 #include <xe/graphics/TextureCubeMap.h>
 #include <xe/graphics/Uniform.h>
 
-namespace XE {
+namespace xe {
     static std::string hexstr(const GLenum value) {
         std::string str;
         str.resize(16, ' ');
@@ -83,11 +83,10 @@ namespace XE {
         assert(context);
 
         std::cout << "[GL] Loading OpenGL Extensions ..." << '\n';
-        gladLoadGL();
+        glazeLoadFunctions(reinterpret_cast<GLAZE_GETPROCADDRESS>(context->getProcAddressFunctionGL()));
 
-#ifndef NDEBUG
-        glad_set_post_callback_gl(GraphicsDeviceGL_callback);
-        glad_set_post_callback(GraphicsDeviceGL_callback);
+#if defined(GLAZE_DEBUG)
+        glazeSetPostCallback(GraphicsDeviceGL_callback);
 #endif
     }
 
@@ -509,4 +508,4 @@ namespace XE {
     const Material *GraphicsDeviceGL::getMaterial() const {
         return m_material;
     }
-} // namespace XE
+} // namespace xe

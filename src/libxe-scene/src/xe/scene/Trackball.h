@@ -7,7 +7,7 @@
 #include <xe/math/Vector.h>
 #include <xe/scene/VirtualSphere.h>
 
-namespace XE {
+namespace xe {
     /**
      * @brief Generate rotation information
      */
@@ -50,6 +50,6 @@ namespace XE {
         Vector2i dragEnd;
         Vector2i dragCurrent;
     };
-} // namespace XE
+} // namespace xe
 
 #endif

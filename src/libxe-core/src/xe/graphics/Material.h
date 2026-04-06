@@ -6,7 +6,7 @@
 #include <cstddef>
 #include <xe/Predef.h>
 
-namespace XE {
+namespace xe {
     class Texture;
 
     enum class TextureFilter { Nearest, Linear };
@@ -78,6 +78,6 @@ namespace XE {
         int layerCount = 0;
         MaterialRenderState renderState;
     };
-} // namespace XE
+} // namespace xe
 
 #endif
