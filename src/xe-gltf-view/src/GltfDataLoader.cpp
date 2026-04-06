@@ -78,7 +78,7 @@ xe::gl::Texture GltfTextureLoader::createTexture(const cgltf_texture_view &textu
         parameters.push_back({GL_TEXTURE_MIN_FILTER, sampler->min_filter});
         parameters.push_back({GL_TEXTURE_WRAP_S, sampler->wrap_s});
         parameters.push_back({GL_TEXTURE_WRAP_T, sampler->wrap_t});
-        options.parameters = parameters;
+        options.parameters = bpstd::span<const xe::gl::TextureParameter>(parameters.data(), parameters.size());
     }
 
     return renderer->createTexture(GL_TEXTURE_2D, *internalFormat, clientImage, options);
@@ -164,7 +164,7 @@ GltfMeshPrimitive GltfDataLoader::createMeshPrimitive(const cgltf_primitive &pri
     if (primitive.indices) {
         const GLenum indexType = mapToGLDataType(primitive.indices->component_type).value();
         const xe::gl::Buffer indexBuffer = createIndexBuffer(*primitive.indices);
-        indexData = std::make_optional<GltfIndexData>(indexBuffer, indexType);
+        indexData = GltfIndexData{indexBuffer, indexType};
     }
 
     // FIXME: Assuming that all of the attributes are referencing the same count of vertices
@@ -292,5 +292,5 @@ xe::gl::VertexArray GltfDataLoader::createVertexArray(const cgltf_primitive &pri
         }
     }
 
-    return renderer->createVertexArray({attributesGL.data(), attributesGL.size()}, indexBuffer);
+    return renderer->createVertexArray(bpstd::span<const xe::gl::Attribute>(attributesGL.data(), attributesGL.size()), indexBuffer);
 }

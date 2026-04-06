@@ -191,14 +191,14 @@ namespace xe::gl {
         GLsizei count = 0;
 
         //! attributes to set prior making the rendering call
-        bpstd::span<Attribute> attribs;
+        bpstd::span<const Attribute> attribs;
 
         VertexArrayPrimitive(GLint start, GLsizei count) {
             this->start = start;
             this->count = count;
         }
 
-        VertexArrayPrimitive(GLint start, GLsizei count, const bpstd::span<Attribute> &attribs) {
+        VertexArrayPrimitive(GLint start, GLsizei count, const bpstd::span<const Attribute> &attribs) {
             this->start = start;
             this->count = count;
             this->attribs = attribs;
@@ -218,7 +218,7 @@ namespace xe::gl {
 
     struct TextureLayer {
         Texture texture = {};
-        bpstd::span<TextureParameter> parameters;
+        bpstd::span<const TextureParameter> parameters;
     };
 
     enum class ClearFlags { Color = 0x01, Depth = 0x02, Stencil = 0x04 };
@@ -275,7 +275,7 @@ namespace xe::gl {
 
     struct CreateTextureOptions {
         CreateTextureFlags flags = None;
-        bpstd::span<TextureParameter> parameters;
+        bpstd::span<const TextureParameter> parameters;
     };
 
     /**

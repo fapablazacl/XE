@@ -41,7 +41,8 @@
       "WebFetch(domain:raw.githubusercontent.com)",
       "Bash(conan install:*)",
       "Bash(cmake --preset conan-default)",
-      "Bash(cmake --build build)"
+      "Bash(cmake --build build)",
+      "Bash(cmake --build build --config Release)"
     ]
   }
 }

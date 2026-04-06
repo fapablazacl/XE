@@ -2,6 +2,7 @@
 #include "Game.h"
 
 #include <cstddef>
+#include <bpstd/span.hpp>
 #include "Util.h"
 
 const int SCREEN_WIDTH = 640;
@@ -99,7 +100,7 @@ int Game::initializeOpenGL() {
 
     std::vector<xe::gl::Shader> shaders = {renderer->createShader(GL_VERTEX_SHADER, vertexShader.c_str()), renderer->createShader(GL_FRAGMENT_SHADER, fragmentShader.c_str())};
 
-    program = renderer->createProgram({shaders.data(), shaders.size()});
+    program = renderer->createProgram(bpstd::span<xe::gl::Shader>(shaders.data(), shaders.size()));
 
     if (!program.id) {
         return EXIT_FAILURE;
@@ -177,8 +178,8 @@ void Game::render() {
     auto triangleVaoAttrib = xe::gl::Attribute{vertCoordZLoc, xe::gl::AttributeDim::_1, xe::gl::AttributeType::Float};
     triangleVaoAttrib.data = &triangleVaoAttribData;
 
-    auto triangleVaoPrimitive = xe::gl::VertexArrayPrimitive{0, 3, {&triangleVaoAttrib, 1}};
-    auto triangleVaoPrimitiveMem = bpstd::span<xe::gl::VertexArrayPrimitive>{&triangleVaoPrimitive, 1};
+    auto triangleVaoPrimitive = xe::gl::VertexArrayPrimitive{0, 3, bpstd::span<const xe::gl::Attribute>(&triangleVaoAttrib, static_cast<size_t>(1))};
+    auto triangleVaoPrimitiveMem = bpstd::span<const xe::gl::VertexArrayPrimitive>(&triangleVaoPrimitive, static_cast<size_t>(1));
     renderer->draw(triangleVao, GL_TRIANGLE_STRIP, triangleVaoPrimitiveMem);
 
     // render floor geometry
@@ -217,7 +218,7 @@ FloorGeometry createFloorGeometry(
         xe::gl::Attribute{vertColorLoc, xe::gl::AttributeDim::_3, xe::gl::AttributeType::Float, GL_FALSE, 0, {}, 0}
     };
 
-    floorGeometry.vao = renderer.createVertexArray({attribs, 1}, {});
+    floorGeometry.vao = renderer.createVertexArray(bpstd::span<const xe::gl::Attribute>(attribs, static_cast<size_t>(1)), {});
 
     return floorGeometry;
 }
@@ -268,5 +269,5 @@ xe::gl::VertexArray createTriangleGeometry(const RendererGL &renderer, const GLi
         xe::gl::Attribute{vertColorLoc, xe::gl::AttributeDim::_3, xe::gl::AttributeType::Float, GL_FALSE, 0, colourBuffer, 0}
     };
 
-    return renderer.createVertexArray({attribs, 1}, {});
+    return renderer.createVertexArray(bpstd::span<const xe::gl::Attribute>(attribs, static_cast<size_t>(1)), {});
 }

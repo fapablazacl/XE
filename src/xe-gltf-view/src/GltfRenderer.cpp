@@ -4,6 +4,7 @@
 #include <array>
 #include <filesystem>
 #include <stdexcept>
+#include <cstddef>
 #include <bpstd/span.hpp>
 
 #include "fmt/printf.h"
@@ -51,7 +52,7 @@ namespace xe::gltf_view {
             renderer->createShader(GL_FRAGMENT_SHADER, fragmentShaderSource.c_str())
         };
 
-        program = renderer->createProgram(shaders);
+        program = renderer->createProgram(bpstd::span<xe::gl::Shader>(shaders.data(), shaders.size()));
         if (!program.id) {
             throw std::runtime_error("Failed create program.");
         }
@@ -119,11 +120,17 @@ namespace xe::gltf_view {
 
         const std::vector<xe::gl::CapabilityStatus> renderState = {{GL_DEPTH_TEST, GL_TRUE}, {GL_CULL_FACE, GL_TRUE}};
 
-        renderer->bindRenderState(renderState);
+        renderer->bindRenderState(bpstd::span<const xe::gl::CapabilityStatus>(renderState.data(), renderState.size()));
         renderer->useProgram(program);
 
-        renderer->bindRenderState(uniformData.mapUniforms(program));
-        renderer->bindRenderState(uniformData.mapMatrixUniforms(program));
+        {
+            const auto uniforms = uniformData.mapUniforms(program);
+            renderer->bindRenderState(bpstd::span<const xe::gl::Uniform>(uniforms.data(), uniforms.size()));
+        }
+        {
+            const auto matrixUniforms = uniformData.mapMatrixUniforms(program);
+            renderer->bindRenderState(bpstd::span<const xe::gl::UniformMatrix>(matrixUniforms.data(), matrixUniforms.size()));
+        }
 
         for (const auto &mesh : meshes) {
             for (const auto &meshSubset : mesh.primitives) {
@@ -131,7 +138,7 @@ namespace xe::gltf_view {
 
                 xe::gl::TextureLayer layer;
                 layer.texture = meshSubset.material.texture;
-                renderer->bindRenderState({&layer, 1});
+                renderer->bindRenderState(bpstd::span<const xe::gl::TextureLayer>(&layer, static_cast<size_t>(1)));
 
                 if (meshSubset.indexData.has_value()) {
                     renderer->draw(meshSubset.vao, meshSubset.primitive, prims, meshSubset.indexData->type);
@@ -225,7 +232,7 @@ namespace xe::gltf_view {
 
             xe::gl::TextureLayer layer;
             layer.texture = meshSubset.material.texture;
-            renderer->bindRenderState({&layer, 1});
+            renderer->bindRenderState(bpstd::span<const xe::gl::TextureLayer>(&layer, static_cast<size_t>(1)));
 
             if (meshSubset.indexData.has_value()) {
                 renderer->draw(meshSubset.vao, meshSubset.primitive, prims, meshSubset.indexData->type);
