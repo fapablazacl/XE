@@ -24,6 +24,16 @@ def _to_handle_name(class_str: str) -> str:
     return "".join(word.capitalize() for word in class_str.split())
 
 
+def _functor_struct_name(func_name: str) -> str:
+    """Return the bare C++ functor struct name (without leading underscore).
+
+    Mirrors the convention in `_build_functors`: '<UpperCamel>Fn'. The leading
+    underscore is added by the Jinja template.
+    e.g. 'genBuffer' -> 'GenBufferFn', 'createProgram' -> 'CreateProgramFn'.
+    """
+    return f"{func_name[0].upper()}{func_name[1:]}Fn"
+
+
 def _is_uint_handle(param: CommandParam) -> bool:
     """Return True if param's base GL type is GLuint (a potential object handle)."""
     return param.type == "GLuint"
@@ -374,6 +384,7 @@ class CppGenerator(Generator):
             "enum_classes": enum_classes,
             "functors": functors,
             "dsa_classes": dsa_classes,
+            "resources": raii_resources,
         }
         raii_context = {
             "api": api,
@@ -466,8 +477,10 @@ class CppGenerator(Generator):
                 "handle_type": self._handle_classes[cls],
                 "gen_gl_name": create_cmd.name,
                 "gen_func_name": gen_func_name,
+                "creator_struct": _functor_struct_name(gen_func_name),
                 "delete_gl_name": delete_cmd.name,
                 "delete_func_name": delete_func_name,
+                "deleter_struct": _functor_struct_name(delete_func_name),
             })
         return resources
 

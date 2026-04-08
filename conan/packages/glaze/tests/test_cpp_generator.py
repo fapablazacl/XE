@@ -317,12 +317,10 @@ class TestCppGeneratorRaii:
     def test_raii_buffer_aliases_after_1_5(self, mini_registry: Registry) -> None:
         files = CppGenerator(mini_registry).generate("gl", "1.5")
         raii = files["include/glaze/gl_raii.hpp"]
-        assert "_BufferDeleter" in raii
-        assert "using UniqueBuffer = Unique<" in raii
-        assert "using SharedBuffer = Shared<" in raii
-        assert "using WeakBuffer = Weak<" in raii
-        assert "makeUniqueBuffer" in raii
-        assert "makeSharedBuffer" in raii
+        # In MINI_XML there's no enum-class collision, so handle stays "Buffer".
+        assert "using UniqueBuffer = UniqueHandle<gl::Buffer>" in raii
+        assert "using SharedBuffer = SharedHandle<gl::Buffer>" in raii
+        assert "using WeakBuffer = WeakHandle<gl::Buffer>" in raii
 
     def test_raii_weak_lock_present(self, mini_registry: Registry) -> None:
         files = CppGenerator(mini_registry).generate("gl", "1.0")
@@ -336,33 +334,48 @@ class TestCppGeneratorRaii:
         files = CppGenerator(mini_registry).generate("gl", "1.0")
         raii = files["include/glaze/gl_raii.hpp"]
         assert "UniqueBuffer" not in raii
-        assert "_BufferDeleter" not in raii
 
     def test_raii_singular_program_alias(self, mini_registry: Registry) -> None:
         files = CppGenerator(mini_registry).generate("gl", "2.0")
         raii = files["include/glaze/gl_raii.hpp"]
-        assert "_ProgramDeleter" in raii
-        assert "using UniqueProgram = Unique<" in raii
-        assert "using SharedProgram = Shared<" in raii
-        assert "makeUniqueProgram" in raii
+        assert "using UniqueProgram = UniqueHandle<gl::Program>" in raii
+        assert "using SharedProgram = SharedHandle<gl::Program>" in raii
 
     def test_raii_singular_shader_alias(self, mini_registry: Registry) -> None:
         files = CppGenerator(mini_registry).generate("gl", "2.0")
         raii = files["include/glaze/gl_raii.hpp"]
-        assert "_ShaderDeleter" in raii
-        assert "using UniqueShader = Unique<" in raii
+        assert "using UniqueShader = UniqueHandle<gl::Shader>" in raii
 
-    def test_raii_deleter_invokes_delete_func(self, mini_registry: Registry) -> None:
-        files = CppGenerator(mini_registry).generate("gl", "1.5")
+    def test_raii_generic_make_templates_present(self, mini_registry: Registry) -> None:
+        files = CppGenerator(mini_registry).generate("gl", "1.0")
         raii = files["include/glaze/gl_raii.hpp"]
-        # _BufferDeleter must call gl::deleteBuffer (the singular wrapper),
-        # not glDeleteBuffers directly.
-        assert "gl::deleteBuffer(h)" in raii
+        # The generic make<H>() templates use HandleTraits to look up creator/deleter.
+        assert "UniqueHandle<H> makeUnique()" in raii
+        assert "SharedHandle<H> makeShared()" in raii
+        assert "::gl::HandleTraits<H>::creator" in raii
+        assert "::gl::HandleTraits<H>::deleter" in raii
 
-    def test_raii_make_unique_uses_gen_func(self, mini_registry: Registry) -> None:
+    def test_gl_hpp_emits_handle_traits_for_buffer(self, mini_registry: Registry) -> None:
         files = CppGenerator(mini_registry).generate("gl", "1.5")
-        raii = files["include/glaze/gl_raii.hpp"]
-        assert "gl::genBuffer()" in raii
+        gl_hpp = files["include/glaze/gl.hpp"]
+        assert "template<typename H> struct HandleTraits;" in gl_hpp
+        # In MINI_XML the buffer handle is just "Buffer" (no collision).
+        assert "struct HandleTraits<Buffer>" in gl_hpp
+        assert "using creator = _GenBufferFn;" in gl_hpp
+        assert "using deleter = _DeleteBufferFn;" in gl_hpp
+
+    def test_gl_hpp_emits_handle_traits_for_program(self, mini_registry: Registry) -> None:
+        files = CppGenerator(mini_registry).generate("gl", "2.0")
+        gl_hpp = files["include/glaze/gl.hpp"]
+        assert "struct HandleTraits<Program>" in gl_hpp
+        assert "using creator = _CreateProgramFn;" in gl_hpp
+        assert "using deleter = _DeleteProgramFn;" in gl_hpp
+
+    def test_gl_hpp_no_handle_traits_in_1_0(self, mini_registry: Registry) -> None:
+        files = CppGenerator(mini_registry).generate("gl", "1.0")
+        gl_hpp = files["include/glaze/gl.hpp"]
+        # No resources at GL 1.0 → traits block omitted
+        assert "HandleTraits" not in gl_hpp
 
 
 class TestConvertFunctionName:

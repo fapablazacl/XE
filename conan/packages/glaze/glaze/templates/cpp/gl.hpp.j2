@@ -214,6 +214,22 @@ struct _{{ fn.struct_name }} {
 GLAZE_INLINE constexpr _{{ fn.struct_name }} {{ fn.func_name }};
 
 {% endfor %}
+{% if resources %}
+// ── Handle traits ────────────────────────────────────────────────────────────
+
+/// @brief Type-traits hook that associates an OpenGL handle type with the
+/// functor types responsible for creating and destroying it. Specialized once
+/// per resource handle below; the primary template is intentionally undefined
+/// so misuse fails at compile time.
+template<typename H> struct HandleTraits;
+
+{% for r in resources %}
+template<> struct HandleTraits<{{ r.handle_type }}> {
+    using creator = _{{ r.creator_struct }};
+    using deleter = _{{ r.deleter_struct }};
+};
+{% endfor %}
+{% endif %}
 {% if dsa_classes %}
 // ── DSA object classes ──────────────────────────────────────────────────────
 namespace dsa {

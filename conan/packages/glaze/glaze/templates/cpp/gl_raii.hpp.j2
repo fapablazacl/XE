@@ -251,40 +251,45 @@ private:
     Ctrl* ctrl_;
 };
 
-{% if resources %}
-// ── Per-resource deleter functors and smart-pointer aliases ──────────────────
-{% for r in resources %}
+// ── Generic smart-pointer aliases driven by HandleTraits ─────────────────────
+/**
+ * @brief Move-only owning wrapper specialized for an OpenGL resource handle.
+ * The deleter is looked up via {{ api }}::HandleTraits<H>.
+ */
+template<typename H>
+using UniqueHandle = Unique<H, typename ::{{ api }}::HandleTraits<H>::deleter>;
 
 /**
- * @brief Deleter for {{ r.alias }} resources. Calls {{ api }}::{{ r.delete_func_name }}.
+ * @brief Atomically ref-counted owning wrapper for an OpenGL resource handle.
+ * The deleter is looked up via {{ api }}::HandleTraits<H>.
  */
-struct _{{ r.alias }}Deleter {
-    void operator()({{ api }}::{{ r.handle_type }} h) const noexcept {
-        if (h) {
-            {{ api }}::{{ r.delete_func_name }}(h);
-        }
-    }
-};
-
-using Unique{{ r.alias }} = Unique<{{ api }}::{{ r.handle_type }}, _{{ r.alias }}Deleter>;
-using Shared{{ r.alias }} = Shared<{{ api }}::{{ r.handle_type }}, _{{ r.alias }}Deleter>;
-using Weak{{ r.alias }} = Weak<{{ api }}::{{ r.handle_type }}, _{{ r.alias }}Deleter>;
+template<typename H>
+using SharedHandle = Shared<H, typename ::{{ api }}::HandleTraits<H>::deleter>;
 
 /**
- * @brief Allocate a new {{ r.alias }} resource and wrap it in a Unique{{ r.alias }}.
+ * @brief Non-owning observer for an OpenGL resource handle, paired with the
+ * deleter from {{ api }}::HandleTraits<H>.
  */
-inline Unique{{ r.alias }} makeUnique{{ r.alias }}() {
-    return Unique{{ r.alias }}({{ api }}::{{ r.gen_func_name }}());
+template<typename H>
+using WeakHandle = Weak<H, typename ::{{ api }}::HandleTraits<H>::deleter>;
+
+/**
+ * @brief Allocate a new resource of type H and wrap it in a UniqueHandle<H>.
+ * Uses the creator functor from {{ api }}::HandleTraits<H>.
+ */
+template<typename H>
+inline UniqueHandle<H> makeUnique() {
+    return UniqueHandle<H>(typename ::{{ api }}::HandleTraits<H>::creator{}());
 }
 
 /**
- * @brief Allocate a new {{ r.alias }} resource and wrap it in a Shared{{ r.alias }}.
+ * @brief Allocate a new resource of type H and wrap it in a SharedHandle<H>.
+ * Uses the creator functor from {{ api }}::HandleTraits<H>.
  */
-inline Shared{{ r.alias }} makeShared{{ r.alias }}() {
-    return Shared{{ r.alias }}({{ api }}::{{ r.gen_func_name }}());
+template<typename H>
+inline SharedHandle<H> makeShared() {
+    return SharedHandle<H>(typename ::{{ api }}::HandleTraits<H>::creator{}());
 }
-{% endfor %}
-{% endif %}
 
 } // namespace raii
 } // namespace {{ api }}
