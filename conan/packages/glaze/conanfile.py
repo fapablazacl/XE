@@ -154,15 +154,9 @@ class GlazeConan(ConanFile):
     def package(self):
         out_dir = os.path.join(self.build_folder, "generated")
         copy(self, "*.h", src=os.path.join(out_dir, "include"), dst=os.path.join(self.package_folder, "include"))
+        # The static raii.hpp is written into out_dir/include/glaze/ by
+        # CppGenerator.generate(), so the *.hpp glob picks it up automatically.
         copy(self, "*.hpp", src=os.path.join(out_dir, "include"), dst=os.path.join(self.package_folder, "include"))
-
-        # Static, API-agnostic RAII smart-pointer header. Lives in the source
-        # tree under glaze/templates/cpp/static/ and is copied verbatim into
-        # the package; not generated, never templated.
-        if self.options.language in ("cpp", "both"):
-            copy(self, "raii.hpp",
-                 src=os.path.join(self.source_folder, "glaze", "templates", "cpp", "static"),
-                 dst=os.path.join(self.package_folder, "include", "glaze"))
             
         # Always package the C library — the C++ API depends on C function pointers
         if self.options.language in ("c", "cpp", "both"):

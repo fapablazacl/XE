@@ -19,7 +19,13 @@
       "Bash(cygpath:*)",
       "Bash(xargs grep:*)",
       "Bash(python -m pytest tests/)",
-      "Bash(python glaze_cli.py generate --api gl 4.6 --lang cpp --output-dir /tmp/glaze-out)"
+      "Bash(python glaze_cli.py generate --api gl 4.6 --lang cpp --output-dir /tmp/glaze-out)",
+      "Bash(python glaze_cli.py generate --api gles1 1.0 --lang cpp --output-dir /tmp/glaze-out2)",
+      "Bash(clang++ -std=c++11 -Iinclude -fsyntax-only smoke.cpp)",
+      "Read(//c/Users/FAPABL~1/AppData/Local/Temp/glaze-out/**)",
+      "Bash(cp /c/tmp/glaze-out/smoke.cpp .)",
+      "Bash(clang++ -std=c++17 -Iinclude -fsyntax-only smoke.cpp)",
+      "Bash(clang++ -std=c++11 -Iinclude -fsyntax-only smoke_raii.cpp)"
     ]
   }
 }

@@ -74,3 +74,12 @@ class Generator(ABC):
         template = _env.get_template(template_path)
         result: str = template.render(**context)
         return result
+
+    def _read_static_template(self, path: str) -> str:
+        """Read a non-templated source file from glaze/templates/ verbatim.
+
+        Used for static assets (like the API-agnostic raii.hpp) that should be
+        shipped alongside generated headers without going through Jinja.
+        """
+        source, _filename, _uptodate = _env.loader.get_source(_env, path)
+        return source

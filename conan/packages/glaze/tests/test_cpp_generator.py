@@ -110,14 +110,15 @@ class TestCppGeneratorBasics:
         gen = CppGenerator(mini_registry)
         assert gen.name == "cpp"
 
-    def test_generate_returns_main_and_handle_hpp(self, mini_registry: Registry) -> None:
+    def test_generate_returns_main_handle_and_static_raii(self, mini_registry: Registry) -> None:
         gen = CppGenerator(mini_registry)
         files = gen.generate("gl", "1.0")
-        # The per-API gl_raii.hpp file is no longer generated — the smart-pointer
-        # templates ship as a single static glaze/raii.hpp via the Conan package.
-        assert len(files) == 2
+        # Per-API gl_raii.hpp is no longer generated. Instead, the API-agnostic
+        # raii.hpp is shipped verbatim alongside the generated per-API headers.
+        assert len(files) == 3
         assert "include/glaze/gl.hpp" in files
         assert "include/glaze/gl_handle.hpp" in files
+        assert "include/glaze/raii.hpp" in files
         assert "include/glaze/gl_raii.hpp" not in files
 
     def test_generate_file_key_uses_api_name(self, mini_registry: Registry) -> None:
@@ -345,6 +346,18 @@ class TestCppGeneratorRaii:
         assert "::gl::handle::Program(::gl::createProgram())" in h
         assert "::gl::deleteProgram(w.id())" in h
         assert "struct Traits<::gl::handle::Shader>" in h
+
+    def test_static_raii_hpp_shipped_verbatim(self, mini_registry: Registry) -> None:
+        files = CppGenerator(mini_registry).generate("gl", "1.0")
+        raii = files["include/glaze/raii.hpp"]
+        # Sanity-check the static header's namespace, customization point, and templates.
+        assert "namespace glaze" in raii
+        assert "struct Traits;" in raii
+        assert "class Unique" in raii
+        assert "class Shared" in raii
+        assert "class Weak" in raii
+        assert "Unique<T> makeUnique()" in raii
+        assert "Shared<T> makeShared()" in raii
 
     def test_gl_hpp_emits_handle_traits_for_buffer(self, mini_registry: Registry) -> None:
         files = CppGenerator(mini_registry).generate("gl", "1.5")

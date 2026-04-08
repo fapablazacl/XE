@@ -426,6 +426,10 @@ class CppGenerator(Generator):
         return {
             hpp_name: self._render_template("cpp/gl.hpp.j2", context),
             handle_name: self._render_template("cpp/gl_handle.hpp.j2", handle_context),
+            # Static, API-agnostic smart-pointer header. Shipped alongside the
+            # generated per-API headers so a standalone CLI invocation produces
+            # a self-contained include tree.
+            "include/glaze/raii.hpp": self._read_static_template("cpp/static/raii.hpp"),
         }
 
     # ----------------------------------------------------------------- RAII
