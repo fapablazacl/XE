@@ -191,3 +191,11 @@ class GlazeConan(ConanFile):
                 raii.bindirs = []
                 raii.libdirs = []
                 raii.requires = [api_name]
+
+                # Header-only enriched-handle wrappers for legacy commands.
+                hwrap = self.cpp_info.components[f"{api_name}_handle"]
+                hwrap.set_property("cmake_target_name", f"glaze::{api_name}_handle")
+                hwrap.includedirs = ["include"]
+                hwrap.bindirs = []
+                hwrap.libdirs = []
+                hwrap.requires = [api_name]

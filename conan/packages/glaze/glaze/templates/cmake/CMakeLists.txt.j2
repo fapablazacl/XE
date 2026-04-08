@@ -16,4 +16,11 @@ target_include_directories(glaze_{{ api }}_raii INTERFACE
     $<BUILD_INTERFACE:{{ out_dir }}/include>
     $<INSTALL_INTERFACE:include>)
 
+# Header-only enriched-handle wrappers for legacy {{ api }} commands.
+add_library(glaze_{{ api }}_handle INTERFACE)
+target_link_libraries(glaze_{{ api }}_handle INTERFACE glaze_{{ api }})
+target_include_directories(glaze_{{ api }}_handle INTERFACE
+    $<BUILD_INTERFACE:{{ out_dir }}/include>
+    $<INSTALL_INTERFACE:include>)
+
 {% endfor %}

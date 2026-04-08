@@ -78,6 +78,20 @@ MINI_XML = """\
       <param class="shader"><ptype>GLuint</ptype> <name>shader</name></param>
     </command>
     <command>
+      <proto>void <name>glLinkProgram</name></proto>
+      <param class="program"><ptype>GLuint</ptype> <name>program</name></param>
+    </command>
+    <command>
+      <proto><ptype>GLint</ptype> <name>glGetUniformLocation</name></proto>
+      <param class="program"><ptype>GLuint</ptype> <name>program</name></param>
+      <param>const <ptype>GLchar</ptype> *<name>name</name></param>
+    </command>
+    <command>
+      <proto>void <name>glAttachShader</name></proto>
+      <param class="program"><ptype>GLuint</ptype> <name>program</name></param>
+      <param class="shader"><ptype>GLuint</ptype> <name>shader</name></param>
+    </command>
+    <command>
       <proto>void <name>glNamedBufferData</name></proto>
       <param class="buffer"><ptype>GLuint</ptype> <name>buffer</name></param>
       <param><ptype>GLsizei</ptype> <name>size</name></param>
@@ -121,6 +135,9 @@ MINI_XML = """\
       <command name="glDeleteProgram"/>
       <command name="glCreateShader"/>
       <command name="glDeleteShader"/>
+      <command name="glLinkProgram"/>
+      <command name="glGetUniformLocation"/>
+      <command name="glAttachShader"/>
     </require>
   </feature>
 

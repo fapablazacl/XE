@@ -371,11 +371,15 @@ class CppGenerator(Generator):
         # Build DSA object classes
         dsa_classes = self._build_dsa_classes(consolidated, api)
 
+        # Build enriched-handle wrapper classes (legacy non-DSA companion)
+        handle_classes = self._build_handle_classes(consolidated, api)
+
         # Build RAII smart-pointer resource list
         raii_resources = self._collect_raii_resources(consolidated)
 
         hpp_name = f"include/glaze/{api}.hpp"
         raii_name = f"include/glaze/{api}_raii.hpp"
+        handle_name = f"include/glaze/{api}_handle.hpp"
         context = {
             "api": api,
             "generation_header": self._generation_header(api, version, "C++"),
@@ -391,9 +395,15 @@ class CppGenerator(Generator):
             "generation_header": self._generation_header(api, version, "C++ RAII"),
             "resources": raii_resources,
         }
+        handle_context = {
+            "api": api,
+            "generation_header": self._generation_header(api, version, "C++ Handle"),
+            "handle_classes": handle_classes,
+        }
         return {
             hpp_name: self._render_template("cpp/gl.hpp.j2", context),
             raii_name: self._render_template("cpp/gl_raii.hpp.j2", raii_context),
+            handle_name: self._render_template("cpp/gl_handle.hpp.j2", handle_context),
         }
 
     # ----------------------------------------------------------------- RAII
@@ -564,6 +574,68 @@ class CppGenerator(Generator):
                 "methods": methods,
             })
         return dsa_classes
+
+    def _build_handle_classes(self, consolidated: ConsolidatedRequire, api: str) -> list:
+        """Build context dicts for the enriched-handle wrapper classes.
+
+        Same shape as `_build_dsa_classes` but excludes DSA (Named*) commands and
+        delegates each method to the corresponding free-function functor in `gl::`,
+        so the wrapper inherits the functor's strong return type (e.g.
+        UniformLocation), type-safe param substitution and GLAZE_GL_CHECK.
+        """
+        handle_classes = []
+        for class_str in sorted(self.registry.object_dict):
+            if class_str not in self._handle_classes:
+                continue
+            handle_name = self._handle_classes[class_str]
+            class_name = _to_handle_name(class_str)
+            commands = self.registry.object_dict[class_str]
+            filtered = [
+                cmd for cmd in commands
+                if cmd.name in consolidated.commands and "Named" not in cmd.name
+            ]
+            if not filtered:
+                continue
+
+            methods = []
+            for cmd in sorted(filtered, key=lambda c: c.name):
+                method_name = self._dsa_method_name(cmd.name, class_str)
+                if method_name in _CPP_KEYWORDS:
+                    method_name = method_name + "_"
+
+                # Reuse _function_context to derive the *wrapped* return type and
+                # the canonical functor name. This guarantees that
+                # glGetUniformLocation → "UniformLocation", glGetString → "std::string",
+                # etc., matching the binding's free functions exactly.
+                fn_ctx = self._function_context(cmd)
+                functor_name = fn_ctx["func_name"]
+                return_type = fn_ctx["return_type"]
+
+                method_params = cmd.params[1:]
+                params_str = ", ".join(
+                    self._generate_dsa_param_decl(p, cmd, api) for p in method_params
+                )
+                # Pass-through call args: m_id is already a strong handle, and
+                # the other params are strong-typed in the method signature, so
+                # forward them by name. The functor's operator() does any
+                # `.id`/`.loc`/cast extraction internally.
+                forwarded = ", ".join(["m_id"] + [p.name for p in method_params])
+
+                methods.append({
+                    "name": method_name,
+                    "return_type": return_type,
+                    "params_str": params_str,
+                    "functor_name": functor_name,
+                    "gl_name": cmd.name,
+                    "call_args_str": forwarded,
+                })
+
+            handle_classes.append({
+                "class_name": class_name,
+                "handle_type": handle_name,
+                "methods": methods,
+            })
+        return handle_classes
 
     def _dsa_method_name(self, gl_name: str, class_str: str) -> str:
         """Convert a GL command name to a DSA method name.

@@ -110,18 +110,20 @@ class TestCppGeneratorBasics:
         gen = CppGenerator(mini_registry)
         assert gen.name == "cpp"
 
-    def test_generate_returns_main_and_raii_hpp(self, mini_registry: Registry) -> None:
+    def test_generate_returns_main_raii_and_handle_hpp(self, mini_registry: Registry) -> None:
         gen = CppGenerator(mini_registry)
         files = gen.generate("gl", "1.0")
-        assert len(files) == 2
+        assert len(files) == 3
         assert "include/glaze/gl.hpp" in files
         assert "include/glaze/gl_raii.hpp" in files
+        assert "include/glaze/gl_handle.hpp" in files
 
     def test_generate_file_key_uses_api_name(self, mini_registry: Registry) -> None:
         gen = CppGenerator(mini_registry)
         files = gen.generate("gles2", "2.0")
         assert any("gles2.hpp" in key for key in files)
         assert any("gles2_raii.hpp" in key for key in files)
+        assert any("gles2_handle.hpp" in key for key in files)
 
 
 class TestCppGeneratorValidation:
@@ -352,6 +354,48 @@ class TestCppGeneratorRaii:
         gl_hpp = files["include/glaze/gl.hpp"]
         # No resources at GL 1.0 → traits block omitted
         assert "HandleTraits" not in gl_hpp
+
+
+class TestCppGeneratorHandle:
+    def test_generate_emits_handle_header(self, mini_registry: Registry) -> None:
+        files = CppGenerator(mini_registry).generate("gl", "2.0")
+        assert "include/glaze/gl_handle.hpp" in files
+
+    def test_handle_header_uses_handle_namespace(self, mini_registry: Registry) -> None:
+        h = CppGenerator(mini_registry).generate("gl", "2.0")["include/glaze/gl_handle.hpp"]
+        assert "namespace handle" in h
+        assert '#include "gl.hpp"' in h
+
+    def test_program_class_methods(self, mini_registry: Registry) -> None:
+        h = CppGenerator(mini_registry).generate("gl", "2.0")["include/glaze/gl_handle.hpp"]
+        assert "class Program {" in h
+        assert "link()" in h
+        assert "attachShader(" in h
+        assert "getUniformLocation(" in h
+        assert "delete_()" in h  # glDeleteProgram (keyword collision)
+
+    def test_handle_excludes_named_dsa_commands(self, mini_registry: Registry) -> None:
+        h = CppGenerator(mini_registry).generate("gl", "4.5")["include/glaze/gl_handle.hpp"]
+        # glNamedBufferData/SubData live in dsa::, not handle::.
+        assert "::glNamedBufferData" not in h
+        assert "::glNamedBufferSubData" not in h
+
+    def test_handle_delegates_to_functor(self, mini_registry: Registry) -> None:
+        h = CppGenerator(mini_registry).generate("gl", "2.0")["include/glaze/gl_handle.hpp"]
+        # Method body delegates to the gl:: functor instance, not ::glXxx() directly,
+        # so it picks up the strong return-type wrapping for free.
+        assert "::gl::linkProgram(m_id)" in h
+        assert "::glLinkProgram(" not in h
+
+    def test_handle_returns_strong_uniform_location(self, mini_registry: Registry) -> None:
+        h = CppGenerator(mini_registry).generate("gl", "2.0")["include/glaze/gl_handle.hpp"]
+        # glGetUniformLocation returns UniformLocation (strong typedef), not GLint.
+        assert "UniformLocation getUniformLocation(" in h
+
+    def test_handle_classes_absent_in_1_0(self, mini_registry: Registry) -> None:
+        # GL 1.0 has no first-param-handle commands in MINI_XML.
+        h = CppGenerator(mini_registry).generate("gl", "1.0")["include/glaze/gl_handle.hpp"]
+        assert "class Program" not in h
 
 
 class TestConvertFunctionName:

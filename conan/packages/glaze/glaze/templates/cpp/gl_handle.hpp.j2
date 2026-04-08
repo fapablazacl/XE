@@ -1,0 +1,38 @@
+#pragma once
+/*
+ * {{ generation_header | replace('\n', '\n * ') }}
+ */
+
+#ifndef __GLAZE_{{ api | upper }}_HANDLE_HPP__
+#define __GLAZE_{{ api | upper }}_HANDLE_HPP__
+
+#include "{{ api }}.hpp"
+
+namespace {{ api }} {
+namespace handle {
+
+{% for cls in handle_classes %}
+/**
+ * @brief Object-style wrapper around an OpenGL {{ cls.class_name }} handle.
+ * Exposes legacy (non-DSA) GL commands that take a {{ cls.class_name }} as
+ * their first parameter as member methods, returning the strongly-typed
+ * wrappers (UniformLocation, std::string, …) where available.
+ */
+class {{ cls.class_name }} {
+    ::{{ api }}::{{ cls.handle_type }} m_id;
+public:
+    {{ cls.class_name }}() = default;
+    explicit {{ cls.class_name }}(::{{ api }}::{{ cls.handle_type }} id) : m_id(id) {}
+    ::{{ api }}::{{ cls.handle_type }} id() const { return m_id; }
+{% for method in cls.methods %}
+    {{ method.return_type }} {{ method.name }}({{ method.params_str }}) const {
+        return ::{{ api }}::{{ method.functor_name }}({{ method.call_args_str }});
+    }
+{% endfor %}
+};
+
+{% endfor %}
+} // namespace handle
+} // namespace {{ api }}
+
+#endif
