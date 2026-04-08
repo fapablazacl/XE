@@ -2,7 +2,7 @@ from typing import ClassVar
 
 from glaze.doc_parser import FunctionDoc
 from glaze.generators.base import Generator
-from glaze.model import Command, CommandParam, Enum, Registry
+from glaze.model import Command, CommandParam, ConsolidatedRequire, Enum, Registry
 from glaze.utils.string_utils import split_capitalized
 
 _CPP_KEYWORDS: frozenset = frozenset({
@@ -361,7 +361,11 @@ class CppGenerator(Generator):
         # Build DSA object classes
         dsa_classes = self._build_dsa_classes(consolidated, api)
 
-        filename = f"include/glaze/{api}.hpp"
+        # Build RAII smart-pointer resource list
+        raii_resources = self._collect_raii_resources(consolidated)
+
+        hpp_name = f"include/glaze/{api}.hpp"
+        raii_name = f"include/glaze/{api}_raii.hpp"
         context = {
             "api": api,
             "generation_header": self._generation_header(api, version, "C++"),
@@ -371,7 +375,101 @@ class CppGenerator(Generator):
             "functors": functors,
             "dsa_classes": dsa_classes,
         }
-        return {filename: self._render_template("cpp/gl.hpp.j2", context)}
+        raii_context = {
+            "api": api,
+            "generation_header": self._generation_header(api, version, "C++ RAII"),
+            "resources": raii_resources,
+        }
+        return {
+            hpp_name: self._render_template("cpp/gl.hpp.j2", context),
+            raii_name: self._render_template("cpp/gl_raii.hpp.j2", raii_context),
+        }
+
+    # ----------------------------------------------------------------- RAII
+
+    def _collect_raii_resources(self, consolidated: ConsolidatedRequire) -> list[dict]:
+        """Collect RAII smart-pointer resource entries from consolidated commands.
+
+        Detects two patterns and groups them by GL object class:
+
+        - Multi-object: glGenBuffers/glDeleteBuffers, glGenTextures/glDeleteTextures,
+          glCreateBuffers/glDeleteBuffers (DSA), etc. — both creator and deleter take
+          (GLsizei n, GLuint*) and have a class_ attribute on the array param.
+        - Singular: glCreateProgram/glDeleteProgram, glCreateShader/glDeleteShader —
+          creator returns GLuint, deleter takes a single GLuint with class_.
+
+        Returns a list of dicts (sorted by alias) suitable for the gl_raii.hpp.j2
+        template; each entry has keys: alias, handle_type, gen_func_name,
+        delete_func_name.
+        """
+        creators: dict[str, tuple[Command, str]] = {}
+        deleters: dict[str, tuple[Command, str]] = {}
+
+        for command_name in consolidated.commands:
+            cmd = self.registry.command_by_name.get(command_name)
+            if cmd is None:
+                continue
+
+            # Multi-object creator (glGen*/glCreate* + count + GLuint*)
+            create_pair = _find_object_creation_params(cmd)
+            if create_pair is not None:
+                _, output_param = create_pair
+                cls = output_param.class_
+                if cls and cls in self._handle_classes:
+                    plural = self._convert_function_name(cmd.name)
+                    singular = plural.rstrip("s") if plural.endswith("s") else plural
+                    creators[cls] = (cmd, singular)
+                    continue
+
+            # Multi-object deleter (glDelete* + count + const GLuint*)
+            delete_pair = _find_object_deletion_params(cmd)
+            if delete_pair is not None:
+                _, input_param = delete_pair
+                cls = input_param.class_
+                if cls and cls in self._handle_classes:
+                    plural = self._convert_function_name(cmd.name)
+                    singular = plural.rstrip("s") if plural.endswith("s") else plural
+                    deleters[cls] = (cmd, singular)
+                    continue
+
+            # Singular creator: glCreate<Name>() -> GLuint, no GLuint* output param
+            handle_alias = self._detect_handle_return(cmd)
+            if handle_alias is not None:
+                # Find which class_ this handle alias maps to
+                for cls_str, alias in self._handle_classes.items():
+                    if alias == handle_alias:
+                        creators[cls_str] = (cmd, self._convert_function_name(cmd.name))
+                        break
+                continue
+
+            # Singular deleter: glDelete<Name>(GLuint name)
+            if cmd.name.startswith("glDelete") and len(cmd.params) == 1:
+                p = cmd.params[0]
+                if (
+                    p.type == "GLuint"
+                    and not p.is_pointer
+                    and p.class_
+                    and p.class_ in self._handle_classes
+                ):
+                    deleters[p.class_] = (cmd, self._convert_function_name(cmd.name))
+
+        resources: list[dict] = []
+        for cls in sorted(set(creators) & set(deleters)):
+            create_cmd, gen_func_name = creators[cls]
+            delete_cmd, delete_func_name = deleters[cls]
+            # Use the unsuffixed CamelCase name for ergonomic Unique<X>/Shared<X>
+            # aliases, even when the handle type itself was Id-suffixed to avoid
+            # collisions with enum class names.
+            alias = _to_handle_name(cls)
+            resources.append({
+                "alias": alias,
+                "handle_type": self._handle_classes[cls],
+                "gen_gl_name": create_cmd.name,
+                "gen_func_name": gen_func_name,
+                "delete_gl_name": delete_cmd.name,
+                "delete_func_name": delete_func_name,
+            })
+        return resources
 
     # --------------------------------------------------------------- functors
 

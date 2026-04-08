@@ -66,8 +66,16 @@ MINI_XML = """\
       <proto><ptype>GLuint</ptype> <name>glCreateProgram</name></proto>
     </command>
     <command>
+      <proto>void <name>glDeleteProgram</name></proto>
+      <param class="program"><ptype>GLuint</ptype> <name>program</name></param>
+    </command>
+    <command>
       <proto><ptype>GLuint</ptype> <name>glCreateShader</name></proto>
       <param><ptype>GLenum</ptype> <name>type</name></param>
+    </command>
+    <command>
+      <proto>void <name>glDeleteShader</name></proto>
+      <param class="shader"><ptype>GLuint</ptype> <name>shader</name></param>
     </command>
     <command>
       <proto>void <name>glNamedBufferData</name></proto>
@@ -110,7 +118,9 @@ MINI_XML = """\
   <feature api="gl" name="GL_VERSION_2_0" number="2.0">
     <require>
       <command name="glCreateProgram"/>
+      <command name="glDeleteProgram"/>
       <command name="glCreateShader"/>
+      <command name="glDeleteShader"/>
     </require>
   </feature>
 

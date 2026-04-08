@@ -110,19 +110,18 @@ class TestCppGeneratorBasics:
         gen = CppGenerator(mini_registry)
         assert gen.name == "cpp"
 
-    def test_generate_returns_single_hpp(self, mini_registry: Registry) -> None:
+    def test_generate_returns_main_and_raii_hpp(self, mini_registry: Registry) -> None:
         gen = CppGenerator(mini_registry)
         files = gen.generate("gl", "1.0")
-        assert len(files) == 1
-        key = next(iter(files.keys()))
-        assert key.endswith(".hpp")
-        assert "gl.hpp" in key
+        assert len(files) == 2
+        assert "include/glaze/gl.hpp" in files
+        assert "include/glaze/gl_raii.hpp" in files
 
     def test_generate_file_key_uses_api_name(self, mini_registry: Registry) -> None:
         gen = CppGenerator(mini_registry)
         files = gen.generate("gles2", "2.0")
-        key = next(iter(files.keys()))
-        assert "gles2.hpp" in key
+        assert any("gles2.hpp" in key for key in files)
+        assert any("gles2_raii.hpp" in key for key in files)
 
 
 class TestCppGeneratorValidation:
@@ -284,16 +283,86 @@ class TestCppGeneratorSingleObjectCreation:
         gen = CppGenerator(mini_registry)
         files = gen.generate("gl", "2.0")
         content = next(iter(files.values()))
-        # glCreateProgram should return Program, not GLuint
+        # glCreateProgram should be wrapped to return Program, not GLuint
         assert "Program" in content
-        assert "::glCreateProgram()" in content
+        assert "return Program(glCreateProgram(" in content
 
     def test_create_shader_returns_handle(self, mini_registry: Registry) -> None:
         gen = CppGenerator(mini_registry)
         files = gen.generate("gl", "2.0")
         content = next(iter(files.values()))
         assert "Shader" in content
-        assert "::glCreateShader(" in content
+        assert "return Shader(glCreateShader(" in content
+
+
+class TestCppGeneratorRaii:
+    def test_generate_emits_raii_header(self, mini_registry: Registry) -> None:
+        files = CppGenerator(mini_registry).generate("gl", "2.0")
+        assert "include/glaze/gl_raii.hpp" in files
+        assert "include/glaze/gl.hpp" in files
+
+    def test_raii_header_defines_class_templates(self, mini_registry: Registry) -> None:
+        files = CppGenerator(mini_registry).generate("gl", "1.0")
+        raii = files["include/glaze/gl_raii.hpp"]
+        assert "namespace raii" in raii
+        assert "class Unique" in raii
+        assert "class Shared" in raii
+        assert "class Weak" in raii
+
+    def test_raii_header_includes_main_header(self, mini_registry: Registry) -> None:
+        files = CppGenerator(mini_registry).generate("gl", "2.0")
+        raii = files["include/glaze/gl_raii.hpp"]
+        assert '#include "gl.hpp"' in raii
+
+    def test_raii_buffer_aliases_after_1_5(self, mini_registry: Registry) -> None:
+        files = CppGenerator(mini_registry).generate("gl", "1.5")
+        raii = files["include/glaze/gl_raii.hpp"]
+        assert "_BufferDeleter" in raii
+        assert "using UniqueBuffer = Unique<" in raii
+        assert "using SharedBuffer = Shared<" in raii
+        assert "using WeakBuffer = Weak<" in raii
+        assert "makeUniqueBuffer" in raii
+        assert "makeSharedBuffer" in raii
+
+    def test_raii_weak_lock_present(self, mini_registry: Registry) -> None:
+        files = CppGenerator(mini_registry).generate("gl", "1.0")
+        raii = files["include/glaze/gl_raii.hpp"]
+        # Weak template must expose lock() returning Shared, expired(), and use_count()
+        assert "lock()" in raii
+        assert "expired()" in raii
+        assert "weak_rc" in raii
+
+    def test_raii_buffer_absent_in_1_0(self, mini_registry: Registry) -> None:
+        files = CppGenerator(mini_registry).generate("gl", "1.0")
+        raii = files["include/glaze/gl_raii.hpp"]
+        assert "UniqueBuffer" not in raii
+        assert "_BufferDeleter" not in raii
+
+    def test_raii_singular_program_alias(self, mini_registry: Registry) -> None:
+        files = CppGenerator(mini_registry).generate("gl", "2.0")
+        raii = files["include/glaze/gl_raii.hpp"]
+        assert "_ProgramDeleter" in raii
+        assert "using UniqueProgram = Unique<" in raii
+        assert "using SharedProgram = Shared<" in raii
+        assert "makeUniqueProgram" in raii
+
+    def test_raii_singular_shader_alias(self, mini_registry: Registry) -> None:
+        files = CppGenerator(mini_registry).generate("gl", "2.0")
+        raii = files["include/glaze/gl_raii.hpp"]
+        assert "_ShaderDeleter" in raii
+        assert "using UniqueShader = Unique<" in raii
+
+    def test_raii_deleter_invokes_delete_func(self, mini_registry: Registry) -> None:
+        files = CppGenerator(mini_registry).generate("gl", "1.5")
+        raii = files["include/glaze/gl_raii.hpp"]
+        # _BufferDeleter must call gl::deleteBuffer (the singular wrapper),
+        # not glDeleteBuffers directly.
+        assert "gl::deleteBuffer(h)" in raii
+
+    def test_raii_make_unique_uses_gen_func(self, mini_registry: Registry) -> None:
+        files = CppGenerator(mini_registry).generate("gl", "1.5")
+        raii = files["include/glaze/gl_raii.hpp"]
+        assert "gl::genBuffer()" in raii
 
 
 class TestConvertFunctionName:

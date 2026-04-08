@@ -173,7 +173,7 @@ class GlazeConan(ConanFile):
             comp = self.cpp_info.components[api_name]
             comp.set_property("cmake_target_name", f"glaze::{api_name}")
             comp.includedirs = ["include"]
-            
+
             # Always provide the C library — the C++ API depends on C function pointers
             if self.options.language in ("c", "cpp", "both"):
                 comp.libs = [f"glaze_{api_name}"]
@@ -182,3 +182,12 @@ class GlazeConan(ConanFile):
             else:
                 comp.bindirs = []
                 comp.libdirs = []
+
+            # Header-only RAII smart-pointer wrappers — only when C++ is generated.
+            if self.options.language in ("cpp", "both"):
+                raii = self.cpp_info.components[f"{api_name}_raii"]
+                raii.set_property("cmake_target_name", f"glaze::{api_name}_raii")
+                raii.includedirs = ["include"]
+                raii.bindirs = []
+                raii.libdirs = []
+                raii.requires = [api_name]
