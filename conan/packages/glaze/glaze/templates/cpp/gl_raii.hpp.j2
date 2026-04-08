@@ -15,10 +15,11 @@ namespace {{ api }} {
 namespace raii {
 
 // ── Unique<Handle, Deleter> ──────────────────────────────────────────────────
-//
-// Move-only owning wrapper for an OpenGL handle. Inspired by std::unique_ptr,
-// but specialized to non-pointer handle types (e.g. {{ api }}::BufferId).
-// Zero overhead: the deleter is a stateless functor known at compile time.
+/**
+ * @brief Move-only owning wrapper for an OpenGL handle. Inspired by std::unique_ptr,
+ * but specialized to non-pointer handle types (e.g. {{ api }}::BufferId).
+ * Zero overhead: the deleter is a stateless functor known at compile time.
+ */
 template<typename Handle, typename Deleter>
 class Unique {
 public:
@@ -68,12 +69,13 @@ private:
 template<typename Handle, typename Deleter> class Weak;
 
 // ── Shared<Handle, Deleter> ──────────────────────────────────────────────────
-//
-// Atomically ref-counted owning wrapper for an OpenGL handle. Inspired by
-// std::shared_ptr; uses an internally allocated control block. The deleter is
-// invoked exactly once, when the last Shared instance is destroyed. The control
-// block itself is freed only after the last associated Weak observer is also
-// gone.
+/**
+ * @brief Atomically ref-counted owning wrapper for an OpenGL handle. Inspired by
+ * std::shared_ptr; uses an internally allocated control block. The deleter is
+ * invoked exactly once, when the last Shared instance is destroyed. The control
+ * block itself is freed only after the last associated Weak observer is also
+ * gone.
+ */
 template<typename Handle, typename Deleter>
 class Shared {
     struct Ctrl {
@@ -83,8 +85,10 @@ class Shared {
         Ctrl(Handle hh) : h(hh), strong_rc(1), weak_rc(1) {}
     };
 
-    // Private constructor used by Weak::lock() — assumes the caller has
-    // already incremented strong_rc on `ctrl`.
+    /**
+     * @brief Private constructor used by Weak::lock() — assumes the caller has
+     * already incremented strong_rc on `ctrl`.
+     */
     struct AdoptStrongTag {};
     Shared(Ctrl* ctrl, AdoptStrongTag) noexcept : ctrl_(ctrl) {}
 
@@ -153,12 +157,13 @@ private:
 };
 
 // ── Weak<Handle, Deleter> ────────────────────────────────────────────────────
-//
-// Non-owning observer of a Shared<Handle, Deleter>. Inspired by std::weak_ptr.
-// Holds a reference to the control block (so the block survives even after the
-// last Shared is destroyed) but does *not* keep the underlying GL resource
-// alive. Use lock() to attempt promotion back to a Shared; the result is empty
-// if the resource has already been released.
+/**
+ * @brief Non-owning observer of a Shared<Handle, Deleter>. Inspired by std::weak_ptr.
+ * Holds a reference to the control block (so the block survives even after the
+ * last Shared is destroyed) but does *not* keep the underlying GL resource
+ * alive. Use lock() to attempt promotion back to a Shared; the result is empty
+ * if the resource has already been released.
+ */
 template<typename Handle, typename Deleter>
 class Weak {
     using SharedT = Shared<Handle, Deleter>;
@@ -220,7 +225,9 @@ public:
         other.ctrl_ = tmp;
     }
 
-    /// @brief Attempt to promote to a Shared. Returns an empty Shared if expired.
+    /**
+     * @brief Attempt to promote to a Shared. Returns an empty Shared if expired.
+     */
     SharedT lock() const noexcept {
         if (!ctrl_) return SharedT();
         long expected = ctrl_->strong_rc.load(std::memory_order_relaxed);
@@ -248,7 +255,9 @@ private:
 // ── Per-resource deleter functors and smart-pointer aliases ──────────────────
 {% for r in resources %}
 
-/// Deleter for {{ r.alias }} resources. Calls {{ api }}::{{ r.delete_func_name }}.
+/**
+ * @brief Deleter for {{ r.alias }} resources. Calls {{ api }}::{{ r.delete_func_name }}.
+ */
 struct _{{ r.alias }}Deleter {
     void operator()({{ api }}::{{ r.handle_type }} h) const noexcept {
         if (h) {
@@ -261,12 +270,16 @@ using Unique{{ r.alias }} = Unique<{{ api }}::{{ r.handle_type }}, _{{ r.alias }
 using Shared{{ r.alias }} = Shared<{{ api }}::{{ r.handle_type }}, _{{ r.alias }}Deleter>;
 using Weak{{ r.alias }} = Weak<{{ api }}::{{ r.handle_type }}, _{{ r.alias }}Deleter>;
 
-/// Allocate a new {{ r.alias }} resource and wrap it in a Unique{{ r.alias }}.
+/**
+ * @brief Allocate a new {{ r.alias }} resource and wrap it in a Unique{{ r.alias }}.
+ */
 inline Unique{{ r.alias }} makeUnique{{ r.alias }}() {
     return Unique{{ r.alias }}({{ api }}::{{ r.gen_func_name }}());
 }
 
-/// Allocate a new {{ r.alias }} resource and wrap it in a Shared{{ r.alias }}.
+/**
+ * @brief Allocate a new {{ r.alias }} resource and wrap it in a Shared{{ r.alias }}.
+ */
 inline Shared{{ r.alias }} makeShared{{ r.alias }}() {
     return Shared{{ r.alias }}({{ api }}::{{ r.gen_func_name }}());
 }
