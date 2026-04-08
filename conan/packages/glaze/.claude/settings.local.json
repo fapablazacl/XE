@@ -17,7 +17,9 @@
       "Bash(python -m pytest tests/ -q)",
       "Bash(python glaze_cli.py generate --api gl 4.6 --lang cpp --output-dir /tmp/glaze_smoke)",
       "Bash(cygpath:*)",
-      "Bash(xargs grep:*)"
+      "Bash(xargs grep:*)",
+      "Bash(python -m pytest tests/)",
+      "Bash(python glaze_cli.py generate --api gl 4.6 --lang cpp --output-dir /tmp/glaze-out)"
     ]
   }
 }

@@ -110,20 +110,23 @@ class TestCppGeneratorBasics:
         gen = CppGenerator(mini_registry)
         assert gen.name == "cpp"
 
-    def test_generate_returns_main_raii_and_handle_hpp(self, mini_registry: Registry) -> None:
+    def test_generate_returns_main_and_handle_hpp(self, mini_registry: Registry) -> None:
         gen = CppGenerator(mini_registry)
         files = gen.generate("gl", "1.0")
-        assert len(files) == 3
+        # The per-API gl_raii.hpp file is no longer generated — the smart-pointer
+        # templates ship as a single static glaze/raii.hpp via the Conan package.
+        assert len(files) == 2
         assert "include/glaze/gl.hpp" in files
-        assert "include/glaze/gl_raii.hpp" in files
         assert "include/glaze/gl_handle.hpp" in files
+        assert "include/glaze/gl_raii.hpp" not in files
 
     def test_generate_file_key_uses_api_name(self, mini_registry: Registry) -> None:
         gen = CppGenerator(mini_registry)
         files = gen.generate("gles2", "2.0")
         assert any("gles2.hpp" in key for key in files)
-        assert any("gles2_raii.hpp" in key for key in files)
         assert any("gles2_handle.hpp" in key for key in files)
+        # Per-API RAII header is no longer generated.
+        assert not any("gles2_raii.hpp" in key for key in files)
 
 
 class TestCppGeneratorValidation:
@@ -298,40 +301,50 @@ class TestCppGeneratorSingleObjectCreation:
 
 
 class TestCppGeneratorRaii:
-    def test_generate_emits_raii_header(self, mini_registry: Registry) -> None:
+    def test_generator_no_longer_emits_raii_header(self, mini_registry: Registry) -> None:
+        # The static glaze/raii.hpp ships via Conan; it is not generated.
         files = CppGenerator(mini_registry).generate("gl", "2.0")
-        assert "include/glaze/gl_raii.hpp" in files
+        assert "include/glaze/gl_raii.hpp" not in files
         assert "include/glaze/gl.hpp" in files
 
-    def test_raii_header_defines_class_templates(self, mini_registry: Registry) -> None:
+    def test_gl_hpp_includes_static_raii_header(self, mini_registry: Registry) -> None:
         files = CppGenerator(mini_registry).generate("gl", "1.0")
-        raii = files["include/glaze/gl_raii.hpp"]
-        assert "namespace raii" in raii
-        assert "class Unique" in raii
-        assert "class Shared" in raii
-        assert "class Weak" in raii
+        gl_hpp = files["include/glaze/gl.hpp"]
+        assert '#include "raii.hpp"' in gl_hpp
 
-    def test_raii_header_includes_main_header(self, mini_registry: Registry) -> None:
+    def test_gl_hpp_emits_glaze_traits_for_raw_handles(self, mini_registry: Registry) -> None:
+        # gl 1.5 has glGenBuffers/glDeleteBuffers → buffer handle gets a raw trait.
+        files = CppGenerator(mini_registry).generate("gl", "1.5")
+        gl_hpp = files["include/glaze/gl.hpp"]
+        assert "namespace glaze" in gl_hpp
+        assert "struct Traits<::gl::Buffer>" in gl_hpp
+        assert "::gl::genBuffer()" in gl_hpp
+        assert "::gl::deleteBuffer(h)" in gl_hpp
+
+    def test_gl_hpp_emits_glaze_traits_for_program_handle(self, mini_registry: Registry) -> None:
+        # gl 2.0 introduces glCreateProgram/glDeleteProgram → program handle trait.
         files = CppGenerator(mini_registry).generate("gl", "2.0")
-        raii = files["include/glaze/gl_raii.hpp"]
-        assert '#include "gl.hpp"' in raii
+        gl_hpp = files["include/glaze/gl.hpp"]
+        assert "struct Traits<::gl::Program>" in gl_hpp
+        assert "::gl::createProgram()" in gl_hpp
+        assert "::gl::deleteProgram(h)" in gl_hpp
 
-    def test_raii_weak_lock_present(self, mini_registry: Registry) -> None:
+    def test_gl_hpp_no_glaze_traits_in_1_0(self, mini_registry: Registry) -> None:
         files = CppGenerator(mini_registry).generate("gl", "1.0")
-        raii = files["include/glaze/gl_raii.hpp"]
-        # Weak template must expose lock() returning Shared, expired(), and use_count()
-        assert "lock()" in raii
-        assert "expired()" in raii
-        assert "weak_rc" in raii
+        gl_hpp = files["include/glaze/gl.hpp"]
+        # MINI_XML has no creator/deleter pair at GL 1.0 → no Traits specializations,
+        # only the empty `namespace glaze {}` block.
+        assert "struct Traits<" not in gl_hpp
 
-    def test_raii_generic_make_templates_present(self, mini_registry: Registry) -> None:
-        files = CppGenerator(mini_registry).generate("gl", "1.0")
-        raii = files["include/glaze/gl_raii.hpp"]
-        # The generic make<H>() templates use HandleTraits to look up creator/deleter.
-        assert "UniqueHandle<H> makeUnique()" in raii
-        assert "SharedHandle<H> makeShared()" in raii
-        assert "::gl::HandleTraits<H>::creator" in raii
-        assert "::gl::HandleTraits<H>::deleter" in raii
+    def test_gl_handle_hpp_emits_glaze_traits_for_legacy_wrappers(self, mini_registry: Registry) -> None:
+        files = CppGenerator(mini_registry).generate("gl", "2.0")
+        h = files["include/glaze/gl_handle.hpp"]
+        # gl::handle::Program / Shader are legacy wrapper classes — each gets a Traits.
+        assert "namespace glaze" in h
+        assert "struct Traits<::gl::handle::Program>" in h
+        assert "::gl::handle::Program(::gl::createProgram())" in h
+        assert "::gl::deleteProgram(w.id())" in h
+        assert "struct Traits<::gl::handle::Shader>" in h
 
     def test_gl_hpp_emits_handle_traits_for_buffer(self, mini_registry: Registry) -> None:
         files = CppGenerator(mini_registry).generate("gl", "1.5")

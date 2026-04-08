@@ -155,6 +155,14 @@ class GlazeConan(ConanFile):
         out_dir = os.path.join(self.build_folder, "generated")
         copy(self, "*.h", src=os.path.join(out_dir, "include"), dst=os.path.join(self.package_folder, "include"))
         copy(self, "*.hpp", src=os.path.join(out_dir, "include"), dst=os.path.join(self.package_folder, "include"))
+
+        # Static, API-agnostic RAII smart-pointer header. Lives in the source
+        # tree under glaze/templates/cpp/static/ and is copied verbatim into
+        # the package; not generated, never templated.
+        if self.options.language in ("cpp", "both"):
+            copy(self, "raii.hpp",
+                 src=os.path.join(self.source_folder, "glaze", "templates", "cpp", "static"),
+                 dst=os.path.join(self.package_folder, "include", "glaze"))
             
         # Always package the C library — the C++ API depends on C function pointers
         if self.options.language in ("c", "cpp", "both"):
@@ -167,7 +175,17 @@ class GlazeConan(ConanFile):
     def package_info(self):
         self.cpp_info.set_property("cmake_file_name", "glaze")
         api_list = [api.strip() for api in str(self.options.apis).split(",") if api.strip()]
-        
+
+        # Top-level header-only component for the API-agnostic glaze::Unique /
+        # Shared / Weak templates. Downstream users who only want the smart
+        # pointers (e.g. with their own handle types) link this directly.
+        if self.options.language in ("cpp", "both"):
+            raii = self.cpp_info.components["raii"]
+            raii.set_property("cmake_target_name", "glaze::raii")
+            raii.includedirs = ["include"]
+            raii.bindirs = []
+            raii.libdirs = []
+
         for api_item in api_list:
             api_name = api_item.split(":")[0]
             comp = self.cpp_info.components[api_name]
@@ -183,16 +201,8 @@ class GlazeConan(ConanFile):
                 comp.bindirs = []
                 comp.libdirs = []
 
-            # Header-only RAII smart-pointer wrappers — only when C++ is generated.
+            # Header-only enriched-handle wrappers for legacy commands.
             if self.options.language in ("cpp", "both"):
-                raii = self.cpp_info.components[f"{api_name}_raii"]
-                raii.set_property("cmake_target_name", f"glaze::{api_name}_raii")
-                raii.includedirs = ["include"]
-                raii.bindirs = []
-                raii.libdirs = []
-                raii.requires = [api_name]
-
-                # Header-only enriched-handle wrappers for legacy commands.
                 hwrap = self.cpp_info.components[f"{api_name}_handle"]
                 hwrap.set_property("cmake_target_name", f"glaze::{api_name}_handle")
                 hwrap.includedirs = ["include"]

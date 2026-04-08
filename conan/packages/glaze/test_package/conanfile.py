@@ -24,7 +24,12 @@ class GlazeTestConan(ConanFile):
             apis = str(self.dependencies[self.tested_reference_str].options.apis)
             api_names = [a.split(":")[0] for a in apis.split(",") if a.strip()]
             for api in api_names:
-                for name in (f"test_{api}", f"test_{api}_c", f"test_{api}_raii"):
+                for name in (f"test_{api}", f"test_{api}_c"):
                     cmd = os.path.join(self.cpp.build.bindir, name)
                     if os.path.isfile(cmd) or os.path.isfile(cmd + ".exe"):
                         self.run(cmd, env="conanrun")
+
+            # API-agnostic smoke test for glaze::Unique / Shared / Weak.
+            raii_cmd = os.path.join(self.cpp.build.bindir, "test_raii")
+            if os.path.isfile(raii_cmd) or os.path.isfile(raii_cmd + ".exe"):
+                self.run(raii_cmd, env="conanrun")

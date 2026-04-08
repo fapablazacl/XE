@@ -10,6 +10,7 @@
 #include <type_traits>
 #include <cassert>
 
+#include "raii.hpp"
 #include "{{ api }}.h"
 
 #ifndef GLAZE_INLINE
@@ -265,4 +266,46 @@ public:
 } // namespace dsa
 {% endif %}
 } // namespace gl
+
+// ── glaze::Traits specializations ───────────────────────────────────────────
+// Bridges {{ api }} value types into the glaze::Unique / Shared / Weak system
+// declared in raii.hpp. Three families are emitted:
+//
+//   * Raw handle ids (gl::BufferId, gl::TextureId, …)
+//   * DSA wrapper classes (gl::dsa::Buffer, gl::dsa::Texture, …) when present
+//
+// Legacy (non-DSA) wrapper traits live in {{ api }}_handle.hpp so users only
+// pay for them when they include the legacy header.
+namespace glaze {
+
+{% for r in resources %}
+template<> struct Traits<::{{ api }}::{{ r.handle_type }}> {
+    static ::{{ api }}::{{ r.handle_type }} create() {
+        return ::{{ api }}::{{ r.gen_func_name }}();
+    }
+    static void destroy(::{{ api }}::{{ r.handle_type }}& h) {
+        ::{{ api }}::{{ r.delete_func_name }}(h);
+    }
+    static bool valid(const ::{{ api }}::{{ r.handle_type }}& h) {
+        return static_cast<bool>(h);
+    }
+};
+
+{% endfor %}
+{% for hp in dsa_handles_with_proxy %}
+template<> struct Traits<::{{ api }}::dsa::{{ hp.class_name }}> {
+    static ::{{ api }}::dsa::{{ hp.class_name }} create() {
+        return ::{{ api }}::dsa::{{ hp.class_name }}(::{{ api }}::{{ hp.gen_func_name }}());
+    }
+    static void destroy(::{{ api }}::dsa::{{ hp.class_name }}& w) {
+        ::{{ api }}::{{ hp.delete_func_name }}(w.id());
+    }
+    static bool valid(const ::{{ api }}::dsa::{{ hp.class_name }}& w) {
+        return static_cast<bool>(w.id());
+    }
+};
+
+{% endfor %}
+} // namespace glaze
+
 #endif

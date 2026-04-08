@@ -35,4 +35,26 @@ public:
 } // namespace handle
 } // namespace {{ api }}
 
+// ── glaze::Traits specializations (legacy wrappers) ─────────────────────────
+// Bridges the {{ api }}::handle::* wrapper classes into glaze::Unique / Shared
+// / Weak. Coexists with the DSA and raw-handle traits already declared in
+// {{ api }}.hpp; users pick the wrapper family at instantiation time.
+namespace glaze {
+
+{% for hp in handle_handles_with_proxy %}
+template<> struct Traits<::{{ api }}::handle::{{ hp.class_name }}> {
+    static ::{{ api }}::handle::{{ hp.class_name }} create() {
+        return ::{{ api }}::handle::{{ hp.class_name }}(::{{ api }}::{{ hp.gen_func_name }}());
+    }
+    static void destroy(::{{ api }}::handle::{{ hp.class_name }}& w) {
+        ::{{ api }}::{{ hp.delete_func_name }}(w.id());
+    }
+    static bool valid(const ::{{ api }}::handle::{{ hp.class_name }}& w) {
+        return static_cast<bool>(w.id());
+    }
+};
+
+{% endfor %}
+} // namespace glaze
+
 #endif

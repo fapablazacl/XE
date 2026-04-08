@@ -377,8 +377,34 @@ class CppGenerator(Generator):
         # Build RAII smart-pointer resource list
         raii_resources = self._collect_raii_resources(consolidated)
 
+        # Bridge per-resource creator/deleter pairs to the wrapper classes that
+        # exist in each family (DSA and legacy "handle::"). The result feeds the
+        # glaze::Traits<T> specialization blocks emitted at the bottom of
+        # gl.hpp.j2 (DSA + raw handles) and gl_handle.hpp.j2 (legacy wrappers).
+        dsa_proxy_map = {c["handle_type"]: c["class_name"] for c in dsa_classes}
+        handle_proxy_map = {c["handle_type"]: c["class_name"] for c in handle_classes}
+        dsa_handles_with_proxy = [
+            {
+                "handle_type": r["handle_type"],
+                "class_name": dsa_proxy_map[r["handle_type"]],
+                "gen_func_name": r["gen_func_name"],
+                "delete_func_name": r["delete_func_name"],
+            }
+            for r in raii_resources
+            if r["handle_type"] in dsa_proxy_map
+        ]
+        handle_handles_with_proxy = [
+            {
+                "handle_type": r["handle_type"],
+                "class_name": handle_proxy_map[r["handle_type"]],
+                "gen_func_name": r["gen_func_name"],
+                "delete_func_name": r["delete_func_name"],
+            }
+            for r in raii_resources
+            if r["handle_type"] in handle_proxy_map
+        ]
+
         hpp_name = f"include/glaze/{api}.hpp"
-        raii_name = f"include/glaze/{api}_raii.hpp"
         handle_name = f"include/glaze/{api}_handle.hpp"
         context = {
             "api": api,
@@ -389,20 +415,16 @@ class CppGenerator(Generator):
             "functors": functors,
             "dsa_classes": dsa_classes,
             "resources": raii_resources,
-        }
-        raii_context = {
-            "api": api,
-            "generation_header": self._generation_header(api, version, "C++ RAII"),
-            "resources": raii_resources,
+            "dsa_handles_with_proxy": dsa_handles_with_proxy,
         }
         handle_context = {
             "api": api,
             "generation_header": self._generation_header(api, version, "C++ Handle"),
             "handle_classes": handle_classes,
+            "handle_handles_with_proxy": handle_handles_with_proxy,
         }
         return {
             hpp_name: self._render_template("cpp/gl.hpp.j2", context),
-            raii_name: self._render_template("cpp/gl_raii.hpp.j2", raii_context),
             handle_name: self._render_template("cpp/gl_handle.hpp.j2", handle_context),
         }
 
