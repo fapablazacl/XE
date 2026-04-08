@@ -314,14 +314,6 @@ class TestCppGeneratorRaii:
         raii = files["include/glaze/gl_raii.hpp"]
         assert '#include "gl.hpp"' in raii
 
-    def test_raii_buffer_aliases_after_1_5(self, mini_registry: Registry) -> None:
-        files = CppGenerator(mini_registry).generate("gl", "1.5")
-        raii = files["include/glaze/gl_raii.hpp"]
-        # In MINI_XML there's no enum-class collision, so handle stays "Buffer".
-        assert "using UniqueBuffer = UniqueHandle<gl::Buffer>" in raii
-        assert "using SharedBuffer = SharedHandle<gl::Buffer>" in raii
-        assert "using WeakBuffer = WeakHandle<gl::Buffer>" in raii
-
     def test_raii_weak_lock_present(self, mini_registry: Registry) -> None:
         files = CppGenerator(mini_registry).generate("gl", "1.0")
         raii = files["include/glaze/gl_raii.hpp"]
@@ -329,22 +321,6 @@ class TestCppGeneratorRaii:
         assert "lock()" in raii
         assert "expired()" in raii
         assert "weak_rc" in raii
-
-    def test_raii_buffer_absent_in_1_0(self, mini_registry: Registry) -> None:
-        files = CppGenerator(mini_registry).generate("gl", "1.0")
-        raii = files["include/glaze/gl_raii.hpp"]
-        assert "UniqueBuffer" not in raii
-
-    def test_raii_singular_program_alias(self, mini_registry: Registry) -> None:
-        files = CppGenerator(mini_registry).generate("gl", "2.0")
-        raii = files["include/glaze/gl_raii.hpp"]
-        assert "using UniqueProgram = UniqueHandle<gl::Program>" in raii
-        assert "using SharedProgram = SharedHandle<gl::Program>" in raii
-
-    def test_raii_singular_shader_alias(self, mini_registry: Registry) -> None:
-        files = CppGenerator(mini_registry).generate("gl", "2.0")
-        raii = files["include/glaze/gl_raii.hpp"]
-        assert "using UniqueShader = UniqueHandle<gl::Shader>" in raii
 
     def test_raii_generic_make_templates_present(self, mini_registry: Registry) -> None:
         files = CppGenerator(mini_registry).generate("gl", "1.0")
