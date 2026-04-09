@@ -100,9 +100,21 @@ if (XE_DEV_SANITIZER_ENABLE)
 endif()
 
 if (XE_DEV_DOCS)
-    # Aggregator target. Each library that wants documentation generated
-    # appends its own custom target to this one via add_dependencies().
-    add_custom_target(docs)
+    find_package(Doxygen REQUIRED)
+
+    set (XE_DOXYFILE_IN  "${CMAKE_SOURCE_DIR}/Doxyfile.in")
+    set (XE_DOXYFILE_OUT "${CMAKE_BINARY_DIR}/Doxyfile")
+
+    configure_file(${XE_DOXYFILE_IN} ${XE_DOXYFILE_OUT} @ONLY)
+
+    # Single project-wide Doxygen target. Covers every library under src/
+    # in one Doxygen run; INPUT and EXCLUDE_PATTERNS in Doxyfile.in control
+    # what is documented.
+    add_custom_target(docs
+        COMMAND ${DOXYGEN_EXECUTABLE} ${XE_DOXYFILE_OUT}
+        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+        COMMENT "Generating XE Doxygen documentation"
+        VERBATIM)
 endif()
 
 add_subdirectory ("src")

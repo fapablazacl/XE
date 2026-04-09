@@ -10,12 +10,16 @@
 
 ## Documentation
 
-The math library (`libxe-math`) is documented in-source with Doxygen blocks
-on every public class, struct, free function, and method, following the
-project's [Code Conventions](CLAUDE.md#code-conventions). To produce the
-HTML output, opt in via the Conan `with_docs` option — Conan will then
-pull `doxygen` as a build-time tool dependency and CMake will expose a
-`docs` target.
+The XE engine is documented in-source with Doxygen blocks on every public
+class, struct, free function, and method, following the project's
+[Code Conventions](CLAUDE.md#code-conventions). The math library
+(`libxe-math`) is fully documented; the rest of the libraries are being
+brought up to the same standard incrementally.
+
+A single project-wide Doxygen run produces the HTML output. Opt in via
+the Conan `with_docs` option — Conan will then pull `doxygen` as a
+build-time tool dependency and CMake will expose a `docs` target driven
+by the root [`Doxyfile.in`](Doxyfile.in).
 
 ```bash
 # 1. Configure with documentation generation enabled.
@@ -27,7 +31,7 @@ cmake --preset conan-release
 cmake --build --preset conan-release --target docs
 ```
 
-The build emits two trees under `build/Release/src/libxe-math/docs/`:
+The build emits two trees under `build/Release/docs/`:
 
 | Path | Purpose |
 |---|---|

@@ -1,21 +1,37 @@
-# Doxygen configuration template for libxe-math.
+# Doxygen configuration template for the XE engine.
 #
-# Configured via `configure_file()` from src/libxe-math/CMakeLists.txt when
-# the engine-wide `XE_DEV_DOCS` option is ON. Variables of the form
-# @VARNAME@ are substituted by CMake at configure time; everything else is
-# a literal Doxygen setting.
+# Configured via `configure_file()` from the root CMakeLists.txt when the
+# engine-wide `XE_DEV_DOCS` option is ON. Variables of the form @VARNAME@
+# are substituted by CMake at configure time; everything else is a literal
+# Doxygen setting.
+#
+# Scope: this file is the single source of Doxygen configuration for the
+# entire XE codebase. INPUT covers every library under src/ (libxe-app,
+# libxe-core, libxe-core-imageloader-lodepng, libxe-core-platform-glfw,
+# libxe-geometry, libxe-gl, libxe-imageloader, libxe-math, libxe-scene)
+# and the engine tools/applications. EXCLUDE_PATTERNS keeps test code,
+# imgui backend bindings and CMake build artifacts out of the output.
 
-PROJECT_NAME           = "xe-math"
+PROJECT_NAME           = "XE"
 PROJECT_NUMBER         = "@XE_VERSION@"
-PROJECT_BRIEF          = "GLM-style math library for the XE game engine"
+PROJECT_BRIEF          = "Multiplatform C++17 game engine"
 
-OUTPUT_DIRECTORY       = @CMAKE_CURRENT_BINARY_DIR@/docs
+OUTPUT_DIRECTORY       = @CMAKE_BINARY_DIR@/docs
 
-# Source layout: every public header lives under src/xe/math.
-INPUT                  = @CMAKE_CURRENT_SOURCE_DIR@/src/xe/math
+# The whole engine source tree. RECURSIVE picks up every nested header
+# directory; EXCLUDE_PATTERNS below trims out per-library test suites and
+# the third-party imgui backend bindings.
+INPUT                  = @CMAKE_SOURCE_DIR@/src
 RECURSIVE              = YES
-FILE_PATTERNS          = *.h
-STRIP_FROM_PATH        = @CMAKE_CURRENT_SOURCE_DIR@/src
+FILE_PATTERNS          = *.h *.hpp *.cpp *.cc *.cxx
+STRIP_FROM_PATH        = @CMAKE_SOURCE_DIR@
+
+EXCLUDE_PATTERNS       = */test/* \
+                         */tests/* \
+                         */unit-test/* \
+                         */bindings/* \
+                         */build/* \
+                         */CMakeFiles/*
 
 # Documentation policy: we explicitly comment what is public, so do NOT
 # auto-extract everything. Anything left undocumented after the planned
@@ -33,7 +49,7 @@ HIDE_UNDOC_CLASSES     = NO
 WARN_IF_UNDOCUMENTED   = YES
 WARN_IF_DOC_ERROR      = YES
 WARN_NO_PARAMDOC       = YES
-# Start permissive; flip to YES once the warning count is at zero.
+# Start permissive; flip to YES once every library has been documented.
 WARN_AS_ERROR          = NO
 
 # C++17 source.
@@ -65,7 +81,8 @@ GENERATE_RTF           = NO
 GENERATE_XML           = YES
 XML_OUTPUT             = xml
 
-# Plane.h uses @f$ ... @f$ for the plane equation, so MathJax must be on.
+# libxe-math/Plane.h uses @f$ ... @f$ for the plane equation, so MathJax
+# must be on for the formulas to render.
 USE_MATHJAX            = YES
 MATHJAX_FORMAT         = HTML-CSS
 
