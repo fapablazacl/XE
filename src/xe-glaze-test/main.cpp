@@ -51,7 +51,7 @@ int main() {
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    GLFWwindow* window = glfwCreateWindow(800, 600, "glaze — spinning triangle", nullptr, nullptr);
+    GLFWwindow* window = glfwCreateWindow(800, 600, "glaze - spinning triangle", nullptr, nullptr);
     if (!window) {
         std::cerr << "Failed to create GLFW window" << std::endl;
         glfwTerminate();
@@ -73,8 +73,8 @@ int main() {
 				0.433f, -0.25f,
 		};
 
-		auto vao = glaze::makeUnique<gl::handle::VertexArray>();
-		gl::bindVertexArray(vao->id());
+		auto vao = glaze::makeUnique<gl::VertexArray>();
+		gl::bindVertexArray(vao.get());
 
 		auto vbo = glaze::makeUnique<gl::BufferId>();
 
@@ -117,7 +117,7 @@ int main() {
 			gl::useProgram(prog->id());
 			gl::uniform1f(angleLoc, static_cast<float>(glfwGetTime()));
 
-			gl::bindVertexArray(vao->id());
+			gl::bindVertexArray(vao.get());
 			gl::drawArrays(gl::PrimitiveType::eTriangles, 0, 3);
 			gl::bindVertexArray({});
 
