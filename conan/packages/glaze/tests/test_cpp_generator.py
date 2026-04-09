@@ -248,6 +248,83 @@ class TestCppGeneratorVersionGating:
         assert "#if GLAZE_GL_VERSION >= " in handle_hpp
 
 
+class TestCppGeneratorExtensions:
+    def test_extension_struct_present(self, mini_registry: Registry) -> None:
+        gen = CppGenerator(mini_registry)
+        files = gen.generate("gl", "4.5")
+        hpp = files["include/glaze/gl.hpp"]
+        assert "struct Extension {" in hpp
+        assert "namespace exts {" in hpp
+
+    def test_extension_token_constexpr(self, mini_registry: Registry) -> None:
+        gen = CppGenerator(mini_registry)
+        files = gen.generate("gl", "4.5")
+        hpp = files["include/glaze/gl.hpp"]
+        assert (
+            'constexpr Extension ARB_buffer_storage{ "GL_ARB_buffer_storage", '
+            "&::GLAZE_EXT_GL_ARB_buffer_storage };" in hpp
+        )
+        assert (
+            'constexpr Extension ARB_draw_instanced{ "GL_ARB_draw_instanced", '
+            "&::GLAZE_EXT_GL_ARB_draw_instanced };" in hpp
+        )
+
+    def test_extension_token_per_extension_guard(self, mini_registry: Registry) -> None:
+        gen = CppGenerator(mini_registry)
+        files = gen.generate("gl", "4.5")
+        hpp = files["include/glaze/gl.hpp"]
+        # Each constexpr token sits inside its own #ifndef GLAZE_GL_NO_EXT_<short>
+        target = "constexpr Extension ARB_draw_instanced"
+        idx = hpp.find(target)
+        assert idx != -1
+        line_start = hpp.rfind("\n", 0, idx) + 1
+        prev_line_end = line_start - 1
+        prev_line_start = hpp.rfind("\n", 0, prev_line_end) + 1
+        prev_line = hpp[prev_line_start:prev_line_end]
+        assert prev_line == "#ifndef GLAZE_GL_NO_EXT_ARB_draw_instanced"
+
+    def test_supports_overloads_present(self, mini_registry: Registry) -> None:
+        gen = CppGenerator(mini_registry)
+        files = gen.generate("gl", "4.5")
+        hpp = files["include/glaze/gl.hpp"]
+        assert "inline bool supports(const Extension &ext)" in hpp
+        assert "inline bool supports(const char *name)" in hpp
+        assert "inline bool supports(int major, int minor)" in hpp
+
+    def test_extension_functor_emitted_and_guarded(self, mini_registry: Registry) -> None:
+        gen = CppGenerator(mini_registry)
+        files = gen.generate("gl", "4.5")
+        hpp = files["include/glaze/gl.hpp"]
+        struct_target = "struct _DrawArraysInstancedARBFn"
+        idx = hpp.find(struct_target)
+        assert idx != -1
+        # The line directly above must be the per-extension guard.
+        line_start = hpp.rfind("\n", 0, idx) + 1
+        prev_line_end = line_start - 1
+        prev_line_start = hpp.rfind("\n", 0, prev_line_end) + 1
+        prev_line = hpp[prev_line_start:prev_line_end]
+        assert prev_line == "#ifndef GLAZE_GL_NO_EXT_ARB_draw_instanced"
+        # Two lines up must be the master switch.
+        prev_prev_end = prev_line_start - 1
+        prev_prev_start = hpp.rfind("\n", 0, prev_prev_end) + 1
+        prev_prev = hpp[prev_prev_start:prev_prev_end]
+        assert prev_prev == "#ifndef GLAZE_GL_NO_EXTENSIONS"
+
+    def test_extension_runtime_inside_master_switch(self, mini_registry: Registry) -> None:
+        gen = CppGenerator(mini_registry)
+        files = gen.generate("gl", "4.5")
+        hpp = files["include/glaze/gl.hpp"]
+        master_idx = hpp.find("// ── Extension runtime")
+        assert master_idx != -1
+        # The master `#ifndef GLAZE_GL_NO_EXTENSIONS` opens immediately after.
+        opener_idx = hpp.find("#ifndef GLAZE_GL_NO_EXTENSIONS", master_idx)
+        closer_idx = hpp.find("#endif // GLAZE_GL_NO_EXTENSIONS", opener_idx)
+        assert opener_idx != -1 and closer_idx > opener_idx
+        block = hpp[opener_idx:closer_idx]
+        assert "namespace exts" in block
+        assert "supports(const Extension" in block
+
+
 class TestCppGeneratorFlags:
     def test_flags_template_present(self, mini_registry: Registry) -> None:
         gen = CppGenerator(mini_registry)

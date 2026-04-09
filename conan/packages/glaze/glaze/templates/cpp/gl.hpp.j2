@@ -194,7 +194,12 @@ inline Flags<{{ ec.group_name }}> operator~({{ ec.group_name }} a) {
 
 {% endfor %}
 {% for fn in functors %}
+{% if fn.extension_short_name %}
+#ifndef GLAZE_GL_NO_EXTENSIONS
+#ifndef GLAZE_GL_NO_EXT_{{ fn.extension_short_name }}
+{% else %}
 #if GLAZE_GL_VERSION >= {{ fn.version_int }}
+{% endif %}
 struct _{{ fn.struct_name }} {
     constexpr _{{ fn.struct_name }}() noexcept = default;
     explicit operator bool() const noexcept { return ::{{ fn.gl_name }} != nullptr; }
@@ -224,9 +229,51 @@ struct _{{ fn.struct_name }} {
 /** @brief {{ fn.doc_brief }} */
 {% endif %}
 GLAZE_INLINE constexpr _{{ fn.struct_name }} {{ fn.func_name }};
+{% if fn.extension_short_name %}
 #endif
+#endif
+{% else %}
+#endif
+{% endif %}
 
 {% endfor %}
+// ── Extension runtime ────────────────────────────────────────────────────────
+#ifndef GLAZE_GL_NO_EXTENSIONS
+
+/**
+ * @brief Lightweight token bound to a single OpenGL extension.
+ *
+ * Each `gl::exts::*` constant carries the extension's Khronos name and a
+ * pointer to its corresponding C-side ``GLAZE_EXT_<name>`` flag, which is set
+ * by ``glazeLoadExtensions``. The bool conversion returns whether the driver
+ * exposed the extension at load time, so ``if (gl::exts::ARB_buffer_storage)``
+ * is the idiomatic guard. Pair with ``gl::supports(...)`` for explicit calls.
+ */
+struct Extension {
+    const char *name;
+    const int  *loaded;
+    explicit operator bool() const noexcept {
+        return loaded != nullptr && *loaded != 0;
+    }
+};
+
+namespace exts {
+{% for ext in extensions %}
+#ifndef {{ ext.guard_macro }}
+constexpr Extension {{ ext.short_name }}{ "{{ ext.name }}", &::{{ ext.flag_var }} };
+#endif
+{% endfor %}
+} // namespace exts
+
+/** @brief Returns true if the driver exposes the extension at load time. */
+inline bool supports(const Extension &ext) noexcept { return static_cast<bool>(ext); }
+/** @brief Returns true if the driver exposes an extension by name (string fallback). */
+inline bool supports(const char *name) { return ::glazeHasExtension(name) != 0; }
+/** @brief Returns true if the bound GL context's version is at least major.minor. */
+inline bool supports(int major, int minor) { return ::glazeIsVersionSupported(major, minor) != 0; }
+
+#endif // GLAZE_GL_NO_EXTENSIONS
+
 {% if resources %}
 // ── Handle traits ────────────────────────────────────────────────────────────
 

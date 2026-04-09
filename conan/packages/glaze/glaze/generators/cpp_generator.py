@@ -312,7 +312,7 @@ class CppGenerator(Generator):
                 cmd_to_extension_short[cmd.name] = ext["short_name"]
             for enum in ext["enums"]:
                 extension_enum_names.add(enum.name)
-        # Discovery (handle classes, enum groups) walks core ∪ extensions so
+        # Discovery (handle classes, enum groups) walks core + extensions so
         # extension-only commands contribute their handle types and enum
         # groups to the bindings. The dsa/handle/raii pipelines still filter
         # by `consolidated.commands` and stay core-only.
@@ -346,22 +346,24 @@ class CppGenerator(Generator):
             (n, n) for n in sorted(set(self._handle_classes.values()))
         ]
 
-        # Build enum class context — only include enums in the consolidated set
+        # Build enum class context — include enum entries from the union of
+        # core + extension emissions, so an extension-only entry naturally
+        # appears inside its (core or extension) enum class.
         self._emitted_groups: set = set()
         enum_classes = []
         for group_name in sorted(group_set):
             all_enums = self.registry.group_to_enums[group_name]
-            filtered = [e for e in all_enums if e.name in consolidated.enums]
+            filtered = [e for e in all_enums if e.name in union_enum_names]
             if filtered:
                 enum_classes.append(self._enum_class_context(group_name, filtered))
                 self._emitted_groups.add(group_name)
 
         self._emitted_bitmask_groups: set = self._emitted_groups & self.registry.bitmask_groups
 
-        # Collect location types used by included commands
+        # Collect location types used by included commands (core + extensions)
         need_uniform_location = False
         need_attrib_location = False
-        for command_name in consolidated.commands:
+        for command_name in discovery_command_names:
             cmd = self.registry.command_by_name.get(command_name)
             if cmd is None:
                 continue
@@ -381,38 +383,23 @@ class CppGenerator(Generator):
             location_types.append(("UniformLocation", "UniformLocation"))
 
         # Build inline function context
-        functions = []
+        functions: list = []
         for command_name in sorted(consolidated.commands):
             command = self.registry.command_by_name.get(command_name)
             if command is None:
                 continue
-            functions.append(self._function_context(command))
-            # For Pattern B (void + GLchar* output buffer), add a std::string overload
-            string_param = _find_string_output_param(command)
-            if string_param:
-                length_param = _find_length_param(command)
-                functions.append(self._string_overload_context(command, string_param, length_param))
-            # For data upload functions (const void* + size), add an ArrayView<T> overload
-            upload_params = _find_data_upload_params(command)
-            if upload_params:
-                data_param, size_param = upload_params
-                functions.append(self._array_view_overload_context(command, data_param, size_param))
-            # For object-creation functions (glGen*/glCreate*), add a singular convenience functor
-            creation_params = _find_object_creation_params(command)
-            if creation_params:
-                count_param, output_param = creation_params
-                if output_param.class_ in self._handle_classes:
-                    functions.append(
-                        self._single_object_creation_context(command, count_param, output_param)
-                    )
-            # For object-deletion functions (glDelete*), add a singular convenience functor
-            deletion_params = _find_object_deletion_params(command)
-            if deletion_params:
-                count_param, input_param = deletion_params
-                if input_param.class_ in self._handle_classes:
-                    functions.append(
-                        self._single_object_deletion_context(command, count_param, input_param)
-                    )
+            self._append_command_function_contexts(functions, command)
+
+        # Append extension function contexts, tagged with `extension_short_name`
+        # so the template (and `_build_functors`) can wrap them in their per-
+        # extension `#ifndef GLAZE_GL_NO_EXT_<short>` guard.
+        for ext in ext_emissions:
+            short = ext["short_name"]
+            for cmd in sorted(ext["commands"], key=lambda c: c.name):
+                start = len(functions)
+                self._append_command_function_contexts(functions, cmd)
+                for fn_ctx in functions[start:]:
+                    fn_ctx["extension_short_name"] = short
 
         cmd_version_map = self._build_command_version_map(api, version)
         functors = self._build_functors(functions, api, cmd_version_map)
@@ -468,6 +455,20 @@ class CppGenerator(Generator):
         # emitted by the C header (`{api}.h`), which `gl.hpp` already includes.
         # The C++ template just `#if`-gates against the macros that are already
         # in scope, so no extra context is needed for the version gating itself.
+
+        # Extension tokens for the gl::exts namespace and the gl::supports
+        # overloads. Each entry mirrors the C-side flag variable so the
+        # constexpr `Extension` initializer can take its address.
+        extensions_context = [
+            {
+                "name": ext["name"],
+                "short_name": ext["short_name"],
+                "guard_macro": ext["guard_macro"],
+                "flag_var": ext["flag_var"],
+            }
+            for ext in ext_emissions
+        ]
+
         hpp_name = f"include/glaze/{api}.hpp"
         handle_name = f"include/glaze/{api}_handle.hpp"
         context = {
@@ -480,6 +481,7 @@ class CppGenerator(Generator):
             "dsa_classes": dsa_classes,
             "resources": raii_resources,
             "dsa_handles_with_proxy": dsa_handles_with_proxy,
+            "extensions": extensions_context,
         }
         handle_context = {
             "api": api,
@@ -611,6 +613,7 @@ class CppGenerator(Generator):
                     "doc_brief": doc_brief,
                     "doc_params": doc.params if doc else {},
                     "version_int": version_to_int(ver) if ver else 0,
+                    "extension_short_name": fn.get("extension_short_name"),
                 }
                 order.append(fname)
             seen[fname]["overloads"].append(
@@ -794,6 +797,38 @@ class CppGenerator(Generator):
             "entries": entries,
             "is_bitmask": is_bitmask,
         }
+
+    def _append_command_function_contexts(self, functions: list, command: Command) -> None:
+        """Append every functor variant glaze emits for ``command`` to ``functions``.
+
+        Mirrors the per-command logic that used to live inline in ``generate``:
+        the canonical context, the std::string overload, the ArrayView overload,
+        and the singular create/delete convenience overloads. Used by both the
+        core-command pass and the extension-command pass so they stay in sync.
+        """
+        functions.append(self._function_context(command))
+        string_param = _find_string_output_param(command)
+        if string_param:
+            length_param = _find_length_param(command)
+            functions.append(self._string_overload_context(command, string_param, length_param))
+        upload_params = _find_data_upload_params(command)
+        if upload_params:
+            data_param, size_param = upload_params
+            functions.append(self._array_view_overload_context(command, data_param, size_param))
+        creation_params = _find_object_creation_params(command)
+        if creation_params:
+            count_param, output_param = creation_params
+            if output_param.class_ in self._handle_classes:
+                functions.append(
+                    self._single_object_creation_context(command, count_param, output_param)
+                )
+        deletion_params = _find_object_deletion_params(command)
+        if deletion_params:
+            count_param, input_param = deletion_params
+            if input_param.class_ in self._handle_classes:
+                functions.append(
+                    self._single_object_deletion_context(command, count_param, input_param)
+                )
 
     def _function_context(self, command: Command) -> dict:
         return_type_str = command.return_type_str or command.return_type.to_c_string()

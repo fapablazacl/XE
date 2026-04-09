@@ -229,3 +229,22 @@ class TestRegistry:
         assert profile is not None
         assert profile.registry_api == "gl"
         assert "core" in profile.skip_remove_profiles
+
+    def test_extensions_for_api_filters_by_supported(self, mini_registry: Registry) -> None:
+        gl_exts = mini_registry.extensions_for_api("gl")
+        gl_names = {e.name for e in gl_exts}
+        assert "GL_ARB_buffer_storage" in gl_names
+        assert "GL_ARB_draw_instanced" in gl_names
+        # GL_ARB_draw_instanced is `supported="gl"` only — so gles2 sees only the
+        # buffer_storage extension.
+        gles2_exts = mini_registry.extensions_for_api("gles2")
+        gles2_names = {e.name for e in gles2_exts}
+        assert gles2_names == {"GL_ARB_buffer_storage"}
+        assert mini_registry.extensions_for_api("gles1") == []
+
+    def test_extensions_for_api_resolves_virtual_api(self, mini_registry: Registry) -> None:
+        # gl_compat is a virtual API mapping to registry api "gl"; it must
+        # return the same extension list.
+        gl_names = {e.name for e in mini_registry.extensions_for_api("gl")}
+        compat_names = {e.name for e in mini_registry.extensions_for_api("gl_compat")}
+        assert compat_names == gl_names

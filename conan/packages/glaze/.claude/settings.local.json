@@ -38,7 +38,11 @@
       "Bash(python -m ruff check glaze/generators/ glaze/utils/string_utils.py tests/test_string_utils.py tests/test_c_generator.py tests/test_cpp_generator.py)",
       "Bash(python glaze_cli.py list-apis)",
       "Bash(python glaze_cli.py generate --api gl 4.6 --lang c --lang cpp --output-dir /tmp/glaze-out)",
-      "Bash(python -m pytest tests/test_string_utils.py tests/test_model.py tests/test_parser.py tests/test_c_generator.py --tb=short)"
+      "Bash(python -m pytest tests/test_string_utils.py tests/test_model.py tests/test_parser.py tests/test_c_generator.py --tb=short)",
+      "Bash(python -m ruff check glaze/ tests/test_string_utils.py tests/test_c_generator.py tests/test_cpp_generator.py tests/test_model.py tests/test_parser.py)",
+      "Bash(python -m ruff format --check glaze/ tests/test_string_utils.py tests/test_c_generator.py tests/test_cpp_generator.py tests/test_model.py)",
+      "Bash(python -m ruff check glaze/ tests/test_string_utils.py tests/test_c_generator.py tests/test_cpp_generator.py tests/test_parser.py)",
+      "Bash(python -m ruff format glaze/generators/cpp_generator.py tests/test_c_generator.py tests/test_cpp_generator.py tests/test_model.py)"
     ]
   }
 }
