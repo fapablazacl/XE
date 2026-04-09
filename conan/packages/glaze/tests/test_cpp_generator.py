@@ -728,6 +728,30 @@ class TestCppGeneratorHandleCrossReferences:
         # free functor, which still expects the raw handle-id type.
         assert "::gl::attachShader(m_id, shader.id())" in h
 
+    def test_handle_forward_declarations_emitted(self, mini_registry: Registry) -> None:
+        """All handle classes get a forward declaration before any definitions."""
+        h = CppGenerator(mini_registry).generate("gl", "2.0")["include/glaze/gl_handle.hpp"]
+        forward_idx = h.find("class Program;")
+        def_idx = h.find("class Program {")
+        assert 0 < forward_idx < def_idx
+
+    def test_cross_referencing_method_defined_out_of_line(
+        self, mini_registry: Registry
+    ) -> None:
+        """Program::attachShader is declared inside Program but defined
+        after every handle class is complete, so the by-value Shader
+        parameter can see its complete type regardless of class ordering."""
+        h = CppGenerator(mini_registry).generate("gl", "2.0")["include/glaze/gl_handle.hpp"]
+        # The in-class line must be a pure declaration (ends with a ;, no body).
+        decl = "void attachShader(::gl::handle::Shader shader) const;"
+        assert decl in h
+        # The out-of-line definition sits *after* the Shader class body.
+        shader_end = h.find("class Shader {")
+        shader_end = h.find("};", shader_end)
+        assert shader_end != -1
+        out_of_line = "inline void Program::attachShader(::gl::handle::Shader shader) const"
+        assert h.find(out_of_line) > shader_end
+
 
 class TestConvertFunctionName:
     def test_standard_conversion(self, mini_registry: Registry) -> None:

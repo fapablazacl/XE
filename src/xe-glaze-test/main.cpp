@@ -119,7 +119,7 @@ int main() {
 
 			gl::bindVertexArray(vao->id());
 			gl::drawArrays(gl::PrimitiveType::eTriangles, 0, 3);
-			gl::bindVertexArray(gl::VertexArray{});
+			gl::bindVertexArray({});
 
 			gl::useProgram({});
 
