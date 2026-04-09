@@ -7,21 +7,65 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 XE is a barebones multiplatform C++17 game engine with OpenGL rendering, GLTF model loading, math/scene libraries, and demo applications (Capybaria game, Apostate game and GLTF viewer, among other tools). It uses OpenGL 3.3 as the primary rendering backend (with an OpenGL 4.6 backend available). The current active branch (`feature/gltf-view`) focuses on a glTF 2.0 model viewer.
 
 ## Code Conventions
-- class names must be PascalCase
+- instance types (AKA polymorphic type) should be classes with PascalCase naming.
 - value types must be represented as structs, and global functions and methods must be camelCase.
 - each new test should have their own unit test suite.
-- public classes and methods must have extended Doxygen documentation, in the form:
+- public classes and methods must have extended Doxygen documentation
+- member variables must have a single line Doxygen comment above them.
+- Some examples of these conventions:
+```C++
 /**
- * @brief what it this (classes / structs) | what it does (public methods, global functions)
+ * @brief what it this (classes / structs)
  * Extended description on why it is neccesary | how it does it, plus secondary effects
  * @param param1 description
  * @param param2 description
  * @return description
  */
+class Foo {
+public:
+    /**
+    * @brief what it does
+    * how it does, indicating which member variables mutate.
+    * @param param1 description
+    * @param param2 description
+    * @return description
+    */
+    int computeValue(int a, int b) const;
+
+    virtual ~Foo() = default;
+
+private:
+    //! Just a single comment suffices here
+    int intervalMember = 0;
+};
+```
 
 ## Build System
 
 **Prerequisites:** CMake 3.16+, Conan 2.x
+
+### CMake Conventions
+- Each target must be live inside in the "src" folder, into its own folder there.
+- library related targets start with the "lib" prefix.
+- each library target must a companion test target, with the same base as the library target adding the "-test" suffix.
+- executable related targets start with the "xe-" prefix.
+- source code must live in a "src" sub folder.
+- Example CMakeLists.txt form:
+
+```bash
+find_package(package1 REQUIRED)
+find_package(package2 REQUIRED)
+
+set (target libxe-core)
+set (sources "src/main.cpp")
+
+add_library(${target} ${sources})
+
+target_include_directories(${target} PUBLIC "src")
+
+target_link_libraries(${target} PRIVATE package1::bar)
+target_link_libraries(${target} PRIVATE package2::foo)
+```
 
 ### Configure and build
 
@@ -59,17 +103,6 @@ Conan generates CMake presets in `build/generators/CMakePresets.json`. Always ru
 | `XE_DEV_SANITIZER_ENABLE` | OFF | AddressSanitizer |
 | `XE_DEV_INSTRUMENT_COVERAGE` | OFF | Instrument source files for code coverage |
 
-### Code quality
-
-```bash
-make format       # clang-format all sources in src/
-make tidy         # run clang-tidy against build/Debug/
-make tidy-fix     # auto-fix clang-tidy issues
-make cppcheck     # exhaustive cppcheck (excludes imgui bindings)
-make iwyu         # include-what-you-use check
-make iwyu-fix     # auto-fix includes
-```
-
 ### Running tests
 
 Tests require `-DXE_DEV_UNIT_TEST=ON` at configure time.
@@ -78,18 +111,6 @@ Tests require `-DXE_DEV_UNIT_TEST=ON` at configure time.
 make test
 # or directly:
 ctest --test-dir build/Debug --output-on-failure
-```
-
-### Docker workflow
-
-All make targets have `docker-` prefixed equivalents. Build the Docker image first with `make docker`.
-
-```bash
-make docker             # Build Docker image (Ubuntu)
-make docker-configure   # Configure inside container
-make docker-format      # clang-format inside container
-make docker-tidy        # clang-tidy inside container
-make docker-test        # Run tests inside container
 ```
 
 ## Architecture
@@ -119,15 +140,6 @@ All libraries live under `src/` and are prefixed `libxe-`:
 - **xe-gltfc** — glTF 3d model compiler/converter (Assimp, KTX, DevIL).
 - **xe-ktxc** — KTX texture compiler/converter (Vulkan SDK, cxxopts).
 - **Package: Glaze (`conan/packages/glaze/` / `tools/OpenGL-Hpp`)** — A Conan-packaged Python code generator producing OpenGL C/C++ bindings from the Khronos XML registry (GL 1.0–4.6) via Jinja2 templates. Has its own `CLAUDE.md`, pytest suite, and CI workflow.
-
-### Dependency Chain
-
-```
-XE.Core → XE.Math, fmt, glfw
-XE.GL → XE.Core, glad, glm, glfw
-XE.App → XE.Core, XE.GL
-xe-gltf-view → XE.Core, XE.GL, XE.App, cgltf, imgui, SDL2
-```
 
 ## Code Style
 
@@ -168,7 +180,6 @@ lipo -create -output libxe.dylib arm64/libxe.dylib x64/libxe.dylib
 Adjust `compiler.version` in the macOS profiles to match the installed Xcode version.
 
 ## Notes
-
 - imgui backends (glfw, opengl3, sdl2, sdl3) are auto-copied from the Conan package into `src/xe-gltf-view/src/bindings/` during `conan install`.
 - VulkanSDK must be downloaded manually; the Conan package provides only the loader.
 - `compile_commands.json` is generated at `build/Debug/compile_commands.json` and copied to the root for IDE/tooling use.
