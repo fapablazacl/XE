@@ -334,8 +334,8 @@ namespace glaze {
 {% for r in resources %}
 #if GLAZE_GL_VERSION >= {{ r.version_int }}
 template<> struct Traits<::{{ api }}::{{ r.handle_type }}> {
-    static ::{{ api }}::{{ r.handle_type }} create() {
-        return ::{{ api }}::{{ r.gen_func_name }}();
+    static ::{{ api }}::{{ r.handle_type }} create({{ r.create_params_str }}) {
+        return ::{{ api }}::{{ r.gen_func_name }}({{ r.create_call_args_str }});
     }
     static void destroy(::{{ api }}::{{ r.handle_type }}& h) {
         ::{{ api }}::{{ r.delete_func_name }}(h);
@@ -350,8 +350,8 @@ template<> struct Traits<::{{ api }}::{{ r.handle_type }}> {
 {% for hp in dsa_handles_with_proxy %}
 #if GLAZE_GL_VERSION >= {{ hp.version_int }}
 template<> struct Traits<::{{ api }}::dsa::{{ hp.class_name }}> {
-    static ::{{ api }}::dsa::{{ hp.class_name }} create() {
-        return ::{{ api }}::dsa::{{ hp.class_name }}(::{{ api }}::{{ hp.gen_func_name }}());
+    static ::{{ api }}::dsa::{{ hp.class_name }} create({{ hp.create_params_str }}) {
+        return ::{{ api }}::dsa::{{ hp.class_name }}(::{{ api }}::{{ hp.gen_func_name }}({{ hp.create_call_args_str }}));
     }
     static void destroy(::{{ api }}::dsa::{{ hp.class_name }}& w) {
         ::{{ api }}::{{ hp.delete_func_name }}(w.id());

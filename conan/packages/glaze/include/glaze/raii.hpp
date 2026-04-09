@@ -332,25 +332,21 @@ private:
 
 // ── Factory helpers ─────────────────────────────────────────────────────────
 /**
- * @brief Allocate a fresh resource of type T (via Traits<T>::create(args...))
- * and wrap it in a Unique<T>. Extra arguments are perfect-forwarded to the
- * trait factory, so types whose creator requires parameters (e.g. gl::Shader,
- * whose glCreateShader takes a GLenum type) are constructible via
- * `glaze::makeUnique<gl::Shader>(gl::ShaderType::eVertexShader)`.
+ * @brief Allocate a fresh resource of type T (via Traits<T>::create()) and
+ * wrap it in a Unique<T>.
  */
-template<typename T, typename... Args>
-inline Unique<T> makeUnique(Args&&... args) {
-    return Unique<T>(Traits<T>::create(std::forward<Args>(args)...));
+template<typename T>
+inline Unique<T> makeUnique() {
+    return Unique<T>(Traits<T>::create());
 }
 
 /**
- * @brief Allocate a fresh resource of type T (via Traits<T>::create(args...))
- * and wrap it in a Shared<T>. Arguments are forwarded the same way as
- * makeUnique.
+ * @brief Allocate a fresh resource of type T (via Traits<T>::create()) and
+ * wrap it in a Shared<T>.
  */
-template<typename T, typename... Args>
-inline Shared<T> makeShared(Args&&... args) {
-    return Shared<T>(Traits<T>::create(std::forward<Args>(args)...));
+template<typename T>
+inline Shared<T> makeShared() {
+    return Shared<T>(Traits<T>::create());
 }
 
 } // namespace glaze

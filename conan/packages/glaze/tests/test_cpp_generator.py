@@ -489,10 +489,15 @@ class TestCppGeneratorRaii:
 
     def test_gl_hpp_emits_glaze_traits_for_raw_handles(self, mini_registry: Registry) -> None:
         # gl 1.5 has glGenBuffers/glDeleteBuffers → buffer handle gets a raw trait.
+        # glGenBuffers has only (count, output*) — no leading params — so the
+        # Traits::create(...) signature must be nullary. Explicitly pin the
+        # zero-arg signature so a future regression that over-propagates
+        # params here would be caught.
         files = CppGenerator(mini_registry).generate("gl", "1.5")
         gl_hpp = files["include/glaze/gl.hpp"]
         assert "namespace glaze" in gl_hpp
         assert "struct Traits<::gl::Buffer>" in gl_hpp
+        assert "static ::gl::Buffer create() {" in gl_hpp
         assert "::gl::genBuffer()" in gl_hpp
         assert "::gl::deleteBuffer(h)" in gl_hpp
 
@@ -501,8 +506,52 @@ class TestCppGeneratorRaii:
         files = CppGenerator(mini_registry).generate("gl", "2.0")
         gl_hpp = files["include/glaze/gl.hpp"]
         assert "struct Traits<::gl::Program>" in gl_hpp
+        assert "static ::gl::Program create() {" in gl_hpp
         assert "::gl::createProgram()" in gl_hpp
         assert "::gl::deleteProgram(h)" in gl_hpp
+
+    def test_gl_hpp_query_traits_propagates_create_target(
+        self, mini_registry: Registry
+    ) -> None:
+        # glCreateQueries(target, n, ids) is a multi-object creator whose
+        # singular wrapper _CreateQuerieFn::operator()(QueryTarget) keeps the
+        # leading target parameter. The Traits specialization must propagate
+        # that parameter into create(...) — otherwise Traits<gl::Query>::create()
+        # calls a functor that requires arguments and compilation fails with
+        # C2064 "term does not evaluate to a function taking 0 arguments".
+        files = CppGenerator(mini_registry).generate("gl", "4.5")
+        gl_hpp = files["include/glaze/gl.hpp"]
+        # Isolate the Traits<::gl::Query> block so nothing elsewhere in the
+        # file (e.g. glBindBuffer using static_cast<GLenum>(target) for an
+        # unrelated enum param) can accidentally satisfy the assertions.
+        start = gl_hpp.index("struct Traits<::gl::Query>")
+        end = gl_hpp.index("};", start)
+        block = gl_hpp[start:end]
+        assert "static ::gl::Query create(::gl::QueryTarget target) {" in block
+        # Body must forward target verbatim to the C++ functor — no
+        # static_cast<GLenum>(target), which would fail to match the
+        # functor's QueryTarget operator().
+        assert "::gl::createQuerie(target)" in block
+        assert "::gl::createQuerie(static_cast" not in block
+
+    def test_gl_hpp_shader_traits_propagates_create_param(
+        self, mini_registry: Registry
+    ) -> None:
+        # glCreateShader takes a mandatory GLenum type parameter. The Traits
+        # specialization must propagate it into create(...) and forward it to
+        # the underlying functor, otherwise the generated header fails to
+        # compile as soon as Traits<gl::Shader>::create is instantiated.
+        files = CppGenerator(mini_registry).generate("gl", "2.0")
+        gl_hpp = files["include/glaze/gl.hpp"]
+        assert "struct Traits<::gl::Shader>" in gl_hpp
+        assert "static ::gl::Shader create(" in gl_hpp
+        assert " type)" in gl_hpp
+        # The body calls the C++ functor, which already accepts the strong
+        # type used in the signature, so the parameter must be forwarded
+        # verbatim without any static_cast — otherwise the functor would
+        # refuse the raw GLenum.
+        assert "::gl::createShader(type)" in gl_hpp
+        assert "static_cast<GLenum>(type)" not in gl_hpp
 
     def test_gl_hpp_no_glaze_traits_in_1_0(self, mini_registry: Registry) -> None:
         files = CppGenerator(mini_registry).generate("gl", "1.0")
@@ -519,9 +568,16 @@ class TestCppGeneratorRaii:
         # gl::handle::Program / Shader are legacy wrapper classes — each gets a Traits.
         assert "namespace glaze" in h
         assert "struct Traits<::gl::handle::Program>" in h
+        assert "static ::gl::handle::Program create() {" in h
         assert "::gl::handle::Program(::gl::createProgram())" in h
         assert "::gl::deleteProgram(w.id())" in h
+        # gl::handle::Shader's Traits must propagate glCreateShader's GLenum type
+        # parameter through create(...) — see the matching assertion for the raw
+        # handle trait in test_gl_hpp_shader_traits_propagates_create_param.
         assert "struct Traits<::gl::handle::Shader>" in h
+        assert "static ::gl::handle::Shader create(" in h
+        assert " type)" in h
+        assert "::gl::handle::Shader(::gl::createShader(type))" in h
 
     def test_static_raii_hpp_shipped_verbatim(self, mini_registry: Registry) -> None:
         files = CppGenerator(mini_registry).generate("gl", "1.0")
@@ -532,8 +588,12 @@ class TestCppGeneratorRaii:
         assert "class Unique" in raii
         assert "class Shared" in raii
         assert "class Weak" in raii
-        assert "Unique<T> makeUnique()" in raii
-        assert "Shared<T> makeShared()" in raii
+        # The factory helpers are variadic so they can forward arguments to
+        # Traits<T>::create(...) for types whose creator requires parameters
+        # (e.g. gl::Shader).
+        assert "Unique<T> makeUnique(Args&&... args)" in raii
+        assert "Shared<T> makeShared(Args&&... args)" in raii
+        assert "Traits<T>::create(std::forward<Args>(args)...)" in raii
 
     def test_gl_hpp_emits_handle_traits_for_buffer(self, mini_registry: Registry) -> None:
         files = CppGenerator(mini_registry).generate("gl", "1.5")
@@ -598,6 +658,75 @@ class TestCppGeneratorHandle:
         # GL 1.0 has no first-param-handle commands in MINI_XML.
         h = CppGenerator(mini_registry).generate("gl", "1.0")["include/glaze/gl_handle.hpp"]
         assert "class Program" not in h
+
+
+class TestCppGeneratorScalarQueryOverload:
+    """glGet*iv-style per-object scalar queries get a value-returning overload."""
+
+    def test_free_functor_returns_glint(self, mini_registry: Registry) -> None:
+        # glGetShaderiv isn't in mini_registry — exercise via a minimal
+        # synthetic command glued on top for coverage. Instead, rely on the
+        # production gl.xml output being exercised by the regen tests elsewhere
+        # and just pin the helper directly here.
+        from glaze.generators.cpp_generator import _find_scalar_query_param
+
+        cmd = Command(
+            name="glGetShaderiv",
+            return_type=TypeDecl("void"),
+            return_type_str="void",
+            params=[
+                CommandParam(name="shader", type_parts=["GLuint"], class_="shader"),
+                CommandParam(name="pname", type_parts=["GLenum"]),
+                CommandParam(name="params", type_parts=["GLint", "*"]),
+            ],
+        )
+        scalar = _find_scalar_query_param(cmd)
+        assert scalar is not None
+        assert scalar.name == "params"
+
+    def test_non_handle_first_param_skipped(self) -> None:
+        """glGetIntegerv-style multi-value queries must not get a scalar overload."""
+        from glaze.generators.cpp_generator import _find_scalar_query_param
+
+        cmd = Command(
+            name="glGetIntegerv",
+            return_type=TypeDecl("void"),
+            return_type_str="void",
+            params=[
+                CommandParam(name="pname", type_parts=["GLenum"]),
+                CommandParam(name="data", type_parts=["GLint", "*"]),
+            ],
+        )
+        assert _find_scalar_query_param(cmd) is None
+
+    def test_non_get_command_skipped(self) -> None:
+        from glaze.generators.cpp_generator import _find_scalar_query_param
+
+        cmd = Command(
+            name="glBufferData",
+            return_type=TypeDecl("void"),
+            return_type_str="void",
+            params=[
+                CommandParam(name="buffer", type_parts=["GLuint"], class_="buffer"),
+                CommandParam(name="out", type_parts=["GLint", "*"]),
+            ],
+        )
+        assert _find_scalar_query_param(cmd) is None
+
+
+class TestCppGeneratorHandleCrossReferences:
+    """handle::Program::attachShader should take handle::Shader, not gl::Shader."""
+
+    def test_attach_shader_param_is_handle_wrapper(self, mini_registry: Registry) -> None:
+        h = CppGenerator(mini_registry).generate("gl", "2.0")["include/glaze/gl_handle.hpp"]
+        # Param type must be ::gl::handle::Shader, not bare ::gl::Shader.
+        assert "attachShader(::gl::handle::Shader shader)" in h
+
+    def test_attach_shader_call_forwards_id(self, mini_registry: Registry) -> None:
+        h = CppGenerator(mini_registry).generate("gl", "2.0")["include/glaze/gl_handle.hpp"]
+        # The wrapper unwraps the handle via .id() before handing it to the
+        # free functor, which still expects the raw handle-id type.
+        assert "::gl::attachShader(m_id, shader.id())" in h
 
 
 class TestConvertFunctionName:

@@ -38,6 +38,11 @@ MINI_XML = """\
     <enum value="0x1406" name="GL_FLOAT"/>
   </enums>
 
+  <enums namespace="GL" group="QueryTarget" type="enum">
+    <enum value="0x8914" name="GL_SAMPLES_PASSED" group="QueryTarget"/>
+    <enum value="0x8C2F" name="GL_ANY_SAMPLES_PASSED" group="QueryTarget"/>
+  </enums>
+
   <commands namespace="GL">
     <command>
       <proto>void <name>glClear</name></proto>
@@ -106,6 +111,17 @@ MINI_XML = """\
       <param>const void *<name>data</name></param>
     </command>
     <command>
+      <proto>void <name>glCreateQueries</name></proto>
+      <param group="QueryTarget"><ptype>GLenum</ptype> <name>target</name></param>
+      <param><ptype>GLsizei</ptype> <name>n</name></param>
+      <param class="query"><ptype>GLuint</ptype> *<name>ids</name></param>
+    </command>
+    <command>
+      <proto>void <name>glDeleteQueries</name></proto>
+      <param><ptype>GLsizei</ptype> <name>n</name></param>
+      <param class="query">const <ptype>GLuint</ptype> *<name>ids</name></param>
+    </command>
+    <command>
       <proto>void <name>glDrawArraysInstancedARB</name></proto>
       <param><ptype>GLenum</ptype> <name>mode</name></param>
       <param><ptype>GLint</ptype> <name>first</name></param>
@@ -158,8 +174,12 @@ MINI_XML = """\
 
   <feature api="gl" name="GL_VERSION_4_5" number="4.5">
     <require>
+      <enum name="GL_SAMPLES_PASSED"/>
+      <enum name="GL_ANY_SAMPLES_PASSED"/>
       <command name="glNamedBufferData"/>
       <command name="glNamedBufferSubData"/>
+      <command name="glCreateQueries"/>
+      <command name="glDeleteQueries"/>
     </require>
   </feature>
 

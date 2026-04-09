@@ -11,6 +11,13 @@
 namespace {{ api }} {
 namespace handle {
 
+// Forward declarations so handle classes can freely reference each other in
+// method signatures (e.g. Program::attachShader(Shader)) regardless of the
+// alphabetical order in which the class definitions are emitted below.
+{% for cls in handle_classes %}
+class {{ cls.class_name }};
+{% endfor %}
+
 {% for cls in handle_classes %}
 /**
  * @brief Object-style wrapper around an OpenGL {{ cls.class_name }} handle.
@@ -46,8 +53,8 @@ namespace glaze {
 {% for hp in handle_handles_with_proxy %}
 #if GLAZE_GL_VERSION >= {{ hp.version_int }}
 template<> struct Traits<::{{ api }}::handle::{{ hp.class_name }}> {
-    static ::{{ api }}::handle::{{ hp.class_name }} create() {
-        return ::{{ api }}::handle::{{ hp.class_name }}(::{{ api }}::{{ hp.gen_func_name }}());
+    static ::{{ api }}::handle::{{ hp.class_name }} create({{ hp.create_params_str }}) {
+        return ::{{ api }}::handle::{{ hp.class_name }}(::{{ api }}::{{ hp.gen_func_name }}({{ hp.create_call_args_str }}));
     }
     static void destroy(::{{ api }}::handle::{{ hp.class_name }}& w) {
         ::{{ api }}::{{ hp.delete_func_name }}(w.id());

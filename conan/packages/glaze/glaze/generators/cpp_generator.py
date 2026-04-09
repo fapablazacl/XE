@@ -164,6 +164,67 @@ def _find_length_param(command: Command) -> CommandParam | None:
     return None
 
 
+# Scalar pointer types accepted as the trailing output parameter of a per-object
+# "getter" query (glGetShaderiv, glGetProgramiv, glGetBufferParameteriv, …).
+_SCALAR_QUERY_TYPES: frozenset = frozenset(
+    {
+        "GLint",
+        "GLuint",
+        "GLfloat",
+        "GLdouble",
+        "GLboolean",
+        "GLint64",
+        "GLuint64",
+    }
+)
+
+
+def _find_scalar_query_param(command: Command) -> CommandParam | None:
+    """Return the trailing scalar output pointer param of a per-object query, or None.
+
+    Matches commands of the form ``glGet<Obj><...>v(<handle>, ..., T *out)``,
+    where the first parameter is a named GL object handle and the last is the
+    only non-const output pointer. Used to synthesize a convenience overload
+    that returns the scalar directly instead of requiring the caller to pass a
+    pointer to a local (e.g. ``getShaderiv(shader, eCompileStatus) -> GLint``).
+
+    Restricted to handle-first commands so that fetching ``glGetIntegerv`` /
+    ``glGetFloatv`` — which may legitimately write multiple values — does not
+    accidentally get a single-slot overload that would corrupt the stack.
+    """
+    if not command.name.startswith("glGet"):
+        return None
+    if len(command.params) < 2:
+        return None
+    first = command.params[0]
+    if not (first.class_ and first.type == "GLuint" and not first.is_pointer):
+        return None
+    last = command.params[-1]
+    if (
+        last.type not in _SCALAR_QUERY_TYPES
+        or not last.is_pointer
+        or last.is_const
+    ):
+        return None
+    # Ensure `last` is the only non-const output pointer.
+    for p in command.params[1:-1]:
+        if p.is_pointer and not p.is_const:
+            return None
+    return last
+
+
+# Commands whose info log length can be queried via an adjacent ``Get*iv``
+# functor. Used to synthesize a zero-extra-argument std::string overload that
+# internally sizes the buffer via GL_INFO_LOG_LENGTH, removing the need for
+# callers to chain two calls manually. Keyed by the C command name (the body
+# still emits the raw ``::glGet*`` calls so it is independent of handle-type
+# naming collisions).
+_INFOLOG_SELF_QUERY_MAP: dict[str, str] = {
+    "glGetShaderInfoLog": "::glGetShaderiv",
+    "glGetProgramInfoLog": "::glGetProgramiv",
+}
+
+
 # ── Vendor-suffix stripping for group names ───────────────────────────────────
 
 # Known vendor/extension suffixes that appear at the end of XML group names.
@@ -417,7 +478,7 @@ class CppGenerator(Generator):
         handle_classes = self._build_handle_classes(consolidated, api, cmd_version_map)
 
         # Build RAII smart-pointer resource list
-        raii_resources = self._collect_raii_resources(consolidated)
+        raii_resources = self._collect_raii_resources(consolidated, api)
         # Annotate each resource with the GL version at which both creator and
         # deleter become available — used to gate HandleTraits and Traits
         # specializations behind #if GLAZE_GL_VERSION >= NN.
@@ -441,6 +502,8 @@ class CppGenerator(Generator):
                 "gen_func_name": r["gen_func_name"],
                 "delete_func_name": r["delete_func_name"],
                 "version_int": r["version_int"],
+                "create_params_str": r["create_params_str"],
+                "create_call_args_str": r["create_call_args_str"],
             }
             for r in raii_resources
             if r["handle_type"] in dsa_proxy_map
@@ -452,6 +515,8 @@ class CppGenerator(Generator):
                 "gen_func_name": r["gen_func_name"],
                 "delete_func_name": r["delete_func_name"],
                 "version_int": r["version_int"],
+                "create_params_str": r["create_params_str"],
+                "create_call_args_str": r["create_call_args_str"],
             }
             for r in raii_resources
             if r["handle_type"] in handle_proxy_map
@@ -506,7 +571,7 @@ class CppGenerator(Generator):
 
     # ----------------------------------------------------------------- RAII
 
-    def _collect_raii_resources(self, consolidated: ConsolidatedRequire) -> list[dict]:
+    def _collect_raii_resources(self, consolidated: ConsolidatedRequire, api: str) -> list[dict]:
         """Collect RAII smart-pointer resource entries from consolidated commands.
 
         Detects two patterns and groups them by GL object class:
@@ -580,6 +645,42 @@ class CppGenerator(Generator):
             # aliases, even when the handle type itself was Id-suffixed to avoid
             # collisions with enum class names.
             alias = _to_handle_name(cls)
+
+            # Determine the leading (non count/output) params of the selected
+            # creator and propagate them into Traits::create(...):
+            #
+            #   • Singular creator (glCreateShader, glCreateProgram, …) →
+            #     all params are "extra". glCreateShader contributes
+            #     ShaderType type; glCreateProgram contributes nothing.
+            #   • Multi-object (glGen*/glCreate* + count + GLuint*) → params
+            #     that are neither the count nor the output pointer.
+            #     glGenBuffers / glCreateBuffers contribute nothing;
+            #     glCreateQueries(target, n, ids) and glCreateTextures(
+            #     target, n, textures) contribute `target`.
+            #
+            # These are exactly the params _single_object_creation_context
+            # keeps on the singular wrapper's operator(), so the Traits
+            # signature and the functor signature stay in lock-step.
+            #
+            # The body calls the C++ functor (e.g. ::gl::createShader), which
+            # already accepts the strong types used in the signature, so
+            # arguments are forwarded verbatim — no static_cast is needed
+            # (and adding one would fail to compile, since the functor does
+            # not accept the raw GLenum/GLuint form).
+            creation_pair = _find_object_creation_params(create_cmd)
+            if creation_pair is not None:
+                count_param, output_param = creation_pair
+                extra_params = [
+                    p for p in create_cmd.params if p is not count_param and p is not output_param
+                ]
+            else:
+                extra_params = list(create_cmd.params)
+            create_params_str = ", ".join(
+                f"{self._param_type_str(p, command=create_cmd, namespace_prefix=f'::{api}::')} {p.name}"
+                for p in extra_params
+            )
+            create_call_args_str = ", ".join(p.name for p in extra_params)
+
             resources.append(
                 {
                     "alias": alias,
@@ -590,6 +691,8 @@ class CppGenerator(Generator):
                     "delete_gl_name": delete_cmd.name,
                     "delete_func_name": delete_func_name,
                     "deleter_struct": _functor_struct_name(delete_func_name),
+                    "create_params_str": create_params_str,
+                    "create_call_args_str": create_call_args_str,
                 }
             )
         return resources
@@ -712,39 +815,10 @@ class CppGenerator(Generator):
 
             methods = []
             for cmd in sorted(filtered, key=lambda c: c.name):
-                method_name = self._dsa_method_name(cmd.name, class_str)
-                if method_name in _CPP_KEYWORDS:
-                    method_name = method_name + "_"
-
-                # Reuse _function_context to derive the *wrapped* return type and
-                # the canonical functor name. This guarantees that
-                # glGetUniformLocation → "UniformLocation", glGetString → "std::string",
-                # etc., matching the binding's free functions exactly.
-                fn_ctx = self._function_context(cmd)
-                functor_name = fn_ctx["func_name"]
-                return_type = fn_ctx["return_type"]
-
-                method_params = cmd.params[1:]
-                params_str = ", ".join(
-                    self._generate_dsa_param_decl(p, cmd, api) for p in method_params
-                )
-                # Pass-through call args: m_id is already a strong handle, and
-                # the other params are strong-typed in the method signature, so
-                # forward them by name. The functor's operator() does any
-                # `.id`/`.loc`/cast extraction internally.
-                forwarded = ", ".join(["m_id"] + [p.name for p in method_params])
-
-                ver = cmd_version_map.get(cmd.name)
-                methods.append(
-                    {
-                        "name": method_name,
-                        "return_type": return_type,
-                        "params_str": params_str,
-                        "functor_name": functor_name,
-                        "gl_name": cmd.name,
-                        "call_args_str": forwarded,
-                        "version_int": version_to_int(ver) if ver else 0,
-                    }
+                methods.extend(
+                    self._build_handle_methods_for_command(
+                        cmd, class_str, api, cmd_version_map
+                    )
                 )
 
             handle_classes.append(
@@ -755,6 +829,170 @@ class CppGenerator(Generator):
                 }
             )
         return handle_classes
+
+    def _build_handle_methods_for_command(
+        self,
+        cmd: Command,
+        class_str: str,
+        api: str,
+        cmd_version_map: dict[str, str],
+    ) -> list[dict]:
+        """Produce one or more handle-class method entries for ``cmd``.
+
+        Emits the canonical method plus any convenience overloads the free
+        functor exposes (scalar-return query, std::string-return, zero-arg
+        InfoLog self-query). Each method substitutes handle-valued parameters
+        with their corresponding ``::{api}::handle::*`` wrapper so wrapper
+        classes reference each other rather than the raw handle-id types.
+        """
+        base_name = self._dsa_method_name(cmd.name, class_str)
+        if base_name in _CPP_KEYWORDS:
+            base_name = base_name + "_"
+
+        fn_ctx = self._function_context(cmd)
+        functor_name = fn_ctx["func_name"]
+        canonical_return = fn_ctx["return_type"]
+
+        ver = cmd_version_map.get(cmd.name)
+        ver_int = version_to_int(ver) if ver else 0
+
+        methods: list[dict] = []
+
+        # Canonical overload — keep every param except the leading handle.
+        canonical_params = list(cmd.params[1:])
+        methods.append(
+            self._emit_handle_method(
+                cmd=cmd,
+                method_name=base_name,
+                return_type=canonical_return,
+                functor_name=functor_name,
+                api=api,
+                version_int=ver_int,
+                kept_params=canonical_params,
+                extra_forward=None,
+            )
+        )
+
+        # Scalar query overload (drops the trailing scalar output pointer).
+        scalar_param = _find_scalar_query_param(cmd)
+        if scalar_param is not None:
+            kept = [p for p in canonical_params if p is not scalar_param]
+            methods.append(
+                self._emit_handle_method(
+                    cmd=cmd,
+                    method_name=base_name,
+                    return_type=scalar_param.type,
+                    functor_name=functor_name,
+                    api=api,
+                    version_int=ver_int,
+                    kept_params=kept,
+                    extra_forward=None,
+                )
+            )
+
+        # std::string output overload (drops the GLchar* buffer + length).
+        string_param = _find_string_output_param(cmd)
+        if string_param is not None:
+            length_param = _find_length_param(cmd)
+            kept = [
+                p
+                for p in canonical_params
+                if p is not string_param and p is not length_param
+            ]
+            methods.append(
+                self._emit_handle_method(
+                    cmd=cmd,
+                    method_name=base_name,
+                    return_type="std::string",
+                    functor_name=functor_name,
+                    api=api,
+                    version_int=ver_int,
+                    kept_params=kept,
+                    extra_forward=None,
+                )
+            )
+
+        # InfoLog self-query overload (no extra args; sizes itself via Get*iv).
+        if cmd.name in _INFOLOG_SELF_QUERY_MAP:
+            methods.append(
+                self._emit_handle_method(
+                    cmd=cmd,
+                    method_name=base_name,
+                    return_type="std::string",
+                    functor_name=functor_name,
+                    api=api,
+                    version_int=ver_int,
+                    kept_params=[],
+                    extra_forward=None,
+                )
+            )
+
+        return methods
+
+    def _emit_handle_method(
+        self,
+        cmd: Command,
+        method_name: str,
+        return_type: str,
+        functor_name: str,
+        api: str,
+        version_int: int,
+        kept_params: list[CommandParam],
+        extra_forward: list[str] | None,
+    ) -> dict:
+        """Assemble a single handle-class method entry for the given overload."""
+        params_str = ", ".join(
+            self._generate_handle_param_decl(p, cmd, api) for p in kept_params
+        )
+        forwarded = ["m_id"] + [self._handle_method_call_arg(p) for p in kept_params]
+        if extra_forward:
+            forwarded.extend(extra_forward)
+        return {
+            "name": method_name,
+            "return_type": return_type,
+            "params_str": params_str,
+            "functor_name": functor_name,
+            "gl_name": cmd.name,
+            "call_args_str": ", ".join(forwarded),
+            "version_int": version_int,
+        }
+
+    def _generate_handle_param_decl(
+        self, param: CommandParam, command: Command, api: str
+    ) -> str:
+        """Like ``_generate_dsa_param_decl`` but substitutes handle-valued
+        parameters with the ``::{api}::handle::*`` wrapper type so handle
+        classes reference each other consistently (addresses the TODO about
+        handle:: methods preferring handle:: types over raw handle ids).
+        Pointer params keep their raw handle-id type to preserve the ABI of
+        the underlying GL array call.
+        """
+        if (
+            param.class_
+            and _is_uint_handle(param)
+            and param.class_ in self._handle_classes
+            and not param.is_pointer
+        ):
+            wrapper = _to_handle_name(param.class_)
+            return f"::{api}::handle::{wrapper} {param.name}"
+        return self._generate_dsa_param_decl(param, command, api)
+
+    def _handle_method_call_arg(self, param: CommandParam) -> str:
+        """Forward a handle-class method parameter to the free functor.
+
+        Handle-valued wrapper parameters are unwrapped via ``.id()`` so the
+        free functor sees its expected strong ``gl::`` handle type; every other
+        parameter is forwarded by name (the functor's own operator() performs
+        any ``.id`` / ``.loc`` / ``.value()`` extraction internally).
+        """
+        if (
+            param.class_
+            and _is_uint_handle(param)
+            and param.class_ in self._handle_classes
+            and not param.is_pointer
+        ):
+            return f"{param.name}.id()"
+        return param.name
 
     def _dsa_method_name(self, gl_name: str, class_str: str) -> str:
         """Convert a GL command name to a DSA method name.
@@ -809,7 +1047,8 @@ class CppGenerator(Generator):
 
         Mirrors the per-command logic that used to live inline in ``generate``:
         the canonical context, the std::string overload, the ArrayView overload,
-        and the singular create/delete convenience overloads. Used by both the
+        the scalar-return query overload, the InfoLog self-query overload, and
+        the singular create/delete convenience overloads. Used by both the
         core-command pass and the extension-command pass so they stay in sync.
         """
         functions.append(self._function_context(command))
@@ -817,6 +1056,11 @@ class CppGenerator(Generator):
         if string_param:
             length_param = _find_length_param(command)
             functions.append(self._string_overload_context(command, string_param, length_param))
+        scalar_param = _find_scalar_query_param(command)
+        if scalar_param is not None:
+            functions.append(self._scalar_query_overload_context(command, scalar_param))
+        if command.name in _INFOLOG_SELF_QUERY_MAP:
+            functions.append(self._infolog_selfquery_overload_context(command))
         upload_params = _find_data_upload_params(command)
         if upload_params:
             data_param, size_param = upload_params
@@ -927,6 +1171,75 @@ class CppGenerator(Generator):
             "GLsizei length = 0;\n"
             f"{command.name}({call_args_str});\n"
             "result.resize(static_cast<std::size_t>(length));\n"
+            "return result;"
+        )
+        return {
+            "return_type": "std::string",
+            "func_name": func_name,
+            "params_str": params_str,
+            "gl_name": command.name,
+            "body": body,
+        }
+
+    def _scalar_query_overload_context(
+        self, command: Command, scalar_param: CommandParam
+    ) -> dict:
+        """Build an overload that drops a trailing scalar output pointer and returns it.
+
+        Turns ``glGetShaderiv(shader, pname, params)`` into a second
+        ``operator()(Shader shader, ShaderParameterName pname) -> GLint`` that
+        fills a local and returns it, so callers can write
+        ``GLint ok = gl::getShaderiv(shader, ShaderParameterName::eCompileStatus)``
+        without wrangling an out-parameter.
+        """
+        func_name = self._convert_function_name(command.name)
+        overload_params = [p for p in command.params if p is not scalar_param]
+        params_str = ", ".join(self._generate_param_decl(p, command) for p in overload_params)
+
+        call_parts = []
+        for p in command.params:
+            if p is scalar_param:
+                call_parts.append("&result")
+            else:
+                call_parts.append(self._generate_call_arg(p, command))
+        call_args_str = ", ".join(call_parts)
+
+        body = (
+            f"{scalar_param.type} result = 0;\n"
+            f"::{command.name}({call_args_str});\n"
+            "return result;"
+        )
+        return {
+            "return_type": scalar_param.type,
+            "func_name": func_name,
+            "params_str": params_str,
+            "gl_name": command.name,
+            "body": body,
+        }
+
+    def _infolog_selfquery_overload_context(self, command: Command) -> dict:
+        """Build a zero-extra-argument std::string overload for InfoLog commands.
+
+        Generates an overload that keeps only the leading handle parameter and
+        internally queries GL_INFO_LOG_LENGTH via the paired ``glGet*iv``
+        function, sizes an std::string accordingly, and returns it. This is
+        the convenience most callers actually want when diagnosing shader
+        compile / program link failures.
+        """
+        iv_query = _INFOLOG_SELF_QUERY_MAP[command.name]
+        func_name = self._convert_function_name(command.name)
+        handle_param = command.params[0]
+        handle_call = self._generate_call_arg(handle_param, command)
+        params_str = self._generate_param_decl(handle_param, command)
+
+        body = (
+            "GLint length = 0;\n"
+            f"{iv_query}({handle_call}, GL_INFO_LOG_LENGTH, &length);\n"
+            "if (length <= 0) return std::string{};\n"
+            "std::string result(static_cast<std::size_t>(length), '\\0');\n"
+            "GLsizei written = 0;\n"
+            f"::{command.name}({handle_call}, length, &written, &result[0]);\n"
+            "result.resize(static_cast<std::size_t>(written));\n"
             "return result;"
         )
         return {

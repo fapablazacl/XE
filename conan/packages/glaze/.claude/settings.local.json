@@ -52,7 +52,14 @@
       "Bash(python glaze_cli.py generate --api gl 3.3 --lang c --extension-vendors ARB,KHR --output-dir /tmp/glaze_arb_khr)",
       "Read(//tmp/glaze_arb_khr/include/glaze/**)",
       "Bash(python glaze_cli.py generate --api gl 3.3 --lang c --extensions GL_FOO_does_not_exist --output-dir /tmp/glaze_bad)",
-      "Bash(echo \"EXIT: $?\")"
+      "Bash(echo \"EXIT: $?\")",
+      "Bash(python -m glaze_cli gen cpp gl 3.3)",
+      "Bash(python -m glaze_cli generate cpp gl 3.3)",
+      "Bash(python -m glaze_cli generate --api gl 3.3 --lang cpp)",
+      "Bash(python3:*)",
+      "Bash(python:*)",
+      "Bash(PYTHONIOENCODING=utf-8 python)",
+      "Bash(grep -E \"return|{$\")"
     ]
   }
 }
