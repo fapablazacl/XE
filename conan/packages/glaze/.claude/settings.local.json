@@ -42,7 +42,10 @@
       "Bash(python -m ruff check glaze/ tests/test_string_utils.py tests/test_c_generator.py tests/test_cpp_generator.py tests/test_model.py tests/test_parser.py)",
       "Bash(python -m ruff format --check glaze/ tests/test_string_utils.py tests/test_c_generator.py tests/test_cpp_generator.py tests/test_model.py)",
       "Bash(python -m ruff check glaze/ tests/test_string_utils.py tests/test_c_generator.py tests/test_cpp_generator.py tests/test_parser.py)",
-      "Bash(python -m ruff format glaze/generators/cpp_generator.py tests/test_c_generator.py tests/test_cpp_generator.py tests/test_model.py)"
+      "Bash(python -m ruff format glaze/generators/cpp_generator.py tests/test_c_generator.py tests/test_cpp_generator.py tests/test_model.py)",
+      "Bash(conan create:*)",
+      "Bash(python glaze_cli.py generate --api gl 3.3 --lang c --output-dir /tmp/glaze_test)",
+      "Bash(pytest tests/ -x -q)"
     ]
   }
 }

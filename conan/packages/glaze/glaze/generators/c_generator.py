@@ -24,21 +24,36 @@ class CGenerator(Generator):
     def generate(self, api: str, version: str) -> dict[str, str]:
         self._check_api_version(api, version)
         features = self.registry.collect_features(api, version)
-        type_name_set = self._collect_param_types(features)
+        ext_emissions = self._collect_extension_emissions(api, version)
+        type_name_set = self._collect_param_types(features, ext_emissions)
 
         return {
             f"include/glaze/{api}.h": self._render_template(
-                "c/gl.h.j2", self._header_context(features, type_name_set, api, version)
+                "c/gl.h.j2",
+                self._header_context(features, ext_emissions, type_name_set, api, version),
             ),
             f"src/{api}.c": self._render_template(
-                "c/gl.c.j2", self._source_context(features, api, version)
+                "c/gl.c.j2", self._source_context(features, ext_emissions, api, version)
             ),
         }
 
     # ------------------------------------------------------- type collection
 
-    def _collect_param_types(self, features: list[Feature]) -> set:
-        """Collect the set of GL type names used by command parameters and return types."""
+    def _collect_command_types(self, command: Command, type_name_set: set) -> None:
+        """Add the GL type names referenced by a command's return type and parameters."""
+        if command.return_type.name not in ("void",):
+            type_name_set.add(command.return_type.name)
+        for param in command.params:
+            if param.data_type is not None:
+                type_name_set.add(param.data_type)
+
+    def _collect_param_types(self, features: list[Feature], ext_emissions: list[dict]) -> set:
+        """Collect the set of GL type names used by command parameters and return types.
+
+        Walks both core features and the extension emissions so extension-only
+        commands (e.g. ``glUniform3ui64NV`` referencing ``GLuint64EXT``) get the
+        typedefs they need declared in ``gl.h``.
+        """
         type_name_set: set = set()
         for feature in features:
             for require in feature.require_list:
@@ -46,17 +61,21 @@ class CGenerator(Generator):
                     command = self.registry.command_by_name.get(command_ref.name)
                     if command is None:
                         continue
-                    if command.return_type.name not in ("void",):
-                        type_name_set.add(command.return_type.name)
-                    for param in command.params:
-                        if param.data_type is not None:
-                            type_name_set.add(param.data_type)
+                    self._collect_command_types(command, type_name_set)
+        for ext in ext_emissions:
+            for command in ext["commands"]:
+                self._collect_command_types(command, type_name_set)
         return type_name_set
 
     # --------------------------------------------------------------- contexts
 
     def _header_context(
-        self, features: list[Feature], type_name_set: set, api: str, version: str
+        self,
+        features: list[Feature],
+        ext_emissions: list[dict],
+        type_name_set: set,
+        api: str,
+        version: str,
     ) -> dict:
         # Collect all required type names: from command params/returns and <require><type> entries
         all_type_names: set = set(type_name_set)
@@ -102,7 +121,7 @@ class CGenerator(Generator):
             )
 
         # Extension declarations (deduped against the consolidated core set).
-        extension_list = self._build_extension_header_list(api, version)
+        extension_list = self._build_extension_header_list(ext_emissions)
 
         return {
             "types": types,
@@ -113,7 +132,9 @@ class CGenerator(Generator):
             "generation_header": self._generation_header(api, version, "C"),
         }
 
-    def _source_context(self, features: list[Feature], api: str, version: str) -> dict:
+    def _source_context(
+        self, features: list[Feature], ext_emissions: list[dict], api: str, version: str
+    ) -> dict:
         feature_list = []
         loader_feature_list = []
         debug_wrapper_features = []
@@ -161,7 +182,7 @@ class CGenerator(Generator):
                 }
             )
 
-        extension_list = self._build_extension_source_list(api, version)
+        extension_list = self._build_extension_source_list(ext_emissions)
 
         return {
             "features": feature_list,
@@ -200,9 +221,8 @@ class CGenerator(Generator):
             "doc_params": doc.params if doc else {},
         }
 
-    def _build_extension_header_list(self, api: str, version: str) -> list[dict]:
-        """Wrap ``_collect_extension_emissions`` for the C header template."""
-        emissions = self._collect_extension_emissions(api, version)
+    def _build_extension_header_list(self, emissions: list[dict]) -> list[dict]:
+        """Convert extension emissions into the dicts consumed by ``gl.h.j2``."""
         result: list[dict] = []
         for ext in emissions:
             enums = [{"name": e.name, "value": e.value} for e in ext["enums"]]
@@ -223,9 +243,8 @@ class CGenerator(Generator):
             )
         return result
 
-    def _build_extension_source_list(self, api: str, version: str) -> list[dict]:
-        """Wrap ``_collect_extension_emissions`` for the C source template."""
-        emissions = self._collect_extension_emissions(api, version)
+    def _build_extension_source_list(self, emissions: list[dict]) -> list[dict]:
+        """Convert extension emissions into the dicts consumed by ``gl.c.j2``."""
         result: list[dict] = []
         for ext in emissions:
             definitions = []
