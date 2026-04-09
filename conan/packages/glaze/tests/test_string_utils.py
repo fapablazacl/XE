@@ -2,7 +2,7 @@
 
 import pytest
 
-from glaze.utils.string_utils import camel_case, is_capitalized, split_capitalized
+from glaze.utils.string_utils import camel_case, is_capitalized, split_capitalized, version_to_int
 
 
 @pytest.mark.parametrize(
@@ -47,3 +47,23 @@ def test_split_capitalized(value: str, expected: list[str]) -> None:
 )
 def test_camel_case(value: str, expected: str) -> None:
     assert camel_case(value) == expected
+
+
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("1.0", 10),
+        ("1.5", 15),
+        ("2.0", 20),
+        ("3.3", 33),
+        ("4.6", 46),
+    ],
+)
+def test_version_to_int(value: str, expected: int) -> None:
+    assert version_to_int(value) == expected
+
+
+@pytest.mark.parametrize("value", ["", "1", "1.2.3", "x.y", "1.x"])
+def test_version_to_int_rejects_malformed(value: str) -> None:
+    with pytest.raises(ValueError):
+        version_to_int(value)

@@ -45,3 +45,17 @@ def split_capitalized(value: str) -> list[str]:
 
 def camel_case(class_name: str) -> str:
     return "".join([item.title() for item in class_name.split(" ")])
+
+
+def version_to_int(version: str) -> int:
+    """Encode a "MAJOR.MINOR" GL version string as MAJOR*10 + MINOR.
+
+    e.g. "1.0" -> 10, "3.3" -> 33, "4.6" -> 46. Matches the convention used by
+    glcorearb.h-style ``GL_VERSION_X_Y`` macros and the GLAD loader. Raises
+    ``ValueError`` on malformed input.
+    """
+    parts = version.split(".")
+    if len(parts) != 2:
+        raise ValueError(f"version must be 'MAJOR.MINOR', got {version!r}")
+    major, minor = parts
+    return int(major) * 10 + int(minor)

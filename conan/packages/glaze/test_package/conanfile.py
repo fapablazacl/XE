@@ -28,3 +28,8 @@ class GlazeTestConan(ConanFile):
                     cmd = os.path.join(self.cpp.build.bindir, name)
                     if os.path.isfile(cmd) or os.path.isfile(cmd + ".exe"):
                         self.run(cmd, env="conanrun")
+
+            # API-agnostic smoke test for glaze::Unique / Shared / Weak.
+            raii_cmd = os.path.join(self.cpp.build.bindir, "test_raii")
+            if os.path.isfile(raii_cmd) or os.path.isfile(raii_cmd + ".exe"):
+                self.run(raii_cmd, env="conanrun")

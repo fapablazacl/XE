@@ -22,6 +22,8 @@ class GlazeConan(ConanFile):
     options = {
         "apis": ["ANY"],
         "language": ["c", "cpp", "both"],
+        "extension_vendors": ["ANY"],
+        "extensions": ["ANY"],
         "shared": [True, False],
         "fPIC": [True, False],
         "with_docs": [True, False],
@@ -30,6 +32,8 @@ class GlazeConan(ConanFile):
     default_options = {
         "apis": "gl:3.3,gl_compat:4.6,gles1:1.0,gles2:3.2,glsc2:2.0",
         "language": "cpp",
+        "extension_vendors": "",
+        "extensions": "",
         "shared": False,
         "fPIC": True,
         "with_docs": True,
@@ -99,12 +103,19 @@ class GlazeConan(ConanFile):
         if self.options.with_docs and os.path.isdir(refpages_dir):
             refpages_args = ["--refpages", refpages_dir]
 
+        ext_vendor_args = []
+        if str(self.options.extension_vendors).strip():
+            ext_vendor_args = ["--extension-vendors", str(self.options.extension_vendors)]
+        ext_name_args = []
+        if str(self.options.extensions).strip():
+            ext_name_args = ["--extensions", str(self.options.extensions)]
+
         cmd = [
             self.get_python(),
             os.path.join(self.source_folder, "glaze_cli.py"),
             "generate",
             "--output-dir", out_dir
-        ] + langs_args + refpages_args
+        ] + langs_args + refpages_args + ext_vendor_args + ext_name_args
 
         for api_item in api_list:
             parts = api_item.split(":")
@@ -154,8 +165,10 @@ class GlazeConan(ConanFile):
     def package(self):
         out_dir = os.path.join(self.build_folder, "generated")
         copy(self, "*.h", src=os.path.join(out_dir, "include"), dst=os.path.join(self.package_folder, "include"))
+        # The static raii.hpp is written into out_dir/include/glaze/ by
+        # CppGenerator.generate(), so the *.hpp glob picks it up automatically.
         copy(self, "*.hpp", src=os.path.join(out_dir, "include"), dst=os.path.join(self.package_folder, "include"))
-            
+
         # Always package the C library — the C++ API depends on C function pointers
         if self.options.language in ("c", "cpp", "both"):
             copy(self, "*.a", src=self.build_folder, dst=os.path.join(self.package_folder, "lib"), keep_path=False)
@@ -164,16 +177,47 @@ class GlazeConan(ConanFile):
             copy(self, "*.dylib", src=self.build_folder, dst=os.path.join(self.package_folder, "lib"), keep_path=False)
             copy(self, "*.dll", src=self.build_folder, dst=os.path.join(self.package_folder, "bin"), keep_path=False)
 
+        # Ship the Python generator sources alongside the package so downstream
+        # tool_requires consumers (e.g. the `glazed` package) can run glaze_cli.py
+        # without re-cloning this repo. Purely additive — no existing consumer
+        # touches share/glaze/.
+        share_dst = os.path.join(self.package_folder, "share", "glaze")
+        copy(self, "glaze_cli.py", src=self.source_folder, dst=share_dst)
+        copy(self, "pyproject.toml", src=self.source_folder, dst=share_dst)
+        copy(self, "*.py", src=os.path.join(self.source_folder, "glaze"),
+             dst=os.path.join(share_dst, "glaze"))
+        copy(self, "*.j2", src=os.path.join(self.source_folder, "glaze"),
+             dst=os.path.join(share_dst, "glaze"))
+        copy(self, "*.hpp", src=os.path.join(self.source_folder, "glaze"),
+             dst=os.path.join(share_dst, "glaze"))
+
     def package_info(self):
         self.cpp_info.set_property("cmake_file_name", "glaze")
         api_list = [api.strip() for api in str(self.options.apis).split(",") if api.strip()]
-        
+
+        # Expose the path to the shipped Python generator sources so downstream
+        # `tool_requires("glaze/...")` consumers can locate glaze_cli.py without
+        # having to know the package layout.
+        share_dir = os.path.join(self.package_folder, "share", "glaze")
+        self.conf_info.define("user.glaze:source_dir", share_dir)
+        self.conf_info.define("user.glaze:cli_path", os.path.join(share_dir, "glaze_cli.py"))
+
+        # Top-level header-only component for the API-agnostic glaze::Unique /
+        # Shared / Weak templates. Downstream users who only want the smart
+        # pointers (e.g. with their own handle types) link this directly.
+        if self.options.language in ("cpp", "both"):
+            raii = self.cpp_info.components["raii"]
+            raii.set_property("cmake_target_name", "glaze::raii")
+            raii.includedirs = ["include"]
+            raii.bindirs = []
+            raii.libdirs = []
+
         for api_item in api_list:
             api_name = api_item.split(":")[0]
             comp = self.cpp_info.components[api_name]
             comp.set_property("cmake_target_name", f"glaze::{api_name}")
             comp.includedirs = ["include"]
-            
+
             # Always provide the C library — the C++ API depends on C function pointers
             if self.options.language in ("c", "cpp", "both"):
                 comp.libs = [f"glaze_{api_name}"]
@@ -182,3 +226,12 @@ class GlazeConan(ConanFile):
             else:
                 comp.bindirs = []
                 comp.libdirs = []
+
+            # Header-only enriched-handle wrappers for legacy commands.
+            if self.options.language in ("cpp", "both"):
+                hwrap = self.cpp_info.components[f"{api_name}_handle"]
+                hwrap.set_property("cmake_target_name", f"glaze::{api_name}_handle")
+                hwrap.includedirs = ["include"]
+                hwrap.bindirs = []
+                hwrap.libdirs = []
+                hwrap.requires = [api_name]

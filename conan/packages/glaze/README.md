@@ -7,6 +7,8 @@ It supports the following OpenGL versions:
 - OpenGL Compat (1.0, 1.1, 1.2, 1.3, 1.4, 2.0, 2.1, 3.0, 3.1, 3.2, 3.3, 4.0, 4.1, 4.2, 4.3, 4.4, 4.5, 4.6) — compatibility profile, keeps deprecated symbols removed in core
 - OpenGL ES (1.0, 1.1, 2.0, 3.0, 3.1, 3.2)
 
+Extension generation is **opt-in**. Use `--extension-vendors` to include all extensions from specific vendors (e.g. `ARB,KHR,EXT`) and/or `--extensions` to include individual extensions by name. The two options are additive. If neither is specified, only the core API is generated.
+
 ## Design goals (relevant when extending the generator)
 
 - **Generated code** must have zero runtime overhead (inline functions in C++), no external dependencies, and catch errors at build time via `enum class` and strong typedefs.

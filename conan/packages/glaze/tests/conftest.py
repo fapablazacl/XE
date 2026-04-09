@@ -38,6 +38,11 @@ MINI_XML = """\
     <enum value="0x1406" name="GL_FLOAT"/>
   </enums>
 
+  <enums namespace="GL" group="QueryTarget" type="enum">
+    <enum value="0x8914" name="GL_SAMPLES_PASSED" group="QueryTarget"/>
+    <enum value="0x8C2F" name="GL_ANY_SAMPLES_PASSED" group="QueryTarget"/>
+  </enums>
+
   <commands namespace="GL">
     <command>
       <proto>void <name>glClear</name></proto>
@@ -66,8 +71,30 @@ MINI_XML = """\
       <proto><ptype>GLuint</ptype> <name>glCreateProgram</name></proto>
     </command>
     <command>
+      <proto>void <name>glDeleteProgram</name></proto>
+      <param class="program"><ptype>GLuint</ptype> <name>program</name></param>
+    </command>
+    <command>
       <proto><ptype>GLuint</ptype> <name>glCreateShader</name></proto>
       <param><ptype>GLenum</ptype> <name>type</name></param>
+    </command>
+    <command>
+      <proto>void <name>glDeleteShader</name></proto>
+      <param class="shader"><ptype>GLuint</ptype> <name>shader</name></param>
+    </command>
+    <command>
+      <proto>void <name>glLinkProgram</name></proto>
+      <param class="program"><ptype>GLuint</ptype> <name>program</name></param>
+    </command>
+    <command>
+      <proto><ptype>GLint</ptype> <name>glGetUniformLocation</name></proto>
+      <param class="program"><ptype>GLuint</ptype> <name>program</name></param>
+      <param>const <ptype>GLchar</ptype> *<name>name</name></param>
+    </command>
+    <command>
+      <proto>void <name>glAttachShader</name></proto>
+      <param class="program"><ptype>GLuint</ptype> <name>program</name></param>
+      <param class="shader"><ptype>GLuint</ptype> <name>shader</name></param>
     </command>
     <command>
       <proto>void <name>glNamedBufferData</name></proto>
@@ -82,6 +109,24 @@ MINI_XML = """\
       <param><ptype>GLsizei</ptype> <name>offset</name></param>
       <param><ptype>GLsizei</ptype> <name>size</name></param>
       <param>const void *<name>data</name></param>
+    </command>
+    <command>
+      <proto>void <name>glCreateQueries</name></proto>
+      <param group="QueryTarget"><ptype>GLenum</ptype> <name>target</name></param>
+      <param><ptype>GLsizei</ptype> <name>n</name></param>
+      <param class="query"><ptype>GLuint</ptype> *<name>ids</name></param>
+    </command>
+    <command>
+      <proto>void <name>glDeleteQueries</name></proto>
+      <param><ptype>GLsizei</ptype> <name>n</name></param>
+      <param class="query">const <ptype>GLuint</ptype> *<name>ids</name></param>
+    </command>
+    <command>
+      <proto>void <name>glDrawArraysInstancedARB</name></proto>
+      <param><ptype>GLenum</ptype> <name>mode</name></param>
+      <param><ptype>GLint</ptype> <name>first</name></param>
+      <param><ptype>GLsizei</ptype> <name>count</name></param>
+      <param><ptype>GLsizei</ptype> <name>primcount</name></param>
     </command>
   </commands>
 
@@ -110,7 +155,12 @@ MINI_XML = """\
   <feature api="gl" name="GL_VERSION_2_0" number="2.0">
     <require>
       <command name="glCreateProgram"/>
+      <command name="glDeleteProgram"/>
       <command name="glCreateShader"/>
+      <command name="glDeleteShader"/>
+      <command name="glLinkProgram"/>
+      <command name="glGetUniformLocation"/>
+      <command name="glAttachShader"/>
     </require>
   </feature>
 
@@ -124,8 +174,12 @@ MINI_XML = """\
 
   <feature api="gl" name="GL_VERSION_4_5" number="4.5">
     <require>
+      <enum name="GL_SAMPLES_PASSED"/>
+      <enum name="GL_ANY_SAMPLES_PASSED"/>
       <command name="glNamedBufferData"/>
       <command name="glNamedBufferSubData"/>
+      <command name="glCreateQueries"/>
+      <command name="glDeleteQueries"/>
     </require>
   </feature>
 
@@ -136,10 +190,38 @@ MINI_XML = """\
     </require>
   </feature>
 
+  <commands namespace="GL">
+    <command>
+      <proto>void <name>glMakeBufferResidentNV</name></proto>
+      <param group="BufferTargetARB"><ptype>GLenum</ptype> <name>target</name></param>
+      <param><ptype>GLenum</ptype> <name>access</name></param>
+    </command>
+    <command>
+      <proto>void <name>glDebugMessageCallbackKHR</name></proto>
+      <param><ptype>GLenum</ptype> <name>source</name></param>
+      <param><ptype>GLuint</ptype> <name>id</name></param>
+    </command>
+  </commands>
+
   <extensions>
     <extension name="GL_ARB_buffer_storage" supported="gl|gles2">
       <require>
         <enum name="GL_ARRAY_BUFFER"/>
+      </require>
+    </extension>
+    <extension name="GL_ARB_draw_instanced" supported="gl">
+      <require>
+        <command name="glDrawArraysInstancedARB"/>
+      </require>
+    </extension>
+    <extension name="GL_NV_shader_buffer_load" supported="gl">
+      <require>
+        <command name="glMakeBufferResidentNV"/>
+      </require>
+    </extension>
+    <extension name="GL_KHR_debug" supported="gl|gles2">
+      <require>
+        <command name="glDebugMessageCallbackKHR"/>
       </require>
     </extension>
   </extensions>

@@ -43,3 +43,10 @@ if (TARGET glaze::glsc2)
         target_link_libraries(test_glsc2 PRIVATE glaze::glsc2)
     endif()
 endif()
+
+# Single api-agnostic smoke test for the static glaze::Unique / Shared / Weak
+# templates. Linked against the header-only glaze::raii component.
+if (TARGET glaze::raii)
+    add_executable(test_raii test_raii.cpp)
+    target_link_libraries(test_raii PRIVATE glaze::raii)
+endif()

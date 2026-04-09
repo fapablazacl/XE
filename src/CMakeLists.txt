@@ -29,3 +29,4 @@ endif()
 
 add_subdirectory("apostate")
 add_subdirectory("capybaria")
+add_subdirectory("xe-glaze-test")

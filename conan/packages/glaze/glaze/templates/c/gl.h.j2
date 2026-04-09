@@ -15,6 +15,10 @@
 #define __{{ api }}_h_
 #define __{{ api | upper }}_H__
 
+#ifndef GLAZE_GL_VERSION
+#  define GLAZE_GL_VERSION {{ version_floor_int }}
+#endif
+
 #if defined(_WIN32)
   #define GLCALLCONV __stdcall
   #if defined(GLAZE_BUILD_DLL)
@@ -49,6 +53,8 @@ GLAZE_API void glazeSetPostCallback(GLAZE_CALLBACK callback);
 {% endfor %}
 
 {% for feature in features %}
+#if GLAZE_GL_VERSION >= {{ feature.version_int }}
+#define GL_VERSION_{{ feature.version_major }}_{{ feature.version_minor }} 1
 /* {{ feature.name }} definitions */
 {% for enum in feature.enums %}
 #define {{ enum.name }} {{ enum.value }}
@@ -71,7 +77,47 @@ GLAZE_API void glazeSetPostCallback(GLAZE_CALLBACK callback);
 #endif
 
 {% endfor %}
+#endif /* GLAZE_GL_VERSION >= {{ feature.version_int }} */
+
 {% endfor %}
+
+/* ── Extension declarations ──────────────────────────────────────────────── */
+#ifndef GLAZE_GL_NO_EXTENSIONS
+
+GLAZE_API void glazeLoadExtensions(GLAZE_GETPROCADDRESS getProcAddress);
+GLAZE_API int  glazeHasExtension(const char *name);
+GLAZE_API int  glazeIsVersionSupported(int major, int minor);
+
+{% for ext in extensions %}
+#ifndef {{ ext.guard_macro }}
+#define {{ ext.khronos_define }} 1
+GLAZE_API extern int {{ ext.flag_var }};
+{% for enum in ext.enums %}
+#ifndef {{ enum.name }}
+#define {{ enum.name }} {{ enum.value }}
+#endif
+{% endfor %}
+{% for cmd in ext.commands %}
+{% if cmd.doc_brief %}
+/** @brief {{ cmd.doc_brief }}
+{% for pname, pdesc in cmd.doc_params.items() %}
+ *  @param {{ pname }} {{ pdesc }}
+{% endfor %}
+ */
+{% endif %}
+{{ cmd.typedef }}
+{{ cmd.extern_raw }}
+#if defined(GLAZE_DEBUG)
+{{ cmd.debug_decl }}
+{{ cmd.debug_alias }}
+#else
+{{ cmd.release_alias }}
+#endif
+{% endfor %}
+#endif /* {{ ext.guard_macro }} */
+
+{% endfor %}
+#endif /* GLAZE_GL_NO_EXTENSIONS */
 
 #if defined(__cplusplus)
 }
