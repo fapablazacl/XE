@@ -29,6 +29,21 @@ target_sources(${target} INTERFACE FILE_SET HEADERS BASE_DIRS "src" FILES ${head
 target_include_directories(${target} INTERFACE "src")
 target_link_libraries(${target} INTERFACE xe::interface)
 
-if (XE_DEV_UNIT_TEST)
-    add_subdirectory("test")
+if (XE_DEV_DOCS)
+    find_package(Doxygen REQUIRED)
+
+    set (XE_MATH_DOXYFILE_IN  "${CMAKE_CURRENT_SOURCE_DIR}/docs/Doxyfile.in")
+    set (XE_MATH_DOXYFILE_OUT "${CMAKE_CURRENT_BINARY_DIR}/docs/Doxyfile")
+
+    configure_file(${XE_MATH_DOXYFILE_IN} ${XE_MATH_DOXYFILE_OUT} @ONLY)
+
+    add_custom_target(xe-math-docs
+        COMMAND ${DOXYGEN_EXECUTABLE} ${XE_MATH_DOXYFILE_OUT}
+        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+        COMMENT "Generating xe-math Doxygen documentation"
+        VERBATIM)
+
+    if (TARGET docs)
+        add_dependencies(docs xe-math-docs)
+    endif()
 endif()

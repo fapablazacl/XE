@@ -13,6 +13,7 @@ option (XE_DEV_WARNINGS_AS_ERRORS   "Marks all warnings as errors" OFF)
 option (XE_DEV_INSTRUMENT_COVERAGE  "Instrument code for code coverage reporting during unit tests" OFF)
 option (XE_DEV_PRECOMPILED_HEADERS  "Enable precompiled headers for internal libraries, to improve build times" OFF)
 option (XE_DEV_SANITIZER_ENABLE     "Enable sanitizer usage" OFF)
+option (XE_DEV_DOCS                 "Generate Doxygen documentation for the engine libraries" OFF)
 
 # Which sanitizer to use
 set (XE_DEV_SANITIZER "" CACHE STRING "")
@@ -96,6 +97,12 @@ endif()
 if (XE_DEV_SANITIZER_ENABLE)
     target_compile_options(${target} INTERFACE -fsanitize=${XE_DEV_SANITIZER})
     target_link_options(${target} INTERFACE -fsanitize=${XE_DEV_SANITIZER})
+endif()
+
+if (XE_DEV_DOCS)
+    # Aggregator target. Each library that wants documentation generated
+    # appends its own custom target to this one via add_dependencies().
+    add_custom_target(docs)
 endif()
 
 add_subdirectory ("src")

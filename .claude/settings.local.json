@@ -56,7 +56,8 @@
       "Bash(ctest --test-dir build --output-on-failure -R xe-math -C Debug)",
       "Bash(ctest --test-dir build -C Debug -N)",
       "Bash(ctest --test-dir build -C Debug)",
-      "Bash(ctest --test-dir build -C Debug --rerun-failed --output-on-failure)"
+      "Bash(ctest --test-dir build -C Debug --rerun-failed --output-on-failure)",
+      "Bash(ls:*)"
     ]
   }
 }
