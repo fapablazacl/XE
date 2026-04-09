@@ -3,17 +3,58 @@ from typing import ClassVar
 from glaze.doc_parser import FunctionDoc
 from glaze.generators.base import Generator
 from glaze.model import Command, CommandParam, ConsolidatedRequire, Enum, Registry
-from glaze.utils.string_utils import split_capitalized
+from glaze.utils.string_utils import split_capitalized, version_to_int
 
-_CPP_KEYWORDS: frozenset = frozenset({
-    "delete", "new", "class", "template", "operator", "return",
-    "switch", "case", "default", "break", "continue", "if", "else",
-    "for", "while", "do", "void", "int", "float", "double", "bool",
-    "char", "namespace", "using", "static", "const", "virtual",
-    "public", "private", "protected", "struct", "enum", "union",
-    "typedef", "extern", "inline", "volatile", "register", "auto",
-    "throw", "try", "catch", "this", "sizeof", "true", "false",
-})
+_CPP_KEYWORDS: frozenset = frozenset(
+    {
+        "delete",
+        "new",
+        "class",
+        "template",
+        "operator",
+        "return",
+        "switch",
+        "case",
+        "default",
+        "break",
+        "continue",
+        "if",
+        "else",
+        "for",
+        "while",
+        "do",
+        "void",
+        "int",
+        "float",
+        "double",
+        "bool",
+        "char",
+        "namespace",
+        "using",
+        "static",
+        "const",
+        "virtual",
+        "public",
+        "private",
+        "protected",
+        "struct",
+        "enum",
+        "union",
+        "typedef",
+        "extern",
+        "inline",
+        "volatile",
+        "register",
+        "auto",
+        "throw",
+        "try",
+        "catch",
+        "this",
+        "sizeof",
+        "true",
+        "false",
+    }
+)
 
 
 def _to_handle_name(class_str: str) -> str:
@@ -75,12 +116,7 @@ def _find_object_deletion_params(
     for param in command.params:
         if param.type == "GLsizei" and not param.is_pointer:
             count_param = param
-        if (
-            param.type == "GLuint"
-            and param.is_pointer
-            and param.is_const
-            and param.class_
-        ):
+        if param.type == "GLuint" and param.is_pointer and param.is_const and param.class_:
             input_param = param
     if count_param and input_param:
         return count_param, input_param
@@ -98,12 +134,7 @@ def _find_object_creation_params(
     for param in command.params:
         if param.type == "GLsizei" and not param.is_pointer:
             count_param = param
-        if (
-            param.type == "GLuint"
-            and param.is_pointer
-            and not param.is_const
-            and param.class_
-        ):
+        if param.type == "GLuint" and param.is_pointer and not param.is_const and param.class_:
             output_param = param
     if count_param and output_param:
         return count_param, output_param
@@ -369,13 +400,22 @@ class CppGenerator(Generator):
         functors = self._build_functors(functions, api, cmd_version_map)
 
         # Build DSA object classes
-        dsa_classes = self._build_dsa_classes(consolidated, api)
+        dsa_classes = self._build_dsa_classes(consolidated, api, cmd_version_map)
 
         # Build enriched-handle wrapper classes (legacy non-DSA companion)
-        handle_classes = self._build_handle_classes(consolidated, api)
+        handle_classes = self._build_handle_classes(consolidated, api, cmd_version_map)
 
         # Build RAII smart-pointer resource list
         raii_resources = self._collect_raii_resources(consolidated)
+        # Annotate each resource with the GL version at which both creator and
+        # deleter become available — used to gate HandleTraits and Traits
+        # specializations behind #if GLAZE_GL_VERSION >= NN.
+        for r in raii_resources:
+            gen_ver = cmd_version_map.get(r["gen_gl_name"])
+            del_ver = cmd_version_map.get(r["delete_gl_name"])
+            gen_int = version_to_int(gen_ver) if gen_ver else 0
+            del_int = version_to_int(del_ver) if del_ver else 0
+            r["version_int"] = max(gen_int, del_int)
 
         # Bridge per-resource creator/deleter pairs to the wrapper classes that
         # exist in each family (DSA and legacy "handle::"). The result feeds the
@@ -389,6 +429,7 @@ class CppGenerator(Generator):
                 "class_name": dsa_proxy_map[r["handle_type"]],
                 "gen_func_name": r["gen_func_name"],
                 "delete_func_name": r["delete_func_name"],
+                "version_int": r["version_int"],
             }
             for r in raii_resources
             if r["handle_type"] in dsa_proxy_map
@@ -399,11 +440,16 @@ class CppGenerator(Generator):
                 "class_name": handle_proxy_map[r["handle_type"]],
                 "gen_func_name": r["gen_func_name"],
                 "delete_func_name": r["delete_func_name"],
+                "version_int": r["version_int"],
             }
             for r in raii_resources
             if r["handle_type"] in handle_proxy_map
         ]
 
+        # Note: GLAZE_GL_VERSION and the GL_VERSION_X_Y feature macros are
+        # emitted by the C header (`{api}.h`), which `gl.hpp` already includes.
+        # The C++ template just `#if`-gates against the macros that are already
+        # in scope, so no extra context is needed for the version gating itself.
         hpp_name = f"include/glaze/{api}.hpp"
         handle_name = f"include/glaze/{api}_handle.hpp"
         context = {
@@ -508,16 +554,18 @@ class CppGenerator(Generator):
             # aliases, even when the handle type itself was Id-suffixed to avoid
             # collisions with enum class names.
             alias = _to_handle_name(cls)
-            resources.append({
-                "alias": alias,
-                "handle_type": self._handle_classes[cls],
-                "gen_gl_name": create_cmd.name,
-                "gen_func_name": gen_func_name,
-                "creator_struct": _functor_struct_name(gen_func_name),
-                "delete_gl_name": delete_cmd.name,
-                "delete_func_name": delete_func_name,
-                "deleter_struct": _functor_struct_name(delete_func_name),
-            })
+            resources.append(
+                {
+                    "alias": alias,
+                    "handle_type": self._handle_classes[cls],
+                    "gen_gl_name": create_cmd.name,
+                    "gen_func_name": gen_func_name,
+                    "creator_struct": _functor_struct_name(gen_func_name),
+                    "delete_gl_name": delete_cmd.name,
+                    "delete_func_name": delete_func_name,
+                    "deleter_struct": _functor_struct_name(delete_func_name),
+                }
+            )
         return resources
 
     # --------------------------------------------------------------- functors
@@ -534,7 +582,9 @@ class CppGenerator(Generator):
                 gl_name = fn["gl_name"]
                 ver = cmd_version_map.get(gl_name)
                 ver_tag = f" [{api.upper()} {ver}]" if ver else ""
-                doc_brief = f"{doc.brief}{ver_tag}" if doc else (ver_tag.strip() if ver_tag else None)
+                doc_brief = (
+                    f"{doc.brief}{ver_tag}" if doc else (ver_tag.strip() if ver_tag else None)
+                )
                 seen[fname] = {
                     "struct_name": struct_name,
                     "func_name": fname,
@@ -542,6 +592,7 @@ class CppGenerator(Generator):
                     "overloads": [],
                     "doc_brief": doc_brief,
                     "doc_params": doc.params if doc else {},
+                    "version_int": version_to_int(ver) if ver else 0,
                 }
                 order.append(fname)
             seen[fname]["overloads"].append(
@@ -557,7 +608,9 @@ class CppGenerator(Generator):
 
     # ------------------------------------------------------------ DSA classes
 
-    def _build_dsa_classes(self, consolidated: object, api: str) -> list:
+    def _build_dsa_classes(
+        self, consolidated: object, api: str, cmd_version_map: dict[str, str]
+    ) -> list:
         """Build context dicts for DSA wrapper classes from object_dict."""
         dsa_classes = []
         for class_str in sorted(self.registry.object_dict):
@@ -581,27 +634,33 @@ class CppGenerator(Generator):
                 params_str = ", ".join(
                     self._generate_dsa_param_decl(p, cmd, api) for p in method_params
                 )
-                call_args = ["m_id.id"] + [
-                    self._generate_call_arg(p, cmd) for p in method_params
-                ]
+                call_args = ["m_id.id"] + [self._generate_call_arg(p, cmd) for p in method_params]
                 call_args_str = ", ".join(call_args)
                 return_type_str = cmd.return_type_str or cmd.return_type.to_c_string()
-                methods.append({
-                    "name": method_name,
-                    "return_type": return_type_str,
-                    "params_str": params_str,
-                    "gl_name": cmd.name,
-                    "call_args_str": call_args_str,
-                })
+                ver = cmd_version_map.get(cmd.name)
+                methods.append(
+                    {
+                        "name": method_name,
+                        "return_type": return_type_str,
+                        "params_str": params_str,
+                        "gl_name": cmd.name,
+                        "call_args_str": call_args_str,
+                        "version_int": version_to_int(ver) if ver else 0,
+                    }
+                )
 
-            dsa_classes.append({
-                "class_name": class_name,
-                "handle_type": handle_name,
-                "methods": methods,
-            })
+            dsa_classes.append(
+                {
+                    "class_name": class_name,
+                    "handle_type": handle_name,
+                    "methods": methods,
+                }
+            )
         return dsa_classes
 
-    def _build_handle_classes(self, consolidated: ConsolidatedRequire, api: str) -> list:
+    def _build_handle_classes(
+        self, consolidated: ConsolidatedRequire, api: str, cmd_version_map: dict[str, str]
+    ) -> list:
         """Build context dicts for the enriched-handle wrapper classes.
 
         Same shape as `_build_dsa_classes` but excludes DSA (Named*) commands and
@@ -617,7 +676,8 @@ class CppGenerator(Generator):
             class_name = _to_handle_name(class_str)
             commands = self.registry.object_dict[class_str]
             filtered = [
-                cmd for cmd in commands
+                cmd
+                for cmd in commands
                 if cmd.name in consolidated.commands and "Named" not in cmd.name
             ]
             if not filtered:
@@ -647,20 +707,26 @@ class CppGenerator(Generator):
                 # `.id`/`.loc`/cast extraction internally.
                 forwarded = ", ".join(["m_id"] + [p.name for p in method_params])
 
-                methods.append({
-                    "name": method_name,
-                    "return_type": return_type,
-                    "params_str": params_str,
-                    "functor_name": functor_name,
-                    "gl_name": cmd.name,
-                    "call_args_str": forwarded,
-                })
+                ver = cmd_version_map.get(cmd.name)
+                methods.append(
+                    {
+                        "name": method_name,
+                        "return_type": return_type,
+                        "params_str": params_str,
+                        "functor_name": functor_name,
+                        "gl_name": cmd.name,
+                        "call_args_str": forwarded,
+                        "version_int": version_to_int(ver) if ver else 0,
+                    }
+                )
 
-            handle_classes.append({
-                "class_name": class_name,
-                "handle_type": handle_name,
-                "methods": methods,
-            })
+            handle_classes.append(
+                {
+                    "class_name": class_name,
+                    "handle_type": handle_name,
+                    "methods": methods,
+                }
+            )
         return handle_classes
 
     def _dsa_method_name(self, gl_name: str, class_str: str) -> str:
@@ -678,7 +744,7 @@ class CppGenerator(Generator):
         # Remove class name (capitalized words)
         class_camel = _to_handle_name(class_str)
         if name.startswith(class_camel):
-            name = name[len(class_camel):]
+            name = name[len(class_camel) :]
         elif class_camel in name:
             name = name.replace(class_camel, "", 1)
         # Lowercase first letter
@@ -704,7 +770,12 @@ class CppGenerator(Generator):
                 seen_names.add(name)
                 entries.append({"name": name, "value": e.name})
         is_bitmask = group_name in self.registry.bitmask_groups
-        return {"group_name": clean_name, "base_type": base_type, "entries": entries, "is_bitmask": is_bitmask}
+        return {
+            "group_name": clean_name,
+            "base_type": base_type,
+            "entries": entries,
+            "is_bitmask": is_bitmask,
+        }
 
     def _function_context(self, command: Command) -> dict:
         return_type_str = command.return_type_str or command.return_type.to_c_string()
@@ -854,9 +925,7 @@ class CppGenerator(Generator):
         func_name = plural_name.rstrip("s") if plural_name.endswith("s") else plural_name
 
         # Extra params: anything that isn't the count or the output pointer
-        extra_params = [
-            p for p in command.params if p is not count_param and p is not output_param
-        ]
+        extra_params = [p for p in command.params if p is not count_param and p is not output_param]
         params_str = ", ".join(self._generate_param_decl(p, command) for p in extra_params)
 
         # Build call args: 1 for count, &obj for output, pass-through for extras
@@ -870,11 +939,7 @@ class CppGenerator(Generator):
                 call_parts.append(self._generate_call_arg(p, command))
         call_args_str = ", ".join(call_parts)
 
-        body = (
-            f"{handle_name} obj;\n"
-            f"::{command.name}({call_args_str});\n"
-            "return obj;"
-        )
+        body = f"{handle_name} obj;\n::{command.name}({call_args_str});\nreturn obj;"
         return {
             "return_type": handle_name,
             "func_name": func_name,
@@ -895,9 +960,7 @@ class CppGenerator(Generator):
         func_name = plural_name.rstrip("s") if plural_name.endswith("s") else plural_name
 
         # Extra params: anything that isn't the count or the input pointer
-        extra_params = [
-            p for p in command.params if p is not count_param and p is not input_param
-        ]
+        extra_params = [p for p in command.params if p is not count_param and p is not input_param]
         param_decls = [self._generate_param_decl(p, command) for p in extra_params]
         param_decls.append(f"{handle_name} obj")
         params_str = ", ".join(param_decls)
@@ -933,7 +996,7 @@ class CppGenerator(Generator):
         if not command.name.startswith("glCreate"):
             return None
         # Extract the object name from glCreate<Name>
-        suffix = command.name[len("glCreate"):]
+        suffix = command.name[len("glCreate") :]
         # Match against known handle classes (case-insensitive)
         for class_str, handle_name in self._handle_classes.items():
             class_camel = _to_handle_name(class_str)
@@ -950,14 +1013,11 @@ class CppGenerator(Generator):
     def _generate_param_decl(self, param: CommandParam, command: Command | None = None) -> str:
         return f"{self._param_type_str(param, command=command)} {param.name}"
 
-    def _generate_dsa_param_decl(
-        self, param: CommandParam, command: Command, api: str
-    ) -> str:
+    def _generate_dsa_param_decl(self, param: CommandParam, command: Command, api: str) -> str:
         """Like _generate_param_decl but fully qualifies types that could collide in the dsa namespace."""
         needs_qualify = (
-            (param.class_ and _is_uint_handle(param) and param.class_ in self._handle_classes)
-            or (param.has_group() and param.group in self._emitted_groups)
-        )
+            param.class_ and _is_uint_handle(param) and param.class_ in self._handle_classes
+        ) or (param.has_group() and param.group in self._emitted_groups)
         if needs_qualify:
             type_str = self._param_type_str(param, command=command, namespace_prefix=f"::{api}::")
         else:
@@ -998,7 +1058,11 @@ class CppGenerator(Generator):
         if not ignore_group and param.has_group() and param.group in self._emitted_groups:
             clean = self._group_rename.get(param.group, param.group)
             if param.group in self._emitted_bitmask_groups and not param.is_pointer:
-                use_type = f"Flags<{clean}>" if not namespace_prefix else f"{namespace_prefix}Flags<{namespace_prefix}{clean}>"
+                use_type = (
+                    f"Flags<{clean}>"
+                    if not namespace_prefix
+                    else f"{namespace_prefix}Flags<{namespace_prefix}{clean}>"
+                )
             else:
                 use_type = f"{namespace_prefix}{clean}" if namespace_prefix else clean
 

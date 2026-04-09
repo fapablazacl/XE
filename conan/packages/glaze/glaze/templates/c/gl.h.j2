@@ -15,6 +15,10 @@
 #define __{{ api }}_h_
 #define __{{ api | upper }}_H__
 
+#ifndef GLAZE_GL_VERSION
+#  define GLAZE_GL_VERSION {{ version_floor_int }}
+#endif
+
 #if defined(_WIN32)
   #define GLCALLCONV __stdcall
   #if defined(GLAZE_BUILD_DLL)
@@ -49,6 +53,8 @@ GLAZE_API void glazeSetPostCallback(GLAZE_CALLBACK callback);
 {% endfor %}
 
 {% for feature in features %}
+#if GLAZE_GL_VERSION >= {{ feature.version_int }}
+#define GL_VERSION_{{ feature.version_major }}_{{ feature.version_minor }} 1
 /* {{ feature.name }} definitions */
 {% for enum in feature.enums %}
 #define {{ enum.name }} {{ enum.value }}
@@ -71,6 +77,8 @@ GLAZE_API void glazeSetPostCallback(GLAZE_CALLBACK callback);
 #endif
 
 {% endfor %}
+#endif /* GLAZE_GL_VERSION >= {{ feature.version_int }} */
+
 {% endfor %}
 
 #if defined(__cplusplus)

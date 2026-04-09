@@ -180,6 +180,74 @@ class TestCppGeneratorVersionTag:
         assert "[GL 1.5]" in content
 
 
+class TestCppGeneratorVersionGating:
+    def test_glaze_gl_version_comes_from_c_header(self, mini_registry: Registry) -> None:
+        """The C++ header relies on the C header for the GLAZE_GL_VERSION default."""
+        gen = CppGenerator(mini_registry)
+        files = gen.generate("gl", "4.5")
+        hpp = files["include/glaze/gl.hpp"]
+        # gl.hpp delegates the macro definition to gl.h, which it includes.
+        assert '#include "gl.h"' in hpp
+        # gl.hpp itself does not redefine GLAZE_GL_VERSION.
+        assert "#  define GLAZE_GL_VERSION" not in hpp
+        assert "#define GLAZE_GL_VERSION" not in hpp
+
+    def test_functor_gated_by_version(self, mini_registry: Registry) -> None:
+        """A 4.5-only functor sits inside ``#if GLAZE_GL_VERSION >= 45``."""
+        gen = CppGenerator(mini_registry)
+        files = gen.generate("gl", "4.5")
+        hpp = files["include/glaze/gl.hpp"]
+        guard = "#if GLAZE_GL_VERSION >= 45"
+        assert guard in hpp
+        guard_idx = hpp.find(guard)
+        named_idx = hpp.find("_NamedBufferDataFn", guard_idx)
+        assert named_idx > guard_idx
+        # And a 1.0 functor sits inside a >=10 guard, not the >=45 guard
+        clear_guard_idx = hpp.find("#if GLAZE_GL_VERSION >= 10")
+        assert clear_guard_idx != -1
+        clear_idx = hpp.find("_ClearFn", clear_guard_idx)
+        assert 0 < clear_idx < guard_idx
+
+    def test_enum_class_unconditional(self, mini_registry: Registry) -> None:
+        """Enum classes are inert constants, deliberately not version-gated."""
+        gen = CppGenerator(mini_registry)
+        files = gen.generate("gl", "4.5")
+        hpp = files["include/glaze/gl.hpp"]
+        idx = hpp.find("enum class ClearBufferMask")
+        assert idx != -1
+        # Walk backwards to the previous non-blank line and confirm it isn't an
+        # `#if GLAZE_GL_VERSION` guard.
+        prefix = hpp[:idx].rstrip()
+        prev_line = prefix.rsplit("\n", 1)[-1]
+        assert "GLAZE_GL_VERSION" not in prev_line
+
+    def test_handle_traits_gated(self, mini_registry: Registry) -> None:
+        """``HandleTraits<Buffer>`` is gated by the version that introduces both creator and deleter."""
+        gen = CppGenerator(mini_registry)
+        files = gen.generate("gl", "4.5")
+        hpp = files["include/glaze/gl.hpp"]
+        # Buffer creator/deleter come from GL 1.5; the line directly above the
+        # specialization must be the matching #if guard.
+        target = "template<> struct HandleTraits<Buffer>"
+        idx = hpp.find(target)
+        assert idx != -1
+        line_start = hpp.rfind("\n", 0, idx) + 1
+        prev_line_end = line_start - 1
+        prev_line_start = hpp.rfind("\n", 0, prev_line_end) + 1
+        prev_line = hpp[prev_line_start:prev_line_end]
+        assert prev_line == "#if GLAZE_GL_VERSION >= 15"
+
+    def test_handle_header_method_gated(self, mini_registry: Registry) -> None:
+        """``handle::*`` method bodies are wrapped in their own version guards."""
+        gen = CppGenerator(mini_registry)
+        files = gen.generate("gl", "4.5")
+        handle_hpp = files["include/glaze/gl_handle.hpp"]
+        # gl_handle.hpp inherits GLAZE_GL_VERSION via gl.hpp -> gl.h
+        assert '#include "gl.hpp"' in handle_hpp
+        # At least one method body should be guarded by GLAZE_GL_VERSION
+        assert "#if GLAZE_GL_VERSION >= " in handle_hpp
+
+
 class TestCppGeneratorFlags:
     def test_flags_template_present(self, mini_registry: Registry) -> None:
         gen = CppGenerator(mini_registry)
@@ -337,7 +405,9 @@ class TestCppGeneratorRaii:
         # only the empty `namespace glaze {}` block.
         assert "struct Traits<" not in gl_hpp
 
-    def test_gl_handle_hpp_emits_glaze_traits_for_legacy_wrappers(self, mini_registry: Registry) -> None:
+    def test_gl_handle_hpp_emits_glaze_traits_for_legacy_wrappers(
+        self, mini_registry: Registry
+    ) -> None:
         files = CppGenerator(mini_registry).generate("gl", "2.0")
         h = files["include/glaze/gl_handle.hpp"]
         # gl::handle::Program / Shader are legacy wrapper classes — each gets a Traits.

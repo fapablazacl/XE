@@ -25,9 +25,11 @@ public:
     explicit {{ cls.class_name }}(::{{ api }}::{{ cls.handle_type }} id) : m_id(id) {}
     ::{{ api }}::{{ cls.handle_type }} id() const { return m_id; }
 {% for method in cls.methods %}
+#if GLAZE_GL_VERSION >= {{ method.version_int }}
     {{ method.return_type }} {{ method.name }}({{ method.params_str }}) const {
         return ::{{ api }}::{{ method.functor_name }}({{ method.call_args_str }});
     }
+#endif
 {% endfor %}
 };
 
@@ -42,6 +44,7 @@ public:
 namespace glaze {
 
 {% for hp in handle_handles_with_proxy %}
+#if GLAZE_GL_VERSION >= {{ hp.version_int }}
 template<> struct Traits<::{{ api }}::handle::{{ hp.class_name }}> {
     static ::{{ api }}::handle::{{ hp.class_name }} create() {
         return ::{{ api }}::handle::{{ hp.class_name }}(::{{ api }}::{{ hp.gen_func_name }}());
@@ -53,6 +56,7 @@ template<> struct Traits<::{{ api }}::handle::{{ hp.class_name }}> {
         return static_cast<bool>(w.id());
     }
 };
+#endif
 
 {% endfor %}
 } // namespace glaze

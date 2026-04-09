@@ -1,6 +1,7 @@
 from glaze.doc_parser import FunctionDoc
 from glaze.generators.base import Generator
 from glaze.model import Command, CommandParam, Enum, Feature, Registry
+from glaze.utils.string_utils import version_to_int
 
 
 class CGenerator(Generator):
@@ -54,7 +55,9 @@ class CGenerator(Generator):
 
     # --------------------------------------------------------------- contexts
 
-    def _header_context(self, features: list[Feature], type_name_set: set, api: str, version: str) -> dict:
+    def _header_context(
+        self, features: list[Feature], type_name_set: set, api: str, version: str
+    ) -> dict:
         # Collect all required type names: from command params/returns and <require><type> entries
         all_type_names: set = set(type_name_set)
         for feature in features:
@@ -101,22 +104,36 @@ class CGenerator(Generator):
                             "doc_params": doc.params if doc else {},
                         }
                     )
-            feature_list.append({"name": feature.name, "enums": enums, "commands": commands})
+            ver_int = version_to_int(feature.number)
+            feature_list.append(
+                {
+                    "name": feature.name,
+                    "version_int": ver_int,
+                    "version_major": ver_int // 10,
+                    "version_minor": ver_int % 10,
+                    "enums": enums,
+                    "commands": commands,
+                }
+            )
 
         return {
             "types": types,
             "features": feature_list,
             "api": api,
+            "version_floor_int": version_to_int(version),
             "generation_header": self._generation_header(api, version, "C"),
         }
 
     def _source_context(self, features: list[Feature], api: str, version: str) -> dict:
         feature_list = []
-        loader_entries = []
-        debug_wrappers = []
+        loader_feature_list = []
+        debug_wrapper_features = []
 
         for feature in features:
+            ver_int = version_to_int(feature.number)
             definitions = []
+            entries = []
+            wrappers = []
             for require in feature.require_list:
                 for command_ref in require.commands:
                     command = self.registry.command_by_name.get(command_ref.name)
@@ -125,21 +142,42 @@ class CGenerator(Generator):
                     raw_name = f"glaze_{command.name}"
                     ptr_type = self._command_ptr_type_name(command.name)
                     definitions.append(f"GLAZE_API {ptr_type} {raw_name};")
-                    loader_entries.append(
+                    entries.append(
                         {
                             "ptr_var": raw_name,
                             "ptr_type": ptr_type,
                             "gl_name": command.name,
                         }
                     )
-                    debug_wrappers.append(self._generate_debug_wrapper_context(command))
-            feature_list.append({"name": feature.name, "definitions": definitions})
+                    wrappers.append(self._generate_debug_wrapper_context(command))
+            feature_list.append(
+                {
+                    "name": feature.name,
+                    "version_int": ver_int,
+                    "definitions": definitions,
+                }
+            )
+            loader_feature_list.append(
+                {
+                    "name": feature.name,
+                    "version_int": ver_int,
+                    "entries": entries,
+                }
+            )
+            debug_wrapper_features.append(
+                {
+                    "name": feature.name,
+                    "version_int": ver_int,
+                    "wrappers": wrappers,
+                }
+            )
 
         return {
             "features": feature_list,
-            "loader_entries": loader_entries,
-            "debug_wrappers": debug_wrappers,
+            "loader_features": loader_feature_list,
+            "debug_wrapper_features": debug_wrapper_features,
             "api": api,
+            "version_floor_int": version_to_int(version),
             "generation_header": self._generation_header(api, version, "C"),
         }
 

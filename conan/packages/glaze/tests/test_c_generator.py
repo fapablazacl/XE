@@ -72,6 +72,54 @@ class TestCGeneratorVersionTag:
         assert "[GL 1.5]" in header
 
 
+class TestCGeneratorVersionGating:
+    def test_emits_default_glaze_gl_version(self, mini_registry: Registry) -> None:
+        """The default GLAZE_GL_VERSION matches the ceiling the header was generated for."""
+        gen = CGenerator(mini_registry)
+        files = gen.generate("gl", "4.5")
+        header = files["include/glaze/gl.h"]
+        assert "#ifndef GLAZE_GL_VERSION" in header
+        assert "#  define GLAZE_GL_VERSION 45" in header
+
+    def test_emits_standard_version_macros(self, mini_registry: Registry) -> None:
+        """Each enabled feature emits the standard ``GL_VERSION_X_Y`` macro."""
+        gen = CGenerator(mini_registry)
+        files = gen.generate("gl", "4.5")
+        header = files["include/glaze/gl.h"]
+        assert "#define GL_VERSION_1_0 1" in header
+        assert "#define GL_VERSION_1_5 1" in header
+        assert "#define GL_VERSION_2_0 1" in header
+        assert "#define GL_VERSION_4_5 1" in header
+
+    def test_header_wraps_feature_block_in_if(self, mini_registry: Registry) -> None:
+        """Each feature block is preceded by an ``#if GLAZE_GL_VERSION >= NN`` guard."""
+        gen = CGenerator(mini_registry)
+        files = gen.generate("gl", "4.5")
+        header = files["include/glaze/gl.h"]
+        # Within a 4.5 generation, glNamedBufferData must sit inside a >=45 block
+        assert "#if GLAZE_GL_VERSION >= 45" in header
+        guard_idx = header.find("#if GLAZE_GL_VERSION >= 45")
+        named_idx = header.find("glNamedBufferData", guard_idx)
+        assert named_idx > guard_idx
+        # And glClear must sit inside a >=10 block, not the >=45 block
+        assert "#if GLAZE_GL_VERSION >= 10" in header
+        clear_guard_idx = header.find("#if GLAZE_GL_VERSION >= 10")
+        clear_idx = header.find("glClear", clear_guard_idx)
+        assert clear_idx > clear_guard_idx
+        assert clear_idx < guard_idx
+
+    def test_source_loader_grouped_by_version(self, mini_registry: Registry) -> None:
+        """The loader emits one ``#if GLAZE_GL_VERSION >= NN`` block per feature."""
+        gen = CGenerator(mini_registry)
+        files = gen.generate("gl", "4.5")
+        source = files["src/gl.c"]
+        # The 4.5-only loader entry sits inside a >=45 guard
+        assert "#if GLAZE_GL_VERSION >= 45" in source
+        guard_idx = source.find("#if GLAZE_GL_VERSION >= 45")
+        named_idx = source.find('getProcAddress("glNamedBufferData")', guard_idx)
+        assert named_idx > guard_idx
+
+
 class TestCGeneratorTimestamp:
     def test_header_contains_generation_header(self, mini_registry: Registry) -> None:
         gen = CGenerator(mini_registry)

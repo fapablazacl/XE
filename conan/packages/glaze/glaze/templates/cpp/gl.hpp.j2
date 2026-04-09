@@ -194,6 +194,7 @@ inline Flags<{{ ec.group_name }}> operator~({{ ec.group_name }} a) {
 
 {% endfor %}
 {% for fn in functors %}
+#if GLAZE_GL_VERSION >= {{ fn.version_int }}
 struct _{{ fn.struct_name }} {
     constexpr _{{ fn.struct_name }}() noexcept = default;
     explicit operator bool() const noexcept { return ::{{ fn.gl_name }} != nullptr; }
@@ -223,6 +224,7 @@ struct _{{ fn.struct_name }} {
 /** @brief {{ fn.doc_brief }} */
 {% endif %}
 GLAZE_INLINE constexpr _{{ fn.struct_name }} {{ fn.func_name }};
+#endif
 
 {% endfor %}
 {% if resources %}
@@ -237,10 +239,12 @@ GLAZE_INLINE constexpr _{{ fn.struct_name }} {{ fn.func_name }};
 template<typename H> struct HandleTraits;
 
 {% for r in resources %}
+#if GLAZE_GL_VERSION >= {{ r.version_int }}
 template<> struct HandleTraits<{{ r.handle_type }}> {
     using creator = _{{ r.creator_struct }};
     using deleter = _{{ r.deleter_struct }};
 };
+#endif
 {% endfor %}
 {% endif %}
 {% if dsa_classes %}
@@ -255,10 +259,12 @@ public:
     explicit {{ cls.class_name }}(::{{ api }}::{{ cls.handle_type }} id) : m_id(id) {}
     ::{{ api }}::{{ cls.handle_type }} id() const { return m_id; }
 {% for method in cls.methods %}
+#if GLAZE_GL_VERSION >= {{ method.version_int }}
     {{ method.return_type }} {{ method.name }}({{ method.params_str }}) const {
         GLAZE_GL_CHECK;
         return ::{{ method.gl_name }}({{ method.call_args_str }});
     }
+#endif
 {% endfor %}
 };
 
@@ -279,6 +285,7 @@ public:
 namespace glaze {
 
 {% for r in resources %}
+#if GLAZE_GL_VERSION >= {{ r.version_int }}
 template<> struct Traits<::{{ api }}::{{ r.handle_type }}> {
     static ::{{ api }}::{{ r.handle_type }} create() {
         return ::{{ api }}::{{ r.gen_func_name }}();
@@ -290,9 +297,11 @@ template<> struct Traits<::{{ api }}::{{ r.handle_type }}> {
         return static_cast<bool>(h);
     }
 };
+#endif
 
 {% endfor %}
 {% for hp in dsa_handles_with_proxy %}
+#if GLAZE_GL_VERSION >= {{ hp.version_int }}
 template<> struct Traits<::{{ api }}::dsa::{{ hp.class_name }}> {
     static ::{{ api }}::dsa::{{ hp.class_name }} create() {
         return ::{{ api }}::dsa::{{ hp.class_name }}(::{{ api }}::{{ hp.gen_func_name }}());
@@ -304,6 +313,7 @@ template<> struct Traits<::{{ api }}::dsa::{{ hp.class_name }}> {
         return static_cast<bool>(w.id());
     }
 };
+#endif
 
 {% endfor %}
 } // namespace glaze

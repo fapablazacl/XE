@@ -71,7 +71,7 @@ A single `python glaze_cli.py generate --api gl X.Y --lang cpp` invocation produ
 | Target | Purpose |
 |---|---|
 | `glaze::raii` | Top-level header-only component exposing only `raii.hpp`. For consumers that want `glaze::Unique/Shared/Weak` with their own handle types, no per-API binding required. |
-| `glaze::{api}` | Per-API binding: links the C loader library and provides `{api}.hpp` (which itself includes `raii.hpp`). |
+| `glaze::{api}` | Per-API binding: links the C loader library and provides `{api}.hpp`.
 | `glaze::{api}_handle` | Header-only enriched-handle companion: provides `{api}_handle.hpp`, requires `glaze::{api}`. |
 
 ## Commands

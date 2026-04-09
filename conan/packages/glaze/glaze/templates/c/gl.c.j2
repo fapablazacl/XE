@@ -16,16 +16,20 @@ GLAZE_API void glazeSetPostCallback(GLAZE_CALLBACK callback) {
 }
 
 {% for feature in features %}
+#if GLAZE_GL_VERSION >= {{ feature.version_int }}
 /* {{ feature.name }} function pointer variables */
 {% for defn in feature.definitions %}
 {{ defn }}
 {% endfor %}
+#endif
 
 {% endfor %}
 
 #if defined(GLAZE_DEBUG)
 /* debug wrapper functions */
-{% for w in debug_wrappers %}
+{% for feature in debug_wrapper_features %}
+#if GLAZE_GL_VERSION >= {{ feature.version_int }}
+{% for w in feature.wrappers %}
 GLAZE_API {{ w.return_type }} GLCALLCONV {{ w.debug_name }}({{ w.params_str }}) {
 {% if w.args_str %}
     if (glaze_pre_callback) glaze_pre_callback("{{ w.name }}", (void*){{ w.raw_name }}, {{ w.param_count }}, {{ w.args_str }});
@@ -49,9 +53,15 @@ GLAZE_API {{ w.return_type }} GLCALLCONV {{ w.debug_name }}({{ w.params_str }}) 
 
 {% endfor %}
 #endif
+{% endfor %}
+#endif
 
 GLAZE_API void glazeLoadFunctions(GLAZE_GETPROCADDRESS getProcAddress) {
-{% for entry in loader_entries %}
+{% for feature in loader_features %}
+#if GLAZE_GL_VERSION >= {{ feature.version_int }}
+{% for entry in feature.entries %}
     {{ entry.ptr_var }} = ({{ entry.ptr_type }})getProcAddress("{{ entry.gl_name }}");
+{% endfor %}
+#endif
 {% endfor %}
 }
