@@ -227,6 +227,15 @@ class Registry:
                 self.features_by_api[feat.api] = []
             self.features_by_api[feat.api].append(feat)
 
+        # Maps registry api name → list of Extensions whose `supported` list
+        # contains that api. Used by `extensions_for_api`.
+        self.extensions_by_api: dict[str, list[Extension]] = {}
+        for ext in self.extensions_list:
+            for api_name in ext.supported:
+                if api_name not in self.extensions_by_api:
+                    self.extensions_by_api[api_name] = []
+                self.extensions_by_api[api_name].append(ext)
+
         # Maps class name → list of commands (used by C++ generator)
         self.object_dict: dict[str, list[Command]] = {}
         for cmd in self.commands_list:
@@ -305,3 +314,13 @@ class Registry:
             if feature.number <= number:
                 result.append(feature)
         return result
+
+    def extensions_for_api(self, api: str) -> list[Extension]:
+        """Return extensions whose `supported` list contains the given api.
+
+        Resolves virtual APIs (e.g. ``gl_compat``) to their underlying registry
+        api name before lookup, so a caller can pass either a real or a virtual
+        api and get the same answer.
+        """
+        registry_api = self._registry_api(api)
+        return list(self.extensions_by_api.get(registry_api, []))

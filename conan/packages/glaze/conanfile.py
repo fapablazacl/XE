@@ -157,7 +157,7 @@ class GlazeConan(ConanFile):
         # The static raii.hpp is written into out_dir/include/glaze/ by
         # CppGenerator.generate(), so the *.hpp glob picks it up automatically.
         copy(self, "*.hpp", src=os.path.join(out_dir, "include"), dst=os.path.join(self.package_folder, "include"))
-            
+
         # Always package the C library — the C++ API depends on C function pointers
         if self.options.language in ("c", "cpp", "both"):
             copy(self, "*.a", src=self.build_folder, dst=os.path.join(self.package_folder, "lib"), keep_path=False)
@@ -166,9 +166,30 @@ class GlazeConan(ConanFile):
             copy(self, "*.dylib", src=self.build_folder, dst=os.path.join(self.package_folder, "lib"), keep_path=False)
             copy(self, "*.dll", src=self.build_folder, dst=os.path.join(self.package_folder, "bin"), keep_path=False)
 
+        # Ship the Python generator sources alongside the package so downstream
+        # tool_requires consumers (e.g. the `glazed` package) can run glaze_cli.py
+        # without re-cloning this repo. Purely additive — no existing consumer
+        # touches share/glaze/.
+        share_dst = os.path.join(self.package_folder, "share", "glaze")
+        copy(self, "glaze_cli.py", src=self.source_folder, dst=share_dst)
+        copy(self, "pyproject.toml", src=self.source_folder, dst=share_dst)
+        copy(self, "*.py", src=os.path.join(self.source_folder, "glaze"),
+             dst=os.path.join(share_dst, "glaze"))
+        copy(self, "*.j2", src=os.path.join(self.source_folder, "glaze"),
+             dst=os.path.join(share_dst, "glaze"))
+        copy(self, "*.hpp", src=os.path.join(self.source_folder, "glaze"),
+             dst=os.path.join(share_dst, "glaze"))
+
     def package_info(self):
         self.cpp_info.set_property("cmake_file_name", "glaze")
         api_list = [api.strip() for api in str(self.options.apis).split(",") if api.strip()]
+
+        # Expose the path to the shipped Python generator sources so downstream
+        # `tool_requires("glaze/...")` consumers can locate glaze_cli.py without
+        # having to know the package layout.
+        share_dir = os.path.join(self.package_folder, "share", "glaze")
+        self.conf_info.define("user.glaze:source_dir", share_dir)
+        self.conf_info.define("user.glaze:cli_path", os.path.join(share_dir, "glaze_cli.py"))
 
         # Top-level header-only component for the API-agnostic glaze::Unique /
         # Shared / Weak templates. Downstream users who only want the smart

@@ -301,10 +301,28 @@ class CppGenerator(Generator):
         self._check_api_version(api, version)
         consolidated = self.registry.consolidate(api, version)
 
+        # Extension emissions: per-extension Commands/Enums NOT already in core.
+        ext_emissions = self._collect_extension_emissions(api, version)
+        extension_command_names: set[str] = set()
+        extension_enum_names: set[str] = set()
+        cmd_to_extension_short: dict[str, str] = {}
+        for ext in ext_emissions:
+            for cmd in ext["commands"]:
+                extension_command_names.add(cmd.name)
+                cmd_to_extension_short[cmd.name] = ext["short_name"]
+            for enum in ext["enums"]:
+                extension_enum_names.add(enum.name)
+        # Discovery (handle classes, enum groups) walks core ∪ extensions so
+        # extension-only commands contribute their handle types and enum
+        # groups to the bindings. The dsa/handle/raii pipelines still filter
+        # by `consolidated.commands` and stay core-only.
+        discovery_command_names = set(consolidated.commands) | extension_command_names
+        union_enum_names: set[str] = set(consolidated.enums) | extension_enum_names
+
         # Single pass: collect handle classes and enum groups from all included commands
         self._handle_classes = {}
         group_set: set = set()
-        for command_name in consolidated.commands:
+        for command_name in discovery_command_names:
             command = self.registry.command_by_name.get(command_name)
             if command is None:
                 continue

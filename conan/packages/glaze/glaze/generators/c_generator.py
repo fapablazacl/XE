@@ -84,25 +84,10 @@ class CGenerator(Generator):
                     command = self.registry.command_by_name.get(command_ref.name)
                     if command is None:
                         continue
-                    doc = self.doc_index.get(command.name)
-                    ver_tag = f" [{api.upper()} {feature.number}]"
-                    doc_brief = f"{doc.brief}{ver_tag}" if doc else ver_tag.strip()
-                    ptr_type = self._command_ptr_type_name(command.name)
-                    raw_name = f"glaze_{command.name}"
-                    debug_name = f"glaze_debug_{command.name}"
                     commands.append(
-                        {
-                            "typedef": self._generate_command_ptr_typedef(command),
-                            "extern": self._generate_command_ptr_extern(command),
-                            "extern_raw": f"extern GLAZE_API {ptr_type} {raw_name};",
-                            "debug_decl": self._generate_debug_wrapper_decl(command),
-                            "debug_name": debug_name,
-                            "release_alias": f"#define {command.name} {raw_name}",
-                            "debug_alias": f"#define {command.name} {debug_name}",
-                            "name": command.name,
-                            "doc_brief": doc_brief,
-                            "doc_params": doc.params if doc else {},
-                        }
+                        self._build_command_header_entry(
+                            command, f" [{api.upper()} {feature.number}]"
+                        )
                     )
             ver_int = version_to_int(feature.number)
             feature_list.append(
@@ -116,9 +101,13 @@ class CGenerator(Generator):
                 }
             )
 
+        # Extension declarations (deduped against the consolidated core set).
+        extension_list = self._build_extension_header_list(api, version)
+
         return {
             "types": types,
             "features": feature_list,
+            "extensions": extension_list,
             "api": api,
             "version_floor_int": version_to_int(version),
             "generation_header": self._generation_header(api, version, "C"),
@@ -172,14 +161,100 @@ class CGenerator(Generator):
                 }
             )
 
+        extension_list = self._build_extension_source_list(api, version)
+
         return {
             "features": feature_list,
             "loader_features": loader_feature_list,
             "debug_wrapper_features": debug_wrapper_features,
+            "extensions": extension_list,
             "api": api,
             "version_floor_int": version_to_int(version),
             "generation_header": self._generation_header(api, version, "C"),
         }
+
+    # ----------------------------------------------------------- shared builders
+
+    def _build_command_header_entry(self, command: Command, ver_tag: str) -> dict:
+        """Build the per-command dict consumed by ``gl.h.j2``.
+
+        Used by both the per-feature loop and the extension loop. ``ver_tag``
+        is the bracketed marker appended to the doc brief (e.g. ``" [GL 3.3]"``
+        for a core feature, or ``" [GL_ARB_buffer_storage]"`` for an extension).
+        """
+        doc = self.doc_index.get(command.name)
+        doc_brief = f"{doc.brief}{ver_tag}" if doc else ver_tag.strip()
+        ptr_type = self._command_ptr_type_name(command.name)
+        raw_name = f"glaze_{command.name}"
+        debug_name = f"glaze_debug_{command.name}"
+        return {
+            "typedef": self._generate_command_ptr_typedef(command),
+            "extern": self._generate_command_ptr_extern(command),
+            "extern_raw": f"extern GLAZE_API {ptr_type} {raw_name};",
+            "debug_decl": self._generate_debug_wrapper_decl(command),
+            "debug_name": debug_name,
+            "release_alias": f"#define {command.name} {raw_name}",
+            "debug_alias": f"#define {command.name} {debug_name}",
+            "name": command.name,
+            "doc_brief": doc_brief,
+            "doc_params": doc.params if doc else {},
+        }
+
+    def _build_extension_header_list(self, api: str, version: str) -> list[dict]:
+        """Wrap ``_collect_extension_emissions`` for the C header template."""
+        emissions = self._collect_extension_emissions(api, version)
+        result: list[dict] = []
+        for ext in emissions:
+            enums = [{"name": e.name, "value": e.value} for e in ext["enums"]]
+            commands = [
+                self._build_command_header_entry(cmd, f" [{ext['name']}]")
+                for cmd in ext["commands"]
+            ]
+            result.append(
+                {
+                    "name": ext["name"],
+                    "short_name": ext["short_name"],
+                    "guard_macro": ext["guard_macro"],
+                    "flag_var": ext["flag_var"],
+                    "khronos_define": ext["khronos_define"],
+                    "enums": enums,
+                    "commands": commands,
+                }
+            )
+        return result
+
+    def _build_extension_source_list(self, api: str, version: str) -> list[dict]:
+        """Wrap ``_collect_extension_emissions`` for the C source template."""
+        emissions = self._collect_extension_emissions(api, version)
+        result: list[dict] = []
+        for ext in emissions:
+            definitions = []
+            entries = []
+            wrappers = []
+            for cmd in ext["commands"]:
+                raw_name = f"glaze_{cmd.name}"
+                ptr_type = self._command_ptr_type_name(cmd.name)
+                definitions.append(f"GLAZE_API {ptr_type} {raw_name};")
+                entries.append(
+                    {
+                        "ptr_var": raw_name,
+                        "ptr_type": ptr_type,
+                        "gl_name": cmd.name,
+                    }
+                )
+                wrappers.append(self._generate_debug_wrapper_context(cmd))
+            result.append(
+                {
+                    "name": ext["name"],
+                    "short_name": ext["short_name"],
+                    "guard_macro": ext["guard_macro"],
+                    "flag_var": ext["flag_var"],
+                    "definitions": definitions,
+                    "entries": entries,
+                    "wrappers": wrappers,
+                }
+            )
+        return result
 
     # ----------------------------------------------------------- command helpers
 

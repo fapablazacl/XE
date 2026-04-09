@@ -59,6 +59,73 @@ class Generator(ABC):
                         cmd_version[cmd_ref.name] = feature.number
         return cmd_version
 
+    def _collect_extension_emissions(self, api: str, version: str) -> list[dict]:
+        """Return per-extension emission descriptors for the given API/ceiling.
+
+        For each extension whose ``supported`` list contains the resolved
+        registry api, returns a dict carrying the metadata both generators need:
+
+        - ``name``: the full Khronos extension name (e.g. ``GL_ARB_buffer_storage``).
+        - ``short_name``: the name with the ``GL_`` prefix stripped, used in the
+          C++ ``gl::exts::*`` namespace and as the suffix for build-time guards.
+        - ``guard_macro``: ``GLAZE_GL_NO_EXT_<short_name>``.
+        - ``flag_var``: ``GLAZE_EXT_<full_name>`` — the C ``int`` flag set at
+          ``glazeLoadExtensions`` time.
+        - ``khronos_define``: same as ``name`` (separate field for template
+          clarity).
+        - ``enums``: list of ``Enum`` objects this extension uniquely contributes
+          (i.e. NOT already required by any core feature ≤ ``version``).
+        - ``commands``: list of ``Command`` objects this extension uniquely
+          contributes (same dedup rule).
+
+        Extensions whose enums and commands are entirely covered by core are
+        still returned — the consumer can still detect them at runtime via
+        ``glazeHasExtension`` / ``gl::exts::<name>`` even when there's nothing
+        new to declare. Extensions are returned in registry declaration order.
+        """
+        consolidated = self.registry.consolidate(api, version)
+        extensions = self.registry.extensions_for_api(api)
+        emissions: list[dict] = []
+        for ext in extensions:
+            short_name = ext.name[3:] if ext.name.startswith("GL_") else ext.name
+            enums: list = []
+            commands: list = []
+            seen_enum_names: set[str] = set()
+            seen_command_names: set[str] = set()
+            for require in ext.require_list:
+                for enum_ref in require.enums:
+                    if enum_ref.name in consolidated.enums:
+                        continue
+                    if enum_ref.name in seen_enum_names:
+                        continue
+                    enum = self.registry.enum_by_name.get(enum_ref.name)
+                    if enum is None:
+                        continue
+                    enums.append(enum)
+                    seen_enum_names.add(enum_ref.name)
+                for cmd_ref in require.commands:
+                    if cmd_ref.name in consolidated.commands:
+                        continue
+                    if cmd_ref.name in seen_command_names:
+                        continue
+                    command = self.registry.command_by_name.get(cmd_ref.name)
+                    if command is None:
+                        continue
+                    commands.append(command)
+                    seen_command_names.add(cmd_ref.name)
+            emissions.append(
+                {
+                    "name": ext.name,
+                    "short_name": short_name,
+                    "guard_macro": f"GLAZE_GL_NO_EXT_{short_name}",
+                    "flag_var": f"GLAZE_EXT_{ext.name}",
+                    "khronos_define": ext.name,
+                    "enums": enums,
+                    "commands": commands,
+                }
+            )
+        return emissions
+
     def _check_api_version(self, api: str, version: str) -> None:
         """Validate that the given API and version are available."""
         available = self.registry.available_apis()

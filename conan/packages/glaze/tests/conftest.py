@@ -105,6 +105,13 @@ MINI_XML = """\
       <param><ptype>GLsizei</ptype> <name>size</name></param>
       <param>const void *<name>data</name></param>
     </command>
+    <command>
+      <proto>void <name>glDrawArraysInstancedARB</name></proto>
+      <param><ptype>GLenum</ptype> <name>mode</name></param>
+      <param><ptype>GLint</ptype> <name>first</name></param>
+      <param><ptype>GLsizei</ptype> <name>count</name></param>
+      <param><ptype>GLsizei</ptype> <name>primcount</name></param>
+    </command>
   </commands>
 
   <feature api="gl" name="GL_VERSION_1_0" number="1.0">
@@ -167,6 +174,11 @@ MINI_XML = """\
     <extension name="GL_ARB_buffer_storage" supported="gl|gles2">
       <require>
         <enum name="GL_ARRAY_BUFFER"/>
+      </require>
+    </extension>
+    <extension name="GL_ARB_draw_instanced" supported="gl">
+      <require>
+        <command name="glDrawArraysInstancedARB"/>
       </require>
     </extension>
   </extensions>
