@@ -1,4 +1,6 @@
 #include <glaze/gl.hpp>
+#include <glaze/raii.hpp>
+#include <glaze/gl_handle.hpp>
 #include <GLFW/glfw3.h>
 #include <iostream>
 #include <cstdlib>
@@ -24,19 +26,15 @@ void main() {
 }
 )glsl";
 
-static gl::Shader compileShader(gl::ShaderType type, const char* src) {
-    gl::Shader shader = gl::createShader(type);
-    gl::shaderSource(shader, 1, &src, nullptr);
-    
-    if (gl::compileShader)
-        gl::compileShader(shader);
 
-    GLint ok = 0;
-    gl::getShaderiv(shader, gl::ShaderParameterName::eCompileStatus, &ok);
-    if (!ok) {
-        GLint logLen = 0;
-        gl::getShaderiv(shader, gl::ShaderParameterName::eInfoLogLength, &logLen);
-        std::cerr << "Shader compile error:\n" << gl::getShaderInfoLog(shader, logLen) << std::endl;
+static glaze::Unique<gl::handle::Shader> compileShader(gl::ShaderType type, const char* src) {
+    auto shader = glaze::makeUnique<gl::handle::Shader>(type);
+
+    shader->source(1, &src, nullptr);
+    shader->compile();
+
+    if (!shader->getiv(gl::ShaderParameterName::eCompileStatus)) {
+        std::cerr << "Shader compile error:\n" << shader->getInfoLog() << std::endl;
         std::exit(1);
     }
     return shader;
@@ -62,69 +60,72 @@ int main() {
     glfwMakeContextCurrent(window);
     glazeLoadFunctions(glfwGetProcAddress);
 
-    // Geometry — equilateral triangle centred at origin
-    static const float verts[] = {
-         0.0f,  0.5f,
-        -0.433f, -0.25f,
-         0.433f, -0.25f,
-    };
+	// Inner scope so every RAII-managed GL resource is destroyed while the
+	// context is still current. Without it the Unique<> destructors fire
+	// after glfwDestroyWindow/glfwTerminate, which tears down the GL context
+	// and causes glDeleteProgram/glDeleteShader/... to raise
+	// GL_INVALID_OPERATION (caught by GLAZE_GL_CHECK in debug builds).
+	{
+		// Geometry — equilateral triangle centred at origin
+		static const float verts[] = {
+				0.0f,  0.5f,
+			-0.433f, -0.25f,
+				0.433f, -0.25f,
+		};
 
-    gl::VertexArray vao = gl::genVertexArray();
-    gl::BufferId vbo = gl::genBuffer();
-    gl::bindVertexArray(vao);
-    gl::bindBuffer(gl::BufferTarget::eArray, vbo);
-    gl::bufferData(gl::BufferTarget::eArray, sizeof(verts), verts, gl::BufferUsage::eStaticDraw);
-    gl::vertexAttribPointer(gl::AttribLocation(0), 2, gl::VertexAttribPointerType::eFloat, GL_FALSE, 0, nullptr);
-    gl::enableVertexAttribArray(gl::AttribLocation(0));
-    gl::bindVertexArray(gl::VertexArray{});
+		auto vao = glaze::makeUnique<gl::handle::VertexArray>();
+		gl::bindVertexArray(vao->id());
 
-    // Shader program
-    gl::Shader vert = compileShader(gl::ShaderType::eVertex,   VERT_SRC);
-    gl::Shader frag = compileShader(gl::ShaderType::eFragment, FRAG_SRC);
+		auto vbo = glaze::makeUnique<gl::BufferId>();
 
-    gl::Program prog = gl::createProgram();
-    gl::attachShader(prog, vert);
-    gl::attachShader(prog, frag);
-    gl::linkProgram(prog);
+		gl::bindBuffer(gl::BufferTarget::eArray, vbo.get());
+		gl::bufferData(gl::BufferTarget::eArray, sizeof(verts), verts, gl::BufferUsage::eStaticDraw);
+		gl::vertexAttribPointer(gl::AttribLocation(0), 2, gl::VertexAttribPointerType::eFloat, GL_FALSE, 0, nullptr);
+		gl::enableVertexAttribArray(gl::AttribLocation(0));
 
-    GLint ok = 0;
-    gl::getProgramiv(prog, gl::ProgramProperty::eLinkStatus, &ok);
-    if (!ok) {
-        GLint logLen = 0;
-        gl::getProgramiv(prog, gl::ProgramProperty::eInfoLogLength, &logLen);
-        std::cerr << "Link error:\n" << gl::getProgramInfoLog(prog, logLen) << std::endl;
-        return -1;
-    }
+		// Shader program
+		auto prog = glaze::makeUnique<gl::handle::Program>();
 
-    gl::deleteShader(vert);
-    gl::deleteShader(frag);
+		{
+			glaze::Unique<gl::handle::Shader> vert = compileShader(gl::ShaderType::eVertex, VERT_SRC);
+			glaze::Unique<gl::handle::Shader> frag = compileShader(gl::ShaderType::eFragment, FRAG_SRC);
 
-    gl::UniformLocation angleLoc = gl::getUniformLocation(prog, "angle");
+			prog->attachShader(*vert);
+			prog->attachShader(*frag);
+		}
 
-    while (!glfwWindowShouldClose(window)) {
-        glfwPollEvents();
+		prog->link();
 
-        int w, h;
-        glfwGetFramebufferSize(window, &w, &h);
-        
-        gl::viewport(0, 0, w, h);
+		if (!prog->getiv(gl::ProgramProperty::eLinkStatus)) {
+			std::cerr << "Link error:\n" << prog->getInfoLog() << std::endl;
+			return -1;
+		}
 
-        gl::clearColor(0.15f, 0.15f, 0.2f, 1.0f);
-        gl::clear(gl::ClearBufferMask::eColorBit);
+		gl::UniformLocation const angleLoc = prog->getUniformLocation("angle");
 
-        gl::useProgram(prog);
-        gl::uniform1f(angleLoc, static_cast<float>(glfwGetTime()));
+		while (!glfwWindowShouldClose(window)) {
+			glfwPollEvents();
 
-        gl::bindVertexArray(vao);
-        gl::drawArrays(gl::PrimitiveType::eTriangles, 0, 3);
-        gl::bindVertexArray(gl::VertexArray{});
+			int w, h;
+			glfwGetFramebufferSize(window, &w, &h);
 
-        glfwSwapBuffers(window);
-    }
+			gl::viewport(0, 0, w, h);
 
-    gl::deleteVertexArray(vao);
-    gl::deleteBuffer(vbo);
-    gl::deleteProgram(prog);
+			gl::clearColor(0.15f, 0.15f, 0.2f, 1.0f);
+			gl::clear(gl::ClearBufferMask::eColorBit);
+
+			gl::useProgram(prog->id());
+			gl::uniform1f(angleLoc, static_cast<float>(glfwGetTime()));
+
+			gl::bindVertexArray(vao->id());
+			gl::drawArrays(gl::PrimitiveType::eTriangles, 0, 3);
+			gl::bindVertexArray(gl::VertexArray{});
+
+			gl::useProgram({});
+
+			glfwSwapBuffers(window);
+		}
+	}
 
     glfwDestroyWindow(window);
     glfwTerminate();

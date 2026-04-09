@@ -33,13 +33,25 @@ public:
     ::{{ api }}::{{ cls.handle_type }} id() const { return m_id; }
 {% for method in cls.methods %}
 #if GLAZE_GL_VERSION >= {{ method.version_int }}
-    {{ method.return_type }} {{ method.name }}({{ method.params_str }}) const {
-        return ::{{ api }}::{{ method.functor_name }}({{ method.call_args_str }});
-    }
+    {{ method.return_type }} {{ method.name }}({{ method.params_str }}) const;
 #endif
 {% endfor %}
 };
 
+{% endfor %}
+// ── Out-of-line method definitions ─────────────────────────────────────────
+// Member bodies are emitted after every handle class has been fully declared
+// so methods that take another handle wrapper by value (e.g.
+// Program::attachShader(Shader)) can see the complete type regardless of the
+// alphabetical order in which the class definitions appear above.
+{% for cls in handle_classes %}
+{% for method in cls.methods %}
+#if GLAZE_GL_VERSION >= {{ method.version_int }}
+inline {{ method.return_type }} {{ cls.class_name }}::{{ method.name }}({{ method.params_str }}) const {
+    return ::{{ api }}::{{ method.functor_name }}({{ method.call_args_str }});
+}
+#endif
+{% endfor %}
 {% endfor %}
 } // namespace handle
 } // namespace {{ api }}
