@@ -6,6 +6,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 XE is a barebones multiplatform C++17 game engine with OpenGL rendering, GLTF model loading, math/scene libraries, and demo applications (Capybaria game, Apostate game and GLTF viewer, among other tools). It uses OpenGL 3.3 as the primary rendering backend (with an OpenGL 4.6 backend available). The current active branch (`feature/gltf-view`) focuses on a glTF 2.0 model viewer.
 
+## Code Conventions
+- class names must be PascalCase
+- value types must be represented as structs, and global functions and methods must be camelCase.
+- each new test should have their own unit test suite.
+
 ## Build System
 
 **Prerequisites:** CMake 3.16+, Conan 2.x
