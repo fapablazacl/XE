@@ -27,6 +27,11 @@ GENERATORS = {
 }
 
 
+def _parse_comma_list(value: str) -> list[str]:
+    """Split a comma-separated string into a list of stripped, non-empty tokens."""
+    return [tok.strip() for tok in value.split(",") if tok.strip()]
+
+
 def cmd_generate(args: argparse.Namespace) -> None:
     registry = _load_registry(args.registry)
 
@@ -45,6 +50,10 @@ def cmd_generate(args: argparse.Namespace) -> None:
     output_dir = args.output_dir or "."
     os.makedirs(output_dir, exist_ok=True)
 
+    # Parse extension filter options
+    ext_vendors = _parse_comma_list(getattr(args, "extension_vendors", "") or "")
+    ext_names = _parse_comma_list(getattr(args, "extensions", "") or "")
+
     # Parse refpages documentation if available
     refpages_dir = getattr(args, "refpages", None)
     doc_indices: dict[str, dict] = {}
@@ -54,10 +63,29 @@ def cmd_generate(args: argparse.Namespace) -> None:
                 doc_indices[api_name] = parse_refpages(refpages_dir, api_name)
                 print(f"  Parsed {len(doc_indices[api_name])} doc entries for {api_name}")
 
+    # Validate extension filters against all requested APIs before generating
+    if ext_vendors or ext_names:
+        sample_gen = CGenerator(
+            registry,
+            extension_vendors=ext_vendors,
+            extension_names=ext_names,
+        )
+        for api_name, _ in args.api:
+            errors = sample_gen.validate_extension_filters(api_name)
+            if errors:
+                for err in errors:
+                    print(f"error: {err}", file=sys.stderr)
+                sys.exit(1)
+
     for lang in args.lang:
         for api_name, api_version in args.api:
             doc_index = doc_indices.get(api_name, {})
-            gen = GENERATORS[lang](registry, doc_index=doc_index)
+            gen = GENERATORS[lang](
+                registry,
+                doc_index=doc_index,
+                extension_vendors=ext_vendors,
+                extension_names=ext_names,
+            )
             try:
                 files = gen.generate(api_name, api_version)
             except ValueError as e:
@@ -123,6 +151,18 @@ def build_parser() -> argparse.ArgumentParser:
         "--output-dir",
         default=".",
         help="Directory to write generated files into (default: current dir)",
+    )
+    gen_p.add_argument(
+        "--extension-vendors",
+        default="",
+        metavar="VENDORS",
+        help="Comma-separated vendor prefixes whose extensions to generate (e.g. ARB,KHR,EXT). Default: none.",
+    )
+    gen_p.add_argument(
+        "--extensions",
+        default="",
+        metavar="NAMES",
+        help="Comma-separated extension names to generate (e.g. GL_KHR_debug,GL_NV_shader_atomic_float). Default: none.",
     )
     gen_p.add_argument(
         "--refpages",

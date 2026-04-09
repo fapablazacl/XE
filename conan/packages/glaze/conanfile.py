@@ -22,6 +22,8 @@ class GlazeConan(ConanFile):
     options = {
         "apis": ["ANY"],
         "language": ["c", "cpp", "both"],
+        "extension_vendors": ["ANY"],
+        "extensions": ["ANY"],
         "shared": [True, False],
         "fPIC": [True, False],
         "with_docs": [True, False],
@@ -30,6 +32,8 @@ class GlazeConan(ConanFile):
     default_options = {
         "apis": "gl:3.3,gl_compat:4.6,gles1:1.0,gles2:3.2,glsc2:2.0",
         "language": "cpp",
+        "extension_vendors": "",
+        "extensions": "",
         "shared": False,
         "fPIC": True,
         "with_docs": True,
@@ -99,12 +103,19 @@ class GlazeConan(ConanFile):
         if self.options.with_docs and os.path.isdir(refpages_dir):
             refpages_args = ["--refpages", refpages_dir]
 
+        ext_vendor_args = []
+        if str(self.options.extension_vendors).strip():
+            ext_vendor_args = ["--extension-vendors", str(self.options.extension_vendors)]
+        ext_name_args = []
+        if str(self.options.extensions).strip():
+            ext_name_args = ["--extensions", str(self.options.extensions)]
+
         cmd = [
             self.get_python(),
             os.path.join(self.source_folder, "glaze_cli.py"),
             "generate",
             "--output-dir", out_dir
-        ] + langs_args + refpages_args
+        ] + langs_args + refpages_args + ext_vendor_args + ext_name_args
 
         for api_item in api_list:
             parts = api_item.split(":")

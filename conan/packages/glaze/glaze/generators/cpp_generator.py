@@ -287,8 +287,14 @@ class CppGenerator(Generator):
       {api}.hpp
     """
 
-    def __init__(self, registry: Registry, doc_index: dict[str, FunctionDoc] | None = None):
-        super().__init__(registry, doc_index)
+    def __init__(
+        self,
+        registry: Registry,
+        doc_index: dict[str, FunctionDoc] | None = None,
+        extension_vendors: list[str] | None = None,
+        extension_names: list[str] | None = None,
+    ):
+        super().__init__(registry, doc_index, extension_vendors, extension_names)
         self._capitalizer = _Capitalizer()
         self._handle_classes: dict[str, str] = {}  # class_ string → CamelCase handle name
         self._group_rename: dict[str, str] = {}  # xml group name → clean C++ type name

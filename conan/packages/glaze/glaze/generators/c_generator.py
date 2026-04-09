@@ -14,8 +14,14 @@ class CGenerator(Generator):
                             glazeLoadFunctions() implementation.
     """
 
-    def __init__(self, registry: Registry, doc_index: dict[str, FunctionDoc] | None = None):
-        super().__init__(registry, doc_index)
+    def __init__(
+        self,
+        registry: Registry,
+        doc_index: dict[str, FunctionDoc] | None = None,
+        extension_vendors: list[str] | None = None,
+        extension_names: list[str] | None = None,
+    ):
+        super().__init__(registry, doc_index, extension_vendors, extension_names)
 
     @property
     def name(self) -> str:

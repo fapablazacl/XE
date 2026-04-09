@@ -249,15 +249,20 @@ class TestCppGeneratorVersionGating:
 
 
 class TestCppGeneratorExtensions:
+    """Tests that exercise extension emission with explicit vendor opt-in."""
+
+    def _gen(self, registry: Registry, **kwargs) -> CppGenerator:
+        return CppGenerator(registry, extension_vendors=["ARB"], **kwargs)
+
     def test_extension_struct_present(self, mini_registry: Registry) -> None:
-        gen = CppGenerator(mini_registry)
+        gen = self._gen(mini_registry)
         files = gen.generate("gl", "4.5")
         hpp = files["include/glaze/gl.hpp"]
         assert "struct Extension {" in hpp
         assert "namespace exts {" in hpp
 
     def test_extension_token_constexpr(self, mini_registry: Registry) -> None:
-        gen = CppGenerator(mini_registry)
+        gen = self._gen(mini_registry)
         files = gen.generate("gl", "4.5")
         hpp = files["include/glaze/gl.hpp"]
         assert (
@@ -270,7 +275,7 @@ class TestCppGeneratorExtensions:
         )
 
     def test_extension_token_per_extension_guard(self, mini_registry: Registry) -> None:
-        gen = CppGenerator(mini_registry)
+        gen = self._gen(mini_registry)
         files = gen.generate("gl", "4.5")
         hpp = files["include/glaze/gl.hpp"]
         # Each constexpr token sits inside its own #ifndef GLAZE_GL_NO_EXT_<short>
@@ -284,7 +289,7 @@ class TestCppGeneratorExtensions:
         assert prev_line == "#ifndef GLAZE_GL_NO_EXT_ARB_draw_instanced"
 
     def test_supports_overloads_present(self, mini_registry: Registry) -> None:
-        gen = CppGenerator(mini_registry)
+        gen = self._gen(mini_registry)
         files = gen.generate("gl", "4.5")
         hpp = files["include/glaze/gl.hpp"]
         assert "inline bool supports(const Extension &ext)" in hpp
@@ -292,7 +297,7 @@ class TestCppGeneratorExtensions:
         assert "inline bool supports(int major, int minor)" in hpp
 
     def test_extension_functor_emitted_and_guarded(self, mini_registry: Registry) -> None:
-        gen = CppGenerator(mini_registry)
+        gen = self._gen(mini_registry)
         files = gen.generate("gl", "4.5")
         hpp = files["include/glaze/gl.hpp"]
         struct_target = "struct _DrawArraysInstancedARBFn"
@@ -311,7 +316,7 @@ class TestCppGeneratorExtensions:
         assert prev_prev == "#ifndef GLAZE_GL_NO_EXTENSIONS"
 
     def test_extension_runtime_inside_master_switch(self, mini_registry: Registry) -> None:
-        gen = CppGenerator(mini_registry)
+        gen = self._gen(mini_registry)
         files = gen.generate("gl", "4.5")
         hpp = files["include/glaze/gl.hpp"]
         master_idx = hpp.find("// ── Extension runtime")
@@ -323,6 +328,30 @@ class TestCppGeneratorExtensions:
         block = hpp[opener_idx:closer_idx]
         assert "namespace exts" in block
         assert "supports(const Extension" in block
+
+    def test_default_no_extensions(self, mini_registry: Registry) -> None:
+        """With no extension filters, no extensions should be emitted."""
+        gen = CppGenerator(mini_registry)
+        files = gen.generate("gl", "4.5")
+        hpp = files["include/glaze/gl.hpp"]
+        assert "GL_ARB_buffer_storage" not in hpp
+        assert "GL_ARB_draw_instanced" not in hpp
+        assert "GL_NV_shader_buffer_load" not in hpp
+
+    def test_vendor_filter_includes_only_matching(self, mini_registry: Registry) -> None:
+        gen = CppGenerator(mini_registry, extension_vendors=["NV"])
+        files = gen.generate("gl", "4.5")
+        hpp = files["include/glaze/gl.hpp"]
+        assert "GL_NV_shader_buffer_load" in hpp
+        assert "GL_ARB_buffer_storage" not in hpp
+
+    def test_vendor_and_name_filters_are_additive(self, mini_registry: Registry) -> None:
+        gen = CppGenerator(mini_registry, extension_vendors=["ARB"], extension_names=["GL_KHR_debug"])
+        files = gen.generate("gl", "4.5")
+        hpp = files["include/glaze/gl.hpp"]
+        assert "GL_ARB_buffer_storage" in hpp
+        assert "GL_KHR_debug" in hpp
+        assert "GL_NV_shader_buffer_load" not in hpp
 
 
 class TestCppGeneratorFlags:

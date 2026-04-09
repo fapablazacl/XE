@@ -79,11 +79,21 @@ A single `python glaze_cli.py generate --api gl X.Y --lang cpp` invocation produ
 ### Generate code
 
 ```bash
-# Generate C header + source
+# Generate C header + source (core only, no extensions)
 python3 glaze_cli.py generate --api gl 3.3 --lang c --output-dir out/
 
-# Generate C++ header
+# Generate C++ header (core only, no extensions)
 python3 glaze_cli.py generate --api gl 3.3 --lang cpp --output-dir out/
+
+# Generate with all ARB and KHR extensions
+python3 glaze_cli.py generate --api gl 3.3 --lang cpp --extension-vendors ARB,KHR --output-dir out/
+
+# Generate with specific individual extensions
+python3 glaze_cli.py generate --api gl 3.3 --lang c --extensions GL_KHR_debug,GL_ARB_buffer_storage --output-dir out/
+
+# Combine vendor and individual extension filters (additive)
+python3 glaze_cli.py generate --api gl 4.6 --lang c --lang cpp \
+  --extension-vendors ARB --extensions GL_NV_shader_atomic_float --output-dir out/
 
 # Generate both languages in one invocation (--lang is repeatable)
 python3 glaze_cli.py generate --api gl 4.6 --api gles1 1.0 --lang c --lang cpp --output-dir out/
@@ -91,6 +101,8 @@ python3 glaze_cli.py generate --api gl 4.6 --api gles1 1.0 --lang c --lang cpp -
 # List all available APIs and versions from the registry
 python3 glaze_cli.py list-apis
 ```
+
+Extension generation is **opt-in**: if neither `--extension-vendors` nor `--extensions` is specified, no extensions are emitted. The two options are additive (union).
 
 ### Lint, format, and type-check
 
@@ -109,7 +121,14 @@ pytest tests/ -v
 ### Build as Conan package
 
 ```bash
+# Core only (no extensions)
 conan create . --build=missing -o "apis=gl:3.3" -o "language=cpp"
+
+# With ARB and KHR extensions
+conan create . --build=missing -o "apis=gl:3.3" -o "language=cpp" -o "extension_vendors=ARB,KHR"
+
+# With specific extensions
+conan create . --build=missing -o "apis=gl:3.3" -o "language=cpp" -o "extensions=GL_KHR_debug"
 ```
 
 ### Data model concepts

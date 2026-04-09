@@ -121,29 +121,34 @@ class TestCGeneratorVersionGating:
 
 
 class TestCGeneratorExtensions:
+    """Tests that exercise extension emission with explicit vendor opt-in."""
+
+    def _gen(self, registry: Registry, **kwargs) -> CGenerator:
+        return CGenerator(registry, extension_vendors=["ARB"], **kwargs)
+
     def test_emits_per_extension_guard(self, mini_registry: Registry) -> None:
-        gen = CGenerator(mini_registry)
+        gen = self._gen(mini_registry)
         files = gen.generate("gl", "4.5")
         header = files["include/glaze/gl.h"]
         assert "#ifndef GLAZE_GL_NO_EXT_ARB_buffer_storage" in header
         assert "#ifndef GLAZE_GL_NO_EXT_ARB_draw_instanced" in header
 
     def test_emits_khronos_define(self, mini_registry: Registry) -> None:
-        gen = CGenerator(mini_registry)
+        gen = self._gen(mini_registry)
         files = gen.generate("gl", "4.5")
         header = files["include/glaze/gl.h"]
         assert "#define GL_ARB_buffer_storage 1" in header
         assert "#define GL_ARB_draw_instanced 1" in header
 
     def test_emits_extension_flag_extern(self, mini_registry: Registry) -> None:
-        gen = CGenerator(mini_registry)
+        gen = self._gen(mini_registry)
         files = gen.generate("gl", "4.5")
         header = files["include/glaze/gl.h"]
         assert "GLAZE_API extern int GLAZE_EXT_GL_ARB_buffer_storage;" in header
         assert "GLAZE_API extern int GLAZE_EXT_GL_ARB_draw_instanced;" in header
 
     def test_extension_command_emitted(self, mini_registry: Registry) -> None:
-        gen = CGenerator(mini_registry)
+        gen = self._gen(mini_registry)
         files = gen.generate("gl", "4.5")
         header = files["include/glaze/gl.h"]
         # The extension's typedef appears, and it appears AFTER the per-ext guard.
@@ -153,7 +158,7 @@ class TestCGeneratorExtensions:
 
     def test_dedups_enum_already_in_core(self, mini_registry: Registry) -> None:
         """An extension enum that core already requires must not be re-emitted."""
-        gen = CGenerator(mini_registry)
+        gen = self._gen(mini_registry)
         files = gen.generate("gl", "4.5")
         header = files["include/glaze/gl.h"]
         # GL_ARRAY_BUFFER is required by core 1.5 AND by GL_ARB_buffer_storage —
@@ -161,7 +166,7 @@ class TestCGeneratorExtensions:
         assert header.count("#define GL_ARRAY_BUFFER ") == 1
 
     def test_glaze_load_extensions_prototype(self, mini_registry: Registry) -> None:
-        gen = CGenerator(mini_registry)
+        gen = self._gen(mini_registry)
         files = gen.generate("gl", "4.5")
         header = files["include/glaze/gl.h"]
         assert "GLAZE_API void glazeLoadExtensions(GLAZE_GETPROCADDRESS getProcAddress);" in header
@@ -170,7 +175,7 @@ class TestCGeneratorExtensions:
 
     def test_master_no_extensions_switch(self, mini_registry: Registry) -> None:
         """Both header and source extension sections sit inside the master switch."""
-        gen = CGenerator(mini_registry)
+        gen = self._gen(mini_registry)
         files = gen.generate("gl", "4.5")
         header = files["include/glaze/gl.h"]
         source = files["src/gl.c"]
@@ -180,13 +185,78 @@ class TestCGeneratorExtensions:
         assert "#endif /* GLAZE_GL_NO_EXTENSIONS */" in source
 
     def test_extension_loader_sets_flag_and_loads_pointers(self, mini_registry: Registry) -> None:
-        gen = CGenerator(mini_registry)
+        gen = self._gen(mini_registry)
         files = gen.generate("gl", "4.5")
         source = files["src/gl.c"]
         # The runtime sets the flag and loads the function pointer for the
         # command-bearing extension.
         assert "GLAZE_EXT_GL_ARB_draw_instanced = 1;" in source
         assert 'getProcAddress("glDrawArraysInstancedARB")' in source
+
+    def test_default_no_extensions(self, mini_registry: Registry) -> None:
+        """With no extension filters, no extensions should be emitted."""
+        gen = CGenerator(mini_registry)
+        files = gen.generate("gl", "4.5")
+        header = files["include/glaze/gl.h"]
+        assert "GL_ARB_buffer_storage" not in header
+        assert "GL_ARB_draw_instanced" not in header
+        assert "GL_NV_shader_buffer_load" not in header
+        assert "GL_KHR_debug" not in header
+
+    def test_vendor_filter_includes_only_matching(self, mini_registry: Registry) -> None:
+        gen = CGenerator(mini_registry, extension_vendors=["NV"])
+        files = gen.generate("gl", "4.5")
+        header = files["include/glaze/gl.h"]
+        assert "GL_NV_shader_buffer_load" in header
+        assert "GL_ARB_buffer_storage" not in header
+        assert "GL_KHR_debug" not in header
+
+    def test_name_filter_includes_only_matching(self, mini_registry: Registry) -> None:
+        gen = CGenerator(mini_registry, extension_names=["GL_KHR_debug"])
+        files = gen.generate("gl", "4.5")
+        header = files["include/glaze/gl.h"]
+        assert "GL_KHR_debug" in header
+        assert "GL_ARB_buffer_storage" not in header
+        assert "GL_NV_shader_buffer_load" not in header
+
+    def test_vendor_and_name_filters_are_additive(self, mini_registry: Registry) -> None:
+        gen = CGenerator(mini_registry, extension_vendors=["ARB"], extension_names=["GL_KHR_debug"])
+        files = gen.generate("gl", "4.5")
+        header = files["include/glaze/gl.h"]
+        assert "GL_ARB_buffer_storage" in header
+        assert "GL_ARB_draw_instanced" in header
+        assert "GL_KHR_debug" in header
+        assert "GL_NV_shader_buffer_load" not in header
+
+    def test_vendor_filter_case_insensitive(self, mini_registry: Registry) -> None:
+        gen = CGenerator(mini_registry, extension_vendors=["arb"])
+        files = gen.generate("gl", "4.5")
+        header = files["include/glaze/gl.h"]
+        assert "GL_ARB_buffer_storage" in header
+
+
+class TestExtensionFilterValidation:
+    def test_unknown_vendor_returns_error(self, mini_registry: Registry) -> None:
+        gen = CGenerator(mini_registry, extension_vendors=["FAKE_VENDOR"])
+        errors = gen.validate_extension_filters("gl")
+        assert len(errors) == 1
+        assert "FAKE_VENDOR" in errors[0]
+
+    def test_unknown_extension_name_returns_error(self, mini_registry: Registry) -> None:
+        gen = CGenerator(mini_registry, extension_names=["GL_FOO_nonexistent"])
+        errors = gen.validate_extension_filters("gl")
+        assert len(errors) == 1
+        assert "GL_FOO_nonexistent" in errors[0]
+
+    def test_valid_vendor_returns_no_errors(self, mini_registry: Registry) -> None:
+        gen = CGenerator(mini_registry, extension_vendors=["ARB", "NV"])
+        errors = gen.validate_extension_filters("gl")
+        assert errors == []
+
+    def test_valid_extension_name_returns_no_errors(self, mini_registry: Registry) -> None:
+        gen = CGenerator(mini_registry, extension_names=["GL_ARB_buffer_storage"])
+        errors = gen.validate_extension_filters("gl")
+        assert errors == []
 
 
 class TestCGeneratorTimestamp:

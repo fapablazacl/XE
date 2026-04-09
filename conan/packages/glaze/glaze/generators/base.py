@@ -14,6 +14,20 @@ _env = jinja2.Environment(
 )
 
 
+def _vendor_of(extension_name: str) -> str | None:
+    """Extract the vendor token from an extension name.
+
+    ``GL_ARB_buffer_storage`` → ``ARB``, ``GL_3DFX_multisample`` → ``3DFX``.
+    Returns ``None`` if the name doesn't follow the ``GL_<VENDOR>_*`` pattern.
+    """
+    if not extension_name.startswith("GL_"):
+        return None
+    rest = extension_name[3:]
+    if "_" not in rest:
+        return None
+    return rest.split("_", 1)[0].upper()
+
+
 class Generator(ABC):
     """Abstract base for all language generators.
 
@@ -21,9 +35,19 @@ class Generator(ABC):
     output files keyed by their relative path.
     """
 
-    def __init__(self, registry: Registry, doc_index: dict[str, FunctionDoc] | None = None):
+    def __init__(
+        self,
+        registry: Registry,
+        doc_index: dict[str, FunctionDoc] | None = None,
+        extension_vendors: list[str] | None = None,
+        extension_names: list[str] | None = None,
+    ):
         self.registry = registry
         self.doc_index: dict[str, FunctionDoc] = doc_index or {}
+        self._extension_vendor_set: set[str] = {
+            v.upper() for v in (extension_vendors or [])
+        }
+        self._extension_name_set: set[str] = set(extension_names or [])
 
     @abstractmethod
     def generate(self, api: str, version: str) -> dict[str, str]:
@@ -62,8 +86,11 @@ class Generator(ABC):
     def _collect_extension_emissions(self, api: str, version: str) -> list[dict]:
         """Return per-extension emission descriptors for the given API/ceiling.
 
-        For each extension whose ``supported`` list contains the resolved
-        registry api, returns a dict carrying the metadata both generators need:
+        Only extensions matching the constructor-supplied ``extension_vendors``
+        or ``extension_names`` filters are included.  If neither filter was set,
+        an empty list is returned (extensions are opt-in).
+
+        For each matched extension returns a dict carrying:
 
         - ``name``: the full Khronos extension name (e.g. ``GL_ARB_buffer_storage``).
         - ``short_name``: the name with the ``GL_`` prefix stripped, used in the
@@ -84,7 +111,7 @@ class Generator(ABC):
         new to declare. Extensions are returned in registry declaration order.
         """
         consolidated = self.registry.consolidate(api, version)
-        extensions = self.registry.extensions_for_api(api)
+        extensions = self._filter_extensions(self.registry.extensions_for_api(api))
         emissions: list[dict] = []
         for ext in extensions:
             short_name = ext.name[3:] if ext.name.startswith("GL_") else ext.name
@@ -125,6 +152,49 @@ class Generator(ABC):
                 }
             )
         return emissions
+
+    def _filter_extensions(self, extensions: list) -> list:
+        """Filter extensions by the configured vendor and name sets.
+
+        Returns only extensions whose vendor matches ``_extension_vendor_set``
+        or whose full name is in ``_extension_name_set``.  When both sets are
+        empty, returns an empty list (opt-in default).
+        """
+        if not self._extension_vendor_set and not self._extension_name_set:
+            return []
+        result = []
+        for ext in extensions:
+            if ext.name in self._extension_name_set:
+                result.append(ext)
+            elif _vendor_of(ext.name) in self._extension_vendor_set:
+                result.append(ext)
+        return result
+
+    def validate_extension_filters(self, api: str) -> list[str]:
+        """Check that every requested vendor/extension exists for ``api``.
+
+        Returns a list of error messages (empty if everything is valid).
+        """
+        extensions = self.registry.extensions_for_api(api)
+        known_vendors: set[str] = set()
+        known_names: set[str] = set()
+        for ext in extensions:
+            known_names.add(ext.name)
+            vendor = _vendor_of(ext.name)
+            if vendor:
+                known_vendors.add(vendor)
+
+        errors: list[str] = []
+        for v in sorted(self._extension_vendor_set):
+            if v not in known_vendors:
+                errors.append(
+                    f"unknown extension vendor '{v}' for api '{api}'. "
+                    f"Known vendors: {', '.join(sorted(known_vendors))}"
+                )
+        for n in sorted(self._extension_name_set):
+            if n not in known_names:
+                errors.append(f"unknown extension '{n}' for api '{api}'.")
+        return errors
 
     def _check_api_version(self, api: str, version: str) -> None:
         """Validate that the given API and version are available."""

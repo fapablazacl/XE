@@ -235,11 +235,13 @@ class TestRegistry:
         gl_names = {e.name for e in gl_exts}
         assert "GL_ARB_buffer_storage" in gl_names
         assert "GL_ARB_draw_instanced" in gl_names
-        # GL_ARB_draw_instanced is `supported="gl"` only — so gles2 sees only the
-        # buffer_storage extension.
+        assert "GL_NV_shader_buffer_load" in gl_names
+        assert "GL_KHR_debug" in gl_names
+        # GL_ARB_draw_instanced and GL_NV_shader_buffer_load are `supported="gl"` only —
+        # so gles2 sees only the buffer_storage and KHR_debug extensions.
         gles2_exts = mini_registry.extensions_for_api("gles2")
         gles2_names = {e.name for e in gles2_exts}
-        assert gles2_names == {"GL_ARB_buffer_storage"}
+        assert gles2_names == {"GL_ARB_buffer_storage", "GL_KHR_debug"}
         assert mini_registry.extensions_for_api("gles1") == []
 
     def test_extensions_for_api_resolves_virtual_api(self, mini_registry: Registry) -> None:

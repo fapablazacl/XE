@@ -39,3 +39,26 @@ class TestBuildParser:
         parser = build_parser()
         args = parser.parse_args(["generate", "--api", "gl", "3.3", "--lang", "c"])
         assert args.output_dir == "."
+
+    def test_extension_vendors_arg(self) -> None:
+        parser = build_parser()
+        args = parser.parse_args(
+            ["generate", "--api", "gl", "3.3", "--lang", "c", "--extension-vendors", "ARB,EXT"]
+        )
+        assert args.extension_vendors == "ARB,EXT"
+
+    def test_extensions_arg(self) -> None:
+        parser = build_parser()
+        args = parser.parse_args(
+            [
+                "generate", "--api", "gl", "3.3", "--lang", "c",
+                "--extensions", "GL_KHR_debug,GL_NV_shader_buffer_load",
+            ]
+        )
+        assert args.extensions == "GL_KHR_debug,GL_NV_shader_buffer_load"
+
+    def test_extension_args_default_empty(self) -> None:
+        parser = build_parser()
+        args = parser.parse_args(["generate", "--api", "gl", "3.3", "--lang", "c"])
+        assert args.extension_vendors == ""
+        assert args.extensions == ""

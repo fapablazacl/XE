@@ -170,6 +170,19 @@ MINI_XML = """\
     </require>
   </feature>
 
+  <commands namespace="GL">
+    <command>
+      <proto>void <name>glMakeBufferResidentNV</name></proto>
+      <param group="BufferTargetARB"><ptype>GLenum</ptype> <name>target</name></param>
+      <param><ptype>GLenum</ptype> <name>access</name></param>
+    </command>
+    <command>
+      <proto>void <name>glDebugMessageCallbackKHR</name></proto>
+      <param><ptype>GLenum</ptype> <name>source</name></param>
+      <param><ptype>GLuint</ptype> <name>id</name></param>
+    </command>
+  </commands>
+
   <extensions>
     <extension name="GL_ARB_buffer_storage" supported="gl|gles2">
       <require>
@@ -179,6 +192,16 @@ MINI_XML = """\
     <extension name="GL_ARB_draw_instanced" supported="gl">
       <require>
         <command name="glDrawArraysInstancedARB"/>
+      </require>
+    </extension>
+    <extension name="GL_NV_shader_buffer_load" supported="gl">
+      <require>
+        <command name="glMakeBufferResidentNV"/>
+      </require>
+    </extension>
+    <extension name="GL_KHR_debug" supported="gl|gles2">
+      <require>
+        <command name="glDebugMessageCallbackKHR"/>
       </require>
     </extension>
   </extensions>

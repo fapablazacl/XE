@@ -206,7 +206,7 @@ class TestParseFullMiniRegistry:
         assert len(mini_registry.features_by_api["gles2"]) == 1
 
     def test_extensions_count(self, mini_registry: Registry) -> None:
-        assert len(mini_registry.extensions_list) == 2
+        assert len(mini_registry.extensions_list) == 4
 
 
 class TestParseErrors:

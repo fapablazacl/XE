@@ -45,7 +45,14 @@
       "Bash(python -m ruff format glaze/generators/cpp_generator.py tests/test_c_generator.py tests/test_cpp_generator.py tests/test_model.py)",
       "Bash(conan create:*)",
       "Bash(python glaze_cli.py generate --api gl 3.3 --lang c --output-dir /tmp/glaze_test)",
-      "Bash(pytest tests/ -x -q)"
+      "Bash(pytest tests/ -x -q)",
+      "Bash(pytest tests/ -v)",
+      "Bash(python glaze_cli.py generate --api gl 3.3 --lang c --output-dir /tmp/glaze_default)",
+      "Read(//tmp/glaze_default/include/glaze/**)",
+      "Bash(python glaze_cli.py generate --api gl 3.3 --lang c --extension-vendors ARB,KHR --output-dir /tmp/glaze_arb_khr)",
+      "Read(//tmp/glaze_arb_khr/include/glaze/**)",
+      "Bash(python glaze_cli.py generate --api gl 3.3 --lang c --extensions GL_FOO_does_not_exist --output-dir /tmp/glaze_bad)",
+      "Bash(echo \"EXIT: $?\")"
     ]
   }
 }
