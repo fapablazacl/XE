@@ -1,15 +1,18 @@
+#pragma once
 
-#ifndef __XE_MATH_ROTATION_HPP__
-#define __XE_MATH_ROTATION_HPP__
-
+#include "Common.h"
 #include "Vector.h"
 
 namespace xe {
-    template <typename T> struct Rotation {
+    /**
+     * @brief Axis-angle rotation (radians). Used as an explicit conversion
+     * target from @ref tquat.
+     */
+    template <typename T> struct axis_angle {
         T angle;
-        TVector<T, 3> axis;
+        tvec<T, 3> axis;
     };
 
+    // Legacy PascalCase alias. See Legacy.h.
+    template <typename T> using Rotation = axis_angle<T>;
 } // namespace xe
-
-#endif

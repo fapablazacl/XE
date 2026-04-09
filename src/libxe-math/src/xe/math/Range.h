@@ -1,4 +1,3 @@
-
 #pragma once
 
 #include <algorithm>
@@ -7,76 +6,63 @@
 
 namespace xe {
     /**
-     * @brief Mathematical Range pair implementation.
+     * @brief Half-open numeric range @f$[min, max)@f$.
      *
-     * This struct represent Ranges of the form:
-     * [min, max)
-     *
-     * @tparam T
+     * Not part of glm — it's an xe::math utility used by @ref tboundary for SAT
+     * projection intersection tests.
      */
-    template <typename T> struct TRange {
+    template <typename T> struct trange {
         T min = static_cast<T>(0);
         T max = static_cast<T>(1);
 
-        TRange() {
+        constexpr trange() noexcept = default;
+
+        constexpr explicit trange(T value) noexcept : min(value), max(value) {
         }
 
-        explicit TRange(const T value) : min(value), max(value) {
+        constexpr trange(T a, T b) noexcept : min(a), max(a) {
+            expand(b);
         }
 
-        explicit TRange(const T value1, const T value2) : TRange(value1) {
-            expand(value2);
+        constexpr void expand(T value) noexcept {
+            if (value < min) {
+                min = value;
+            }
+            if (value > max) {
+                max = value;
+            }
         }
 
-        void expand(const T value) {
-            min = std::min(min, value);
-            max = std::max(max, value);
-        }
-
-        bool overlap(const TRange<T> &other) const {
+        [[nodiscard]] constexpr bool overlap(const trange<T> &other) const noexcept {
             return partialOverlap(other) || other.partialOverlap(*this);
         }
 
-        /**
-         * @brief Checks if the current Projection overlaps with the supplied Projection.
-         *
-         * @param other
-         * @return true
-         * @return false
-         */
-        bool partialOverlap(const TRange<T> &other) const {
+        [[nodiscard]] constexpr bool partialOverlap(const trange<T> &other) const noexcept {
             assert(max >= min);
             assert(other.max >= other.min);
 
             if (min >= other.min && min < other.max) {
                 return true;
             }
-
             if (max > other.min && max < other.max) {
                 return true;
             }
-
             return false;
         }
     };
 
-    /**
-     * @brief Serializes a Range<T> using the supplied ostream
-     */
-    template <typename T> inline std::ostream &operator<<(std::ostream &os, const TRange<T> &range) {
-        os << "xe::Range<" << typeid(T).name() << ">{ ";
-
-        os << range.min << ", ";
-        os << range.max << " }";
-
+    template <typename T> inline std::ostream &operator<<(std::ostream &os, const trange<T> &r) {
+        os << "xe::trange{ " << r.min << ", " << r.max << " }";
         return os;
     }
 
-    using Range = TRange<float>;
-    using Ranged = TRange<double>;
-    using Rangei = TRange<int>;
+    using range = trange<float>;
+    using drange = trange<double>;
+    using irange = trange<int>;
 
-    extern template struct TRange<float>;
-    extern template struct TRange<double>;
-    extern template struct TRange<int>;
+    // Legacy PascalCase aliases. See Legacy.h.
+    template <typename T> using TRange = trange<T>;
+    using Range = range;
+    using Ranged = drange;
+    using Rangei = irange;
 } // namespace xe

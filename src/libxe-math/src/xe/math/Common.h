@@ -1,47 +1,46 @@
 /**
- * @file Common.hpp
- * @brief Common utility definitions and functions
+ * @file Common.h
+ * @brief Common math constants and scalar helpers.
+ *
+ * Names and semantics match GLM where possible, so xe::pi, xe::radians,
+ * xe::degrees, xe::lerp, xe::equals, and xe::epsilon behave as their glm::
+ * counterparts.
  */
 
-#ifndef __XE_MATH_COMMON_HPP__
-#define __XE_MATH_COMMON_HPP__
+#pragma once
 
-#include <cassert>
 #include <cmath>
-#include <limits>
-#include <sstream>
-#include <string>
+#include <cstdlib>
 
 namespace xe {
-    template <typename T> inline const T DEFAULT_EPSILON = T{0.000001};
+    //! Default infinitesimal used by @ref equals when no explicit epsilon is supplied.
+    template <typename T> inline constexpr T epsilon = static_cast<T>(1e-6);
 
-    //! Perform a safe comparison between two floating point using the default reference "infinitesimal" epsilon
-    template <typename T> bool equals(const T a, const T b) {
-        return std::abs(a - b) <= DEFAULT_EPSILON<T>;
+    //! Pi constant.
+    template <typename T> inline constexpr T pi = static_cast<T>(3.141592653589793238);
+
+    //! Absolute-difference comparison against the default @ref epsilon.
+    template <typename T> [[nodiscard]] constexpr bool equals(const T a, const T b) noexcept {
+        return (a > b ? a - b : b - a) <= epsilon<T>;
     }
 
-    //! Perform a safe comparison between two floating point using a reference "infinitesimal" epsilon
-    template <typename T> bool equals(const T a, const T b, const T epsilon) {
-        return std::abs(a - b) <= epsilon;
+    //! Absolute-difference comparison against a caller-supplied epsilon.
+    template <typename T> [[nodiscard]] constexpr bool equals(const T a, const T b, const T eps) noexcept {
+        return (a > b ? a - b : b - a) <= eps;
     }
 
-    //! Variable Template that contains the PI value
-    template <typename T> inline const T pi = static_cast<T>(3.141592653589793238);
-
-    //! Converts Degrees to Radians.
-    template <typename T> constexpr T radians(const T degrees) {
+    //! Convert degrees to radians.
+    template <typename T> [[nodiscard]] constexpr T radians(const T degrees) noexcept {
         return degrees * pi<T> / static_cast<T>(180);
     }
 
-    //! Converts Radians to Degrees
-    template <typename T> constexpr T degrees(const T radians) {
+    //! Convert radians to degrees.
+    template <typename T> [[nodiscard]] constexpr T degrees(const T radians) noexcept {
         return radians * static_cast<T>(180) / pi<T>;
     }
 
-    //! Performs a Linear Interpolation between two values.
-    template <typename T, typename S> T lerp(const T v1, const T v2, const S s) {
+    //! Scalar linear interpolation: result = v1 + (v2 - v1) * s.
+    template <typename T, typename S> [[nodiscard]] constexpr T lerp(const T v1, const T v2, const S s) noexcept {
         return v1 + (v2 - v1) * s;
     }
 } // namespace xe
-
-#endif

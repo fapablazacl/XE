@@ -1,30 +1,29 @@
+#pragma once
 
-#ifndef __XE_MATH_BOX_HPP__
-#define __XE_MATH_BOX_HPP__
+#include <ostream>
+#include <typeinfo>
 
 #include "Boundary.h"
 
 namespace xe {
-    extern template class TBoundary<float, 3>;
-    extern template class TBoundary<double, 3>;
-    extern template class TBoundary<int, 3>;
+    //! 3D axis-aligned bounding box. Not part of glm.
+    template <typename T> using tbox = tboundary<T, 3>;
 
-    //! Bounding box in 3-space. It's a Boundary specialization
-    template <typename T> using TBox = TBoundary<T, 3>;
+    using box = tbox<float>;
+    using dbox = tbox<double>;
+    using ibox = tbox<int>;
 
-    using Box = TBox<float>;
-    using Boxd = TBox<double>;
-    using Boxi = TBox<int>;
+    // Legacy PascalCase aliases. See Legacy.h.
+    template <typename T> using TBox = tbox<T>;
+    using Box = box;
+    using Boxd = dbox;
+    using Boxi = ibox;
 
-    //! Serializes the content of a Box object to an ostream.
-    template <typename T> inline std::ostream &operator<<(std::ostream &os, const TBox<T> &box) {
-        os << "xe::Box<" << typeid(T).name() << ">{ " << std::endl;
-        os << "    " << box.getMinEdge() << ", " << std::endl;
-        os << "    " << box.getMaxEdge() << std::endl;
-        os << "}" << std::endl;
-
+    template <typename T> inline std::ostream &operator<<(std::ostream &os, const tbox<T> &b) {
+        os << "xe::box<" << typeid(T).name() << ">{\n";
+        os << "    " << b.getMinEdge() << ",\n";
+        os << "    " << b.getMaxEdge() << "\n";
+        os << "}";
         return os;
     }
 } // namespace xe
-
-#endif

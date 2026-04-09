@@ -1,43 +1,37 @@
+#pragma once
 
-#ifndef __XE_MATH_ELLIPSOID_HPP__
-#define __XE_MATH_ELLIPSOID_HPP__
+#include <ostream>
+#include <typeinfo>
 
 #include "Vector.h"
 
-#include <limits>
-
 namespace xe {
     /**
-     * @brief Ellipsoid in the 3-space
+     * @brief Axis-aligned ellipsoid. Not part of glm.
      */
-    template <typename T> struct TEllipsoid {
-        TVector<T, 3> center;
-        TVector<T, 3> size;
+    template <typename T> struct tellipsoid {
+        tvec<T, 3> center{T(0), T(0), T(0)};
+        tvec<T, 3> size{T(1), T(1), T(1)};
 
-        //! Initializes an Ellipsoid at the origin with radius 1, 1, 1.
-        TEllipsoid() : center{T(0), T(0), T(0)}, size{T(1), T(1), T(1)} {
-        }
+        constexpr tellipsoid() noexcept = default;
 
-        //! Initializes a Ellipsoid from the given center and radius
-        TEllipsoid(const TVector<T, 3> &center, const TVector<T, 3> &size) : center(center), size(size) {
+        constexpr tellipsoid(const tvec<T, 3> &c, const tvec<T, 3> &s) noexcept : center(c), size(s) {
         }
     };
 
-    //! Serializes the content of a Box object to an ostream.
-    template <typename T> inline std::ostream &operator<<(std::ostream &os, const TEllipsoid<T> &ellipsoid) {
-        os << "xe::Ellipsoid<" << typeid(T).name() << "{ " << std::endl;
-        os << "    " << ellipsoid.center << ", " << std::endl;
-        os << "    " << ellipsoid.size << std::endl;
-        os << "}" << std::endl;
-
+    template <typename T> inline std::ostream &operator<<(std::ostream &os, const tellipsoid<T> &e) {
+        os << "xe::ellipsoid<" << typeid(T).name() << ">{\n";
+        os << "    " << e.center << ",\n";
+        os << "    " << e.size << "\n";
+        os << "}";
         return os;
     }
 
-    extern template struct TEllipsoid<float>;
-    extern template struct TEllipsoid<double>;
+    using ellipsoid = tellipsoid<float>;
+    using dellipsoid = tellipsoid<double>;
 
-    using Ellipsoid = TEllipsoid<float>;
-    using Ellipsoidd = TEllipsoid<double>;
+    // Legacy PascalCase aliases. See Legacy.h.
+    template <typename T> using TEllipsoid = tellipsoid<T>;
+    using Ellipsoid = ellipsoid;
+    using Ellipsoidd = dellipsoid;
 } // namespace xe
-
-#endif

@@ -1,12 +1,21 @@
+/**
+ * @file Quaternion.h
+ * @brief GLM-style quaternion type for xe::math.
+ *
+ * Matches glm::qua<T, Q>:
+ *   - Memory layout is (x, y, z, w) — 16 bytes for float, bit-identical to glm::quat.
+ *   - The default scalar-first constructor @c tquat(w, x, y, z) also matches glm.
+ *   - @c length / @c length2 / @c normalize / @c dot / @c conjugate / @c inverse
+ *     names line up with glm's.
+ *   - Use @c angleAxis(radians, axis) to build a rotation (matches glm::angleAxis).
+ *   - @c q * vec3 rotates the vector.
+ */
 
 #pragma once
 
-#ifndef __XE_MATH_QUATERNION_HPP__
-#define __XE_MATH_QUATERNION_HPP__
-
 #include <cassert>
 #include <cmath>
-#include <cstdint>
+#include <cstddef>
 
 #include "Common.h"
 #include "Rotation.h"
@@ -14,328 +23,214 @@
 
 #if defined(_MSC_VER)
 #pragma warning(push)
-#pragma warning(disable : 4201) // non-standard extension used: nameless struct/union
+#pragma warning(disable : 4201) // nonstandard extension used: nameless struct/union
 #endif
 
 namespace xe {
-    template <typename T> struct TQuaternion {
+    template <typename T> struct tquat {
+        // Storage: x, y, z, w in memory — matches glm::qua<T, Q>.
+        // The legacy uppercase X/Y/Z/W aliases live in a second anon struct
+        // of the same union, kept for source compatibility with consumer code
+        // that still uses `q.W` — see Legacy.h.
         union {
             struct {
-                TVector<T, 3> V;
-                T W;
+                T x, y, z, w;
             };
-
-            T values[4];
+            struct {
+                T X, Y, Z, W;
+            };
         };
 
-        TQuaternion() {
-            V.X = V.Y = V.Z = W = T(0);
+        constexpr tquat() noexcept : x(T{}), y(T{}), z(T{}), w(T(1)) {
         }
 
-        explicit TQuaternion(const T w) {
-            V.X = V.Y = V.Z = T(0);
-            W = w;
+        //! Scalar-first constructor, matching glm::quat(w, x, y, z).
+        constexpr tquat(T wv, T xv, T yv, T zv) noexcept : x(xv), y(yv), z(zv), w(wv) {
         }
 
-        explicit TQuaternion(const T *values) {
-            assert(values);
-
-            for (int i = 0; i < 4; i++) {
-                this->values[i] = values[i];
-            }
+        //! Build from a 3D vector (imaginary part) and a scalar.
+        constexpr tquat(const tvec<T, 3> &v, T wv) noexcept : x(v.x), y(v.y), z(v.z), w(wv) {
         }
 
-        TQuaternion(const T x, const T y, const T z, const T w) {
-            V.X = x;
-            V.Y = y;
-            V.Z = z;
-            W = w;
+        //! Build from a pointer to four values in (x, y, z, w) order.
+        constexpr explicit tquat(const T *ptr) noexcept : x(ptr[0]), y(ptr[1]), z(ptr[2]), w(ptr[3]) {
         }
 
-        explicit TQuaternion(const TVector<T, 3> &v) {
-            V = v;
-            W = T(0);
+        //! Build from a 4-vector interpreted as (x, y, z, w).
+        constexpr explicit tquat(const tvec<T, 4> &v) noexcept : x(v.x), y(v.y), z(v.z), w(v.w) {
         }
 
-        explicit TQuaternion(const T x, const T y, const T z) {
-            V.X = x;
-            V.Y = y;
-            V.Z = z;
-            W = T(0);
-        }
-
-        TQuaternion(const TVector<T, 3> &v, T w) {
-            V = v;
-            W = w;
-        }
-
-        explicit TQuaternion(const TVector<T, 4> &v) {
-            V.X = v.X;
-            V.Y = v.Y;
-            V.Z = v.Z;
-            W = v.W;
-        }
-
-        TQuaternion(const TQuaternion<T> &other) {
-            V = other.V;
-            W = other.W;
-        }
-
-        TQuaternion<T> &operator=(const TQuaternion<T> &other) {
-            V = other.V;
-            W = other.W;
-
-            return *this;
-        }
-
-        [[nodiscard]] constexpr size_t size() const {
+        [[nodiscard]] static constexpr std::size_t size() noexcept {
             return 4;
         }
 
-        T *data() {
-            return &values[0];
+        [[nodiscard]] constexpr T *data() noexcept {
+            return &x;
         }
 
-        [[nodiscard]] const T *data() const {
-            return &values[0];
+        [[nodiscard]] constexpr const T *data() const noexcept {
+            return &x;
         }
 
-        constexpr const T &operator[](const size_t index) const {
-            assert(index < 4);
-
-            return values[index];
+        [[nodiscard]] constexpr T &operator[](std::size_t i) noexcept {
+            return (&x)[i];
         }
 
-        constexpr T &operator[](const size_t index) {
-            assert(index < 4);
-
-            return values[index];
+        [[nodiscard]] constexpr const T &operator[](std::size_t i) const noexcept {
+            return (&x)[i];
         }
 
-        explicit operator Rotation<T>() const {
-            const T angle = T(2) * std::acos(W);
-
-            if (angle == T(0)) {
-                return {angle, {T(1), T(0), T(0)}};
-            } else {
-                return {angle, normalize(V)};
+        //! Explicit conversion to an axis-angle rotation.
+        explicit operator axis_angle<T>() const {
+            const T a = T(2) * std::acos(w);
+            if (a == T(0)) {
+                return {a, {T(1), T(0), T(0)}};
             }
+            return {a, normalize(tvec<T, 3>{x, y, z})};
         }
 
-        explicit operator TVector<T, 4>() const {
-            return {V.X, V.Y, V.Z, W};
-        }
-
-        TQuaternion<T> operator+(const TQuaternion<T> &rhs) const {
-            TQuaternion<T> result;
-
-            for (int i = 0; i < 4; i++) {
-                result.values[i] = this->values[i] + rhs.values[i];
-            }
-
-            return result;
-        }
-
-        TQuaternion<T> operator-(const TQuaternion<T> &rhs) const {
-            TQuaternion<T> result;
-
-            for (int i = 0; i < 4; i++) {
-                result.values[i] = this->values[i] - rhs.values[i];
-            }
-
-            return result;
-        }
-
-        TQuaternion<T> operator-() const {
-            TQuaternion<T> result;
-
-            for (int i = 0; i < 4; i++) {
-                result.values[i] = -this->values[i];
-            }
-
-            return result;
-        }
-
-        TQuaternion<T> operator+() const {
-            return *this;
-        }
-
-        TQuaternion<T> operator*(const TQuaternion<T> &rhs) const {
-            const auto v1 = cross(V, rhs.V);
-            const auto v2 = rhs.V * W;
-            const auto v3 = V * rhs.W;
-            const auto v = v1 + v2 + v3;
-
-            const auto w = W * rhs.W - dot(V, rhs.V);
-
-            return {v, w};
-        }
-
-        TQuaternion<T> operator/(const TQuaternion<T> &rhs) const {
-            return (*this) * inverse(rhs);
-        }
-
-        TQuaternion<T> operator*(const T s) const {
-            TQuaternion<T> result;
-
-            for (int i = 0; i < 4; i++) {
-                result.values[i] = this->values[i] * s;
-            }
-
-            return result;
-        }
-
-        TQuaternion<T> operator/(const T s) const {
-            TQuaternion<T> result;
-
-            for (int i = 0; i < 4; i++) {
-                result.values[i] = this->values[i] / s;
-            }
-
-            return result;
-        }
-
-        friend TQuaternion<T> operator*(const T s, const TQuaternion<T> &q) {
-            return q * s;
-        }
-
-        TQuaternion<T> &operator+=(const TQuaternion<T> &rhs) {
-            for (int i = 0; i < 4; i++) {
-                this->values[i] += rhs.values[i];
-            }
-
-            return *this;
-        }
-
-        TQuaternion<T> &operator-=(const TQuaternion<T> &rhs) {
-            for (int i = 0; i < 4; i++) {
-                this->values[i] -= rhs.values[i];
-            }
-
-            return *this;
-        }
-
-        TQuaternion<T> &operator*=(const TQuaternion<T> &rhs) {
-            *this = *this * rhs;
-
-            return *this;
-        }
-
-        TQuaternion<T> &operator/=(const TQuaternion<T> &rhs) {
-            *this = *this / rhs;
-
-            return *this;
-        }
-
-        TQuaternion<T> &operator*=(const T s) {
-            for (int i = 0; i < 4; i++) {
-                this->values[i] *= s;
-            }
-
-            return *this;
-        }
-
-        TQuaternion<T> &operator/=(const T s) {
-            for (int i = 0; i < 4; i++) {
-                this->values[i] /= s;
-            }
-
-            return *this;
-        }
-
-        bool operator==(const TQuaternion<T> &rhs) const {
-            for (int i = 0; i < 4; i++) {
-                if (!equals(values[i], rhs.values[i])) {
-                    return false;
-                }
-            }
-
-            return true;
-        }
-
-        bool operator!=(const TQuaternion<T> &rhs) const {
-            return !(*this == rhs);
+        //! Explicit conversion to a 4-vector (x, y, z, w).
+        explicit constexpr operator tvec<T, 4>() const noexcept {
+            return {x, y, z, w};
         }
     };
 
-    template <typename T = float> TQuaternion<T> conjugate(const TQuaternion<T> &q) {
-        return {-q.V, q.W};
+    // ---------------------------------------------------------------------
+    // Arithmetic operators.
+    // ---------------------------------------------------------------------
+
+    template <typename T> [[nodiscard]] constexpr tquat<T> operator+(const tquat<T> &q) noexcept {
+        return q;
     }
 
-    template <typename T = float> TQuaternion<T> inverse(const TQuaternion<T> &q) {
-        return conjugate(q) / norm2(q);
+    template <typename T> [[nodiscard]] constexpr tquat<T> operator-(const tquat<T> &q) noexcept {
+        return {-q.w, -q.x, -q.y, -q.z};
     }
 
-    template <typename T = float> T dot(const TQuaternion<T> &q1, const TQuaternion<T> &q2) {
-        T sum = T(0);
-
-        for (int i = 0; i < 4; i++) {
-            sum += q1.values[i] * q2.values[i];
-        }
-
-        return sum;
+    template <typename T> [[nodiscard]] constexpr tquat<T> operator+(const tquat<T> &a, const tquat<T> &b) noexcept {
+        return {a.w + b.w, a.x + b.x, a.y + b.y, a.z + b.z};
     }
 
-    template <typename T = float> T norm2(const TQuaternion<T> &q) {
+    template <typename T> [[nodiscard]] constexpr tquat<T> operator-(const tquat<T> &a, const tquat<T> &b) noexcept {
+        return {a.w - b.w, a.x - b.x, a.y - b.y, a.z - b.z};
+    }
+
+    //! Hamilton product — matches glm's quat * quat.
+    template <typename T> [[nodiscard]] constexpr tquat<T> operator*(const tquat<T> &a, const tquat<T> &b) noexcept {
+        return {
+            a.w * b.w - a.x * b.x - a.y * b.y - a.z * b.z, // w
+            a.w * b.x + a.x * b.w + a.y * b.z - a.z * b.y, // x
+            a.w * b.y - a.x * b.z + a.y * b.w + a.z * b.x, // y
+            a.w * b.z + a.x * b.y - a.y * b.x + a.z * b.w, // z
+        };
+    }
+
+    template <typename T> [[nodiscard]] constexpr tquat<T> operator*(const tquat<T> &q, T s) noexcept {
+        return {q.w * s, q.x * s, q.y * s, q.z * s};
+    }
+
+    template <typename T> [[nodiscard]] constexpr tquat<T> operator*(T s, const tquat<T> &q) noexcept {
+        return q * s;
+    }
+
+    template <typename T> [[nodiscard]] constexpr tquat<T> operator/(const tquat<T> &q, T s) noexcept {
+        return {q.w / s, q.x / s, q.y / s, q.z / s};
+    }
+
+    template <typename T> constexpr tquat<T> &operator+=(tquat<T> &a, const tquat<T> &b) noexcept {
+        a = a + b;
+        return a;
+    }
+
+    template <typename T> constexpr tquat<T> &operator-=(tquat<T> &a, const tquat<T> &b) noexcept {
+        a = a - b;
+        return a;
+    }
+
+    template <typename T> constexpr tquat<T> &operator*=(tquat<T> &a, const tquat<T> &b) noexcept {
+        a = a * b;
+        return a;
+    }
+
+    template <typename T> constexpr tquat<T> &operator*=(tquat<T> &q, T s) noexcept {
+        q = q * s;
+        return q;
+    }
+
+    template <typename T> constexpr tquat<T> &operator/=(tquat<T> &q, T s) noexcept {
+        q = q / s;
+        return q;
+    }
+
+    template <typename T> [[nodiscard]] constexpr bool operator==(const tquat<T> &a, const tquat<T> &b) noexcept {
+        return a.x == b.x && a.y == b.y && a.z == b.z && a.w == b.w;
+    }
+
+    template <typename T> [[nodiscard]] constexpr bool operator!=(const tquat<T> &a, const tquat<T> &b) noexcept {
+        return !(a == b);
+    }
+
+    // ---------------------------------------------------------------------
+    // Geometric functions.
+    // ---------------------------------------------------------------------
+
+    template <typename T> [[nodiscard]] constexpr T dot(const tquat<T> &a, const tquat<T> &b) noexcept {
+        return a.x * b.x + a.y * b.y + a.z * b.z + a.w * b.w;
+    }
+
+    template <typename T> [[nodiscard]] constexpr T length2(const tquat<T> &q) noexcept {
         return dot(q, q);
     }
 
-    /**
-     * @brief Compute the magnitude, module or length (AKA Absolute Value) for a given Quaternion.
-     */
-    template <typename T = float> T norm(const TQuaternion<T> &q) {
-        return static_cast<T>(std::sqrt(norm2(q)));
+    template <typename T> [[nodiscard]] T length(const tquat<T> &q) {
+        return static_cast<T>(std::sqrt(length2(q)));
+    }
+
+    template <typename T> [[nodiscard]] tquat<T> normalize(const tquat<T> &q) {
+        return q / length(q);
+    }
+
+    template <typename T> [[nodiscard]] constexpr tquat<T> conjugate(const tquat<T> &q) noexcept {
+        return {q.w, -q.x, -q.y, -q.z};
+    }
+
+    template <typename T> [[nodiscard]] constexpr tquat<T> inverse(const tquat<T> &q) noexcept {
+        return conjugate(q) / length2(q);
     }
 
     /**
-     * @brief Compute a Quaternion with a unit magnitude (1)
+     * @brief Rotate a 3D vector by a unit quaternion. Matches @c glm::quat * vec3.
      */
-    template <typename T = float> TQuaternion<T> normalize(const TQuaternion<T> &q) {
-        return q / norm(q);
+    template <typename T> [[nodiscard]] constexpr tvec<T, 3> operator*(const tquat<T> &q, const tvec<T, 3> &v) noexcept {
+        const tvec<T, 3> qv{q.x, q.y, q.z};
+        const tvec<T, 3> t = T(2) * cross(qv, v);
+        return v + q.w * t + cross(qv, t);
     }
 
-    template <typename T = float> TVector<T, 3> transform(const TQuaternion<T> &q, const TVector<T, 3> &v) {
-        const auto inv_q = inverse(q);
-        const auto q1 = q * TQuaternion<T>(v);
-        const auto final_q = q1 * inv_q;
-
-        return final_q.V;
+    /**
+     * @brief Build a unit quaternion from an (angle, axis) pair — matches glm::angleAxis.
+     * @param radians  Rotation angle in radians.
+     * @param axis     Unit-length rotation axis.
+     */
+    template <typename T> [[nodiscard]] tquat<T> angleAxis(T radians, const tvec<T, 3> &axis) {
+        const T half = radians * T(0.5);
+        const T s = std::sin(half);
+        return {std::cos(half), axis.x * s, axis.y * s, axis.z * s};
     }
 
-    template <typename T = float> TQuaternion<T> quatId() {
-        return TQuaternion<T>({T(0), T(0), T(0)}, T(1));
-    }
+    // ---------------------------------------------------------------------
+    // Type aliases.
+    // ---------------------------------------------------------------------
 
-    template <typename T = float> TQuaternion<T> quatZero() {
-        return TQuaternion<T>({T(0), T(0), T(0)}, T(0));
-    }
+    using quat = tquat<float>;
+    using dquat = tquat<double>;
 
-    template <typename T = float> TQuaternion<T> quatRotationRH(const TVector<T, 3> &axis, const T radians) {
-        assert(equals(norm(axis), T{1}) && "Axis should be normalized");
-        const T angle = T{0.5} * radians;
-        const T sin = std::sin(angle);
-        const T cos = std::cos(angle);
-
-        return TQuaternion<T>(sin * axis, cos);
-    }
-
-    template <typename T = float> TQuaternion<T> quatRotationLH(const TVector<T, 3> &axis, const T radians) {
-        assert(equals(norm(axis), T{1}) && "Axis should be normalized");
-
-        const T angle = T{0.5} * radians;
-
-        return TQuaternion<T>(-std::sin(angle) * axis, std::cos(angle));
-    }
-
-    using Quat = TQuaternion<float>;
-    using Quatd = TQuaternion<double>;
-
-    extern template struct TQuaternion<float>;
-    extern template struct TQuaternion<double>;
+    // Legacy PascalCase aliases. See Legacy.h.
+    template <typename T> using TQuaternion = tquat<T>;
+    using Quat = quat;
+    using Quatd = dquat;
 } // namespace xe
 
 #if defined(_MSC_VER)
 #pragma warning(pop)
-#endif
-
 #endif

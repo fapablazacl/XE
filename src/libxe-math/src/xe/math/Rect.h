@@ -1,16 +1,16 @@
-
-#ifndef __XE_MATH_RECT_HPP__
-#define __XE_MATH_RECT_HPP__
+#pragma once
 
 #include "Boundary.h"
 
 namespace xe {
-    typedef TBoundary<float, 2> Rectf;
-    typedef TBoundary<int, 2> Recti;
+    //! 2D axis-aligned rectangle. Not part of glm.
+    template <typename T> using trect = tboundary<T, 2>;
 
-    extern template class TBoundary<float, 2>;
-    extern template class TBoundary<double, 2>;
-    extern template class TBoundary<int, 2>;
+    using rect = trect<float>;
+    using drect = trect<double>;
+    using irect = trect<int>;
+
+    // Legacy PascalCase aliases. See Legacy.h.
+    using Rectf = trect<float>;
+    using Recti = trect<int>;
 } // namespace xe
-
-#endif

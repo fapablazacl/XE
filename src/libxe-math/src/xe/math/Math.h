@@ -1,7 +1,6 @@
+#pragma once
 
-#ifndef __XE_MATH_H__
-#define __XE_MATH_H__
-
+// Canonical (glm-style) xe::math public headers.
 #include "Boundary.h"
 #include "Box.h"
 #include "Common.h"
@@ -17,4 +16,5 @@
 #include "Triangle.h"
 #include "Vector.h"
 
-#endif
+// Deprecated PascalCase aliases. Kept last so it sees every canonical type.
+#include "Legacy.h"

@@ -1,40 +1,34 @@
-
-#ifndef __XE_MATH_RAY_HPP__
-#define __XE_MATH_RAY_HPP__
+#pragma once
 
 #include "Vector.h"
-#include <cassert>
 
 namespace xe {
     /**
-     * @brief Ray with normalized direction in the 3-space
+     * @brief Ray in 3-space — origin + direction.
+     *
+     * Not part of glm. Field names follow the glm-ish convention: @c origin and
+     * @c direction (instead of the old @c position + @c direction).
      */
-    template <typename T> struct TRay {
-        TVector<T, 3> position;
-        TVector<T, 3> direction;
+    template <typename T> struct tray {
+        tvec<T, 3> origin{T(0), T(0), T(0)};
+        tvec<T, 3> direction{T(0), T(0), T(1)};
 
-        /**
-         * @brief Computes the point of the ray at 't' distance from the starting point, to the
-         * direction of the ray.
-         */
-        TVector<T, 3> pointAt(const T t) const {
-            return position + t * direction;
+        constexpr tray() noexcept = default;
+
+        constexpr tray(const tvec<T, 3> &o, const tvec<T, 3> &d) noexcept : origin(o), direction(d) {
         }
 
-        /**
-         * @brief Initializes the ray, positioned around the origin and aiming to the positive Z-axis.
-         */
-        TRay() {
-            position = {T(0.0), T(0.0), T(0.0)};
-            direction = {T(0.0), T(0.0), T(1.0)};
+        //! Point along the ray at parameter @p t from the origin.
+        [[nodiscard]] constexpr tvec<T, 3> pointAt(T t) const noexcept {
+            return origin + t * direction;
         }
     };
 
-    using Ray = TRay<float>;
-    using Rayd = TRay<double>;
+    using ray = tray<float>;
+    using dray = tray<double>;
 
-    extern template struct TRay<float>;
-    extern template struct TRay<double>;
+    // Legacy PascalCase aliases. See Legacy.h.
+    template <typename T> using TRay = tray<T>;
+    using Ray = ray;
+    using Rayd = dray;
 } // namespace xe
-
-#endif

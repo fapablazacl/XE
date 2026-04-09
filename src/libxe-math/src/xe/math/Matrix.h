@@ -1,10 +1,28 @@
+/**
+ * @file Matrix.h
+ * @brief GLM-style matrix types for xe::math.
+ *
+ * xe::tmat<T, C, R> is a C-column, R-row matrix stored in column-major order
+ * so that @c data() yields the same bit pattern as glm::mat<C, R, T, Q>::data().
+ * The convenience aliases @c mat2, @c mat3, @c mat4 (and the @c tmat2, @c tmat3,
+ * @c tmat4 template ones) mirror glm's public surface.
+ *
+ * Element access:
+ *   - @c m[col]          — returns a reference to the C-th column as a @c tvec<T,R>
+ *   - @c m[col][row]     — scalar access, same as glm
+ *   - @c m(row, col)     — row/column scalar access (legacy convenience, not in glm)
+ *
+ * Construction helpers @c translate, @c rotate, @c scale, @c lookAtRH, @c lookAt,
+ * @c perspective, @c ortho match glm's functions with the same arguments and
+ * sign conventions.
+ */
 
-#ifndef __XE_MATH_MATRIX_HPP__
-#define __XE_MATH_MATRIX_HPP__
+#pragma once
 
 #include <array>
 #include <cassert>
-#include <cstdint>
+#include <cmath>
+#include <cstddef>
 #include <cstring>
 #include <iomanip>
 #include <ostream>
@@ -13,767 +31,661 @@
 #include "Vector.h"
 
 namespace xe {
-    template <typename T, int R, int C> struct TMatrix;
-
-    template <typename T, int R, int C> TMatrix<T, R, C> transpose(const TMatrix<T, R, C> &m);
-
-    template <typename T, int R, int C> TMatrix<T, R, C> inverse(const TMatrix<T, R, C> &m);
-
-    template <typename T, int R, int C> TMatrix<T, R, C> inverse(const TMatrix<T, R, C> &m, const T abs);
-
-    template <typename T, int R, int C> TMatrix<T, R, C> adjoint(const TMatrix<T, R, C> &matrix);
-
-    template <typename T, int R, int C> T determinant(const TMatrix<T, R, C> &m);
-
-    enum class MatrixOrder { RowMajor, ColumnMajor };
-
     /**
-     * @brief NxM matrix struct, in row-major order.
+     * @brief C columns x R rows matrix, column-major storage (matches glm).
      */
-    template <typename T, int R, int C> struct TMatrix {
-    private:
-        //! row-column accessor
-        union {
-            T element[R][C];
-            TVector<T, C> v[R];
-        };
+    template <typename T, int C, int R> struct tmat {
+        //! Column-major storage: cols[c] is the c-th column as an R-dimensional vector.
+        tvec<T, R> cols[C];
 
-    public:
-        TMatrix() {
-            for (int i = 0; i < R; i++) {
-                v[i] = TVector<T, C>{};
-            }
-        }
+        //! Zero matrix.
+        constexpr tmat() noexcept = default;
 
-        explicit TMatrix(const T *const values) {
-            assert(values);
-            std::memcpy(data(), values, R * C * sizeof(T));
-        }
-
-        explicit TMatrix(const std::initializer_list<T> il) {
-            assert(il.size() == R * C);
-
-            T *values = data();
-
-            for (const T value : il) {
-                *values = value;
-                values++;
-            }
-        }
-
-        explicit TMatrix(const std::array<TVector<T, C>, R> &rows) {
-            for (int i = 0; i < R; i++) {
-                for (int j = 0; j < C; j++) {
-                    v[i] = rows[i];
+        //! Diagonal scalar — produces an identity scaled by @p s. Matches glm::mat4(1.0f).
+        constexpr explicit tmat(T s) noexcept {
+            for (int c = 0; c < C; ++c) {
+                for (int r = 0; r < R; ++r) {
+                    cols[c][r] = (c == r) ? s : T{};
                 }
             }
         }
 
-        explicit TMatrix(const TVector<T, R * C> &vector) {
-            T *values = data();
-
-            for (int i = 0; i < R * C; i++) {
-                values[i] = vector.values[i];
+        //! From a raw pointer to C*R values in column-major order.
+        constexpr explicit tmat(const T *values) noexcept {
+            for (int c = 0; c < C; ++c) {
+                for (int r = 0; r < R; ++r) {
+                    cols[c][r] = values[c * R + r];
+                }
             }
         }
 
-        constexpr MatrixOrder order() const {
-            return MatrixOrder::RowMajor;
+        //! From an initializer list of C*R values in column-major order.
+        constexpr tmat(std::initializer_list<T> il) noexcept {
+            int i = 0;
+            for (const T value : il) {
+                cols[i / R][i % R] = value;
+                ++i;
+            }
         }
 
-        bool operator==(const TMatrix<T, R, C> &other) const;
-
-        bool operator!=(const TMatrix<T, R, C> &other) const;
-
-        TMatrix<T, R, C> operator+() const;
-
-        TMatrix<T, R, C> operator+(const TMatrix<T, R, C> &rhs) const;
-
-        TMatrix<T, R, C> operator-() const;
-
-        TMatrix<T, R, C> operator-(const TMatrix<T, R, C> &rhs) const;
-
-        template <int R2, int C2> TMatrix<T, R, C2> operator*(const TMatrix<T, R2, C2> &rhs) const;
-
-        TMatrix<T, R, C> operator/(const TMatrix<T, R, C> &rhs) const;
-
-        TMatrix<T, R, C> operator*(const T s) const;
-
-        TMatrix<T, R, C> operator/(const T s) const;
-
-        TMatrix<T, R, C> &operator+=(const TMatrix<T, R, C> &rhs);
-
-        TMatrix<T, R, C> &operator-=(const TMatrix<T, R, C> &rhs);
-
-        TMatrix<T, R, C> &operator*=(const TMatrix<T, R, C> &rhs);
-
-        TVector<T, R> operator*(const TVector<T, R> &v) const;
-
-        inline friend TVector<T, R> operator*(const TVector<T, R> &c, const TMatrix<T, R, C> &m) {
-            TVector<T, R> result;
-
-            for (int row = 0; row < R; row++) {
-                result[row] = dot(m.getColumn(row), c);
+        //! From an array of columns.
+        constexpr explicit tmat(const std::array<tvec<T, R>, C> &columns) noexcept {
+            for (int c = 0; c < C; ++c) {
+                cols[c] = columns[c];
             }
+        }
 
+        //! Column access (glm style): m[col] returns the C-th column.
+        [[nodiscard]] constexpr tvec<T, R> &operator[](int c) noexcept {
+            return cols[c];
+        }
+
+        [[nodiscard]] constexpr const tvec<T, R> &operator[](int c) const noexcept {
+            return cols[c];
+        }
+
+        //! Row/col scalar access (legacy convenience — not present in glm).
+        [[nodiscard]] constexpr T &operator()(int row, int col) noexcept {
+            return cols[col][row];
+        }
+
+        [[nodiscard]] constexpr const T &operator()(int row, int col) const noexcept {
+            return cols[col][row];
+        }
+
+        [[nodiscard]] constexpr T *data() noexcept {
+            return cols[0].data();
+        }
+
+        [[nodiscard]] constexpr const T *data() const noexcept {
+            return cols[0].data();
+        }
+
+        //! Returns a copy of the c-th column.
+        [[nodiscard]] constexpr tvec<T, R> getColumn(int c) const noexcept {
+            return cols[c];
+        }
+
+        //! Returns a copy of the r-th row.
+        [[nodiscard]] constexpr tvec<T, C> getRow(int r) const noexcept {
+            tvec<T, C> result;
+            for (int c = 0; c < C; ++c) {
+                result[c] = cols[c][r];
+            }
             return result;
         }
 
-        inline friend TMatrix<T, R, C> operator*(const T s, const TMatrix<T, R, C> &m) {
-            return m * s;
-        }
-
-        const TVector<T, C> &operator[](const size_t i) const {
-            assert(i < R);
-
-            return v[i];
-        }
-
-        TVector<T, C> &operator[](const size_t i) {
-            assert(i < R);
-
-            return v[i];
-        }
-
-        T &operator()(const int i, const int j) {
-            assert(i >= 0);
-            assert(j >= 0);
-            assert(i < R);
-            assert(j < C);
-
-            return element[i][j];
-        }
-
-        const T operator()(const int i, const int j) const {
-            assert(i >= 0);
-            assert(j >= 0);
-            assert(i < R);
-            assert(j < C);
-
-            return element[i][j];
-        }
-
-        TVector<T, C> getRow(const int i) const {
-            assert(i >= 0);
-            assert(i < R);
-
-            TVector<T, C> result;
-
-            for (int j = 0; j < C; j++) {
-                result.values[j] = (*this)(i, j);
-            }
-
-            return result;
-        }
-
-        TVector<T, R> getColumn(const int j) const {
-            assert(j >= 0);
-            assert(j < C);
-
-            TVector<T, R> result;
-
-            for (int i = 0; i < R; i++) {
-                result.values[i] = (*this)(i, j);
-            }
-
-            return result;
-        }
-
-        TMatrix<T, R, C> &setRow(const int i, const TVector<T, C> &r) {
-            for (int j = 0; j < C; j++) {
-                (*this)(i, j) = r[j];
-            }
-
+        constexpr tmat &setColumn(int c, const tvec<T, R> &v) noexcept {
+            cols[c] = v;
             return *this;
         }
 
-        TMatrix<T, R, C> &setColumn(const int j, const TVector<T, R> &c) {
-            for (int i = 0; i < R; i++) {
-                (*this)(i, j) = c[i];
+        constexpr tmat &setRow(int r, const tvec<T, C> &v) noexcept {
+            for (int c = 0; c < C; ++c) {
+                cols[c][r] = v[c];
             }
-
             return *this;
         }
 
-        auto getSubMatrix(const int row, const int column) const {
-            if constexpr (C > 2 && R > 2) {
-                assert(row >= 0);
-                assert(row < R);
-
-                assert(column >= 0);
-                assert(column < C);
-
-                TMatrix<T, R - 1, C - 1> result;
-
-                int ii = 0, jj = 0;
-
-                for (int i = 0; i < R; ++i) {
-                    if (i == row) {
+        //! Returns the (R-1)x(C-1) minor obtained by removing @p skipRow and @p skipCol.
+        [[nodiscard]] constexpr tmat<T, C - 1, R - 1> getSubMatrix(int skipRow, int skipCol) const noexcept {
+            tmat<T, C - 1, R - 1> result;
+            int dstRow = 0;
+            for (int r = 0; r < R; ++r) {
+                if (r == skipRow) {
+                    continue;
+                }
+                int dstCol = 0;
+                for (int c = 0; c < C; ++c) {
+                    if (c == skipCol) {
                         continue;
                     }
-
-                    for (int j = 0; j < C; ++j) {
-                        if (j == column) {
-                            continue;
-                        }
-
-                        result(ii, jj) = (*this)(i, j);
-                        ++jj;
-                    }
-
-                    ++ii;
-                    jj = 0;
+                    result(dstRow, dstCol) = (*this)(r, c);
+                    ++dstCol;
                 }
-
-                return result;
+                ++dstRow;
             }
-        }
-
-        T *data() {
-            return &element[0][0];
-        }
-
-        const T *data() const {
-            return &element[0][0];
-        }
-
-    public:
-        static auto columns(const std::array<TVector<T, R>, C> &columns) {
-            TMatrix<T, R, C> result;
-
-            for (int i = 0; i < R; i++) {
-                for (int j = 0; j < C; j++) {
-                    result.setColumn(j, columns[j]);
-                }
-            }
-
-            return result;
-        }
-
-        static auto rows(const std::array<TVector<T, C>, R> &rows) {
-            TMatrix<T, R, C> result;
-
-            for (int i = 0; i < R; i++) {
-                for (int j = 0; j < C; j++) {
-                    result.setRow(i, rows[i]);
-                }
-            }
-
-            return result;
-        }
-
-        /**
-         * @brief Build a matrix initialized with zeroes.
-         */
-        static auto zero() {
-            TMatrix<T, R, C> result;
-
-            for (int j = 0; j < C; ++j) {
-                for (int i = 0; i < R; ++i) {
-                    result(i, j) = static_cast<T>(0);
-                }
-            }
-
             return result;
         }
     };
 
-    template <typename T = float, int N> auto matIdentity() {
-        constexpr auto R = N;
-        constexpr auto C = N;
+    // ---------------------------------------------------------------------
+    // Operators.
+    // ---------------------------------------------------------------------
 
-        auto result = TMatrix<T, R, C>();
-
-        for (int i = 0; i < R; ++i) {
-            result(i, i) = static_cast<T>(1);
+    template <typename T, int C, int R> [[nodiscard]] constexpr bool operator==(const tmat<T, C, R> &a, const tmat<T, C, R> &b) noexcept {
+        for (int c = 0; c < C; ++c) {
+            if (a[c] != b[c]) {
+                return false;
+            }
         }
+        return true;
+    }
 
+    template <typename T, int C, int R> [[nodiscard]] constexpr bool operator!=(const tmat<T, C, R> &a, const tmat<T, C, R> &b) noexcept {
+        return !(a == b);
+    }
+
+    template <typename T, int C, int R> [[nodiscard]] constexpr tmat<T, C, R> operator+(const tmat<T, C, R> &m) noexcept {
+        return m;
+    }
+
+    template <typename T, int C, int R> [[nodiscard]] constexpr tmat<T, C, R> operator-(const tmat<T, C, R> &m) noexcept {
+        tmat<T, C, R> r;
+        for (int c = 0; c < C; ++c) {
+            r[c] = -m[c];
+        }
+        return r;
+    }
+
+    template <typename T, int C, int R> [[nodiscard]] constexpr tmat<T, C, R> operator+(const tmat<T, C, R> &a, const tmat<T, C, R> &b) noexcept {
+        tmat<T, C, R> r;
+        for (int c = 0; c < C; ++c) {
+            r[c] = a[c] + b[c];
+        }
+        return r;
+    }
+
+    template <typename T, int C, int R> [[nodiscard]] constexpr tmat<T, C, R> operator-(const tmat<T, C, R> &a, const tmat<T, C, R> &b) noexcept {
+        tmat<T, C, R> r;
+        for (int c = 0; c < C; ++c) {
+            r[c] = a[c] - b[c];
+        }
+        return r;
+    }
+
+    template <typename T, int C, int R> [[nodiscard]] constexpr tmat<T, C, R> operator*(const tmat<T, C, R> &m, T s) noexcept {
+        tmat<T, C, R> r;
+        for (int c = 0; c < C; ++c) {
+            r[c] = m[c] * s;
+        }
+        return r;
+    }
+
+    template <typename T, int C, int R> [[nodiscard]] constexpr tmat<T, C, R> operator*(T s, const tmat<T, C, R> &m) noexcept {
+        return m * s;
+    }
+
+    template <typename T, int C, int R> [[nodiscard]] constexpr tmat<T, C, R> operator/(const tmat<T, C, R> &m, T s) noexcept {
+        tmat<T, C, R> r;
+        for (int c = 0; c < C; ++c) {
+            r[c] = m[c] / s;
+        }
+        return r;
+    }
+
+    template <typename T, int C, int R> constexpr tmat<T, C, R> &operator+=(tmat<T, C, R> &a, const tmat<T, C, R> &b) noexcept {
+        for (int c = 0; c < C; ++c) {
+            a[c] += b[c];
+        }
+        return a;
+    }
+
+    template <typename T, int C, int R> constexpr tmat<T, C, R> &operator-=(tmat<T, C, R> &a, const tmat<T, C, R> &b) noexcept {
+        for (int c = 0; c < C; ++c) {
+            a[c] -= b[c];
+        }
+        return a;
+    }
+
+    //! Matrix * column vector: mat<C,R> * vec<C> = vec<R>. Same convention as glm.
+    template <typename T, int C, int R> [[nodiscard]] constexpr tvec<T, R> operator*(const tmat<T, C, R> &m, const tvec<T, C> &v) noexcept {
+        tvec<T, R> result;
+        for (int r = 0; r < R; ++r) {
+            T acc = T{};
+            for (int c = 0; c < C; ++c) {
+                acc += m(r, c) * v[c];
+            }
+            result[r] = acc;
+        }
         return result;
     }
 
-    template <typename T = float> auto mat2Identity() {
-        return matIdentity<T, 2>();
-    }
-
-    template <typename T = float> auto mat3Identity() {
-        return matIdentity<T, 3>();
-    }
-
-    template <typename T = float> auto mat4Identity() {
-        return matIdentity<T, 4>();
-    }
-
-    template <typename T, int N> auto matScaling(const TVector<T, N> &scale) {
-        auto result = matIdentity<T, N>();
-
-        for (int i = 0; i < N; ++i) {
-            result(i, i) = scale[i];
+    //! row vector * matrix: vec<R> * mat<C,R> = vec<C>.
+    template <typename T, int C, int R> [[nodiscard]] constexpr tvec<T, C> operator*(const tvec<T, R> &v, const tmat<T, C, R> &m) noexcept {
+        tvec<T, C> result;
+        for (int c = 0; c < C; ++c) {
+            T acc = T{};
+            for (int r = 0; r < R; ++r) {
+                acc += v[r] * m(r, c);
+            }
+            result[c] = acc;
         }
-
         return result;
     }
 
-    template <typename T = float> auto mat2Scaling(const TVector<T, 2> &scale) {
-        return matScaling<T, 2>(scale);
-    }
-
-    template <typename T = float> auto mat3Scaling(const TVector<T, 3> &scale) {
-        return matScaling<T, 3>(scale);
-    }
-
-    template <typename T = float> auto mat4Scaling(const TVector<T, 4> &scale) {
-        return matScaling<T, 4>(scale);
-    }
-
-    template <typename T, int N> auto matTranslation(const TVector<T, N - 1> &displace) {
-        constexpr auto R = N;
-        constexpr auto C = N;
-
-        auto result = matIdentity<T, N>();
-
-        for (int i = 0; i < R - 1; i++) {
-            result[i][C - 1] = displace[i];
+    //! Matrix * matrix: mat<T,Ca,Ra> * mat<T,Cb,Cb==Ra> = mat<T,Cb,Ra>.
+    template <typename T, int Ca, int Ra, int Cb> [[nodiscard]] constexpr tmat<T, Cb, Ra> operator*(const tmat<T, Ca, Ra> &a, const tmat<T, Cb, Ca> &b) noexcept {
+        tmat<T, Cb, Ra> result;
+        for (int r = 0; r < Ra; ++r) {
+            for (int c = 0; c < Cb; ++c) {
+                T acc = T{};
+                for (int k = 0; k < Ca; ++k) {
+                    acc += a(r, k) * b(k, c);
+                }
+                result(r, c) = acc;
+            }
         }
-
         return result;
     }
 
-    template <typename T = float> auto mat3Translation(const TVector<T, 2> &displace) {
-        return matTranslation<T, 3>(displace);
+    template <typename T, int N> constexpr tmat<T, N, N> &operator*=(tmat<T, N, N> &a, const tmat<T, N, N> &b) noexcept {
+        a = a * b;
+        return a;
     }
 
-    template <typename T = float> auto mat4Translation(const TVector<T, 3> &displace) {
-        return matTranslation<T, 4>(displace);
+    // ---------------------------------------------------------------------
+    // Linear algebra functions (names match glm).
+    // ---------------------------------------------------------------------
+
+    template <typename T, int C, int R> [[nodiscard]] constexpr tmat<T, R, C> transpose(const tmat<T, C, R> &m) noexcept {
+        tmat<T, R, C> result;
+        for (int r = 0; r < R; ++r) {
+            for (int c = 0; c < C; ++c) {
+                result(c, r) = m(r, c);
+            }
+        }
+        return result;
     }
 
-    template <typename T, int N> auto matRotationX(const T radians) {
-        if constexpr (N == 3 || N == 4) {
-            auto result = matIdentity<T, N>();
-
-            const T cos = std::cos(radians);
-            const T sin = std::sin(radians);
-
-            result(1, 1) = cos;
-            result(2, 2) = cos;
-
-            result(1, 2) = -sin;
-            result(2, 1) = sin;
-
+    template <typename T, int N> [[nodiscard]] constexpr T determinant(const tmat<T, N, N> &m) noexcept {
+        if constexpr (N == 1) {
+            return m(0, 0);
+        } else if constexpr (N == 2) {
+            return m(0, 0) * m(1, 1) - m(0, 1) * m(1, 0);
+        } else {
+            T result = T{};
+            for (int c = 0; c < N; ++c) {
+                const T factor = (c % 2 == 0) ? T(1) : T(-1);
+                result += factor * m(0, c) * determinant(m.getSubMatrix(0, c));
+            }
             return result;
         }
     }
 
-    template <typename T = float> auto mat3RotationX(const T radians) {
-        return matRotationX<T, 3>(radians);
-    }
-
-    template <typename T = float> auto mat4RotationX(const T radians) {
-        return matRotationX<T, 4>(radians);
-    }
-
-    template <typename T, int N> auto matRotationY(const T radians) {
-        if constexpr (N == 3 || N == 4) {
-            auto result = matIdentity<T, N>();
-
-            const T cos = std::cos(radians);
-            const T sin = std::sin(radians);
-
-            result(0, 0) = cos;
-            result(2, 2) = cos;
-            result(0, 2) = sin;
-            result(2, 0) = -sin;
-
-            return result;
-        }
-    }
-
-    template <typename T = float> auto mat3RotationY(const T radians) {
-        return matRotationY<T, 3>(radians);
-    }
-
-    template <typename T = float> auto mat4RotationY(const T radians) {
-        return matRotationY<T, 4>(radians);
-    }
-
-    template <typename T, int N> auto matRotationZ(const T radians) {
-        if constexpr (N == 2 || N == 3 || N == 4) {
-            auto result = matIdentity<T, N>();
-
-            const T cos = std::cos(radians);
-            const T sin = std::sin(radians);
-
-            result(0, 0) = cos;
-            result(1, 1) = cos;
-            result(0, 1) = -sin;
-            result(1, 0) = sin;
-
-            return result;
-        }
-    }
-
-    template <typename T = float> auto mat2Rotation(const T radians) {
-        return matRotationZ<T, 2>(radians);
-    }
-
-    template <typename T = float> auto mat3RotationZ(const T radians) {
-        return matRotationZ<T, 3>(radians);
-    }
-
-    template <typename T = float> auto mat4RotationZ(const T radians) {
-        return matRotationZ<T, 4>(radians);
-    }
-
-    template <typename T, int N> static auto matRotation(const T rads, const TVector<T, 3> &axis) {
-        if constexpr (N == 3 || N == 4) {
-            assert(!std::isnan(rads));
-            assert(!std::isinf(rads));
-
-            const auto I = matIdentity<T, 3>();
-
-            const T cos = std::cos(rads);
-            const T sin = std::sin(rads);
-
-            TVector<T, 3> V = normalize(axis);
-
-            const auto c1 = TVector<T, 3>{static_cast<T>(0), -V.Z, V.Y};
-            const auto c2 = TVector<T, 3>{V.Z, static_cast<T>(0), -V.X};
-            const auto c3 = TVector<T, 3>{-V.Y, V.X, static_cast<T>(0)};
-
-            const auto matS = TMatrix<T, 3, 3>::columns({c1, c2, c3});
-
-            const auto matUUT = TMatrix<T, 3, 1>{V} * TMatrix<T, 1, 3>{V};
-            const auto tempResult = matUUT + cos * (I - matUUT) + sin * matS;
-
-            auto result = matIdentity<T, N>();
-
-            for (int i = 0; i < 3; ++i) {
-                for (int j = 0; j < 3; ++j) {
-                    result(i, j) = tempResult(i, j);
+    template <typename T, int N> [[nodiscard]] constexpr tmat<T, N, N> adjoint(const tmat<T, N, N> &m) noexcept {
+        tmat<T, N, N> cofactors;
+        if constexpr (N == 2) {
+            cofactors(0, 0) = m(1, 1);
+            cofactors(0, 1) = -m(1, 0);
+            cofactors(1, 0) = -m(0, 1);
+            cofactors(1, 1) = m(0, 0);
+            return cofactors;
+        } else {
+            for (int r = 0; r < N; ++r) {
+                for (int c = 0; c < N; ++c) {
+                    const T factor = ((r + c) % 2 == 0) ? T(1) : T(-1);
+                    cofactors(c, r) = factor * determinant(m.getSubMatrix(r, c));
                 }
             }
-
-            return xe::transpose(result);
+            return cofactors;
         }
     }
 
-    template <typename T = float> auto mat3Rotation(const T rads, const TVector<T, 3> &axis) {
-        return matRotation<T, 3>(rads, axis);
+    template <typename T, int N> [[nodiscard]] constexpr tmat<T, N, N> inverse(const tmat<T, N, N> &m) noexcept {
+        return adjoint(m) / determinant(m);
     }
 
-    template <typename T = float> auto mat4Rotation(const T rads, const TVector<T, 3> &axis) {
-        return matRotation<T, 4>(rads, axis);
+    template <typename T, int N> [[nodiscard]] constexpr tmat<T, N, N> inverse(const tmat<T, N, N> &m, T det) noexcept {
+        return adjoint(m) / det;
     }
 
-    template <typename T = float> auto mat4LookAtRH(const TVector<T, 3> &eye, const TVector<T, 3> &at, const TVector<T, 3> &up) {
-        const auto zaxis = normalize(at - eye);
-        const auto xaxis = normalize(cross(zaxis, up));
-        const auto yaxis = cross(xaxis, zaxis);
+    // ---------------------------------------------------------------------
+    // Transformation builders (glm-compatible).
+    //
+    // These produce matrices in the usual "right-handed, column-vector" convention,
+    // meaning the resulting matrices can be multiplied on the left of a point:
+    //     new_point = M * point
+    // and, when uploaded to OpenGL with transpose=false, behave identically to glm.
+    // ---------------------------------------------------------------------
 
-        auto result = TMatrix<T, 4, 4>{};
-        result[0] = {xaxis.X, xaxis.Y, xaxis.Z, -dot(xaxis, eye)};
-        result[1] = {yaxis.X, yaxis.Y, yaxis.Z, -dot(yaxis, eye)};
-        result[2] = {-zaxis.X, -zaxis.Y, -zaxis.Z, dot(zaxis, eye)};
-        result[3] = {T(0), T(0), T(0), T(1)};
-
+    //! Scale an existing matrix (matches glm::scale).
+    template <typename T> [[nodiscard]] constexpr tmat<T, 4, 4> scale(const tmat<T, 4, 4> &m, const tvec<T, 3> &v) noexcept {
+        tmat<T, 4, 4> result;
+        result[0] = m[0] * v.x;
+        result[1] = m[1] * v.y;
+        result[2] = m[2] * v.z;
+        result[3] = m[3];
         return result;
     }
 
-    template <typename T = float> auto mat4Perspective(const T fov_radians, const T aspect, const T znear, const T zfar) {
-        assert(fov_radians > T(0));
+    //! Build a scale matrix from a 3-vector.
+    template <typename T> [[nodiscard]] constexpr tmat<T, 4, 4> scale(const tvec<T, 3> &v) noexcept {
+        tmat<T, 4, 4> m(T(1));
+        m(0, 0) = v.x;
+        m(1, 1) = v.y;
+        m(2, 2) = v.z;
+        return m;
+    }
+
+    //! Translate an existing matrix (matches glm::translate).
+    template <typename T> [[nodiscard]] constexpr tmat<T, 4, 4> translate(const tmat<T, 4, 4> &m, const tvec<T, 3> &v) noexcept {
+        tmat<T, 4, 4> result = m;
+        result[3] = m[0] * v.x + m[1] * v.y + m[2] * v.z + m[3];
+        return result;
+    }
+
+    //! Build a translation matrix.
+    template <typename T> [[nodiscard]] constexpr tmat<T, 4, 4> translate(const tvec<T, 3> &v) noexcept {
+        tmat<T, 4, 4> m(T(1));
+        m(0, 3) = v.x;
+        m(1, 3) = v.y;
+        m(2, 3) = v.z;
+        return m;
+    }
+
+    //! Right-handed rotation matrix around the X axis.
+    template <typename T> [[nodiscard]] tmat<T, 4, 4> rotateX(T radians) noexcept {
+        tmat<T, 4, 4> m(T(1));
+        const T c = std::cos(radians);
+        const T s = std::sin(radians);
+        m(1, 1) = c;
+        m(1, 2) = -s;
+        m(2, 1) = s;
+        m(2, 2) = c;
+        return m;
+    }
+
+    template <typename T> [[nodiscard]] tmat<T, 4, 4> rotateY(T radians) noexcept {
+        tmat<T, 4, 4> m(T(1));
+        const T c = std::cos(radians);
+        const T s = std::sin(radians);
+        m(0, 0) = c;
+        m(0, 2) = s;
+        m(2, 0) = -s;
+        m(2, 2) = c;
+        return m;
+    }
+
+    template <typename T> [[nodiscard]] tmat<T, 4, 4> rotateZ(T radians) noexcept {
+        tmat<T, 4, 4> m(T(1));
+        const T c = std::cos(radians);
+        const T s = std::sin(radians);
+        m(0, 0) = c;
+        m(0, 1) = -s;
+        m(1, 0) = s;
+        m(1, 1) = c;
+        return m;
+    }
+
+    //! Arbitrary-axis rotation. Matches glm::rotate(mat4(1), angle, axis).
+    template <typename T> [[nodiscard]] tmat<T, 4, 4> rotate(T radians, const tvec<T, 3> &axis) {
+        const T c = std::cos(radians);
+        const T s = std::sin(radians);
+        const tvec<T, 3> n = normalize(axis);
+        const T one_minus_c = T(1) - c;
+
+        tmat<T, 4, 4> m(T(1));
+
+        m(0, 0) = c + n.x * n.x * one_minus_c;
+        m(0, 1) = n.x * n.y * one_minus_c - n.z * s;
+        m(0, 2) = n.x * n.z * one_minus_c + n.y * s;
+
+        m(1, 0) = n.y * n.x * one_minus_c + n.z * s;
+        m(1, 1) = c + n.y * n.y * one_minus_c;
+        m(1, 2) = n.y * n.z * one_minus_c - n.x * s;
+
+        m(2, 0) = n.z * n.x * one_minus_c - n.y * s;
+        m(2, 1) = n.z * n.y * one_minus_c + n.x * s;
+        m(2, 2) = c + n.z * n.z * one_minus_c;
+
+        return m;
+    }
+
+    //! rotate-as-glm: applies an arbitrary-axis rotation to an existing matrix.
+    template <typename T> [[nodiscard]] tmat<T, 4, 4> rotate(const tmat<T, 4, 4> &m, T radians, const tvec<T, 3> &axis) {
+        return m * rotate(radians, axis);
+    }
+
+    //! Right-handed view matrix (matches glm::lookAtRH).
+    template <typename T> [[nodiscard]] tmat<T, 4, 4> lookAtRH(const tvec<T, 3> &eye, const tvec<T, 3> &center, const tvec<T, 3> &up) {
+        const tvec<T, 3> f = normalize(center - eye);
+        const tvec<T, 3> s = normalize(cross(f, up));
+        const tvec<T, 3> u = cross(s, f);
+
+        tmat<T, 4, 4> m(T(1));
+        m(0, 0) = s.x;
+        m(0, 1) = s.y;
+        m(0, 2) = s.z;
+        m(1, 0) = u.x;
+        m(1, 1) = u.y;
+        m(1, 2) = u.z;
+        m(2, 0) = -f.x;
+        m(2, 1) = -f.y;
+        m(2, 2) = -f.z;
+        m(0, 3) = -dot(s, eye);
+        m(1, 3) = -dot(u, eye);
+        m(2, 3) = dot(f, eye);
+        return m;
+    }
+
+    //! Default lookAt is right-handed, matching glm.
+    template <typename T> [[nodiscard]] tmat<T, 4, 4> lookAt(const tvec<T, 3> &eye, const tvec<T, 3> &center, const tvec<T, 3> &up) {
+        return lookAtRH(eye, center, up);
+    }
+
+    //! Right-handed perspective projection with depth in [-1, 1] (glm default).
+    template <typename T> [[nodiscard]] tmat<T, 4, 4> perspectiveRH(T fovyRadians, T aspect, T znear, T zfar) {
+        assert(fovyRadians > T(0));
         assert(aspect > T(0));
         assert(znear > T(0));
         assert(zfar > znear);
 
-        const T half_fov = fov_radians / T(2);
-        const T f = T(1) / std::tan(half_fov);
-        const T zdiff = znear - zfar;
-        const T a = aspect;
+        const T tan_half = std::tan(fovyRadians / T(2));
 
-        auto result = TMatrix<T, 4, 4>{};
-        result[0] = TVector<T, 4>{f / a, T(0), T(0), T(0)};
-        result[1] = TVector<T, 4>{T(0), f, T(0), T(0)};
-        result[2] = TVector<T, 4>{T(0), T(0), (zfar + znear) / zdiff, (T(2) * zfar * znear) / zdiff};
-        result[3] = TVector<T, 4>{T(0), T(0), T(-1), T(0)};
-
-        return result;
+        tmat<T, 4, 4> m;
+        m(0, 0) = T(1) / (aspect * tan_half);
+        m(1, 1) = T(1) / tan_half;
+        m(2, 2) = -(zfar + znear) / (zfar - znear);
+        m(3, 2) = -T(1);
+        m(2, 3) = -(T(2) * zfar * znear) / (zfar - znear);
+        return m;
     }
 
-    template <typename T = float> auto mat4Ortho(const TVector<T, 3> &pmin, const TVector<T, 3> &pmax) {
-        constexpr auto two = static_cast<T>(2);
-        constexpr auto one = static_cast<T>(1);
-        const auto diff = pmax - pmin;
-
-        auto result = matIdentity<T, 4>();
-
-        result(0, 0) = two / diff.X;
-        result(1, 1) = two / diff.Y;
-        result(2, 2) = -two / diff.Z;
-        result(3, 3) = one;
-
-        result(0, 3) = -(pmax.X + pmin.X) / diff.X;
-        result(1, 3) = -(pmax.Y + pmin.Y) / diff.Y;
-        result(2, 3) = -(pmax.Z + pmin.Z) / diff.Z;
-
-        return result;
+    template <typename T> [[nodiscard]] tmat<T, 4, 4> perspective(T fovyRadians, T aspect, T znear, T zfar) {
+        return perspectiveRH(fovyRadians, aspect, znear, zfar);
     }
 
-    extern template struct TMatrix<float, 2, 2>;
-    extern template struct TMatrix<float, 3, 3>;
-    extern template struct TMatrix<float, 4, 4>;
-
-    using Matrix2 = TMatrix<float, 2, 2>;
-    using Matrix3 = TMatrix<float, 3, 3>;
-    using Matrix4 = TMatrix<float, 4, 4>;
-
-    template <typename T, int R, int C> bool TMatrix<T, R, C>::operator==(const TMatrix<T, R, C> &other) const {
-        const T *values = data();
-        const T *rhs_values = other.data();
-
-        for (int i = 0; i < R * C; i++) {
-            if (!equals(values[i], rhs_values[i])) {
-                return false;
-            }
-        }
-
-        return true;
+    //! Right-handed orthographic projection (depth in [-1, 1]).
+    template <typename T> [[nodiscard]] constexpr tmat<T, 4, 4> orthoRH(T left, T right, T bottom, T top, T znear, T zfar) noexcept {
+        tmat<T, 4, 4> m(T(1));
+        m(0, 0) = T(2) / (right - left);
+        m(1, 1) = T(2) / (top - bottom);
+        m(2, 2) = -T(2) / (zfar - znear);
+        m(0, 3) = -(right + left) / (right - left);
+        m(1, 3) = -(top + bottom) / (top - bottom);
+        m(2, 3) = -(zfar + znear) / (zfar - znear);
+        return m;
     }
 
-    template <typename T, int R, int C> bool TMatrix<T, R, C>::operator!=(const TMatrix<T, R, C> &other) const {
-        return !(*this == other);
+    template <typename T> [[nodiscard]] constexpr tmat<T, 4, 4> ortho(T left, T right, T bottom, T top, T znear, T zfar) noexcept {
+        return orthoRH(left, right, bottom, top, znear, zfar);
     }
 
-    template <typename T, int R, int C> TMatrix<T, R, C> TMatrix<T, R, C>::operator+(const TMatrix<T, R, C> &rhs) const {
-        TMatrix<T, R, C> result;
+    // ---------------------------------------------------------------------
+    // Debug output.
+    // ---------------------------------------------------------------------
 
-        T *result_values = result.data();
-
-        const T *lhs_values = data();
-        const T *rhs_values = rhs.data();
-
-        for (int i = 0; i < R * C; i++) {
-            result_values[i] = lhs_values[i] + rhs_values[i];
-        }
-
-        return result;
-    }
-
-    template <typename T, int R, int C> TMatrix<T, R, C> TMatrix<T, R, C>::operator-() const {
-        TMatrix<T, R, C> result;
-        T *result_values = result.data();
-
-        const T *lhs_values = data();
-
-        for (int i = 0; i < R * C; i++) {
-            result_values[i] = -lhs_values[i];
-        }
-
-        return result;
-    }
-
-    template <typename T, int R, int C> TMatrix<T, R, C> TMatrix<T, R, C>::operator+() const {
-        return *this;
-    }
-
-    template <typename T, int R, int C> TMatrix<T, R, C> TMatrix<T, R, C>::operator-(const TMatrix<T, R, C> &rhs) const {
-        TMatrix<T, R, C> result;
-
-        T *result_values = result.data();
-
-        const T *lhs_values = data();
-        const T *rhs_values = rhs.data();
-
-        for (int i = 0; i < R * C; i++) {
-            result_values[i] = lhs_values[i] - rhs_values[i];
-        }
-
-        return result;
-    }
-
-    template <typename T, int R, int C> template <int R2, int C2> TMatrix<T, R, C2> TMatrix<T, R, C>::operator*(const TMatrix<T, R2, C2> &rhs) const {
-        static_assert(R == C2);
-        static_assert(C == R2);
-
-        TMatrix<T, R, C2> result;
-
-        for (int i = 0; i < R; i++) {
-            for (int j = 0; j < C2; j++) {
-                const auto rowI = getRow(i);
-                const auto colJ = rhs.getColumn(j);
-                const auto mIJ = dot(rowI, colJ);
-
-                result(i, j) = mIJ;
-            }
-        }
-
-        return result;
-    }
-
-    template <typename T, int R, int C> TMatrix<T, R, C> TMatrix<T, R, C>::operator/(const TMatrix<T, R, C> &rhs) const {
-        return *this * inverse(rhs);
-    }
-
-    template <typename T, int R, int C> TMatrix<T, R, C> TMatrix<T, R, C>::operator*(const T s) const {
-        TMatrix<T, R, C> result;
-
-        T *result_values = result.data();
-        const T *values = data();
-
-        for (int i = 0; i < R * C; i++) {
-            result_values[i] = values[i] * s;
-        }
-
-        return result;
-    }
-
-    template <typename T, int R, int C> TMatrix<T, R, C> TMatrix<T, R, C>::operator/(const T s) const {
-        TMatrix<T, R, C> result;
-
-        T *result_values = result.data();
-        const T *values = data();
-
-        for (int i = 0; i < R * C; i++) {
-            result_values[i] = values[i] / s;
-        }
-
-        return result;
-    }
-
-    template <typename T, int R, int C> TMatrix<T, R, C> &TMatrix<T, R, C>::operator+=(const TMatrix<T, R, C> &rhs) {
-        const T *rhs_values = rhs.data();
-        T *values = data();
-
-        for (int i = 0; i < R * C; i++) {
-            values[i] += rhs_values[i];
-        }
-
-        return *this;
-    }
-
-    template <typename T, int R, int C> TMatrix<T, R, C> &TMatrix<T, R, C>::operator-=(const TMatrix<T, R, C> &rhs) {
-        const T *rhs_values = rhs.data();
-        T *values = data();
-
-        for (int i = 0; i < R * C; i++) {
-            values[i] -= rhs_values[i];
-        }
-
-        return *this;
-    }
-
-    template <typename T, int R, int C> TMatrix<T, R, C> &TMatrix<T, R, C>::operator*=(const TMatrix<T, R, C> &rhs) {
-        *this = *this * rhs;
-
-        return *this;
-    }
-
-    template <typename T, int R, int C> TVector<T, R> TMatrix<T, R, C>::operator*(const TVector<T, R> &c) const {
-        TVector<T, R> result;
-
-        for (int row = 0; row < R; row++) {
-            result[row] = dot(getRow(row), c);
-        }
-
-        return result;
-    }
-
-    template <typename T, int R, int C> TMatrix<T, R, C> transpose(const TMatrix<T, R, C> &m) {
-        TMatrix<T, C, R> result;
-
-        for (int i = 0; i < R; i++) {
-            for (int j = 0; j < C; j++) {
-                result(j, i) = m(i, j);
-            }
-        }
-
-        return result;
-    }
-
-    template <typename T, int N> TMatrix<T, N, N> transpose(const TMatrix<T, N, N> &m) {
-        return transpose<T, N, N>(m);
-    }
-
-    template <typename T, int R, int C> TMatrix<T, R, C> inverse(const TMatrix<T, R, C> &m) {
-        return transpose(adjoint(m)) / determinant(m);
-    }
-
-    template <typename T, int R, int C> TMatrix<T, R, C> inverse(const TMatrix<T, R, C> &m, const T det) {
-        return transpose(adjoint(m)) / det;
-    }
-
-    template <typename T, int R, int C> T determinant(const TMatrix<T, R, C> &m) {
-        if constexpr (R == C && R > 0) {
-            if constexpr (R == 1) {
-                return m(0, 0);
-            }
-            if constexpr (R == 2) {
-                return m(1, 1) * m(0, 0) - m(0, 1) * m(1, 0);
-            } else {
-                T result = T(0);
-
-                const int i = 0;
-
-                for (int j = 0; j < C; j++) {
-                    const T factor = (j + 1) % 2 ? T(-1) : T(1);
-                    const T subdet = determinant(m.getSubMatrix(i, j));
-
-                    result += factor * m(i, j) * subdet;
-                }
-
-                return result;
-            }
-        }
-    }
-
-    template <typename T, int R, int C> TMatrix<T, R, C> adjoint(const TMatrix<T, R, C> &matrix) {
-        if constexpr (C == 2 && R == 2) {
-            TMatrix<T, R, C> result;
-
-            result(0, 0) = matrix(1, 1);
-            result(0, 1) = -matrix(0, 1);
-            result(1, 0) = -matrix(1, 0);
-            result(1, 1) = matrix(0, 0);
-
-            return result;
-        } else {
-            TMatrix<T, R, C> result;
-
-            for (int i = 0; i < R; ++i) {
-                for (int j = 0; j < C; ++j) {
-                    const T factor = ((i + j) % 2 == 1) ? static_cast<T>(1) : static_cast<T>(-1);
-                    result(i, j) = factor * determinant(matrix.getSubMatrix(i, j));
-                }
-            }
-
-            return result;
-        }
-    }
-
-    template <typename T, int R, int C> std::ostream &operator<<(std::ostream &os, const xe::TMatrix<T, R, C> &m) {
-        os << "xe::TMatrix<" << typeid(T).name() << ", " << R << ", " << C << "> {" << std::endl;
-
-        for (int i = 0; i < R; ++i) {
-            os << "  ";
-            os << "{ ";
-            for (int j = 0; j < C; j++) {
-                os << std::fixed << std::setprecision(8) << std::setw(12) << m(i, j);
-
-                if (j < C - 1) {
+    template <typename T, int C, int R> inline std::ostream &operator<<(std::ostream &os, const tmat<T, C, R> &m) {
+        os << "xe::tmat<" << C << ", " << R << "> {\n";
+        for (int r = 0; r < R; ++r) {
+            os << "  { ";
+            for (int c = 0; c < C; ++c) {
+                os << std::fixed << std::setprecision(6) << std::setw(12) << m(r, c);
+                if (c < C - 1) {
                     os << ", ";
                 }
             }
             os << " }";
-
-            if (i < R - 1) {
+            if (r < R - 1) {
                 os << ",";
             }
-
-            os << std::endl;
+            os << "\n";
         }
-
-        os << "}" << std::endl;
-
+        os << "}";
         return os;
     }
-} // namespace xe
 
-#endif
+    // ---------------------------------------------------------------------
+    // Canonical type aliases.
+    // ---------------------------------------------------------------------
+
+    using mat2 = tmat<float, 2, 2>;
+    using mat3 = tmat<float, 3, 3>;
+    using mat4 = tmat<float, 4, 4>;
+
+    using dmat2 = tmat<double, 2, 2>;
+    using dmat3 = tmat<double, 3, 3>;
+    using dmat4 = tmat<double, 4, 4>;
+
+    // ---------------------------------------------------------------------
+    // Legacy PascalCase aliases. Old TMatrix<T, R, C> had R rows and C columns;
+    // new tmat<T, C, R> is stored column-major but the argument order is
+    // indistinguishable for square matrices (the only ones used).
+    // ---------------------------------------------------------------------
+
+    template <typename T, int R, int C> using TMatrix = tmat<T, C, R>;
+    using Matrix2 = mat2;
+    using Matrix3 = mat3;
+    using Matrix4 = mat4;
+
+    // ---------------------------------------------------------------------
+    // Legacy matrix-builder free functions. Kept here (rather than Legacy.h)
+    // so that any header pulling in just Matrix.h gets them.
+    // ---------------------------------------------------------------------
+
+    template <typename T = float, int N> [[nodiscard]] constexpr tmat<T, N, N> matIdentity() noexcept {
+        return tmat<T, N, N>(T(1));
+    }
+
+    template <typename T = float> [[nodiscard]] constexpr mat2 mat2Identity() noexcept {
+        return mat2(T(1));
+    }
+
+    template <typename T = float> [[nodiscard]] constexpr mat3 mat3Identity() noexcept {
+        return mat3(T(1));
+    }
+
+    template <typename T = float> [[nodiscard]] constexpr mat4 mat4Identity() noexcept {
+        return mat4(T(1));
+    }
+
+    template <typename T> [[nodiscard]] constexpr tmat<T, 3, 3> mat3Scaling(const tvec<T, 3> &s) noexcept {
+        tmat<T, 3, 3> m(T(1));
+        m(0, 0) = s.x;
+        m(1, 1) = s.y;
+        m(2, 2) = s.z;
+        return m;
+    }
+
+    template <typename T> [[nodiscard]] constexpr tmat<T, 4, 4> mat4Scaling(const tvec<T, 4> &s) noexcept {
+        tmat<T, 4, 4> m(T(1));
+        m(0, 0) = s.x;
+        m(1, 1) = s.y;
+        m(2, 2) = s.z;
+        m(3, 3) = s.w;
+        return m;
+    }
+
+    template <typename T> [[nodiscard]] constexpr tmat<T, 4, 4> mat4Scaling(const tvec<T, 3> &s) noexcept {
+        return scale(s);
+    }
+
+    template <typename T> [[nodiscard]] constexpr tmat<T, 3, 3> mat3Translation(const tvec<T, 2> &t) noexcept {
+        tmat<T, 3, 3> m(T(1));
+        m(0, 2) = t.x;
+        m(1, 2) = t.y;
+        return m;
+    }
+
+    template <typename T> [[nodiscard]] constexpr tmat<T, 4, 4> mat4Translation(const tvec<T, 3> &t) noexcept {
+        return translate(t);
+    }
+
+    template <typename T = float> [[nodiscard]] tmat<T, 3, 3> mat3RotationX(T radians) {
+        const auto m4 = rotateX<T>(radians);
+        tmat<T, 3, 3> r(T(1));
+        for (int i = 0; i < 3; ++i) {
+            for (int j = 0; j < 3; ++j) {
+                r(i, j) = m4(i, j);
+            }
+        }
+        return r;
+    }
+
+    template <typename T = float> [[nodiscard]] tmat<T, 3, 3> mat3RotationY(T radians) {
+        const auto m4 = rotateY<T>(radians);
+        tmat<T, 3, 3> r(T(1));
+        for (int i = 0; i < 3; ++i) {
+            for (int j = 0; j < 3; ++j) {
+                r(i, j) = m4(i, j);
+            }
+        }
+        return r;
+    }
+
+    template <typename T = float> [[nodiscard]] tmat<T, 3, 3> mat3RotationZ(T radians) {
+        const auto m4 = rotateZ<T>(radians);
+        tmat<T, 3, 3> r(T(1));
+        for (int i = 0; i < 3; ++i) {
+            for (int j = 0; j < 3; ++j) {
+                r(i, j) = m4(i, j);
+            }
+        }
+        return r;
+    }
+
+    template <typename T = float> [[nodiscard]] tmat<T, 4, 4> mat4RotationX(T radians) {
+        return rotateX<T>(radians);
+    }
+
+    template <typename T = float> [[nodiscard]] tmat<T, 4, 4> mat4RotationY(T radians) {
+        return rotateY<T>(radians);
+    }
+
+    template <typename T = float> [[nodiscard]] tmat<T, 4, 4> mat4RotationZ(T radians) {
+        return rotateZ<T>(radians);
+    }
+
+    template <typename T = float> [[nodiscard]] tmat<T, 2, 2> mat2Rotation(T radians) {
+        tmat<T, 2, 2> m(T(1));
+        const T c = std::cos(radians);
+        const T s = std::sin(radians);
+        m(0, 0) = c;
+        m(0, 1) = -s;
+        m(1, 0) = s;
+        m(1, 1) = c;
+        return m;
+    }
+
+    template <typename T = float> [[nodiscard]] tmat<T, 3, 3> mat3Rotation(T radians, const tvec<T, 3> &axis) {
+        const auto m4 = rotate<T>(radians, axis);
+        tmat<T, 3, 3> r(T(1));
+        for (int i = 0; i < 3; ++i) {
+            for (int j = 0; j < 3; ++j) {
+                r(i, j) = m4(i, j);
+            }
+        }
+        return r;
+    }
+
+    template <typename T = float> [[nodiscard]] tmat<T, 4, 4> mat4Rotation(T radians, const tvec<T, 3> &axis) {
+        return rotate<T>(radians, axis);
+    }
+
+    template <typename T = float> [[nodiscard]] tmat<T, 4, 4> mat4LookAtRH(const tvec<T, 3> &eye, const tvec<T, 3> &center, const tvec<T, 3> &up) {
+        return lookAtRH<T>(eye, center, up);
+    }
+
+    template <typename T = float> [[nodiscard]] tmat<T, 4, 4> mat4LookAt(const tvec<T, 3> &eye, const tvec<T, 3> &center, const tvec<T, 3> &up) {
+        return lookAtRH<T>(eye, center, up);
+    }
+
+    template <typename T = float> [[nodiscard]] tmat<T, 4, 4> mat4Perspective(T fovRadians, T aspect, T znear, T zfar) {
+        return perspectiveRH<T>(fovRadians, aspect, znear, zfar);
+    }
+
+    template <typename T = float> [[nodiscard]] tmat<T, 4, 4> mat4Ortho(const tvec<T, 3> &pmin, const tvec<T, 3> &pmax) {
+        return orthoRH<T>(pmin.x, pmax.x, pmin.y, pmax.y, pmin.z, pmax.z);
+    }
+} // namespace xe

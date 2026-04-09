@@ -260,7 +260,7 @@ namespace Sandbox {
                 const float inv_denom = 1.0f / std::sqrt(1.0f - q.W * q.W);
 
                 if (radians > 0.0f) {
-                    const xe::Vector3 axis = q.V * inv_denom;
+                    const xe::Vector3 axis = xe::Vector3{q.x, q.y, q.z} * inv_denom;
 
                     nodeMatrix *= xe::mat4Rotation(radians, axis);
                 }
@@ -269,7 +269,7 @@ namespace Sandbox {
             if (node->has_scale) {
                 // TODO: Untested scale
                 const auto s = xe::Vector3{node->scale};
-                nodeMatrix *= xe::mat4Scaling({s, 1.0f});
+                nodeMatrix *= xe::mat4Scaling(xe::Vector4{s, 1.0f});
             }
         }
 
