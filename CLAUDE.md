@@ -10,6 +10,14 @@ XE is a barebones multiplatform C++17 game engine with OpenGL rendering, GLTF mo
 - class names must be PascalCase
 - value types must be represented as structs, and global functions and methods must be camelCase.
 - each new test should have their own unit test suite.
+- public classes and methods must have extended Doxygen documentation, in the form:
+/**
+ * @brief what it this (classes / structs) | what it does (public methods, global functions)
+ * Extended description on why it is neccesary | how it does it, plus secondary effects
+ * @param param1 description
+ * @param param2 description
+ * @return description
+ */
 
 ## Build System
 
