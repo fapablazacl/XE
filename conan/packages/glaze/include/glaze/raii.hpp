@@ -124,6 +124,16 @@ public:
     /** @brief True iff the held value is currently valid. */
     explicit operator bool() const noexcept { return Traits<T>::valid(value_); }
 
+    /** 
+     * @brief Implicit conversion to the held type T
+     */
+    operator T&() noexcept { return value_; }
+
+    /** 
+     * @brief Implicit conversion to the held type T
+     */
+    operator const T&() const noexcept { return value_; }
+
 private:
     T value_;
 };
@@ -218,6 +228,16 @@ public:
     explicit operator bool() const noexcept { return ctrl_ != nullptr; }
     bool operator==(const Shared& o) const noexcept { return ctrl_ == o.ctrl_; }
     bool operator!=(const Shared& o) const noexcept { return ctrl_ != o.ctrl_; }
+
+    /** 
+     * @brief Implicit conversion to the held type T
+     */
+    operator T&() noexcept { return ctrl_->value; }
+
+    /** 
+     * @brief Implicit conversion to the held type T
+     */
+    operator const T&() const noexcept { return ctrl_->value; }
 
 private:
     friend class Weak<T>;
@@ -320,6 +340,16 @@ public:
         }
         return SharedT();
     }
+
+    /** 
+     * @brief Implicit conversion to the held type T
+     */
+    operator T&() noexcept { return ctrl_->value; }
+
+    /** 
+     * @brief Implicit conversion to the held type T
+     */
+    operator const T&() const noexcept { return ctrl_->value; }
 
 private:
     void release() noexcept {
