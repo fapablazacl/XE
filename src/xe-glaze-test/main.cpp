@@ -1,6 +1,6 @@
+
 #include <glaze/gl.hpp>
 #include <glaze/raii.hpp>
-#include <glaze/gl_handle.hpp>
 #include <GLFW/glfw3.h>
 #include <iostream>
 #include <cstdlib>
@@ -27,14 +27,14 @@ void main() {
 )glsl";
 
 
-static glaze::Unique<gl::handle::Shader> compileShader(gl::ShaderType type, const char* src) {
-    auto shader = glaze::makeUnique<gl::handle::Shader>(type);
+static glaze::Unique<gl::Shader> compileShader(gl::ShaderType type, const char* src) {
+    auto shader = glaze::makeUnique<gl::Shader>(type);
 
-    shader->source(1, &src, nullptr);
-    shader->compile();
+	gl::shaderSource(shader.get(), 1, &src, nullptr);
+	gl::compileShader(shader.get());
 
-    if (!shader->getiv(gl::ShaderParameterName::eCompileStatus)) {
-        std::cerr << "Shader compile error:\n" << shader->getInfoLog() << std::endl;
+    if (!gl::getShaderiv(shader.get(), gl::ShaderParameterName::eCompileStatus)) {
+        std::cerr << "Shader compile error:\n" << gl::getShaderInfoLog(shader.get()) << std::endl;
         std::exit(1);
     }
     return shader;
@@ -84,24 +84,24 @@ int main() {
 		gl::enableVertexAttribArray(gl::AttribLocation(0));
 
 		// Shader program
-		auto prog = glaze::makeUnique<gl::handle::Program>();
+		auto prog = glaze::makeUnique<gl::Program>();
 
 		{
-			glaze::Unique<gl::handle::Shader> vert = compileShader(gl::ShaderType::eVertex, VERT_SRC);
-			glaze::Unique<gl::handle::Shader> frag = compileShader(gl::ShaderType::eFragment, FRAG_SRC);
+			glaze::Unique<gl::Shader> vert = compileShader(gl::ShaderType::eVertex, VERT_SRC);
+			glaze::Unique<gl::Shader> frag = compileShader(gl::ShaderType::eFragment, FRAG_SRC);
 
-			prog->attachShader(*vert);
-			prog->attachShader(*frag);
+			gl::attachShader(prog.get(), vert.get());
+			gl::attachShader(prog.get(), frag.get());
 		}
 
-		prog->link();
+		gl::linkProgram(prog.get());
 
-		if (!prog->getiv(gl::ProgramProperty::eLinkStatus)) {
-			std::cerr << "Link error:\n" << prog->getInfoLog() << std::endl;
+		if (!gl::getProgramiv(prog.get(), gl::ProgramProperty::eLinkStatus)) {
+			std::cerr << "Link error:\n" << gl::getProgramInfoLog(prog.get()) << std::endl;
 			return -1;
 		}
 
-		gl::UniformLocation const angleLoc = prog->getUniformLocation("angle");
+		gl::UniformLocation const angleLoc = gl::getUniformLocation(prog.get(), "angle");
 
 		while (!glfwWindowShouldClose(window)) {
 			glfwPollEvents();
@@ -114,7 +114,7 @@ int main() {
 			gl::clearColor(0.15f, 0.15f, 0.2f, 1.0f);
 			gl::clear(gl::ClearBufferMask::eColorBit);
 
-			gl::useProgram(prog->id());
+			gl::useProgram(prog.get());
 			gl::uniform1f(angleLoc, static_cast<float>(glfwGetTime()));
 
 			gl::bindVertexArray(vao.get());
