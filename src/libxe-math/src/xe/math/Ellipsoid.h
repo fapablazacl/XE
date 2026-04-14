@@ -1,43 +1,64 @@
+/**
+ * @file Ellipsoid.h
+ * @brief Axis-aligned 3D ellipsoid primitive.
+ */
 
-#ifndef __XE_MATH_ELLIPSOID_HPP__
-#define __XE_MATH_ELLIPSOID_HPP__
+#pragma once
+
+#include <ostream>
+#include <typeinfo>
 
 #include "Vector.h"
 
-#include <limits>
-
 namespace xe {
     /**
-     * @brief Ellipsoid in the 3-space
+     * @brief Axis-aligned ellipsoid in 3-space — centre and per-axis radii. Not part of glm.
+     * Stored as a centre point and a "size" 3-vector whose components
+     * are the radii along the @c x, @c y and @c z axes (not the diameter).
+     * Used for soft collision volumes and ellipsoidal swept-shape tests
+     * where a sphere is too coarse.
      */
-    template <typename T> struct TEllipsoid {
-        TVector<T, 3> center;
-        TVector<T, 3> size;
+    template <typename T> struct tellipsoid {
+        tvec<T, 3> center{T(0), T(0), T(0)};   ///< Centre of the ellipsoid in world space.
+        tvec<T, 3> size{T(1), T(1), T(1)};     ///< Per-axis radii (not diameters).
 
-        //! Initializes an Ellipsoid at the origin with radius 1, 1, 1.
-        TEllipsoid() : center{T(0), T(0), T(0)}, size{T(1), T(1), T(1)} {
-        }
+        /**
+         * @brief Default-construct to a unit sphere centred at the origin.
+         * The default size of @c (1, 1, 1) makes the ellipsoid degenerate
+         * into a unit-radius sphere — useful as a starting point.
+         */
+        constexpr tellipsoid() noexcept = default;
 
-        //! Initializes a Ellipsoid from the given center and radius
-        TEllipsoid(const TVector<T, 3> &center, const TVector<T, 3> &size) : center(center), size(size) {
+        /**
+         * @brief Construct from explicit centre and per-axis radii.
+         * @param c Centre in world space.
+         * @param s Per-axis radii.
+         */
+        constexpr tellipsoid(const tvec<T, 3> &c, const tvec<T, 3> &s) noexcept : center(c), size(s) {
         }
     };
 
-    //! Serializes the content of a Box object to an ostream.
-    template <typename T> inline std::ostream &operator<<(std::ostream &os, const TEllipsoid<T> &ellipsoid) {
-        os << "xe::Ellipsoid<" << typeid(T).name() << "{ " << std::endl;
-        os << "    " << ellipsoid.center << ", " << std::endl;
-        os << "    " << ellipsoid.size << std::endl;
-        os << "}" << std::endl;
-
+    /**
+     * @brief Stream insertion for @ref tellipsoid — debug print.
+     * Writes the type's @c typeid name followed by the centre and size on
+     * separate lines. Not intended as a serialisation format.
+     * @param os Output stream.
+     * @param e Ellipsoid to print.
+     * @return The same stream, to allow chaining.
+     */
+    template <typename T> inline std::ostream &operator<<(std::ostream &os, const tellipsoid<T> &e) {
+        os << "xe::ellipsoid<" << typeid(T).name() << ">{\n";
+        os << "    " << e.center << ",\n";
+        os << "    " << e.size << "\n";
+        os << "}";
         return os;
     }
 
-    extern template struct TEllipsoid<float>;
-    extern template struct TEllipsoid<double>;
+    using ellipsoid = tellipsoid<float>;   ///< Single-precision ellipsoid.
+    using dellipsoid = tellipsoid<double>; ///< Double-precision ellipsoid.
 
-    using Ellipsoid = TEllipsoid<float>;
-    using Ellipsoidd = TEllipsoid<double>;
+    // Legacy PascalCase aliases. See Legacy.h.
+    template <typename T> using TEllipsoid = tellipsoid<T>; ///< @deprecated Use @ref tellipsoid.
+    using Ellipsoid = ellipsoid;   ///< @deprecated Use @ref ellipsoid.
+    using Ellipsoidd = dellipsoid; ///< @deprecated Use @ref dellipsoid.
 } // namespace xe
-
-#endif

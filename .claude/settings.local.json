@@ -46,7 +46,18 @@
       "Bash(python -m pytest tests/test_cpp_generator.py -q)",
       "Bash(python glaze_cli.py generate --api gl 3.3 --lang cpp --output-dir ./_tmp_regen)",
       "Bash(python -m pytest tests/ -q)",
-      "Bash(python -m pytest tests/test_cpp_generator.py::TestCppGeneratorHandle -q)"
+      "Bash(python -m pytest tests/test_cpp_generator.py::TestCppGeneratorHandle -q)",
+      "Bash(wc -l /c/Users/fapablaza/Desktop/nativedevcl/XE/src/libxe-math/test/*.Test.cpp)",
+      "Bash(wc:*)",
+      "Bash(cmake --preset conan-debug -DXE_DEV_UNIT_TEST=ON)",
+      "Bash(cmake:*)",
+      "Bash(ls src/libxe-math/test/*.test.cpp)",
+      "Bash(./build/src/libxe-math/test/Debug/xe-math-test.exe)",
+      "Bash(ctest --test-dir build --output-on-failure -R xe-math -C Debug)",
+      "Bash(ctest --test-dir build -C Debug -N)",
+      "Bash(ctest --test-dir build -C Debug)",
+      "Bash(ctest --test-dir build -C Debug --rerun-failed --output-on-failure)",
+      "Bash(ls:*)"
     ]
   }
 }

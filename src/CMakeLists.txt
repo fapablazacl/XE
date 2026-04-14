@@ -2,7 +2,12 @@ add_subdirectory("vulkan-app-poc")
 add_subdirectory("d3d11-app-poc")
 
 add_subdirectory ("libxe-core")
+
 add_subdirectory ("libxe-math")
+if (XE_DEV_UNIT_TEST)
+    add_subdirectory ("libxe-math-test")    
+endif()
+
 add_subdirectory ("libxe-scene")
 add_subdirectory ("libxe-geometry")
 add_subdirectory ("libxe-app")

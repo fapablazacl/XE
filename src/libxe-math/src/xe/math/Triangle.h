@@ -1,75 +1,67 @@
+/**
+ * @file Triangle.h
+ * @brief 3D triangle primitive with normal computation.
+ */
 
-#ifndef __XE_MATH_TRIANGLE_HPP__
-#define __XE_MATH_TRIANGLE_HPP__
+#pragma once
 
-#include "Plane.h"
-#include "Ray.h"
 #include "Vector.h"
-#include <array>
 
 namespace xe {
-    template <typename T> struct TTriangle {
-        TVector<T, 3> P1;
-        TVector<T, 3> P2;
-        TVector<T, 3> P3;
+    /**
+     * @brief Triangle in 3-space — three vertices in fixed winding order. Not part of glm.
+     * The vertex order matters for normal computation: the right-handed
+     * cross product @c (p2 - p1) @c × @c (p3 - p1) determines which side
+     * of the triangle is the "front". Reversing two vertices flips the
+     * normal.
+     */
+    template <typename T> struct ttriangle {
+        tvec<T, 3> p1{}; ///< First vertex.
+        tvec<T, 3> p2{}; ///< Second vertex.
+        tvec<T, 3> p3{}; ///< Third vertex.
 
-        TTriangle() {
+        /**
+         * @brief Default-construct to a degenerate triangle at the origin.
+         */
+        constexpr ttriangle() noexcept = default;
+
+        /**
+         * @brief Construct from three explicit vertices.
+         * @param a First vertex.
+         * @param b Second vertex.
+         * @param c Third vertex.
+         */
+        constexpr ttriangle(const tvec<T, 3> &a, const tvec<T, 3> &b, const tvec<T, 3> &c) noexcept : p1(a), p2(b), p3(c) {
         }
 
-        TTriangle(const TVector<T, 3> &p1, const TVector<T, 3> &p2, const TVector<T, 3> &p3) {
-            P1 = p1;
-            P2 = p2;
-            P3 = p3;
-        }
-
-        TVector<T, 3> computeNormal() const {
+        /**
+         * @brief Compute the unit-length face normal of the triangle.
+         * Uses @ref computeNormalUnnormalized and then normalises. Calls
+         * @c std::sqrt and is therefore not @c constexpr.
+         * @return The unit normal in the right-handed sense from the triangle's winding.
+         */
+        [[nodiscard]] tvec<T, 3> computeNormal() const {
             return normalize(computeNormalUnnormalized());
         }
 
-        TVector<T, 3> computeNormalUnnormalized() const {
-            return cross((P2 - P1), P3 - P1);
+        /**
+         * @brief Compute the un-normalised face normal of the triangle.
+         * Returns the cross product @c (p2 - p1) @c × @c (p3 - p1). The
+         * magnitude of the result equals twice the triangle's area, which
+         * makes this useful for area-weighted normal averaging across a
+         * mesh — that is the main reason the un-normalised form is exposed.
+         * @return The cross product of two edge vectors.
+         */
+        [[nodiscard]] constexpr tvec<T, 3> computeNormalUnnormalized() const noexcept {
+            return cross(p2 - p1, p3 - p1);
         }
     };
 
-    using Triangle = TTriangle<float>;
-    using Triangled = TTriangle<double>;
+    using triangle = ttriangle<float>;   ///< Single-precision triangle.
+    using dtriangle = ttriangle<double>; ///< Double-precision triangle.
 
-    extern template struct TTriangle<float>;
-    extern template struct TTriangle<double>;
-
-    /*
-    template<typename T=float>
-    TVector3<T> hit(const TTriangle<T> &tri, const TRay<T>& ray) {
-        // Generar un plano con los tres puntos
-        auto plane = planeTriangle<T>(tri.P1, tri.P2, tri.P3);
-
-        if (plane.intersect(ray, &info) == true) {
-            if (info.distance <= 0.0) {
-                continue;
-            }
-
-            // Comprobar si el punto de interseccion pertenece al triangulo o no, usando
-            // coordenadas baricentricas
-            Vector3 r0=ray.getPointAt(info.distance);
-            Vector3 p=ray.getPoint(), q=r0;
-            Vector3 a=tri.p1, b=tri.p2, c=tri.p3;
-
-            Vector3 pq = (q - p);
-            Vector3 pa = (a - p);
-            Vector3 pb = (b - p);
-            Vector3 pc = (c - p);
-
-            float u, v, w;
-            u = pq.triple(pc, pb);
-            v = pq.triple(pa, pc);
-            w = pq.triple(pb, pa);
-
-            // Detectar si existe colision, sin importar como esten ordenados los triangulos
-            bool isBackSide = (u > 0.0f && v > 0.0f && w > 0.0f);
-            bool isFrontSide = (u < 0.0f && v < 0.0f && w < 0.0f);
-        }
-    }
-     */
+    // Legacy PascalCase aliases. See Legacy.h.
+    template <typename T> using TTriangle = ttriangle<T>; ///< @deprecated Use @ref ttriangle.
+    using Triangle = triangle;   ///< @deprecated Use @ref triangle.
+    using Triangled = dtriangle; ///< @deprecated Use @ref dtriangle.
 } // namespace xe
-
-#endif

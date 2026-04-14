@@ -13,6 +13,7 @@ option (XE_DEV_WARNINGS_AS_ERRORS   "Marks all warnings as errors" OFF)
 option (XE_DEV_INSTRUMENT_COVERAGE  "Instrument code for code coverage reporting during unit tests" OFF)
 option (XE_DEV_PRECOMPILED_HEADERS  "Enable precompiled headers for internal libraries, to improve build times" OFF)
 option (XE_DEV_SANITIZER_ENABLE     "Enable sanitizer usage" OFF)
+option (XE_DEV_DOCS                 "Generate Doxygen documentation for the engine libraries" OFF)
 
 # Which sanitizer to use
 set (XE_DEV_SANITIZER "" CACHE STRING "")
@@ -42,6 +43,7 @@ if (XE_DEV_UNIT_TEST)
     include(CTest)
     enable_testing()
     find_package(GTest CONFIG REQUIRED)
+    find_package(Catch2 3 CONFIG REQUIRED)
 endif()
 
 if (CMAKE_BUILD_TYPE MATCHES "Debug")
@@ -95,6 +97,24 @@ endif()
 if (XE_DEV_SANITIZER_ENABLE)
     target_compile_options(${target} INTERFACE -fsanitize=${XE_DEV_SANITIZER})
     target_link_options(${target} INTERFACE -fsanitize=${XE_DEV_SANITIZER})
+endif()
+
+if (XE_DEV_DOCS)
+    find_package(Doxygen REQUIRED)
+
+    set (XE_DOXYFILE_IN  "${CMAKE_SOURCE_DIR}/Doxyfile.in")
+    set (XE_DOXYFILE_OUT "${CMAKE_BINARY_DIR}/Doxyfile")
+
+    configure_file(${XE_DOXYFILE_IN} ${XE_DOXYFILE_OUT} @ONLY)
+
+    # Single project-wide Doxygen target. Covers every library under src/
+    # in one Doxygen run; INPUT and EXCLUDE_PATTERNS in Doxyfile.in control
+    # what is documented.
+    add_custom_target(docs
+        COMMAND ${DOXYGEN_EXECUTABLE} ${XE_DOXYFILE_OUT}
+        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+        COMMENT "Generating XE Doxygen documentation"
+        VERBATIM)
 endif()
 
 add_subdirectory ("src")

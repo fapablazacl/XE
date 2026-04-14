@@ -19,11 +19,26 @@ class xeRecipe(ConanFile):
     # Binary configuration
     settings = "os", "compiler", "build_type", "arch"
 
+    options = {
+        "with_docs": [True, False],
+    }
+    default_options = {
+        "with_docs": False,
+    }
+
     # Sources are located in the same place as this recipe, copy them to the recipe
     exports_sources = "CMakeLists.txt", "src/*"
 
     def layout(self):
         cmake_layout(self)
+
+    def build_requirements(self):
+        if self.options.with_docs:
+            # Doxygen is consumed at build time only — never linked, never
+            # shipped — so it goes through tool_requires rather than the
+            # regular requires() list. Pinning to the 1.9.x line keeps the
+            # config syntax in Doxyfile.in stable.
+            self.tool_requires("doxygen/[>=1.9 <2]")
 
     def requirements(self):
         self.requires("imgui/1.92.2b")
@@ -45,6 +60,8 @@ class xeRecipe(ConanFile):
 
         self.requires("cxxopts/3.3.1")
         self.requires("backport-cpp/1.2.0")
+        self.requires("catch2/3.7.1")
+        self.requires("gtest/1.15.0")
         self.requires("glaze/1.0.0", options={"language": "both", "apis": "gl:4.6,gles2:3.2,gl_compat:2.1"})
 
         # NOTE: sdl2 and sdl3 both don't build under ArchLinux
@@ -55,6 +72,10 @@ class xeRecipe(ConanFile):
         deps = CMakeDeps(self)
         deps.generate()
         tc = CMakeToolchain(self)
+        if self.options.with_docs:
+            # Hoist the conan-side opt-in into the engine-wide CMake option
+            # so a single `-o with_docs=True` is all the user needs to type.
+            tc.variables["XE_DEV_DOCS"] = "ON"
         tc.generate()
 
         # imgui backends
