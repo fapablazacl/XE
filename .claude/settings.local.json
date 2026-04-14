@@ -57,7 +57,20 @@
       "Bash(ctest --test-dir build -C Debug -N)",
       "Bash(ctest --test-dir build -C Debug)",
       "Bash(ctest --test-dir build -C Debug --rerun-failed --output-on-failure)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "WebFetch(domain:conan.io)",
+      "WebFetch(domain:jinja2cpp.github.io)",
+      "Bash(\"build/src/libxe-glaze-model-test/Debug/xe-glaze-model-test.exe\")",
+      "Bash(\"build/src/libxe-glaze-producer-test/Debug/xe-glaze-producer-test.exe\")",
+      "Bash(\"build/src/libxe-glaze-cgen-test/Debug/xe-glaze-cgen-test.exe\")",
+      "Bash(\"build/src/libxe-glaze-cppgen-test/Debug/xe-glaze-cppgen-test.exe\")",
+      "Bash(\"build/src/libxe-glaze-facade-test/Debug/xe-glaze-facade-test.exe\")",
+      "Bash(\"build/src/xe-glaze/Debug/xe-glaze.exe\" list-apis *)",
+      "Bash(rm -rf /tmp/xe-glaze-smoke)",
+      "Bash(\"build/src/xe-glaze/Debug/xe-glaze.exe\" generate *)",
+      "Bash(ctest --test-dir build --output-on-failure -C Debug -R \"xe-glaze-\")",
+      "Bash(ctest --test-dir build --output-on-failure -C Debug)",
+      "Bash(ctest --test-dir build --output-on-failure -C Debug -N)"
     ]
   }
 }
