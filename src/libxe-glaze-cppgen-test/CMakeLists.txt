@@ -2,6 +2,10 @@ set (target "xe-glaze-cppgen-test")
 
 set (sources
     "CppGenerator.Generate.Test.cpp"
+    "CppGenerator.Extensions.Test.cpp"
+    "CppGenerator.Overloads.Test.cpp"
+    "CppKeywords.Test.cpp"
+    "PatternDetector.Test.cpp"
 )
 
 add_executable(${target} ${sources})

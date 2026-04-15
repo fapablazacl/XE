@@ -1,11 +1,13 @@
 #include "xe/glaze/cppgen/detail/FunctorEmitter.h"
 
+#include "xe/glaze/cppgen/detail/OverloadEmitter.h"
 #include "xe/glaze/cppgen/detail/ParamFormat.h"
 #include "xe/glaze/cppgen/detail/PatternDetector.h"
 #include "xe/glaze/model/StringUtils.h"
 #include "xe/glaze/model/TypeDecl.h"
 
 #include <cctype>
+#include <sstream>
 
 namespace xe::glaze::cppgen::detail {
 
@@ -19,13 +21,14 @@ std::string functorStructName(const std::string &funcName) {
     return out + "Fn";
 }
 
-//! Build the parameter-list / call-args strings for one overload.
+//! Build the parameter-list / call-args strings for the canonical overload.
 struct OverloadStrings {
     std::string paramsStr;
     std::string callArgsStr;
 };
 
-OverloadStrings buildOverloadStrings(const model::Command &command, const EmitterContext &ctx) {
+OverloadStrings buildCanonicalStrings(const model::Command &command,
+                                      const EmitterContext &ctx) {
     OverloadStrings s;
     bool first = true;
     for (const auto &param : command.params) {
@@ -73,6 +76,31 @@ std::string functorReturnType(const model::Command &command, const EmitterContex
     return model::toCString(command.returnType);
 }
 
+//! Build the pre-composed body string for the canonical operator() overload.
+//! Mirrors the three branches the template used to hard-code (void / handle /
+//! value return) so we can hand the emitted body straight to the template.
+std::string buildCanonicalBody(const std::string &returnType,
+                               const std::string &rawPtr,
+                               const std::string &callArgsStr,
+                               const model::Command &command) {
+    const bool isVoid = returnType == "void";
+    const bool isHandle = !isVoid && returnType != "std::string" &&
+                          !command.returnType.isPointer &&
+                          command.returnType.name == "GLuint";
+
+    std::ostringstream body;
+    if (isVoid) {
+        body << "        " << rawPtr << "(" << callArgsStr << ");";
+    } else if (isHandle) {
+        body << "        return " << returnType << "{" << rawPtr << "("
+             << callArgsStr << ")};";
+    } else {
+        body << "        return " << returnType << "(" << rawPtr << "("
+             << callArgsStr << "));";
+    }
+    return body.str();
+}
+
 } // namespace
 
 nlohmann::json buildFunctors(const std::vector<const model::Command *> &commands,
@@ -82,8 +110,11 @@ nlohmann::json buildFunctors(const std::vector<const model::Command *> &commands
         const auto funcName = ctx.nameTransform.transformCommandName(cmd->name);
         const auto structName = functorStructName(funcName);
 
-        auto overloadStrings = buildOverloadStrings(*cmd, ctx);
+        auto overloadStrings = buildCanonicalStrings(*cmd, ctx);
         const auto returnType = functorReturnType(*cmd, ctx);
+        const auto rawPtr = std::string{"glaze_"} + cmd->name;
+        const auto canonicalBody = buildCanonicalBody(
+            returnType, rawPtr, overloadStrings.callArgsStr, *cmd);
 
         int versionInt = 0;
         if (const auto it = ctx.commandVersionMap.find(cmd->name);
@@ -95,25 +126,45 @@ nlohmann::json buildFunctors(const std::vector<const model::Command *> &commands
             }
         }
 
-        nlohmann::json overload = {
+        nlohmann::json canonical = {
             {"return_type", returnType},
             {"params_str", overloadStrings.paramsStr},
-            {"call_args_str", overloadStrings.callArgsStr},
-            {"gl_name", cmd->name},
-            {"raw_ptr", "glaze_" + cmd->name},
-            {"is_void_return", returnType == "void"},
-            {"is_handle_return", returnType != "void" && returnType != "std::string" &&
-                                     !cmd->returnType.isPointer &&
-                                     cmd->returnType.name == "GLuint"},
+            {"body", canonicalBody},
+            {"is_template_overload", false},
         };
 
-        functors.push_back(nlohmann::json{
+        nlohmann::json overloads = nlohmann::json::array();
+        overloads.push_back(std::move(canonical));
+        for (auto &extra : buildExtraOverloads(*cmd, ctx)) {
+            overloads.push_back(std::move(extra));
+        }
+
+        nlohmann::json fn{
             {"struct_name", structName},
             {"func_name", funcName},
             {"gl_name", cmd->name},
+            {"raw_ptr", rawPtr},
             {"version_int", versionInt},
-            {"overloads", nlohmann::json::array({overload})},
-        });
+            {"overloads", std::move(overloads)},
+        };
+
+        // Doc comment fields — empty strings when no refpages dir was given.
+        std::string docBrief;
+        nlohmann::json docParams = nlohmann::json::array();
+        if (const auto it = ctx.docs.find(cmd->name); it != ctx.docs.end()) {
+            docBrief = it->second.brief;
+            for (const auto &[paramName, desc] : it->second.params) {
+                docParams.push_back(nlohmann::json{
+                    {"name", paramName},
+                    {"desc", desc},
+                });
+            }
+        }
+        fn["has_doc_brief"] = !docBrief.empty();
+        fn["doc_brief"] = std::move(docBrief);
+        fn["doc_params"] = std::move(docParams);
+
+        functors.push_back(std::move(fn));
     }
     return functors;
 }

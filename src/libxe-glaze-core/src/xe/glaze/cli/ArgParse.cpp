@@ -53,6 +53,8 @@ std::optional<GenerateOptions> parseGenerate(int argc, const char *const *argv) 
             cxxopts::value<std::string>()->default_value(""))
         ("extensions", "Comma-separated extension names (e.g. GL_KHR_debug)",
             cxxopts::value<std::string>()->default_value(""))
+        ("refpages-dir", "Path to OpenGL-Refpages for Doxygen brief attachment",
+            cxxopts::value<std::string>()->default_value(""))
         ("h,help", "Print help");
 
     try {
@@ -87,6 +89,10 @@ std::optional<GenerateOptions> parseGenerate(int argc, const char *const *argv) 
 
         out.extensionVendors = splitCsvSet(parsed["extension-vendors"].as<std::string>());
         out.extensionNames = splitCsvSet(parsed["extensions"].as<std::string>());
+        if (const auto &refpages = parsed["refpages-dir"].as<std::string>();
+            !refpages.empty()) {
+            out.refpagesDir = refpages;
+        }
         return out;
     } catch (const cxxopts::exceptions::exception &e) {
         throw std::invalid_argument(std::string{"cxxopts error: "} + e.what());

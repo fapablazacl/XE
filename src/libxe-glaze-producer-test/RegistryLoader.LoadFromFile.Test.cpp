@@ -28,7 +28,7 @@ TEST_CASE("loadFromFile parses a file identical to loadFromString",
           "[glaze][producer][loader]") {
     const auto path = writeTempXml();
     const auto registry = RegistryLoader{}.loadFromFile(path.string());
-    REQUIRE(registry.types().size() == 7);
+    REQUIRE(registry.types().size() == 9);
     REQUIRE(registry.features().size() == 6);
     REQUIRE(registry.extensions().size() == 4);
     std::error_code ec;

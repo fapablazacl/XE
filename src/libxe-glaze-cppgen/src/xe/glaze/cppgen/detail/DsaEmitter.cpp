@@ -1,5 +1,6 @@
 #include "xe/glaze/cppgen/detail/DsaEmitter.h"
 
+#include "xe/glaze/cppgen/detail/CppKeywords.h"
 #include "xe/glaze/cppgen/detail/ParamFormat.h"
 #include "xe/glaze/cppgen/detail/PatternDetector.h"
 #include "xe/glaze/model/StringUtils.h"
@@ -37,7 +38,7 @@ std::string dsaMethodName(const std::string &glName, const std::string &classStr
     if (!name.empty()) {
         name.front() = static_cast<char>(std::tolower(static_cast<unsigned char>(name.front())));
     }
-    return name;
+    return sanitizeMethodName(std::move(name));
 }
 
 //! Return true when a command is a DSA method for the given class — i.e. its
@@ -116,6 +117,11 @@ nlohmann::json buildDsaClasses(const model::Registry &registry,
                 }
             }
 
+            std::string docBrief;
+            if (const auto it = ctx.docs.find(command.name); it != ctx.docs.end()) {
+                docBrief = it->second.brief;
+            }
+
             methods.push_back(nlohmann::json{
                 {"name", dsaMethodName(command.name, classStr)},
                 {"return_type", returnType},
@@ -125,6 +131,8 @@ nlohmann::json buildDsaClasses(const model::Registry &registry,
                 {"raw_ptr", "glaze_" + command.name},
                 {"version_int", versionInt},
                 {"is_void_return", returnType == "void"},
+                {"has_doc_brief", !docBrief.empty()},
+                {"doc_brief", docBrief},
             });
         }
 

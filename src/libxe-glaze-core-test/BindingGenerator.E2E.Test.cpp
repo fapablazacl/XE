@@ -18,7 +18,7 @@ namespace {
 //! Write MINI_XML to a per-test temp file and return its path. Each call
 //! picks a unique suffix so parallel test runs do not collide.
 std::filesystem::path writeMiniXml(const std::string &tag) {
-    auto path = std::filesystem::temp_directory_path() / ("xe-glaze-facade-" + tag + ".xml");
+    auto path = std::filesystem::temp_directory_path() / ("xe-glaze-core-" + tag + ".xml");
     std::ofstream out{path, std::ios::binary | std::ios::trunc};
     out.write(kMiniXml.data(), static_cast<std::streamsize>(kMiniXml.size()));
     return path;
@@ -27,7 +27,7 @@ std::filesystem::path writeMiniXml(const std::string &tag) {
 //! Build an isolated output directory for each test case. std::filesystem
 //! happily overwrites existing files so repeat runs stay deterministic.
 std::filesystem::path makeOutputDir(const std::string &tag) {
-    auto dir = std::filesystem::temp_directory_path() / ("xe-glaze-facade-out-" + tag);
+    auto dir = std::filesystem::temp_directory_path() / ("xe-glaze-core-out-" + tag);
     std::error_code ec;
     std::filesystem::remove_all(dir, ec);
     std::filesystem::create_directories(dir);
@@ -36,7 +36,7 @@ std::filesystem::path makeOutputDir(const std::string &tag) {
 
 } // namespace
 
-TEST_CASE("BindingGenerator generates both C and C++ outputs", "[glaze][facade][e2e]") {
+TEST_CASE("BindingGenerator generates both C and C++ outputs", "[glaze][core][e2e]") {
     const auto xmlPath = writeMiniXml("e2e");
     const auto outDir = makeOutputDir("e2e");
 
@@ -63,7 +63,7 @@ TEST_CASE("BindingGenerator generates both C and C++ outputs", "[glaze][facade][
     std::filesystem::remove(xmlPath);
 }
 
-TEST_CASE("BindingGenerator::listApis returns gl and gles2", "[glaze][facade][list]") {
+TEST_CASE("BindingGenerator::listApis returns gl and gles2", "[glaze][core][list]") {
     const auto xmlPath = writeMiniXml("listapis");
     const auto apis = BindingGenerator{}.listApis(xmlPath);
     REQUIRE(apis.find("gl") != apis.end());
@@ -73,7 +73,7 @@ TEST_CASE("BindingGenerator::listApis returns gl and gles2", "[glaze][facade][li
 }
 
 TEST_CASE("BindingGenerator propagates custom NameTransform into the C++ output",
-          "[glaze][facade][extension]") {
+          "[glaze][core][extension]") {
     struct MyNames : public xe::glaze::codegen::NameTransform {
         std::string transformCommandName(std::string_view glName) const override {
             return std::string{"myfacade_"} +

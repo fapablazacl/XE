@@ -41,6 +41,7 @@ add_library(xe::glaze-cgen ALIAS ${target})
 target_include_directories(${target} PUBLIC "src")
 target_link_libraries(${target}
     PUBLIC  xe::glaze-model
+    PUBLIC  xe::glaze-docparser
     PRIVATE xe::interface
     PRIVATE pantor::inja
     PRIVATE nlohmann_json::nlohmann_json

@@ -22,12 +22,11 @@ public:
 
 {% for m in hc.methods %}
 #if GLAZE_GL_VERSION >= {{ m.version_int }}
-    inline {{ m.return_type }} {{ m.name }}({{ m.params_str }}) const {
-{% if m.is_void_return %}
-        ::{{ api }}::{{ m.functor_name }}({{ m.call_args_str }});
-{% else %}
-        return ::{{ api }}::{{ m.functor_name }}({{ m.call_args_str }});
+{% if m.has_doc_brief %}
+    /** @brief {{ m.doc_brief }} */
 {% endif %}
+    inline {{ m.return_type }} {{ m.name }}({{ m.params_str }}) const {
+{{ m.body }}
     }
 #endif
 {% endfor %}

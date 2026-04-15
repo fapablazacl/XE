@@ -15,7 +15,8 @@ namespace {
 //! glaze/generators/c_generator.py::_build_command_header_entry.
 nlohmann::json buildCommandEntry(const model::Command &command,
                                  const std::string &verTag,
-                                 const codegen::TypeMapper &typeMapper) {
+                                 const codegen::TypeMapper &typeMapper,
+                                 const docparser::DocIndex &docs) {
     nlohmann::json entry;
     entry["typedef"] = generateCommandPtrTypedef(command, typeMapper);
     entry["extern_raw"] = generateCommandPtrExternRaw(command);
@@ -24,9 +25,13 @@ nlohmann::json buildCommandEntry(const model::Command &command,
     entry["release_alias"] = "#define " + command.name + " glaze_" + command.name;
     entry["debug_alias"] = "#define " + command.name + " glaze_debug_" + command.name;
     entry["name"] = command.name;
-    // doc_parser.py is deferred; doc_brief reduces to the version tag alone
-    // so downstream templates still render a minimal /** @brief */ comment.
-    entry["doc_brief"] = verTag;
+    // Prefer the refpage brief when available; fall back to the version tag
+    // so downstream templates always render a minimal /** @brief */ comment.
+    std::string brief = verTag;
+    if (const auto it = docs.find(command.name); it != docs.end() && !it->second.brief.empty()) {
+        brief = it->second.brief;
+    }
+    entry["doc_brief"] = std::move(brief);
     return entry;
 }
 
@@ -51,7 +56,8 @@ nlohmann::json buildHeaderContext(
     const std::vector<codegen::ExtensionEmission> &extensionEmissions,
     const std::string &api,
     const std::string &version,
-    const codegen::TypeMapper &typeMapper) {
+    const codegen::TypeMapper &typeMapper,
+    const docparser::DocIndex &docs) {
     // 1. Collect the union of type names referenced by core and extension commands
     std::set<std::string> allTypeNames;
     for (const auto &featureRef : features) {
@@ -106,7 +112,7 @@ nlohmann::json buildHeaderContext(
                     continue;
                 }
                 const std::string verTag = "[" + apiUpper + " " + feature.number + "]";
-                commandsArr.push_back(buildCommandEntry(*cmd, verTag, typeMapper));
+                commandsArr.push_back(buildCommandEntry(*cmd, verTag, typeMapper, docs));
             }
         }
 
@@ -130,7 +136,7 @@ nlohmann::json buildHeaderContext(
         nlohmann::json commandsArr = nlohmann::json::array();
         for (const auto *cmd : emission.commands) {
             const std::string verTag = "[" + emission.name + "]";
-            commandsArr.push_back(buildCommandEntry(*cmd, verTag, typeMapper));
+            commandsArr.push_back(buildCommandEntry(*cmd, verTag, typeMapper, docs));
         }
         extensionsArray.push_back(nlohmann::json{
             {"name", emission.name},

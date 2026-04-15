@@ -13,9 +13,9 @@ using xe::glaze::testfixtures::loadMiniRegistry;
 TEST_CASE("loadFromString parses MINI_XML into a populated Registry",
           "[glaze][producer][loader]") {
     const auto registry = loadMiniRegistry();
-    REQUIRE(registry.types().size() == 7);
+    REQUIRE(registry.types().size() == 9);
     REQUIRE(registry.enumGroups().size() == 4);
-    REQUIRE(registry.commands().size() >= 17);
+    REQUIRE(registry.commands().size() >= 20);
     REQUIRE(registry.features().size() == 6);
     REQUIRE(registry.extensions().size() == 4);
 }

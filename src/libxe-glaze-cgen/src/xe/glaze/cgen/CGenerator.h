@@ -2,6 +2,7 @@
 
 #include "xe/glaze/codegen/NameTransform.h"
 #include "xe/glaze/codegen/TypeMapper.h"
+#include "xe/glaze/docparser/DocIndex.h"
 #include "xe/glaze/model/Registry.h"
 
 #include <map>
@@ -47,7 +48,8 @@ public:
         const std::string &api,
         const std::string &version,
         const std::set<std::string> &extensionVendors = {},
-        const std::set<std::string> &extensionNames = {}) const;
+        const std::set<std::string> &extensionNames = {},
+        const docparser::DocIndex &docs = {}) const;
 
     /**
      * @brief Validate that the requested extension filters exist for the api.

@@ -69,23 +69,44 @@ std::map<std::string, std::string>
 CppGenerator::generate(const std::string &api,
                        const std::string &version,
                        const std::set<std::string> &extensionVendors,
-                       const std::set<std::string> &extensionNames) const {
-    // Simplified port: extension emission is not yet wired through cppgen.
-    // checkApiVersion still runs and the filters are validated via the
-    // companion validateExtensionFilters() method when the facade calls it.
-    (void)extensionVendors;
-    (void)extensionNames;
+                       const std::set<std::string> &extensionNames,
+                       const docparser::DocIndex &docs) const {
     codegen::checkApiVersion(registry_, api, version);
 
     const auto consolidated = registry_.consolidate(api, version);
+    const auto extEmissions = codegen::collectExtensionEmissions(
+        registry_, api, version, extensionVendors, extensionNames);
 
-    // Discovery pass: walk every core command and gather handle classes and
-    // enum group names. Extensions are skipped in this simplified port — they
-    // can still emit functors via the canonical context builder if present
-    // but no extra DSA/handle classes are discovered from them.
+    // Union of core + every extension-contributed command/enum name so the
+    // downstream discovery and emission passes see one merged view.
+    std::set<std::string> unionCommandNames = consolidated.commands;
+    std::set<std::string> unionEnumNames = consolidated.enums;
+    //! Map each extension-only command back to its originating extension so
+    //! we can tag the functor with the guard macro / flag var spellings.
+    struct ExtensionMeta {
+        std::string shortName;
+        std::string guardMacro;
+        std::string flagVar;
+    };
+    std::map<std::string, ExtensionMeta> cmdToExtension;
+
+    for (const auto &emission : extEmissions) {
+        for (const auto *cmd : emission.commands) {
+            unionCommandNames.insert(cmd->name);
+            cmdToExtension[cmd->name] = {emission.shortName, emission.guardMacro,
+                                          emission.flagVar};
+        }
+        for (const auto *e : emission.enums) {
+            unionEnumNames.insert(e->name);
+        }
+    }
+
+    // Discovery pass: walk every core + extension command and gather handle
+    // classes and enum group names. Extensions are merged into the same
+    // discovery set so extension-only commands contribute their types too.
     std::map<std::string, std::string> handleClasses;
     std::set<std::string> groupSet;
-    for (const auto &cmdName : consolidated.commands) {
+    for (const auto &cmdName : unionCommandNames) {
         const auto *cmd = registry_.findCommand(cmdName);
         if (cmd == nullptr) {
             continue;
@@ -133,7 +154,7 @@ CppGenerator::generate(const std::string &api,
     // Location-type usage scan.
     bool needUniformLocation = false;
     bool needAttribLocation = false;
-    for (const auto &cmdName : consolidated.commands) {
+    for (const auto &cmdName : unionCommandNames) {
         const auto *cmd = registry_.findCommand(cmdName);
         if (cmd == nullptr) {
             continue;
@@ -172,10 +193,12 @@ CppGenerator::generate(const std::string &api,
     // Shared emitter context.
     detail::EmitterContext emitterCtx{
         *nameTransform_,
+        api,
         handleClasses,
         groupRename,
         bitmaskGroups,
         buildCommandVersionMap(registry_, api, version),
+        docs,
     };
 
     // Enum classes block.
@@ -188,7 +211,7 @@ CppGenerator::generate(const std::string &api,
         std::vector<const model::Enum *> filtered;
         filtered.reserve(enumPtrs->size());
         for (const auto *e : *enumPtrs) {
-            if (consolidated.enums.count(e->name) != 0) {
+            if (unionEnumNames.count(e->name) != 0) {
                 filtered.push_back(e);
             }
         }
@@ -201,16 +224,40 @@ CppGenerator::generate(const std::string &api,
             rawGroup, cleanName, isBitmask, filtered, *nameTransform_));
     }
 
-    // Functor block.
+    // Functor block. Build from the merged core+extension command set so
+    // extension-only functors get their own struct + instance, then post-
+    // process the result to tag every extension-origin functor with the
+    // guard macro / flag var the template uses to wrap them.
     std::vector<const model::Command *> sortedCommands;
-    for (const auto &cmdName : consolidated.commands) {
+    for (const auto &cmdName : unionCommandNames) {
         if (const auto *cmd = registry_.findCommand(cmdName); cmd != nullptr) {
             sortedCommands.push_back(cmd);
         }
     }
     std::sort(sortedCommands.begin(), sortedCommands.end(),
               [](const model::Command *a, const model::Command *b) { return a->name < b->name; });
-    const auto functorsArr = detail::buildFunctors(sortedCommands, emitterCtx);
+    auto functorsArr = detail::buildFunctors(sortedCommands, emitterCtx);
+
+    // Tag extension-origin functors with their extension metadata so the
+    // template can emit the correct `#ifndef GLAZE_GL_NO_EXT_<short>` block.
+    // Also set `has_extension_guard` for inja's truthiness test — plain
+    // `{% if fn.extension_short_name %}` on an empty string was unreliable
+    // across inja versions, so we use an explicit bool.
+    for (auto &fn : functorsArr) {
+        const auto glName = fn.at("gl_name").get<std::string>();
+        const auto it = cmdToExtension.find(glName);
+        if (it == cmdToExtension.end()) {
+            fn["has_extension_guard"] = false;
+            fn["extension_short_name"] = "";
+            fn["guard_macro"] = "";
+            fn["flag_var"] = "";
+        } else {
+            fn["has_extension_guard"] = true;
+            fn["extension_short_name"] = it->second.shortName;
+            fn["guard_macro"] = it->second.guardMacro;
+            fn["flag_var"] = it->second.flagVar;
+        }
+    }
 
     // DSA classes.
     const auto dsaClassesArr = detail::buildDsaClasses(registry_, consolidated, emitterCtx);
@@ -219,7 +266,21 @@ CppGenerator::generate(const std::string &api,
     const auto handleClassesArr = detail::buildHandleClasses(registry_, consolidated, emitterCtx);
 
     // RAII resources.
-    const auto raiiResourcesArr = detail::collectRaiiResources(registry_, consolidated, handleClasses);
+    const auto raiiResourcesArr =
+        detail::collectRaiiResources(registry_, consolidated, emitterCtx);
+
+    // Extensions context: one entry per emission for the gl::exts::* namespace
+    // block and the template-side guard/flag macros. Matches the shape
+    // produced by glaze/generators/base.py::_collect_extension_emissions.
+    nlohmann::json extensionsArr = nlohmann::json::array();
+    for (const auto &emission : extEmissions) {
+        extensionsArr.push_back(nlohmann::json{
+            {"name", emission.name},
+            {"short_name", emission.shortName},
+            {"guard_macro", emission.guardMacro},
+            {"flag_var", emission.flagVar},
+        });
+    }
 
     // Handle wrapper RAII list: pair each raii resource with its handle-class
     // wrapper type name so gl_handle.hpp.inja can emit Traits specializations.
@@ -264,6 +325,7 @@ CppGenerator::generate(const std::string &api,
         {"functors", functorsArr},
         {"dsa_classes", dsaClassesArr},
         {"raii_resources", raiiResourcesArr},
+        {"extensions", extensionsArr},
     };
 
     nlohmann::json handleCtx = {
@@ -273,6 +335,7 @@ CppGenerator::generate(const std::string &api,
         {"generation_header_formatted", generationHeaderFormatted},
         {"handle_classes", handleClassesArr},
         {"handle_raii_resources", handleRaiiArr},
+        {"extensions", extensionsArr},
     };
 
     auto env = makeEnvironment();

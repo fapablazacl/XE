@@ -1,7 +1,11 @@
 #include "xe/glaze/cppgen/detail/RaiiCollector.h"
 
+#include "xe/glaze/cppgen/detail/ParamFormat.h"
 #include "xe/glaze/cppgen/detail/PatternDetector.h"
+#include "xe/glaze/model/StringUtils.h"
 
+#include <algorithm>
+#include <stdexcept>
 #include <string>
 
 namespace xe::glaze::cppgen::detail {
@@ -45,11 +49,62 @@ std::string makeSingularDeleteName(const std::string &glName) {
 
 } // namespace
 
+namespace {
+
+//! Build the "ShaderType type, GLenum extra" parameter list and the matching
+//! "type, static_cast<GLenum>(extra)" call-arg list for whichever params on
+//! the creator survive after dropping the count + output. Matches the Python
+//! _collect_raii_resources code at lines 663–682.
+struct ExtraParamStrings {
+    std::string paramsStr;
+    std::string callArgsStr;
+};
+
+ExtraParamStrings buildExtraParams(const model::Command &command,
+                                   const model::CommandParam *countParam,
+                                   const model::CommandParam *outputParam,
+                                   const EmitterContext &ctx) {
+    ExtraParamStrings s;
+    bool first = true;
+    for (const auto &param : command.params) {
+        if (&param == countParam || &param == outputParam) {
+            continue;
+        }
+        if (!first) {
+            s.paramsStr.append(", ");
+            s.callArgsStr.append(", ");
+        }
+        s.paramsStr.append(generateParamDecl(param, command, ctx.handleClasses,
+                                             ctx.groupRename, ctx.bitmaskGroups));
+        s.callArgsStr.append(generateCallArg(param, command, ctx.handleClasses,
+                                             ctx.groupRename, ctx.bitmaskGroups));
+        first = false;
+    }
+    return s;
+}
+
+int versionIntFor(const model::Command *command, const EmitterContext &ctx) {
+    if (command == nullptr) {
+        return 0;
+    }
+    const auto it = ctx.commandVersionMap.find(command->name);
+    if (it == ctx.commandVersionMap.end()) {
+        return 0;
+    }
+    try {
+        return model::versionToInt(it->second);
+    } catch (const std::invalid_argument &) {
+        return 0;
+    }
+}
+
+} // namespace
+
 nlohmann::json collectRaiiResources(const model::Registry &registry,
                                     const model::ConsolidatedRequire &consolidated,
-                                    const std::map<std::string, std::string> &handleClasses) {
+                                    const EmitterContext &ctx) {
     nlohmann::json out = nlohmann::json::array();
-    (void)registry;
+    const auto &handleClasses = ctx.handleClasses;
 
     // Index commands by GL name for quick lookup.
     for (const auto &[classStr, handleType] : handleClasses) {
@@ -110,6 +165,23 @@ nlohmann::json collectRaiiResources(const model::Registry &registry,
             continue;
         }
 
+        // Walk the creator params, skipping the count/output pair that the
+        // singular overload hides. For singular creators (e.g.
+        // glCreateShader) the entire param list survives.
+        const model::CommandParam *countParam = nullptr;
+        const model::CommandParam *outputParam = nullptr;
+        if (chosenGen == multiGen) {
+            findObjectCreationParams(*chosenGen, countParam, outputParam);
+        }
+        const auto extras = buildExtraParams(*chosenGen, countParam, outputParam, ctx);
+
+        // Gate the Traits specialization behind the latest GLAZE_GL_VERSION
+        // of the creator and deleter so we never emit Traits for symbols the
+        // feature floor excludes.
+        const int genVer = versionIntFor(chosenGen, ctx);
+        const int delVer = versionIntFor(chosenDel, ctx);
+        const int versionInt = std::max(genVer, delVer);
+
         nlohmann::json entry;
         entry["alias"] = handleType;
         entry["handle_type"] = handleType;
@@ -117,8 +189,9 @@ nlohmann::json collectRaiiResources(const model::Registry &registry,
         entry["gen_func_name"] = makeSingularGenName(chosenGen->name);
         entry["delete_gl_name"] = chosenDel->name;
         entry["delete_func_name"] = makeSingularDeleteName(chosenDel->name);
-        entry["create_params_str"] = "";
-        entry["create_call_args_str"] = "";
+        entry["create_params_str"] = extras.paramsStr;
+        entry["create_call_args_str"] = extras.callArgsStr;
+        entry["version_int"] = versionInt;
         out.push_back(entry);
     }
 

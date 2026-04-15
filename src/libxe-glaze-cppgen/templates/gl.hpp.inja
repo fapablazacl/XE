@@ -9,11 +9,26 @@
 #include <glaze/{{ api }}.h>
 #include <glaze/raii.hpp>
 
+#include <cstddef>
 #include <cstdint>
 #include <string>
 #include <type_traits>
 
 namespace {{ api }} {
+
+// ── ArrayView<T>: lightweight contiguous-span view used by upload overloads ──
+template <typename T>
+struct ArrayView {
+    const T *ptr;
+    std::size_t count;
+    constexpr ArrayView() noexcept : ptr(nullptr), count(0) {}
+    constexpr ArrayView(const T *p, std::size_t n) noexcept : ptr(p), count(n) {}
+    template <std::size_t N>
+    constexpr ArrayView(const T (&arr)[N]) noexcept : ptr(&arr[0]), count(N) {}
+    constexpr const T *data() const noexcept { return ptr; }
+    constexpr std::size_t size() const noexcept { return count; }
+    constexpr std::size_t size_bytes() const noexcept { return count * sizeof(T); }
+};
 
 // ── Strong handle types ──────────────────────────────────────────────────────
 {% for ht in handle_types %}
@@ -66,25 +81,46 @@ constexpr Flags<{{ ec.group_name }}> operator|({{ ec.group_name }} a, {{ ec.grou
 {% endif %}
 {% endfor %}
 
+// ── Extension flag variables ─────────────────────────────────────────────────
+{% for ext in extensions %}
+#ifndef {{ ext.guard_macro }}
+extern int {{ ext.flag_var }};
+#endif
+{% endfor %}
+
+namespace exts {
+{% for ext in extensions %}
+#ifndef {{ ext.guard_macro }}
+inline bool {{ ext.short_name }}() { return ::{{ ext.flag_var }} != 0; }
+#endif
+{% endfor %}
+} // namespace exts
+
 // ── Functors ─────────────────────────────────────────────────────────────────
 {% for fn in functors %}
+{% if fn.has_extension_guard %}
+#ifndef {{ fn.guard_macro }}
+{% endif %}
 #if GLAZE_GL_VERSION >= {{ fn.version_int }}
+{% if fn.has_doc_brief %}
+/** @brief {{ fn.doc_brief }} */
+{% endif %}
 struct {{ fn.struct_name }} {
 {% for ov in fn.overloads %}
-    inline {{ ov.return_type }} operator()({{ ov.params_str }}) const {
-{% if ov.is_void_return %}
-        {{ ov.raw_ptr }}({{ ov.call_args_str }});
-{% else if ov.is_handle_return %}
-        return {{ ov.return_type }}{{ "{" }}{{ ov.raw_ptr }}({{ ov.call_args_str }}){{ "}" }};
-{% else %}
-        return {{ ov.return_type }}({{ ov.raw_ptr }}({{ ov.call_args_str }}));
+{% if ov.is_template_overload %}
+    template <typename T>
 {% endif %}
+    inline {{ ov.return_type }} operator()({{ ov.params_str }}) const {
+{{ ov.body }}
     }
 {% endfor %}
-    explicit operator bool() const { return {{ fn.overloads.0.raw_ptr }} != nullptr; }
+    explicit operator bool() const { return {{ fn.raw_ptr }} != nullptr; }
 };
 inline {{ fn.struct_name }} {{ fn.func_name }}{};
 #endif
+{% if fn.has_extension_guard %}
+#endif
+{% endif %}
 {% endfor %}
 
 // ── DSA classes ──────────────────────────────────────────────────────────────
@@ -98,6 +134,9 @@ public:
 
 {% for m in dc.methods %}
 #if GLAZE_GL_VERSION >= {{ m.version_int }}
+{% if m.has_doc_brief %}
+    /** @brief {{ m.doc_brief }} */
+{% endif %}
     inline {{ m.return_type }} {{ m.name }}({{ m.params_str }}) const {
 {% if m.is_void_return %}
         {{ m.raw_ptr }}({{ m.call_args_str }});
@@ -116,12 +155,16 @@ public:
 
 namespace glaze {
 {% for r in raii_resources %}
+#if GLAZE_GL_VERSION >= {{ r.version_int }}
 template <>
 struct Traits<{{ api }}::{{ r.handle_type }}> {
-    static {{ api }}::{{ r.handle_type }} create() { return {{ api }}::{{ r.gen_func_name }}(); }
+    static {{ api }}::{{ r.handle_type }} create({{ r.create_params_str }}) {
+        return {{ api }}::{{ r.gen_func_name }}({{ r.create_call_args_str }});
+    }
     static void destroy({{ api }}::{{ r.handle_type }}& v) { {{ api }}::{{ r.delete_func_name }}(v); }
     static bool valid(const {{ api }}::{{ r.handle_type }}& v) { return static_cast<bool>(v); }
 };
+#endif
 {% endfor %}
 } // namespace glaze
 

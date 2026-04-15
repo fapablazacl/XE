@@ -1,6 +1,6 @@
 find_package(cxxopts CONFIG REQUIRED)
 
-set (target "xe-glaze-facade")
+set (target "xe-glaze-core")
 
 set (sources
     "src/xe/glaze/Glaze.h"
@@ -13,12 +13,13 @@ set (sources
 )
 
 add_library(${target} ${sources})
-add_library(xe::glaze-facade ALIAS ${target})
+add_library(xe::glaze-core ALIAS ${target})
 
 target_include_directories(${target} PUBLIC "src")
 target_link_libraries(${target}
     PUBLIC  xe::glaze-model
     PUBLIC  xe::glaze-producer
+    PUBLIC  xe::glaze-docparser
     PUBLIC  xe::glaze-cgen
     PUBLIC  xe::glaze-cppgen
     PUBLIC  cxxopts::cxxopts

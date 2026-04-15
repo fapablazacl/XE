@@ -42,10 +42,14 @@ set (sources
     "src/xe/glaze/cppgen/detail/RaiiCollector.cpp"
     "src/xe/glaze/cppgen/detail/FunctorEmitter.h"
     "src/xe/glaze/cppgen/detail/FunctorEmitter.cpp"
+    "src/xe/glaze/cppgen/detail/OverloadEmitter.h"
+    "src/xe/glaze/cppgen/detail/OverloadEmitter.cpp"
     "src/xe/glaze/cppgen/detail/DsaEmitter.h"
     "src/xe/glaze/cppgen/detail/DsaEmitter.cpp"
     "src/xe/glaze/cppgen/detail/HandleEmitter.h"
     "src/xe/glaze/cppgen/detail/HandleEmitter.cpp"
+    "src/xe/glaze/cppgen/detail/CppKeywords.h"
+    "src/xe/glaze/cppgen/detail/CppKeywords.cpp"
     "${generated_dir}/gl_hpp_inja.cpp"
     "${generated_dir}/gl_handle_hpp_inja.cpp"
     "${generated_dir}/raii_hpp.cpp"
@@ -57,6 +61,7 @@ add_library(xe::glaze-cppgen ALIAS ${target})
 target_include_directories(${target} PUBLIC "src")
 target_link_libraries(${target}
     PUBLIC  xe::glaze-model
+    PUBLIC  xe::glaze-docparser
     PRIVATE xe::interface
     PRIVATE pantor::inja
     PRIVATE nlohmann_json::nlohmann_json

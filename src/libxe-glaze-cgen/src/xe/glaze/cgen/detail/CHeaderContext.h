@@ -2,6 +2,7 @@
 
 #include "xe/glaze/codegen/ExtensionFilter.h"
 #include "xe/glaze/codegen/TypeMapper.h"
+#include "xe/glaze/docparser/DocIndex.h"
 #include "xe/glaze/model/Registry.h"
 
 #include <nlohmann/json.hpp>
@@ -22,6 +23,7 @@ nlohmann::json buildHeaderContext(
     const std::vector<codegen::ExtensionEmission> &extensionEmissions,
     const std::string &api,
     const std::string &version,
-    const codegen::TypeMapper &typeMapper);
+    const codegen::TypeMapper &typeMapper,
+    const docparser::DocIndex &docs = {});
 
 } // namespace xe::glaze::cgen::detail

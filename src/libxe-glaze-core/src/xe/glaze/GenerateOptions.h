@@ -46,6 +46,9 @@ struct GenerateOptions {
     std::shared_ptr<const codegen::NameTransform> nameTransform;
     //! Optional custom type mapper. Null -> per-language default.
     std::shared_ptr<const codegen::TypeMapper> typeMapper;
+    //! Optional path to a checked-out OpenGL-Refpages tree. Empty means no
+    //! documentation is attached to the generated symbols.
+    std::filesystem::path refpagesDir;
 };
 
 /**

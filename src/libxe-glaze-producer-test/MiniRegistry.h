@@ -19,6 +19,8 @@ inline constexpr std::string_view kMiniXml = R"XML(<?xml version="1.0" encoding=
     <type>typedef unsigned int <name>GLbitfield</name>;</type>
     <type>typedef void <name>GLvoid</name>;</type>
     <type>typedef unsigned char <name>GLubyte</name>;</type>
+    <type>typedef char <name>GLchar</name>;</type>
+    <type>typedef ptrdiff_t <name>GLsizeiptr</name>;</type>
   </types>
 
   <enums namespace="GL" group="BufferTargetARB" type="enum">
@@ -127,6 +129,26 @@ inline constexpr std::string_view kMiniXml = R"XML(<?xml version="1.0" encoding=
       <param><ptype>GLsizei</ptype> <name>count</name></param>
       <param><ptype>GLsizei</ptype> <name>primcount</name></param>
     </command>
+    <command>
+      <proto>void <name>glBufferData</name></proto>
+      <param group="BufferTargetARB"><ptype>GLenum</ptype> <name>target</name></param>
+      <param><ptype>GLsizeiptr</ptype> <name>size</name></param>
+      <param len="size">const void *<name>data</name></param>
+      <param group="BufferUsageARB"><ptype>GLenum</ptype> <name>usage</name></param>
+    </command>
+    <command>
+      <proto>void <name>glGetShaderiv</name></proto>
+      <param class="shader"><ptype>GLuint</ptype> <name>shader</name></param>
+      <param><ptype>GLenum</ptype> <name>pname</name></param>
+      <param><ptype>GLint</ptype> *<name>params</name></param>
+    </command>
+    <command>
+      <proto>void <name>glGetShaderInfoLog</name></proto>
+      <param class="shader"><ptype>GLuint</ptype> <name>shader</name></param>
+      <param><ptype>GLsizei</ptype> <name>bufSize</name></param>
+      <param len="1"><ptype>GLsizei</ptype> *<name>length</name></param>
+      <param len="bufSize"><ptype>GLchar</ptype> *<name>infoLog</name></param>
+    </command>
   </commands>
 
   <feature api="gl" name="GL_VERSION_1_0" number="1.0">
@@ -148,6 +170,7 @@ inline constexpr std::string_view kMiniXml = R"XML(<?xml version="1.0" encoding=
       <command name="glBindBuffer"/>
       <command name="glGenBuffers"/>
       <command name="glDeleteBuffers"/>
+      <command name="glBufferData"/>
     </require>
   </feature>
 
@@ -160,6 +183,8 @@ inline constexpr std::string_view kMiniXml = R"XML(<?xml version="1.0" encoding=
       <command name="glLinkProgram"/>
       <command name="glGetUniformLocation"/>
       <command name="glAttachShader"/>
+      <command name="glGetShaderiv"/>
+      <command name="glGetShaderInfoLog"/>
     </require>
   </feature>
 

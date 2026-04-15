@@ -46,7 +46,8 @@ std::map<std::string, std::string>
 CGenerator::generate(const std::string &api,
                      const std::string &version,
                      const std::set<std::string> &extensionVendors,
-                     const std::set<std::string> &extensionNames) const {
+                     const std::set<std::string> &extensionNames,
+                     const docparser::DocIndex &docs) const {
     codegen::checkApiVersion(registry_, api, version);
 
     const auto features = registry_.collectFeatures(api, version);
@@ -55,8 +56,8 @@ CGenerator::generate(const std::string &api,
 
     auto env = makeEnvironment();
 
-    const auto headerCtx =
-        detail::buildHeaderContext(registry_, features, emissions, api, version, *typeMapper_);
+    const auto headerCtx = detail::buildHeaderContext(
+        registry_, features, emissions, api, version, *typeMapper_, docs);
     const auto sourceCtx =
         detail::buildSourceContext(registry_, features, emissions, api, version, *typeMapper_);
 

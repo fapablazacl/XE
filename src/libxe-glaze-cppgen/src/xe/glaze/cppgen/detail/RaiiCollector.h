@@ -1,5 +1,6 @@
 #pragma once
 
+#include "xe/glaze/cppgen/detail/FunctorEmitter.h"
 #include "xe/glaze/model/ConsolidatedRequire.h"
 #include "xe/glaze/model/Registry.h"
 
@@ -32,6 +33,6 @@ namespace xe::glaze::cppgen::detail {
  */
 nlohmann::json collectRaiiResources(const model::Registry &registry,
                                     const model::ConsolidatedRequire &consolidated,
-                                    const std::map<std::string, std::string> &handleClasses);
+                                    const EmitterContext &ctx);
 
 } // namespace xe::glaze::cppgen::detail

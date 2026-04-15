@@ -2,6 +2,8 @@
 
 #include <array>
 #include <string_view>
+#include <unordered_map>
+#include <unordered_set>
 
 namespace xe::glaze::cppgen::detail {
 
@@ -119,6 +121,142 @@ bool isUniformLocationReturn(const model::Command &command) noexcept {
 
 bool isAttribLocationReturn(const model::Command &command) noexcept {
     return containsName(kAttribLocationReturnCommands, command.name);
+}
+
+const std::unordered_set<std::string> &scalarQueryTypes() {
+    static const std::unordered_set<std::string> kTypes{
+        "GLint", "GLuint",  "GLfloat",  "GLdouble",
+        "GLboolean", "GLint64", "GLuint64",
+    };
+    return kTypes;
+}
+
+const std::unordered_map<std::string, std::string> &infoLogSelfQueryMap() {
+    static const std::unordered_map<std::string, std::string> kMap{
+        {"glGetShaderInfoLog", "::glGetShaderiv"},
+        {"glGetProgramInfoLog", "::glGetProgramiv"},
+    };
+    return kMap;
+}
+
+const model::CommandParam *findScalarQueryParam(const model::Command &command) noexcept {
+    if (!startsWith(command.name, "glGet")) {
+        return nullptr;
+    }
+    if (command.params.size() < 2) {
+        return nullptr;
+    }
+    const auto &first = command.params.front();
+    {
+        const auto firstBase = model::baseType(first);
+        if (!model::hasClass(first) || !firstBase || *firstBase != "GLuint" ||
+            model::isPointer(first)) {
+            return nullptr;
+        }
+    }
+    const auto &last = command.params.back();
+    const auto lastBase = model::baseType(last);
+    if (!lastBase || scalarQueryTypes().count(*lastBase) == 0 ||
+        !model::isPointer(last) || model::isConst(last)) {
+        return nullptr;
+    }
+    // Every interior param must be const or non-pointer — the trailing out
+    // must be the only non-const output.
+    for (std::size_t i = 1; i + 1 < command.params.size(); ++i) {
+        const auto &p = command.params[i];
+        if (model::isPointer(p) && !model::isConst(p)) {
+            return nullptr;
+        }
+    }
+    return &last;
+}
+
+namespace {
+
+bool paramHasName(const model::Command &command, std::string_view name) {
+    for (const auto &p : command.params) {
+        if (p.name == name) {
+            return true;
+        }
+    }
+    return false;
+}
+
+const model::CommandParam *findByName(const model::Command &command,
+                                      std::string_view name) {
+    for (const auto &p : command.params) {
+        if (p.name == name) {
+            return &p;
+        }
+    }
+    return nullptr;
+}
+
+} // namespace
+
+const model::CommandParam *findStringOutputParam(const model::Command &command) noexcept {
+    for (const auto &param : command.params) {
+        const auto base = model::baseType(param);
+        if (!base || *base != "GLchar") {
+            continue;
+        }
+        if (!model::isPointer(param) || model::isConst(param)) {
+            continue;
+        }
+        if (!param.len || param.len->empty()) {
+            continue;
+        }
+        if (!paramHasName(command, *param.len)) {
+            continue;
+        }
+        return &param;
+    }
+    return nullptr;
+}
+
+const model::CommandParam *findLengthParam(const model::Command &command) noexcept {
+    for (const auto &param : command.params) {
+        const auto base = model::baseType(param);
+        if (!base || *base != "GLsizei") {
+            continue;
+        }
+        if (!model::isPointer(param) || model::isConst(param)) {
+            continue;
+        }
+        if (param.len && *param.len == "1") {
+            return &param;
+        }
+    }
+    return nullptr;
+}
+
+std::optional<DataUploadParams> findDataUploadParams(const model::Command &command) noexcept {
+    for (const auto &param : command.params) {
+        if (!model::isVoid(param) || !model::isPointer(param) || !model::isConst(param)) {
+            continue;
+        }
+        if (!param.len || param.len->empty()) {
+            continue;
+        }
+        const auto *sizeParam = findByName(command, *param.len);
+        if (sizeParam == nullptr) {
+            continue;
+        }
+        const auto sizeBase = model::baseType(*sizeParam);
+        if (!sizeBase) {
+            continue;
+        }
+        if ((*sizeBase != "GLsizei" && *sizeBase != "GLsizeiptr") ||
+            model::isPointer(*sizeParam)) {
+            continue;
+        }
+        return DataUploadParams{&param, sizeParam};
+    }
+    return std::nullopt;
+}
+
+bool isInfoLogCommand(const model::Command &command) noexcept {
+    return infoLogSelfQueryMap().count(command.name) != 0;
 }
 
 } // namespace xe::glaze::cppgen::detail

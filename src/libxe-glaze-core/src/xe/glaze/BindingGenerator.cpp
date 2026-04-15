@@ -2,10 +2,13 @@
 
 #include "xe/glaze/cgen/CGenerator.h"
 #include "xe/glaze/cppgen/CppGenerator.h"
+#include "xe/glaze/docparser/DocIndex.h"
+#include "xe/glaze/docparser/DocParser.h"
 #include "xe/glaze/producer/RegistryLoader.h"
 
 #include <filesystem>
 #include <fstream>
+#include <map>
 #include <string>
 
 namespace xe::glaze {
@@ -31,9 +34,29 @@ GenerateResult BindingGenerator::generate(const GenerateOptions &options) const 
     producer::RegistryLoader loader;
     auto registry = loader.loadFromFile(options.registryPath.string());
 
+    // Step 2: load Doxygen briefs from the OpenGL-Refpages tree when asked.
+    // The index is built once per api to avoid rescanning the directory for
+    // every language pass. An empty refpagesDir short-circuits to an empty
+    // DocIndex so the generators stay well-defined.
+    std::map<std::string, docparser::DocIndex> docsByApi;
+    if (!options.refpagesDir.empty()) {
+        const docparser::DocParser parser;
+        for (const auto &request : options.apis) {
+            if (docsByApi.count(request.api) == 0) {
+                docsByApi[request.api] =
+                    parser.parseRefpages(options.refpagesDir, request.api);
+            }
+        }
+    }
+    static const docparser::DocIndex kEmptyDocs;
+    const auto docsFor = [&](const std::string &api) -> const docparser::DocIndex & {
+        const auto it = docsByApi.find(api);
+        return it == docsByApi.end() ? kEmptyDocs : it->second;
+    };
+
     GenerateResult result;
 
-    // Step 2: for each requested language, instantiate the generator once and
+    // Step 3: for each requested language, instantiate the generator once and
     // run it for every requested api/version, merging the outputs.
     for (const auto language : options.languages) {
         if (language == Language::C) {
@@ -44,8 +67,9 @@ GenerateResult BindingGenerator::generate(const GenerateOptions &options) const 
                 if (!errors.empty()) {
                     throw std::invalid_argument(errors.front());
                 }
-                const auto files = gen.generate(request.api, request.version,
-                                                options.extensionVendors, options.extensionNames);
+                const auto files = gen.generate(
+                    request.api, request.version, options.extensionVendors,
+                    options.extensionNames, docsFor(request.api));
                 for (const auto &[relPath, content] : files) {
                     const auto abs = std::filesystem::path{options.outputDir} / relPath;
                     writeTextFile(abs, content);
@@ -60,8 +84,9 @@ GenerateResult BindingGenerator::generate(const GenerateOptions &options) const 
                 if (!errors.empty()) {
                     throw std::invalid_argument(errors.front());
                 }
-                const auto files = gen.generate(request.api, request.version,
-                                                options.extensionVendors, options.extensionNames);
+                const auto files = gen.generate(
+                    request.api, request.version, options.extensionVendors,
+                    options.extensionNames, docsFor(request.api));
                 for (const auto &[relPath, content] : files) {
                     const auto abs = std::filesystem::path{options.outputDir} / relPath;
                     writeTextFile(abs, content);
