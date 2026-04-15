@@ -257,6 +257,7 @@ class GlazeCppConan(ConanFile):
 
     def package_info(self):
         self.cpp_info.set_property("cmake_file_name", "glaze")
+        self.cpp_info.set_property("cmake_target_name", "glaze::glaze")
         api_list = [api.strip() for api in str(self.options.apis).split(",") if api.strip()]
 
         # Top-level header-only component: API-agnostic glaze::Unique / Shared / Weak.
