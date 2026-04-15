@@ -91,7 +91,16 @@
       "Bash(ctest --test-dir build --output-on-failure -C Debug *)",
       "Bash(ctest --test-dir build -C Debug -R \"doc|refpages|DocBrief\")",
       "Read(//tmp/xe-glaze-final/include/**)",
-      "Read(//tmp/xe-glaze-final/include/glaze/**)"
+      "Read(//tmp/xe-glaze-final/include/glaze/**)",
+      "Bash(find /c/Users/fapablaza/Desktop/nativedevcl/XE/src/libxe-glaze-* -type f -name \"*.h\" -o -name \"*.cpp\")",
+      "Bash(find *)",
+      "Bash(cat conan/packages/glaze-cpp/src/xe-glaze/src/*.cpp)",
+      "Bash(echo \"exit=$?\")",
+      "Bash(cmake --build --preset conan-debug)",
+      "Bash(echo \"build exit=$?\")",
+      "Read(//tmp/**)",
+      "Bash(ctest --test-dir build --output-on-failure --build-config Debug)",
+      "Bash(conan list *)"
     ]
   }
 }

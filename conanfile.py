@@ -64,17 +64,6 @@ class xeRecipe(ConanFile):
         self.requires("gtest/1.15.0")
         self.requires("glaze/1.0.0", options={"language": "both", "apis": "gl:4.6,gles2:3.2,gl_compat:2.1"})
 
-        # libxe-glaze-producer wraps pugixml as its XML parser backend. It is
-        # linked privately so nothing in the public ABI references pugi types,
-        # which lets us swap the parser later without breaking consumers.
-        # Also a transitive dep of assimp, so we force=True to pin the version.
-        self.requires("pugixml/1.15", force=True)
-
-        # libxe-glaze-cgen and libxe-glaze-cppgen render their output through
-        # inja, a C++17 header-only Jinja2-compatible template engine that
-        # reuses nlohmann_json (already a requirement above).
-        self.requires("inja/3.4.0")
-
         # NOTE: sdl2 and sdl3 both don't build under ArchLinux
         # Neither with gcc-x86 (gcc5)
         #self.requires("sdl/2.32.10")

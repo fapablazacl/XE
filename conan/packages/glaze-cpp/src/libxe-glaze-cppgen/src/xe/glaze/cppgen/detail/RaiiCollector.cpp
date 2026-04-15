@@ -12,10 +12,13 @@ namespace xe::glaze::cppgen::detail {
 
 namespace {
 
-//! Convert a gl command name such as "glGenBuffers" into a lowerCamel method
-//! name: "genBuffer" (singular when pluralized by GL convention).
-std::string makeSingularGenName(const std::string &glName) {
-    // glGenBuffers -> genBuffer, glCreateShader -> createShader
+//! Convert a gl command name such as "glGenBuffers" into the canonical
+//! lowerCamel functor instance name: "genBuffers". The Traits<T>::create()
+//! body invokes this name and relies on the parameterless overload that the
+//! functor exposes (e.g. `Buffer GenBuffersFn::operator()() const`) — so we
+//! must NOT singularize it here, otherwise the call resolves to a name that
+//! doesn't exist in the gl:: namespace.
+std::string makeGenFunctorName(const std::string &glName) {
     std::string rest;
     if (glName.rfind("gl", 0) == 0 && glName.size() > 2) {
         rest = glName.substr(2);
@@ -24,14 +27,11 @@ std::string makeSingularGenName(const std::string &glName) {
     }
     if (!rest.empty()) {
         rest.front() = static_cast<char>(std::tolower(static_cast<unsigned char>(rest.front())));
-    }
-    if (!rest.empty() && rest.back() == 's') {
-        rest.pop_back();
     }
     return rest;
 }
 
-std::string makeSingularDeleteName(const std::string &glName) {
+std::string makeDeleteFunctorName(const std::string &glName) {
     std::string rest;
     if (glName.rfind("gl", 0) == 0 && glName.size() > 2) {
         rest = glName.substr(2);
@@ -40,9 +40,6 @@ std::string makeSingularDeleteName(const std::string &glName) {
     }
     if (!rest.empty()) {
         rest.front() = static_cast<char>(std::tolower(static_cast<unsigned char>(rest.front())));
-    }
-    if (!rest.empty() && rest.back() == 's') {
-        rest.pop_back();
     }
     return rest;
 }
@@ -186,9 +183,9 @@ nlohmann::json collectRaiiResources(const model::Registry &registry,
         entry["alias"] = handleType;
         entry["handle_type"] = handleType;
         entry["gen_gl_name"] = chosenGen->name;
-        entry["gen_func_name"] = makeSingularGenName(chosenGen->name);
+        entry["gen_func_name"] = makeGenFunctorName(chosenGen->name);
         entry["delete_gl_name"] = chosenDel->name;
-        entry["delete_func_name"] = makeSingularDeleteName(chosenDel->name);
+        entry["delete_func_name"] = makeDeleteFunctorName(chosenDel->name);
         entry["create_params_str"] = extras.paramsStr;
         entry["create_call_args_str"] = extras.callArgsStr;
         entry["version_int"] = versionInt;
