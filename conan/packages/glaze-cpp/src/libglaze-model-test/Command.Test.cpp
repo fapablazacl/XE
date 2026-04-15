@@ -1,8 +1,8 @@
-#include "xe/glaze/model/Command.h"
+#include "glaze/model/Command.h"
 
 #include <catch2/catch_test_macros.hpp>
 
-using namespace xe::glaze::model;
+using namespace glaze::model;
 
 TEST_CASE("getClass returns the first parameter's class attribute", "[glaze][model][command]") {
     Command cmd;

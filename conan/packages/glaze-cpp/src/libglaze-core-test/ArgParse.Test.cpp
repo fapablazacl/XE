@@ -1,13 +1,13 @@
-#include "xe/glaze/cli/ArgParse.h"
+#include "glaze/cli/ArgParse.h"
 
 #include <catch2/catch_test_macros.hpp>
 
 #include <stdexcept>
 #include <vector>
 
-using xe::glaze::Language;
-using xe::glaze::cli::parseGenerate;
-using xe::glaze::cli::parseListApisRegistryPath;
+using glaze::Language;
+using glaze::cli::parseGenerate;
+using glaze::cli::parseListApisRegistryPath;
 
 namespace {
 

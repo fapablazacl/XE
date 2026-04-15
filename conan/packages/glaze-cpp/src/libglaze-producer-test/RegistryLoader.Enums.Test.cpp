@@ -2,7 +2,7 @@
 
 #include <catch2/catch_test_macros.hpp>
 
-using xe::glaze::testfixtures::loadMiniRegistry;
+using glaze::testfixtures::loadMiniRegistry;
 
 TEST_CASE("Enum parser populates groups and per-enum lookups",
           "[glaze][producer][enums]") {

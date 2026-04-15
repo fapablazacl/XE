@@ -6,8 +6,8 @@ set (sources
 
 add_executable(${target} ${sources})
 target_link_libraries(${target} PRIVATE
-    xe::glaze-docparser
-    xe::interface
+    glaze::docparser
+    glaze::interface
     Catch2::Catch2WithMain
 )
 

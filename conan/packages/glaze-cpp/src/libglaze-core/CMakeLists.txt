@@ -3,25 +3,25 @@ find_package(cxxopts CONFIG REQUIRED)
 set (target "glaze-core")
 
 set (sources
-    "src/xe/glaze/Glaze.h"
-    "src/xe/glaze/Language.h"
-    "src/xe/glaze/GenerateOptions.h"
-    "src/xe/glaze/BindingGenerator.h"
-    "src/xe/glaze/BindingGenerator.cpp"
-    "src/xe/glaze/cli/ArgParse.h"
-    "src/xe/glaze/cli/ArgParse.cpp"
+    "src/glaze/Glaze.h"
+    "src/glaze/Language.h"
+    "src/glaze/GenerateOptions.h"
+    "src/glaze/BindingGenerator.h"
+    "src/glaze/BindingGenerator.cpp"
+    "src/glaze/cli/ArgParse.h"
+    "src/glaze/cli/ArgParse.cpp"
 )
 
 add_library(${target} ${sources})
-add_library(xe::glaze-core ALIAS ${target})
+add_library(glaze::core ALIAS ${target})
 
 target_include_directories(${target} PUBLIC "src")
 target_link_libraries(${target}
-    PUBLIC  xe::glaze-model
-    PUBLIC  xe::glaze-producer
-    PUBLIC  xe::glaze-docparser
-    PUBLIC  xe::glaze-cgen
-    PUBLIC  xe::glaze-cppgen
+    PUBLIC  glaze::model
+    PUBLIC  glaze::producer
+    PUBLIC  glaze::docparser
+    PUBLIC  glaze::cgen
+    PUBLIC  glaze::cppgen
     PUBLIC  cxxopts::cxxopts
-    PRIVATE xe::interface
+    PRIVATE glaze::interface
 )

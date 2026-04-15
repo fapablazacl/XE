@@ -4,7 +4,7 @@
 
 #include <catch2/catch_test_macros.hpp>
 
-using xe::glaze::testfixtures::loadMiniRegistry;
+using glaze::testfixtures::loadMiniRegistry;
 
 TEST_CASE("Extension parser produces four extensions", "[glaze][producer][extensions]") {
     const auto registry = loadMiniRegistry();

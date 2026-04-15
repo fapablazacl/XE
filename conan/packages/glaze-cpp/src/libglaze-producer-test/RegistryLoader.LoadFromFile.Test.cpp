@@ -1,7 +1,7 @@
 #include "MiniRegistry.h"
 
-#include "xe/glaze/producer/ParseError.h"
-#include "xe/glaze/producer/RegistryLoader.h"
+#include "glaze/producer/ParseError.h"
+#include "glaze/producer/RegistryLoader.h"
 
 #include <catch2/catch_test_macros.hpp>
 
@@ -9,9 +9,9 @@
 #include <fstream>
 #include <string>
 
-using xe::glaze::producer::ParseError;
-using xe::glaze::producer::RegistryLoader;
-using xe::glaze::testfixtures::kMiniXml;
+using glaze::producer::ParseError;
+using glaze::producer::RegistryLoader;
+using glaze::testfixtures::kMiniXml;
 
 namespace {
 

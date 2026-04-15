@@ -1,9 +1,9 @@
-#include "xe/glaze/cppgen/detail/CppKeywords.h"
+#include "glaze/cppgen/detail/CppKeywords.h"
 
 #include <catch2/catch_test_macros.hpp>
 
-using xe::glaze::cppgen::detail::cppKeywords;
-using xe::glaze::cppgen::detail::sanitizeMethodName;
+using glaze::cppgen::detail::cppKeywords;
+using glaze::cppgen::detail::sanitizeMethodName;
 
 TEST_CASE("cppKeywords contains the canonical subset from cpp_generator.py",
           "[glaze][cppgen][keywords]") {

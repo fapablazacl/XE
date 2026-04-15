@@ -1,13 +1,13 @@
 #include "MiniRegistry.h"
 
-#include "xe/glaze/cppgen/CppGenerator.h"
+#include "glaze/cppgen/CppGenerator.h"
 
 #include <catch2/catch_test_macros.hpp>
 
 #include <string>
 
-using xe::glaze::cppgen::CppGenerator;
-using xe::glaze::testfixtures::loadMiniRegistry;
+using glaze::cppgen::CppGenerator;
+using glaze::testfixtures::loadMiniRegistry;
 
 namespace {
 

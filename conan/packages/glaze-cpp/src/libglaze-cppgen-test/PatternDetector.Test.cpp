@@ -1,14 +1,14 @@
-#include "xe/glaze/cppgen/detail/PatternDetector.h"
+#include "glaze/cppgen/detail/PatternDetector.h"
 
-#include "xe/glaze/model/Command.h"
-#include "xe/glaze/model/CommandParam.h"
+#include "glaze/model/Command.h"
+#include "glaze/model/CommandParam.h"
 
 #include <catch2/catch_test_macros.hpp>
 
-using namespace xe::glaze::cppgen::detail;
-using xe::glaze::model::Command;
-using xe::glaze::model::CommandParam;
-using xe::glaze::model::TypeDecl;
+using namespace glaze::cppgen::detail;
+using glaze::model::Command;
+using glaze::model::CommandParam;
+using glaze::model::TypeDecl;
 
 namespace {
 

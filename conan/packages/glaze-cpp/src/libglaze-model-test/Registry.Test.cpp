@@ -1,10 +1,10 @@
-#include "xe/glaze/model/Registry.h"
+#include "glaze/model/Registry.h"
 
 #include <catch2/catch_test_macros.hpp>
 
 #include <string>
 
-using namespace xe::glaze::model;
+using namespace glaze::model;
 
 namespace {
 

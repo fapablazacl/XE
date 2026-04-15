@@ -1,5 +1,5 @@
-#include "xe/glaze/cgen/CGenerator.h"
-#include "xe/glaze/producer/RegistryLoader.h"
+#include "glaze/cgen/CGenerator.h"
+#include "glaze/producer/RegistryLoader.h"
 
 #include "MiniRegistry.h"
 
@@ -7,8 +7,8 @@
 
 #include <stdexcept>
 
-using xe::glaze::cgen::CGenerator;
-using xe::glaze::testfixtures::loadMiniRegistry;
+using glaze::cgen::CGenerator;
+using glaze::testfixtures::loadMiniRegistry;
 
 TEST_CASE("CGenerator produces gl.h and gl.c keys", "[glaze][cgen][generate]") {
     const auto registry = loadMiniRegistry();

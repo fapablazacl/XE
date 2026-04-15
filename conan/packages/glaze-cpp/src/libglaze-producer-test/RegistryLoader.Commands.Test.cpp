@@ -2,8 +2,8 @@
 
 #include <catch2/catch_test_macros.hpp>
 
-using xe::glaze::model::getClass;
-using xe::glaze::testfixtures::loadMiniRegistry;
+using glaze::model::getClass;
+using glaze::testfixtures::loadMiniRegistry;
 
 TEST_CASE("Command parser reads glClear and its group", "[glaze][producer][commands]") {
     const auto registry = loadMiniRegistry();

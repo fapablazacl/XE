@@ -1,14 +1,14 @@
 #include "MiniRegistry.h"
 
-#include "xe/glaze/producer/ParseError.h"
-#include "xe/glaze/producer/RegistryLoader.h"
+#include "glaze/producer/ParseError.h"
+#include "glaze/producer/RegistryLoader.h"
 
 #include <catch2/catch_test_macros.hpp>
 
-using xe::glaze::producer::ParseError;
-using xe::glaze::producer::RegistryLoader;
-using xe::glaze::testfixtures::kMiniXml;
-using xe::glaze::testfixtures::loadMiniRegistry;
+using glaze::producer::ParseError;
+using glaze::producer::RegistryLoader;
+using glaze::testfixtures::kMiniXml;
+using glaze::testfixtures::loadMiniRegistry;
 
 TEST_CASE("loadFromString parses MINI_XML into a populated Registry",
           "[glaze][producer][loader]") {

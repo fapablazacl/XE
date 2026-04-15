@@ -5,16 +5,16 @@
 #
 # Usage:
 #     include("${CMAKE_SOURCE_DIR}/cmake/EmbedTextFile.cmake")
-#     xe_glaze_embed_text_file(
+#     glaze_embed_text_file(
 #         "path/to/input.inja"
 #         "${CMAKE_CURRENT_BINARY_DIR}/generated/gl_hpp_inja.cpp"
-#         "xe::glaze::cgen::detail::templates"
+#         "glaze::cgen::detail::templates"
 #         "gl_hpp_inja"
 #     )
 #
 # The generated .cpp defines a single const char * with the template contents.
 # Callers must also add the generated .cpp to their add_library() sources.
-function(xe_glaze_embed_text_file input_file output_cpp cpp_namespace symbol_name)
+function(glaze_embed_text_file input_file output_cpp cpp_namespace symbol_name)
     add_custom_command(
         OUTPUT  "${output_cpp}"
         COMMAND "${CMAKE_COMMAND}"

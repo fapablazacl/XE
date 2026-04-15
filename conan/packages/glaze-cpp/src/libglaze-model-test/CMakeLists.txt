@@ -12,8 +12,8 @@ set (sources
 
 add_executable(${target} ${sources})
 target_link_libraries(${target} PRIVATE
-    xe::glaze-model
-    xe::interface
+    glaze::model
+    glaze::interface
     Catch2::Catch2WithMain
 )
 

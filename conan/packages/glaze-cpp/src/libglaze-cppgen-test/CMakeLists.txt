@@ -14,10 +14,10 @@ target_include_directories(${target} PRIVATE
     "${CMAKE_SOURCE_DIR}/src/libglaze-producer-test"
 )
 target_link_libraries(${target} PRIVATE
-    xe::glaze-cppgen
-    xe::glaze-producer
-    xe::glaze-model
-    xe::interface
+    glaze::cppgen
+    glaze::producer
+    glaze::model
+    glaze::interface
     Catch2::Catch2WithMain
 )
 

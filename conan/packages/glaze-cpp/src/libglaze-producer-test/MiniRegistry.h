@@ -1,10 +1,10 @@
 #pragma once
 
-#include "xe/glaze/producer/RegistryLoader.h"
+#include "glaze/producer/RegistryLoader.h"
 
 #include <string_view>
 
-namespace xe::glaze::testfixtures {
+namespace glaze::testfixtures {
 
 // Minimal OpenGL registry XML used by the producer and generator test suites.
 // This is a verbatim port of conan/packages/glaze/tests/conftest.py's
@@ -253,8 +253,8 @@ inline constexpr std::string_view kMiniXml = R"XML(<?xml version="1.0" encoding=
 )XML";
 
 /// Load the MINI_XML fixture into a Registry via the producer.
-inline xe::glaze::model::Registry loadMiniRegistry() {
+inline glaze::model::Registry loadMiniRegistry() {
     return producer::RegistryLoader{}.loadFromString(kMiniXml);
 }
 
-} // namespace xe::glaze::testfixtures
+} // namespace glaze::testfixtures

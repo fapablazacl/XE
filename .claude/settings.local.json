@@ -100,7 +100,8 @@
       "Bash(echo \"build exit=$?\")",
       "Read(//tmp/**)",
       "Bash(ctest --test-dir build --output-on-failure --build-config Debug)",
-      "Bash(conan list *)"
+      "Bash(conan list *)",
+      "Bash(python *)"
     ]
   }
 }

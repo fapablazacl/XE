@@ -1,8 +1,8 @@
-#include "xe/glaze/model/CommandParam.h"
+#include "glaze/model/CommandParam.h"
 
 #include <catch2/catch_test_macros.hpp>
 
-using namespace xe::glaze::model;
+using namespace glaze::model;
 
 namespace {
 

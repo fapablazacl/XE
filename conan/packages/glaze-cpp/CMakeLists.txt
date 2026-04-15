@@ -21,11 +21,11 @@ if (NOT CMAKE_RUNTIME_OUTPUT_DIRECTORY)
 endif()
 
 # Self-contained interface library so the inner libglaze-* CMakeLists
-# files can link `xe::interface` unchanged, without depending on the
-# enclosing XE repo. The alias below is the only name the subtree sees.
+# can link `glaze::interface` for shared warning/compile flags. The
+# alias is the only name the subtree sees.
 set (target glaze-cpp-interface)
 add_library(${target} INTERFACE)
-add_library(xe::interface ALIAS ${target})
+add_library(glaze::interface ALIAS ${target})
 
 if (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
     target_compile_options(${target} INTERFACE -Wall -Wextra)

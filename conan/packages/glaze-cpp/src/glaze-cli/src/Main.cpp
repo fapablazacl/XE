@@ -1,6 +1,6 @@
-#include "xe/glaze/BindingGenerator.h"
-#include "xe/glaze/cli/ArgParse.h"
-#include "xe/glaze/producer/ParseError.h"
+#include "glaze/BindingGenerator.h"
+#include "glaze/cli/ArgParse.h"
+#include "glaze/producer/ParseError.h"
 
 #include <cstdlib>
 #include <cstring>
@@ -32,13 +32,13 @@ void printUsage() {
 }
 
 int runGenerate(int argc, const char *const *argv) {
-    const auto options = xe::glaze::cli::parseGenerate(argc, argv);
+    const auto options = glaze::cli::parseGenerate(argc, argv);
     if (!options) {
         printUsage();
         return 0;
     }
 
-    const auto result = xe::glaze::BindingGenerator{}.generate(*options);
+    const auto result = glaze::BindingGenerator{}.generate(*options);
     for (const auto &path : result.writtenFiles) {
         std::cout << "wrote " << path.string() << "\n";
     }
@@ -46,8 +46,8 @@ int runGenerate(int argc, const char *const *argv) {
 }
 
 int runListApis(int argc, const char *const *argv) {
-    const auto registryPath = xe::glaze::cli::parseListApisRegistryPath(argc, argv);
-    const auto apis = xe::glaze::BindingGenerator{}.listApis(registryPath);
+    const auto registryPath = glaze::cli::parseListApisRegistryPath(argc, argv);
+    const auto apis = glaze::BindingGenerator{}.listApis(registryPath);
     std::cout << "Available APIs and versions:\n";
     for (const auto &[api, versions] : apis) {
         std::cout << "  " << api << ":";
@@ -84,7 +84,7 @@ int main(int argc, char **argv) {
         std::cerr << "error: unknown subcommand: " << cmd << "\n\n";
         printUsage();
         return 1;
-    } catch (const xe::glaze::producer::ParseError &e) {
+    } catch (const glaze::producer::ParseError &e) {
         std::cerr << "error: " << e.what() << "\n";
         return 1;
     } catch (const std::invalid_argument &e) {

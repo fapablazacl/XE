@@ -1,6 +1,6 @@
 #include "MiniRegistry.h"
 
-#include "xe/glaze/BindingGenerator.h"
+#include "glaze/BindingGenerator.h"
 
 #include <catch2/catch_test_macros.hpp>
 
@@ -11,11 +11,11 @@
 #include <string_view>
 #include <system_error>
 
-using xe::glaze::ApiRequest;
-using xe::glaze::BindingGenerator;
-using xe::glaze::GenerateOptions;
-using xe::glaze::Language;
-using xe::glaze::testfixtures::kMiniXml;
+using glaze::ApiRequest;
+using glaze::BindingGenerator;
+using glaze::GenerateOptions;
+using glaze::Language;
+using glaze::testfixtures::kMiniXml;
 
 namespace {
 

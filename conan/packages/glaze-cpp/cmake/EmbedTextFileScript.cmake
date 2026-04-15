@@ -1,4 +1,4 @@
-# Script-mode helper invoked by xe_glaze_embed_text_file via add_custom_command.
+# Script-mode helper invoked by glaze_embed_text_file via add_custom_command.
 # Reads INPUT_FILE and writes OUTPUT_CPP containing a single C++ raw string
 # literal named SYMBOL_NAME inside namespace CPP_NAMESPACE.
 #
@@ -8,10 +8,10 @@
 file(READ "${INPUT_FILE}" file_content)
 
 # Unique delimiter that must not appear in any Glaze template.
-set(delimiter "XE_GLAZE_EMBED")
+set(delimiter "GLAZE_EMBED")
 
 set(header
-"// Auto-generated from ${INPUT_FILE} by xe_glaze_embed_text_file().
+"// Auto-generated from ${INPUT_FILE} by glaze_embed_text_file().
 // Any edits here will be overwritten on the next build.
 namespace ${CPP_NAMESPACE} {
 extern const char *${SYMBOL_NAME};

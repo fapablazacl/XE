@@ -1,11 +1,11 @@
-#include "xe/glaze/codegen/TypeMapper.h"
+#include "glaze/codegen/TypeMapper.h"
 
 #include <catch2/catch_test_macros.hpp>
 
-using xe::glaze::codegen::DefaultCTypeMapper;
-using xe::glaze::model::Command;
-using xe::glaze::model::CommandParam;
-using xe::glaze::model::TypeDecl;
+using glaze::codegen::DefaultCTypeMapper;
+using glaze::model::Command;
+using glaze::model::CommandParam;
+using glaze::model::TypeDecl;
 
 namespace {
 

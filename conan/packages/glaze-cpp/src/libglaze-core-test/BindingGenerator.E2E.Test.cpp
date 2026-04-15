@@ -1,4 +1,4 @@
-#include "xe/glaze/BindingGenerator.h"
+#include "glaze/BindingGenerator.h"
 
 #include "MiniRegistry.h"
 
@@ -7,11 +7,11 @@
 #include <filesystem>
 #include <fstream>
 
-using xe::glaze::ApiRequest;
-using xe::glaze::BindingGenerator;
-using xe::glaze::GenerateOptions;
-using xe::glaze::Language;
-using xe::glaze::testfixtures::kMiniXml;
+using glaze::ApiRequest;
+using glaze::BindingGenerator;
+using glaze::GenerateOptions;
+using glaze::Language;
+using glaze::testfixtures::kMiniXml;
 
 namespace {
 
@@ -74,10 +74,10 @@ TEST_CASE("BindingGenerator::listApis returns gl and gles2", "[glaze][core][list
 
 TEST_CASE("BindingGenerator propagates custom NameTransform into the C++ output",
           "[glaze][core][extension]") {
-    struct MyNames : public xe::glaze::codegen::NameTransform {
+    struct MyNames : public glaze::codegen::NameTransform {
         std::string transformCommandName(std::string_view glName) const override {
             return std::string{"myfacade_"} +
-                   xe::glaze::codegen::DefaultNameTransform{}.transformCommandName(glName);
+                   glaze::codegen::DefaultNameTransform{}.transformCommandName(glName);
         }
     };
 

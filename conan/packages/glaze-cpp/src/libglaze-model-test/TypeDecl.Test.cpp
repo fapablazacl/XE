@@ -1,9 +1,9 @@
-#include "xe/glaze/model/TypeDecl.h"
+#include "glaze/model/TypeDecl.h"
 
 #include <catch2/catch_test_macros.hpp>
 
-using xe::glaze::model::toCString;
-using xe::glaze::model::TypeDecl;
+using glaze::model::toCString;
+using glaze::model::TypeDecl;
 
 TEST_CASE("toCString renders a plain type", "[glaze][model][typedecl]") {
     TypeDecl decl{"GLuint", false, false};

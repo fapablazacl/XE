@@ -1,4 +1,4 @@
-#include "xe/glaze/cppgen/CppGenerator.h"
+#include "glaze/cppgen/CppGenerator.h"
 
 #include "MiniRegistry.h"
 
@@ -6,8 +6,8 @@
 
 #include <stdexcept>
 
-using xe::glaze::cppgen::CppGenerator;
-using xe::glaze::testfixtures::loadMiniRegistry;
+using glaze::cppgen::CppGenerator;
+using glaze::testfixtures::loadMiniRegistry;
 
 TEST_CASE("CppGenerator produces three output files", "[glaze][cppgen][generate]") {
     const auto registry = loadMiniRegistry();
@@ -108,12 +108,12 @@ TEST_CASE("raii.hpp is shipped verbatim with the expected header", "[glaze][cppg
 
 TEST_CASE("CustomNameTransform retargets emitted functor names",
           "[glaze][cppgen][extension]") {
-    struct MyNames : public xe::glaze::codegen::NameTransform {
+    struct MyNames : public glaze::codegen::NameTransform {
         std::string transformCommandName(std::string_view glName) const override {
             // Prefix every functor name with "my_" to prove the extension
             // mechanism propagates into the generated output.
             return std::string{"my_"} +
-                   xe::glaze::codegen::DefaultNameTransform{}.transformCommandName(glName);
+                   glaze::codegen::DefaultNameTransform{}.transformCommandName(glName);
         }
     };
 

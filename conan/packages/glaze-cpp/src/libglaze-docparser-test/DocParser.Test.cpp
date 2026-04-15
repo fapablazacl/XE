@@ -1,4 +1,4 @@
-#include "xe/glaze/docparser/DocParser.h"
+#include "glaze/docparser/DocParser.h"
 
 #include <catch2/catch_test_macros.hpp>
 
@@ -7,8 +7,8 @@
 #include <string>
 #include <system_error>
 
-using xe::glaze::docparser::DocParser;
-using xe::glaze::docparser::DocIndex;
+using glaze::docparser::DocParser;
+using glaze::docparser::DocIndex;
 
 namespace {
 

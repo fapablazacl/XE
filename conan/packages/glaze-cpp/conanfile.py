@@ -102,7 +102,7 @@ class GlazeCppConan(ConanFile):
 
     # ------------------------------------------------------------------ build
 
-    def _find_xe_glaze_binary(self):
+    def _find_glaze_binary(self):
         """Locate the glaze binary produced by Phase A. Handles both
         single-config generators (flat `bin/` layout) and multi-config
         generators (per-config subdirectory). Raises if not found."""
@@ -127,8 +127,8 @@ class GlazeCppConan(ConanFile):
         if self.options.with_tests:
             cmake.test()
 
-        xe_glaze = self._find_xe_glaze_binary()
-        self.output.info(f"Using generator at {xe_glaze}")
+        glaze_binary = self._find_glaze_binary()
+        self.output.info(f"Using generator at {glaze_binary}")
 
         # -------------------- Phase B: run the generator --------------------------
         api_list = [api.strip() for api in str(self.options.apis).split(",") if api.strip()]
@@ -157,7 +157,7 @@ class GlazeCppConan(ConanFile):
         registry_path = os.path.join(self.source_folder, "OpenGL-Registry", "xml", "gl.xml")
 
         cmd = [
-            xe_glaze,
+            glaze_binary,
             "generate",
             "--registry", registry_path,
             "--output-dir", out_dir,

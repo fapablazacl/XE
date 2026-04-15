@@ -2,7 +2,7 @@
 
 #include <catch2/catch_test_macros.hpp>
 
-using xe::glaze::testfixtures::loadMiniRegistry;
+using glaze::testfixtures::loadMiniRegistry;
 
 TEST_CASE("Feature parser produces five gl features and one gles2 feature",
           "[glaze][producer][features]") {

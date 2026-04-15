@@ -1,12 +1,12 @@
-#include "xe/glaze/codegen/NameTransform.h"
+#include "glaze/codegen/NameTransform.h"
 
 #include <catch2/catch_test_macros.hpp>
 
 #include <set>
 #include <string>
 
-using xe::glaze::codegen::DefaultNameTransform;
-using xe::glaze::codegen::NameTransform;
+using glaze::codegen::DefaultNameTransform;
+using glaze::codegen::NameTransform;
 
 TEST_CASE("DefaultNameTransform::transformCommandName strips gl prefix",
           "[glaze][codegen][name]") {

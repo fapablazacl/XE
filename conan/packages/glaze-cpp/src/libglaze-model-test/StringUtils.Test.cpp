@@ -1,4 +1,4 @@
-#include "xe/glaze/model/StringUtils.h"
+#include "glaze/model/StringUtils.h"
 
 #include <catch2/catch_test_macros.hpp>
 
@@ -6,7 +6,7 @@
 #include <string>
 #include <vector>
 
-using namespace xe::glaze::model;
+using namespace glaze::model;
 
 TEST_CASE("isCapitalized recognizes single-word CamelCase shapes",
           "[glaze][model][string]") {
