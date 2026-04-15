@@ -139,8 +139,8 @@ All libraries live under `src/` and are prefixed `libxe-`:
 
 - **xe-gltfc** — glTF 3d model compiler/converter (Assimp, KTX, DevIL).
 - **xe-ktxc** — KTX texture compiler/converter (Vulkan SDK, cxxopts).
-- **Package: Glaze (`conan/packages/glaze/` / `tools/OpenGL-Hpp`)** — A Conan-packaged Python code generator producing OpenGL C/C++ bindings from the Khronos XML registry (GL 1.0–4.6) via Jinja2 templates. Has its own `CLAUDE.md`, pytest suite, and CI workflow. Consumed by the root `conanfile.py` as `glaze/1.0.0`.
-- **Package: Glaze C++ (`conan/packages/glaze-cpp/`)** — A standalone C++ port of the Glaze generator, built on inja, pugixml, nlohmann_json, and cxxopts. Produces the same `glaze::raii` / `glaze::gl` / `glaze::gl_handle` CMake components as the Python package and is a drop-in behavioural replacement. Not wired into the root `conanfile.py`; build and test via `conan create conan/packages/glaze-cpp/ -o 'glaze-cpp/*:with_tests=True'`.
+- **Package: Glaze C++ (`conan/packages/glaze-cpp/`)** — A standalone C++17 code generator producing OpenGL C/C++ bindings from the Khronos XML registry (GL 1.0–4.6) via inja templates. Built on inja, pugixml, nlohmann_json, and cxxopts (all private build-only deps). Exports the `glaze::raii` / `glaze::gl` / `glaze::gl_handle` CMake components. Consumed by the root `conanfile.py` as `glaze-cpp/1.0.0`. Build and test standalone via `conan create conan/packages/glaze-cpp/ -o 'glaze-cpp/*:with_tests=True'`.
+- **Package: Glaze (`conan/packages/glaze/` / `tools/OpenGL-Hpp`)** — Legacy Python code generator producing the same bindings from Jinja2 templates. Has its own `CLAUDE.md`, pytest suite, and CI workflow. Kept in-tree as the original reference implementation; not wired into the root `conanfile.py` anymore (glaze-cpp is the drop-in replacement).
 
 ## Code Style
 
