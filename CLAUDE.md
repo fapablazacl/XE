@@ -151,7 +151,7 @@ All libraries live under `src/` and are prefixed `libxe-`:
 
 ## Dependencies (via Conan)
 
-imgui, assimp, glfw, cgltf, fmt, lodepng, ms-gsl, devil, glm, nlohmann_json, vulkan-loader, ktx, cxxopts, glaze, sdl2
+imgui, assimp, glfw, cgltf, fmt, lodepng, ms-gsl, devil, glm, nlohmann_json, vulkan-loader, ktx, cxxopts, glaze-cpp, sdl2
 
 ## Conan Profiles
 
