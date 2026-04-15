@@ -78,10 +78,10 @@ DsaMethodStrings buildDsaStrings(const model::Command &command, const EmitterCon
             s.paramsStr.append(", ");
         }
         s.paramsStr.append(
-            generateParamDecl(param, command, ctx.handleClasses, ctx.groupRename, ctx.bitmaskGroups));
+            generateParamDecl(param, command, ctx.handleClasses, ctx.groupRename, ctx.bitmaskGroups, ctx.emittedGroups));
         s.callArgsStr.append(", ");
         s.callArgsStr.append(
-            generateCallArg(param, command, ctx.handleClasses, ctx.groupRename, ctx.bitmaskGroups));
+            generateCallArg(param, command, ctx.handleClasses, ctx.groupRename, ctx.bitmaskGroups, ctx.emittedGroups));
         firstParam = false;
     }
     return s;

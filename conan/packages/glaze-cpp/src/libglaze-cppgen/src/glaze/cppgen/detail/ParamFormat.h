@@ -30,7 +30,8 @@ std::string paramTypeStr(const model::CommandParam &param,
                          const model::Command &command,
                          const std::map<std::string, std::string> &handleClasses,
                          const std::map<std::string, std::string> &groupRename,
-                         const std::set<std::string> &bitmaskGroups);
+                         const std::set<std::string> &bitmaskGroups,
+                         const std::set<std::string> &emittedGroups);
 
 /**
  * @brief Render a full parameter declaration: "<type> <name>".
@@ -40,7 +41,8 @@ std::string generateParamDecl(const model::CommandParam &param,
                               const model::Command &command,
                               const std::map<std::string, std::string> &handleClasses,
                               const std::map<std::string, std::string> &groupRename,
-                              const std::set<std::string> &bitmaskGroups);
+                              const std::set<std::string> &bitmaskGroups,
+                              const std::set<std::string> &emittedGroups);
 
 /**
  * @brief Render the call argument expression for passing a wrapped parameter
@@ -52,7 +54,8 @@ std::string generateCallArg(const model::CommandParam &param,
                             const model::Command &command,
                             const std::map<std::string, std::string> &handleClasses,
                             const std::map<std::string, std::string> &groupRename,
-                            const std::set<std::string> &bitmaskGroups);
+                            const std::set<std::string> &bitmaskGroups,
+                            const std::set<std::string> &emittedGroups);
 
 /**
  * @brief Render the return type for a command as a C++ type spelling.

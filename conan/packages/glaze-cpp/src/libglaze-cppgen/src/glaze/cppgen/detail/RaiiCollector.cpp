@@ -57,6 +57,29 @@ struct ExtraParamStrings {
     std::string callArgsStr;
 };
 
+//! The Traits<> specialization lives in namespace glaze, so any enum/handle
+//! type name returned by paramTypeStr() (which is unqualified, assuming the
+//! api namespace as scope) has to be rewritten to `api::Type` before it is
+//! emitted into the Traits<>::create() signature. Raw C types (`GLenum`,
+//! `const GLuint *`, `void`) are left alone because they are global typedefs.
+std::string qualifyWrapperType(std::string type, const std::string &api) {
+    auto startsWith = [&type](const char *prefix) {
+        const std::size_t n = std::char_traits<char>::length(prefix);
+        return type.size() >= n && type.compare(0, n, prefix) == 0;
+    };
+    if (startsWith("const ") || startsWith("GL") || startsWith("void")) {
+        return type;
+    }
+    if (startsWith("Flags<")) {
+        const auto close = type.rfind('>');
+        if (close != std::string::npos && close > 6) {
+            const auto inner = type.substr(6, close - 6);
+            return api + "::Flags<" + api + "::" + inner + ">";
+        }
+    }
+    return api + "::" + type;
+}
+
 ExtraParamStrings buildExtraParams(const model::Command &command,
                                    const model::CommandParam *countParam,
                                    const model::CommandParam *outputParam,
@@ -71,10 +94,18 @@ ExtraParamStrings buildExtraParams(const model::Command &command,
             s.paramsStr.append(", ");
             s.callArgsStr.append(", ");
         }
-        s.paramsStr.append(generateParamDecl(param, command, ctx.handleClasses,
-                                             ctx.groupRename, ctx.bitmaskGroups));
-        s.callArgsStr.append(generateCallArg(param, command, ctx.handleClasses,
-                                             ctx.groupRename, ctx.bitmaskGroups));
+        auto type = paramTypeStr(param, command, ctx.handleClasses,
+                                 ctx.groupRename, ctx.bitmaskGroups,
+                                 ctx.emittedGroups);
+        s.paramsStr.append(qualifyWrapperType(std::move(type), ctx.api));
+        s.paramsStr.push_back(' ');
+        s.paramsStr.append(param.name);
+        // Traits<H>::create() invokes the C++ functor (e.g. gl::createShader),
+        // not the raw C pointer — the functor handles any static_cast/.value()
+        // unwrapping internally. So we forward the typed param unchanged;
+        // generateCallArg would otherwise double-unwrap ShaderType -> GLenum
+        // and break overload resolution.
+        s.callArgsStr.append(param.name);
         first = false;
     }
     return s;

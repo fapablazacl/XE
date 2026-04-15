@@ -190,18 +190,14 @@ CppGenerator::generate(const std::string &api,
         }
     }
 
-    // Shared emitter context.
-    detail::EmitterContext emitterCtx{
-        *nameTransform_,
-        api,
-        handleClasses,
-        groupRename,
-        bitmaskGroups,
-        buildCommandVersionMap(registry_, api, version),
-        docs,
-    };
-
-    // Enum classes block.
+    // Enum classes block. Walk every referenced group, filter its entries to
+    // the consolidated union, and emit only groups that still have at least
+    // one entry. Record those raw group names in `emittedGroups` so the
+    // downstream emitters know which group substitutions are safe to use
+    // (ParamFormat falls back to the raw C type for any group that didn't
+    // survive this filter, so functors never reference a type the header
+    // hasn't declared).
+    std::set<std::string> emittedGroups;
     nlohmann::json enumClassesArr = nlohmann::json::array();
     for (const auto &rawGroup : groupSet) {
         const auto *enumPtrs = registry_.enumsForGroup(rawGroup);
@@ -218,11 +214,25 @@ CppGenerator::generate(const std::string &api,
         if (filtered.empty()) {
             continue;
         }
+        emittedGroups.insert(rawGroup);
         const auto cleanName = detail::renamedGroup(groupRename, rawGroup);
         const bool isBitmask = bitmaskGroups.count(rawGroup) != 0;
         enumClassesArr.push_back(detail::buildEnumClassContext(
             rawGroup, cleanName, isBitmask, filtered, *nameTransform_));
     }
+
+    // Shared emitter context — built after enum-class emission so it can
+    // carry the `emittedGroups` set that ParamFormat needs.
+    detail::EmitterContext emitterCtx{
+        *nameTransform_,
+        api,
+        handleClasses,
+        groupRename,
+        bitmaskGroups,
+        std::move(emittedGroups),
+        buildCommandVersionMap(registry_, api, version),
+        docs,
+    };
 
     // Functor block. Build from the merged core+extension command set so
     // extension-only functors get their own struct + instance, then post-

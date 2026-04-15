@@ -128,9 +128,9 @@ namespace dsa {
 {% for dc in dsa_classes %}
 class {{ dc.class_name }} {
 public:
-    {{ dc.handle_type }} m_id;
+    ::{{ api }}::{{ dc.handle_type }} m_id;
     {{ dc.class_name }}() = default;
-    explicit {{ dc.class_name }}({{ dc.handle_type }} id) : m_id(id) {}
+    explicit {{ dc.class_name }}(::{{ api }}::{{ dc.handle_type }} id) : m_id(id) {}
 
 {% for m in dc.methods %}
 #if GLAZE_GL_VERSION >= {{ m.version_int }}

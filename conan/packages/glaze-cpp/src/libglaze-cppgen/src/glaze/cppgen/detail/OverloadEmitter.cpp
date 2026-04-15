@@ -66,7 +66,8 @@ std::string buildParamsStr(const model::Command &command,
             continue;
         }
         decls.push_back(generateParamDecl(param, command, ctx.handleClasses,
-                                          ctx.groupRename, ctx.bitmaskGroups));
+                                          ctx.groupRename, ctx.bitmaskGroups,
+                                          ctx.emittedGroups));
     }
     for (const auto &extra : spec.extraDecls) {
         decls.push_back(extra);
@@ -83,7 +84,8 @@ std::string buildCallArgsStr(const model::Command &command,
             continue;
         }
         parts.push_back(generateCallArg(param, command, ctx.handleClasses,
-                                        ctx.groupRename, ctx.bitmaskGroups));
+                                        ctx.groupRename, ctx.bitmaskGroups,
+                                        ctx.emittedGroups));
     }
     return joinParams(parts);
 }
@@ -188,10 +190,10 @@ buildInfoLogSelfQueryOverload(const model::Command &command,
     // Overload signature keeps only the leading handle param.
     const auto handleDecl = generateParamDecl(
         handleParam, command, ctx.handleClasses, ctx.groupRename,
-        ctx.bitmaskGroups);
+        ctx.bitmaskGroups, ctx.emittedGroups);
     const auto handleCall = generateCallArg(
         handleParam, command, ctx.handleClasses, ctx.groupRename,
-        ctx.bitmaskGroups);
+        ctx.bitmaskGroups, ctx.emittedGroups);
 
     std::ostringstream body;
     body << "        GLint length = 0;\n";

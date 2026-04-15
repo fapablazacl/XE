@@ -31,7 +31,8 @@ std::string paramTypeStr(const model::CommandParam &param,
                          const model::Command &command,
                          const std::map<std::string, std::string> &handleClasses,
                          const std::map<std::string, std::string> &groupRename,
-                         const std::set<std::string> &bitmaskGroups) {
+                         const std::set<std::string> &bitmaskGroups,
+                         const std::set<std::string> &emittedGroups) {
     // 1. Location-type overrides (name-based heuristics).
     if (isUniformLocationParam(command, param)) {
         return "UniformLocation";
@@ -57,7 +58,15 @@ std::string paramTypeStr(const model::CommandParam &param,
     }
 
     // 3. Enum-group substitution for params with a matching group attribute.
-    if (model::hasGroup(param)) {
+    //    Pointer/array params (e.g. `const GLenum *attachments`) keep their raw
+    //    C spelling — wrapping an array pointer in a scalar enum type would be
+    //    a type error at the call site. Mirrors the handle-pointer branch.
+    //    We also skip substitution when the group has no entries in the
+    //    consolidated enum set for this api profile (e.g. legacy MapTarget /
+    //    PixelMap in core 4.6) — those enum classes never get emitted, so
+    //    naming them here would produce an undeclared-identifier error.
+    if (model::hasGroup(param) && !model::isPointer(param) &&
+        emittedGroups.count(*param.group) != 0) {
         const auto clean = groupRename.count(*param.group) != 0
                                ? groupRename.at(*param.group)
                                : *param.group;
@@ -75,8 +84,10 @@ std::string generateParamDecl(const model::CommandParam &param,
                               const model::Command &command,
                               const std::map<std::string, std::string> &handleClasses,
                               const std::map<std::string, std::string> &groupRename,
-                              const std::set<std::string> &bitmaskGroups) {
-    auto type = paramTypeStr(param, command, handleClasses, groupRename, bitmaskGroups);
+                              const std::set<std::string> &bitmaskGroups,
+                              const std::set<std::string> &emittedGroups) {
+    auto type = paramTypeStr(param, command, handleClasses, groupRename, bitmaskGroups,
+                             emittedGroups);
     type.push_back(' ');
     type.append(param.name);
     return type;
@@ -86,7 +97,8 @@ std::string generateCallArg(const model::CommandParam &param,
                             const model::Command &command,
                             const std::map<std::string, std::string> &handleClasses,
                             const std::map<std::string, std::string> &groupRename,
-                            const std::set<std::string> &bitmaskGroups) {
+                            const std::set<std::string> &bitmaskGroups,
+                            const std::set<std::string> &emittedGroups) {
     (void)groupRename; // reserved for future overloads that substitute by rename
     // Location overrides extract the raw value and optionally cast to GLuint.
     if (isUniformLocationParam(command, param)) {
@@ -108,8 +120,12 @@ std::string generateCallArg(const model::CommandParam &param,
         }
     }
 
-    // Enum-group substitution: static_cast or .value() for bitmasks.
-    if (model::hasGroup(param)) {
+    // Enum-group substitution: static_cast or .value() for bitmasks. Pointer
+    // params kept their raw spelling in paramTypeStr(), so forward as-is. We
+    // also forward the raw spelling when the group wasn't emitted — paramTypeStr
+    // already degraded the type to GLenum, so no wrapping / unwrapping needed.
+    if (model::hasGroup(param) && !model::isPointer(param) &&
+        emittedGroups.count(*param.group) != 0) {
         if (bitmaskGroups.count(*param.group) != 0) {
             return param.name + ".value()";
         }

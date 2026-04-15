@@ -78,8 +78,8 @@ int main() {
 
 		auto vbo = glaze::makeUnique<gl::BufferId>();
 
-		gl::bindBuffer(gl::BufferTarget::eArray, vbo);
-		gl::bufferData(gl::BufferTarget::eArray, sizeof(verts), verts, gl::BufferUsage::eStaticDraw);
+		gl::bindBuffer(gl::BufferTarget::eArrayBuffer, vbo);
+		gl::bufferData(gl::BufferTarget::eArrayBuffer, sizeof(verts), verts, gl::BufferUsage::eStaticDraw);
 		gl::vertexAttribPointer(gl::AttribLocation(0), 2, gl::VertexAttribPointerType::eFloat, GL_FALSE, 0, nullptr);
 		gl::enableVertexAttribArray(gl::AttribLocation(0));
 
@@ -87,8 +87,8 @@ int main() {
 		auto prog = glaze::makeUnique<gl::Program>();
 
 		{
-			glaze::Unique<gl::Shader> vert = compileShader(gl::ShaderType::eVertex, VERT_SRC);
-			glaze::Unique<gl::Shader> frag = compileShader(gl::ShaderType::eFragment, FRAG_SRC);
+			glaze::Unique<gl::Shader> vert = compileShader(gl::ShaderType::eVertexShader, VERT_SRC);
+			glaze::Unique<gl::Shader> frag = compileShader(gl::ShaderType::eFragmentShader, FRAG_SRC);
 
 			gl::attachShader(prog, vert);
 			gl::attachShader(prog, frag);
@@ -112,7 +112,7 @@ int main() {
 			gl::viewport(0, 0, w, h);
 
 			gl::clearColor(0.15f, 0.15f, 0.2f, 1.0f);
-			gl::clear(gl::ClearBufferMask::eColorBit);
+			gl::clear(gl::ClearBufferMask::eColorBufferBit);
 
 			gl::useProgram(prog);
 			gl::uniform1f(angleLoc, static_cast<float>(glfwGetTime()));

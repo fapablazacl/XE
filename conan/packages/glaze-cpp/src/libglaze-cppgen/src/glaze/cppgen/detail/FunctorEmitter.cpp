@@ -37,9 +37,9 @@ OverloadStrings buildCanonicalStrings(const model::Command &command,
             s.callArgsStr.append(", ");
         }
         s.paramsStr.append(
-            generateParamDecl(param, command, ctx.handleClasses, ctx.groupRename, ctx.bitmaskGroups));
+            generateParamDecl(param, command, ctx.handleClasses, ctx.groupRename, ctx.bitmaskGroups, ctx.emittedGroups));
         s.callArgsStr.append(
-            generateCallArg(param, command, ctx.handleClasses, ctx.groupRename, ctx.bitmaskGroups));
+            generateCallArg(param, command, ctx.handleClasses, ctx.groupRename, ctx.bitmaskGroups, ctx.emittedGroups));
         first = false;
     }
     return s;
@@ -84,9 +84,12 @@ std::string buildCanonicalBody(const std::string &returnType,
                                const std::string &callArgsStr,
                                const model::Command &command) {
     const bool isVoid = returnType == "void";
-    const bool isHandle = !isVoid && returnType != "std::string" &&
+    const bool isString = returnType == "std::string";
+    const bool isHandle = !isVoid && !isString &&
                           !command.returnType.isPointer &&
                           command.returnType.name == "GLuint";
+    const bool isLocationWrapper =
+        returnType == "UniformLocation" || returnType == "AttribLocation";
 
     std::ostringstream body;
     if (isVoid) {
@@ -94,9 +97,24 @@ std::string buildCanonicalBody(const std::string &returnType,
     } else if (isHandle) {
         body << "        return " << returnType << "{" << rawPtr << "("
              << callArgsStr << ")};";
-    } else {
+    } else if (isString) {
+        // glGetString / glGetStringi return `const GLubyte*`. A reinterpret
+        // to `const char *` is required before std::string's `const char*`
+        // ctor can accept the pointer — no implicit conversion exists from
+        // unsigned char to char.
+        body << "        return std::string(reinterpret_cast<const char *>("
+             << rawPtr << "(" << callArgsStr << ")));";
+    } else if (isLocationWrapper) {
+        // UniformLocation / AttribLocation wrap `GLint` with an explicit
+        // constructor, so a function-style cast is required to invoke it.
         body << "        return " << returnType << "(" << rawPtr << "("
              << callArgsStr << "));";
+    } else {
+        // Default forward: plain scalar returns (GLint, GLenum, GLfloat, ...)
+        // and pointer returns (`void*`, `GLsync`, ...) where the raw function
+        // already yields the declared return type. A function-style cast is
+        // invalid for pointer returns since `void*(x)` is not valid syntax.
+        body << "        return " << rawPtr << "(" << callArgsStr << ");";
     }
     return body.str();
 }

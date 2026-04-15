@@ -74,7 +74,8 @@ paramDecls(const model::Command &command, const EmitterContext &ctx,
             continue;
         }
         decls.push_back(generateParamDecl(param, command, ctx.handleClasses,
-                                          ctx.groupRename, ctx.bitmaskGroups));
+                                          ctx.groupRename, ctx.bitmaskGroups,
+                                          ctx.emittedGroups));
     }
     return decls;
 }

@@ -27,6 +27,13 @@ struct EmitterContext {
     std::map<std::string, std::string> handleClasses;
     std::map<std::string, std::string> groupRename;
     std::set<std::string> bitmaskGroups;
+    //! Raw group names that survived the consolidated-enum filter and have a
+    //! matching `enum class` declaration in the generated header. Used by
+    //! ParamFormat to decide whether to substitute a group wrapper or fall
+    //! back to the raw C type: groups that exist in the registry but have no
+    //! entries in the current api profile (e.g. legacy MapTarget under core
+    //! 4.6) are NOT in this set and therefore NOT substituted.
+    std::set<std::string> emittedGroups;
     //! gl command name -> earliest feature version number ("1.0", "3.3", ...)
     std::map<std::string, std::string> commandVersionMap;
     //! Optional Doxygen-style brief/param documentation. Empty when the
