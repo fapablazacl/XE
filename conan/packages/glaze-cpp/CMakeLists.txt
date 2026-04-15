@@ -14,13 +14,13 @@ set (CMAKE_CXX_STANDARD_REQUIRED    ON)
 set (CMAKE_CXX_EXTENSIONS           OFF)
 set (CMAKE_EXPORT_COMPILE_COMMANDS  ON)
 
-# Flatten binary output so the conanfile.py recipe can locate xe-glaze with
+# Flatten binary output so the conanfile.py recipe can locate glaze with
 # a single well-known path across single- and multi-config generators.
 if (NOT CMAKE_RUNTIME_OUTPUT_DIRECTORY)
     set (CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 endif()
 
-# Self-contained interface library so the inner libxe-glaze-* CMakeLists
+# Self-contained interface library so the inner libglaze-* CMakeLists
 # files can link `xe::interface` unchanged, without depending on the
 # enclosing XE repo. The alias below is the only name the subtree sees.
 set (target glaze-cpp-interface)

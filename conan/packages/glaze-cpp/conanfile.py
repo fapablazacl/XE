@@ -103,21 +103,21 @@ class GlazeCppConan(ConanFile):
     # ------------------------------------------------------------------ build
 
     def _find_xe_glaze_binary(self):
-        """Locate the xe-glaze binary produced by Phase A. Handles both
+        """Locate the glaze binary produced by Phase A. Handles both
         single-config generators (flat `bin/` layout) and multi-config
         generators (per-config subdirectory). Raises if not found."""
         suffixes = [".exe", ""] if self.settings.os == "Windows" else [""]
         patterns = []
         for suffix in suffixes:
-            patterns.append(os.path.join(self.build_folder, "bin", f"xe-glaze{suffix}"))
-            patterns.append(os.path.join(self.build_folder, "bin", "*", f"xe-glaze{suffix}"))
-            patterns.append(os.path.join(self.build_folder, "**", f"xe-glaze{suffix}"))
+            patterns.append(os.path.join(self.build_folder, "bin", f"glaze{suffix}"))
+            patterns.append(os.path.join(self.build_folder, "bin", "*", f"glaze{suffix}"))
+            patterns.append(os.path.join(self.build_folder, "**", f"glaze{suffix}"))
         for pattern in patterns:
             matches = glob.glob(pattern, recursive=True)
             matches = [m for m in matches if os.path.isfile(m) and "CMakeFiles" not in m]
             if matches:
                 return matches[0]
-        raise RuntimeError("xe-glaze binary not found under " + self.build_folder)
+        raise RuntimeError("glaze binary not found under " + self.build_folder)
 
     def build(self):
         # -------------------- Phase A: build the C++ generator --------------------
