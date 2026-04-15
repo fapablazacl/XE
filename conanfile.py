@@ -66,7 +66,7 @@ class xeRecipe(ConanFile):
 
         # NOTE: sdl2 and sdl3 both don't build under ArchLinux
         # Neither with gcc-x86 (gcc5)
-        #self.requires("sdl/2.32.10")
+        self.requires("sdl/2.32.10")
         
     def generate(self):
         deps = CMakeDeps(self)
