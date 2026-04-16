@@ -312,24 +312,29 @@ struct XeServices {
 
 ```c
 /* C ABI — each backend translation unit exports one of these */
-XE_API BackendVTable xe_backend_gl_legacy_create  (const XeServices*, const RenderSurface*, BackendContext**);
-XE_API BackendVTable xe_backend_gl4_create         (const XeServices*, const RenderSurface*, BackendContext**);
-XE_API BackendVTable xe_backend_gles2_create       (const XeServices*, const RenderSurface*, BackendContext**);
-XE_API BackendVTable xe_backend_gles3_create       (const XeServices*, const RenderSurface*, BackendContext**);
-XE_API BackendVTable xe_backend_d3d11_create       (const XeServices*, const RenderSurface*, BackendContext**);
-XE_API BackendVTable xe_backend_metal_create       (const XeServices*, const RenderSurface*, BackendContext**);
-XE_API BackendVTable xe_backend_n64_rdp_create     (const XeServices*, const RenderSurface*, BackendContext**);
-XE_API BackendVTable xe_backend_gcn_gx_create      (const XeServices*, const RenderSurface*, BackendContext**);
-XE_API BackendVTable xe_backend_ps3_gcm_create     (const XeServices*, const RenderSurface*, BackendContext**, uint32_t gcm_fifo_kb);
-XE_API BackendVTable xe_backend_soft_builtin_create(const XeServices*, const RenderSurface*, BackendContext**);
-XE_API BackendVTable xe_backend_soft_mesa_create   (const XeServices*, const RenderSurface*, BackendContext**, const char* mesa_lib_path);
-XE_API BackendVTable xe_backend_null_create        (const XeServices*, const RenderSurface*, BackendContext**);
+XE_API BackendVTable xe_backend_gl_legacy_create   (const RenderDeviceDesc*, BackendContext**);
+XE_API BackendVTable xe_backend_gl4_create         (const RenderDeviceDesc*, BackendContext**);
+XE_API BackendVTable xe_backend_gles2_create       (const RenderDeviceDesc*, BackendContext**);
+XE_API BackendVTable xe_backend_gles3_create       (const RenderDeviceDesc*, BackendContext**);
+XE_API BackendVTable xe_backend_d3d11_create       (const RenderDeviceDesc*, BackendContext**);
+XE_API BackendVTable xe_backend_metal_create       (const RenderDeviceDesc*, BackendContext**);
+XE_API BackendVTable xe_backend_n64_rdp_create     (const RenderDeviceDesc*, BackendContext**);
+XE_API BackendVTable xe_backend_gcn_gx_create      (const RenderDeviceDesc*, BackendContext**);
+XE_API BackendVTable xe_backend_ps3_gcm_create     (const RenderDeviceDesc*, BackendContext**);
+XE_API BackendVTable xe_backend_soft_builtin_create(const RenderDeviceDesc*, BackendContext**);
+XE_API BackendVTable xe_backend_soft_mesa_create   (const RenderDeviceDesc*, BackendContext**);
+XE_API BackendVTable xe_backend_null_create        (const RenderDeviceDesc*, BackendContext**);
 ```
 
 ### 9.2 `BackendVTable`
 
 ```c
+enum class XeHandleType : uint8_t {
+    Buffer, Texture, Sampler, Shader, Pipeline, RenderTarget
+};
+
 typedef struct BackendContext BackendContext; /* opaque */
+typedef struct CommandBufferBase CommandBufferBase; /* opaque */
 
 typedef struct BackendVTable {
     /* ── Lifecycle ─────────────────────────────────────────── */
@@ -368,6 +373,9 @@ typedef struct BackendVTable {
     /* ── Synchronisation ────────────────────────────────────── */
     void (*flush)  (BackendContext*);
     void (*finish) (BackendContext*);
+
+    /* ── Memory query ───────────────────────────────────────── */
+    void (*query_memory) (BackendContext*, RenderMemoryStats*);
 
     /* ── Native handle access (new in 0.4) ──────────────────── */
     // Returns the underlying API object for a given handle.
@@ -581,6 +589,10 @@ public:
     void end_frame()                                          noexcept;
     void present()                                            noexcept;
 
+    // ── Synchronisation ──────────────────────────────────────────────
+    void flush()                                              noexcept;
+    void finish()                                             noexcept;
+
     // ── Submission ───────────────────────────────────────────────────
     void submit      (CommandBuffer& cmdbuf)                  noexcept;
     void submit_batch(const CommandBuffer* const* bufs,
@@ -598,6 +610,7 @@ public:
                                                       const TextureUpdate&)     noexcept;
     void                        destroy_texture      (TextureHandle)            noexcept;
     [[nodiscard]] TextureHandle create_render_target (const RenderTargetDesc&)  noexcept;
+    void                        destroy_render_target(TextureHandle)            noexcept;
 
     // ── Sampler resources (new in 0.4) ───────────────────────────────
     // On GL Legacy, internally creates a compiled display list.
@@ -696,7 +709,7 @@ class CommandBufferT;
 
 // Dynamic: generic tagged byte-stream, decoded during submit()
 template<>
-class CommandBufferT<BackendPolicy_Dynamic> {
+class CommandBufferT<BackendPolicy_Dynamic> : public CommandBufferBase {
 public:
     explicit CommandBufferT(XeAllocator alloc = XeAllocator::make_default(),
                             uint32_t initial_capacity = 64 * 1024) noexcept;
@@ -790,11 +803,14 @@ public:
     void bind_pipeline(PipelineHandle h) noexcept {
         // Reads baked combiner config from pipeline table;
         // emits SET_COMBINE_MODE directly into the display list.
-        const auto& cfg = _pipeline_table[h & HANDLE_INDEX_MASK];
+        const auto& cfg = _ctx->pipeline_table[h & HANDLE_INDEX_MASK];
         rdpq_set_combiner_raw(cfg.combiner_word);
     }
+    void bind_vertex_buffer(BufferHandle h, uint8_t, uint32_t, uint32_t offset = 0) noexcept {
+        _verts = (const uint8_t*)_ctx->rdp_buffers[h & HANDLE_INDEX_MASK] + offset;
+    }
     void draw_indexed(uint32_t count, uint32_t first, int32_t) noexcept {
-        rdpq_triangle_strip(_verts + first, count);
+        rdpq_triangle_strip((const void*)((uintptr_t)_verts + first * sizeof(uint16_t)), count);
     }
     // submit() = rspq_flush() / DMA kickoff — no decode pass
     // On a 93MHz R4300 this is the difference between shipping and not shipping.
@@ -802,6 +818,7 @@ public:
 private:
     uint64_t* _dl;        // rdpq display list buffer
     uint32_t  _dl_used, _dl_capacity;
+    const void* _verts = nullptr;
     const N64BackendContext* _ctx;  // pipeline table access
 };
 ```
