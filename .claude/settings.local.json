@@ -104,7 +104,10 @@
       "Bash(python *)",
       "Bash(conan build *)",
       "Bash(./build/src/xe-glaze-test/Release/xe-glaze-test.exe)",
-      "WebFetch(domain:docs.structurizr.com)"
+      "WebFetch(domain:docs.structurizr.com)",
+      "Bash(rm -f docs/rendering/*.md)",
+      "Bash(rmdir docs/rendering)",
+      "Bash(cmd //c \"rmdir docs\\\\\\\\rendering\")"
     ]
   }
 }
