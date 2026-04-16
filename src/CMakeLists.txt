@@ -5,7 +5,7 @@ add_subdirectory ("libxe-core")
 
 add_subdirectory ("libxe-math")
 if (XE_DEV_UNIT_TEST)
-    add_subdirectory ("libxe-math-test")    
+    add_subdirectory ("libxe-math-test")
 endif()
 
 add_subdirectory ("libxe-scene")

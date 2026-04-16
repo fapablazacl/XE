@@ -62,11 +62,11 @@ class xeRecipe(ConanFile):
         self.requires("backport-cpp/1.2.0")
         self.requires("catch2/3.7.1")
         self.requires("gtest/1.15.0")
-        self.requires("glaze/1.0.0", options={"language": "both", "apis": "gl:4.6,gles2:3.2,gl_compat:2.1"})
+        self.requires("glaze-cpp/1.0.0", options={"language": "both", "apis": "gl:4.6,gles2:3.2,gl_compat:2.1"})
 
         # NOTE: sdl2 and sdl3 both don't build under ArchLinux
         # Neither with gcc-x86 (gcc5)
-        #self.requires("sdl/2.32.10")
+        self.requires("sdl/2.32.10")
         
     def generate(self):
         deps = CMakeDeps(self)
