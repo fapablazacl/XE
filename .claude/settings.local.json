@@ -103,7 +103,8 @@
       "Bash(conan list *)",
       "Bash(python *)",
       "Bash(conan build *)",
-      "Bash(./build/src/xe-glaze-test/Release/xe-glaze-test.exe)"
+      "Bash(./build/src/xe-glaze-test/Release/xe-glaze-test.exe)",
+      "WebFetch(domain:docs.structurizr.com)"
     ]
   }
 }
