@@ -1,22 +1,9 @@
 # XE Engine — Rendering Middleware Specification
 **Revision:** 0.6 — Consolidated Spec (per-module split reverted)
-**Project:** XenoIDE / XE Engine
+**Project:** XE Engine
 **Scope:** Core rendering middleware; public API surface, class design, portability strategy
 
 > The C4 architecture model for this subsystem lives in [`architecture/`](architecture/) as a Structurizr DSL workspace. See `architecture/README.md` for how to view it.
-
----
-
-## Revision History
-
-| Rev | Summary |
-|---|---|
-| **0.1** | Initial skeleton: `Pipeline`, `CommandBuffer`, `RenderDevice`, `SystemCaps`, `BackendVTable` |
-| **0.2** | Multi-backend per platform, `XeServices` (allocator/log/profiler), mobile (Android/iOS), software rasterizers, C++ subset rules |
-| **0.3** | Formalized threading contract; `TierLevel` extended with `Microcode` and `TEV`; console backends: N64 (libdragon), GameCube/Wii (libogc GX), PS3 (PSL1GHT/libGCM); `PipelineDesc` union extended; `RenderSurface` + `SystemCaps` console fields; additional target notes (Dreamcast, Xbox OG) |
-| **0.4** | `RenderDeviceT<Policy>` + `CommandBufferT<Policy>` static dispatch; `xe_platform_config.hpp` alias pattern; `BackendVTable` native handle + extension query slots; per-backend extension headers; `SamplerHandle` / `SamplerDesc` first-class resource; GL Legacy display list optimization for sampler and pipeline state; asset pipeline architecture: `xe-asset-compiler`, `.xemesh`, `.xetex`, `.xetexprop`; `submit_batch()` added to `RenderDevice` class definition; PS3 GCM FIFO size configuration |
-| **0.5** | Split into per-module markdown files under `rendering/`; Structurizr C4 architecture model added in `docs/architecture/` |
-| **0.6** | 0.5 module split reverted — cognitive overhead of navigating ten files outweighed the benefit. Spec is a single document again. Structurizr model in `docs/architecture/` retained |
 
 ---
 
