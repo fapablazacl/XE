@@ -32,6 +32,6 @@ if (XE_PLUGIN_GL_GLFW)
     add_subdirectory("libxe-core-platform-glfw")
 endif()
 
-add_subdirectory("apostate")
-add_subdirectory("capybaria")
+# add_subdirectory("apostate")
+# add_subdirectory("capybaria")
 add_subdirectory("xe-glaze-test")

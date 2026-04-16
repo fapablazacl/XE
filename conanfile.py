@@ -42,28 +42,34 @@ class xeRecipe(ConanFile):
 
     def requirements(self):
         self.requires("imgui/1.92.2b")
-        self.requires("assimp/6.0.2")
+
+        # self.requires("assimp/6.0.2")
         self.requires("glfw/3.4")
-        self.requires("cgltf/1.13")
+        # self.requires("cgltf/1.13")
         self.requires("fmt/[>=11 <12]")
-        self.requires("lodepng/cci.20230410")
+        # self.requires("lodepng/cci.20230410")
         self.requires("ms-gsl/4.2.0")
-        self.requires("devil/1.8.0")
-        self.requires("glm/1.0.1")
-        self.requires("nlohmann_json/3.12.0")
-        self.requires("vulkan-loader/1.4.313.0")
+        # self.requires("devil/1.8.0")
+        # self.requires("glm/1.0.1")
+        # self.requires("nlohmann_json/3.12.0")
+        # self.requires("vulkan-loader/1.4.313.0")
         
+        """
         compiler = self.settings.get_safe("compiler")
         compiler_version = self.settings.get_safe("compiler.version")
         if not (compiler == "gcc" and str(compiler_version).startswith("5")):
             self.requires("ktx/4.4.2")
+        """
 
         self.requires("cxxopts/3.3.1")
         self.requires("backport-cpp/1.2.0")
         self.requires("catch2/3.7.1")
-        self.requires("gtest/1.15.0")
-        self.requires("glaze-cpp/1.0.0", options={"language": "both", "apis": "gl:4.6,gles2:3.2,gl_compat:2.1"})
 
+        """
+        self.requires("gtest/1.15.0")
+        """
+        
+        self.requires("glaze-cpp/1.0.0", options={"language": "both", "apis": "gl:4.6,gles2:3.2,gl_compat:2.1"})
         # NOTE: sdl2 and sdl3 both don't build under ArchLinux
         # Neither with gcc-x86 (gcc5)
         self.requires("sdl/2.32.10")

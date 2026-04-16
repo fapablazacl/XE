@@ -2,7 +2,7 @@ find_package(glfw3 REQUIRED)
 find_package(glaze REQUIRED)
 
 set (target xe-glaze-test)
-set (sources "main.cpp" RenderBackend.h RenderBackend.cpp)
+set (sources "main.cpp" RenderBackend.h RenderBackend.cpp BackendTableGL.h BackendTableGL.cpp)
 
 add_executable(${target} ${sources})
 target_link_libraries(${target} PRIVATE glfw)

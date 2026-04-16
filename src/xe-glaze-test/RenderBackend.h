@@ -25,7 +25,7 @@ namespace xe {
 
 
 	template<class BackendT>
-	BackendTable createBackendTableGL() {
+	BackendTable createBackendTable() {
 		BackendTable vtable;
 
 		vtable.createBuffer = &BackendT::createBuffer;
