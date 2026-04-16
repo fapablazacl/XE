@@ -29,30 +29,6 @@
 
 ---
 
-## 2. Permitted C++ Subset
-
-### Allowed
-- `template` functions and structs
-- `constexpr` / `consteval`
-- `static_assert`, `[[nodiscard]]`, `[[maybe_unused]]`, `[[likely]]` / `[[unlikely]]`
-- Aggregate initialization, designated initializers (C++20; C++17 fallback)
-- `inline` forwarding functions in headers
-- `noexcept` on all public functions
-- Move semantics for `CommandBufferT` and `Pipeline` value types
-- `std::type_traits` for `static_assert` / SFINAE (no runtime use)
-
-### Forbidden
-- `virtual` functions — replaced by `BackendVTable` fn-pointer dispatch
-- `dynamic_cast`, `typeid`, RTTI of any kind
-- Exceptions (`throw`, `try`, `catch`)
-- `std::function`
-- `std::shared_ptr` / `std::unique_ptr` owning GPU resources
-- STL containers in public headers
-- Multiple inheritance
-- Global constructors with side effects
-
----
-
 ## 3. Threading Contract
 
 ### Renderer Has Zero Internal Threads
