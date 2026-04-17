@@ -6,22 +6,31 @@
 #include <xe/render/types.h>
 
 namespace xe {
-    struct BackendContext {
+    /**
+     * @brief render device dispatch table 
+     * Allows to abstract away the underlying graphics API without resorting to polymorphism
+     */
+    struct RenderDeviceBackendVTable {
+        Handle (*createBuffer)(RenderDeviceBackendContext *, const BufferDescriptor &) = nullptr;
+        void (*destroyBuffer)(RenderDeviceBackendContext *, Handle) = nullptr;
 
-    };
+        Handle (*createShaderProgram)(RenderDeviceBackendContext *, const ShaderProgramDescriptor &) = nullptr;
+        void (*destroyShaderProgram)(RenderDeviceBackendContext *, Handle) = nullptr;
 
-    struct BufferDescriptor {
-        size_t size = 0;
-        const void* data = nullptr;
-    };
-    
-    //! eliminates polymorphic calls
-    struct BackendTable {
-        Handle (*createBuffer)(BackendContext *, const BufferDescriptor &) = nullptr;
-        void (*destroyBuffer)(BackendContext *, Handle) = nullptr;
+        Handle (*createVertexLayout)(RenderDeviceBackendContext *, const VertexLayoutDescriptor &) = nullptr;
+        void (*destroyVertexLayout)(RenderDeviceBackendContext *, Handle) = nullptr;
 
-        void (*beginFrame)(BackendContext *) = nullptr;
-        void (*endFrame)(BackendContext *) = nullptr;
-        void (*present)(BackendContext *) = nullptr;
+        Handle (*createPipeline)(RenderDeviceBackendContext *, const PipelineDescriptor&) = nullptr;
+        void (*destroyPipeline)(RenderDeviceBackendContext *, Handle) = nullptr;
+
+        Handle (*createTexture)(RenderDeviceBackendContext *, const TextureDescriptor) = nullptr;
+        void (*destroyTexture)(RenderDeviceBackendContext *, Handle) = nullptr;
+
+        Handle (*createGeometry)(RenderDeviceBackendContext *, const GeometryDescriptor) = nullptr;
+        void (*destroyGeometry)(RenderDeviceBackendContext *, Handle) = nullptr;
+
+        void (*beginFrame)(RenderDeviceBackendContext *) = nullptr;
+        void (*endFrame)(RenderDeviceBackendContext *) = nullptr;
+        void (*present)(RenderDeviceBackendContext *) = nullptr;
     };
 }
