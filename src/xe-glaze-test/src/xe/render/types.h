@@ -30,7 +30,7 @@ namespace xe {
 		uint32_t raw = 0;
 
 		uint32_t index() const {
-			return (raw >> IndexMask) & IndexMask;
+			return (raw >> IndexShift) & IndexMask;
 		}
 
 		uint32_t gen() const {

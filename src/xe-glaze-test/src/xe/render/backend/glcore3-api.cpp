@@ -25,9 +25,13 @@ namespace xe {
 		std::vector<glaze::Unique<gl::Program>> shaderPrograms;
 	};
 
+	RenderDeviceBackendContextGL* glctx(RenderDeviceBackendContext *ctx) {
+		assert(ctx);
+		return static_cast<RenderDeviceBackendContextGL* >(ctx);
+	}
+
 	Handle createBufferGL(RenderDeviceBackendContext* ctx, const BufferDescriptor& desc) {
-		auto glctx = static_cast<RenderDeviceBackendContextGL*>(ctx);
-		auto &buffers = glctx->buffers;
+		auto &buffers = glctx(ctx)->buffers;
 
 		//! TODO: Derive from the descriptor
 		auto const target = gl::BufferTarget::eArrayBuffer;
@@ -49,9 +53,7 @@ namespace xe {
 	}
 
 	void destroyBufferGL(RenderDeviceBackendContext* ctx, Handle handle) {
-		auto glctx = static_cast<RenderDeviceBackendContextGL*>(ctx);
-		
-		glctx->buffers[handle.index()].reset({});
+		glctx(ctx)->buffers[handle.index()].reset({});
 	}
 
 	static glaze::Unique<gl::Shader> compileShader(gl::ShaderType type, const char* src) {
@@ -61,37 +63,46 @@ namespace xe {
 		gl::compileShader(shader);
 
 		if (!gl::getShaderiv(shader, gl::ShaderParameterName::eCompileStatus)) {
-			// TODO: Define a way to handle errors
 			std::cerr << "Shader compile error:\n" << gl::getShaderInfoLog(shader) << std::endl;
-			std::exit(1);
+
+			return {};
 		}
 
 		return shader;
 	}
 
-	static glaze::Unique<gl::Program> linkProgram(const std::vector<glaze::Unique<gl::Shader>> &shaders ) {
-		// Shader program
-		auto prog = glaze::makeUnique<gl::Program>();
+	static glaze::Unique<gl::Program> linkProgram(const std::vector<glaze::Unique<gl::Shader>> &shaders) {
+		auto program = glaze::makeUnique<gl::Program>();
 
-		for (const auto &shader : shaders) {
-			gl::attachShader(prog, shader);
+		for (size_t i = 0; i < shaders.size(); i++) {
+			if (!shaders[i]) {
+				std::cerr << "Can't link program: One of its shaders was not built successfully" << std::endl;
+				return {};
+			}
+
+			gl::attachShader(program, shaders[i]);
 		}
 
-		gl::linkProgram(prog);
+		gl::linkProgram(program);
 
-		// TODO: Check for linking errors
+		for (size_t i = 0; i < shaders.size(); i++) {
+			gl::detachShader(program, shaders[i]);
+		}
 
-		return prog;
+		if (!gl::getProgramiv(program, gl::ProgramProperty::eLinkStatus)) {
+			std::cerr << "Shader link error:\n" << gl::getProgramInfoLog(program) << std::endl;
+			return {};
+		}
+
+		return program;
 	}
 
 	Handle createShaderProgramGL(RenderDeviceBackendContext *ctx, const ShaderProgramDescriptor &desc) {
-		auto glctx = static_cast<RenderDeviceBackendContextGL*>(ctx);
-		auto &shaderPrograms = glctx->shaderPrograms;
+		auto &shaderPrograms = glctx(ctx)->shaderPrograms;
 
-		std::vector<glaze::Unique<gl::Shader>> shaders = {
-			compileShader(gl::ShaderType::eVertexShader, desc.glslVertexShader.c_str()),
-			compileShader(gl::ShaderType::eFragmentShader, desc.glslFragmentShader.c_str())
-		};
+		std::vector<glaze::Unique<gl::Shader>> shaders;
+		shaders.push_back(std::move(compileShader(gl::ShaderType::eVertexShader, desc.glslVertexShader.c_str())));
+		shaders.push_back(std::move(compileShader(gl::ShaderType::eFragmentShader, desc.glslFragmentShader.c_str())));
 
 		glaze::Unique<gl::Program> shaderProgram = linkProgram(shaders);
 
@@ -103,8 +114,7 @@ namespace xe {
 	}
 
 	void destroyShaderProgramGL(RenderDeviceBackendContext *ctx, Handle handle) {
-		auto glctx = static_cast<RenderDeviceBackendContextGL*>(ctx);
-		auto& shaderPrograms = glctx->shaderPrograms;
+		auto& shaderPrograms = glctx(ctx)->shaderPrograms;
 
 		shaderPrograms[handle.index()].reset({});
 	}
