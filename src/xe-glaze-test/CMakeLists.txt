@@ -6,4 +6,4 @@ set (sources "main.cpp" RenderBackend.h RenderBackend.cpp BackendTableGL.h Backe
 
 add_executable(${target} ${sources})
 target_link_libraries(${target} PRIVATE glfw)
-target_link_libraries(${target} PRIVATE glaze::raii glaze::gl glaze::gl_handle)
+target_link_libraries(${target} PRIVATE glaze::raii glaze::gl xe::math)

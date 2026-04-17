@@ -4,25 +4,30 @@
 #include <cstdint>
 
 namespace xe {
-    typedef struct BackendContext;
+    struct BackendContext;
 
-    using Buffer = uint32_t;
+    enum class HandleType {
+        Buffer,
+        Texture
+    };
+
+    using Handle = uint32_t;
+    using Buffer = uint32_t;    // deprecated. use Handle instead
 
     struct BufferDescriptor {
-        size_t size;
+        size_t size = 0;
         const void* data = nullptr;
     };
     
-    // eliminates polymorphic calls
+    //! eliminates polymorphic calls
     struct BackendTable {
-        Buffer (*createBuffer)(const BufferDescriptor &) = nullptr;
-        void (*destroyBuffer)(Buffer) = nullptr;
+        Buffer (*createBuffer)(BackendContext *, const BufferDescriptor &) = nullptr;
+        void (*destroyBuffer)(BackendContext *, Buffer) = nullptr;
 
-        void (*beginFrame)() = nullptr;
-        void (*endFrame)() = nullptr;
-        void (*present)() = nullptr;
+        void (*beginFrame)(BackendContext *) = nullptr;
+        void (*endFrame)(BackendContext *) = nullptr;
+        void (*present)(BackendContext *) = nullptr;
     };
-
 
 	template<class BackendT>
 	BackendTable createBackendTable() {

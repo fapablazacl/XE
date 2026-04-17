@@ -63,7 +63,7 @@ int main() {
     glfwMakeContextCurrent(window);
     glazeLoadFunctions(glfwGetProcAddress);
 
-	xe::BackendTable vtable = xe::createBackendTableGL()
+	xe::BackendTable vtable = xe::createBackendTable<xe::BackendTableGL>();
 
 	// Inner scope so every RAII-managed GL resource is destroyed while the
 	// context is still current. Without it the Unique<> destructors fire

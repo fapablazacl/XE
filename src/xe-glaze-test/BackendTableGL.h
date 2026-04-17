@@ -3,16 +3,19 @@
 
 #include "RenderBackend.h"
 
+#include <glaze/raii.hpp>
+#include <vector>
+
 namespace xe {
 	struct BackendTableGL {
-		static Buffer createBuffer(const BufferDescriptor&);
+		static Buffer createBuffer(BackendContext *ctx, const BufferDescriptor&);
 
-		static void destroyBuffer(Buffer buffer);
+		static void destroyBuffer(BackendContext *ctx, Buffer buffer);
 
-		static void beginFrame();
+		static void beginFrame(BackendContext *ctx);
 
-		static void endFrame();
+		static void endFrame(BackendContext *ctx);
 
-		static void present();
+		static void present(BackendContext *ctx);
 	};
 }
