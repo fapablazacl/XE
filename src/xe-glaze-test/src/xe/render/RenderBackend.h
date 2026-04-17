@@ -6,7 +6,9 @@
 #include <xe/render/types.h>
 
 namespace xe {
-    struct BackendContext;
+    struct BackendContext {
+
+    };
 
     struct BufferDescriptor {
         size_t size = 0;

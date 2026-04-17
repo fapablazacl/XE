@@ -9,34 +9,78 @@
 #include "glcore3-api.h"
 
 namespace xe {
-	struct BackendContextGLCore3 {
-		std::vector<glaze::Unique<gl::BufferId>> buffers;
-	};
 
-	Handle createBuffer(BackendContext *ctx, const BufferDescriptor& desc) {
-		gl::BufferId buffer = gl::createBuffers();
-		gl::bindBuffer(gl::BufferTarget::eArrayBuffer, buffer);
-		gl::bufferData(gl::BufferTarget::eArrayBuffer, desc.size, desc.data, gl::BufferUsage::eDynamicDraw);
-		gl::bindBuffer(gl::BufferTarget::eArrayBuffer, {});
+	namespace glcore3 {
+		struct Pipeline {
+			xe::vec4 clearColor = { 0.0f, 0.0f, 0.0f, 1.0f };
+			gl::Flags<gl::ClearBufferMask> clearMask = gl::ClearBufferMask::eColorBufferBit;
+			glaze::Unique<gl::Program> shaderProgram;
+		};
 
-		return static_cast<Handle>(buffer.id);
-	}
+		struct BackendContextGLCore3 : BackendContext {
+			std::vector<glaze::Unique<gl::BufferId>> buffers;
 
-	void destroyBuffer(BackendContext *ctx, Handle buffer) {
-		// NOTE: maybe we should check if the buffer is being used?
-		gl::deleteBuffers(gl::BufferId{buffer});
-	}
+			Handle createBuffer(const BufferDescriptor& desc) {
+				auto const target = gl::BufferTarget::eArrayBuffer;
+				auto const usage = gl::BufferUsage::eDynamicDraw;
 
-	void beginFrame(BackendContext *ctx) {
-		gl::clearColor(0.2f, 0.2f, 8.0f, 1.0f);
-		gl::clear(gl::ClearBufferMask::eColorBufferBit | gl::ClearBufferMask::eDepthBufferBit);
-	}
+				auto buffer = glaze::makeUnique<gl::BufferId>();
+				gl::bindBuffer(target, buffer);
+				gl::bufferData(target, desc.size, desc.data, usage);
+				gl::bindBuffer(target, {});
 
-	void endFrame(BackendContext *ctx) {
-		gl::flush();
-	}
+				Handle const bufferHandle = buffers.size();
 
-	void present(BackendContext *ctx) {
-		// no-op
-	}
+				// TODO: Search for a free Handle
+				buffers.push_back(std::move(buffer));
+
+				return bufferHandle;
+			}
+
+			void destroyBuffer(Handle bufferHandle) {
+				buffers[bufferHandle].reset({});
+			}
+
+			void beginFrame() {
+				gl::clearColor(0.2f, 0.2f, 8.0f, 1.0f);
+				gl::clear(gl::ClearBufferMask::eColorBufferBit | gl::ClearBufferMask::eDepthBufferBit);
+			}
+
+			void endFrame() {
+				gl::flush();
+			}
+
+			void present() {
+				// no-op
+			}
+		};
+
+		Handle createBuffer(BackendContext* ctx, const BufferDescriptor& desc) {
+			return static_cast<BackendContextGLCore3*>(ctx)->createBuffer(desc);
+		}
+
+		void destroyBuffer(BackendContext* ctx, Handle buffer) {
+			static_cast<BackendContextGLCore3*>(ctx)->destroyBuffer(buffer);
+		}
+
+		void beginFrame(BackendContext* ctx) {
+			static_cast<BackendContextGLCore3*>(ctx)->beginFrame();
+		}
+
+		void endFrame(BackendContext* ctx) {
+			static_cast<BackendContextGLCore3*>(ctx)->endFrame();
+		}
+
+		void present(BackendContext* ctx) {
+			static_cast<BackendContextGLCore3*>(ctx)->present();
+		}
+
+		void initializeBackendTable(BackendTable* vtable) {
+			vtable->createBuffer = &createBuffer;
+			vtable->destroyBuffer = &destroyBuffer;
+			vtable->beginFrame = &beginFrame;
+			vtable->endFrame = &endFrame;
+			vtable->present = &present;
+		}
+	}	
 }
