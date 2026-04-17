@@ -24,9 +24,7 @@ if (XE_PLUGIN_PNG)
     # add_subdirectory("libxe-core-imageloader-lodepng")
 endif ()
 
-if (XE_PLUGIN_GL)
-    # add_subdirectory ("libxe-gl")
-endif ()
+add_subdirectory ("libxe-graphics")
 
 if (XE_PLUGIN_GL_GLFW)
     # add_subdirectory("libxe-core-platform-glfw")

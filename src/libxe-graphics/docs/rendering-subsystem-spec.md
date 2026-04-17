@@ -3,7 +3,7 @@
 **Project:** XE Engine
 **Scope:** Core rendering middleware; public API surface, design, portability strategy.
 
-> The C4 architecture model for this subsystem lives in [`architecture/`](architecture/) as a Structurizr DSL workspace. See `architecture/README.md` for how to view it.
+> The C4 architecture model for this subsystem lives in [`docs/architecture/`](../../../docs/architecture/) at the repository root as a Structurizr DSL workspace. See its `README.md` for how to view it.
 
 ---
 

@@ -107,7 +107,8 @@
       "WebFetch(domain:docs.structurizr.com)",
       "Bash(rm -f docs/rendering/*.md)",
       "Bash(rmdir docs/rendering)",
-      "Bash(cmd //c \"rmdir docs\\\\\\\\rendering\")"
+      "Bash(cmd //c \"rmdir docs\\\\\\\\rendering\")",
+      "Bash(awk '{print \"  \" $0}')"
     ]
   }
 }
