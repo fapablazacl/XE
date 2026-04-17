@@ -5,9 +5,6 @@
 #include <iostream>
 #include <cstdlib>
 
-#include "BackendTableGL.h"
-#include "RenderBackend.h"
-
 static const char* VERT_SRC = R"glsl(
 #version 330 core
 layout(location = 0) in vec2 position; 
@@ -62,8 +59,6 @@ int main() {
     }
     glfwMakeContextCurrent(window);
     glazeLoadFunctions(glfwGetProcAddress);
-
-	xe::BackendTable vtable = xe::createBackendTable<xe::BackendTableGL>();
 
 	// Inner scope so every RAII-managed GL resource is destroyed while the
 	// context is still current. Without it the Unique<> destructors fire
