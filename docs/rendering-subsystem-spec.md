@@ -1,9 +1,25 @@
 # XE Engine — Rendering Middleware Specification
-**Revision:** 0.6 — Consolidated Spec (per-module split reverted)
+**Revision:** 0.7 — Prose-normalized; code listings replaced with implementation approach and rationale; inconsistencies resolved.
 **Project:** XE Engine
-**Scope:** Core rendering middleware; public API surface, class design, portability strategy
+**Scope:** Core rendering middleware; public API surface, design, portability strategy.
 
 > The C4 architecture model for this subsystem lives in [`architecture/`](architecture/) as a Structurizr DSL workspace. See `architecture/README.md` for how to view it.
+
+---
+
+## 0. Executive Summary
+
+The XE rendering middleware is a thin, portable, low-overhead abstraction that targets a very wide tier range of graphics hardware — from fixed-function consoles of the 1990s (N64, GameCube/Wii, PS3) through modern programmable GPUs on desktop and mobile. Its central design axis is *portability without paying for what you don't use*.
+
+The middleware is implemented as a small dispatch shell (`RenderDeviceT<Policy>`) that forwards resource creation and command submission to a backend. Backends are reached through either a function-pointer vtable (`BackendPolicy_Dynamic`, the default on desktop/mobile) or through template specialization that inlines backend calls directly (`BackendPolicy_*` for each console and for single-backend dev/CI builds). On static-policy targets, LTO collapses the dispatch to zero runtime overhead.
+
+The renderer owns no threads, no mutexes, and no heap — allocators are injected. Exceptions and RTTI are disabled. Every diagnostic facility (logging, profiling, assertion, allocation tracking) is reached through a single injectable `XeServices` struct whose sinks are C-style function pointers. Backend-specific types never appear in the public API; a typed escape hatch (`get_native_handle` / `query_extension`) lets advanced clients reach the underlying GL/D3D/Metal/GCM objects through opt-in extension headers.
+
+Assets are compiled offline by `xe-asset-compiler` into directly-memory-mappable, platform-native binaries (`.xemesh`, `.xetex`, `.xeanim`). The runtime loader makes one pass over the package calling `create_*` — no decoding, no conversion, no intermediate buffers. This preserves memory predictability on tight targets (N64 TMEM: 4 KB; GameCube ARAM: 16 MB) where runtime allocation size cannot exceed the file on disk by any margin.
+
+Command buffers are the only thread-safe record surface; the device itself is single-threaded. Multiple workers fill independent command buffers; the render thread submits a batch in explicit order. No implicit synchronization — submitted order is executed order.
+
+The spec is deliberately silent on render graphs, multi-GPU, compute dispatch, and asynchronous streaming. These live above the middleware layer and produce ordinary command buffers for this layer to execute.
 
 ---
 
@@ -29,444 +45,201 @@
 
 ---
 
+## 2. Document Conventions
+
+Types are written in *PascalCase*. Public methods use *snake_case*; internal glue and helper free functions use *camelCase*. Enumerants are *PascalCase*. Handles are 32-bit unsigned values whose encoding is formalized in §10 — typed aliases like `BufferHandle` are documentation-only and share the same underlying type.
+
+*Tier* always refers to a `TierLevel`. *Backend* is a concrete rendering API implementation (GL4, D3D11, GX, RDP). *Policy* is a compile-time tag selecting static or dynamic dispatch. *Client* is the engine code consuming this middleware. *Backend code* is the code implementing the vtable slots.
+
+Struct layouts are described in prose with field-by-field intent. A companion reference implementation lives in `src/libxe-render/` and is the authoritative source for exact layouts. Code fragments appear only as isolated syntax examples where a prose description would be less clear than the syntax itself.
+
+---
+
 ## 3. Threading Contract
 
-### Renderer Has Zero Internal Threads
+### 3.1 Renderer Has Zero Internal Threads
 
-The renderer creates no threads, owns no mutexes, and makes no use of atomics in the
-fast path. All parallelism is the client's responsibility. `XeThread` / `XeJob` is a
-**separate utility library** sitting above the renderer in the dependency graph. The
-renderer does not link against it.
+The renderer creates no threads, owns no mutexes, and issues no atomics on the fast path. All parallelism is the client's responsibility through `XeJob` (a separate utility library sitting above the renderer in the dependency graph). The renderer does not link against `XeJob`.
 
-### Thread Safety Contract
+**Rationale:** this constraint is load-bearing for console targets. libogc and libdragon offer no pthreads-compatible primitives, and `std::mutex` is unavailable in their C++ toolchains. Keeping the renderer thread-unaware sidesteps that entirely. On desktop, it also means no accidental contention between engine worker threads and driver threads.
+
+### 3.2 Thread Safety Contract
 
 | Operation | Guarantee |
 |---|---|
 | `CommandBufferT` recording (`draw*`, `bind_*`, `set_*`) | **Safe from any thread** — no shared state |
-| `RenderDevice` resource creation (`create_buffer`, etc.) | **Render thread only** |
+| `RenderDevice` resource creation (`create_*`) | **Render thread only** |
 | `RenderDevice::submit()` / `submit_batch()` | **Render thread only** |
 | `RenderDevice::begin_frame()` / `end_frame()` / `present()` | **Render thread only** |
 | `BackendRegistry::probe()` | **One-shot, pre-device** |
-| `SystemCaps::query_host()` | **Safe from any thread** — read-only after return |
+| `SystemCaps::query_host()` | **Safe from any thread** — subject to the reentrancy of the injected `XeServices` sinks |
 
-### Multithreaded Recording Pattern
+`SystemCaps::query_host()` is safe from any thread *provided the injected `XeServices` sinks are themselves safe from any thread*. The default sinks are fully reentrant; if a client installs a non-reentrant log sink, that constraint propagates.
 
-```
-[Worker thread A]  CommandBuffer cmdbuf_a(arena_a);
-                   cmdbuf_a.bind_pipeline(pl);
-                   cmdbuf_a.draw_indexed(n);
+Violating the render-thread-only rules is an assertion in debug builds and undefined behavior in release.
 
-[Worker thread B]  CommandBuffer cmdbuf_b(arena_b);
-                   cmdbuf_b.bind_pipeline(pl2);
-                   cmdbuf_b.draw_indexed(m);
+### 3.3 Multithreaded Recording Pattern
 
-[Render thread]    const CommandBuffer* batch[] = { &cmdbuf_a, &cmdbuf_b };
-                   device->submit_batch(batch, 2);   // ordered by array index
-                   device->end_frame();
-                   device->present();
-```
+Worker threads each own a private `CommandBuffer`, each backed by a private arena (`XeAllocator`). They record independently — no locks, no atomics. The render thread collects the filled buffers and submits them as a batch; the batch array's index order *is* the execution order. There is no implicit reordering.
 
-### Deferred Resource Creation Pattern
+### 3.4 Deferred Resource Creation Pattern
 
-`create_*` is render-thread-only. Worker threads enqueue creation requests into a
-lock-free ring buffer; the render thread flushes them at `begin_frame()` before any
-`CommandBuffer` records against the new handles. This is a recommended client idiom,
-not part of the renderer itself.
+A recommended client idiom, not part of the renderer itself: worker threads that need to create resources enqueue descriptors into a lock-free ring buffer; the render thread drains the ring at the top of `begin_frame()` before any command buffer references the new handles. This keeps the synchronization outside the middleware while giving worker code an apparent creation surface.
 
 ---
 
-## 4. `TierLevel`
+## 4. TierLevel
 
-```cpp
-enum class TierLevel : uint8_t {
-    Microcode = 0, // N64 RDP/RSP — combiner equation, no shaders, no HW T&L
-    TEV       = 1, // GC/Wii GX  — HW T&L, up to 16 TEV stages, no GLSL
-    Legacy    = 2, // GL 1.x–2.x — fixed-function matrix stacks, per-vertex lighting
-    Modern    = 3, // GL 3.3+ / GLES 3 / D3D11 / Metal — programmable shaders
-    Extended  = 4, // GL 4.x / Vulkan / Metal 3 — compute, geometry, tessellation
-};
-```
+A five-valued `uint8_t` enum capturing the coarsest capability boundary across the supported hardware range:
 
----
+- **Microcode** — N64 RDP/RSP. Combiner-equation rasterizer, no shaders, no hardware T&L.
+- **TEV** — GX on GameCube/Wii. Hardware T&L, up to 16 TEV stages, no GLSL.
+- **Legacy** — GL 1.x–2.x. Matrix stacks, per-vertex lighting, fixed-function texturing.
+- **Modern** — GL 3.3+, GLES 3, D3D11, Metal. Programmable shaders, VBOs, FBOs.
+- **Extended** — GL 4.x, Vulkan, Metal 3. Compute, geometry, tessellation.
 
-## 5. `BackendHint`
-
-```cpp
-enum class BackendHint : uint8_t {
-    Auto,
-    // Desktop
-    GLLegacy, GL4, D3D11, Vulkan,
-    // Mobile
-    GLES2, GLES3, Metal,
-    // Consoles
-    N64_RDP, GCN_GX, PS3_GCM,
-    // Software
-    SoftBuiltin, SoftMesa, Null,
-    _Count
-};
-```
+Tier is the coarse branch the client uses when selecting pipeline-state payloads (§14). Sub-tier features (anisotropic filtering, NPOT textures, instancing) are surfaced as bool flags in `GPUCaps` rather than appearing as new tiers — tiers are slow-moving; feature flags change with every GPU driver revision.
 
 ---
 
-## 6. `RenderSurface`
+## 5. BackendHint
 
-```cpp
-enum class SurfaceType : uint8_t {
-    Win32, X11, Wayland, Cocoa, UIKit, ANativeWindow,
-    N64, GameCube, Wii, PS3, Offscreen,
-};
+A `uint8_t` enum listing every concrete backend the middleware knows about: `Auto`, the desktop set (GLLegacy, GL4, D3D11, Vulkan), mobile (GLES2, GLES3, Metal), consoles (N64_RDP, GCN_GX, PS3_GCM), and software fallbacks (SoftBuiltin, SoftMesa, Null). `Auto` defers backend selection to `BackendRegistry::best_available()`.
 
-struct RenderSurface {
-    SurfaceType type;
-    void*    native_window;      // HWND / X11 Window / wl_surface* / NSView* / UIView* / ANativeWindow*
-    void*    native_display;     // HDC / X11 Display* / wl_display* / nullptr on Apple/Android
-    void*    metal_layer;        // CAMetalLayer* — required for Metal backend
-    void*    console_context;    // gcmContextData* (PS3); nullptr on N64/GC/Wii
-    uint32_t console_buffer_idx;
-    uint32_t width, height;
-    PixelFormat color_format   = PixelFormat::RGBA8;
-    PixelFormat depth_format   = PixelFormat::Depth24Stencil8;
-    uint8_t     msaa_samples   = 1;
-    bool        srgb           = false;
-    bool        hdr            = false;
-    uint8_t     swap_interval  = 1;
-};
-```
+**Implementation approach:** the enum is densely packed (no gaps) so that `BackendRegistry` can use it directly as an array index. Adding a new backend means appending a new enumerant before `_Count` — no reordering, no renumbering of existing values.
+
+**Rationale:** dense enums make the registry's storage a plain array instead of a map. The constant-time lookup matters because `is_available()` is called during startup probing and must not regress when the backend list grows.
 
 ---
 
-## 7. `SystemCaps`
+## 6. RenderSurface
 
-```cpp
-struct CPUCaps {
-    char     brand[64];
-    uint32_t physical_cores, logical_cores, cache_line_bytes;
-    uint64_t l1_cache_bytes, l2_cache_bytes, l3_cache_bytes;
-    // x86
-    bool has_sse2, has_sse4, has_avx, has_avx2;
-    // ARM
-    bool has_neon, has_sve, is_apple_silicon;
-    // PowerPC (GC, Wii, PS3 PPU)
-    bool has_altivec, is_powerpc;
-    // Common
-    bool is_bigendian; // N64, GC, Wii, PS3 PPU — critical for texture swizzle
-    bool is_64bit, is_arm;
-    // Auxiliary processors
-    uint8_t  spu_count;              // PS3: usable SPEs (typically 6)
-    uint32_t spu_local_store_bytes;  // PS3: 256 KB per SPU
-    uint32_t rsp_dmem_bytes;         // N64: 4 KB
-    uint32_t rsp_imem_bytes;         // N64: 4 KB
-};
+A POD tagged union carrying the platform's surface identity. Fields include a `SurfaceType` discriminator; opaque `void*` fields for `native_window`, `native_display`, `metal_layer`, and `console_context`; a console buffer index; surface dimensions; color and depth `PixelFormat` hints; MSAA sample count; sRGB, HDR, and swap-interval flags.
 
-struct GPUCaps {
-    char      renderer[128], vendor[64], api_version[32];
-    TierLevel tier;
-    // Memory
-    uint64_t  vram_bytes;     // 0 on UMA / console shared memory
-    uint64_t  aram_bytes;     // GC/Wii auxiliary RAM (~16 MB)
-    uint64_t  tmem_bytes;     // N64 TMEM (4 KB) — first-class budget
-    bool      is_uma;
-    // Limits
-    uint32_t max_texture_size, max_texture_units;
-    uint32_t max_uniform_bindings, max_vertex_attribs, max_msaa_samples;
-    uint8_t  max_tev_stages;  // GX: 16; 0 on other backends
-    uint8_t  max_hw_lights;   // GX / GL Legacy: 8; 0 on Modern+
-    // Feature flags
-    bool has_geometry_shaders, has_tessellation, has_compute;
-    bool has_instancing, has_vao, has_fbo, has_anisotropic;
-    // Texture compression
-    bool has_s3tc, has_etc2, has_astc, has_pvrtc, has_cmpr;
-    bool has_tile_memory, has_float_textures, has_depth_texture, supports_npot;
-    bool is_bigendian_gpu;    // RDP, GX, RSX (PS3) — affects texture upload swizzle
-    bool uses_display_list;   // N64_RDP, GCN_GX, PS3_GCM
-};
+**Implementation approach:** one struct carries every platform's identifiers; each backend reads only the fields it cares about. On 64-bit desktop the struct is roughly 64 bytes.
 
-struct MemoryCaps {
-    uint64_t system_ram_bytes, available_ram_bytes, page_size_bytes;
-    bool     has_mmu;            // false on N64 (libdragon bare-metal)
-    bool     has_large_pages, is_low_memory_device;
-    uint64_t display_list_pool_bytes; // GX / rdpq DL budget
-    uint64_t rsx_local_bytes;    // PS3 RSX GDDR3 (256 MB)
-    uint64_t rsx_main_bytes;     // PS3 RSX XDR window (up to 256 MB)
-};
-
-struct PlatformCaps {
-    char  os_name[64], os_version[32];
-    bool  is_64bit_os, is_mobile, is_tablet, is_console, is_low_power_mode;
-    bool  has_os;          // false on bare N64 (libdragon, no OS)
-    bool  has_filesystem;
-    float display_scale;
-};
-
-struct SystemCaps {
-    CPUCaps cpu; GPUCaps gpu; MemoryCaps memory; PlatformCaps platform;
-
-    static SystemCaps query_host(const XeServices& svc) noexcept; // Phase 1: pre-context
-    void              query_gpu (const XeServices& svc) noexcept; // Phase 2: post-create
-
-    bool supports_tier        (TierLevel t)       const noexcept;
-    bool is_extension_available(const char* name) const noexcept;
-};
-```
+**Rationale:** the alternative — a virtual `Surface` class hierarchy — would require an allocation and a vtable for a type that is read exactly once at device creation. Paying a few unused `void*` (8 bytes each on 64-bit) avoids the allocation entirely and keeps the surface description trivially copyable across the factory boundary. The surface struct is the *only* point at which OS-specific window handles cross into the middleware, so isolating it in a POD stops that knowledge from cascading into a type hierarchy.
 
 ---
 
-## 8. `XeServices` — Facility Injection Hub
+## 7. SystemCaps
 
-```cpp
-enum class XeLogLevel : uint8_t { Trace, Debug, Info, Warn, Error, Fatal };
+`SystemCaps` is the central capabilities record — a POD aggregate of four sub-structs.
 
-struct XeLogSink {
-    void (*write)(void* user, XeLogLevel level, const char* tag,
-                  const char* msg, const char* file, int line) noexcept;
-    void*      user_data;
-    XeLogLevel min_level = XeLogLevel::Info;
-};
+### 7.1 CPUCaps
 
-struct XeProfilerHook {
-    void (*begin_cpu_scope)(void* user, const char* name, uint32_t argb_color) noexcept;
-    void (*end_cpu_scope)  (void* user)                                         noexcept;
-    void (*mark)           (void* user, const char* name)                       noexcept;
-    void (*gpu_timestamp)  (void* user, const char* name, uint64_t ns)          noexcept;
-    void (*counter)        (void* user, const char* name, int64_t value)        noexcept;
-    void* user_data;
-};
+Fields: brand string, physical/logical core counts, cache-line size, L1/L2/L3 cache sizes, x86 SIMD flags (SSE2/SSE4/AVX/AVX2), ARM flags (NEON/SVE/is-Apple-Silicon), PowerPC flags (AltiVec/is-PowerPC), `is_bigendian` (critical for texture byte-swapping on N64/GC/Wii/PS3 PPU), `is_64bit`, `is_arm`, and auxiliary-processor budgets — SPU count and local-store bytes on PS3; RSP DMEM/IMEM on N64.
 
-struct XeAllocator {
-    void* (*alloc)  (void* user, size_t size, size_t align)                          noexcept;
-    void  (*free)   (void* user, void* ptr, size_t size, size_t align)               noexcept;
-    void* (*realloc)(void* user, void* ptr, size_t old_sz, size_t new_sz, size_t align) noexcept;
-    void* user_data;
-    static XeAllocator make_default()                              noexcept;
-    static XeAllocator make_tracking(XeAllocator base, XeAllocTracker*) noexcept;
-};
+Auxiliary-processor fields are zero on platforms without them, so client code can consult them uniformly without `#ifdef`.
 
-struct XeAllocTracker {
-    void (*on_alloc)(void* user, void* ptr, size_t size, size_t align,
-                     const char* tag, const char* file, int line) noexcept;
-    void (*on_free) (void* user, void* ptr, size_t size)          noexcept;
-    void* user_data;
-};
+### 7.2 GPUCaps
 
-struct XeAssertHandler {
-    bool (*on_assert)(void* user, const char* expr, const char* msg,
-                      const char* file, int line) noexcept; // false → abort()
-    void* user_data;
-};
+Fields: identification strings (renderer, vendor, api_version), `TierLevel tier`, GPU memory budgets (`vram_bytes`, `aram_bytes` for GC/Wii, `tmem_bytes` for N64, and the PS3 RSX partitions `rsx_local_bytes` / `rsx_main_bytes`), `is_uma`, resource limits (`max_texture_size`, `max_texture_units`, `max_uniform_bindings`, `max_vertex_attribs`, `max_msaa_samples`, `max_tev_stages`, `max_hw_lights`), feature flags (geometry shaders, tessellation, compute, instancing, VAO, FBO, anisotropic, tile memory, float textures, depth textures, NPOT support), texture-compression flags (S3TC, ETC2, ASTC, PVRTC, CMPR), `is_bigendian_gpu`, and `uses_gpu_command_list`.
 
-struct XeServices {
-    XeAllocator     allocator;
-    XeLogSink       log;
-    XeProfilerHook  profiler;
-    XeAllocTracker* alloc_tracker = nullptr;
-    XeAssertHandler assert_handler;
-    static XeServices make_default() noexcept;
-};
+**Corrections from rev 0.6:**
 
-// Internal-use macros (implementation files only)
-// XE_LOG(svc, level, tag, fmt, ...)
-// XE_TRACE_SCOPE(svc, name, color)
-// XE_ASSERT(svc, expr, msg)
-// XE_ALLOC(svc, size, align)
-// XE_FREE(svc, ptr, size, align)
-```
+- The fields `rsx_local_bytes` and `rsx_main_bytes` have moved from `MemoryCaps` to `GPUCaps`. They describe GPU-addressable memory, not system RAM.
+- The field formerly named `uses_display_list` has been renamed to `uses_gpu_command_list` to eliminate the collision with the GL Legacy driver-side `glNewList` optimization covered in §9.3. The two concepts are unrelated: `uses_gpu_command_list` marks backends whose primary submission model is a replayable command list (RDP, GX, RSX); the GL Legacy display-list optimization is a backend-private implementation detail.
+
+### 7.3 MemoryCaps
+
+Fields: `system_ram_bytes`, `available_ram_bytes`, `page_size_bytes`, `has_mmu` (false on bare-metal N64), `has_large_pages`, `is_low_memory_device`, and `display_list_pool_bytes` for GX/rdpq display-list budgeting.
+
+### 7.4 PlatformCaps
+
+OS identification, mobility/tablet/console flags, `is_low_power_mode`, `has_os` (false on bare N64), `has_filesystem`, and `display_scale`.
+
+### 7.5 Two-Phase Query
+
+`SystemCaps::query_host(const XeServices&)` fills `CPUCaps`, `MemoryCaps`, `PlatformCaps` — everything available before GL/D3D/GCM context creation. `SystemCaps::query_gpu(const XeServices&)` is called by the device factory after context creation to populate `GPUCaps`. Two phases are mandatory because GPU identification requires a live context, but backend selection requires knowledge of system memory *before* the context exists.
+
+**Implementation approach:** POD struct, default-constructed to all zero, no heap. All query functions are free or static — no dependency on a global or singleton.
+
+**Rationale:** every field being directly readable avoids accessor boilerplate; `SystemCaps` is the most-referenced struct in the middleware, and keeping it a POD makes reading it a cache-line hit. The two-phase split is a hard requirement: any design that merged them would either force the client to create and destroy a throwaway context (wasted work) or require backend selection without capability information (defeats the registry's purpose).
 
 ---
 
-## 9. `BackendVTable` and `BackendContext`
+## 8. XeServices — Facility Injection Hub
 
-### 9.1 Factory Signatures
+`XeServices` aggregates four sinks the middleware needs from the client — allocator, log sink, profiler hook, assert handler — plus an optional allocation tracker carried by pointer.
 
-```c
-/* C ABI — each backend translation unit exports one of these */
-XE_API BackendVTable xe_backend_gl_legacy_create   (const RenderDeviceDesc*, BackendContext**);
-XE_API BackendVTable xe_backend_gl4_create         (const RenderDeviceDesc*, BackendContext**);
-XE_API BackendVTable xe_backend_gles2_create       (const RenderDeviceDesc*, BackendContext**);
-XE_API BackendVTable xe_backend_gles3_create       (const RenderDeviceDesc*, BackendContext**);
-XE_API BackendVTable xe_backend_d3d11_create       (const RenderDeviceDesc*, BackendContext**);
-XE_API BackendVTable xe_backend_metal_create       (const RenderDeviceDesc*, BackendContext**);
-XE_API BackendVTable xe_backend_n64_rdp_create     (const RenderDeviceDesc*, BackendContext**);
-XE_API BackendVTable xe_backend_gcn_gx_create      (const RenderDeviceDesc*, BackendContext**);
-XE_API BackendVTable xe_backend_ps3_gcm_create     (const RenderDeviceDesc*, BackendContext**);
-XE_API BackendVTable xe_backend_soft_builtin_create(const RenderDeviceDesc*, BackendContext**);
-XE_API BackendVTable xe_backend_soft_mesa_create   (const RenderDeviceDesc*, BackendContext**);
-XE_API BackendVTable xe_backend_null_create        (const RenderDeviceDesc*, BackendContext**);
-```
+### 8.1 Sink Shapes
 
-### 9.2 `BackendVTable`
+- **`XeLogSink`** — `write(user, level, tag, msg, file, line)` function pointer plus `user_data` plus a `min_level` filter. Log levels: Trace, Debug, Info, Warn, Error, Fatal.
+- **`XeProfilerHook`** — `begin_cpu_scope`, `end_cpu_scope`, `mark`, `gpu_timestamp`, `counter`. Every hook takes a `void* user`. No hook is allowed to allocate in the steady state.
+- **`XeAllocator`** — `alloc(user, size, align)`, `free(user, ptr, size, align)`, `realloc(user, ptr, old_size, new_size, align)`. The middleware always passes matching size/align to free, enabling sized-free allocators (musl, mimalloc) to skip the bookkeeping lookup.
+- **`XeAllocTracker`** (optional) — `on_alloc`, `on_free` with tag/file/line for leak detection.
+- **`XeAssertHandler`** — `on_assert(user, expr, msg, file, line) → bool`; return false to abort.
 
-```c
-enum class XeHandleType : uint8_t {
-    Buffer, Texture, Sampler, Shader, Pipeline, RenderTarget
-};
+### 8.2 Implementation Approach
 
-typedef struct BackendContext BackendContext; /* opaque */
-typedef struct CommandBufferBase CommandBufferBase; /* opaque */
+Each sink is a POD of C-style function pointers plus `void* user_data`; there is no `std::function`, no virtual dispatch, no RTTI. `XeServices::make_default()` returns a value wired to platform-natural primitives: `malloc`/`free` on desktop, `memalign`/`free` on N64, `abort()` for unhandled asserts. Clients override individual function pointers — never inherit.
 
-typedef struct BackendVTable {
-    /* ── Lifecycle ─────────────────────────────────────────── */
-    void     (*shutdown)     (BackendContext*);
-    void     (*begin_frame)  (BackendContext*);
-    void     (*end_frame)    (BackendContext*);
-    void     (*present)      (BackendContext*);
+Internal use is gated through macros (`XE_LOG`, `XE_ASSERT`, `XE_TRACE_SCOPE`, `XE_ALLOC`, `XE_FREE`) that compile away to nothing when `XE_DIAGNOSTICS_OFF` is defined — essential for N64 release builds where every kilobyte of `.text` counts.
 
-    /* ── Buffer management ──────────────────────────────────── */
-    uint32_t (*buffer_create)  (BackendContext*, const BufferDesc*);
-    void     (*buffer_update)  (BackendContext*, uint32_t, const void*, uint32_t, uint32_t);
-    void     (*buffer_destroy) (BackendContext*, uint32_t);
+### 8.3 Rationale
 
-    /* ── Texture management ─────────────────────────────────── */
-    uint32_t (*texture_create)        (BackendContext*, const TextureDesc*);
-    void     (*texture_update)        (BackendContext*, uint32_t, const TextureUpdate*);
-    void     (*texture_destroy)       (BackendContext*, uint32_t);
-    uint32_t (*rendertarget_create)   (BackendContext*, const RenderTargetDesc*);
-    void     (*rendertarget_destroy)  (BackendContext*, uint32_t);
+Function-pointer injection has three important properties over virtual calls:
 
-    /* ── Sampler management ─────────────────────────────────── */
-    uint32_t (*sampler_create)  (BackendContext*, const SamplerDesc*);
-    void     (*sampler_destroy) (BackendContext*, uint32_t);
+1. **ABI resilience.** A new field may be appended to a sink struct without breaking existing backends; the layout is not tied to a C++ type hierarchy's vtable.
+2. **No hidden allocation.** A polymorphic sink would need storage for its derived-class state; a function-pointer sink carries its state in the `user_data` pointer that the client controls.
+3. **Provable `noexcept`.** The sink boundary is C-ABI, so no destructor can run through it. The middleware can claim `noexcept` end-to-end.
 
-    /* ── Shader management (Modern / Extended only) ─────────── */
-    uint32_t (*shader_create)   (BackendContext*, const ShaderDesc*);
-    void     (*shader_destroy)  (BackendContext*, uint32_t);
+---
 
-    /* ── Pipeline management ────────────────────────────────── */
-    uint32_t (*pipeline_create) (BackendContext*, const PipelineDesc*);
-    void     (*pipeline_destroy)(BackendContext*, uint32_t);
+## 9. BackendVTable and BackendContext
 
-    /* ── Command submission ─────────────────────────────────── */
-    void (*submit_batch)(BackendContext*, const CommandBufferBase* const*, uint32_t count);
+### 9.1 Factory
 
-    /* ── Synchronisation ────────────────────────────────────── */
-    void (*flush)  (BackendContext*);
-    void (*finish) (BackendContext*);
+Each backend translation unit exports one C-ABI symbol:
 
-    /* ── Memory query ───────────────────────────────────────── */
-    void (*query_memory) (BackendContext*, RenderMemoryStats*);
+`xe_backend_<name>_create(const RenderDeviceDesc* desc, BackendContext** out_ctx) → BackendVTable`
 
-    /* ── Native handle access (new in 0.4) ──────────────────── */
-    // Returns the underlying API object for a given handle.
-    // Result type is backend-specific; client casts via the extension header.
-    // Returns nullptr if unsupported (Null, SoftBuiltin, etc.)
-    void* (*get_native_handle)(BackendContext*, XeHandleType, uint32_t handle);
+The function returns a filled `BackendVTable` value and writes a heap-allocated opaque `BackendContext*` into `out_ctx`. `BackendContext` is backend-private — the middleware never dereferences it. All backends are linked statically, gated by CMake options. There is no `dlopen`, no dynamic plugin loading.
 
-    // Extension struct negotiation.
-    // `extension_id` is a backend-specific constant (e.g. GL4DeviceExt::kID).
-    // Returns a pointer to a backend-owned struct, or nullptr if unsupported.
-    void* (*query_extension)(BackendContext*, uint32_t extension_id);
+**Rationale:** static linking keeps the binary flat for console targets (N64 has no dynamic loader), simplifies symbol stripping for release builds, and gives LTO the whole graph to inline. Dynamic plugin loading would also make handle generation counters (§10) harder to invalidate cleanly on backend reload.
 
-    /* ── Debug ──────────────────────────────────────────────── */
-    void        (*set_debug_label) (BackendContext*, XeHandleType, uint32_t, const char*);
-    const char* (*get_error_string)(BackendContext*);
+### 9.2 BackendVTable Shape
 
-} BackendVTable;
-```
+A C struct of function pointers, grouped into sections:
 
-**Unsupported slot contract:** Slots that a backend does not support are set to a
-stub that logs an error via `XeServices.log` and returns `XE_INVALID_HANDLE` or
-`nullptr`. This is validated once at device creation — the application gates feature
-use on `SystemCaps`.
+- **Lifecycle** — `shutdown`, `begin_frame`, `end_frame`, `present`.
+- **Buffer management** — `buffer_create`, `buffer_update`, `buffer_destroy`.
+- **Texture management** — `texture_create`, `texture_update`, `texture_destroy`, `rendertarget_create`, `rendertarget_destroy`.
+- **Sampler management** — `sampler_create`, `sampler_destroy`.
+- **Shader management** (Modern/Extended only) — `shader_create`, `shader_destroy`.
+- **Pipeline management** — `pipeline_create`, `pipeline_destroy`.
+- **Command submission** — `submit_batch(ctx, const CommandBufferBase* const* bufs, uint32_t count)`.
+- **Synchronization** — `flush`, `finish`.
+- **Memory query** — `query_memory`.
+- **Native handle access** — `get_native_handle`, `query_extension`.
+- **Debug** — `set_debug_label(ctx, XeHandleType, handle, label)`, `get_error_string`.
 
-**ABI stability rule:** The `BackendVTable` struct may only be extended at the end.
-Existing slots must never be reordered or removed.
+**Command recording does not appear in the vtable.** `bind_*`, `draw_*`, `set_*` are recorded into a `CommandBuffer` (see §12) and cross the dispatch boundary exactly once per submit, not once per call. This is the single most important performance property of the middleware.
+
+**Unsupported-slot contract:** a backend that cannot implement a slot installs a stub that logs through `XeServices` (obtained via `BackendContext`) and returns `XE_INVALID_HANDLE` for handle-returning slots or `nullptr` for pointer-returning slots. The application gates feature use on `SystemCaps`, not on slot presence — the stub is a defense-in-depth safety net.
+
+**ABI stability rule:** new slots may be appended only. Existing slots may never be reordered or removed. This preserves the ability to mix backend object files from different middleware versions — a rare but valuable diagnostic scenario.
+
+**Rationale for flat vtable vs. virtual class:** a vtable is a POD with known offsets. A virtual class forces a specific compiler's vtable layout, which varies across MSVC, GCC, and Clang and is not stable across C++ ABIs. Exporting a flat vtable from a C-ABI factory gives us platform-independent binary compatibility and clean LTO behavior.
+
+**Rationale for excluding command recording:** draws and state binds happen tens of thousands of times per frame. Dispatching each through a function pointer would cost a branch-predictor miss and a cache-line load per call. Instead, `CommandBuffer` serializes commands into a backend-neutral byte stream (dynamic policy) or directly into the native command format (static policy); `submit_batch` crosses the dispatch boundary exactly once per frame.
 
 ### 9.3 GL Legacy — Display List Optimization for Sampler and Pipeline State
 
-The GL Legacy backend compiles sampler and pipeline state into GL display lists at
-creation time. This trades one-time compile cost for minimal per-bind overhead —
-important on constrained Legacy hardware where individual GL state calls carry
-significant per-call overhead.
+The GL Legacy backend exploits `glNewList` / `glCallList`. At `create_sampler()`, the backend compiles the sequence of `glTexParameter*` calls into a display list; at `bind_texture()`, one `glCallList(sampler_list)` replays all four to five parameter calls in a single driver entry. At `create_pipeline()`, the rasterizer/blend/depth-stencil/fixed-function state is similarly compiled; `bind_pipeline()` replays it with one list call.
 
-#### Sampler Display List
+**Correction from rev 0.6:** the earlier spec claimed `glBindTexture`, `glVertexPointer`, and `glDrawElements` "capture values at `glNewList` time, not at `glCallList` time." This is incorrect in detail:
 
-```cpp
-// Inside GL1BackendContext
-struct GL1SamplerEntry {
-    GLuint  display_list;    // compiled glTexParameter* sequence
-    // State mirror for dirty checking
-    GLenum  wrap_s, wrap_t, min_filter, mag_filter;
-    GLfloat aniso;
-};
+- `glBindTexture` *is* listable under GL 1.1–2.1; it captures the *texture name* at compile time (not the texture contents).
+- `glVertexPointer` is *not* compilable into a display list — it is client-side state in every GL profile that still exposes it.
+- `glDrawElements` is listable, but compiling a draw into the list would capture the *element array pointer at compile time* — which is almost never what you want.
 
-uint32_t gl1_sampler_create(BackendContext* ctx, const SamplerDesc* desc) {
-    auto* c = static_cast<GL1BackendContext*>(ctx);
-    uint32_t idx = c->sampler_pool.alloc();
-    GL1SamplerEntry& e = c->samplers[idx];
+The corrected rule for this backend: *compile only the state you want permanently baked into the list. Never compile commands that reference client-side pointers (vertex arrays) or resources whose identity is decided per-bind (the currently bound texture).*
 
-    e.wrap_s     = xe_wrap_to_gl(desc->wrap_u);
-    e.wrap_t     = xe_wrap_to_gl(desc->wrap_v);
-    e.min_filter = xe_filter_min_to_gl(desc->filter_min);
-    e.mag_filter = xe_filter_mag_to_gl(desc->filter_mag);
-    e.aniso      = (float)desc->aniso_level;
+The middleware compiles into the sampler list only `glTexParameter*` calls — not `glBindTexture`. The pipeline list compiles only rasterizer/blend/depth state — not `glDrawElements`. Both compiled lists are replay-safe at any point, in any order, between texture binds.
 
-    e.display_list = glGenLists(1);
-    glNewList(e.display_list, GL_COMPILE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,     e.wrap_s);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T,     e.wrap_t);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, e.min_filter);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, e.mag_filter);
-        if (c->caps.has_anisotropic && desc->aniso_level > 1)
-            glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, e.aniso);
-    glEndList();
-
-    return xe_make_handle(XeHandleType::Sampler, idx);
-}
-```
-
-Binding a texture + sampler then becomes:
-
-```cpp
-void gl1_bind_texture(BackendContext* ctx, uint32_t tex_h,
-                      uint32_t smp_h, uint8_t unit) {
-    auto* c = static_cast<GL1BackendContext*>(ctx);
-    glActiveTexture(GL_TEXTURE0 + unit);
-    glBindTexture(GL_TEXTURE_2D, c->textures[tex_h & HANDLE_INDEX_MASK]);
-    glCallList(c->samplers[smp_h & HANDLE_INDEX_MASK].display_list);
-    // One glCallList replaces 4–5 glTexParameter* calls
-}
-```
-
-#### Pipeline State Display List
-
-The rasterizer, blend, and depth/stencil state — along with fixed-function
-lighting/fog/alpha-test setup — are compiled into a pipeline display list at
-`create_pipeline()` time:
-
-```cpp
-// Compiled once; called once per bind_pipeline()
-glNewList(entry.state_list, GL_COMPILE);
-    // Rasterizer
-    (rast.cull_mode == CullMode::None)
-        ? glDisable(GL_CULL_FACE)
-        : (glEnable(GL_CULL_FACE), glCullFace(xe_cull_to_gl(rast.cull_mode)));
-    glPolygonMode(GL_FRONT_AND_BACK, xe_fill_to_gl(rast.fill_mode));
-    // Depth
-    ds.depth_test
-        ? (glEnable(GL_DEPTH_TEST), glDepthFunc(xe_compare_to_gl(ds.depth_func)))
-        : glDisable(GL_DEPTH_TEST);
-    glDepthMask(ds.depth_write ? GL_TRUE : GL_FALSE);
-    // Blend
-    blend.enabled
-        ? (glEnable(GL_BLEND),
-           glBlendFuncSeparate(xe_blend_to_gl(blend.src_color),
-                               xe_blend_to_gl(blend.dst_color),
-                               xe_blend_to_gl(blend.src_alpha),
-                               xe_blend_to_gl(blend.dst_alpha)))
-        : glDisable(GL_BLEND);
-    // Fixed-function (lighting, fog, alpha test, tex env)
-    // ... compiled from FixedFunctionState fields
-glEndList();
-```
-
-**Display list scope rules:** `glBindTexture`, `glVertexPointer`, and `glDrawElements`
-capture values at `glNewList` time, not at `glCallList` time. Therefore texture binds
-must happen *before* calling the sampler display list. Pipeline and sampler display
-lists are orthogonal and correct to call in any order relative to each other.
-
-**Display lists are compatibility-profile only.** This optimization applies exclusively
-to the GL Legacy backend (GL 1.x–2.x / compatibility). The GL4 backend uses core
-profile and has no access to display lists — the driver's internal state caching
-provides equivalent or better optimization there.
+**Rationale:** GL Legacy drivers carry heavy per-call overhead (call validation, argument marshalling, command-packet build). A display list collapses N calls into one and lets the driver pre-validate the list at compile time. On Mesa3D and older Windows GL drivers the speedup per bind is 3–5×. On GL4 core profile this optimization is unavailable (display lists were removed in 3.0 core) but also unnecessary — the driver's internal state cache is more effective than anything the client can construct.
 
 #### GL Legacy Display List Usage Summary
 
@@ -478,915 +251,277 @@ provides equivalent or better optimization there.
 
 ---
 
-## 10. Static Backend Dispatch — `RenderDeviceT<Policy>`
+## 10. Handle Encoding
 
-### 10.1 Backend Policy Tags
+Every resource handle is a 32-bit unsigned integer with the following bit layout:
 
-```cpp
-// xe_backend_policy.hpp — no backend-specific headers included here
+| Bits  | Field       | Width | Purpose                                 |
+|-------|-------------|:-----:|-----------------------------------------|
+| 31–28 | `type`      | 4     | `XeHandleType` — one of 15 categories + Invalid |
+| 27–20 | `gen`       | 8     | Generation counter                      |
+| 19–0  | `index`     | 20    | Slot index into the backend pool        |
 
-struct BackendPolicy_Dynamic    {};  // Runtime fn-pointer dispatch (default, all desktop/mobile)
-struct BackendPolicy_N64_RDP    {};  // Static: libdragon rdpq direct calls
-struct BackendPolicy_GCN_GX     {};  // Static: libogc GX direct calls
-struct BackendPolicy_PS3_GCM    {};  // Static: PSL1GHT libGCM direct calls
-struct BackendPolicy_GL4        {};  // Static: GL4 Glaze (dev/CI single-backend builds)
-struct BackendPolicy_SoftBuiltin{};  // Static: tile rasterizer
-```
+`XE_INVALID_HANDLE == 0`. For this sentinel to be unambiguous, `XeHandleType::Invalid = 0` is reserved; `Buffer`, `Texture`, `Sampler`, `Shader`, `Pipeline`, `RenderTarget` start at 1. *Correction from rev 0.6, which placed `Buffer = 0`; that encoding made handle `0` simultaneously mean "invalid" and "buffer slot 0 generation 0".*
 
-### 10.2 `DispatchCore<Policy>` — One Pointer Indirection
+20 bits of index gives a pool capacity of ~1,048,576 resources per type — comfortably above any realistic streaming scenario. 8 bits of generation allow 256 recycles of the same slot before the counter wraps, at which point a stale handle could collide; in practice this is several orders of magnitude beyond per-frame churn and is already longer-lived than any reasonable caching strategy.
 
-The C++ template shell that wraps the vtable. All methods are `inline` — with LTO on
-static builds they collapse to direct calls with no overhead whatsoever.
+Helpers `xe_make_handle(type, gen, idx)` and `xe_decode_handle(h)` are provided in the middleware header. The backend's `resolve(handle)` path reads the type, checks it matches the expected category, indexes the slot, and checks the generation matches the slot's current generation — three AND/compare operations, no cache misses once the slot table is hot.
 
-```cpp
-// xe_dispatch.hpp
+**Typed aliases** (`BufferHandle`, `TextureHandle`, …) are `using` aliases of `uint32_t`, not distinct classes. This preserves C-ABI compatibility and lets handles travel through the vtable without conversion. Mixing types at the call site is technically legal C++ but produces an assertion on resolve — the type tag will not match.
 
-template<typename Policy = BackendPolicy_Dynamic>
-class DispatchCore {
-public:
-    DispatchCore(const BackendVTable& vt, BackendContext* ctx) noexcept
-        : _vt(vt), _ctx(ctx) {}
+**Implementation approach:** each backend owns per-type pools. A pool is a `std::array`-sized (or hand-rolled fixed-capacity) array of slots plus a freelist of recycled indices. Allocating a handle pops from the freelist (or grows the high watermark), bumps the slot's generation, marks it live, and encodes (type, gen, idx) into the returned handle. Releasing marks the slot dead and pushes its index onto the freelist; the generation is *not* bumped on release — it is bumped on the next allocation, which both saves work and guarantees that released handles immediately become stale.
 
-    [[nodiscard]] inline BufferHandle
-    create_buffer(const BufferDesc& d) noexcept { return _vt.buffer_create(_ctx, &d); }
-    inline void destroy_buffer(BufferHandle h) noexcept { _vt.buffer_destroy(_ctx, h); }
-
-    [[nodiscard]] inline SamplerHandle
-    create_sampler(const SamplerDesc& d) noexcept { return _vt.sampler_create(_ctx, &d); }
-    inline void destroy_sampler(SamplerHandle h) noexcept { _vt.sampler_destroy(_ctx, h); }
-
-    // ... one inline forwarder per BackendVTable slot
-
-    inline void* get_native_handle(XeHandleType t, uint32_t h) const noexcept {
-        return _vt.get_native_handle(_ctx, t, h);
-    }
-    inline void* query_extension(uint32_t id) const noexcept {
-        return _vt.query_extension(_ctx, id);
-    }
-    inline BackendContext* ctx() const noexcept { return _ctx; }
-
-private:
-    BackendVTable   _vt;
-    BackendContext* _ctx;
-};
-```
-
-### 10.3 `RenderDeviceT<Policy>`
-
-```cpp
-// Primary template — forward-declared; specialized per policy below
-template<typename Policy = BackendPolicy_Dynamic>
-class RenderDeviceT;
-
-// ── Dynamic specialization (desktop / mobile shipping builds) ─────────────
-template<>
-class RenderDeviceT<BackendPolicy_Dynamic> {
-public:
-    static RenderDeviceT* create (const RenderDeviceDesc&) noexcept;
-    static void           destroy(RenderDeviceT*)          noexcept;
-
-    // ── Backend introspection ────────────────────────────────────────
-    TierLevel         tier()           const noexcept;
-    BackendHint       active_backend() const noexcept;
-    const SystemCaps& caps()           const noexcept;
-    const XeServices& services()       const noexcept;
-
-    // ── Frame lifecycle ──────────────────────────────────────────────
-    void begin_frame()                                        noexcept;
-    void end_frame()                                          noexcept;
-    void present()                                            noexcept;
-
-    // ── Synchronisation ──────────────────────────────────────────────
-    void flush()                                              noexcept;
-    void finish()                                             noexcept;
-
-    // ── Submission ───────────────────────────────────────────────────
-    void submit      (CommandBuffer& cmdbuf)                  noexcept;
-    void submit_batch(const CommandBuffer* const* bufs,
-                      uint32_t count)                         noexcept;
-
-    // ── Buffer resources ─────────────────────────────────────────────
-    [[nodiscard]] BufferHandle create_buffer        (const BufferDesc&)         noexcept;
-    void                       update_buffer        (BufferHandle, const void*,
-                                                     uint32_t, uint32_t offset=0) noexcept;
-    void                       destroy_buffer       (BufferHandle)              noexcept;
-
-    // ── Texture resources ────────────────────────────────────────────
-    [[nodiscard]] TextureHandle create_texture       (const TextureDesc&)       noexcept;
-    void                        update_texture       (TextureHandle,
-                                                      const TextureUpdate&)     noexcept;
-    void                        destroy_texture      (TextureHandle)            noexcept;
-    [[nodiscard]] TextureHandle create_render_target (const RenderTargetDesc&)  noexcept;
-    void                        destroy_render_target(TextureHandle)            noexcept;
-
-    // ── Sampler resources (new in 0.4) ───────────────────────────────
-    // On GL Legacy, internally creates a compiled display list.
-    // On GL4/D3D11/Metal, maps to a real sampler state object.
-    // On console backends without a sampler concept, stores state applied at bind.
-    [[nodiscard]] SamplerHandle create_sampler  (const SamplerDesc&)            noexcept;
-    void                        destroy_sampler (SamplerHandle)                 noexcept;
-
-    // ── Shader resources ─────────────────────────────────────────────
-    [[nodiscard]] ShaderHandle create_shader  (const ShaderDesc&)               noexcept;
-    void                       destroy_shader (ShaderHandle)                    noexcept;
-
-    // ── Pipeline resources ───────────────────────────────────────────
-    [[nodiscard]] PipelineHandle create_pipeline  (const PipelineDesc&)         noexcept;
-    void                         destroy_pipeline (PipelineHandle)              noexcept;
-
-    // ── Native handle access (new in 0.4) ────────────────────────────
-    // O(1) array lookup — single pointer dereference into the backend table.
-    // Result type is backend-specific; cast via the appropriate extension header.
-    void* get_native_handle (XeHandleType type, uint32_t handle) const noexcept;
-
-    // Extension struct negotiation — typed native access beyond single handles.
-    void* query_extension   (uint32_t extension_id)              const noexcept;
-
-    // Exposes the opaque backend context for use in extension header helpers.
-    BackendContext* backend_ctx() const noexcept;
-
-    // ── Memory stats ─────────────────────────────────────────────────
-    void query_memory_usage(RenderMemoryStats& out) const noexcept;
-
-    // ── Debug ────────────────────────────────────────────────────────
-    void        set_debug_label(PipelineHandle, const char*) noexcept;
-    void        set_debug_label(BufferHandle,   const char*) noexcept;
-    void        set_debug_label(TextureHandle,  const char*) noexcept;
-    void        set_debug_label(SamplerHandle,  const char*) noexcept;
-    const char* last_error()                           const noexcept;
-
-    RenderDeviceT(const RenderDeviceT&) = delete;
-    RenderDeviceT& operator=(const RenderDeviceT&) = delete;
-
-private:
-    DispatchCore<BackendPolicy_Dynamic> _dispatch;
-    SystemCaps  _caps;
-    XeServices  _svc;
-    BackendHint _backend;
-};
-
-// ── N64 static specialization ─────────────────────────────────────────────
-// Defined in xe_backend_n64.hpp — only compiled on XE_PLATFORM_N64 builds.
-// BackendContext is embedded BY VALUE — no heap allocation, no pointer chase.
-template<>
-class RenderDeviceT<BackendPolicy_N64_RDP> {
-public:
-    static RenderDeviceT* create (const RenderDeviceDesc&) noexcept;
-    static void           destroy(RenderDeviceT*)          noexcept;
-
-    // Public interface identical to the dynamic specialization.
-    // Every call is a direct function call — zero pointer indirection.
-
-    [[nodiscard]] BufferHandle create_buffer(const BufferDesc& d) noexcept {
-        return n64_rdp_buffer_create(&_ctx, &d);   // direct call, inlineable
-    }
-    void submit_batch(const CommandBuffer* const* bufs, uint32_t n) noexcept {
-        n64_rdp_submit_batch(&_ctx, bufs, n);       // direct call
-    }
-    // Native handle: direct array index, no function pointer at all
-    void* get_native_handle(XeHandleType t, uint32_t h) const noexcept {
-        uint32_t idx = h & HANDLE_INDEX_MASK;
-        switch (t) {
-            case XeHandleType::Buffer:  return _ctx.rdp_buffers[idx];
-            case XeHandleType::Texture: return &_ctx.tex_objs[idx];
-            default:                    return nullptr;
-        }
-    }
-    // ... full interface follows same pattern
-
-private:
-    N64BackendContext _ctx;   // Embedded by value — no heap, no pointer chase
-    SystemCaps        _caps;
-    XeServices        _svc;
-};
-
-// GCN_GX and PS3_GCM specializations follow the same pattern.
-// Defined in xe_backend_gcn.hpp and xe_backend_ps3.hpp respectively.
-```
-
-### 10.4 `CommandBufferT<Policy>`
-
-The same policy parameterization applies to `CommandBuffer`. On N64 and GC/Wii the
-static specialization encodes directly into the native display list format — the
-generic decode pass in `submit()` is eliminated entirely.
-
-```cpp
-template<typename Policy = BackendPolicy_Dynamic>
-class CommandBufferT;
-
-// Dynamic: generic tagged byte-stream, decoded during submit()
-template<>
-class CommandBufferT<BackendPolicy_Dynamic> : public CommandBufferBase {
-public:
-    explicit CommandBufferT(XeAllocator alloc = XeAllocator::make_default(),
-                            uint32_t initial_capacity = 64 * 1024) noexcept;
-    ~CommandBufferT() noexcept;
-    void reset() noexcept;
-
-    // ── Render pass ──────────────────────────────────────────────────
-    void begin_pass(const PassDesc&) noexcept;
-    void end_pass()                  noexcept;
-
-    // ── State binding ────────────────────────────────────────────────
-    void bind_pipeline      (PipelineHandle)                           noexcept;
-    void bind_vertex_buffer (BufferHandle, uint8_t slot, uint32_t stride,
-                             uint32_t offset = 0)                      noexcept;
-    void bind_index_buffer  (BufferHandle, IndexType, uint32_t offset=0) noexcept;
-    void bind_texture       (TextureHandle, SamplerHandle, uint8_t unit) noexcept;
-    void bind_uniform_buffer(BufferHandle, uint8_t binding)            noexcept;
-
-    // ── Viewport / scissor ───────────────────────────────────────────
-    void set_viewport(float x, float y, float w, float h,
-                      float min_d = 0.f, float max_d = 1.f)            noexcept;
-    void set_scissor (int32_t x, int32_t y, uint32_t w, uint32_t h)   noexcept;
-
-    // ── Fixed-function state helpers (Legacy / Microcode / TEV) ─────
-    void set_matrix_modelview  (const float m[16]) noexcept;
-    void set_matrix_projection (const float m[16]) noexcept;
-    void set_light             (uint8_t idx, const LightDesc&) noexcept;
-    void set_material          (const MaterialDesc&)           noexcept;
-    void set_fog               (const FogDesc&)                noexcept;
-
-    // ── Uniforms (Modern / Extended) ─────────────────────────────────
-    void push_constants(const void* data, uint32_t bytes,
-                        uint32_t offset = 0)                           noexcept;
-
-    // ── Draw ─────────────────────────────────────────────────────────
-    void draw                    (uint32_t vertex_count,
-                                  uint32_t first_vertex = 0)           noexcept;
-    void draw_indexed            (uint32_t index_count,
-                                  uint32_t first_index = 0,
-                                  int32_t  vertex_offset = 0)          noexcept;
-    void draw_instanced          (uint32_t vertex_count,
-                                  uint32_t instance_count,
-                                  uint32_t first_vertex = 0,
-                                  uint32_t first_instance = 0)         noexcept;
-    void draw_indexed_instanced  (uint32_t index_count,
-                                  uint32_t instance_count,
-                                  uint32_t first_index = 0,
-                                  int32_t  vertex_offset = 0,
-                                  uint32_t first_instance = 0)         noexcept;
-
-    // ── Inline buffer update (streaming geometry) ────────────────────
-    void update_buffer_inline(BufferHandle, const void*, uint32_t bytes,
-                              uint32_t offset = 0)                     noexcept;
-
-    // ── GPU profiling scopes ─────────────────────────────────────────
-    void begin_gpu_scope (const char* name)                            noexcept;
-    void end_gpu_scope   ()                                            noexcept;
-
-    // ── Debug markers ────────────────────────────────────────────────
-    void push_debug_group  (const char* label)                         noexcept;
-    void pop_debug_group   ()                                          noexcept;
-    void insert_debug_marker(const char* label)                        noexcept;
-
-    // ── Inspection ───────────────────────────────────────────────────
-    uint32_t    recorded_command_count() const noexcept;
-    uint32_t    used_bytes()             const noexcept;
-    uint32_t    capacity_bytes()         const noexcept;
-    bool        is_empty()               const noexcept;
-
-    CommandBufferT(CommandBufferT&&) noexcept;
-    CommandBufferT& operator=(CommandBufferT&&) noexcept;
-    CommandBufferT(const CommandBufferT&) = delete;
-    CommandBufferT& operator=(const CommandBufferT&) = delete;
-
-private:
-    uint8_t*    _data;
-    uint32_t    _used, _capacity, _cmd_count;
-    XeAllocator _alloc;
-};
-
-// N64 static specialization — encodes directly into rdpq display list format.
-// submit() is a DMA kickoff, not a decode loop.
-template<>
-class CommandBufferT<BackendPolicy_N64_RDP> {
-public:
-    explicit CommandBufferT(XeAllocator alloc, uint32_t capacity) noexcept;
-
-    // Public interface identical to dynamic specialization.
-    // Internally: each method writes rdpq_* commands into _dl buffer.
-
-    void bind_pipeline(PipelineHandle h) noexcept {
-        // Reads baked combiner config from pipeline table;
-        // emits SET_COMBINE_MODE directly into the display list.
-        const auto& cfg = _ctx->pipeline_table[h & HANDLE_INDEX_MASK];
-        rdpq_set_combiner_raw(cfg.combiner_word);
-    }
-    void bind_vertex_buffer(BufferHandle h, uint8_t, uint32_t, uint32_t offset = 0) noexcept {
-        _verts = (const uint8_t*)_ctx->rdp_buffers[h & HANDLE_INDEX_MASK] + offset;
-    }
-    void draw_indexed(uint32_t count, uint32_t first, int32_t) noexcept {
-        rdpq_triangle_strip((const void*)((uintptr_t)_verts + first * sizeof(uint16_t)), count);
-    }
-    // submit() = rspq_flush() / DMA kickoff — no decode pass
-    // On a 93MHz R4300 this is the difference between shipping and not shipping.
-
-private:
-    uint64_t* _dl;        // rdpq display list buffer
-    uint32_t  _dl_used, _dl_capacity;
-    const void* _verts = nullptr;
-    const N64BackendContext* _ctx;  // pipeline table access
-};
-```
-
-### 10.5 `xe_platform_config.hpp` — The Alias Convention
-
-Templates do not leak upward. A single `using` alias, generated by CMake or set by
-a `#define`, makes all client code use `RenderDevice` without knowing the policy:
-
-```cpp
-// xe_platform_config.hpp — generated by build system or set manually
-
-#if   defined(XE_PLATFORM_N64)
-    using RenderDevice  = RenderDeviceT<BackendPolicy_N64_RDP>;
-    using CommandBuffer = CommandBufferT<BackendPolicy_N64_RDP>;
-#elif defined(XE_PLATFORM_GAMECUBE) || defined(XE_PLATFORM_WII)
-    using RenderDevice  = RenderDeviceT<BackendPolicy_GCN_GX>;
-    using CommandBuffer = CommandBufferT<BackendPolicy_GCN_GX>;
-#elif defined(XE_PLATFORM_PS3)
-    using RenderDevice  = RenderDeviceT<BackendPolicy_PS3_GCM>;
-    using CommandBuffer = CommandBufferT<BackendPolicy_PS3_GCM>;
-#else
-    // Desktop / mobile — dynamic dispatch, all backends available
-    using RenderDevice  = RenderDeviceT<BackendPolicy_Dynamic>;
-    using CommandBuffer = CommandBufferT<BackendPolicy_Dynamic>;
-#endif
-```
-
-All downstream code is written against `RenderDevice` and `CommandBuffer` with no
-awareness of the policy. On N64, every call is a direct function call. On desktop,
-every call is one pointer indirection through the vtable.
+**Rationale for in-band encoding:** on console targets we cannot afford a parallel generation table — that would double the indirection count on every handle use. Packing gen+type into the handle itself keeps resolve a single AND + compare, cache-free if the slot fits in L1. The 20/8/4 split is an engineering compromise: larger indices reduce slot-recycling pressure (fewer generation bumps, longer stale-detection window) but eat into the generation bits. 20/8/4 hits the sweet spot for every identified use case in the engine.
 
 ---
 
-## 11. Native Handle Access — Extension Headers
+## 11. Static vs Dynamic Dispatch — `RenderDeviceT<Policy>`
 
-Per-backend extension headers provide type-safe access to underlying API objects.
-They live in a separate include path (`xe/native/`) and are **never included by the
-middleware core itself**. The client explicitly includes the header when it knows
-which backend is active.
+### 11.1 Policy Tags
 
-### 11.1 `xe/native/xe_native_gl4.hpp`
+Six compile-time tags, each an empty struct carrying no data:
 
-```cpp
-// Only include when active_backend() == BackendHint::GL4.
-#include <GL/gl.h>
-#include "xe_render_device.hpp"
+- `BackendPolicy_Dynamic` — runtime vtable dispatch, default on desktop and mobile.
+- `BackendPolicy_N64_RDP`, `BackendPolicy_GCN_GX`, `BackendPolicy_PS3_GCM` — console static dispatch.
+- `BackendPolicy_GL4`, `BackendPolicy_SoftBuiltin` — optional static dispatch for dev/CI single-backend builds.
 
-namespace xe::native::gl4 {
+The policy tag is purely a compile-time marker. No backend-specific header is included through the policy header itself.
 
-struct GL4DeviceExt {
-    static constexpr uint32_t kID = 0x474C3400; // "GL4\0"
+### 11.2 DispatchCore<Policy>
 
-    GLuint (*get_buffer_name)  (BackendContext*, BufferHandle)   noexcept;
-    GLuint (*get_texture_name) (BackendContext*, TextureHandle)  noexcept;
-    GLuint (*get_program_id)   (BackendContext*, PipelineHandle) noexcept;
-    GLuint (*get_sampler_name) (BackendContext*, SamplerHandle)  noexcept;
+A thin class holding the vtable (by value) and the opaque `BackendContext*`. Every public method is an `inline` forwarder over the corresponding vtable slot.
 
-    // Escape to raw GL — make the device's context current on the calling thread
-    void   (*make_current)     (BackendContext*)                 noexcept;
-    void   (*release_current)  (BackendContext*)                 noexcept;
+**Implementation approach:** on the dynamic policy, each method compiles to one indirect call through the vtable. On any static policy, the specialized `DispatchCore<Tag>` replaces vtable indirection with a direct call to the backend's exported symbol — with LTO the dispatch shell disappears entirely, and the call site becomes a register-to-register hand-off into the backend.
 
-    // Insert a GL fence before and after native GL calls for safe interop
-    GLsync (*insert_fence)     (BackendContext*)                 noexcept;
-};
+**Rationale:** centralizing the `_vt.slot(_ctx, …)` pattern in one class keeps `RenderDeviceT` readable and prevents drift between the vtable layout and its public users. One forwarder is a handful of instructions; the compiler keeps `_vt` in registers across back-to-back calls (resource loading loops, batch binding), and the vtable itself is ~256 bytes — hot in L1 after the first draw.
 
-// Typed access helpers — return 0 / nullptr if backend is not GL4
-inline const GL4DeviceExt* get_ext(RenderDevice* dev) noexcept {
-    return static_cast<const GL4DeviceExt*>(dev->query_extension(GL4DeviceExt::kID));
-}
-inline GLuint buffer_name (RenderDevice* dev, BufferHandle  h) noexcept {
-    auto* e = get_ext(dev); return e ? e->get_buffer_name(dev->backend_ctx(), h) : 0;
-}
-inline GLuint texture_name(RenderDevice* dev, TextureHandle h) noexcept {
-    auto* e = get_ext(dev); return e ? e->get_texture_name(dev->backend_ctx(), h) : 0;
-}
+### 11.3 RenderDeviceT<Policy>
 
-} // namespace xe::native::gl4
-```
+Two specialization shapes matter: the dynamic one (desktop/mobile shipping builds) and the per-console static ones. The public method surface is *identical* across specializations — the client never sees the policy.
 
-### 11.2 `xe/native/xe_native_gl_legacy.hpp`
+**Dynamic specialization (`BackendPolicy_Dynamic`):** every public method delegates to `_dispatch.method(args)`. The member layout is `DispatchCore + SystemCaps + XeServices + BackendHint`. `RenderDeviceT::create()` calls the backend factory, stores the returned `BackendContext*` in the dispatch core, and calls `SystemCaps::query_gpu()` to fill the GPU caps. `RenderDeviceT::destroy()` forwards to the vtable's `shutdown` slot and frees the device.
 
-```cpp
-#include <GL/gl.h>
-#include "xe_render_device.hpp"
+**Static specializations (`N64_RDP`, `GCN_GX`, `PS3_GCM`):** every method calls the backend's exported symbol directly. `BackendContext` is *embedded by value* — no heap allocation, no pointer chase. `get_native_handle()` is an array index, not a function pointer; the compiler reduces it to an address computation.
 
-namespace xe::native::gl_legacy {
+**`submit()` on the dynamic specialization** wraps `submit_batch` with `count = 1`, forwarding a pointer to the single command buffer. The wrapper is inlined.
 
-struct GL1DeviceExt {
-    static constexpr uint32_t kID = 0x474C3100; // "GL1\0"
+**Rationale for embedding by value on consoles:** N64 and GameCube have no heap worth using — it is either absent (N64 with libdragon bare-metal) or a simple bump allocator with catastrophic fragmentation risk. Every runtime heap allocation we avoid is one less place the game can run out of memory. Embedding the context eliminates the allocation without changing the public API surface, which is the entire point of the policy mechanism.
 
-    GLuint (*get_texture_name)    (BackendContext*, TextureHandle)   noexcept;
-    // Display list access — for advanced native GL1 optimizations
-    GLuint (*get_sampler_list)    (BackendContext*, SamplerHandle)   noexcept;
-    GLuint (*get_pipeline_list)   (BackendContext*, PipelineHandle)  noexcept;
-    void   (*make_current)        (BackendContext*)                  noexcept;
-    void   (*release_current)     (BackendContext*)                  noexcept;
-};
+**Rationale for template specialization over `#ifdef`:** templates give us one source tree with multiple backends compiled in. The alias (§11.5) makes that invisible to client code. Using `#ifdef` across the renderer would fork the source per platform and make cross-platform CI build verification impossible.
 
-inline const GL1DeviceExt* get_ext(RenderDevice* dev) noexcept {
-    return static_cast<const GL1DeviceExt*>(dev->query_extension(GL1DeviceExt::kID));
-}
+### 11.4 CommandBufferT<Policy>
 
-} // namespace xe::native::gl_legacy
-```
+The same policy parameterization applies to `CommandBuffer`. The public record surface is identical across specializations.
 
-### 11.3 `xe/native/xe_native_gcn_gx.hpp`
+**Dynamic specialization:** commands serialize into a tagged byte stream — one opcode byte per command plus packed arguments. `submit()` walks the stream, decoding each tag into the appropriate vtable slot call.
 
-```cpp
-#include <gccore.h>   // libogc
-#include "xe_render_device.hpp"
+**Static specializations:** commands serialize *directly into the native display-list format* — rdpq words on N64, GX FIFO on GameCube, libGCM command stream on PS3. `submit()` is a DMA kickoff with no decode.
 
-namespace xe::native::gcn_gx {
+`CommandBufferT` inherits from an opaque `CommandBufferBase` that exposes a single read accessor returning a `(const uint8_t*, uint32_t bytes)` pair. This is what the vtable's `submit_batch` sees — backends decode only that narrow surface without coupling to the policy-specific layout.
 
-struct GXDeviceExt {
-    static constexpr uint32_t kID = 0x47585F47; // "GX_G"
+**Rationale for direct encoding on consoles:** on a 93 MHz R4300 (N64), a generic decode pass would cost thousands of cycles per draw — unaffordable when the frame budget is 16.6 ms at 60 fps. Going straight to rdpq words means every `draw_indexed` is a few writes to a DMA-ready buffer. On desktop, the decode pass is cheap relative to GPU submission latency, and the neutrality of the byte stream lets backends evolve without changing command encoding.
 
-    GXTexObj* (*get_tex_obj)  (BackendContext*, TextureHandle)  noexcept;
-    void*     (*get_dl_buf)   (BackendContext*, uint32_t* out_size) noexcept; // raw GX DL buffer
-};
+### 11.5 The Alias Convention — `xe_platform_config.hpp`
 
-inline const GXDeviceExt* get_ext(RenderDevice* dev) noexcept {
-    return static_cast<const GXDeviceExt*>(dev->query_extension(GXDeviceExt::kID));
-}
+A single header, generated by CMake (or set manually by a `#define`), aliases `xe::RenderDevice` to the appropriate `RenderDeviceT<Tag>` and `xe::CommandBuffer` to the matching `CommandBufferT<Tag>`. Every downstream file references `xe::RenderDevice`; the policy never leaks.
 
-} // namespace xe::native::gcn_gx
-```
-
-### 11.4 `xe/native/xe_native_ps3_gcm.hpp`
-
-```cpp
-#include <rsx/rsx.h>       // PSL1GHT
-#include <sysutil/video.h>
-#include "xe_render_device.hpp"
-
-namespace xe::native::ps3_gcm {
-
-struct PS3GCMDeviceExt {
-    static constexpr uint32_t kID = 0x50533347; // "PS3G"
-
-    rsxBuffer*      (*get_rsx_buffer)  (BackendContext*, TextureHandle)  noexcept;
-    gcmContextData* (*get_gcm_context) (BackendContext*)                  noexcept;
-    uint32_t        (*get_rsx_offset)  (BackendContext*, BufferHandle)   noexcept;
-};
-
-inline const PS3GCMDeviceExt* get_ext(RenderDevice* dev) noexcept {
-    return static_cast<const PS3GCMDeviceExt*>(dev->query_extension(PS3GCMDeviceExt::kID));
-}
-
-} // namespace xe::native::ps3_gcm
-```
-
-### 11.5 Native Handle Access Under Static Dispatch
-
-With a static backend policy, `get_native_handle()` eliminates even the single array
-dereference overhead — the compiler sees the implementation directly and reduces the
-call to an address computation:
-
-```cpp
-// On an N64 static build the compiler sees this:
-auto* raw = dev->get_native_handle(XeHandleType::Texture, tex);
-auto* obj = static_cast<rdpq_tile_descriptor_t*>(raw);
-
-// As equivalent to:
-auto* obj = &n64_ctx.tex_objs[tex & HANDLE_INDEX_MASK];
-// A single address computation. No function call.
-```
+**Rationale:** template parameters are a compile-time concern, not a public-API concern. Exposing them would force client code to either write templates or hard-code a backend. The alias layer makes client code uniform across platforms — the same file compiles on N64, PS3, and Linux with different behavior underneath.
 
 ---
 
-## 12. `SamplerDesc` and `SamplerHandle`
+## 12. Native Handle Access — Extension Headers
 
-```cpp
-using SamplerHandle = uint32_t;
+For clients that need to reach the underlying API object (for example, to plug in ImGui's GL backend, or to share a texture with a compute library), the middleware provides two vtable slots: `get_native_handle(XeHandleType, uint32_t) → void*` and `query_extension(uint32_t extension_id) → void*`.
 
-enum class WrapMode : uint8_t {
-    Repeat, ClampToEdge, MirroredRepeat,
-    ClampToBorder,  // Desktop GL / D3D11 only; ignored on console / GLES2
-};
+Per-backend extension headers under `xe/native/` provide typed wrappers. Each exposes an `Ext` struct with a constexpr `kID` (a four-character code) and a table of backend-specific function pointers. The client includes the header only when it knows which backend is active — these headers are *never* pulled in by the middleware core, which keeps the engine layer free of backend symbols.
 
-enum class FilterMode : uint8_t {
-    Nearest,
-    Linear,
-    LinearMip,    // Trilinear: linear + linear mip
-    NearestMip,   // Bilinear:  linear + nearest mip
-    Anisotropic,  // Requires has_anisotropic; falls back to LinearMip if unsupported
-};
+**Implementation approach:** the client calls `dev->query_extension(GL4DeviceExt::kID)`, receives a `void*` that the header's inline helper casts to `GL4DeviceExt*`, and from there invokes typed accessors. If the backend does not recognize the ID, it returns `nullptr`; helpers null-check and return 0/nullptr on mismatch. On a static backend policy, `get_native_handle` reduces to an array index — one address computation, no function call.
 
-struct SamplerDesc {
-    WrapMode   wrap_u        = WrapMode::Repeat;
-    WrapMode   wrap_v        = WrapMode::Repeat;
-    WrapMode   wrap_w        = WrapMode::Repeat; // Tex3D only
-    FilterMode filter_min    = FilterMode::LinearMip;
-    FilterMode filter_mag    = FilterMode::Linear;
-    uint8_t    aniso_level   = 1;                // 1 = no anisotropy; max from GPUCaps
-    float      lod_bias      = 0.0f;
-    float      lod_min       = 0.0f;
-    float      lod_max       = 1000.0f;
-    bool       srgb          = false;
-    bool       compare_enable = false;           // For shadow / depth samplers
-    CompareFunc compare_func  = CompareFunc::Less;
-    float      border_color[4] = {0,0,0,1};     // Used only with ClampToBorder
-    const char* debug_name    = nullptr;
-};
-```
+The existing headers cover GL4 (GLuint accessors, `make_current`/`release_current`, `insert_fence`), GL Legacy (GLuint accessors, compiled display-list names), GCN GX (`GXTexObj*`, raw DL buffer pointer), and PS3 GCM (`rsxBuffer*`, `gcmContextData*`, RSX offsets).
 
-**Backend behaviour summary:**
+**Rationale:** forcing every advanced use case into the generic API would bloat the surface for everybody. Making native access opt-in keeps the default build clean, and the `kID` negotiation gives the backend full type control over what it exposes. No dynamic cast, no RTTI, no virtual dispatch.
+
+---
+
+## 13. SamplerDesc and SamplerHandle
+
+`SamplerDesc` is a POD containing:
+
+- wrap modes per axis (`WrapMode`: Repeat, ClampToEdge, MirroredRepeat, ClampToBorder)
+- min and mag filter (`FilterMode`: Nearest, Linear, LinearMip, NearestMip, Anisotropic)
+- anisotropy level
+- LOD bias, min, and max
+- sRGB flag
+- comparison-enable and comparison function for shadow/depth samplers
+- border color (used only with `ClampToBorder`)
+- optional debug name
+
+`SamplerHandle` is a 32-bit handle following §10's encoding.
+
+### 13.1 Backend Implementations
 
 | Backend | Implementation |
 |---|---|
-| GL Legacy | Compiled GL display list of `glTexParameter*` calls; called once per bind |
-| GL4 | `glGenSamplers` / `glSamplerParameter*` — real sampler object |
-| GLES2 | Per-texture `glTexParameter*` calls inline (no sampler objects in GLES2) |
-| GLES3 | `glGenSamplers` — real sampler object (GLES3 has `GL_OES_sampler_objects`) |
+| GL Legacy | Compiled GL display list of `glTexParameter*` calls; replayed by `glCallList` at bind |
+| GL4 | `glGenSamplers` / `glSamplerParameter*` — native sampler object |
+| GLES2 | No sampler objects; per-texture `glTexParameter*` calls inline at bind |
+| GLES3 | `glGenSamplers` — native sampler object (GLES3 core; *no extension required* — correction from rev 0.6 which cited `GL_OES_sampler_objects`, a GLES2 extension) |
 | D3D11 | `ID3D11SamplerState` |
 | Metal | `MTLSamplerState` |
-| GCN_GX | GX has no sampler object; state stored in `GL1SamplerEntry`; applied at bind via `GX_InitTexObjFilterMode` |
-| N64_RDP | TMEM tile parameters embedded in the draw command; state stored and applied at `bind_texture()` |
+| GCN_GX | No sampler object; state cached and applied at bind via `GX_InitTexObjFilterMode` etc. |
+| N64_RDP | TMEM tile parameters embedded in the draw command; state applied at bind |
 | PS3_GCM | `rsxTextureControl` + `rsxTextureFilter`; state stored, applied at bind |
-| SoftBuiltin | Sampler state applied in tile inner loop |
+| SoftBuiltin | Sampler parameters threaded into the tile inner loop |
 | Null | No-op |
 
-`bind_texture()` in `CommandBufferT` now takes both a `TextureHandle` and a
-`SamplerHandle`. They are independent resources:
+`CommandBuffer::bind_texture(TextureHandle, SamplerHandle, uint8_t unit)` takes both handles; samplers are reusable across textures.
 
-```cpp
-cmdbuf.bind_texture(albedo_tex, trilinear_sampler, 0);
-cmdbuf.bind_texture(normal_tex, no_mip_sampler,    1);
-```
+### 13.2 Rationale
 
----
+D3D11, Metal, and modern GL decoupled sampler state from texture state because the same texture is often used with different filtering in different passes — mip vs no-mip for UI vs scene, clamp vs repeat for atlas vs tiling, trilinear vs anisotropic based on distance LOD. Matching the modern model keeps the client code portable.
 
-## 13. `PipelineDesc` — Full Union (Unchanged from 0.3, Reproduced for Completeness)
-
-```cpp
-struct PipelineDesc {
-    TierLevel tier;
-
-    union {
-        MicrocodePipelineState microcode; // TierLevel::Microcode
-        TEVPipelineState       tev;       // TierLevel::TEV
-        FixedFunctionState     fixed;     // TierLevel::Legacy
-        ProgrammableState      prog;      // TierLevel::Modern / Extended
-    } stage;
-
-    VertexLayout      vertex_layout;
-    RasterizerState   rasterizer;
-    BlendState        blend;
-    DepthStencilState depth_stencil;
-    PrimitiveType     primitive             = PrimitiveType::Triangles;
-
-    uint8_t     color_attachment_count      = 1;
-    PixelFormat color_formats[8];
-    PixelFormat depth_format                = PixelFormat::Depth24Stencil8;
-    uint8_t     msaa_samples                = 1;
-};
-```
-
-Tier-specific state structs (`MicrocodePipelineState`, `TEVPipelineState`,
-`FixedFunctionState`, `ProgrammableState`) are defined in full in Revision 0.3,
-Section 7. They are unchanged.
+Backends that lack true sampler objects simply cache the state and apply it at bind, so the client pays nothing for the abstraction on those backends — the `SamplerHandle` resolves to a small state struct and is applied through whatever primitives that backend exposes.
 
 ---
 
-## 14. `ShaderDesc`
+## 14. PipelineDesc
 
-```cpp
-struct ShaderDesc {
-    ShaderStage stage;
-    // Source forms — backend picks what it can use; ignores the rest
-    const char* glsl_source;          // GL 3.3+ / GLES 3.0+
-    const char* glsl_es_100_source;   // GLES 2.0 / GL Legacy
-    const char* hlsl_source;          // D3D11
-    const char* metal_source;         // MSL
-    const char* cg_source;            // PS3 Cg (PSL1GHT / PSGL)
-    // Precompiled forms (take precedence over source)
-    const void* spirv_bytecode;   uint32_t spirv_size;
-    const void* dxbc_bytecode;    uint32_t dxbc_size;
-    const void* metallib_bytecode;uint32_t metallib_size;
-    const void* cg_microcode;     uint32_t cg_microcode_size;
-    const char* entry_point  = "main";
-    const char* debug_name;
-};
-```
+A descriptor composed of tier-specific state plus common rendering state.
 
----
+### 14.1 Common Fields
 
-## 15. `BackendRegistry`
+`tier` (discriminator), `vertex_layout`, `rasterizer`, `blend`, `depth_stencil`, `primitive`, `color_attachment_count`, `color_formats[8]`, `depth_format`, `msaa_samples`.
 
-```cpp
-struct BackendInfo {
-    BackendHint hint;
-    const char* name;             // "OpenGL 4.x (Glaze)"
-    const char* short_name;       // "gl4"
-    TierLevel   tier;
-    bool        available;
-    bool        hardware_accel;   // false for Soft* and Null
-    const char* unavailable_reason; // nullptr if available
-};
+### 14.2 Tier-Specific Payload (one of four, selected by `tier`)
 
-class BackendRegistry {
-public:
-    static void               probe          (const XeServices&)      noexcept;
-    static uint32_t           count          ()                        noexcept;
-    static const BackendInfo& get            (uint32_t index)         noexcept;
-    static const BackendInfo* find           (BackendHint)            noexcept;
-    static BackendHint        best_available ()                        noexcept;
-    static bool               is_available   (BackendHint)            noexcept;
-    static const BackendHint* platform_candidates()                   noexcept;
-};
-```
+- **`MicrocodePipelineState`** (Microcode tier): RDP combiner equation, cycle type (1-cycle or 2-cycle), TMEM tile configuration, fill color for cycle-0 clears.
+- **`TEVPipelineState`** (TEV tier): up to 16 TEV stage descriptors (color/alpha combiner equations, texture source, register routing), hardware light configuration (up to 8 lights), fog setup.
+- **`FixedFunctionState`** (Legacy tier): matrix stack mode, enabled lights, material properties, fog, alpha test, texture environment (modulate/replace/decal), per-vertex lighting toggles.
+- **`ProgrammableState`** (Modern/Extended tier): shader handles (vertex, fragment, optionally geometry/tessellation), push-constant layout, uniform buffer bindings, sampler bindings, per-attachment write mask.
+
+### 14.3 Implementation Approach
+
+A C-style `union` of the four payloads, discriminated by `tier`. The client populates exactly one branch; backends read only their tier's field. The `union` is wrapped in a named outer struct so the common fields precede it.
+
+### 14.4 Rationale
+
+The alternative — a single unified pipeline struct that merges every tier's state — would:
+
+1. Balloon `sizeof(PipelineDesc)` with fields inapplicable to the target platform.
+2. Confuse the client about which fields actually affect rendering on the active backend.
+3. Force the asset compiler to emit every field, which fights the "platform-native binary" principle (§18).
+
+The tier union makes the applicable state surface local to the tier the client is targeting, which matches how the client's shader/material system thinks about pipelines anyway. The discriminated union is decodable by the asset compiler and by the runtime without polymorphism or hidden allocation.
 
 ---
 
-## 16. `RenderDeviceDesc`
+## 15. ShaderDesc
 
-```cpp
-struct RenderDeviceDesc {
-    RenderSurface surface;
-    BackendHint   backend_hint   = BackendHint::Auto;
-    XeServices    services;
-    uint32_t      max_buffers    = 4096;
-    uint32_t      max_textures   = 2048;
-    uint32_t      max_samplers   = 512;    // new in 0.4
-    uint32_t      max_pipelines  = 256;
-    uint32_t      max_shaders    = 512;
-    bool          enable_debug_layer = false;
-    SoftRastDesc  soft_rast;               // SoftBuiltin tuning
-    uint32_t      gcm_fifo_kb    = 512;    // PS3 GCM command buffer ring (default 512 KB)
-};
-```
+A descriptor carrying multiple source forms and multiple precompiled forms, plus stage, entry point, and debug name. Source forms cover GLSL, GLSL ES 1.00, HLSL, MSL, and Cg. Precompiled forms cover SPIR-V, DXBC, metallib, and Cg microcode — each as a `(const void* bytecode, uint32_t size)` pair.
+
+**Implementation approach:** a POD with pointer+size pairs for every format. Unused pointers are `nullptr`. The backend walks its known formats in priority order (precompiled first, then source). The client owns the memory backing each pointer — the descriptor holds no allocations of its own.
+
+**Rationale:** in a multi-platform engine the asset compiler emits every format for every shader source file; the runtime binary carries all of them and the backend picks one. Avoiding a polymorphic `ShaderDesc` hierarchy keeps the compiler output flat, mmappable, and free of version-sensitive vtable layouts.
 
 ---
 
-## 17. Asset Pipeline
+## 16. BackendRegistry
 
-### 17.1 Architecture Overview
+A process-lifetime singleton holding a `BackendInfo` array — one entry per `BackendHint`. Each entry carries `hint`, `name` (human-readable), `short_name` (tokenized), `tier`, `available`, `hardware_accel`, and an `unavailable_reason` string (null when available).
 
-The asset pipeline is a **build-time tool**, not a runtime component. Its job is to
-translate any supported source format into a platform-native binary that the runtime
-loads with zero conversion overhead. The compiler, the asset formats, and the
-runtime loader are three distinct concerns with clean boundaries.
+Public methods: `probe(const XeServices&)`, `count()`, `get(uint32_t index)`, `find(BackendHint)`, `best_available()`, `is_available(BackendHint)`, `platform_candidates()`.
 
-```
-┌───────────────────────────────────────────────────────────────┐
-│  Source Assets (checked into source control)                  │
-│  .glb / .gltf / .fbx / .obj / .dae / .blend / .3ds           │
-│  .png / .jpg / .tga / .hdr / .exr / .dds / .ktx2             │
-│  .png.xetexprop  (sidecar: usage, wrap, filter, compression)  │
-└────────────────────────────┬──────────────────────────────────┘
-                             │  build-time step (CI / offline)
-                             ▼
-┌───────────────────────────────────────────────────────────────┐
-│  xe-asset-compiler  (standalone CLI tool, not linked in game) │
-│                                                               │
-│  Stage 1 — Import                                             │
-│    Any source format → Compiler IR                            │
-│    (cgltf / OpenFBX / tinyobjloader / stb_image / tinyexr)   │
-│    No source-format types survive past this stage.            │
-│                                                               │
-│  Stage 2 — Process                                            │
-│    Mesh optimization      (meshoptimizer)                     │
-│    Texture compression    (Basis Universal, libsquish)        │
-│    Platform tiling        (N64 TMEM, GX block, RSX swizzle)   │
-│    LOD generation         (meshoptimizer simplify)            │
-│    Mip chain generation   (Kaiser filter)                     │
-│    Animation baking       (resample, quantize)                │
-│    Material baking        (PBR → tier-appropriate PipelineDesc│
-│    Vertex quantization    (float32 → int16 normalized)        │
-│    Bounds computation                                         │
-│                                                               │
-│  Stage 3 — Export                                             │
-│    Processed IR → platform-native binary                      │
-└────────────────────────────┬──────────────────────────────────┘
-                             │
-                             ▼
-┌───────────────────────────────────────────────────────────────┐
-│  Runtime Binaries (stored in package registry / ROM)          │
-│  .xemesh  — mesh + materials + embedded texture refs          │
-│  .xetex   — texture (tiled, compressed, mip-chained)          │
-│  .xeanim  — baked animation clip                              │
-│  .xepkg   — multi-asset bundle                                │
-└────────────────────────────┬──────────────────────────────────┘
-                             │  runtime load
-                             ▼
-┌───────────────────────────────────────────────────────────────┐
-│  Runtime Loader (thin; one loop of create_* calls)            │
-│  mmap() / fread() → RenderDevice::create_buffer()             │
-│                    RenderDevice::create_texture()             │
-│                    RenderDevice::create_sampler()             │
-│                    RenderDevice::create_pipeline()            │
-└───────────────────────────────────────────────────────────────┘
-```
+**Implementation approach:** a static array sized to `BackendHint::_Count`. Entries are zero-initialized. `probe` is idempotent and one-shot — repeat calls are no-ops. The probe routine for each backend typically creates a throwaway context, queries extensions, destroys the context, and records the result. No heap allocation; the registry's storage is `.bss`.
 
-The **Intermediate Representation (IR)** is the compiler-private neutral type system.
-Every importer converts to IR; every exporter reads from IR. Adding a new source
-format costs only a new importer; adding a new target platform costs only a new
-exporter. The LLVM frontend/middleend/backend analogy is exact.
+`best_available()` walks the array in descending tier order and returns the first hardware-accelerated, available entry. If none qualify, it falls back to `SoftBuiltin` and finally `Null`.
 
-### 17.2 `xe-asset-compiler` CLI
+**Rationale:** backend probing is expensive (creating a test context alone can cost tens of milliseconds on desktop). Making the registry a static, thread-unsafe, one-shot matches that lifecycle exactly — the client cannot accidentally re-probe mid-frame.
 
-```
-xe-asset-compiler [options] <input> --target <platform> --output <path>
+---
 
-Targets:
-  n64          Nintendo 64 (libdragon)
-  gamecube     GameCube (libogc GX)
-  wii          Wii (libogc GX)
-  ps3          PlayStation 3 (PSL1GHT)
-  desktop-gl4  Desktop OpenGL 4.x
-  desktop-d3d11 Desktop Direct3D 11
-  ios-metal    iOS / macOS Metal
-  android      Android (ASTC + GLES3)
+## 17. RenderDeviceDesc
 
-Options:
-  --lod-levels  1–4          LOD count (default: 1)
-  --strip                    Convert to triangle strips (N64 / GC benefit)
-  --quantize-pos none|i16|i10 Vertex position quantization
-  --anim-rate   <fps>        Animation resample rate
-  --no-compress              Skip texture compression (debugging)
-  --verbose                  Log all processing decisions
-```
+Carries: `surface` (§6), `backend_hint`, `services` (§8), resource pool upper bounds (`max_buffers`, `max_textures`, `max_samplers`, `max_pipelines`, `max_shaders`), `enable_debug_layer` flag, `soft_rast` (SoftRastDesc), and `gcm_fifo_kb` (PS3 GCM command buffer ring size, default 512 KB).
 
-### 17.3 `.xetex` — Texture Binary Format
+The pool upper bounds are respected by the backend: a `BufferHandle` pool is sized to `max_buffers` at creation. This is critical on consoles where a growing `std::vector` is unacceptable; a fixed-size pool means bounded memory, and the capacity can be computed offline from the asset compiler's peak-use report.
 
-The compiled texture binary is a directly-mappable flat structure. The pixel data
-region points to bytes already in the exact memory layout the GPU expects — no
-conversion at load time.
+**`SoftRastDesc`** (not covered in rev 0.6; defined here): tile width/height in pixels, scanline batch size, per-pixel shader function pointer table, and a thread-affinity policy (single-threaded, coarse-tile-per-thread, or deferred — though the `XeJob` integration that powers multi-tile dispatch is deferred to 0.8). `SoftRastDesc::make_default()` returns sensible defaults (16×16 tiles, default shader table).
 
-```
-┌──────────────────────────────────────────────────────────────┐
-│  XeTexHeader                                                 │
-│  magic[4]         = "XETX"                                   │
-│  version          = 4                                        │
-│  platform_id      (XE_PLATFORM_* constant)                   │
-│  texture_type     (TextureType enum)                         │
-│  pixel_format     (PixelFormat enum — platform-native value) │
-│  width, height, depth, array_count, mip_count                │
-│  wrap_u, wrap_v   (WrapMode enum)                            │
-│  filter_min, filter_mag  (FilterMode enum)                   │
-│  aniso_level, lod_bias                                       │
-│  srgb, premul_alpha                                          │
-│  data_offset      (byte offset to pixel data region)         │
-│  data_size                                                   │
-├──────────────────────────────────────────────────────────────┤
-│  MipDescriptor[mip_count]                                    │
-│  { offset, size, width, height }  per mip level              │
-├──────────────────────────────────────────────────────────────┤
-│  Pixel data                                                  │
-│  Platform-tiled, compressed, mip-chained.                    │
-│  Exact layout the GPU / TMEM / ARAM expects.                 │
-│  No conversion required at runtime.                          │
-└──────────────────────────────────────────────────────────────┘
-```
+**Lifetime:** `RenderDeviceDesc` is consumed by the factory call; the middleware copies out the fields it needs. The embedded `XeServices` sinks are *referenced* — the client must keep the underlying `user_data` alive for the lifetime of the device.
 
-Runtime load:
+---
 
-```cpp
-XeTexHeader* hdr  = (XeTexHeader*) mapped_file; // zero-copy mmap
+## 18. Asset Pipeline
 
-TextureDesc desc;
-desc.type         = (TextureType) hdr->texture_type;
-desc.format       = (PixelFormat) hdr->pixel_format; // already platform-native
-desc.width        = hdr->width;
-desc.height       = hdr->height;
-desc.mip_count    = hdr->mip_count;
-desc.initial_data = mapped_file + hdr->data_offset;  // points into file
+### 18.1 Architecture
 
-SamplerDesc samp;
-samp.wrap_u     = (WrapMode)   hdr->wrap_u;
-samp.wrap_v     = (WrapMode)   hdr->wrap_v;
-samp.filter_min = (FilterMode) hdr->filter_min;
-samp.filter_mag = (FilterMode) hdr->filter_mag;
-samp.aniso_level = hdr->aniso_level;
-samp.srgb        = hdr->srgb;
+Three stages: import (any source format → compiler IR), process (mesh optimization, texture compression, platform tiling, LOD, mip chain, animation baking, material baking, vertex quantization, bounds computation), export (IR → platform-native binary). The runtime never sees a source format.
 
-TextureHandle tex = device->create_texture(desc);
-SamplerHandle smp = device->create_sampler(samp);
-// Done. create_texture() is a DMA transfer of already-correct data.
-// On N64: dma_transfer() to TMEM. On desktop: glTexImage2D with pre-tiled data.
-```
+Runtime binaries are `.xemesh`, `.xetex`, `.xeanim`, `.xepkg`. The runtime loader `mmap`s (or `fread`s) the file, casts the start to the header struct, fills the appropriate descriptor with pointers into the mapped region, and calls `create_*`. The create path on every backend is a DMA transfer — no decoder, no intermediate copy.
 
-### 17.4 `.xetexprop` — Texture Properties Sidecar
+**Rationale:** runtime load cost is dominated by format conversion, not by I/O. Moving conversion offline collapses loading to a DMA copy. On N64 the difference is a 10-second load versus a 200 ms load; on desktop it is an invisible startup versus a visible one.
 
-A TOML sidecar file checked in alongside the source image. It provides the
-semantic context the compiler needs to make correct processing decisions.
+### 18.2 Compiler CLI
 
-```toml
-# hero_albedo.png.xetexprop
+`xe-asset-compiler [options] <input> --target <platform> --output <path>`
 
-usage        = "albedo"   # albedo | normal | roughness_metallic |
-                          # emissive | ui | cubemap_face | heightmap
-srgb         = true       # false for normal / roughness / metallic maps
-wrap_u       = "repeat"   # repeat | clamp | mirror
-wrap_v       = "repeat"
-filter_min   = "linear_mip"
-filter_mag   = "linear"
-aniso_level  = 4
-mip_policy   = "full"     # full | none
-mip_filter   = "kaiser"   # box | triangle | kaiser
-max_size     = 512        # downsample if source exceeds this
-premul_alpha = false
-pot_enforce  = true       # force power-of-two (required for N64 / GL Legacy)
+Targets: `n64`, `gamecube`, `wii`, `ps3`, `desktop-gl4`, `desktop-d3d11`, `ios-metal`, `android`.
 
-# Per-platform compression overrides
-[compress.desktop]    format = "bc7"
-[compress.mobile]     format = "astc_6x6"
-[compress.n64]        format = "rgba16"   # No block compression on N64; TMEM is 4KB
-[compress.gamecube]   format = "cmpr"     # GX native DXT1 variant
-[compress.ps3]        format = "dxt1"
-```
+Options: `--lod-levels`, `--strip` (convert to triangle strips — benefits N64 and GC), `--quantize-pos` (`none` / `i16` / `i10`), `--anim-rate`, `--no-compress` (for debugging), `--verbose`.
 
-If no sidecar exists, the compiler infers usage from filename conventions
-(`_n` → normal map, `_rm` → roughness/metallic, `_e` → emissive) and logs a
-warning.
+### 18.3 `.xetex` — Texture Binary Format
 
-### 17.5 `.xemesh` — Mesh Package Format
+A directly-mappable flat structure. Header (`XeTexHeader`): magic `"XETX"`, version, platform id, texture type, pixel format *already in platform-native encoding*, dimensions (width/height/depth/array count/mip count), sampler properties, data offset, data size. Followed by `MipDescriptor[mip_count]` (offset, size, width, height per mip). Followed by the pixel-data region, already tiled/compressed/mipped for the target GPU.
 
-```
-┌──────────────────────────────────────────────────────────────┐
-│  XeMeshHeader                                                │
-│  magic[4] = "XEMS", version, platform_id                    │
-│  mesh_count, material_count, texture_count                   │
-│  skin_count, anim_count                                      │
-│  chunk_table_offset                                          │
-├──────────────────────────────────────────────────────────────┤
-│  Chunk table  { offset, size, type, name_hash } per chunk    │
-├──────────────────────────────────────────────────────────────┤
-│  Chunk: MESH  — VertexLayout, BufferDesc (vertex + index)    │
-│  Chunk: MATL  — Baked PipelineDesc per material variant      │
-│                 (tier-correct for target platform)           │
-│  Chunk: TEXR  — TextureDesc + SamplerDesc per texture        │
-│                 initial_data points into TEXD chunk          │
-│  Chunk: TEXD  — Raw pixel data (tiled, compressed)           │
-│  Chunk: SKIN  — Joint hierarchy + inverse bind matrices      │
-│  Chunk: ANIM  — Baked, quantized animation tracks            │
-│  Chunk: LODS  — LOD mesh descriptors + distance thresholds   │
-│  Chunk: META  — Names, AABBs, LOD ranges, node hierarchy     │
-└──────────────────────────────────────────────────────────────┘
-```
+Runtime load consists of one cast, one descriptor fill from the header, one `create_texture` call, and one `create_sampler` call. The `initial_data` pointer points directly into the mapped file.
 
-Runtime loader:
+### 18.4 `.xetexprop` — Texture Properties Sidecar
 
-```cpp
-XeMeshPackage* pkg = xe_mesh_map(path); // mmap or fread
+A TOML sidecar checked in alongside the source image. Keys: `usage` (albedo/normal/roughness_metallic/emissive/ui/cubemap_face/heightmap), `srgb`, `wrap_u`/`wrap_v`, `filter_min`/`filter_mag`, `aniso_level`, `mip_policy`, `mip_filter`, `max_size`, `premul_alpha`, `pot_enforce`. Plus per-family compression overrides under `[compress.<family>]` tables.
 
-for (uint32_t i = 0; i < pkg->mesh_count; i++) {
-    out.vb[i] = device->create_buffer(pkg->vertex_descs[i]);
-    out.ib[i] = device->create_buffer(pkg->index_descs[i]);
-}
-for (uint32_t i = 0; i < pkg->material_count; i++)
-    out.pipelines[i] = device->create_pipeline(pkg->pipeline_descs[i]);
-for (uint32_t i = 0; i < pkg->texture_count; i++) {
-    out.textures[i] = device->create_texture(pkg->texture_descs[i]);
-    out.samplers[i] = device->create_sampler(pkg->sampler_descs[i]);
-}
-// No format decisions. No conversions. No hidden allocations.
-```
+**Correction from rev 0.6:** the compression buckets are *platform families*, not individual compiler targets. Families are `desktop`, `mobile`, `n64`, `gamecube`, `wii`, `ps3`. The compiler maps its `--target` to a family (e.g., `--target desktop-gl4` and `--target desktop-d3d11` both consult `[compress.desktop]`); a target may override the family default via `[compress.<target>]` if both tables exist. Missing sidecars trigger filename-convention inference (`_n` → normal, `_rm` → roughness/metallic, `_e` → emissive) and a warning.
 
-### 17.6 glTF / Source Format Mapping to Runtime Concepts
+### 18.5 `.xemesh` — Mesh Package Format
+
+A chunked package: `XeMeshHeader` (magic `"XEMS"`, version, platform id, counts for meshes/materials/textures/skins/animations, chunk table offset), then the chunk table `(offset, size, type, name_hash)`, then chunks:
+
+- **MESH** — `VertexLayout` + `BufferDesc` pairs for vertex and index buffers.
+- **MATL** — baked `PipelineDesc` per material variant, tier-correct for the target platform.
+- **TEXR** — `TextureDesc` + `SamplerDesc` per texture, with `initial_data` pointing into TEXD.
+- **TEXD** — raw pixel data (tiled, compressed).
+- **SKIN** — joint hierarchy and inverse bind matrices.
+- **ANIM** — baked, quantized animation tracks (also externalizable to `.xeanim`).
+- **LODS** — LOD mesh descriptors and distance thresholds.
+- **META** — names, AABBs, LOD ranges, node hierarchy.
+
+### 18.6 glTF → Runtime Concept Mapping
 
 | glTF concept | Resolved at | Runtime type |
 |---|---|---|
-| `bufferView` (ARRAY_BUFFER) | Compiler: stride, format, layout | `BufferHandle` (vertex) |
-| `bufferView` (ELEMENT_ARRAY_BUFFER) | Compiler: U16 vs U32 | `BufferHandle` (index) |
-| `accessor` | Compiler: `VertexAttrib` per semantic | Embedded in `VertexLayout` in `PipelineDesc` |
-| `image` + `sampler` | Compiler: decode, compress, tile | `TextureHandle` + `SamplerHandle` |
-| `material` (PBR) | Compiler: tier-appropriate `PipelineDesc` | `PipelineHandle` |
-| `mesh.primitive` | Compile time + runtime | Draw call in `CommandBuffer` |
-| Node transform (TRS) | Runtime | `push_constants` or uniform buffer |
-| Skin + joints | Compiler: baked matrices + quantization | `BufferHandle` (joint matrix palette) |
-| Animation channels | Compiler: resampled + compressed | Loaded from `.xeanim` |
-| Sparse accessors | Compiler: materialized to dense | Dense `BufferHandle` at runtime |
+| `bufferView` (ARRAY_BUFFER) | Compiler | `BufferHandle` (vertex) |
+| `bufferView` (ELEMENT_ARRAY_BUFFER) | Compiler | `BufferHandle` (index) |
+| `accessor` | Compiler | `VertexAttrib` inside `VertexLayout` |
+| `image` + `sampler` | Compiler (decode + compress + tile) | `TextureHandle` + `SamplerHandle` |
+| `material` (PBR) | Compiler (tier-appropriate bake) | `PipelineHandle` |
+| `mesh.primitive` | Compile-time + runtime | Draw call in `CommandBuffer` |
+| Node TRS | Runtime | Push constants or uniform buffer |
+| Skin + joints | Compiler (baked, quantized) | `BufferHandle` (joint palette) |
+| Animation channels | Compiler (resampled + compressed) | `.xeanim` |
+| Sparse accessors | Compiler (materialized dense) | Dense `BufferHandle` |
 
-Sparse accessors are the one glTF concept that would require special handling in a
-runtime loader — they are fully materialized by the compiler and never appear in a
-`.xemesh` file.
+Sparse accessors are fully materialized at compile time — the one glTF concept that would otherwise require special runtime handling is eliminated.
 
-### 17.7 CI Integration
+### 18.7 CI Integration
 
-```
-Content author commits source asset (.glb, .png, .png.xetexprop)
-           │
-           ▼  Forgejo Actions trigger
-xe-asset-compiler --target n64        → model_n64.xemesh + textures_n64.xetex
-xe-asset-compiler --target gamecube   → model_gcn.xemesh + textures_gcn.xetex
-xe-asset-compiler --target desktop-gl4→ model_pc.xemesh  + textures_pc.xetex
-           │
-           ▼
-Compiled assets stored in Forgejo package registry
-alongside code build artifacts.
-Runtime never touches .glb or .png.
-```
+The asset compiler runs in CI on every content-author commit. Compiled outputs are stored in the package registry alongside code build artifacts. Runtime binaries never touch `.glb`, `.fbx`, or `.png`.
 
 ---
 
-## 18. Platform / Backend Availability Matrix
+## 19. Platform / Backend Availability Matrix
 
 | Platform | GLLeg | GL4 | GLES2 | GLES3 | D3D11 | Metal | Vulkan | N64_RDP | GCN_GX | PS3_GCM | SoftBuiltin | SoftMesa | Null |
 |---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
-| **Win 98/ME** | ✓ | – | – | – | – | – | – | – | – | – | ✓ | – | ✓ |
+| **Win 98/ME** | ✓ | – | – | – | – | – | – | – | – | – | ✓ | △ | ✓ |
 | **Win XP/Vista** | ✓ | △ | – | – | – | – | – | – | – | – | ✓ | △ | ✓ |
 | **Win 7+** | ✓ | ✓ | – | – | ✓ | – | – | – | – | – | ✓ | ✓ | ✓ |
 | **Win 10/11** | ✓ | ✓ | – | – | ✓ | – | ✓ | – | – | – | ✓ | ✓ | ✓ |
@@ -1404,45 +539,35 @@ Runtime never touches .glb or .png.
 ¹ GL deprecated on macOS 10.14; functional through macOS 13.
 ² Via ANGLE (GL ES over Metal).
 ³ GLES deprecated iOS 12; Metal is the primary path.
-△ Conditional on external library availability.
+△ Conditional on external library availability (e.g., Mesa3D binaries on Win 9x; SwANGLE on Android 7+).
 
 ---
 
-## 19. Additional Console Target Notes (Unchanged from 0.3)
+## 20. Additional Console Target Notes
 
-### Sega Dreamcast
-**SDK:** KallistiOS + `sh-elf-gcc`. **Tier:** `Legacy`. GLdc (MIT) provides GL 1.2 over PVR
-— the existing `GLLegacy` Glaze-backed backend could run on Dreamcast via GLdc with
-minimal modifications. Future `BackendHint::Dreamcast_PVR`.
+### 20.1 Sega Dreamcast
 
-### Original Xbox
-**SDK:** nxdk (MIT) + LLVM/Clang. **Tier:** `Legacy` / `Modern` boundary (NV2A supports
-VS 1.1 / PS 1.4). Future `BackendHint::Xbox_D3D8`. Good candidate for a
-`LegacyShader` sub-tier revision.
+**SDK:** KallistiOS + `sh-elf-gcc`. **Tier:** `Legacy`. GLdc (MIT) provides GL 1.2 over PVR — the existing `GLLegacy` Glaze-backed backend could run on Dreamcast via GLdc with minimal modifications. Future `BackendHint::Dreamcast_PVR` enumerant.
 
----
+### 20.2 Original Xbox
 
-## 20. Render Graph — Why It Is Out of Scope
+**SDK:** nxdk (MIT) + LLVM/Clang. **Tier:** `Legacy` / `Modern` boundary (NV2A supports VS 1.1 / PS 1.4). Future `BackendHint::Xbox_D3D8`. Good candidate for a `LegacyShader` sub-tier revision.
 
-The render graph belongs in the engine layer **above** this middleware, not inside it.
-This middleware layer's contract is: *given resources and commands, get pixels onto a
-surface.* A render graph's contract is: *given a description of the entire frame,
-determine the optimal execution and resource plan.*
-
-Concretely:
-
-- Console backends (N64, GC/Wii) have no concept of pass dependencies, transient
-  resource aliasing, or barrier insertion. Carrying render graph machinery into these
-  backends would violate the portability goal.
-- A render graph's output is a set of ordered `CommandBuffer`s submitted to a
-  `RenderDevice`. That is precisely the API this layer already exposes — the render
-  graph is a **client** of this layer.
-- `PassDesc` (color/depth targets, clear values) is already expressive enough for
-  a render graph to drive without requiring any changes to this spec.
+Both are deferred — neither appears in the §19 availability matrix yet.
 
 ---
 
-## 21. Class Relationship Diagram
+## 21. Render Graph — Why It Is Out of Scope
+
+The render graph belongs in the engine layer *above* this middleware, not inside it. This middleware's contract is: *given resources and commands, get pixels onto a surface.* A render graph's contract is: *given a description of the entire frame, determine the optimal execution and resource plan.*
+
+- Console backends (N64, GC/Wii) have no concept of pass dependencies, transient resource aliasing, or barrier insertion. Carrying render graph machinery into these backends would violate the portability goal.
+- A render graph's output is a set of ordered `CommandBuffer`s submitted to a `RenderDevice`. That is precisely the API this layer already exposes — the render graph is a *client* of this layer, not a participant.
+- `PassDesc` (color/depth targets, clear values, store actions) is already expressive enough for a render graph to drive without requiring any changes to this spec.
+
+---
+
+## 22. Class Relationship Diagram
 
 ```
  ┌─────────────────────────────────────────────────────────────────────────┐
@@ -1495,101 +620,77 @@ Extension headers (opt-in, xe/native/):
   xe_native_gcn_gx.hpp     → GXDeviceExt     (GXTexObj*, raw DL buffer)
   xe_native_ps3_gcm.hpp    → PS3GCMDeviceExt (rsxBuffer*, gcmContextData*)
 
-Resource handles (uint32_t, backend-private flat arrays):
+Resource handles (uint32_t, type+gen+index encoding per §10):
   BufferHandle  TextureHandle  SamplerHandle  PipelineHandle  ShaderHandle
 ```
 
 ---
 
-## 22. Initialization Flow
+## 23. Initialization Flow
 
-```
-1. XeServices svc = XeServices::make_default();
-   // Override svc.log.write, svc.profiler.*, svc.allocator as needed
-
-2. SystemCaps caps = SystemCaps::query_host(svc);
-   // CPU, memory, platform filled. GPU not yet known.
-
-3. Create OS/console window → RenderSurface
-
-4. BackendRegistry::probe(svc);
-   BackendHint chosen = BackendRegistry::best_available();
-   // Or explicit user override to work around driver bugs:
-   // chosen = BackendHint::GL4;
-
-5. RenderDeviceDesc desc{ .surface=surf, .backend_hint=chosen,
-                          .services=svc, .gcm_fifo_kb=512 };
-   RenderDevice* dev = RenderDevice::create(desc);
-   // caps.gpu populated after this call
-
-6. Load compiled assets:
-   XeMeshPackage* pkg = xe_mesh_map("hero_n64.xemesh");
-   // Thin loop — no format decisions:
-   for (auto& vd : pkg->vertex_descs)   vb[i] = dev->create_buffer(vd);
-   for (auto& td : pkg->texture_descs)  tex[i] = dev->create_texture(td);
-   for (auto& sd : pkg->sampler_descs)  smp[i] = dev->create_sampler(sd);
-   for (auto& pd : pkg->pipeline_descs) pl[i]  = dev->create_pipeline(pd);
-
-7. Per-frame loop:
-   dev->begin_frame();
-   {
-       CommandBuffer cmdbuf(svc.allocator);
-       cmdbuf.begin_pass(pass_desc);
-       cmdbuf.begin_gpu_scope("MainPass");
-         cmdbuf.bind_pipeline(pl[0]);
-         cmdbuf.bind_vertex_buffer(vb[0], 0, stride);
-         cmdbuf.bind_index_buffer(ib[0], IndexType::U16);
-         cmdbuf.bind_texture(tex[0], smp[0], 0);
-         cmdbuf.push_constants(&xform, sizeof(xform));
-         cmdbuf.draw_indexed(index_count);
-       cmdbuf.end_gpu_scope();
-       cmdbuf.end_pass();
-       dev->submit(cmdbuf);
-   }
-   dev->end_frame();
-   dev->present();
-
-8. Shutdown:
-   dev->destroy_pipeline(pl[0]);
-   dev->destroy_sampler(smp[0]);
-   dev->destroy_texture(tex[0]);
-   dev->destroy_buffer(vb[0]);
-   RenderDevice::destroy(dev);
-```
+1. Build `XeServices` (`XeServices::make_default()` or custom).
+2. Run `SystemCaps::query_host(svc)` — fills CPU, memory, platform caps. GPU caps remain zero.
+3. Create an OS/console window and populate a `RenderSurface`.
+4. Run `BackendRegistry::probe(svc)` and choose a `BackendHint` — either `best_available()` or a user override (typically to work around a driver bug).
+5. Build a `RenderDeviceDesc` (surface, backend hint, services, pool sizes, GCM FIFO size), and call `RenderDevice::create(desc)`. The factory runs the chosen backend's create function, which internally calls `SystemCaps::query_gpu(svc)` before returning.
+6. Load compiled assets: `mmap` the `.xemesh`/`.xetex` file, walk the chunk table, call `create_buffer` / `create_texture` / `create_sampler` / `create_pipeline` in a loop. No format decisions, no hidden allocations.
+7. Per frame: `dev->begin_frame()`, record one or more `CommandBuffer`s (possibly from worker threads), `dev->submit(cmdbuf)` (or `submit_batch`), `dev->end_frame()`, `dev->present()`.
+8. Shutdown: release resources in reverse order, then `RenderDevice::destroy(dev)`. The destroy path forwards to the backend's `shutdown` slot, which destroys the `BackendContext`.
 
 ---
 
-## 23. Design Decisions — New in 0.4
+## 24. Design Decisions
 
 | Decision | Rationale |
 |---|---|
 | **`RenderDeviceT<Policy>` + `CommandBufferT<Policy>`** | Single template parameter; `using` alias in `xe_platform_config.hpp` prevents leakage upward; LTO collapses static builds to direct calls |
 | **`BackendContext` embedded by value in static specializations** | Eliminates heap allocation and pointer chase on N64/GC/PS3 where every byte and cycle counts |
-| **`get_native_handle` + `query_extension` in `BackendVTable`** | Provides a typed, backend-specific escape hatch without breaking the API-neutral surface; extension headers are opt-in |
-| **`SamplerHandle` as a distinct resource** | Matches GL4/D3D11/Metal's object model; allows sampler reuse across textures; on backends without sampler objects the state is stored and applied inline at bind — no API surface change for those backends |
-| **GL Legacy display list for sampler + pipeline state** | One `glCallList` replaces 4–5 `glTexParameter*` calls and the entire rasterizer/blend/depth setup; compiled once at object creation; correct because both samplers and pipelines are immutable |
+| **`get_native_handle` + `query_extension` in `BackendVTable`** | Typed, backend-specific escape hatch without polluting the API-neutral surface; extension headers are opt-in |
+| **`SamplerHandle` as a distinct resource** | Matches GL4/D3D11/Metal's object model; allows sampler reuse across textures; on backends without sampler objects the state is cached and applied inline at bind — no API change for those backends |
+| **GL Legacy display list for sampler + pipeline state** | One `glCallList` replaces many `glTexParameter*` calls and the rasterizer/blend/depth setup; compiled once at object creation; correct because both samplers and pipelines are immutable |
+| **Command recording excluded from `BackendVTable`** | Per-draw function-pointer indirection is unaffordable; `CommandBuffer` crosses the dispatch boundary once per submit, not once per draw |
 | **Asset compiler as a standalone CLI** | Heavy dependencies (meshoptimizer, Basis, libktx) never link into the runtime; compiler output size equals runtime memory cost with no hidden conversion buffers — essential for N64 memory budgeting |
-| **`.xetexprop` sidecar** | Source images carry no semantic metadata; the sidecar provides usage, wrap/filter, and per-platform compression overrides in a human-readable, version-controllable form |
+| **`.xetexprop` sidecar** | Source images carry no semantic metadata; the sidecar provides usage, wrap/filter, and per-family compression overrides in a human-readable, version-controllable form |
 | **`.xemesh` TEXD chunk separates descriptors from pixel data** | `initial_data` in `TextureDesc` points directly into the TEXD chunk; `create_texture()` is a DMA transfer with no intermediate copy |
-| **Sparse accessor materialization at compile time** | Eliminates the one glTF concept that would require special runtime handling; runtime loader never sees the concept |
-| **`gcm_fifo_kb` in `RenderDeviceDesc`** | PS3 GCM ring buffer size was deferred in 0.3; now configurable with a 512 KB default |
+| **Sparse accessor materialization at compile time** | Eliminates the one glTF concept that would require special runtime handling; the runtime loader never sees it |
+| **In-band handle encoding (4/8/20 bits)** | One AND + compare resolves a handle with no parallel table lookup; generation catches stale handles across 256 recycles; 20 index bits cover 1M resources per type |
+| **`XE_INVALID_HANDLE == 0` with `XeHandleType::Invalid = 0`** | Makes zero-initialized handle fields unambiguously invalid; matches the zero-default convention used elsewhere in the codebase |
+| **`rsx_*_bytes` in `GPUCaps`** | GPU-addressable memory belongs with GPU caps; rev 0.6 placed it in `MemoryCaps` by mistake |
+| **`uses_gpu_command_list` rename** | Disambiguates from GL Legacy `glNewList`; the two concepts are orthogonal |
 
 ---
 
-## 24. Out of Scope for This Iteration
+## 25. Changes Since 0.6
+
+- **§0 Executive Summary** added.
+- **§2 Document Conventions** added — fills the §2 gap present in prior revisions.
+- **§10 Handle Encoding** added as a dedicated section. `XeHandleType::Invalid = 0` now reserved; `Buffer`, `Texture`, etc. start at 1. `HANDLE_INDEX_MASK` formalized as `0x000FFFFF`.
+- **§7 GPUCaps / MemoryCaps** — `rsx_local_bytes` / `rsx_main_bytes` moved from `MemoryCaps` to `GPUCaps`. `uses_display_list` renamed to `uses_gpu_command_list`.
+- **§9.3 display list scope rules** — `glBindTexture` and `glVertexPointer` capture semantics corrected (`glBindTexture` is listable; `glVertexPointer` is not).
+- **§9.2** — the absence of command-recording slots from `BackendVTable` is now stated explicitly with rationale.
+- **§11.3** — the dynamic `submit()` wrapping `submit_batch` with count 1 is documented.
+- **§13 Sampler backends** — GLES3 correction: sampler objects are core, not `GL_OES_sampler_objects`.
+- **§14 PipelineDesc** — tier union described in prose; rev 0.6 referred to "Revision 0.3 Section 7" which was not available to readers.
+- **§17 SoftRastDesc** — field set now described (rev 0.6 referenced but never defined).
+- **§18.4 `.xetexprop`** — compression buckets clarified as platform *families*, not compiler targets; target override semantics documented.
+- All code listings removed; struct and function shapes described as prose with implementation approach and technical rationale.
+
+---
+
+## 26. Out of Scope for This Iteration
 
 - Compute pipelines and compute dispatch (Extended tier)
 - Multi-GPU / multi-adapter enumeration
 - Async resource streaming / transfer queues
 - Ray tracing
 - Explicit Vulkan-style memory heap sub-allocation
-- Render graph / frame graph (rationale in Section 20)
+- Render graph / frame graph (rationale in §21)
 - Material and scene graph systems (live above this layer)
 - SPIRV-Cross integration for automatic shader cross-compilation
-- `SoftBuiltin` multi-threaded tile dispatch (`max_threads` slot reserved; `XeJob` integration deferred)
+- `SoftBuiltin` multi-threaded tile dispatch (`XeJob` integration deferred to 0.8)
 - SPU-accelerated tile dispatch on PS3 (handoff point defined in `CPUCaps.spu_count`; implementation deferred)
-- Dreamcast `PVR` backend and Xbox OG `D3D8` backend (architecture noted in Section 19; deferred)
+- Dreamcast `PVR` backend and Xbox OG `D3D8` backend (architecture noted in §20; deferred)
 - `LegacyShader` sub-tier for VS 1.x / PS 1.x assembly shaders (Xbox OG NV2A)
-- Pre-tiled `native_format` fast-path for GX CMPR uploads (deferred to 0.5)
-- `.xepkg` multi-asset bundle format (structure noted; full spec deferred to 0.5)
-- Static geometry display lists for world meshes (GL Legacy; architecture noted in Section 9.3; content-pipeline decision deferred)
+- Pre-tiled `native_format` fast-path for GX CMPR uploads (deferred to 0.8)
+- `.xepkg` multi-asset bundle format (structure noted; full spec deferred to 0.8)
+- Static geometry display lists for world meshes (GL Legacy; architecture noted in §9.3; content-pipeline decision deferred)
