@@ -40,18 +40,18 @@ namespace xe {
 		gl::bufferData(target, desc.size, desc.data, usage);
 		gl::bindBuffer(target, {});
 
-		Handle const bufferHandle = buffers.size();
+		uint32_t index = buffers.size();
 
 		// TODO: Implement a mechanism to reuse free buffer slots
 		buffers.push_back(std::move(buffer));
 
-		return bufferHandle;
+		return Handle::make(HandleBuffer, 0, index);
 	}
 
 	void destroyBufferGL(RenderDeviceBackendContext* ctx, Handle handle) {
 		auto glctx = static_cast<RenderDeviceBackendContextGL*>(ctx);
-
-		glctx->buffers[handle].reset({});
+		
+		glctx->buffers[handle.index()].reset({});
 	}
 
 	static glaze::Unique<gl::Shader> compileShader(gl::ShaderType type, const char* src) {
@@ -96,17 +96,17 @@ namespace xe {
 		glaze::Unique<gl::Program> shaderProgram = linkProgram(shaders);
 
 		// TODO: Implement a mechanism to reuse free program slots
-		Handle handle = shaderPrograms.size();
+		uint32_t index = shaderPrograms.size();
 		shaderPrograms.push_back(std::move(shaderProgram));
 
-		return handle;
+		return Handle::make(HandleShader, 0, index);
 	}
 
 	void destroyShaderProgramGL(RenderDeviceBackendContext *ctx, Handle handle) {
 		auto glctx = static_cast<RenderDeviceBackendContextGL*>(ctx);
 		auto& shaderPrograms = glctx->shaderPrograms;
 
-		shaderPrograms[handle].reset({});
+		shaderPrograms[handle.index()].reset({});
 	}
 
 	void initializeBackendTableGL(RenderDeviceBackendVTable* vtable) {
