@@ -17,14 +17,14 @@ namespace xe {
         Handle (*createShaderProgram)(RenderDeviceBackendContext *, const ShaderProgramDescriptor &) = nullptr;
         void (*destroyShaderProgram)(RenderDeviceBackendContext *, Handle) = nullptr;
 
+		Handle(*createTexture)(RenderDeviceBackendContext*, const TextureDescriptor) = nullptr;
+		void (*destroyTexture)(RenderDeviceBackendContext*, Handle) = nullptr;
+
         Handle (*createVertexLayout)(RenderDeviceBackendContext *, const VertexLayoutDescriptor &) = nullptr;
         void (*destroyVertexLayout)(RenderDeviceBackendContext *, Handle) = nullptr;
 
         Handle (*createPipeline)(RenderDeviceBackendContext *, const PipelineDescriptor&) = nullptr;
         void (*destroyPipeline)(RenderDeviceBackendContext *, Handle) = nullptr;
-
-        Handle (*createTexture)(RenderDeviceBackendContext *, const TextureDescriptor) = nullptr;
-        void (*destroyTexture)(RenderDeviceBackendContext *, Handle) = nullptr;
 
         Handle (*createGeometry)(RenderDeviceBackendContext *, const GeometryDescriptor) = nullptr;
         void (*destroyGeometry)(RenderDeviceBackendContext *, Handle) = nullptr;
