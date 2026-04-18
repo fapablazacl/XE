@@ -47,11 +47,6 @@ endif()
 
 if (CMAKE_BUILD_TYPE MATCHES "Debug")
     add_definitions (-D_DEBUG)
-
-    # FIXME:
-    # Usage of this macro should be removed, because should be detected
-    # by GLAZE automatically.
-    add_definitions (-DGLAZE_DEBUG)
 endif ()
 
 add_definitions (-DXE_VERSION_MAJOR=${XE_VERSION_MAJOR})

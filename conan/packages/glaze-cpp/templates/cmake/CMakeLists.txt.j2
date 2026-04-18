@@ -8,6 +8,9 @@ target_include_directories(glaze_{{ api }} INTERFACE $<INSTALL_INTERFACE:include
 {% if shared %}
 target_compile_definitions(glaze_{{ api }} PRIVATE GLAZE_BUILD_DLL)
 {% endif %}
+if(GLAZE_DEBUG)
+    target_compile_definitions(glaze_{{ api }} PRIVATE GLAZE_DEBUG)
+endif()
 
 # Header-only RAII smart-pointer wrappers for {{ api }} resources.
 add_library(glaze_{{ api }}_raii INTERFACE)

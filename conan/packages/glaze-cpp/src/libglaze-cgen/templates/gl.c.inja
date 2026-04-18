@@ -34,7 +34,7 @@ GLAZE_API void glazeSetPostCallback(GLAZE_CALLBACK callback) {
 #if GLAZE_GL_VERSION >= {{ feature.version_int }}
 {% for w in feature.wrappers %}
 GLAZE_API {{ w.return_type }} GLCALLCONV {{ w.debug_name }}({{ w.params_str }}) {
-{% if w.args_str %}
+{% if w.param_count > 0 %}
     if (glaze_pre_callback) glaze_pre_callback("{{ w.name }}", (void*){{ w.raw_name }}, {{ w.param_count }}, {{ w.args_str }});
 {% else %}
     if (glaze_pre_callback) glaze_pre_callback("{{ w.name }}", (void*){{ w.raw_name }}, 0);
@@ -44,7 +44,7 @@ GLAZE_API {{ w.return_type }} GLCALLCONV {{ w.debug_name }}({{ w.params_str }}) 
 {% else %}
     {{ w.return_type }} ret = {{ w.raw_name }}({{ w.args_str }});
 {% endif %}
-{% if w.args_str %}
+{% if w.param_count > 0 %}
     if (glaze_post_callback) glaze_post_callback("{{ w.name }}", (void*){{ w.raw_name }}, {{ w.param_count }}, {{ w.args_str }});
 {% else %}
     if (glaze_post_callback) glaze_post_callback("{{ w.name }}", (void*){{ w.raw_name }}, 0);

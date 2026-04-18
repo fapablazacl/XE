@@ -213,7 +213,10 @@ class GlazeCppConan(ConanFile):
                 "-B", c_build_dir,
                 f"-DCMAKE_TOOLCHAIN_FILE={toolchain}",
                 "-DCMAKE_POLICY_DEFAULT_CMP0091=NEW",
+                f"-DCMAKE_BUILD_TYPE={self.settings.build_type}",
             ]
+            if self.settings.build_type == "Debug":
+                configure_cmd.append("-DGLAZE_DEBUG=ON")
             self.run(" ".join(f'"{c}"' for c in configure_cmd))
 
             build_cmd = [
@@ -260,6 +263,8 @@ class GlazeCppConan(ConanFile):
         self.cpp_info.set_property("cmake_target_name", "glaze::glaze")
         api_list = [api.strip() for api in str(self.options.apis).split(",") if api.strip()]
 
+        debug_build = self.settings.build_type == "Debug"
+
         # Top-level header-only component: API-agnostic glaze::Unique / Shared / Weak.
         if self.options.language in ("cpp", "both"):
             raii = self.cpp_info.components["raii"]
@@ -267,6 +272,8 @@ class GlazeCppConan(ConanFile):
             raii.includedirs = ["include"]
             raii.bindirs = []
             raii.libdirs = []
+            if debug_build:
+                raii.defines = ["GLAZE_DEBUG"]
 
         for api_item in api_list:
             api_name = api_item.split(":")[0]
@@ -282,6 +289,9 @@ class GlazeCppConan(ConanFile):
                 comp.bindirs = []
                 comp.libdirs = []
 
+            if debug_build:
+                comp.defines.append("GLAZE_DEBUG")
+
             if self.options.language in ("cpp", "both"):
                 hwrap = self.cpp_info.components[f"{api_name}_handle"]
                 hwrap.set_property("cmake_target_name", f"glaze::{api_name}_handle")
@@ -289,3 +299,5 @@ class GlazeCppConan(ConanFile):
                 hwrap.bindirs = []
                 hwrap.libdirs = []
                 hwrap.requires = [api_name]
+                if debug_build:
+                    hwrap.defines = ["GLAZE_DEBUG"]

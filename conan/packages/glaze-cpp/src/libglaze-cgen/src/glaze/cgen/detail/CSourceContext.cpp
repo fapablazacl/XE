@@ -5,6 +5,7 @@
 #include "glaze/model/TypeDecl.h"
 
 #include <string>
+#include <unordered_set>
 
 namespace glaze::cgen::detail {
 
@@ -56,6 +57,15 @@ nlohmann::json buildSourceContext(
     nlohmann::json loaderFeaturesArr = nlohmann::json::array();
     nlohmann::json debugWrapperFeaturesArr = nlohmann::json::array();
 
+    // Track command names whose debug wrapper body has already been emitted.
+    // Commands promoted across multiple GL feature versions are requested
+    // again in each feature's requireList; since the per-feature
+    // "#if GLAZE_GL_VERSION >= N" guards all expand when the compile-time
+    // floor is higher, emitting the wrapper body more than once yields a
+    // C redefinition error. Pointer declarations remain duplicated — they
+    // are legal C tentative definitions.
+    std::unordered_set<std::string> emittedWrapperNames;
+
     for (const auto &featureRef : features) {
         const auto &feature = featureRef.get();
         const int verInt = model::versionToInt(feature.number);
@@ -78,7 +88,9 @@ nlohmann::json buildSourceContext(
                     {"ptr_type", ptrType},
                     {"gl_name", cmd->name},
                 });
-                wrappersArr.push_back(buildDebugWrapperContext(*cmd, typeMapper));
+                if (emittedWrapperNames.insert(cmd->name).second) {
+                    wrappersArr.push_back(buildDebugWrapperContext(*cmd, typeMapper));
+                }
             }
         }
 
@@ -113,7 +125,9 @@ nlohmann::json buildSourceContext(
                 {"ptr_type", ptrType},
                 {"gl_name", cmd->name},
             });
-            wrappersArr.push_back(buildDebugWrapperContext(*cmd, typeMapper));
+            if (emittedWrapperNames.insert(cmd->name).second) {
+                wrappersArr.push_back(buildDebugWrapperContext(*cmd, typeMapper));
+            }
         }
         extensionsArr.push_back(nlohmann::json{
             {"name", emission.name},
