@@ -125,7 +125,7 @@ target_link_libraries (${target}
 	PUBLIC glm::glm
 	PUBLIC glfw
 	PUBLIC Backport::Backport
-	PUBLIC Microsoft.GSL::Microsoft.GSL
+	PUBLIC Microsoft.GSL::GSL
 )
 
 if (XE_DEV_UNIT_TEST)
