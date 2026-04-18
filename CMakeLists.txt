@@ -42,7 +42,6 @@ add_definitions(-DGLM_ENABLE_EXPERIMENTAL)
 if (XE_DEV_UNIT_TEST)
     include(CTest)
     enable_testing()
-    find_package(GTest CONFIG REQUIRED)
     find_package(Catch2 3 CONFIG REQUIRED)
 endif()
 

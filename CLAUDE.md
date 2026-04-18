@@ -97,7 +97,7 @@ Conan generates CMake presets in `build/generators/CMakePresets.json`. Always ru
 | `XE_PLUGIN_PNG` | ON | PNG support via LodePNG |
 | `XE_PLUGIN_GL` | ON | OpenGL 3+ backend |
 | `XE_PLUGIN_GL_GLFW` | ON | GLFW window/context |
-| `XE_DEV_UNIT_TEST` | ON | Enable GTest unit tests |
+| `XE_DEV_UNIT_TEST` | ON | Enable Catch2 unit tests |
 | `XE_DEV_WARNINGS_AS_ERRORS` | OFF | Treat warnings as errors |
 | `XE_DEV_PRECOMPILED_HEADERS` | OFF | PCH for faster builds |
 | `XE_DEV_SANITIZER_ENABLE` | OFF | AddressSanitizer |

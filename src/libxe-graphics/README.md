@@ -34,7 +34,7 @@ libxe-graphics/
       render/               # vtable+handle backend prototype
         backend/
           glcore3-api.*     # GL Core 3 backend for the prototype
-  unit-test/                # GTest suite for the GL reference backend
+  unit-test/                # Catch2 suite for the GL reference backend
 ```
 
 ## Building and Testing
