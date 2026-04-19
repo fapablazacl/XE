@@ -10,23 +10,19 @@
 #include "glcore3-api.h"
 
 namespace xe {
-	struct PipelineGL {
-		xe::vec4 clearColor = { 0.0f, 0.0f, 0.0f, 1.0f };
-		gl::Flags<gl::ClearBufferMask> clearMask = gl::ClearBufferMask::eColorBufferBit;
+	namespace {
+		struct PipelineGL {
+			xe::vec4 clearColor = { 0.0f, 0.0f, 0.0f, 1.0f };
+			gl::Flags<gl::ClearBufferMask> clearMask = gl::ClearBufferMask::eColorBufferBit;
 
-		//! @note: Consider a Weak ptr
-		gl::Program shaderProgram;
-	};
+			//! @note: Consider a Weak ptr
+			gl::Program shaderProgram;
+		};
 
-	struct RenderDeviceBackendContextGL : RenderDeviceBackendContext {
-		std::vector<glaze::Unique<gl::BufferId>> buffers;
-		std::vector<glaze::Unique<gl::Program>> shaderPrograms;
-		std::vector<glaze::Unique<gl::Texture>> textures;
-	};
-
-	inline RenderDeviceBackendContextGL* glctx(RenderDeviceBackendContext *ctx) {
-		assert(ctx);
-		return static_cast<RenderDeviceBackendContextGL* >(ctx);
+		inline RenderDeviceBackendContextGL* glctx(RenderDeviceBackendContext *ctx) {
+			assert(ctx);
+			return static_cast<RenderDeviceBackendContextGL* >(ctx);
+		}
 	}
 
 	RenderDeviceBackendContext* createContextGL() {
