@@ -3,9 +3,73 @@
 #include <GLFW/glfw3.h>
 #include <iostream>
 #include <cstdlib>
+#include <cstdint>
+#include <cassert>
 
 #include "xe/render/RenderBackend.h"
 #include "xe/render/backend/glcore3-api.h"
+
+// TODO: The quick initial image generation infra needs to be refactored later
+static float checkerboardValue(int x, int y, int tileSize) {
+    return (((x / tileSize) + (y / tileSize)) & 1) ? 0.0f : 1.0f;
+}
+
+static int channelCountOf(xe::PixelFormat format) {
+    switch (format) {
+    case xe::PixelFormat::R8G8B8:   return 3;
+    case xe::PixelFormat::R8G8B8A8: return 4;
+    default: return 0;
+    }
+}
+
+static size_t byteSizeOf(xe::DataType type) {
+    switch (type) {
+    case xe::DataType::Int8:   case xe::DataType::UInt8:   return 1;
+    case xe::DataType::Int16:  case xe::DataType::UInt16:  case xe::DataType::Float16: return 2;
+    case xe::DataType::Int32:  case xe::DataType::UInt32:  case xe::DataType::Float32: return 4;
+    default: return 0;
+    }
+}
+
+static void writeNormalizedChannel(void* base, size_t pixelOffset, int channel, float value, xe::DataType type) {
+    auto* byteBase = static_cast<uint8_t*>(base) + pixelOffset;
+    switch (type) {
+    case xe::DataType::UInt8:
+        byteBase[channel] = static_cast<uint8_t>(value * 255.0f);
+        break;
+    case xe::DataType::UInt16:
+        reinterpret_cast<uint16_t*>(byteBase)[channel] = static_cast<uint16_t>(value * 65535.0f);
+        break;
+    case xe::DataType::Float32:
+        reinterpret_cast<float*>(byteBase)[channel] = value;
+        break;
+    default:
+        assert(false && "writeNormalizedChannel: unsupported DataType");
+    }
+}
+
+static void fillCheckerboardImage(void* data, size_t byteSize, int width, int height,
+                                  xe::PixelFormat format, xe::DataType dataType, int tileSize) {
+    int const channels = channelCountOf(format);
+    size_t const channelBytes = byteSizeOf(dataType);
+    size_t const pixelStride = static_cast<size_t>(channels) * channelBytes;
+
+    assert(data != nullptr);
+    assert(channels > 0 && channelBytes > 0);
+    assert(byteSize >= static_cast<size_t>(width) * height * pixelStride);
+    (void)byteSize;
+
+    for (int y = 0; y < height; ++y) {
+        for (int x = 0; x < width; ++x) {
+            float const v = checkerboardValue(x, y, tileSize);
+            size_t const pixelOffset = (static_cast<size_t>(y) * width + x) * pixelStride;
+            for (int c = 0; c < channels; ++c) {
+                float const out = (c == 3) ? 1.0f : v;
+                writeNormalizedChannel(data, pixelOffset, c, out, dataType);
+            }
+        }
+    }
+}
 
 int main() {
     if (!glfwInit()) {
