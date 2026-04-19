@@ -1,5 +1,5 @@
 
-#pragma once 
+#pragma once
 
 #include <cstdint>
 
@@ -7,33 +7,35 @@
 
 namespace xe {
     /**
-     * @brief render device dispatch table 
-     * Allows to abstract away the underlying graphics API without resorting to polymorphism
+     * @brief render device dispatch table
+     * Allows to abstract away the underlying graphics API without resorting to polymorphism.
+     * All handle-typed fields use the phantom-typed aliases from xe::types, so cross-resource
+     * mix-ups (e.g. destroying a TextureHandle via destroyBuffer) are compile-time errors.
      */
     struct RenderDeviceBackendVTable {
         RenderDeviceBackendContext* (*createContext)() = nullptr;
         void (*destroyContext)(RenderDeviceBackendContext*) = nullptr;
 
-        Handle (*createBuffer)(RenderDeviceBackendContext *, const BufferDescriptor &) = nullptr;
-        void (*destroyBuffer)(RenderDeviceBackendContext *, Handle) = nullptr;
-        void (*readBuffer)(RenderDeviceBackendContext *, Handle, const BufferReadDescriptor &) = nullptr;
+        BufferHandle (*createBuffer)(RenderDeviceBackendContext *, const BufferDescriptor &) = nullptr;
+        void (*destroyBuffer)(RenderDeviceBackendContext *, BufferHandle) = nullptr;
+        void (*readBuffer)(RenderDeviceBackendContext *, BufferHandle, const BufferReadDescriptor &) = nullptr;
 
-        Handle (*createShaderProgram)(RenderDeviceBackendContext *, const ShaderProgramDescriptor &) = nullptr;
-        void (*destroyShaderProgram)(RenderDeviceBackendContext *, Handle) = nullptr;
+        ShaderHandle (*createShaderProgram)(RenderDeviceBackendContext *, const ShaderProgramDescriptor &) = nullptr;
+        void (*destroyShaderProgram)(RenderDeviceBackendContext *, ShaderHandle) = nullptr;
 
-		Handle(*createTexture)(RenderDeviceBackendContext*, const TextureDescriptor&) = nullptr;
-		void (*destroyTexture)(RenderDeviceBackendContext*, Handle) = nullptr;
-		void (*updateTexture)(RenderDeviceBackendContext*, Handle, const TextureUpdateDescriptor&) = nullptr;
-		void (*readTexture)(RenderDeviceBackendContext*, Handle, const TextureReadDescriptor&) = nullptr;
+		TextureHandle (*createTexture)(RenderDeviceBackendContext*, const TextureDescriptor&) = nullptr;
+		void (*destroyTexture)(RenderDeviceBackendContext*, TextureHandle) = nullptr;
+		void (*updateTexture)(RenderDeviceBackendContext*, TextureHandle, const TextureUpdateDescriptor&) = nullptr;
+		void (*readTexture)(RenderDeviceBackendContext*, TextureHandle, const TextureReadDescriptor&) = nullptr;
 
-        Handle (*createVertexLayout)(RenderDeviceBackendContext *, const VertexLayoutDescriptor &) = nullptr;
-        void (*destroyVertexLayout)(RenderDeviceBackendContext *, Handle) = nullptr;
+        VertexLayoutHandle (*createVertexLayout)(RenderDeviceBackendContext *, const VertexLayoutDescriptor &) = nullptr;
+        void (*destroyVertexLayout)(RenderDeviceBackendContext *, VertexLayoutHandle) = nullptr;
 
-        Handle (*createPipeline)(RenderDeviceBackendContext *, const PipelineDescriptor&) = nullptr;
-        void (*destroyPipeline)(RenderDeviceBackendContext *, Handle) = nullptr;
+        PipelineHandle (*createPipeline)(RenderDeviceBackendContext *, const PipelineDescriptor&) = nullptr;
+        void (*destroyPipeline)(RenderDeviceBackendContext *, PipelineHandle) = nullptr;
 
-        Handle (*createGeometry)(RenderDeviceBackendContext *, const GeometryDescriptor) = nullptr;
-        void (*destroyGeometry)(RenderDeviceBackendContext *, Handle) = nullptr;
+        GeometryHandle (*createGeometry)(RenderDeviceBackendContext *, const GeometryDescriptor&) = nullptr;
+        void (*destroyGeometry)(RenderDeviceBackendContext *, GeometryHandle) = nullptr;
 
         void (*beginFrame)(RenderDeviceBackendContext *) = nullptr;
         void (*endFrame)(RenderDeviceBackendContext *) = nullptr;

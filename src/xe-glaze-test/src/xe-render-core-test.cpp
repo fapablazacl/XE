@@ -72,7 +72,7 @@ static void fillCheckerboardImage(void* data, size_t byteSize, int width, int he
     }
 }
 
-xe::Handle createCheckerBoardTexture(const xe::RenderDeviceBackendVTable &vtable, xe::RenderDeviceBackendContext *ctx, xe::ivec2 size) {
+xe::TextureHandle createCheckerBoardTexture(const xe::RenderDeviceBackendVTable &vtable, xe::RenderDeviceBackendContext *ctx, xe::ivec2 size) {
     constexpr int tileSize = 64;
     constexpr xe::PixelFormat format = xe::PixelFormat::R8G8B8A8;
     constexpr xe::DataType dataType = xe::DataType::UInt8;
@@ -151,17 +151,16 @@ void main() {
 }
 )";
 
-    xe::Handle shaderHandle = vtable.createShaderProgram(ctx, shaderDesc);
-    gl::Program programId = glctxgl->shaderPrograms[shaderHandle.index()].get();
-    if (!programId) {
-        // TODO: Implement an Handle API for checking for invalid/empty handles.
-        std::cerr << "Shader program initialization failed." << std::endl;
-        return 1;
-    }
+    xe::ShaderHandle shaderHandle = vtable.createShaderProgram(ctx, shaderDesc);
+	/*if (!shaderHandle.isValid()) {
+		std::cerr << "Shader program initialization failed." << std::endl;
+		return 1;
+	}*/
+    gl::Program programId = glctxgl->shaderPrograms[shaderHandle.index()].obj.get();
 
     // texture generation
-    xe::Handle textureHandle = createCheckerBoardTexture(vtable, ctx, {512, 512});
-    gl::Texture textureId = glctxgl->textures[textureHandle.index()].get();
+    xe::TextureHandle textureHandle = createCheckerBoardTexture(vtable, ctx, {512, 512});
+    gl::Texture textureId = glctxgl->textures[textureHandle.index()].obj.get();
 
     // vertex buffer initialization
     xe::vec3 const verts[] = {{-0.5f, 0.5f, 0.0f}, {0.5f, 0.5f, 0.0f}, {-0.5f, -0.5, 0.0f}, {0.5, -0.5, 0.0}};
@@ -172,15 +171,15 @@ void main() {
     bufferDesc.usage = xe::BufferUsage::DynamicDraw;
     bufferDesc.data = verts[0].data();
     bufferDesc.size = sizeof(verts);
-    xe::Handle vertexBuffer = vtable.createBuffer(ctx, bufferDesc);
+    xe::BufferHandle vertexBuffer = vtable.createBuffer(ctx, bufferDesc);
 
     bufferDesc.data = texCoords[0].data();
     bufferDesc.size = sizeof(texCoords);
-    xe::Handle texCoordBuffer = vtable.createBuffer(ctx, bufferDesc);
+    xe::BufferHandle texCoordBuffer = vtable.createBuffer(ctx, bufferDesc);
 
     // get native GL buffer id to manually create a VAO for rendering testing purposes
-    const gl::BufferId vertexBufferId = glctxgl->buffers[vertexBuffer.index()].get();
-    const gl::BufferId texCoordBufferId = glctxgl->buffers[texCoordBuffer.index()].get();
+    const gl::BufferId vertexBufferId = glctxgl->buffers[vertexBuffer.index()].obj.get();
+    const gl::BufferId texCoordBufferId = glctxgl->buffers[texCoordBuffer.index()].obj.get();
 
     gl::VertexArray vao = gl::createVertexArrays();
 

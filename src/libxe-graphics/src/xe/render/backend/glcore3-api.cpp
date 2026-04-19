@@ -3,6 +3,8 @@
 #include <glaze/raii.hpp>
 #include <xe/math/Vector.h>
 #include <xe/render/RenderBackend.h>
+#include <cassert>
+#include <utility>
 #include <vector>
 #include <iostream>
 #include <array>
@@ -23,6 +25,40 @@ namespace xe {
 			assert(ctx);
 			return static_cast<RenderDeviceBackendContextGL* >(ctx);
 		}
+
+		// 16-bit index field in the handle bit layout; caps every pool at 65536 entries.
+		constexpr uint32_t kHandleIndexLimit = 0x10000u;
+		// 8-bit gen field in the handle bit layout; rolls over every 256 reuses per slot.
+		constexpr uint32_t kHandleGenMask = 0xFFu;
+
+		/**
+		 * @brief Reuse an empty slot (or append a new one) and return (index, gen).
+		 *
+		 * Linear-scans pool looking for a slot whose RAII holder is empty - those are free slots
+		 * awaiting reuse. On hit, moves obj into that slot and bumps its gen counter. On miss,
+		 * appends a new slot. Returns the index and the final gen value for the caller to pack
+		 * into the typed handle. Scan cost is O(n); resource creation is not on the frame hot
+		 * path so this is intentional.
+		 *
+		 * @tparam T underlying GL resource type (gl::BufferId, gl::Texture, gl::Program, ...)
+		 * @param pool the pool vector to acquire a slot in; grows if no free slot is available
+		 * @param obj RAII holder for the GL object to install at the acquired slot
+		 * @return {index, gen} pair ready to be passed to HandleT::make
+		 */
+		template <class T>
+		std::pair<uint32_t, uint8_t>
+		acquireSlot(std::vector<Slot<T>>& pool, glaze::Unique<T>&& obj) {
+			for (uint32_t i = 0; i < pool.size(); ++i) {
+				if (!pool[i].obj) {
+					pool[i].obj = std::move(obj);
+					pool[i].gen = static_cast<uint8_t>((pool[i].gen + 1) & kHandleGenMask);
+					return { i, pool[i].gen };
+				}
+			}
+			assert(pool.size() < kHandleIndexLimit && "handle index exhausted (16-bit field)");
+			pool.push_back({ std::move(obj), 0 });
+			return { static_cast<uint32_t>(pool.size() - 1), 0 };
+		}
 	}
 
 	RenderDeviceBackendContext* createContextGL() {
@@ -31,11 +67,6 @@ namespace xe {
 
 	void destroyContextGL(RenderDeviceBackendContext* ctx) {
 		delete glctx(ctx);
-	}
-
-	inline TextureType textureTypeOf(Handle handle) {
-		assert(handle.type() == HandleTexture);
-		return static_cast<TextureType>(handle.subType());
 	}
 
 	inline const void* mipLevelDataAt(const TextureDescriptor &desc, size_t mip, size_t face, size_t faceCount) {
@@ -89,7 +120,7 @@ namespace xe {
 		return gl::BufferUsage::eStreamDraw;
 	}
 
-	Handle createBufferGL(RenderDeviceBackendContext* ctx, const BufferDescriptor& desc) {
+	BufferHandle createBufferGL(RenderDeviceBackendContext* ctx, const BufferDescriptor& desc) {
 		auto &buffers = glctx(ctx)->buffers;
 
 		gl::BufferTarget const target = toBufferTargetGL(desc.type);
@@ -98,29 +129,37 @@ namespace xe {
 		auto buffer = glaze::makeUnique<gl::BufferId>();
 		gl::bindBuffer(target, buffer);
 		gl::bufferData(target, desc.size, desc.data, usage);
-		
-		uint32_t index = static_cast<uint32_t>(buffers.size());
 
-		// TODO: Implement a mechanism to reuse free buffer slots
-		buffers.push_back(std::move(buffer));
-
-		return Handle::make(HandleBuffer, 0, index, static_cast<uint32_t>(desc.type));
+		auto const [index, gen] = acquireSlot(buffers, std::move(buffer));
+		return BufferHandle::make(gen, index, desc.type);
 	}
 
-	void destroyBufferGL(RenderDeviceBackendContext* ctx, Handle handle) {
-		glctx(ctx)->buffers[handle.index()].reset({});
+	void destroyBufferGL(RenderDeviceBackendContext* ctx, BufferHandle handle) {
+		auto &buffers = glctx(ctx)->buffers;
+		uint32_t const index = handle.index();
+		assert(index < buffers.size() && "destroyBufferGL: handle index out of range");
+		auto &slot = buffers[index];
+		assert(slot.obj             && "destroyBufferGL: slot already free (double destroy)");
+		assert(slot.gen == handle.gen() && "destroyBufferGL: stale handle (generation mismatch)");
+		// gen is bumped on next acquireSlot, not here: keeps the bump tied to actual reuse so
+		// destroy-without-reacquire doesn't prematurely burn through the 8-bit field.
+		slot.obj.reset({});
 	}
 
-	void readBufferGL(RenderDeviceBackendContext* ctx, Handle handle, const BufferReadDescriptor &desc) {
+	void readBufferGL(RenderDeviceBackendContext* ctx, BufferHandle handle, const BufferReadDescriptor &desc) {
 		assert(desc.data != nullptr && "BufferReadDescriptor: data must not be null");
 		assert(desc.size > 0 && "BufferReadDescriptor: size must be greater than zero");
 
-		auto &buffer = glctx(ctx)->buffers[handle.index()];
+		auto &buffers = glctx(ctx)->buffers;
+		uint32_t const index = handle.index();
+		assert(index < buffers.size() && "readBufferGL: handle index out of range");
+		auto &slot = buffers[index];
+		assert(slot.obj             && "readBufferGL: use of freed handle");
+		assert(slot.gen == handle.gen() && "readBufferGL: stale handle (generation mismatch)");
 
-		auto const type =  static_cast<BufferType>(handle.subType());
-		gl::BufferTarget const target = toBufferTargetGL(type);
+		gl::BufferTarget const target = toBufferTargetGL(handle.subType());
 
-		gl::bindBuffer(target, buffer);
+		gl::bindBuffer(target, slot.obj);
 		gl::getBufferSubData(target,
 			static_cast<GLintptr>(desc.offset),
 			static_cast<GLsizeiptr>(desc.size),
@@ -175,7 +214,7 @@ namespace xe {
 		return gl::PixelType::eUnsignedByte;
 	}
 
-	Handle createTextureGL(RenderDeviceBackendContext* ctx, const TextureDescriptor &desc) {
+	TextureHandle createTextureGL(RenderDeviceBackendContext* ctx, const TextureDescriptor &desc) {
 		auto &textures = glctx(ctx)->textures;
 		auto texture = glaze::makeUnique<gl::Texture>();
 
@@ -253,19 +292,29 @@ namespace xe {
 		gl::texParameteri(target, gl::TextureParameterName::eTextureWrapT, GL_REPEAT);
 		gl::texParameteri(target, gl::TextureParameterName::eTextureWrapR, GL_REPEAT);
 
-		uint32_t index = static_cast<uint32_t>(textures.size());
-		textures.push_back(std::move(texture));
-
-		return Handle::make(xe::HandleTexture, 0, index, static_cast<uint32_t>(desc.type));
+		auto const [index, gen] = acquireSlot(textures, std::move(texture));
+		return TextureHandle::make(gen, index, desc.type);
 	}
 
-	void destroyTextureGL(RenderDeviceBackendContext* ctx, Handle handle) {
-		glctx(ctx)->textures[handle.index()].reset({});
+	void destroyTextureGL(RenderDeviceBackendContext* ctx, TextureHandle handle) {
+		auto &textures = glctx(ctx)->textures;
+		uint32_t const index = handle.index();
+		assert(index < textures.size() && "destroyTextureGL: handle index out of range");
+		auto &slot = textures[index];
+		assert(slot.obj             && "destroyTextureGL: slot already free (double destroy)");
+		assert(slot.gen == handle.gen() && "destroyTextureGL: stale handle (generation mismatch)");
+		slot.obj.reset({});
 	}
 
-	void updateTextureGL(RenderDeviceBackendContext* ctx, Handle handle, const TextureUpdateDescriptor &desc) {
-		auto &texture = glctx(ctx)->textures[handle.index()];
-		TextureType const type = textureTypeOf(handle);
+	void updateTextureGL(RenderDeviceBackendContext* ctx, TextureHandle handle, const TextureUpdateDescriptor &desc) {
+		auto &textures = glctx(ctx)->textures;
+		uint32_t const index = handle.index();
+		assert(index < textures.size() && "updateTextureGL: handle index out of range");
+		auto &slot = textures[index];
+		assert(slot.obj             && "updateTextureGL: use of freed handle");
+		assert(slot.gen == handle.gen() && "updateTextureGL: stale handle (generation mismatch)");
+
+		TextureType const type = handle.subType();
 		gl::TextureTarget const target = toTextureTargetGL(type);
 		gl::PixelFormat const pixelFormat = toPixelFormatGL(desc.sourceFormat);
 		gl::PixelType const pixelType = toPixelTypeGL(desc.sourceDataType);
@@ -278,7 +327,7 @@ namespace xe {
 		GLsizei const h = desc.size.y;
 		GLsizei const d = desc.size.z;
 
-		gl::bindTexture(target, texture);
+		gl::bindTexture(target, slot.obj);
 
 		switch (type) {
 		case TextureType::Tex1D:
@@ -304,13 +353,19 @@ namespace xe {
 		}
 	}
 
-	void readTextureGL(RenderDeviceBackendContext* ctx, Handle handle, const TextureReadDescriptor &desc) {
+	void readTextureGL(RenderDeviceBackendContext* ctx, TextureHandle handle, const TextureReadDescriptor &desc) {
 		assert(desc.data != nullptr && "TextureReadDescriptor: data must not be null");
 		assert(desc.offset.x == 0 && desc.offset.y == 0 && desc.offset.z == 0
 			&& "TextureReadDescriptor: GL 3.3 backend requires offset == {0,0,0}");
 
-		auto &texture = glctx(ctx)->textures[handle.index()];
-		TextureType const type = textureTypeOf(handle);
+		auto &textures = glctx(ctx)->textures;
+		uint32_t const index = handle.index();
+		assert(index < textures.size() && "readTextureGL: handle index out of range");
+		auto &slot = textures[index];
+		assert(slot.obj             && "readTextureGL: use of freed handle");
+		assert(slot.gen == handle.gen() && "readTextureGL: stale handle (generation mismatch)");
+
+		TextureType const type = handle.subType();
 		gl::TextureTarget const bindTarget = toTextureTargetGL(type);
 		gl::PixelFormat const pixelFormat = toPixelFormatGL(desc.destFormat);
 		gl::PixelType const pixelType = toPixelTypeGL(desc.destDataType);
@@ -323,7 +378,7 @@ namespace xe {
 			assert(desc.faceIndex >= 0 && desc.faceIndex < 6 && "TextureReadDescriptor: faceIndex out of range");
 		}
 
-		gl::bindTexture(bindTarget, texture);
+		gl::bindTexture(bindTarget, slot.obj);
 
 #ifndef NDEBUG
 		GLint actualWidth = 0;
@@ -382,7 +437,7 @@ namespace xe {
 		return program;
 	}
 
-	Handle createShaderProgramGL(RenderDeviceBackendContext *ctx, const ShaderProgramDescriptor &desc) {
+	ShaderHandle createShaderProgramGL(RenderDeviceBackendContext *ctx, const ShaderProgramDescriptor &desc) {
 		auto &shaderPrograms = glctx(ctx)->shaderPrograms;
 
 		std::vector<glaze::Unique<gl::Shader>> shaders;
@@ -396,17 +451,18 @@ namespace xe {
 			return {};
 		}
 
-		// TODO: Implement a mechanism to reuse free program slots
-		uint32_t index = static_cast<uint32_t>(shaderPrograms.size());
-		shaderPrograms.push_back(std::move(shaderProgram));
-
-		return Handle::make(HandleShader, 0, index);
+		auto const [index, gen] = acquireSlot(shaderPrograms, std::move(shaderProgram));
+		return ShaderHandle::make(gen, index);
 	}
 
-	void destroyShaderProgramGL(RenderDeviceBackendContext *ctx, Handle handle) {
-		auto& shaderPrograms = glctx(ctx)->shaderPrograms;
-
-		shaderPrograms[handle.index()].reset({});
+	void destroyShaderProgramGL(RenderDeviceBackendContext *ctx, ShaderHandle handle) {
+		auto &shaderPrograms = glctx(ctx)->shaderPrograms;
+		uint32_t const index = handle.index();
+		assert(index < shaderPrograms.size() && "destroyShaderProgramGL: handle index out of range");
+		auto &slot = shaderPrograms[index];
+		assert(slot.obj             && "destroyShaderProgramGL: slot already free (double destroy)");
+		assert(slot.gen == handle.gen() && "destroyShaderProgramGL: stale handle (generation mismatch)");
+		slot.obj.reset({});
 	}
 
 	void initializeBackendTableGL(RenderDeviceBackendVTable* vtable) {

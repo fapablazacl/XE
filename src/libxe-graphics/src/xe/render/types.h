@@ -1,15 +1,21 @@
 
-#pragma once 
+#pragma once
 
 #include <cstdint>
 #include <cstddef>
 #include <array>
+#include <type_traits>
 
 #include <xe/DataType.h>
 #include <xe/graphics/GraphicsDevice.h>
 #include <xe/graphics/BufferDescriptor.h>
 
 namespace xe {
+	/**
+	 * @brief Compile-time tag discriminating handle kinds.
+	 * Encoded in the C++ type system via HandleT's Tag template parameter; no longer stored in the
+	 * handle bit payload (the former type:4 field is now reserved).
+	 */
 	enum HandleType : uint32_t {
 		HandleBuffer = 0x01,
 		HandleShader,
@@ -19,48 +25,80 @@ namespace xe {
 		HandleGeometry
 	};
 
-	/**
-	 * @brief Handle to a resource
-	 * 
-	 * TODO: Add a type-safe and zero-cost wrapper, to avoid mixing up handle of other resources
-	 */
-	struct Handle {
-		static const uint32_t IndexMask = 0xFFFFu;
-		static const uint32_t SubTypeMask = 0xFu;
-		static const uint32_t GenMask = 0xFFu;
-		static const uint32_t TypeMask = 0xFu;
+	namespace detail {
+		//! Sentinel subtype enum used by handles whose resource class has no meaningful subtype.
+		enum class NoSubtype : uint32_t { None = 0 };
 
-		static const uint32_t IndexShift = 0;
-		static const uint32_t SubTypeShift = 16;
-		static const uint32_t GenShift = 20;
-		static const uint32_t TypeShift = 28;
+		/**
+		 * @brief Zero-cost strongly-typed handle to a backend resource.
+		 *
+		 * Instances of HandleT with different Tag (HandleType) or SubEnum template parameters are
+		 * distinct C++ types, so mixing a buffer handle with a texture handle is a compile error.
+		 * The raw 32-bit payload is laid out as:
+		 *
+		 *   bit: 31       28 27        20 19      16 15                    0
+		 *       +-----------+-------------+----------+------------------------+
+		 *       | subType:4 |    gen:8    | reserved |       index:16         |
+		 *       +-----------+-------------+----------+------------------------+
+		 *
+		 * @tparam Tag compile-time HandleType tag (identifies resource class)
+		 * @tparam SubEnum resource-specific subtype enum (e.g. TextureType for textures). Defaults to
+		 *         NoSubtype when the resource class has no subtype dimension.
+		 */
+		template <HandleType Tag, class SubEnum = NoSubtype>
+		struct HandleT {
+			static constexpr uint32_t IndexMask    = 0xFFFFu;
+			static constexpr uint32_t ReservedMask = 0xFu;
+			static constexpr uint32_t GenMask      = 0xFFu;
+			static constexpr uint32_t SubTypeMask  = 0xFu;
 
-		uint32_t raw = 0;
+			static constexpr uint32_t IndexShift    = 0;
+			static constexpr uint32_t ReservedShift = 16;
+			static constexpr uint32_t GenShift      = 20;
+			static constexpr uint32_t SubTypeShift  = 28;
 
-		uint32_t index() const {
-			return (raw >> IndexShift) & IndexMask;
-		}
+			//! Compile-time tag surface, for diagnostics and SFINAE.
+			static constexpr HandleType tag = Tag;
 
-		//! Resource-specific subtype (e.g. TextureType for HandleTexture). Value 0 for handles that don't use it.
-		uint32_t subType() const {
-			return (raw >> SubTypeShift) & SubTypeMask;
-		}
+			//! Raw bit payload. A default-constructed handle (raw == 0) is invalid.
+			uint32_t raw = 0;
 
-		uint32_t gen() const {
-			return (raw >> GenShift) & GenMask;
-		}
+			/**
+			 * @brief Test whether this handle refers to a live resource.
+			 * A zero-initialized handle is the canonical invalid sentinel.
+			 */
+			constexpr bool isValid() const { return raw != 0; }
 
-		uint32_t type() const {
-			return (raw >> TypeShift) & TypeMask;
-		}
+			//! Pool slot index assigned by the backend.
+			constexpr uint32_t index() const { return (raw >> IndexShift) & IndexMask; }
 
-		static Handle make(HandleType type, uint32_t gen, uint32_t index, uint32_t subType = 0) {
-			const uint32_t raw = (type << TypeShift) | (gen << GenShift) | ((subType & SubTypeMask) << SubTypeShift) | (index << IndexShift);
-			return Handle{raw};
-		}
-	};
+			//! Generation counter captured at creation time; used by the backend to detect use-after-free.
+			constexpr uint32_t gen() const { return (raw >> GenShift) & GenMask; }
 
-	static_assert(sizeof(Handle) == 4);
+			//! Strongly-typed subtype (e.g. TextureType::Tex2D for a TextureHandle).
+			constexpr SubEnum subType() const {
+				return static_cast<SubEnum>((raw >> SubTypeShift) & SubTypeMask);
+			}
+
+			/**
+			 * @brief Pack an (index, gen, subType) triple into a typed handle.
+			 * Call site responsibility to ensure each field fits its bit width; debug builds assert.
+			 * @param gen generation counter supplied by the backend's pool
+			 * @param index pool slot index
+			 * @param sub resource-specific subtype (defaults to SubEnum's zero value)
+			 */
+			static constexpr HandleT make(uint32_t gen, uint32_t index, SubEnum sub = SubEnum{}) {
+				const uint32_t packed =
+					((static_cast<uint32_t>(sub) & SubTypeMask) << SubTypeShift) |
+					((gen                        & GenMask)     << GenShift)     |
+					((index                      & IndexMask)   << IndexShift);
+				return HandleT{packed};
+			}
+
+			friend constexpr bool operator==(HandleT a, HandleT b) { return a.raw == b.raw; }
+			friend constexpr bool operator!=(HandleT a, HandleT b) { return a.raw != b.raw; }
+		};
+	} // namespace detail
 
 	struct RenderDeviceBackendContext {
 		// TODO: Put here common utilities / data usable for all contexts (allocators?, logging? profiling?)
@@ -180,7 +218,7 @@ namespace xe {
 		//! Source pixel data. Must cover the region described by size.
 		const void *sourceData = nullptr;
 	};
-	
+
     //! semantic vertex attribute
     enum class VertexAttribSemantic : int {
 		Position,
@@ -226,10 +264,30 @@ namespace xe {
         VertexLayoutResolveMode resolveMode = VertexLayoutResolveMode::Semantic;
     };
 
+	// Typed handle aliases - use these at every API boundary. Each alias is a distinct C++ type,
+	// so mixing kinds (e.g. passing a ShaderHandle where a BufferHandle is expected) is a compile
+	// error. Runtime payload is still a single uint32_t - zero overhead vs. the original untyped
+	// Handle.
+	using BufferHandle       = detail::HandleT<HandleBuffer,       BufferType>;
+	using TextureHandle      = detail::HandleT<HandleTexture,      TextureType>;
+	using ShaderHandle       = detail::HandleT<HandleShader>;
+	using VertexLayoutHandle = detail::HandleT<HandleVertexLayout>;
+	using PipelineHandle     = detail::HandleT<HandlePipeline>;
+	using GeometryHandle     = detail::HandleT<HandleGeometry>;
+
+	static_assert(sizeof(BufferHandle)       == 4);
+	static_assert(sizeof(TextureHandle)      == 4);
+	static_assert(sizeof(ShaderHandle)       == 4);
+	static_assert(sizeof(VertexLayoutHandle) == 4);
+	static_assert(sizeof(PipelineHandle)     == 4);
+	static_assert(sizeof(GeometryHandle)     == 4);
+	static_assert(std::is_trivially_copyable_v<BufferHandle>);
+	static_assert(std::is_trivially_copyable_v<TextureHandle>);
+
     struct GeometryDescriptor {
-		Handle layoutHandle;
-        std::vector<Handle> buffers;
-        Handle indexBufferHandle;
+		VertexLayoutHandle layoutHandle;
+        std::vector<BufferHandle> buffers;
+        BufferHandle indexBufferHandle;
     };
 
 	struct ShaderProgramDescriptor {
@@ -238,8 +296,8 @@ namespace xe {
 	};
 
 	struct PipelineDescriptor {
-		Handle layoutHandle;
-		Handle shaderProgramHandle;
+		VertexLayoutHandle layoutHandle;
+		ShaderHandle shaderProgramHandle;
 		ClearFlags clearFlags = ClearFlags::Color;
 		vec4 clearColor = { 0.0f, 0.0f, 0.0f, 1.0f };
 	};
