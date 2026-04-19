@@ -100,14 +100,22 @@ int main() {
     xe::ShaderProgramDescriptor shaderDesc;
     shaderDesc.glslVertexShader = R"(
 #version 330 core
-layout(location = 0) in vec2 position; 
+layout(location = 0) in vec3 position; 
+// layout(location = 1) in vec2 texCoord;
+
+// out vec2 fragTexCoord;
+
 void main() {
-    gl_Position = vec4(position, 0.0, 1.0);
+    gl_Position = vec4(position, 1.0);
+    // fragTexCoord = texCoord;
 }
 )";
 
     shaderDesc.glslFragmentShader = R"(
 #version 330 core
+
+// in vec2 fragTexCoord;
+
 out vec4 fragColor;
 void main() {
     fragColor = vec4(1.0, 0.5, 0.2, 1.0);
@@ -137,13 +145,33 @@ void main() {
     xe::Handle texCoordBuffer = vtable.createBuffer(ctx, bufferDesc);
 
     // get native GL buffer id to manually create a VAO for rendering testing purposes
+    auto glctxgl = static_cast<xe::RenderDeviceBackendContextGL*>(ctx);
 
+    const gl::BufferId vertexBufferId = glctxgl->buffers[vertexBuffer.index()].get();
+    const gl::BufferId texCoordBufferId = glctxgl->buffers[texCoordBuffer.index()].get();
+
+    gl::VertexArray vao = gl::createVertexArrays();
+
+    gl::bindVertexArray(vao);
+    gl::bindBuffer(gl::BufferTarget::eArrayBuffer, vertexBufferId);
+    gl::enableVertexArrayAttrib(vao, 0);
+    gl::vertexAttribPointer(gl::AttribLocation{0}, 3, gl::VertexAttribPointerType::eFloat, GL_FALSE, 0, nullptr);
+    /*
+	gl::bindBuffer(gl::BufferTarget::eArrayBuffer, texCoordBufferId);
+	gl::enableVertexArrayAttrib(vao, 1);
+	gl::vertexAttribPointer(gl::AttribLocation{ 1 }, 2, gl::VertexAttribPointerType::eFloat, GL_FALSE, 0, nullptr);
+    */
 
 	while (!glfwWindowShouldClose(window)) {
 		glfwPollEvents();
 
 		int w, h;
 		glfwGetFramebufferSize(window, &w, &h);
+
+        gl::viewport(0, 0, w, h);
+
+        gl::bindVertexArray(vao);
+        gl::drawArrays(gl::PrimitiveType::eTriangleStrip, 0, 4);
 
 		glfwSwapBuffers(window);
 	}
