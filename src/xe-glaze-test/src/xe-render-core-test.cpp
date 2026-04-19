@@ -137,11 +137,11 @@ void main() {
     bufferDesc.type = xe::BufferType::Vertex;
     bufferDesc.usage = xe::BufferUsage::DynamicDraw;
     bufferDesc.data = verts[0].data();
-    bufferDesc.size = sizeof(xe::vec3) * 3;
+    bufferDesc.size = sizeof(verts);
     xe::Handle vertexBuffer = vtable.createBuffer(ctx, bufferDesc);
 
     bufferDesc.data = texCoords[0].data();
-    bufferDesc.size = sizeof(xe::vec2) * 3;
+    bufferDesc.size = sizeof(texCoords);
     xe::Handle texCoordBuffer = vtable.createBuffer(ctx, bufferDesc);
 
     // get native GL buffer id to manually create a VAO for rendering testing purposes
