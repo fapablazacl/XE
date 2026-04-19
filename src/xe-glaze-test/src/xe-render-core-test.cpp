@@ -5,6 +5,7 @@
 #include <cstdlib>
 
 #include "xe/render/RenderBackend.h"
+#include "xe/render/backend/glcore3-api.h"
 
 int main() {
     if (!glfwInit()) {
@@ -26,6 +27,47 @@ int main() {
     glfwMakeContextCurrent(window);
     glazeLoadFunctions(glfwGetProcAddress);
 
+    xe::RenderDeviceBackendVTable vtable;
+    xe::initializeBackendTableGL(&vtable);
+
+    xe::RenderDeviceBackendContext* ctx = vtable.createContext();
+
+    // shader initialization
+    xe::ShaderProgramDescriptor shaderDesc;
+    shaderDesc.glslVertexShader = R"(
+#version 330 core
+layout(location = 0) in vec2 position; 
+void main() {
+    gl_Position = vec4(position, 0.0, 1.0);
+}
+)";
+
+    shaderDesc.glslFragmentShader = R"(
+#version 330 core
+out vec4 fragColor;
+void main() {
+    fragColor = vec4(1.0, 0.5, 0.2, 1.0);
+}
+)";
+
+    xe::Handle shaderHandle = vtable.createShaderProgram(ctx, shaderDesc);
+    if (!shaderHandle.type()) {
+        // TODO: Implement an Handle API for checking for invalid/empty handles. This one doesn't work
+        std::cerr << "Shader program initialization failed." << std::endl;
+        return 1;
+    }
+
+    // vertex buffer initialization
+    xe::vec3 const verts[] = {{0.0f, 0.5f, 0.0f}, {0.5f, -0.5, 0.0f}, {-0.5, -0.5, 0.0}};
+
+    xe::BufferDescriptor bufferDesc{};
+    bufferDesc.type = xe::BufferType::Vertex;
+    bufferDesc.usage = xe::BufferUsage::DynamicDraw;
+    bufferDesc.data = verts[0].data();
+    bufferDesc.size = sizeof(xe::vec3) * 3;
+    xe::Handle bufferHandle = vtable.createBuffer(ctx, bufferDesc);
+
+    
 	while (!glfwWindowShouldClose(window)) {
 		glfwPollEvents();
 
@@ -34,6 +76,8 @@ int main() {
 
 		glfwSwapBuffers(window);
 	}
+
+    vtable.destroyContext(ctx);
 
     glfwDestroyWindow(window);
     glfwTerminate();

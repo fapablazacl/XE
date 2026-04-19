@@ -29,6 +29,14 @@ namespace xe {
 		return static_cast<RenderDeviceBackendContextGL* >(ctx);
 	}
 
+	RenderDeviceBackendContext* createContextGL() {
+		return new RenderDeviceBackendContextGL();
+	}
+
+	void destroyContextGL(RenderDeviceBackendContext* ctx) {
+		delete glctx(ctx);
+	}
+
 	inline TextureType textureTypeOf(Handle handle) {
 		assert(handle.type() == HandleTexture);
 		return static_cast<TextureType>(handle.subType());
@@ -399,6 +407,8 @@ namespace xe {
 	}
 
 	void initializeBackendTableGL(RenderDeviceBackendVTable* vtable) {
+		vtable->createContext = &createContextGL;
+		vtable->destroyContext = &destroyContextGL;
 		vtable->createBuffer = &createBufferGL;
 		vtable->destroyBuffer = &destroyBufferGL;
 		vtable->readBuffer = &readBufferGL;

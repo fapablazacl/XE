@@ -11,6 +11,9 @@ namespace xe {
      * Allows to abstract away the underlying graphics API without resorting to polymorphism
      */
     struct RenderDeviceBackendVTable {
+        RenderDeviceBackendContext* (*createContext)() = nullptr;
+        void (*destroyContext)(RenderDeviceBackendContext*) = nullptr;
+
         Handle (*createBuffer)(RenderDeviceBackendContext *, const BufferDescriptor &) = nullptr;
         void (*destroyBuffer)(RenderDeviceBackendContext *, Handle) = nullptr;
         void (*readBuffer)(RenderDeviceBackendContext *, Handle, const BufferReadDescriptor &) = nullptr;

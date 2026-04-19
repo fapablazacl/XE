@@ -19,7 +19,11 @@ namespace xe {
 		HandleGeometry
 	};
 
-	//! Resource Handle
+	/**
+	 * @brief Handle to a resource
+	 * 
+	 * TODO: Add a type-safe and zero-cost wrapper, to avoid mixing up handle of other resources
+	 */
 	struct Handle {
 		static const uint32_t IndexMask = 0xFFFFu;
 		static const uint32_t SubTypeMask = 0xFu;
