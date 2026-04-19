@@ -130,7 +130,7 @@ void main() {
     }
 
     // vertex buffer initialization
-    xe::vec3 const verts[] = {{-5.0f, 0.5f, 0.0f}, {5.0f, 0.5f, 0.0f}, {-0.5f, -0.5, 0.0f}, {0.5, -0.5, 0.0}};
+    xe::vec3 const verts[] = {{-0.5f, 0.5f, 0.0f}, {0.5f, 0.5f, 0.0f}, {-0.5f, -0.5, 0.0f}, {0.5, -0.5, 0.0}};
     xe::vec2 const texCoords[] = {{0.0f, 1.0f}, {0.0f, 0.0f}, {1.0f, 1.0f}, {1.0f, 0.0f}};
 
     xe::BufferDescriptor bufferDesc{};
