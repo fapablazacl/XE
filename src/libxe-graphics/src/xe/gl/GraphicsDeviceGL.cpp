@@ -3,9 +3,7 @@
 
 #include "gl.h"
 
-#include "BufferGL.h"
 #include "Conversion.h"
-#include "ProgramGL.h"
 #include "SubsetGL.h"
 #include "UtilGL.h"
 
@@ -87,7 +85,7 @@ namespace xe {
     }
 
     Subset *GraphicsDeviceGL::createSubset(const SubsetDescriptor &desc) {
-        return new SubsetGL(desc);
+        return nullptr;
     }
 
     Buffer *GraphicsDeviceGL::createBuffer(const BufferDescriptor & /*desc*/) {
@@ -95,7 +93,7 @@ namespace xe {
     }
 
     Program *GraphicsDeviceGL::createProgram(const ProgramDescriptor &desc) {
-        return new ProgramGL(desc);
+        return nullptr;
     }
 
     void GraphicsDeviceGL::draw(const Subset *subset, const SubsetEnvelope *envelopes, const size_t envelopeCount) {
@@ -258,17 +256,10 @@ namespace xe {
     }
 
     void GraphicsDeviceGL::setProgram(const Program *program) {
-        m_program = dynamic_cast<const ProgramGL *>(program);
-
-        if (m_program) {
-            glUseProgram(m_program->GetID());
-        } else {
-            glUseProgram(0);
-        }
     }
 
     const Program *GraphicsDeviceGL::getProgram() const {
-        return m_program;
+        return nullptr;
     }
 
     void GraphicsDeviceGL::applyUniform(const UniformMatrix *uniformMatrix, const size_t count, const void *data) {
@@ -283,7 +274,7 @@ namespace xe {
 
         for (size_t i = 0; i < count; i++) {
             const UniformMatrix *current = &uniformMatrix[i];
-            const GLint location = m_program->getUniformLocation(current->name);
+            const GLint location = 0;
 
             assert(location >= 0);
 
@@ -378,7 +369,7 @@ namespace xe {
 
         for (size_t i = 0; i < count; i++) {
             const Uniform *current = &uniform[i];
-            const GLint location = m_program->getUniformLocation(current->name);
+            const GLint location = 0;
 
             assert(location >= 0);
 
