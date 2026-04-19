@@ -18,20 +18,31 @@ namespace xe {
 		gl::Program shaderProgram;
 	};
 
-	struct TextureRecordGL {
-		glaze::Unique<gl::Texture> texture;
-		TextureType type = TextureType::Tex2D;
-	};
-
 	struct RenderDeviceBackendContextGL : RenderDeviceBackendContext {
 		std::vector<glaze::Unique<gl::BufferId>> buffers;
 		std::vector<glaze::Unique<gl::Program>> shaderPrograms;
-		std::vector<TextureRecordGL> textures;
+		std::vector<glaze::Unique<gl::Texture>> textures;
 	};
 
 	inline RenderDeviceBackendContextGL* glctx(RenderDeviceBackendContext *ctx) {
 		assert(ctx);
 		return static_cast<RenderDeviceBackendContextGL* >(ctx);
+	}
+
+	inline TextureType textureTypeOf(Handle handle) {
+		assert(handle.type() == HandleTexture);
+		return static_cast<TextureType>(handle.subType());
+	}
+
+	inline const void* mipLevelDataAt(const TextureDescriptor &desc, size_t mip, size_t face, size_t faceCount) {
+		if (desc.mipLevels == nullptr) {
+			return nullptr;
+		}
+		return desc.mipLevels[mip * faceCount + face].data;
+	}
+
+	inline int halveDimension(int size) {
+		return size > 1 ? size / 2 : 1;
 	}
 
 	static constexpr std::array<gl::TextureTarget, 6> cubeMapSides {
@@ -138,43 +149,32 @@ namespace xe {
 				&& "TextureDescriptor: mipLevelCount must equal mipCount * faceCount");
 		}
 
-		auto mipData = [&](size_t mip, size_t face) -> const void* {
-			if (desc.mipLevels == nullptr) {
-				return nullptr;
-			}
-			return desc.mipLevels[mip * faceCount + face].data;
-		};
-
-		auto sizeAt = [](int base, size_t mip) -> int {
-			int const shifted = base >> mip;
-			return shifted > 1 ? shifted : 1;
-		};
-
 		gl::bindTexture(target, texture);
 
+		int w = desc.size.x;
+		int h = desc.size.y;
+		int d = desc.size.z;
+
 		for (size_t mip = 0; mip < mipCount; ++mip) {
-			int const w = sizeAt(desc.size.x, mip);
-			int const h = sizeAt(desc.size.y, mip);
-			int const d = sizeAt(desc.size.z, mip);
 			GLint const level = static_cast<GLint>(mip);
 
 			switch (desc.type) {
 			case TextureType::Tex1D:
-				gl::texImage1D(target, level, internalFormat, w, 0, pixelFormat, pixelType, mipData(mip, 0));
+				gl::texImage1D(target, level, internalFormat, w, 0, pixelFormat, pixelType, mipLevelDataAt(desc, mip, 0, faceCount));
 				break;
 
 			case TextureType::Tex2D:
-				gl::texImage2D(target, level, internalFormat, w, h, 0, pixelFormat, pixelType, mipData(mip, 0));
+				gl::texImage2D(target, level, internalFormat, w, h, 0, pixelFormat, pixelType, mipLevelDataAt(desc, mip, 0, faceCount));
 				break;
 
 			case TextureType::Tex3D:
 			case TextureType::Tex2DArray:
-				gl::texImage3D(target, level, internalFormat, w, h, d, 0, pixelFormat, pixelType, mipData(mip, 0));
+				gl::texImage3D(target, level, internalFormat, w, h, d, 0, pixelFormat, pixelType, mipLevelDataAt(desc, mip, 0, faceCount));
 				break;
 
 			case TextureType::TexCubeMap:
 				for (size_t face = 0; face < 6u; ++face) {
-					gl::texImage2D(cubeMapSides[face], level, internalFormat, w, h, 0, pixelFormat, pixelType, mipData(mip, face));
+					gl::texImage2D(cubeMapSides[face], level, internalFormat, w, h, 0, pixelFormat, pixelType, mipLevelDataAt(desc, mip, face, faceCount));
 				}
 				break;
 
@@ -182,6 +182,10 @@ namespace xe {
 				assert(false && "TextureType is unknown");
 				return {};
 			}
+
+			w = halveDimension(w);
+			h = halveDimension(h);
+			d = halveDimension(d);
 		}
 
 		if (desc.generateMipmaps) {
@@ -201,18 +205,19 @@ namespace xe {
 		gl::texParameteri(target, gl::TextureParameterName::eTextureWrapR, GL_REPEAT);
 
 		uint32_t index = static_cast<uint32_t>(textures.size());
-		textures.push_back({ std::move(texture), desc.type });
+		textures.push_back(std::move(texture));
 
-		return Handle::make(xe::HandleTexture, 0, index);
+		return Handle::make(xe::HandleTexture, 0, index, static_cast<uint32_t>(desc.type));
 	}
 
 	void destroyTextureGL(RenderDeviceBackendContext* ctx, Handle handle) {
-		glctx(ctx)->textures[handle.index()].texture.reset({});
+		glctx(ctx)->textures[handle.index()].reset({});
 	}
 
 	void updateTextureGL(RenderDeviceBackendContext* ctx, Handle handle, const TextureUpdateDescriptor &desc) {
-		auto &record = glctx(ctx)->textures[handle.index()];
-		gl::TextureTarget const target = toTextureTargetGL(record.type);
+		auto &texture = glctx(ctx)->textures[handle.index()];
+		TextureType const type = textureTypeOf(handle);
+		gl::TextureTarget const target = toTextureTargetGL(type);
 		gl::PixelFormat const pixelFormat = toPixelFormatGL(desc.sourceFormat);
 		gl::PixelType const pixelType = toPixelTypeGL(desc.sourceDataType);
 
@@ -224,9 +229,9 @@ namespace xe {
 		GLsizei const h = desc.size.y;
 		GLsizei const d = desc.size.z;
 
-		gl::bindTexture(target, record.texture);
+		gl::bindTexture(target, texture);
 
-		switch (record.type) {
+		switch (type) {
 		case TextureType::Tex1D:
 			gl::texSubImage1D(target, level, x, w, pixelFormat, pixelType, desc.sourceData);
 			break;

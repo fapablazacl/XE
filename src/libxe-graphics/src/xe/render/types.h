@@ -22,10 +22,12 @@ namespace xe {
 	//! Resource Handle
 	struct Handle {
 		static const uint32_t IndexMask = 0xFFFFu;
+		static const uint32_t SubTypeMask = 0xFu;
 		static const uint32_t GenMask = 0xFFu;
 		static const uint32_t TypeMask = 0xFu;
 
 		static const uint32_t IndexShift = 0;
+		static const uint32_t SubTypeShift = 16;
 		static const uint32_t GenShift = 20;
 		static const uint32_t TypeShift = 28;
 
@@ -33,6 +35,11 @@ namespace xe {
 
 		uint32_t index() const {
 			return (raw >> IndexShift) & IndexMask;
+		}
+
+		//! Resource-specific subtype (e.g. TextureType for HandleTexture). Value 0 for handles that don't use it.
+		uint32_t subType() const {
+			return (raw >> SubTypeShift) & SubTypeMask;
 		}
 
 		uint32_t gen() const {
@@ -43,8 +50,8 @@ namespace xe {
 			return (raw >> TypeShift) & TypeMask;
 		}
 
-		static Handle make(HandleType type, uint32_t gen, uint32_t index) {
-			const uint32_t raw = (type << TypeShift) | (gen << GenShift) | (index << IndexShift);
+		static Handle make(HandleType type, uint32_t gen, uint32_t index, uint32_t subType = 0) {
+			const uint32_t raw = (type << TypeShift) | (gen << GenShift) | ((subType & SubTypeMask) << SubTypeShift) | (index << IndexShift);
 			return Handle{raw};
 		}
 	};
