@@ -1,19 +1,13 @@
 
 #include "SubsetGL.h"
-#include "BufferGL.h"
 #include "Conversion.h"
 
 #include <cassert>
 
 namespace xe {
     SubsetGL::SubsetGL(const SubsetDescriptor &desc) : descriptor(desc) {
-        for (std::size_t i = 0; i < desc.buffers.size(); i++) {
-            auto bufferGL = dynamic_cast<const BufferGL *>(desc.buffers[i]);
-            assert(bufferGL);
-            buffers.emplace_back(bufferGL);
-        }
-
         // setup the subset arrays based on the vertex format and the mapping information
+        /*
         glGenVertexArrays(1, &id);
         glBindVertexArray(id);
 
@@ -34,38 +28,19 @@ namespace xe {
             );
         }
 
-        indexBuffer = dynamic_cast<const BufferGL *>(desc.indexBuffer);
+		indexBuffer = dynamic_cast<const BufferGL*>(desc.indexBuffer);
 
         if (indexBuffer) {
             glBindBuffer(indexBuffer->getTarget(), indexBuffer->getID());
         }
 
         glBindVertexArray(0);
+        */
     }
 
     SubsetGL::~SubsetGL() {
         if (id) {
             glDeleteVertexArrays(1, &id);
         }
-    }
-
-    int SubsetGL::getBufferCount() const {
-        return (int)buffers.size();
-    }
-
-    BufferGL *SubsetGL::getBuffer(const int index) {
-        return const_cast<BufferGL *>(buffers[index]);
-    }
-
-    BufferGL *SubsetGL::getIndexBuffer() {
-        return const_cast<BufferGL *>(indexBuffer);
-    }
-
-    const BufferGL *SubsetGL::getBuffer(const int index) const {
-        return buffers[index];
-    }
-
-    const BufferGL *SubsetGL::getIndexBuffer() const {
-        return indexBuffer;
     }
 } // namespace xe

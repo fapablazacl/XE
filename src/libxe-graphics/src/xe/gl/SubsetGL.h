@@ -4,7 +4,6 @@
 
 #include <xe/graphics/Subset.h>
 
-#include "BufferGL.h"
 #include "gl.h"
 
 namespace xe {
@@ -16,14 +15,6 @@ namespace xe {
 
         virtual int getBufferCount() const override;
 
-        virtual BufferGL *getBuffer(const int index) override;
-
-        virtual BufferGL *getIndexBuffer() override;
-
-        virtual const BufferGL *getBuffer(const int index) const override;
-
-        virtual const BufferGL *getIndexBuffer() const override;
-
     public:
         GLuint getID() const {
             return id;
@@ -31,8 +22,6 @@ namespace xe {
 
     private:
         GLuint id = 0;
-        std::vector<const BufferGL *> buffers;
-        const BufferGL *indexBuffer = nullptr;
         SubsetDescriptor descriptor;
     };
 } // namespace xe
