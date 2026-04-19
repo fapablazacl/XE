@@ -67,7 +67,7 @@ namespace xe {
 			return gl::BufferTarget::eElementArrayBuffer;
 
 		default:
-			assert(false && "toTextureTargetGL: Invalid TextureType");
+			assert(false && "toTextureTargetGL: Invalid BufferType");
 			return gl::BufferTarget::eArrayBuffer;
 		}
 	}
@@ -104,7 +104,7 @@ namespace xe {
 		// TODO: Implement a mechanism to reuse free buffer slots
 		buffers.push_back(std::move(buffer));
 
-		return Handle::make(HandleBuffer, 0, index, static_cast<uint32_t>(target));
+		return Handle::make(HandleBuffer, 0, index, static_cast<uint32_t>(desc.type));
 	}
 
 	void destroyBufferGL(RenderDeviceBackendContext* ctx, Handle handle) {
@@ -244,8 +244,9 @@ namespace xe {
 
 		// TODO: Use a Sampler Resource instead for later
 		bool const hasMips = desc.generateMipmaps || mipCount > 1;
-		gl::texParameteri(target, gl::TextureParameterName::eTextureMinFilter,
-			hasMips ? GL_LINEAR_MIPMAP_LINEAR : GL_LINEAR);
+
+		GLint const param = hasMips ? GL_LINEAR_MIPMAP_LINEAR : GL_LINEAR;
+		gl::texParameteri(target, gl::TextureParameterName::eTextureMinFilter, param);
 		gl::texParameteri(target, gl::TextureParameterName::eTextureMagFilter, GL_LINEAR);
 		gl::texParameteri(target, gl::TextureParameterName::eTextureWrapS, GL_REPEAT);
 		gl::texParameteri(target, gl::TextureParameterName::eTextureWrapT, GL_REPEAT);
@@ -388,6 +389,11 @@ namespace xe {
 		shaders.push_back(std::move(compileShader(gl::ShaderType::eFragmentShader, desc.glslFragmentShader.c_str())));
 
 		glaze::Unique<gl::Program> shaderProgram = linkProgram(shaders);
+
+		if (!shaderProgram) {
+			std::cerr << "Could not create a Shader Program" << std::endl;
+			return {};
+		}
 
 		// TODO: Implement a mechanism to reuse free program slots
 		uint32_t index = static_cast<uint32_t>(shaderPrograms.size());
