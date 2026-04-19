@@ -58,16 +58,23 @@ void main() {
     }
 
     // vertex buffer initialization
-    xe::vec3 const verts[] = {{0.0f, 0.5f, 0.0f}, {0.5f, -0.5, 0.0f}, {-0.5, -0.5, 0.0}};
+    xe::vec3 const verts[] = {{-5.0f, 0.5f, 0.0f}, {5.0f, 0.5f, 0.0f}, {-0.5f, -0.5, 0.0f}, {0.5, -0.5, 0.0}};
+    xe::vec2 const texCoords[] = {{0.0f, 1.0f}, {0.0f, 0.0f}, {1.0f, 1.0f}, {1.0f, 0.0f}};
 
     xe::BufferDescriptor bufferDesc{};
     bufferDesc.type = xe::BufferType::Vertex;
     bufferDesc.usage = xe::BufferUsage::DynamicDraw;
     bufferDesc.data = verts[0].data();
     bufferDesc.size = sizeof(xe::vec3) * 3;
-    xe::Handle bufferHandle = vtable.createBuffer(ctx, bufferDesc);
+    xe::Handle vertexBuffer = vtable.createBuffer(ctx, bufferDesc);
 
-    
+    bufferDesc.data = texCoords[0].data();
+    bufferDesc.size = sizeof(xe::vec2) * 3;
+    xe::Handle texCoordBuffer = vtable.createBuffer(ctx, bufferDesc);
+
+    // get native GL buffer id to manually create a VAO for rendering testing purposes
+
+
 	while (!glfwWindowShouldClose(window)) {
 		glfwPollEvents();
 
