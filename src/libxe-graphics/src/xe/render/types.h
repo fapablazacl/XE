@@ -3,6 +3,7 @@
 
 #include <cstdint>
 #include <cstddef>
+#include <array>
 
 #include <xe/DataType.h>
 #include <xe/graphics/GraphicsDevice.h>
@@ -62,7 +63,8 @@ namespace xe {
 		ivec3 size;
 		PixelFormat sourceFormat;
 		DataType sourceDataType;
-		const void **sourceData = nullptr;
+		const void *sourceData = nullptr;
+		std::array<void*, 6> const cubeMapFaces;
 	};
 	
     //! semantic vertex attribute

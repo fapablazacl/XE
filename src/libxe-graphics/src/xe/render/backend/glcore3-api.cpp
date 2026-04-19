@@ -41,9 +41,8 @@ namespace xe {
 		auto buffer = glaze::makeUnique<gl::BufferId>();
 		gl::bindBuffer(target, buffer);
 		gl::bufferData(target, desc.size, desc.data, usage);
-		gl::bindBuffer(target, {});
-
-		uint32_t index = buffers.size();
+		
+		uint32_t index = static_cast<uint32_t>(buffers.size());
 
 		// TODO: Implement a mechanism to reuse free buffer slots
 		buffers.push_back(std::move(buffer));
@@ -55,7 +54,7 @@ namespace xe {
 		glctx(ctx)->buffers[handle.index()].reset({});
 	}
 
-	gl::TextureTarget toGL(const TextureType type) {
+	gl::TextureTarget toTextureTargetGL(const TextureType type) {
 		switch (type) {
 		case TextureType::Tex1D:  return gl::TextureTarget::eTexture1d;
 		case TextureType::Tex2D:  return gl::TextureTarget::eTexture2d;
@@ -127,59 +126,64 @@ namespace xe {
 			gl::TextureTarget::eTextureCubeMapNegativeZ,
 		};
 
-		gl::TextureTarget const target = toGL(desc.type);
+		gl::TextureTarget const target = toTextureTargetGL(desc.type);
 		gl::InternalFormat const internalFormat = toInternalFormatGL(desc.format);
 		gl::PixelFormat const pixelFormat = toPixelFormatGL(desc.sourceFormat);
 		gl::PixelType const pixelType = toPixelTypeGL(desc.sourceDataType);
 
-		GLsizei const width = desc.size.x;
-		GLsizei const height = desc.size.y;
-		GLsizei const depth = desc.size.z;
+		int const width = desc.size.x;
+		int const height = desc.size.y;
+		int const depth = desc.size.z;
+
+		gl::bindTexture(target, texture);
 
 		switch (desc.type) {
 		case TextureType::Tex1D:
-			gl::bindTexture(target, texture);
-			gl::texImage1D(target, 0, internalFormat, width, 0, pixelFormat, pixelType, *desc.sourceData);
+			gl::texImage1D(target, 0, internalFormat, width, 0, pixelFormat, pixelType, desc.sourceData);
 			break;
 
 		case TextureType::Tex2D:
-			gl::bindTexture(target, texture);
-			gl::texImage2D(target, 0, internalFormat, width, height, 0, pixelFormat, pixelType, *desc.sourceData);
+			gl::texImage2D(target, 0, internalFormat, width, height, 0, pixelFormat, pixelType, desc.sourceData);
 			break;
 
 		case TextureType::Tex3D:
-			gl::bindTexture(target, texture);
-			gl::texImage3D(target, 0, internalFormat, width, height, depth, 0, pixelFormat, pixelType, *desc.sourceData);
+			gl::texImage3D(target, 0, internalFormat, width, height, depth, 0, pixelFormat, pixelType, desc.sourceData);
 			break;
 
 		case TextureType::TexCubeMap: {
-			gl::bindTexture(target, texture);
-
 			for (size_t i = 0; i < cubeMapSides.size(); i++) {
 				gl::TextureTarget const sideTarget = cubeMapSides[i];
-				gl::texImage2D(sideTarget, 0, internalFormat, width, height, 0, pixelFormat, pixelType, desc.sourceData[i]);
+				gl::texImage2D(sideTarget, 0, internalFormat, width, height, 0, pixelFormat, pixelType, desc.cubeMapFaces[i]);
 			}
 
 			break;
 		}
 
 		case TextureType::Tex2DArray:
-			gl::bindTexture(target, texture);
-			gl::texImage3D(target, 0, internalFormat, width, height, depth, 0, pixelFormat, pixelType, *desc.sourceData);
+			gl::texImage3D(target, 0, internalFormat, width, height, depth, 0, pixelFormat, pixelType, desc.sourceData);
 			break;
 
 		default:
 			assert(false && "TextureType is unknown");
+			return {};
 		}
 
-		uint32_t index = textures.size();
+		gl::generateMipmap(target);
+
+		// TODO: Use a Sampler Resource instead for later
+		gl::texParameteri(target, gl::TextureParameterName::eTextureMinFilter, GL_LINEAR);
+		gl::texParameteri(target, gl::TextureParameterName::eTextureWrapS, GL_REPEAT);
+		gl::texParameteri(target, gl::TextureParameterName::eTextureWrapT, GL_REPEAT);
+		gl::texParameteri(target, gl::TextureParameterName::eTextureWrapR, GL_REPEAT);
+
+		uint32_t index = static_cast<uint32_t>(textures.size());
 		textures.push_back(std::move(texture));
 
 		return Handle::make(xe::HandleTexture, 0, index);
 	}
 	
 	void destroyTextureGL(RenderDeviceBackendContext* ctx, Handle handle) {
-		glctx(ctx)->buffers[handle.index()].reset({});
+		glctx(ctx)->textures[handle.index()].reset({});
 	}
 
 	static glaze::Unique<gl::Shader> compileShader(gl::ShaderType type, const char* src) {
@@ -233,7 +237,7 @@ namespace xe {
 		glaze::Unique<gl::Program> shaderProgram = linkProgram(shaders);
 
 		// TODO: Implement a mechanism to reuse free program slots
-		uint32_t index = shaderPrograms.size();
+		uint32_t index = static_cast<uint32_t>(shaderPrograms.size());
 		shaderPrograms.push_back(std::move(shaderProgram));
 
 		return Handle::make(HandleShader, 0, index);
