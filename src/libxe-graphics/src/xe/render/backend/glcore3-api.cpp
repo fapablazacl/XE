@@ -117,8 +117,9 @@ namespace xe {
 
 		auto &buffer = glctx(ctx)->buffers[handle.index()];
 
-		auto const target =  static_cast<gl::BufferTarget>(handle.subType());
-		
+		auto const type =  static_cast<BufferType>(handle.subType());
+		gl::BufferTarget const target = toBufferTargetGL(type);
+
 		gl::bindBuffer(target, buffer);
 		gl::getBufferSubData(target,
 			static_cast<GLintptr>(desc.offset),
