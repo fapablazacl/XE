@@ -11,7 +11,9 @@ endif()
 add_subdirectory ("libxe-scene")
 add_subdirectory ("libxe-geometry")
 # add_subdirectory ("libxe-app")
-add_subdirectory ("libxe-imageloader")
+
+# DevIL doesn't build in MSVC
+# add_subdirectory ("libxe-imageloader")
 
 # add_subdirectory ("xe-gltf-view")
 # add_subdirectory ("xe-gltfc")
