@@ -3,5 +3,6 @@
 #include "ImageLoaderIL.h"
 
 std::unique_ptr<ImageLoader> createImageLoader() {
-    return std::make_unique<ImageLoaderIL>();
+    return {};
+    // return std::make_unique<ImageLoaderIL>();
 }

@@ -4,8 +4,9 @@
 #include <cstdint>
 #include <cstddef>
 
-#include <xe/graphics/BufferDescriptor.h>
+#include <xe/DataType.h>
 #include <xe/graphics/GraphicsDevice.h>
+#include <xe/graphics/BufferDescriptor.h>
 
 namespace xe {
 	enum HandleType : uint32_t {
@@ -53,14 +54,17 @@ namespace xe {
 		// TODO: Put here common utilities / data usable for all contexts (allocators?, logging? profiling?)
 	};
 
+	enum class TextureType { Tex1D, Tex2D, Tex3D, TexCubeMap, Tex2DArray };
+	
 	struct TextureDescriptor {
-		PixelFormat format;
+		TextureType type = TextureType::Tex2D;
+		PixelFormat format = PixelFormat::R8G8B8;
 		ivec3 size;
 		PixelFormat sourceFormat;
 		DataType sourceDataType;
-		const void *sourceData;
+		const void **sourceData = nullptr;
 	};
-
+	
     //! semantic vertex attribute
     enum class VertexAttribSemantic : int {
 		Position,

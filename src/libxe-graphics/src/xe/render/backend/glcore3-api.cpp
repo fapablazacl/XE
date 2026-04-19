@@ -1,13 +1,11 @@
 
-// TODO: How to deal with nullptr ctx?
-
-
 #include <glaze/gl.hpp>
 #include <glaze/raii.hpp>
 #include <xe/math/Vector.h>
 #include <xe/render/RenderBackend.h>
 #include <vector>
 #include <iostream>
+#include <array>
 
 #include "glcore3-api.h"
 
@@ -23,9 +21,10 @@ namespace xe {
 	struct RenderDeviceBackendContextGL : RenderDeviceBackendContext {
 		std::vector<glaze::Unique<gl::BufferId>> buffers;
 		std::vector<glaze::Unique<gl::Program>> shaderPrograms;
+		std::vector<glaze::Unique<gl::Texture>> textures;
 	};
 
-	RenderDeviceBackendContextGL* glctx(RenderDeviceBackendContext *ctx) {
+	inline RenderDeviceBackendContextGL* glctx(RenderDeviceBackendContext *ctx) {
 		assert(ctx);
 		return static_cast<RenderDeviceBackendContextGL* >(ctx);
 	}
@@ -53,6 +52,133 @@ namespace xe {
 	}
 
 	void destroyBufferGL(RenderDeviceBackendContext* ctx, Handle handle) {
+		glctx(ctx)->buffers[handle.index()].reset({});
+	}
+
+	gl::TextureTarget toGL(const TextureType type) {
+		switch (type) {
+		case TextureType::Tex1D:  return gl::TextureTarget::eTexture1d;
+		case TextureType::Tex2D:  return gl::TextureTarget::eTexture2d;
+		case TextureType::Tex3D:  return gl::TextureTarget::eTexture3d;
+		case TextureType::TexCubeMap:  return gl::TextureTarget::eTextureCubeMap;
+		case TextureType::Tex2DArray: return gl::TextureTarget::eTexture2dArray;
+		default: 
+			assert(false && "toGL: Invalid TextureType");
+		}
+	}
+
+	gl::InternalFormat toInternalFormatGL(const PixelFormat pixelFormat) {
+		switch (pixelFormat) {
+		case PixelFormat::R8G8B8: return gl::InternalFormat::eRgb;
+		case PixelFormat::R8G8B8A8: return gl::InternalFormat::eRgba;
+		default:
+			assert(false && "toGL: Invalid InternalFormat");
+		}
+	}
+
+	gl::PixelFormat toPixelFormatGL(const PixelFormat pixelFormat) {
+		switch (pixelFormat) {
+		case PixelFormat::R8G8B8: return gl::PixelFormat::eRgb;
+		case PixelFormat::R8G8B8A8: return gl::PixelFormat::eRgba;
+		default:
+			assert(false && "toGL: Invalid InternalFormat");
+		}
+	}
+
+	gl::PixelType toPixelTypeGL(const DataType dataType) {
+		switch (dataType) {
+
+		case DataType::Int8:
+			return gl::PixelType::eByte;
+
+		case DataType::UInt8:
+			return gl::PixelType::eUnsignedByte;
+
+		case DataType::Int16:
+			return gl::PixelType::eShort;
+	
+		case DataType::UInt16:
+			return gl::PixelType::eUnsignedShort;
+
+		case DataType::Int32:
+			return gl::PixelType::eInt;
+
+		case DataType::UInt32:
+			return gl::PixelType::eUnsignedInt;
+
+		case DataType::Float32:
+			return gl::PixelType::eFloat;
+
+		case DataType::Float16:
+			return gl::PixelType::eHalfFloat;
+		}
+	}
+
+	Handle createTextureGL(RenderDeviceBackendContext* ctx, const TextureDescriptor &desc) {
+		auto &textures = glctx(ctx)->textures;
+		auto texture = glaze::makeUnique<gl::Texture>();
+
+		constexpr std::array<gl::TextureTarget, 6> cubeMapSides {
+			gl::TextureTarget::eTextureCubeMapPositiveX,
+			gl::TextureTarget::eTextureCubeMapNegativeX,
+			gl::TextureTarget::eTextureCubeMapPositiveY,
+			gl::TextureTarget::eTextureCubeMapNegativeY,
+			gl::TextureTarget::eTextureCubeMapPositiveZ,
+			gl::TextureTarget::eTextureCubeMapNegativeZ,
+		};
+
+		gl::TextureTarget const target = toGL(desc.type);
+		gl::InternalFormat const internalFormat = toInternalFormatGL(desc.format);
+		gl::PixelFormat const pixelFormat = toPixelFormatGL(desc.sourceFormat);
+		gl::PixelType const pixelType = toPixelTypeGL(desc.sourceDataType);
+
+		GLsizei const width = desc.size.x;
+		GLsizei const height = desc.size.y;
+		GLsizei const depth = desc.size.z;
+
+		switch (desc.type) {
+		case TextureType::Tex1D:
+			gl::bindTexture(target, texture);
+			gl::texImage1D(target, 0, internalFormat, width, 0, pixelFormat, pixelType, *desc.sourceData);
+			break;
+
+		case TextureType::Tex2D:
+			gl::bindTexture(target, texture);
+			gl::texImage2D(target, 0, internalFormat, width, height, 0, pixelFormat, pixelType, *desc.sourceData);
+			break;
+
+		case TextureType::Tex3D:
+			gl::bindTexture(target, texture);
+			gl::texImage3D(target, 0, internalFormat, width, height, depth, 0, pixelFormat, pixelType, *desc.sourceData);
+			break;
+
+		case TextureType::TexCubeMap: {
+			gl::bindTexture(target, texture);
+
+			for (size_t i = 0; i < cubeMapSides.size(); i++) {
+				gl::TextureTarget const sideTarget = cubeMapSides[i];
+				gl::texImage2D(sideTarget, 0, internalFormat, width, height, 0, pixelFormat, pixelType, desc.sourceData[i]);
+			}
+
+			break;
+		}
+
+		case TextureType::Tex2DArray:
+			gl::bindTexture(target, texture);
+			gl::texImage3D(target, 0, internalFormat, width, height, depth, 0, pixelFormat, pixelType, *desc.sourceData);
+			break;
+
+		default:
+			assert(false && "TextureType is unknown");
+		}
+
+		uint32_t index = textures.size();
+		textures.push_back(std::move(texture));
+
+		return Handle::make(xe::HandleTexture, 0, index);
+	}
+	
+	void destroyTextureGL(RenderDeviceBackendContext* ctx, Handle handle) {
 		glctx(ctx)->buffers[handle.index()].reset({});
 	}
 
@@ -124,5 +250,7 @@ namespace xe {
 		vtable->destroyBuffer = &destroyBufferGL;
 		vtable->createShaderProgram = &createShaderProgramGL;
 		vtable->destroyShaderProgram = &destroyShaderProgramGL;
+		vtable->createTexture = &createTextureGL;
+		vtable->destroyTexture = &destroyTextureGL;
 	}
 }
