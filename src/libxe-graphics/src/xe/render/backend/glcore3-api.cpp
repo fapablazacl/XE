@@ -54,14 +54,42 @@ namespace xe {
 		gl::TextureTarget::eTextureCubeMapNegativeZ,
 	};
 
+	gl::BufferTarget toBufferTargetGL(BufferType type) {
+		switch (type) {
+		case BufferType::Vertex:
+			return gl::BufferTarget::eArrayBuffer;
+
+		case BufferType::Index:
+			return gl::BufferTarget::eElementArrayBuffer;
+
+		default:
+			assert(false && "toTextureTargetGL: Invalid TextureType");
+			return gl::BufferTarget::eArrayBuffer;
+		}
+	}
+
+	gl::BufferUsage toBufferUsageGL(const BufferUsage usage) {
+		switch (usage) {
+		case BufferUsage::StreamDraw: return gl::BufferUsage::eStreamDraw;
+		case BufferUsage::StreamRead: return gl::BufferUsage::eStreamRead;
+		case BufferUsage::StreamCopy: return gl::BufferUsage::eStreamCopy;
+		case BufferUsage::StaticDraw: return gl::BufferUsage::eStaticDraw;
+		case BufferUsage::StaticRead: return gl::BufferUsage::eStaticRead;
+		case BufferUsage::StaticCopy: return gl::BufferUsage::eStaticCopy;
+		case BufferUsage::DynamicDraw: return gl::BufferUsage::eDynamicDraw;
+		case BufferUsage::DynamicRead: return gl::BufferUsage::eDynamicRead;
+		case BufferUsage::DynamicCopy: return gl::BufferUsage::eDynamicCopy;
+		}
+
+		assert(false && "toBufferUsageGL: Invalid BufferUsage");
+		return gl::BufferUsage::eStreamDraw;
+	}
+
 	Handle createBufferGL(RenderDeviceBackendContext* ctx, const BufferDescriptor& desc) {
 		auto &buffers = glctx(ctx)->buffers;
 
-		//! TODO: Derive from the descriptor
-		auto const target = gl::BufferTarget::eArrayBuffer;
-
-		//! TODO: Derive from the descriptor
-		auto const usage = gl::BufferUsage::eDynamicDraw;
+		gl::BufferTarget const target = toBufferTargetGL(desc.type);
+		gl::BufferUsage const usage = toBufferUsageGL(desc.usage);
 
 		auto buffer = glaze::makeUnique<gl::BufferId>();
 		gl::bindBuffer(target, buffer);
@@ -72,7 +100,7 @@ namespace xe {
 		// TODO: Implement a mechanism to reuse free buffer slots
 		buffers.push_back(std::move(buffer));
 
-		return Handle::make(HandleBuffer, 0, index);
+		return Handle::make(HandleBuffer, 0, index, static_cast<uint32_t>(target));
 	}
 
 	void destroyBufferGL(RenderDeviceBackendContext* ctx, Handle handle) {
@@ -85,9 +113,8 @@ namespace xe {
 
 		auto &buffer = glctx(ctx)->buffers[handle.index()];
 
-		//! TODO: Derive from a stored BufferType, matching createBufferGL
-		auto const target = gl::BufferTarget::eArrayBuffer;
-
+		auto const target =  static_cast<gl::BufferTarget>(handle.subType());
+		
 		gl::bindBuffer(target, buffer);
 		gl::getBufferSubData(target,
 			static_cast<GLintptr>(desc.offset),

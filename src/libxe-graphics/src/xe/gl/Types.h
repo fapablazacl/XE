@@ -17,29 +17,6 @@ namespace xe::gl {
         T id = {};
     };
 
-    /*
-    template<typename T, typename DeleterFn>
-    struct Resource {
-        Resource() = default;
-
-        explicit Resource(const T id)
-            : id(id) {}
-
-        ~Resource() {
-            delete_();
-        }
-
-        void delete_() {
-            if (id) {
-                DeleterFn fn;
-                fn(id);
-                id = {};
-            }
-        }
-
-        T id = {};
-    };
-    */
 
     struct CheckedEnum {
         GLenum value = {};

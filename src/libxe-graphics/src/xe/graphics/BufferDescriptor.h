@@ -6,16 +6,23 @@
 #include <xe/Predef.h>
 
 namespace xe {
-    enum class BufferAccess { Static, Dynamic, Stream };
-
-    enum class BufferUsage { Copy, Read, Write };
+    enum class BufferUsage {
+		StreamDraw,
+		StreamRead,
+		StreamCopy,
+		StaticDraw,
+		StaticRead,
+		StaticCopy,
+		DynamicDraw,
+		DynamicRead,
+		DynamicCopy
+    };
 
     enum class BufferType { Vertex, Index };
 
     struct BufferDescriptor {
         BufferType type;
         BufferUsage usage;
-        BufferAccess access;
         std::size_t size;
         const void *data;
     };
