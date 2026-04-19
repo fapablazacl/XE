@@ -5,6 +5,7 @@
 #include <cstdlib>
 #include <cstdint>
 #include <cassert>
+#include <vector>
 
 #include "xe/render/RenderBackend.h"
 #include "xe/render/backend/glcore3-api.h"
@@ -72,16 +73,25 @@ static void fillCheckerboardImage(void* data, size_t byteSize, int width, int he
 }
 
 xe::Handle createCheckerBoardTexture(const xe::RenderDeviceBackendVTable &vtable, xe::RenderDeviceBackendContext *ctx, xe::ivec2 size) {
+    constexpr int tileSize = 64;
+    constexpr xe::PixelFormat format = xe::PixelFormat::R8G8B8A8;
+    constexpr xe::DataType dataType = xe::DataType::UInt8;
 
-    // allocate the image and initialize it
+    size_t const byteSize = static_cast<size_t>(size.x) * static_cast<size_t>(size.y) * 4u;
+    std::vector<uint8_t> pixels(byteSize);
+    fillCheckerboardImage(pixels.data(), byteSize, size.x, size.y, format, dataType, tileSize);
 
+    xe::MipLevel const mip{ pixels.data() };
 
     xe::TextureDescriptor desc{};
-
+    desc.type = xe::TextureType::Tex2D;
+    desc.format = format;
+    desc.size = xe::ivec3(size, 1);
+    desc.sourceFormat = format;
+    desc.sourceDataType = dataType;
+    desc.mipLevels = &mip;
+    desc.mipLevelCount = 1;
     desc.generateMipmaps = true;
-    desc.size = xe::ivec3(size, 0);
-    
-
 
     return vtable.createTexture(ctx, desc);
 }
@@ -97,7 +107,7 @@ int main() {
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    GLFWwindow* window = glfwCreateWindow(800, 600, "glaze - spinning triangle", nullptr, nullptr);
+    GLFWwindow* window = glfwCreateWindow(800, 600, "render backend test", nullptr, nullptr);
     if (!window) {
         std::cerr << "Failed to create GLFW window" << std::endl;
         glfwTerminate();
@@ -110,39 +120,48 @@ int main() {
     xe::initializeBackendTableGL(&vtable);
 
     xe::RenderDeviceBackendContext* ctx = vtable.createContext();
+	auto glctxgl = static_cast<xe::RenderDeviceBackendContextGL*>(ctx);
 
     // shader initialization
     xe::ShaderProgramDescriptor shaderDesc;
     shaderDesc.glslVertexShader = R"(
 #version 330 core
 layout(location = 0) in vec3 position; 
-// layout(location = 1) in vec2 texCoord;
+layout(location = 1) in vec2 texCoord;
 
-// out vec2 fragTexCoord;
+out vec2 fragTexCoord;
 
 void main() {
     gl_Position = vec4(position, 1.0);
-    // fragTexCoord = texCoord;
+    fragTexCoord = texCoord;
 }
 )";
 
     shaderDesc.glslFragmentShader = R"(
 #version 330 core
 
-// in vec2 fragTexCoord;
+in vec2 fragTexCoord;
+
+uniform sampler2D uTexture;
 
 out vec4 fragColor;
 void main() {
-    fragColor = vec4(1.0, 0.5, 0.2, 1.0);
+    vec4 color = texture(uTexture, fragTexCoord);
+    fragColor = color;
 }
 )";
 
     xe::Handle shaderHandle = vtable.createShaderProgram(ctx, shaderDesc);
-    if (!shaderHandle.type()) {
-        // TODO: Implement an Handle API for checking for invalid/empty handles. This one doesn't work
+    gl::Program programId = glctxgl->shaderPrograms[shaderHandle.index()].get();
+    if (!programId) {
+        // TODO: Implement an Handle API for checking for invalid/empty handles.
         std::cerr << "Shader program initialization failed." << std::endl;
         return 1;
     }
+
+    // texture generation
+    xe::Handle textureHandle = createCheckerBoardTexture(vtable, ctx, {512, 512});
+    gl::Texture textureId = glctxgl->textures[textureHandle.index()].get();
 
     // vertex buffer initialization
     xe::vec3 const verts[] = {{-0.5f, 0.5f, 0.0f}, {0.5f, 0.5f, 0.0f}, {-0.5f, -0.5, 0.0f}, {0.5, -0.5, 0.0}};
@@ -160,22 +179,21 @@ void main() {
     xe::Handle texCoordBuffer = vtable.createBuffer(ctx, bufferDesc);
 
     // get native GL buffer id to manually create a VAO for rendering testing purposes
-    auto glctxgl = static_cast<xe::RenderDeviceBackendContextGL*>(ctx);
-
     const gl::BufferId vertexBufferId = glctxgl->buffers[vertexBuffer.index()].get();
     const gl::BufferId texCoordBufferId = glctxgl->buffers[texCoordBuffer.index()].get();
 
     gl::VertexArray vao = gl::createVertexArrays();
 
     gl::bindVertexArray(vao);
+    // vertex buffer
     gl::bindBuffer(gl::BufferTarget::eArrayBuffer, vertexBufferId);
     gl::enableVertexArrayAttrib(vao, 0);
     gl::vertexAttribPointer(gl::AttribLocation{0}, 3, gl::VertexAttribPointerType::eFloat, GL_FALSE, 0, nullptr);
-    /*
+
+    // texcoord buffer
 	gl::bindBuffer(gl::BufferTarget::eArrayBuffer, texCoordBufferId);
 	gl::enableVertexArrayAttrib(vao, 1);
 	gl::vertexAttribPointer(gl::AttribLocation{ 1 }, 2, gl::VertexAttribPointerType::eFloat, GL_FALSE, 0, nullptr);
-    */
 
 	while (!glfwWindowShouldClose(window)) {
 		glfwPollEvents();
@@ -183,10 +201,21 @@ void main() {
 		int w, h;
 		glfwGetFramebufferSize(window, &w, &h);
 
+        gl::clear(gl::ClearBufferMask::eColorBufferBit);
+
         gl::viewport(0, 0, w, h);
+
+        gl::useProgram(programId);
+
+        gl::UniformLocation textureLoc = gl::getUniformLocation(programId, "uTexture");
+
+        gl::activeTexture(gl::TextureUnit::eTexture0);
+        gl::bindTexture(gl::TextureTarget::eTexture2d, textureId);
+        gl::uniform1i(textureLoc, 0);
 
         gl::bindVertexArray(vao);
         gl::drawArrays(gl::PrimitiveType::eTriangleStrip, 0, 4);
+        gl::flush();
 
 		glfwSwapBuffers(window);
 	}
