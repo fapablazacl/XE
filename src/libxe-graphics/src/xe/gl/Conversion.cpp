@@ -7,7 +7,6 @@
 #include <xe/graphics/Material.h>
 #include <xe/graphics/PixelFormat.h>
 #include <xe/graphics/Subset.h>
-#include <xe/graphics/TextureCubeMap.h>
 
 namespace xe {
     static const std::array<GLenum, 12> dataType{
@@ -124,33 +123,5 @@ namespace xe {
 
     GLboolean convertToGL(const bool value) {
         return static_cast<GLboolean>(value ? GL_TRUE : GL_FALSE);
-    }
-
-    GLenum convertToGL(const TextureCubeMapSide side) {
-        switch (side) {
-        case TextureCubeMapSide::PositiveX:
-            return GL_TEXTURE_CUBE_MAP_POSITIVE_X;
-
-        case TextureCubeMapSide::PositiveY:
-            return GL_TEXTURE_CUBE_MAP_POSITIVE_Y;
-
-        case TextureCubeMapSide::PositiveZ:
-            return GL_TEXTURE_CUBE_MAP_POSITIVE_Z;
-
-        case TextureCubeMapSide::NegativeX:
-            return GL_TEXTURE_CUBE_MAP_NEGATIVE_X;
-
-        case TextureCubeMapSide::NegativeY:
-            return GL_TEXTURE_CUBE_MAP_NEGATIVE_Y;
-
-        case TextureCubeMapSide::NegativeZ:
-            return GL_TEXTURE_CUBE_MAP_NEGATIVE_Z;
-
-        case TextureCubeMapSide::Unknown:
-            return GL_INVALID_ENUM;
-
-        default:
-            return GL_INVALID_ENUM;
-        }
     }
 } // namespace xe

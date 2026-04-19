@@ -7,18 +7,11 @@
 #include "Conversion.h"
 #include "ProgramGL.h"
 #include "SubsetGL.h"
-#include "Texture2DArrayGL.h"
-#include "Texture2DGL.h"
-#include "Texture3DGL.h"
-#include "TextureCubeMapGL.h"
 #include "UtilGL.h"
 
 #include <iostream>
 #include <xe/graphics/Material.h>
 #include <xe/graphics/Subset.h>
-#include <xe/graphics/Texture2DArray.h>
-#include <xe/graphics/Texture3D.h>
-#include <xe/graphics/TextureCubeMap.h>
 #include <xe/graphics/Uniform.h>
 
 namespace xe {
@@ -99,35 +92,6 @@ namespace xe {
 
     Buffer *GraphicsDeviceGL::createBuffer(const BufferDescriptor & /*desc*/) {
         return nullptr;
-    }
-
-    Texture2D *
-    GraphicsDeviceGL::createTexture2D(const PixelFormat format, const Vector2i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void *sourceData) {
-        return new Texture2DGL(format, size, sourceFormat, sourceDataType, sourceData);
-    }
-
-    Texture3D *
-    GraphicsDeviceGL::createTexture3D(const PixelFormat format, const Vector3i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void *sourceData) {
-        return new Texture3DGL(format, size, sourceFormat, sourceDataType, sourceData);
-    }
-
-    Texture2DArray *GraphicsDeviceGL::createTexture2DArray(const PixelFormat format, const Vector2i &size, const int count) {
-        return new Texture2DArrayGL(format, size, count);
-    }
-
-    TextureCubeMap *
-    GraphicsDeviceGL::createTextureCubeMap(const PixelFormat format, const Vector2i &size, const PixelFormat sourceFormat, const DataType sourceDataType, const void **sourceData) {
-
-        const std::array<TextureCubeMapSide, 6> sides = {
-            TextureCubeMapSide::PositiveX,
-            TextureCubeMapSide::PositiveY,
-            TextureCubeMapSide::PositiveZ,
-            TextureCubeMapSide::NegativeX,
-            TextureCubeMapSide::NegativeY,
-            TextureCubeMapSide::NegativeZ,
-        };
-
-        return new TextureCubeMapGL(format, size, sourceFormat, sourceDataType, sides, sourceData);
     }
 
     Program *GraphicsDeviceGL::createProgram(const ProgramDescriptor &desc) {
@@ -239,16 +203,13 @@ namespace xe {
             }
 
             // FIXME: This will cause segfaults if the real implementation isn't derived from the Texture/TextureBaseGL family
-            auto textureBaseGL = dynamic_cast<const TextureBaseGL *>(layer.texture);
-            auto target = textureBaseGL->GetTarget();
-
             glActiveTexture(GL_TEXTURE0 + i);
-            glBindTexture(target, textureBaseGL->GetID());
-            glTexParameteri(target, GL_TEXTURE_MAG_FILTER, convertToGL(layer.magFilter));
-            glTexParameteri(target, GL_TEXTURE_MIN_FILTER, convertToGL(layer.minFilter));
-            glTexParameteri(target, GL_TEXTURE_WRAP_S, convertToGL(layer.wrapS));
-            glTexParameteri(target, GL_TEXTURE_WRAP_T, convertToGL(layer.wrapT));
-            glTexParameteri(target, GL_TEXTURE_WRAP_R, convertToGL(layer.wrapR));
+            glBindTexture(GL_TEXTURE_2D, 0);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, convertToGL(layer.magFilter));
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, convertToGL(layer.minFilter));
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, convertToGL(layer.wrapS));
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, convertToGL(layer.wrapT));
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, convertToGL(layer.wrapR));
         }
     }
 
@@ -275,10 +236,8 @@ namespace xe {
             }
 
             // FIXME: This will cause segfaults if the real implementation isn't derived from the Texture/TextureBaseGL family
-            auto textureBaseGL = reinterpret_cast<const TextureBaseGL *>(layer.texture);
-
             glActiveTexture(GL_TEXTURE0 + i);
-            glBindTexture(textureBaseGL->GetTarget(), 0);
+            glBindTexture(GL_TEXTURE_2D, 0);
         }
 
         glActiveTexture(GL_TEXTURE0);
