@@ -71,6 +71,21 @@ static void fillCheckerboardImage(void* data, size_t byteSize, int width, int he
     }
 }
 
+xe::Handle createCheckerBoardTexture(const xe::RenderDeviceBackendVTable &vtable, xe::RenderDeviceBackendContext *ctx, xe::ivec2 size) {
+
+    // allocate the image and initialize it
+
+
+    xe::TextureDescriptor desc{};
+
+    desc.generateMipmaps = true;
+    desc.size = xe::ivec3(size, 0);
+    
+
+
+    return vtable.createTexture(ctx, desc);
+}
+
 int main() {
     if (!glfwInit()) {
         std::cerr << "Failed to initialize GLFW" << std::endl;
