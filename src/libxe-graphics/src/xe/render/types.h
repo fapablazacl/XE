@@ -56,15 +56,68 @@ namespace xe {
 	};
 
 	enum class TextureType { Tex1D, Tex2D, Tex3D, TexCubeMap, Tex2DArray };
-	
+
+	/**
+	 * @brief Non-owning view of a single mip level's source data.
+	 * Held by the caller; pointers must outlive the createTexture call.
+	 */
+	struct MipLevel {
+		//! Pixel data for this level. nullptr means "allocate storage only".
+		const void *data = nullptr;
+	};
+
+	/**
+	 * @brief Describes a texture to create on the backend.
+	 *
+	 * The mipLevels array is non-owning. For non-cube textures it holds
+	 * mipLevelCount entries indexed as mipLevels[mip]. For cube textures it
+	 * holds mipLevelCount == mipCount * 6 entries indexed as
+	 * mipLevels[mip * 6 + face] (mip-major, face-minor, matches KTX).
+	 * mipLevels == nullptr / mipLevelCount == 0 implies a single implicit
+	 * level 0 with null data (storage-only allocation).
+	 */
 	struct TextureDescriptor {
 		TextureType type = TextureType::Tex2D;
 		PixelFormat format = PixelFormat::R8G8B8;
 		ivec3 size;
 		PixelFormat sourceFormat;
 		DataType sourceDataType;
+
+		//! Borrowed pointer to an array of MipLevel entries. Must outlive createTexture().
+		const MipLevel *mipLevels = nullptr;
+
+		//! Number of entries in mipLevels.
+		size_t mipLevelCount = 0;
+
+		//! Generate the mip chain from level 0 via glGenerateMipmap. Mutually exclusive with supplying >1 mip level.
+		bool generateMipmaps = false;
+	};
+
+	/**
+	 * @brief Describes a partial update to an existing texture.
+	 * offset + size define the region inside the target mip level (and face, for cubemaps).
+	 */
+	struct TextureUpdateDescriptor {
+		//! Region origin inside the target mip level, in texels.
+		ivec3 offset = { 0, 0, 0 };
+
+		//! Region extent in texels. Unused axes should be 1.
+		ivec3 size;
+
+		//! Target mip level index.
+		int mipLevel = 0;
+
+		//! Cubemap face index [0,6). Ignored for non-cube targets.
+		int faceIndex = 0;
+
+		//! Pixel layout of sourceData.
+		PixelFormat sourceFormat = PixelFormat::Unknown;
+
+		//! Component data type of sourceData.
+		DataType sourceDataType = DataType::Unknown;
+
+		//! Source pixel data. Must cover the region described by size.
 		const void *sourceData = nullptr;
-		std::array<void*, 6> const cubeMapFaces;
 	};
 	
     //! semantic vertex attribute

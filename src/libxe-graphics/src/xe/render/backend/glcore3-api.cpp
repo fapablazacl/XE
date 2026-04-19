@@ -18,16 +18,30 @@ namespace xe {
 		gl::Program shaderProgram;
 	};
 
+	struct TextureRecordGL {
+		glaze::Unique<gl::Texture> texture;
+		TextureType type = TextureType::Tex2D;
+	};
+
 	struct RenderDeviceBackendContextGL : RenderDeviceBackendContext {
 		std::vector<glaze::Unique<gl::BufferId>> buffers;
 		std::vector<glaze::Unique<gl::Program>> shaderPrograms;
-		std::vector<glaze::Unique<gl::Texture>> textures;
+		std::vector<TextureRecordGL> textures;
 	};
 
 	inline RenderDeviceBackendContextGL* glctx(RenderDeviceBackendContext *ctx) {
 		assert(ctx);
 		return static_cast<RenderDeviceBackendContextGL* >(ctx);
 	}
+
+	static constexpr std::array<gl::TextureTarget, 6> cubeMapSides {
+		gl::TextureTarget::eTextureCubeMapPositiveX,
+		gl::TextureTarget::eTextureCubeMapNegativeX,
+		gl::TextureTarget::eTextureCubeMapPositiveY,
+		gl::TextureTarget::eTextureCubeMapNegativeY,
+		gl::TextureTarget::eTextureCubeMapPositiveZ,
+		gl::TextureTarget::eTextureCubeMapNegativeZ,
+	};
 
 	Handle createBufferGL(RenderDeviceBackendContext* ctx, const BufferDescriptor& desc) {
 		auto &buffers = glctx(ctx)->buffers;
@@ -61,129 +75,179 @@ namespace xe {
 		case TextureType::Tex3D:  return gl::TextureTarget::eTexture3d;
 		case TextureType::TexCubeMap:  return gl::TextureTarget::eTextureCubeMap;
 		case TextureType::Tex2DArray: return gl::TextureTarget::eTexture2dArray;
-		default: 
-			assert(false && "toGL: Invalid TextureType");
 		}
+		assert(false && "toTextureTargetGL: Invalid TextureType");
+		return gl::TextureTarget::eTexture2d;
 	}
 
 	gl::InternalFormat toInternalFormatGL(const PixelFormat pixelFormat) {
 		switch (pixelFormat) {
 		case PixelFormat::R8G8B8: return gl::InternalFormat::eRgb;
 		case PixelFormat::R8G8B8A8: return gl::InternalFormat::eRgba;
-		default:
-			assert(false && "toGL: Invalid InternalFormat");
+		default: break;
 		}
+		assert(false && "toInternalFormatGL: Invalid PixelFormat");
+		return gl::InternalFormat::eRgba;
 	}
 
 	gl::PixelFormat toPixelFormatGL(const PixelFormat pixelFormat) {
 		switch (pixelFormat) {
 		case PixelFormat::R8G8B8: return gl::PixelFormat::eRgb;
 		case PixelFormat::R8G8B8A8: return gl::PixelFormat::eRgba;
-		default:
-			assert(false && "toGL: Invalid InternalFormat");
+		default: break;
 		}
+		assert(false && "toPixelFormatGL: Invalid PixelFormat");
+		return gl::PixelFormat::eRgba;
 	}
 
 	gl::PixelType toPixelTypeGL(const DataType dataType) {
 		switch (dataType) {
-
-		case DataType::Int8:
-			return gl::PixelType::eByte;
-
-		case DataType::UInt8:
-			return gl::PixelType::eUnsignedByte;
-
-		case DataType::Int16:
-			return gl::PixelType::eShort;
-	
-		case DataType::UInt16:
-			return gl::PixelType::eUnsignedShort;
-
-		case DataType::Int32:
-			return gl::PixelType::eInt;
-
-		case DataType::UInt32:
-			return gl::PixelType::eUnsignedInt;
-
-		case DataType::Float32:
-			return gl::PixelType::eFloat;
-
-		case DataType::Float16:
-			return gl::PixelType::eHalfFloat;
+		case DataType::Int8:    return gl::PixelType::eByte;
+		case DataType::UInt8:   return gl::PixelType::eUnsignedByte;
+		case DataType::Int16:   return gl::PixelType::eShort;
+		case DataType::UInt16:  return gl::PixelType::eUnsignedShort;
+		case DataType::Int32:   return gl::PixelType::eInt;
+		case DataType::UInt32:  return gl::PixelType::eUnsignedInt;
+		case DataType::Float32: return gl::PixelType::eFloat;
+		case DataType::Float16: return gl::PixelType::eHalfFloat;
+		default: break;
 		}
+		assert(false && "toPixelTypeGL: Invalid DataType");
+		return gl::PixelType::eUnsignedByte;
 	}
 
 	Handle createTextureGL(RenderDeviceBackendContext* ctx, const TextureDescriptor &desc) {
 		auto &textures = glctx(ctx)->textures;
 		auto texture = glaze::makeUnique<gl::Texture>();
 
-		constexpr std::array<gl::TextureTarget, 6> cubeMapSides {
-			gl::TextureTarget::eTextureCubeMapPositiveX,
-			gl::TextureTarget::eTextureCubeMapNegativeX,
-			gl::TextureTarget::eTextureCubeMapPositiveY,
-			gl::TextureTarget::eTextureCubeMapNegativeY,
-			gl::TextureTarget::eTextureCubeMapPositiveZ,
-			gl::TextureTarget::eTextureCubeMapNegativeZ,
-		};
-
 		gl::TextureTarget const target = toTextureTargetGL(desc.type);
 		gl::InternalFormat const internalFormat = toInternalFormatGL(desc.format);
 		gl::PixelFormat const pixelFormat = toPixelFormatGL(desc.sourceFormat);
 		gl::PixelType const pixelType = toPixelTypeGL(desc.sourceDataType);
 
-		int const width = desc.size.x;
-		int const height = desc.size.y;
-		int const depth = desc.size.z;
+		size_t const faceCount = (desc.type == TextureType::TexCubeMap) ? 6u : 1u;
+		size_t const mipCount = desc.mipLevelCount == 0
+			? 1u
+			: (desc.mipLevelCount / faceCount);
+
+		assert(!(mipCount > 1 && desc.generateMipmaps)
+			&& "TextureDescriptor: generateMipmaps is mutually exclusive with supplying >1 mip level");
+
+		if (desc.mipLevels != nullptr) {
+			assert(desc.mipLevelCount == mipCount * faceCount
+				&& "TextureDescriptor: mipLevelCount must equal mipCount * faceCount");
+		}
+
+		auto mipData = [&](size_t mip, size_t face) -> const void* {
+			if (desc.mipLevels == nullptr) {
+				return nullptr;
+			}
+			return desc.mipLevels[mip * faceCount + face].data;
+		};
+
+		auto sizeAt = [](int base, size_t mip) -> int {
+			int const shifted = base >> mip;
+			return shifted > 1 ? shifted : 1;
+		};
 
 		gl::bindTexture(target, texture);
 
-		switch (desc.type) {
-		case TextureType::Tex1D:
-			gl::texImage1D(target, 0, internalFormat, width, 0, pixelFormat, pixelType, desc.sourceData);
-			break;
+		for (size_t mip = 0; mip < mipCount; ++mip) {
+			int const w = sizeAt(desc.size.x, mip);
+			int const h = sizeAt(desc.size.y, mip);
+			int const d = sizeAt(desc.size.z, mip);
+			GLint const level = static_cast<GLint>(mip);
 
-		case TextureType::Tex2D:
-			gl::texImage2D(target, 0, internalFormat, width, height, 0, pixelFormat, pixelType, desc.sourceData);
-			break;
+			switch (desc.type) {
+			case TextureType::Tex1D:
+				gl::texImage1D(target, level, internalFormat, w, 0, pixelFormat, pixelType, mipData(mip, 0));
+				break;
 
-		case TextureType::Tex3D:
-			gl::texImage3D(target, 0, internalFormat, width, height, depth, 0, pixelFormat, pixelType, desc.sourceData);
-			break;
+			case TextureType::Tex2D:
+				gl::texImage2D(target, level, internalFormat, w, h, 0, pixelFormat, pixelType, mipData(mip, 0));
+				break;
 
-		case TextureType::TexCubeMap: {
-			for (size_t i = 0; i < cubeMapSides.size(); i++) {
-				gl::TextureTarget const sideTarget = cubeMapSides[i];
-				gl::texImage2D(sideTarget, 0, internalFormat, width, height, 0, pixelFormat, pixelType, desc.cubeMapFaces[i]);
+			case TextureType::Tex3D:
+			case TextureType::Tex2DArray:
+				gl::texImage3D(target, level, internalFormat, w, h, d, 0, pixelFormat, pixelType, mipData(mip, 0));
+				break;
+
+			case TextureType::TexCubeMap:
+				for (size_t face = 0; face < 6u; ++face) {
+					gl::texImage2D(cubeMapSides[face], level, internalFormat, w, h, 0, pixelFormat, pixelType, mipData(mip, face));
+				}
+				break;
+
+			default:
+				assert(false && "TextureType is unknown");
+				return {};
 			}
-
-			break;
 		}
 
-		case TextureType::Tex2DArray:
-			gl::texImage3D(target, 0, internalFormat, width, height, depth, 0, pixelFormat, pixelType, desc.sourceData);
-			break;
-
-		default:
-			assert(false && "TextureType is unknown");
-			return {};
+		if (desc.generateMipmaps) {
+			gl::generateMipmap(target);
+		} else {
+			gl::texParameteri(target, gl::TextureParameterName::eTextureBaseLevel, 0);
+			gl::texParameteri(target, gl::TextureParameterName::eTextureMaxLevel, static_cast<GLint>(mipCount - 1));
 		}
-
-		gl::generateMipmap(target);
 
 		// TODO: Use a Sampler Resource instead for later
-		gl::texParameteri(target, gl::TextureParameterName::eTextureMinFilter, GL_LINEAR);
+		bool const hasMips = desc.generateMipmaps || mipCount > 1;
+		gl::texParameteri(target, gl::TextureParameterName::eTextureMinFilter,
+			hasMips ? GL_LINEAR_MIPMAP_LINEAR : GL_LINEAR);
+		gl::texParameteri(target, gl::TextureParameterName::eTextureMagFilter, GL_LINEAR);
 		gl::texParameteri(target, gl::TextureParameterName::eTextureWrapS, GL_REPEAT);
 		gl::texParameteri(target, gl::TextureParameterName::eTextureWrapT, GL_REPEAT);
 		gl::texParameteri(target, gl::TextureParameterName::eTextureWrapR, GL_REPEAT);
 
 		uint32_t index = static_cast<uint32_t>(textures.size());
-		textures.push_back(std::move(texture));
+		textures.push_back({ std::move(texture), desc.type });
 
 		return Handle::make(xe::HandleTexture, 0, index);
 	}
-	
+
 	void destroyTextureGL(RenderDeviceBackendContext* ctx, Handle handle) {
-		glctx(ctx)->textures[handle.index()].reset({});
+		glctx(ctx)->textures[handle.index()].texture.reset({});
+	}
+
+	void updateTextureGL(RenderDeviceBackendContext* ctx, Handle handle, const TextureUpdateDescriptor &desc) {
+		auto &record = glctx(ctx)->textures[handle.index()];
+		gl::TextureTarget const target = toTextureTargetGL(record.type);
+		gl::PixelFormat const pixelFormat = toPixelFormatGL(desc.sourceFormat);
+		gl::PixelType const pixelType = toPixelTypeGL(desc.sourceDataType);
+
+		GLint const level = desc.mipLevel;
+		GLint const x = desc.offset.x;
+		GLint const y = desc.offset.y;
+		GLint const z = desc.offset.z;
+		GLsizei const w = desc.size.x;
+		GLsizei const h = desc.size.y;
+		GLsizei const d = desc.size.z;
+
+		gl::bindTexture(target, record.texture);
+
+		switch (record.type) {
+		case TextureType::Tex1D:
+			gl::texSubImage1D(target, level, x, w, pixelFormat, pixelType, desc.sourceData);
+			break;
+
+		case TextureType::Tex2D:
+			gl::texSubImage2D(target, level, x, y, w, h, pixelFormat, pixelType, desc.sourceData);
+			break;
+
+		case TextureType::Tex3D:
+		case TextureType::Tex2DArray:
+			gl::texSubImage3D(target, level, x, y, z, w, h, d, pixelFormat, pixelType, desc.sourceData);
+			break;
+
+		case TextureType::TexCubeMap:
+			assert(desc.faceIndex >= 0 && desc.faceIndex < 6 && "TextureUpdateDescriptor: faceIndex out of range");
+			gl::texSubImage2D(cubeMapSides[desc.faceIndex], level, x, y, w, h, pixelFormat, pixelType, desc.sourceData);
+			break;
+
+		default:
+			assert(false && "TextureType is unknown");
+		}
 	}
 
 	static glaze::Unique<gl::Shader> compileShader(gl::ShaderType type, const char* src) {
@@ -256,5 +320,6 @@ namespace xe {
 		vtable->destroyShaderProgram = &destroyShaderProgramGL;
 		vtable->createTexture = &createTextureGL;
 		vtable->destroyTexture = &destroyTextureGL;
+		vtable->updateTexture = &updateTextureGL;
 	}
 }
