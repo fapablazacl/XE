@@ -37,9 +37,6 @@ set (headers
 	"src/xe/GL.h"
 	"src/xe/gl/gl.h"
 	"src/xe/gl/GraphicsDeviceGL.h"
-	"src/xe/gl/ShaderGL.h"
-	"src/xe/gl/ProgramGL.h"
-	"src/xe/gl/BufferGL.h"
 	"src/xe/gl/SubsetGL.h"
 	"src/xe/gl/Conversion.h"
 	"src/xe/gl/UtilGL.h"
@@ -75,9 +72,6 @@ set (sources
 
 	# xe/gl/ implementations
 	"src/xe/gl/GraphicsDeviceGL.cpp"
-	"src/xe/gl/ShaderGL.cpp"
-	"src/xe/gl/ProgramGL.cpp"
-	"src/xe/gl/BufferGL.cpp"
 	"src/xe/gl/SubsetGL.cpp"
 	"src/xe/gl/Conversion.cpp"
 	"src/xe/gl/UtilGL.cpp"

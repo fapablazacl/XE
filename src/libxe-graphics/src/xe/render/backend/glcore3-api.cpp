@@ -79,6 +79,22 @@ namespace xe {
 		glctx(ctx)->buffers[handle.index()].reset({});
 	}
 
+	void readBufferGL(RenderDeviceBackendContext* ctx, Handle handle, const BufferReadDescriptor &desc) {
+		assert(desc.data != nullptr && "BufferReadDescriptor: data must not be null");
+		assert(desc.size > 0 && "BufferReadDescriptor: size must be greater than zero");
+
+		auto &buffer = glctx(ctx)->buffers[handle.index()];
+
+		//! TODO: Derive from a stored BufferType, matching createBufferGL
+		auto const target = gl::BufferTarget::eArrayBuffer;
+
+		gl::bindBuffer(target, buffer);
+		gl::getBufferSubData(target,
+			static_cast<GLintptr>(desc.offset),
+			static_cast<GLsizeiptr>(desc.size),
+			desc.data);
+	}
+
 	gl::TextureTarget toTextureTargetGL(const TextureType type) {
 		switch (type) {
 		case TextureType::Tex1D:  return gl::TextureTarget::eTexture1d;
@@ -255,6 +271,43 @@ namespace xe {
 		}
 	}
 
+	void readTextureGL(RenderDeviceBackendContext* ctx, Handle handle, const TextureReadDescriptor &desc) {
+		assert(desc.data != nullptr && "TextureReadDescriptor: data must not be null");
+		assert(desc.offset.x == 0 && desc.offset.y == 0 && desc.offset.z == 0
+			&& "TextureReadDescriptor: GL 3.3 backend requires offset == {0,0,0}");
+
+		auto &texture = glctx(ctx)->textures[handle.index()];
+		TextureType const type = textureTypeOf(handle);
+		gl::TextureTarget const bindTarget = toTextureTargetGL(type);
+		gl::PixelFormat const pixelFormat = toPixelFormatGL(desc.destFormat);
+		gl::PixelType const pixelType = toPixelTypeGL(desc.destDataType);
+
+		gl::TextureTarget const readTarget = (type == TextureType::TexCubeMap)
+			? cubeMapSides[desc.faceIndex]
+			: bindTarget;
+
+		if (type == TextureType::TexCubeMap) {
+			assert(desc.faceIndex >= 0 && desc.faceIndex < 6 && "TextureReadDescriptor: faceIndex out of range");
+		}
+
+		gl::bindTexture(bindTarget, texture);
+
+#ifndef NDEBUG
+		GLint actualWidth = 0;
+		GLint actualHeight = 0;
+		gl::getTexLevelParameteriv(readTarget, desc.mipLevel,
+			gl::GetTextureParameter::eTextureWidth, &actualWidth);
+		gl::getTexLevelParameteriv(readTarget, desc.mipLevel,
+			gl::GetTextureParameter::eTextureHeight, &actualHeight);
+		assert(actualWidth == desc.size.x
+			&& "TextureReadDescriptor: GL 3.3 backend requires size.x to match the mip's full width");
+		assert((type == TextureType::Tex1D || actualHeight == desc.size.y)
+			&& "TextureReadDescriptor: GL 3.3 backend requires size.y to match the mip's full height");
+#endif
+
+		gl::getTexImage(readTarget, desc.mipLevel, pixelFormat, pixelType, desc.data);
+	}
+
 	static glaze::Unique<gl::Shader> compileShader(gl::ShaderType type, const char* src) {
 		auto shader = glaze::makeUnique<gl::Shader>(type);
 
@@ -321,10 +374,12 @@ namespace xe {
 	void initializeBackendTableGL(RenderDeviceBackendVTable* vtable) {
 		vtable->createBuffer = &createBufferGL;
 		vtable->destroyBuffer = &destroyBufferGL;
+		vtable->readBuffer = &readBufferGL;
 		vtable->createShaderProgram = &createShaderProgramGL;
 		vtable->destroyShaderProgram = &destroyShaderProgramGL;
 		vtable->createTexture = &createTextureGL;
 		vtable->destroyTexture = &destroyTextureGL;
 		vtable->updateTexture = &updateTextureGL;
+		vtable->readTexture = &readTextureGL;
 	}
 }

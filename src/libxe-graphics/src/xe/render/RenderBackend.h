@@ -13,6 +13,7 @@ namespace xe {
     struct RenderDeviceBackendVTable {
         Handle (*createBuffer)(RenderDeviceBackendContext *, const BufferDescriptor &) = nullptr;
         void (*destroyBuffer)(RenderDeviceBackendContext *, Handle) = nullptr;
+        void (*readBuffer)(RenderDeviceBackendContext *, Handle, const BufferReadDescriptor &) = nullptr;
 
         Handle (*createShaderProgram)(RenderDeviceBackendContext *, const ShaderProgramDescriptor &) = nullptr;
         void (*destroyShaderProgram)(RenderDeviceBackendContext *, Handle) = nullptr;
@@ -20,6 +21,7 @@ namespace xe {
 		Handle(*createTexture)(RenderDeviceBackendContext*, const TextureDescriptor&) = nullptr;
 		void (*destroyTexture)(RenderDeviceBackendContext*, Handle) = nullptr;
 		void (*updateTexture)(RenderDeviceBackendContext*, Handle, const TextureUpdateDescriptor&) = nullptr;
+		void (*readTexture)(RenderDeviceBackendContext*, Handle, const TextureReadDescriptor&) = nullptr;
 
         Handle (*createVertexLayout)(RenderDeviceBackendContext *, const VertexLayoutDescriptor &) = nullptr;
         void (*destroyVertexLayout)(RenderDeviceBackendContext *, Handle) = nullptr;

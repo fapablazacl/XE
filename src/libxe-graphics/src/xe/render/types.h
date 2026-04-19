@@ -101,6 +101,56 @@ namespace xe {
 	};
 
 	/**
+	 * @brief Describes a partial read from an existing buffer.
+	 * The backend fills [data, data + size) with bytes from the source buffer
+	 * starting at byte 'offset'. Synchronous; prefer for tooling / debug / snapshot use.
+	 */
+	struct BufferReadDescriptor {
+		//! Byte offset into the source buffer.
+		size_t offset = 0;
+
+		//! Number of bytes to read.
+		size_t size = 0;
+
+		//! Destination, caller-allocated, at least 'size' bytes.
+		void *data = nullptr;
+	};
+
+	/**
+	 * @brief Describes a read of (part of) an existing texture.
+	 *
+	 * The offset/size fields describe the sub-region to read. The GL 3.3 backend
+	 * supports whole-mip reads only (glGetTexImage has no region variant until
+	 * GL 4.5 / glGetTextureSubImage); it asserts that offset == {0,0,0} and that
+	 * size matches the mip level's full extent. Future backends (GL 4.5+, PBO-based,
+	 * Vulkan) may honor arbitrary regions transparently.
+	 *
+	 * Synchronous; prefer for tooling / debug / snapshot use.
+	 */
+	struct TextureReadDescriptor {
+		//! Region origin inside the target mip level, in texels. Must be {0,0,0} on the GL 3.3 backend.
+		ivec3 offset = { 0, 0, 0 };
+
+		//! Region extent in texels. Must equal the mip level's full extent on the GL 3.3 backend.
+		ivec3 size;
+
+		//! Target mip level index.
+		int mipLevel = 0;
+
+		//! Cubemap face index [0,6). Ignored for non-cube targets.
+		int faceIndex = 0;
+
+		//! Desired pixel layout of the destination buffer.
+		PixelFormat destFormat = PixelFormat::Unknown;
+
+		//! Desired component data type of the destination buffer.
+		DataType destDataType = DataType::Unknown;
+
+		//! Destination, caller-allocated, sized for the described region.
+		void *data = nullptr;
+	};
+
+	/**
 	 * @brief Describes a partial update to an existing texture.
 	 * offset + size define the region inside the target mip level (and face, for cubemaps).
 	 */
