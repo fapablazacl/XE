@@ -62,6 +62,7 @@ class xeRecipe(ConanFile):
         """
 
         self.requires("cxxopts/3.3.1")
+        self.requires("tl-expected/20190710")
         self.requires("backport-cpp/1.2.0")
         self.requires("catch2/3.7.1")
         

@@ -72,7 +72,8 @@ static void fillCheckerboardImage(void* data, size_t byteSize, int width, int he
     }
 }
 
-xe::TextureHandle createCheckerBoardTexture(const xe::RenderDeviceBackendVTable &vtable, xe::RenderDeviceBackendContext *ctx, xe::ivec2 size) {
+tl::expected<xe::TextureHandle, xe::BackendError>
+createCheckerBoardTexture(const xe::RenderDeviceBackendVTable &vtable, xe::RenderDeviceBackendContext *ctx, xe::ivec2 size) {
     constexpr int tileSize = 64;
     constexpr xe::PixelFormat format = xe::PixelFormat::R8G8B8A8;
     constexpr xe::DataType dataType = xe::DataType::UInt8;
@@ -119,7 +120,12 @@ int main() {
     xe::RenderDeviceBackendVTable vtable;
     xe::initializeBackendTableGL(&vtable);
 
-    xe::RenderDeviceBackendContext* ctx = vtable.createContext();
+    auto ctxResult = vtable.createContext();
+    if (!ctxResult) {
+        std::cerr << "createContext failed: " << ctxResult.error().message << std::endl;
+        return 1;
+    }
+    xe::RenderDeviceBackendContext* ctx = *ctxResult;
 	auto glctxgl = static_cast<xe::RenderDeviceBackendContextGL*>(ctx);
 
     // shader initialization
@@ -151,15 +157,21 @@ void main() {
 }
 )";
 
-    xe::ShaderHandle shaderHandle = vtable.createShaderProgram(ctx, shaderDesc);
-	/*if (!shaderHandle.isValid()) {
-		std::cerr << "Shader program initialization failed." << std::endl;
-		return 1;
-	}*/
+    auto shaderResult = vtable.createShaderProgram(ctx, shaderDesc);
+    if (!shaderResult) {
+        std::cerr << "createShaderProgram failed: " << shaderResult.error().message << std::endl;
+        return 1;
+    }
+    xe::ShaderHandle shaderHandle = *shaderResult;
     gl::Program programId = glctxgl->shaderPrograms[shaderHandle.index()].obj.get();
 
     // texture generation
-    xe::TextureHandle textureHandle = createCheckerBoardTexture(vtable, ctx, {512, 512});
+    auto textureResult = createCheckerBoardTexture(vtable, ctx, {512, 512});
+    if (!textureResult) {
+        std::cerr << "createCheckerBoardTexture failed: " << textureResult.error().message << std::endl;
+        return 1;
+    }
+    xe::TextureHandle textureHandle = *textureResult;
     gl::Texture textureId = glctxgl->textures[textureHandle.index()].obj.get();
 
     // vertex buffer initialization
@@ -171,11 +183,21 @@ void main() {
     bufferDesc.usage = xe::BufferUsage::DynamicDraw;
     bufferDesc.data = verts[0].data();
     bufferDesc.size = sizeof(verts);
-    xe::BufferHandle vertexBuffer = vtable.createBuffer(ctx, bufferDesc);
+    auto vertexBufferResult = vtable.createBuffer(ctx, bufferDesc);
+    if (!vertexBufferResult) {
+        std::cerr << "createBuffer (vertex) failed: " << vertexBufferResult.error().message << std::endl;
+        return 1;
+    }
+    xe::BufferHandle vertexBuffer = *vertexBufferResult;
 
     bufferDesc.data = texCoords[0].data();
     bufferDesc.size = sizeof(texCoords);
-    xe::BufferHandle texCoordBuffer = vtable.createBuffer(ctx, bufferDesc);
+    auto texCoordBufferResult = vtable.createBuffer(ctx, bufferDesc);
+    if (!texCoordBufferResult) {
+        std::cerr << "createBuffer (texCoord) failed: " << texCoordBufferResult.error().message << std::endl;
+        return 1;
+    }
+    xe::BufferHandle texCoordBuffer = *texCoordBufferResult;
 
     // get native GL buffer id to manually create a VAO for rendering testing purposes
     const gl::BufferId vertexBufferId = glctxgl->buffers[vertexBuffer.index()].obj.get();

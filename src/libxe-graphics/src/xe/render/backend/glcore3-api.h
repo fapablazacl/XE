@@ -49,17 +49,17 @@ namespace xe {
         std::vector<Slot<gl::Texture>> textures;
     };
 
-    RenderDeviceBackendContext* createContextGL();
+    tl::expected<RenderDeviceBackendContext*, BackendError> createContextGL();
     void destroyContextGL(RenderDeviceBackendContext* ctx);
 
-    BufferHandle createBufferGL(RenderDeviceBackendContext* ctx, const BufferDescriptor& desc);
+    tl::expected<BufferHandle, BackendError> createBufferGL(RenderDeviceBackendContext* ctx, const BufferDescriptor& desc);
     void destroyBufferGL(RenderDeviceBackendContext* ctx, BufferHandle handle);
     void readBufferGL(RenderDeviceBackendContext* ctx, BufferHandle handle, const BufferReadDescriptor& desc);
 
-    ShaderHandle createShaderProgramGL(RenderDeviceBackendContext* ctx, const ShaderProgramDescriptor& desc);
+    tl::expected<ShaderHandle, BackendError> createShaderProgramGL(RenderDeviceBackendContext* ctx, const ShaderProgramDescriptor& desc);
     void destroyShaderProgramGL(RenderDeviceBackendContext* ctx, ShaderHandle handle);
 
-    TextureHandle createTextureGL(RenderDeviceBackendContext* ctx, const TextureDescriptor& desc);
+    tl::expected<TextureHandle, BackendError> createTextureGL(RenderDeviceBackendContext* ctx, const TextureDescriptor& desc);
     void destroyTextureGL(RenderDeviceBackendContext* ctx, TextureHandle handle);
     void updateTextureGL(RenderDeviceBackendContext* ctx, TextureHandle handle, const TextureUpdateDescriptor& desc);
     void readTextureGL(RenderDeviceBackendContext* ctx, TextureHandle handle, const TextureReadDescriptor& desc);

@@ -4,13 +4,70 @@
 #include <cstdint>
 #include <cstddef>
 #include <array>
+#include <string>
 #include <type_traits>
+#include <utility>
+
+#include <tl/expected.hpp>
 
 #include <xe/DataType.h>
 #include <xe/graphics/GraphicsDevice.h>
 #include <xe/graphics/BufferDescriptor.h>
 
 namespace xe {
+	/**
+	 * @brief Failure codes produced by the render-backend factory functions.
+	 *
+	 * Used as the discriminant of BackendError. The backend layer is exception-free, so every
+	 * creation entry point returns tl::expected<Handle, BackendError> and callers must check
+	 * the result before use. Codes are broad categories; the specific detail (shader InfoLog,
+	 * descriptor field name, pool identity, ...) lives on BackendError::message.
+	 */
+	enum class BackendErrorCode {
+		//! Sentinel used only as the default value of a freshly default-constructed BackendError.
+		Ok = 0,
+		//! Caller-supplied descriptor violates its contract (unsupported enum, impossible field combo, ...).
+		InvalidDescriptor,
+		//! GLSL source failed to compile; message carries the GL InfoLog verbatim.
+		ShaderCompileFailed,
+		//! Linked program failed to link; message carries the GL InfoLog verbatim.
+		ShaderLinkFailed,
+		//! Backend allocation of a texture resource failed (driver-side).
+		TextureAllocationFailed,
+		//! Backend allocation of a buffer resource failed (driver-side).
+		BufferAllocationFailed,
+		//! The 16-bit index field is saturated and no slot is free for reuse.
+		HandlePoolExhausted,
+		//! Host-side allocation returned null (std::nothrow path).
+		AllocationFailed,
+		//! Unreachable / unknown backend state. Assert-worthy in debug builds.
+		InternalError,
+	};
+
+	/**
+	 * @brief Structured error payload returned by backend factories via tl::expected.
+	 *
+	 * `code` identifies the failure category; `message` carries the human-readable detail
+	 * (shader InfoLog, failed descriptor field, GL driver string, ...). Callers should display
+	 * `message` as-is and should not attempt to parse it.
+	 */
+	struct BackendError {
+		//! Failure category. Default Ok is never returned - a live BackendError has code != Ok.
+		BackendErrorCode code = BackendErrorCode::Ok;
+
+		//! Optional human-readable detail; may be empty.
+		std::string message;
+	};
+
+	/**
+	 * @brief Sugar for building a tl::unexpected<BackendError> without ceremony at the call site.
+	 * @param code failure category
+	 * @param message optional detail; moved into the resulting BackendError
+	 */
+	inline tl::unexpected<BackendError> makeBackendError(BackendErrorCode code, std::string message = {}) {
+		return tl::unexpected<BackendError>{BackendError{code, std::move(message)}};
+	}
+
 	/**
 	 * @brief Compile-time tag discriminating handle kinds.
 	 * Encoded in the C++ type system via HandleT's Tag template parameter; no longer stored in the

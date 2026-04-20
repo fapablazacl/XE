@@ -4,9 +4,9 @@
 #include <xe/math/Vector.h>
 #include <xe/render/RenderBackend.h>
 #include <cassert>
+#include <new>
 #include <utility>
 #include <vector>
-#include <iostream>
 #include <array>
 
 #include "glcore3-api.h"
@@ -32,15 +32,34 @@ namespace xe {
 		constexpr uint32_t kHandleGenMask = 0xFFu;
 
 		/**
+		 * @brief True if the pool has room for one more acquire (either unused capacity or a freed slot).
+		 *
+		 * Called by the public factories before acquireSlot; converts the hard 16-bit index cap into
+		 * a soft tl::expected error (BackendErrorCode::HandlePoolExhausted). Scan cost is O(n) only on
+		 * the overflow path, which is unreachable under normal usage.
+		 *
+		 * @tparam T underlying GL resource type
+		 * @param pool the pool to inspect; not mutated
+		 */
+		template <class T>
+		bool poolHasCapacity(const std::vector<Slot<T>>& pool) {
+			if (pool.size() < kHandleIndexLimit) return true;
+			for (auto const& s : pool) { if (!s.obj) return true; }
+			return false;
+		}
+
+		/**
 		 * @brief Reuse an empty slot (or append a new one) and return (index, gen).
 		 *
 		 * Linear-scans pool looking for a slot whose RAII holder is empty - those are free slots
 		 * awaiting reuse. On hit, moves obj into that slot and bumps its gen counter. On miss,
-		 * appends a new slot. Returns the index and the final gen value for the caller to pack
-		 * into the typed handle. Scan cost is O(n); resource creation is not on the frame hot
-		 * path so this is intentional.
+		 * appends a new slot. Scan cost is O(n); resource creation is not on the frame hot path
+		 * so this is intentional.
 		 *
-		 * @tparam T underlying GL resource type (gl::BufferId, gl::Texture, gl::Program, ...)
+		 * Callers must ensure poolHasCapacity(pool) is true before calling; the tail assert is a
+		 * defensive invariant, not a user-facing failure path.
+		 *
+		 * @tparam T underlying GL resource type
 		 * @param pool the pool vector to acquire a slot in; grows if no free slot is available
 		 * @param obj RAII holder for the GL object to install at the acquired slot
 		 * @return {index, gen} pair ready to be passed to HandleT::make
@@ -55,14 +74,19 @@ namespace xe {
 					return { i, pool[i].gen };
 				}
 			}
-			assert(pool.size() < kHandleIndexLimit && "handle index exhausted (16-bit field)");
+			assert(pool.size() < kHandleIndexLimit && "acquireSlot: pool exhausted - caller skipped poolHasCapacity");
 			pool.push_back({ std::move(obj), 0 });
 			return { static_cast<uint32_t>(pool.size() - 1), 0 };
 		}
 	}
 
-	RenderDeviceBackendContext* createContextGL() {
-		return new RenderDeviceBackendContextGL();
+	tl::expected<RenderDeviceBackendContext*, BackendError> createContextGL() {
+		auto* ctx = new (std::nothrow) RenderDeviceBackendContextGL();
+		if (!ctx) {
+			return makeBackendError(BackendErrorCode::AllocationFailed,
+				"failed to allocate RenderDeviceBackendContextGL");
+		}
+		return ctx;
 	}
 
 	void destroyContextGL(RenderDeviceBackendContext* ctx) {
@@ -120,8 +144,14 @@ namespace xe {
 		return gl::BufferUsage::eStreamDraw;
 	}
 
-	BufferHandle createBufferGL(RenderDeviceBackendContext* ctx, const BufferDescriptor& desc) {
+	tl::expected<BufferHandle, BackendError>
+	createBufferGL(RenderDeviceBackendContext* ctx, const BufferDescriptor& desc) {
 		auto &buffers = glctx(ctx)->buffers;
+
+		if (!poolHasCapacity(buffers)) {
+			return makeBackendError(BackendErrorCode::HandlePoolExhausted,
+				"buffer pool exhausted (16-bit index field)");
+		}
 
 		gl::BufferTarget const target = toBufferTargetGL(desc.type);
 		gl::BufferUsage const usage = toBufferUsageGL(desc.usage);
@@ -214,27 +244,34 @@ namespace xe {
 		return gl::PixelType::eUnsignedByte;
 	}
 
-	TextureHandle createTextureGL(RenderDeviceBackendContext* ctx, const TextureDescriptor &desc) {
+	tl::expected<TextureHandle, BackendError>
+	createTextureGL(RenderDeviceBackendContext* ctx, const TextureDescriptor &desc) {
 		auto &textures = glctx(ctx)->textures;
-		auto texture = glaze::makeUnique<gl::Texture>();
-
-		gl::TextureTarget const target = toTextureTargetGL(desc.type);
-		gl::InternalFormat const internalFormat = toInternalFormatGL(desc.format);
-		gl::PixelFormat const pixelFormat = toPixelFormatGL(desc.sourceFormat);
-		gl::PixelType const pixelType = toPixelTypeGL(desc.sourceDataType);
+		if (!poolHasCapacity(textures)) {
+			return makeBackendError(BackendErrorCode::HandlePoolExhausted,
+				"texture pool exhausted (16-bit index field)");
+		}
 
 		size_t const faceCount = (desc.type == TextureType::TexCubeMap) ? 6u : 1u;
 		size_t const mipCount = desc.mipLevelCount == 0
 			? 1u
 			: (desc.mipLevelCount / faceCount);
 
-		assert(!(mipCount > 1 && desc.generateMipmaps)
-			&& "TextureDescriptor: generateMipmaps is mutually exclusive with supplying >1 mip level");
-
-		if (desc.mipLevels != nullptr) {
-			assert(desc.mipLevelCount == mipCount * faceCount
-				&& "TextureDescriptor: mipLevelCount must equal mipCount * faceCount");
+		if (mipCount > 1 && desc.generateMipmaps) {
+			return makeBackendError(BackendErrorCode::InvalidDescriptor,
+				"TextureDescriptor: generateMipmaps is mutually exclusive with supplying >1 mip level");
 		}
+		if (desc.mipLevels != nullptr && desc.mipLevelCount != mipCount * faceCount) {
+			return makeBackendError(BackendErrorCode::InvalidDescriptor,
+				"TextureDescriptor: mipLevelCount must equal mipCount * faceCount");
+		}
+
+		auto texture = glaze::makeUnique<gl::Texture>();
+
+		gl::TextureTarget const target = toTextureTargetGL(desc.type);
+		gl::InternalFormat const internalFormat = toInternalFormatGL(desc.format);
+		gl::PixelFormat const pixelFormat = toPixelFormatGL(desc.sourceFormat);
+		gl::PixelType const pixelType = toPixelTypeGL(desc.sourceDataType);
 
 		gl::bindTexture(target, texture);
 
@@ -266,8 +303,8 @@ namespace xe {
 				break;
 
 			default:
-				assert(false && "TextureType is unknown");
-				return {};
+				return makeBackendError(BackendErrorCode::InternalError,
+					"createTextureGL: unknown TextureType");
 			}
 
 			w = halveDimension(w);
@@ -396,62 +433,70 @@ namespace xe {
 		gl::getTexImage(readTarget, desc.mipLevel, pixelFormat, pixelType, desc.data);
 	}
 
+	/**
+	 * @brief Compile a single shader stage. Always returns a valid glaze::Unique; compile status
+	 * lives on the shader itself and must be inspected by the caller (getShaderiv + getShaderInfoLog).
+	 */
 	static glaze::Unique<gl::Shader> compileShader(gl::ShaderType type, const char* src) {
 		auto shader = glaze::makeUnique<gl::Shader>(type);
-
 		gl::shaderSource(shader, 1, &src, nullptr);
 		gl::compileShader(shader);
-
-		if (!gl::getShaderiv(shader, gl::ShaderParameterName::eCompileStatus)) {
-			std::cerr << "Shader compile error:\n" << gl::getShaderInfoLog(shader) << std::endl;
-
-			return {};
-		}
-
 		return shader;
 	}
 
+	/**
+	 * @brief Attach/link the given shaders into a fresh program. Always returns a valid glaze::Unique;
+	 * link status lives on the program itself and must be inspected by the caller
+	 * (getProgramiv + getProgramInfoLog).
+	 */
 	static glaze::Unique<gl::Program> linkProgram(const std::vector<glaze::Unique<gl::Shader>> &shaders) {
 		auto program = glaze::makeUnique<gl::Program>();
 
-		for (size_t i = 0; i < shaders.size(); i++) {
-			if (!shaders[i]) {
-				std::cerr << "Can't link program: One of its shaders was not built successfully" << std::endl;
-				return {};
-			}
-
-			gl::attachShader(program, shaders[i]);
+		for (auto const &s : shaders) {
+			gl::attachShader(program, s);
 		}
 
 		gl::linkProgram(program);
 
-		for (size_t i = 0; i < shaders.size(); i++) {
-			gl::detachShader(program, shaders[i]);
-		}
-
-		if (!gl::getProgramiv(program, gl::ProgramProperty::eLinkStatus)) {
-			std::cerr << "Shader link error:\n" << gl::getProgramInfoLog(program) << std::endl;
-			return {};
+		for (auto const &s : shaders) {
+			gl::detachShader(program, s);
 		}
 
 		return program;
 	}
 
-	ShaderHandle createShaderProgramGL(RenderDeviceBackendContext *ctx, const ShaderProgramDescriptor &desc) {
+	tl::expected<ShaderHandle, BackendError>
+	createShaderProgramGL(RenderDeviceBackendContext *ctx, const ShaderProgramDescriptor &desc) {
 		auto &shaderPrograms = glctx(ctx)->shaderPrograms;
 
-		std::vector<glaze::Unique<gl::Shader>> shaders;
-		shaders.push_back(std::move(compileShader(gl::ShaderType::eVertexShader, desc.glslVertexShader.c_str())));
-		shaders.push_back(std::move(compileShader(gl::ShaderType::eFragmentShader, desc.glslFragmentShader.c_str())));
-
-		glaze::Unique<gl::Program> shaderProgram = linkProgram(shaders);
-
-		if (!shaderProgram) {
-			std::cerr << "Could not create a Shader Program" << std::endl;
-			return {};
+		auto vs = compileShader(gl::ShaderType::eVertexShader, desc.glslVertexShader.c_str());
+		if (!gl::getShaderiv(vs, gl::ShaderParameterName::eCompileStatus)) {
+			return makeBackendError(BackendErrorCode::ShaderCompileFailed,
+				gl::getShaderInfoLog(vs));
 		}
 
-		auto const [index, gen] = acquireSlot(shaderPrograms, std::move(shaderProgram));
+		auto fs = compileShader(gl::ShaderType::eFragmentShader, desc.glslFragmentShader.c_str());
+		if (!gl::getShaderiv(fs, gl::ShaderParameterName::eCompileStatus)) {
+			return makeBackendError(BackendErrorCode::ShaderCompileFailed,
+				gl::getShaderInfoLog(fs));
+		}
+
+		std::vector<glaze::Unique<gl::Shader>> shaders;
+		shaders.push_back(std::move(vs));
+		shaders.push_back(std::move(fs));
+
+		auto program = linkProgram(shaders);
+		if (!gl::getProgramiv(program, gl::ProgramProperty::eLinkStatus)) {
+			return makeBackendError(BackendErrorCode::ShaderLinkFailed,
+				gl::getProgramInfoLog(program));
+		}
+
+		if (!poolHasCapacity(shaderPrograms)) {
+			return makeBackendError(BackendErrorCode::HandlePoolExhausted,
+				"shader program pool exhausted (16-bit index field)");
+		}
+
+		auto const [index, gen] = acquireSlot(shaderPrograms, std::move(program));
 		return ShaderHandle::make(gen, index);
 	}
 

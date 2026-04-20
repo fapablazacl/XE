@@ -5,6 +5,7 @@ find_package(glm REQUIRED)
 find_package(glfw3 CONFIG REQUIRED)
 find_package(glaze CONFIG REQUIRED)
 find_package(Backport CONFIG REQUIRED)
+find_package(tl-expected CONFIG REQUIRED)
 
 set (target "libxe-graphics")
 
@@ -102,6 +103,7 @@ target_link_libraries (${target}
 	PUBLIC glfw
 	PUBLIC Backport::Backport
 	PUBLIC Microsoft.GSL::GSL
+	PUBLIC tl::expected
 )
 
 if (XE_DEV_UNIT_TEST)
