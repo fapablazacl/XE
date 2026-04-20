@@ -178,8 +178,7 @@ namespace xe {
         auto &slot = buffers[index];
         assert(slot.obj && "destroyBufferGL: slot already free (double destroy)");
         assert(slot.gen == handle.gen() && "destroyBufferGL: stale handle (generation mismatch)");
-        // gen is bumped on next acquireSlot, not here: keeps the bump tied to actual reuse so
-        // destroy-without-reacquire doesn't prematurely burn through the 8-bit field.
+
         slot.obj.reset({});
     }
 
