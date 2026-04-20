@@ -17,40 +17,51 @@ static float checkerboardValue(int x, int y, int tileSize) {
 
 static int channelCountOf(xe::PixelFormat format) {
     switch (format) {
-    case xe::PixelFormat::R8G8B8:   return 3;
-    case xe::PixelFormat::R8G8B8A8: return 4;
-    default: return 0;
+    case xe::PixelFormat::R8G8B8:
+        return 3;
+    case xe::PixelFormat::R8G8B8A8:
+        return 4;
+    default:
+        return 0;
     }
 }
 
 static size_t byteSizeOf(xe::DataType type) {
     switch (type) {
-    case xe::DataType::Int8:   case xe::DataType::UInt8:   return 1;
-    case xe::DataType::Int16:  case xe::DataType::UInt16:  case xe::DataType::Float16: return 2;
-    case xe::DataType::Int32:  case xe::DataType::UInt32:  case xe::DataType::Float32: return 4;
-    default: return 0;
+    case xe::DataType::Int8:
+    case xe::DataType::UInt8:
+        return 1;
+    case xe::DataType::Int16:
+    case xe::DataType::UInt16:
+    case xe::DataType::Float16:
+        return 2;
+    case xe::DataType::Int32:
+    case xe::DataType::UInt32:
+    case xe::DataType::Float32:
+        return 4;
+    default:
+        return 0;
     }
 }
 
-static void writeNormalizedChannel(void* base, size_t pixelOffset, int channel, float value, xe::DataType type) {
-    auto* byteBase = static_cast<uint8_t*>(base) + pixelOffset;
+static void writeNormalizedChannel(void *base, size_t pixelOffset, int channel, float value, xe::DataType type) {
+    auto *byteBase = static_cast<uint8_t *>(base) + pixelOffset;
     switch (type) {
     case xe::DataType::UInt8:
         byteBase[channel] = static_cast<uint8_t>(value * 255.0f);
         break;
     case xe::DataType::UInt16:
-        reinterpret_cast<uint16_t*>(byteBase)[channel] = static_cast<uint16_t>(value * 65535.0f);
+        reinterpret_cast<uint16_t *>(byteBase)[channel] = static_cast<uint16_t>(value * 65535.0f);
         break;
     case xe::DataType::Float32:
-        reinterpret_cast<float*>(byteBase)[channel] = value;
+        reinterpret_cast<float *>(byteBase)[channel] = value;
         break;
     default:
         assert(false && "writeNormalizedChannel: unsupported DataType");
     }
 }
 
-static void fillCheckerboardImage(void* data, size_t byteSize, int width, int height,
-                                  xe::PixelFormat format, xe::DataType dataType, int tileSize) {
+static void fillCheckerboardImage(void *data, size_t byteSize, int width, int height, xe::PixelFormat format, xe::DataType dataType, int tileSize) {
     int const channels = channelCountOf(format);
     size_t const channelBytes = byteSizeOf(dataType);
     size_t const pixelStride = static_cast<size_t>(channels) * channelBytes;
@@ -72,8 +83,7 @@ static void fillCheckerboardImage(void* data, size_t byteSize, int width, int he
     }
 }
 
-tl::expected<xe::TextureHandle, xe::BackendError>
-createCheckerBoardTexture(const xe::RenderDeviceBackendVTable &vtable, xe::RenderDeviceBackendContext *ctx, xe::ivec2 size) {
+tl::expected<xe::TextureHandle, xe::BackendError> createCheckerBoardTexture(const xe::RenderDeviceBackendVTable &vtable, xe::RenderDeviceBackendContext *ctx, xe::ivec2 size) {
     constexpr int tileSize = 64;
     constexpr xe::PixelFormat format = xe::PixelFormat::R8G8B8A8;
     constexpr xe::DataType dataType = xe::DataType::UInt8;
@@ -82,7 +92,7 @@ createCheckerBoardTexture(const xe::RenderDeviceBackendVTable &vtable, xe::Rende
     std::vector<uint8_t> pixels(byteSize);
     fillCheckerboardImage(pixels.data(), byteSize, size.x, size.y, format, dataType, tileSize);
 
-    xe::MipLevel const mip{ pixels.data() };
+    xe::MipLevel const mip{pixels.data()};
 
     xe::TextureDescriptor desc{};
     desc.type = xe::TextureType::Tex2D;
@@ -108,7 +118,7 @@ int main() {
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    GLFWwindow* window = glfwCreateWindow(800, 600, "render backend test", nullptr, nullptr);
+    GLFWwindow *window = glfwCreateWindow(800, 600, "render backend test", nullptr, nullptr);
     if (!window) {
         std::cerr << "Failed to create GLFW window" << std::endl;
         glfwTerminate();
@@ -125,8 +135,8 @@ int main() {
         std::cerr << "createContext failed: " << ctxResult.error().message << std::endl;
         return 1;
     }
-    xe::RenderDeviceBackendContext* ctx = *ctxResult;
-	auto glctxgl = static_cast<xe::RenderDeviceBackendContextGL*>(ctx);
+    xe::RenderDeviceBackendContext *ctx = *ctxResult;
+    auto glctxgl = static_cast<xe::RenderDeviceBackendContextGL *>(ctx);
 
     // shader initialization
     xe::ShaderProgramDescriptor shaderDesc;
@@ -212,15 +222,15 @@ void main() {
     gl::vertexAttribPointer(gl::AttribLocation{0}, 3, gl::VertexAttribPointerType::eFloat, GL_FALSE, 0, nullptr);
 
     // texcoord buffer
-	gl::bindBuffer(gl::BufferTarget::eArrayBuffer, texCoordBufferId);
-	gl::enableVertexArrayAttrib(vao, 1);
-	gl::vertexAttribPointer(gl::AttribLocation{ 1 }, 2, gl::VertexAttribPointerType::eFloat, GL_FALSE, 0, nullptr);
+    gl::bindBuffer(gl::BufferTarget::eArrayBuffer, texCoordBufferId);
+    gl::enableVertexArrayAttrib(vao, 1);
+    gl::vertexAttribPointer(gl::AttribLocation{1}, 2, gl::VertexAttribPointerType::eFloat, GL_FALSE, 0, nullptr);
 
-	while (!glfwWindowShouldClose(window)) {
-		glfwPollEvents();
+    while (!glfwWindowShouldClose(window)) {
+        glfwPollEvents();
 
-		int w, h;
-		glfwGetFramebufferSize(window, &w, &h);
+        int w, h;
+        glfwGetFramebufferSize(window, &w, &h);
 
         gl::clear(gl::ClearBufferMask::eColorBufferBit);
 
@@ -238,8 +248,8 @@ void main() {
         gl::drawArrays(gl::PrimitiveType::eTriangleStrip, 0, 4);
         gl::flush();
 
-		glfwSwapBuffers(window);
-	}
+        glfwSwapBuffers(window);
+    }
 
     vtable.destroyContext(ctx);
 

@@ -28,7 +28,7 @@ namespace xe {
             );
         }
 
-		indexBuffer = dynamic_cast<const BufferGL*>(desc.indexBuffer);
+                indexBuffer = dynamic_cast<const BufferGL*>(desc.indexBuffer);
 
         if (indexBuffer) {
             glBindBuffer(indexBuffer->getTarget(), indexBuffer->getID());

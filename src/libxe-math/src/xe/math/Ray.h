@@ -19,8 +19,8 @@ namespace xe {
      * necessary.
      */
     template <typename T> struct tray {
-        tvec<T, 3> origin{T(0), T(0), T(0)};       ///< Ray origin in world space.
-        tvec<T, 3> direction{T(0), T(0), T(1)};    ///< Ray direction; expected to be normalised by intersection helpers.
+        tvec<T, 3> origin{T(0), T(0), T(0)};    ///< Ray origin in world space.
+        tvec<T, 3> direction{T(0), T(0), T(1)}; ///< Ray direction; expected to be normalised by intersection helpers.
 
         /**
          * @brief Default-construct to a ray at the origin pointing along @c +Z.
@@ -53,6 +53,6 @@ namespace xe {
 
     // Legacy PascalCase aliases. See Legacy.h.
     template <typename T> using TRay = tray<T>; ///< @deprecated Use @ref tray.
-    using Ray = ray;   ///< @deprecated Use @ref ray.
-    using Rayd = dray; ///< @deprecated Use @ref dray.
+    using Ray = ray;                            ///< @deprecated Use @ref ray.
+    using Rayd = dray;                          ///< @deprecated Use @ref dray.
 } // namespace xe

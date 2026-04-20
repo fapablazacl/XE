@@ -112,7 +112,7 @@ namespace xe {
 
     // Legacy PascalCase aliases. See Legacy.h.
     template <typename T> using TRange = trange<T>; ///< @deprecated Use @ref trange.
-    using Range = range;   ///< @deprecated Use @ref range.
-    using Ranged = drange; ///< @deprecated Use @ref drange.
-    using Rangei = irange; ///< @deprecated Use @ref irange.
+    using Range = range;                            ///< @deprecated Use @ref range.
+    using Ranged = drange;                          ///< @deprecated Use @ref drange.
+    using Rangei = irange;                          ///< @deprecated Use @ref irange.
 } // namespace xe

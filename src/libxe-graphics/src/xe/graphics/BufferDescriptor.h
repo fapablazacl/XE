@@ -6,17 +6,7 @@
 #include <xe/Predef.h>
 
 namespace xe {
-    enum class BufferUsage {
-		StreamDraw,
-		StreamRead,
-		StreamCopy,
-		StaticDraw,
-		StaticRead,
-		StaticCopy,
-		DynamicDraw,
-		DynamicRead,
-		DynamicCopy
-    };
+    enum class BufferUsage { StreamDraw, StreamRead, StreamCopy, StaticDraw, StaticRead, StaticCopy, DynamicDraw, DynamicRead, DynamicCopy };
 
     enum class BufferType { Vertex, Index };
 

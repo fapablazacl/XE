@@ -19,8 +19,8 @@ namespace xe {
      * out of @ref tquat normalise it for the caller.
      */
     template <typename T> struct axis_angle {
-        T angle;          ///< Rotation angle in radians.
-        tvec<T, 3> axis;  ///< Rotation axis; expected to be unit length.
+        T angle;         ///< Rotation angle in radians.
+        tvec<T, 3> axis; ///< Rotation axis; expected to be unit length.
     };
 
     // Legacy PascalCase alias. See Legacy.h.

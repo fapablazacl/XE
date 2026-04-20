@@ -3,7 +3,4 @@
 
 #include <glaze/gl.hpp>
 
-namespace xe {
-
-
-}
+namespace xe {}

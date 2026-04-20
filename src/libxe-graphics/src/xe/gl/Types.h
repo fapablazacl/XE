@@ -17,7 +17,6 @@ namespace xe::gl {
         T id = {};
     };
 
-
     struct CheckedEnum {
         GLenum value = {};
         CheckedEnum() = default;

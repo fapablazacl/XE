@@ -236,7 +236,7 @@ void post_call_callback_gl(const char *name, void *funcptr, int len_args, ...) {
         return;
     }
 
-    va_list valist  {};
+    va_list valist{};
     va_start(valist, len_args);
 
     std::cerr << name << "(";

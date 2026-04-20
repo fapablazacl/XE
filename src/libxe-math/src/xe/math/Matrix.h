@@ -900,9 +900,9 @@ namespace xe {
     // Canonical type aliases.
     // ---------------------------------------------------------------------
 
-    using mat2 = tmat<float, 2, 2>;  ///< 2×2 single-precision matrix — glm-compatible alias.
-    using mat3 = tmat<float, 3, 3>;  ///< 3×3 single-precision matrix — glm-compatible alias.
-    using mat4 = tmat<float, 4, 4>;  ///< 4×4 single-precision matrix — glm-compatible alias.
+    using mat2 = tmat<float, 2, 2>; ///< 2×2 single-precision matrix — glm-compatible alias.
+    using mat3 = tmat<float, 3, 3>; ///< 3×3 single-precision matrix — glm-compatible alias.
+    using mat4 = tmat<float, 4, 4>; ///< 4×4 single-precision matrix — glm-compatible alias.
 
     using dmat2 = tmat<double, 2, 2>; ///< 2×2 double-precision matrix.
     using dmat3 = tmat<double, 3, 3>; ///< 3×3 double-precision matrix.
@@ -915,9 +915,9 @@ namespace xe {
     // ---------------------------------------------------------------------
 
     template <typename T, int R, int C> using TMatrix = tmat<T, C, R>; ///< @deprecated Use @ref tmat. Note the column-major argument order.
-    using Matrix2 = mat2; ///< @deprecated Use @ref mat2.
-    using Matrix3 = mat3; ///< @deprecated Use @ref mat3.
-    using Matrix4 = mat4; ///< @deprecated Use @ref mat4.
+    using Matrix2 = mat2;                                              ///< @deprecated Use @ref mat2.
+    using Matrix3 = mat3;                                              ///< @deprecated Use @ref mat3.
+    using Matrix4 = mat4;                                              ///< @deprecated Use @ref mat4.
 
     // ---------------------------------------------------------------------
     // Legacy matrix-builder free functions. Kept here (rather than Legacy.h)

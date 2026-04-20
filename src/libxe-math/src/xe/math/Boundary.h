@@ -51,10 +51,10 @@ namespace xe {
             static constexpr int value = 1; ///< Terminating value.
         };
 
-        static constexpr int SideCount = 2 * N;                ///< Number of faces (4 for 2D, 6 for 3D).
-        static constexpr int PointCount = Power<2, N>::value;  ///< Number of corners (4 for 2D, 8 for 3D).
-        static constexpr int MinEdgeIndex = 0;                 ///< Corner index of @ref minEdge.
-        static constexpr int MaxEdgeIndex = PointCount - 1;    ///< Corner index of @ref maxEdge.
+        static constexpr int SideCount = 2 * N;               ///< Number of faces (4 for 2D, 6 for 3D).
+        static constexpr int PointCount = Power<2, N>::value; ///< Number of corners (4 for 2D, 8 for 3D).
+        static constexpr int MinEdgeIndex = 0;                ///< Corner index of @ref minEdge.
+        static constexpr int MaxEdgeIndex = PointCount - 1;   ///< Corner index of @ref maxEdge.
 
         /**
          * @brief Default-construct an empty boundary at the origin.

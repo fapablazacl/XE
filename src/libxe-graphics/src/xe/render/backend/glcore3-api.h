@@ -22,8 +22,7 @@ namespace xe {
      *
      * @tparam T the underlying GL resource type (gl::BufferId, gl::Texture, gl::Program, ...)
      */
-    template <class T>
-    struct Slot {
+    template <class T> struct Slot {
         //! RAII-owned GL object. Empty (operator bool -> false) when the slot is free for reuse.
         glaze::Unique<T> obj;
 
@@ -49,20 +48,20 @@ namespace xe {
         std::vector<Slot<gl::Texture>> textures;
     };
 
-    tl::expected<RenderDeviceBackendContext*, BackendError> createContextGL();
-    void destroyContextGL(RenderDeviceBackendContext* ctx);
+    tl::expected<RenderDeviceBackendContext *, BackendError> createContextGL();
+    void destroyContextGL(RenderDeviceBackendContext *ctx);
 
-    tl::expected<BufferHandle, BackendError> createBufferGL(RenderDeviceBackendContext* ctx, const BufferDescriptor& desc);
-    void destroyBufferGL(RenderDeviceBackendContext* ctx, BufferHandle handle);
-    void readBufferGL(RenderDeviceBackendContext* ctx, BufferHandle handle, const BufferReadDescriptor& desc);
+    tl::expected<BufferHandle, BackendError> createBufferGL(RenderDeviceBackendContext *ctx, const BufferDescriptor &desc);
+    void destroyBufferGL(RenderDeviceBackendContext *ctx, BufferHandle handle);
+    void readBufferGL(RenderDeviceBackendContext *ctx, BufferHandle handle, const BufferReadDescriptor &desc);
 
-    tl::expected<ShaderHandle, BackendError> createShaderProgramGL(RenderDeviceBackendContext* ctx, const ShaderProgramDescriptor& desc);
-    void destroyShaderProgramGL(RenderDeviceBackendContext* ctx, ShaderHandle handle);
+    tl::expected<ShaderHandle, BackendError> createShaderProgramGL(RenderDeviceBackendContext *ctx, const ShaderProgramDescriptor &desc);
+    void destroyShaderProgramGL(RenderDeviceBackendContext *ctx, ShaderHandle handle);
 
-    tl::expected<TextureHandle, BackendError> createTextureGL(RenderDeviceBackendContext* ctx, const TextureDescriptor& desc);
-    void destroyTextureGL(RenderDeviceBackendContext* ctx, TextureHandle handle);
-    void updateTextureGL(RenderDeviceBackendContext* ctx, TextureHandle handle, const TextureUpdateDescriptor& desc);
-    void readTextureGL(RenderDeviceBackendContext* ctx, TextureHandle handle, const TextureReadDescriptor& desc);
+    tl::expected<TextureHandle, BackendError> createTextureGL(RenderDeviceBackendContext *ctx, const TextureDescriptor &desc);
+    void destroyTextureGL(RenderDeviceBackendContext *ctx, TextureHandle handle);
+    void updateTextureGL(RenderDeviceBackendContext *ctx, TextureHandle handle, const TextureUpdateDescriptor &desc);
+    void readTextureGL(RenderDeviceBackendContext *ctx, TextureHandle handle, const TextureReadDescriptor &desc);
 
-    void initializeBackendTableGL(RenderDeviceBackendVTable* vtable);
-}
+    void initializeBackendTableGL(RenderDeviceBackendVTable *vtable);
+} // namespace xe

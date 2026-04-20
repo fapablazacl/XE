@@ -19,8 +19,8 @@ namespace xe {
      * radii are nonsense for any geometric purpose.
      */
     template <typename T> struct tsphere {
-        tvec<T, 3> center{T(0), T(0), T(0)};   ///< Centre of the sphere in world space.
-        T radius = static_cast<T>(1);          ///< Radius; non-negative.
+        tvec<T, 3> center{T(0), T(0), T(0)}; ///< Centre of the sphere in world space.
+        T radius = static_cast<T>(1);        ///< Radius; non-negative.
 
         /**
          * @brief Default-construct to a unit sphere centred at the origin.
@@ -50,8 +50,8 @@ namespace xe {
 
     // Legacy PascalCase aliases. See Legacy.h.
     template <typename T> using TSphere = tsphere<T>; ///< @deprecated Use @ref tsphere.
-    using Sphere = sphere;     ///< @deprecated Use @ref sphere.
-    using Sphered = dsphere;   ///< @deprecated Use @ref dsphere.
+    using Sphere = sphere;                            ///< @deprecated Use @ref sphere.
+    using Sphered = dsphere;                          ///< @deprecated Use @ref dsphere.
 
     /**
      * @brief Ray-sphere intersection — returns the nearest hit parameter.

@@ -285,9 +285,7 @@ namespace xe {
          * legacy code would break otherwise.
          * @param other Source vector with scalar type @p U.
          */
-        template <typename U>
-        constexpr tvec(const tvec<U, 3> &other) noexcept
-            : x(static_cast<T>(other.x)), y(static_cast<T>(other.y)), z(static_cast<T>(other.z)) {
+        template <typename U> constexpr tvec(const tvec<U, 3> &other) noexcept : x(static_cast<T>(other.x)), y(static_cast<T>(other.y)), z(static_cast<T>(other.z)) {
         }
 
         /**
@@ -435,8 +433,10 @@ namespace xe {
          * @param other Source vector with scalar type @p U.
          */
         template <typename U>
-        constexpr tvec(const tvec<U, 4> &other) noexcept
-            : x(static_cast<T>(other.x)), y(static_cast<T>(other.y)), z(static_cast<T>(other.z)), w(static_cast<T>(other.w)) {
+        constexpr tvec(const tvec<U, 4> &other) noexcept : x(static_cast<T>(other.x)),
+                                                           y(static_cast<T>(other.y)),
+                                                           z(static_cast<T>(other.z)),
+                                                           w(static_cast<T>(other.w)) {
         }
 
         /**
@@ -841,9 +841,9 @@ namespace xe {
     // Canonical type aliases (match glm names exactly).
     // ---------------------------------------------------------------------
 
-    using vec2 = tvec<float, 2>;  ///< 2-component @c float vector — glm-compatible alias.
-    using vec3 = tvec<float, 3>;  ///< 3-component @c float vector — glm-compatible alias.
-    using vec4 = tvec<float, 4>;  ///< 4-component @c float vector — glm-compatible alias.
+    using vec2 = tvec<float, 2>; ///< 2-component @c float vector — glm-compatible alias.
+    using vec3 = tvec<float, 3>; ///< 3-component @c float vector — glm-compatible alias.
+    using vec4 = tvec<float, 4>; ///< 4-component @c float vector — glm-compatible alias.
 
     using ivec2 = tvec<std::int32_t, 2>; ///< 2-component signed 32-bit integer vector.
     using ivec3 = tvec<std::int32_t, 3>; ///< 3-component signed 32-bit integer vector.
@@ -863,10 +863,10 @@ namespace xe {
     // deprecated forwarders.
     // ---------------------------------------------------------------------
 
-    template <typename T, int N> using TVector = tvec<T, N>;     ///< @deprecated Use @ref tvec.
-    template <typename T> using TVector2 = tvec<T, 2>;           ///< @deprecated Use @ref tvec<T,2>.
-    template <typename T> using TVector3 = tvec<T, 3>;           ///< @deprecated Use @ref tvec<T,3>.
-    template <typename T> using TVector4 = tvec<T, 4>;           ///< @deprecated Use @ref tvec<T,4>.
+    template <typename T, int N> using TVector = tvec<T, N>; ///< @deprecated Use @ref tvec.
+    template <typename T> using TVector2 = tvec<T, 2>;       ///< @deprecated Use @ref tvec<T,2>.
+    template <typename T> using TVector3 = tvec<T, 3>;       ///< @deprecated Use @ref tvec<T,3>.
+    template <typename T> using TVector4 = tvec<T, 4>;       ///< @deprecated Use @ref tvec<T,4>.
 
     using Vector2 = vec2; ///< @deprecated Use @ref vec2.
     using Vector3 = vec3; ///< @deprecated Use @ref vec3.

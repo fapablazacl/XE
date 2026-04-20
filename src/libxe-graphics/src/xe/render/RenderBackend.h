@@ -17,38 +17,32 @@ namespace xe {
      * explicit at the call site and the backend layer can remain exception-free.
      */
     struct RenderDeviceBackendVTable {
-        tl::expected<RenderDeviceBackendContext*, BackendError> (*createContext)() = nullptr;
-        void (*destroyContext)(RenderDeviceBackendContext*) = nullptr;
+        tl::expected<RenderDeviceBackendContext *, BackendError> (*createContext)() = nullptr;
+        void (*destroyContext)(RenderDeviceBackendContext *) = nullptr;
 
-        tl::expected<BufferHandle, BackendError>
-            (*createBuffer)(RenderDeviceBackendContext *, const BufferDescriptor &) = nullptr;
+        tl::expected<BufferHandle, BackendError> (*createBuffer)(RenderDeviceBackendContext *, const BufferDescriptor &) = nullptr;
         void (*destroyBuffer)(RenderDeviceBackendContext *, BufferHandle) = nullptr;
         void (*readBuffer)(RenderDeviceBackendContext *, BufferHandle, const BufferReadDescriptor &) = nullptr;
 
-        tl::expected<ShaderHandle, BackendError>
-            (*createShaderProgram)(RenderDeviceBackendContext *, const ShaderProgramDescriptor &) = nullptr;
+        tl::expected<ShaderHandle, BackendError> (*createShaderProgram)(RenderDeviceBackendContext *, const ShaderProgramDescriptor &) = nullptr;
         void (*destroyShaderProgram)(RenderDeviceBackendContext *, ShaderHandle) = nullptr;
 
-        tl::expected<TextureHandle, BackendError>
-            (*createTexture)(RenderDeviceBackendContext*, const TextureDescriptor&) = nullptr;
-        void (*destroyTexture)(RenderDeviceBackendContext*, TextureHandle) = nullptr;
-        void (*updateTexture)(RenderDeviceBackendContext*, TextureHandle, const TextureUpdateDescriptor&) = nullptr;
-        void (*readTexture)(RenderDeviceBackendContext*, TextureHandle, const TextureReadDescriptor&) = nullptr;
+        tl::expected<TextureHandle, BackendError> (*createTexture)(RenderDeviceBackendContext *, const TextureDescriptor &) = nullptr;
+        void (*destroyTexture)(RenderDeviceBackendContext *, TextureHandle) = nullptr;
+        void (*updateTexture)(RenderDeviceBackendContext *, TextureHandle, const TextureUpdateDescriptor &) = nullptr;
+        void (*readTexture)(RenderDeviceBackendContext *, TextureHandle, const TextureReadDescriptor &) = nullptr;
 
-        tl::expected<VertexLayoutHandle, BackendError>
-            (*createVertexLayout)(RenderDeviceBackendContext *, const VertexLayoutDescriptor &) = nullptr;
+        tl::expected<VertexLayoutHandle, BackendError> (*createVertexLayout)(RenderDeviceBackendContext *, const VertexLayoutDescriptor &) = nullptr;
         void (*destroyVertexLayout)(RenderDeviceBackendContext *, VertexLayoutHandle) = nullptr;
 
-        tl::expected<PipelineHandle, BackendError>
-            (*createPipeline)(RenderDeviceBackendContext *, const PipelineDescriptor&) = nullptr;
+        tl::expected<PipelineHandle, BackendError> (*createPipeline)(RenderDeviceBackendContext *, const PipelineDescriptor &) = nullptr;
         void (*destroyPipeline)(RenderDeviceBackendContext *, PipelineHandle) = nullptr;
 
-        tl::expected<GeometryHandle, BackendError>
-            (*createGeometry)(RenderDeviceBackendContext *, const GeometryDescriptor&) = nullptr;
+        tl::expected<GeometryHandle, BackendError> (*createGeometry)(RenderDeviceBackendContext *, const GeometryDescriptor &) = nullptr;
         void (*destroyGeometry)(RenderDeviceBackendContext *, GeometryHandle) = nullptr;
 
         void (*beginFrame)(RenderDeviceBackendContext *) = nullptr;
         void (*endFrame)(RenderDeviceBackendContext *) = nullptr;
         void (*present)(RenderDeviceBackendContext *) = nullptr;
     };
-}
+} // namespace xe

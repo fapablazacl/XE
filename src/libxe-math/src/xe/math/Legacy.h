@@ -76,44 +76,44 @@ namespace xe {
     // ---------------------------------------------------------------------
 
     template <typename T> using TQuaternion = tquat<T>; ///< @deprecated Use @ref tquat.
-    using Quat = quat;   ///< @deprecated Use @ref quat.
-    using Quatd = dquat; ///< @deprecated Use @ref dquat.
+    using Quat = quat;                                  ///< @deprecated Use @ref quat.
+    using Quatd = dquat;                                ///< @deprecated Use @ref dquat.
 
     // ---------------------------------------------------------------------
     // Geometry aliases.
     // ---------------------------------------------------------------------
 
     template <typename T> using TRay = tray<T>; ///< @deprecated Use @ref tray.
-    using Ray = ray;   ///< @deprecated Use @ref ray.
-    using Rayd = dray; ///< @deprecated Use @ref dray.
+    using Ray = ray;                            ///< @deprecated Use @ref ray.
+    using Rayd = dray;                          ///< @deprecated Use @ref dray.
 
     template <typename T> using TSphere = tsphere<T>; ///< @deprecated Use @ref tsphere.
-    using Sphere = sphere;   ///< @deprecated Use @ref sphere.
-    using Sphered = dsphere; ///< @deprecated Use @ref dsphere.
+    using Sphere = sphere;                            ///< @deprecated Use @ref sphere.
+    using Sphered = dsphere;                          ///< @deprecated Use @ref dsphere.
 
     template <typename T> using TBox = tbox<T>; ///< @deprecated Use @ref tbox.
-    using Box = box;   ///< @deprecated Use @ref box.
-    using Boxd = dbox; ///< @deprecated Use @ref dbox.
-    using Boxi = ibox; ///< @deprecated Use @ref ibox.
+    using Box = box;                            ///< @deprecated Use @ref box.
+    using Boxd = dbox;                          ///< @deprecated Use @ref dbox.
+    using Boxi = ibox;                          ///< @deprecated Use @ref ibox.
 
     template <typename T, int N> using TBoundary = tboundary<T, N>; ///< @deprecated Use @ref tboundary.
 
     template <typename T> using TPlane = tplane<T>; ///< @deprecated Use @ref tplane.
-    using Plane = plane;   ///< @deprecated Use @ref plane.
-    using Planed = dplane; ///< @deprecated Use @ref dplane.
+    using Plane = plane;                            ///< @deprecated Use @ref plane.
+    using Planed = dplane;                          ///< @deprecated Use @ref dplane.
 
     template <typename T> using TTriangle = ttriangle<T>; ///< @deprecated Use @ref ttriangle.
-    using Triangle = triangle;   ///< @deprecated Use @ref triangle.
-    using Triangled = dtriangle; ///< @deprecated Use @ref dtriangle.
+    using Triangle = triangle;                            ///< @deprecated Use @ref triangle.
+    using Triangled = dtriangle;                          ///< @deprecated Use @ref dtriangle.
 
     template <typename T> using TEllipsoid = tellipsoid<T>; ///< @deprecated Use @ref tellipsoid.
-    using Ellipsoid = ellipsoid;   ///< @deprecated Use @ref ellipsoid.
-    using Ellipsoidd = dellipsoid; ///< @deprecated Use @ref dellipsoid.
+    using Ellipsoid = ellipsoid;                            ///< @deprecated Use @ref ellipsoid.
+    using Ellipsoidd = dellipsoid;                          ///< @deprecated Use @ref dellipsoid.
 
     template <typename T> using TRange = trange<T>; ///< @deprecated Use @ref trange.
-    using Range = range;   ///< @deprecated Use @ref range.
-    using Ranged = drange; ///< @deprecated Use @ref drange.
-    using Rangei = irange; ///< @deprecated Use @ref irange.
+    using Range = range;                            ///< @deprecated Use @ref range.
+    using Ranged = drange;                          ///< @deprecated Use @ref drange.
+    using Rangei = irange;                          ///< @deprecated Use @ref irange.
 
     using Rectf = trect<float>; ///< @deprecated Use @ref rect.
     using Recti = trect<int>;   ///< @deprecated Use @ref irect.
