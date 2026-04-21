@@ -406,7 +406,7 @@ namespace xe {
         }
     }
 
-    void readTextureGL(RenderDeviceBackendContext *ctx, TextureHandle handle, const TextureReadDescriptor &desc) {
+    void  readTextureGL(RenderDeviceBackendContext *ctx, TextureHandle handle, const TextureReadDescriptor &desc) {
         assert(desc.data != nullptr && "TextureReadDescriptor: data must not be null");
         assert(desc.offset.x == 0 && desc.offset.y == 0 && desc.offset.z == 0 && "TextureReadDescriptor: GL 3.3 backend requires offset == {0,0,0}");
 
@@ -514,6 +514,43 @@ namespace xe {
         slot.obj.reset({});
     }
 
+    struct VertexAttribGL {
+        gl::AttribLocation loc;
+        GLboolean normalized = GL_FALSE;
+        gl::AttributeType dataType;
+    };
+
+    struct VertexLayoutGL {
+        std::vector<VertexAttribGL> attributes;
+        gl::DrawElementsType indexDataType = gl::DrawElementsType::eUnsignedByte;
+    };
+
+    tl::expected<VertexLayoutHandle, BackendError>
+    createVertexLayoutGL(
+        RenderDeviceBackendContext *ctx,
+        const VertexLayoutDescriptor &desc) {
+
+        VertexLayoutGL layout;
+        layout.attributes.reserve(desc.attribs.size());
+
+        for (const VertexAttrib &attr : desc.attribs) {
+            layout.attributes.push_back({
+                gl::AttribLocation{attr.location},
+                attr.normalized ? GL_TRUE : GL_FALSE,
+                toAttributeTypeGL(attr.format)
+            });
+        }
+
+
+        glctx(ctx)->buffers;
+
+
+    }
+
+    void destroyVertexLayoutGL (RenderDeviceBackendContext * ctx, VertexLayoutHandle handle) {
+
+    }
+
     void initializeBackendTableGL(RenderDeviceBackendVTable *vtable) {
         vtable->createContext = &createContextGL;
         vtable->destroyContext = &destroyContextGL;
@@ -526,5 +563,7 @@ namespace xe {
         vtable->destroyTexture = &destroyTextureGL;
         vtable->updateTexture = &updateTextureGL;
         vtable->readTexture = &readTextureGL;
+        vtable->createVertexLayout = &createVertexLayoutGL;
+        vtable->destroyVertexLayout = &destroyVertexLayoutGL;
     }
 } // namespace xe

@@ -46,6 +46,8 @@ namespace xe {
 
         //! Pool of texture objects. A slot's obj is empty after destroyTextureGL.
         std::vector<Slot<gl::Texture>> textures;
+
+
     };
 
     tl::expected<RenderDeviceBackendContext *, BackendError> createContextGL();
