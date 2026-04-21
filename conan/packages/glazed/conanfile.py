@@ -1,17 +1,16 @@
-import glob
 import os
 import shutil
 
 import jinja2
 from conan import ConanFile
-from conan.tools.cmake import CMake, CMakeDeps, CMakeToolchain, cmake_layout
+from conan.tools.cmake import CMakeToolchain, cmake_layout
 from conan.tools.files import copy
 
 
-class GlazeCppConan(ConanFile):
-    name = "glaze-cpp"
+class GlazedConan(ConanFile):
+    name = "glazed"
     version = "1.0.0"
-    description = "C++ port of the Glaze OpenGL binding generator"
+    description = "Generated OpenGL/ES bindings produced by the Glaze generator"
     license = "MIT"
 
     settings = "os", "compiler", "build_type", "arch"
@@ -24,7 +23,6 @@ class GlazeCppConan(ConanFile):
         "shared": [True, False],
         "fPIC": [True, False],
         "with_docs": [True, False],
-        "with_tests": [True, False],
     }
 
     default_options = {
@@ -35,13 +33,9 @@ class GlazeCppConan(ConanFile):
         "shared": False,
         "fPIC": True,
         "with_docs": True,
-        "with_tests": False,
     }
 
     exports_sources = (
-        "CMakeLists.txt",
-        "cmake/*",
-        "src/*",
         "templates/*",
     )
 
@@ -53,28 +47,21 @@ class GlazeCppConan(ConanFile):
         if self.options.shared:
             self.options.rm_safe("fPIC")
 
-    def requirements(self):
-        # Build-only — the generated OpenGL bindings never #include any of
-        # these. Marking them visible=False stops them from leaking into
-        # downstream dependency graphs.
-        self.requires("pugixml/1.15", visible=False)
-        self.requires("inja/3.4.0", visible=False)
-        self.requires("nlohmann_json/3.12.0", visible=False)
-        self.requires("cxxopts/3.3.1", visible=False)
-
     def build_requirements(self):
-        if self.options.with_tests:
-            self.test_requires("catch2/3.7.1")
+        self.tool_requires("glazer/1.0.0")
 
     def source(self):
         from conan.tools.scm import Git
 
         repos = [
-            ("OpenGL-Registry", "https://github.com/KhronosGroup/OpenGL-Registry.git",
+            ("OpenGL-Registry",
+             "https://github.com/KhronosGroup/OpenGL-Registry.git",
              ["xml/gl.xml"]),
-            ("EGL-Registry", "https://github.com/KhronosGroup/EGL-Registry.git",
+            ("EGL-Registry",
+             "https://github.com/KhronosGroup/EGL-Registry.git",
              ["api/KHR"]),
-            ("OpenGL-Refpages", "https://github.com/KhronosGroup/OpenGL-Refpages.git",
+            ("OpenGL-Refpages",
+             "https://github.com/KhronosGroup/OpenGL-Refpages.git",
              ["gl4", "es1.1", "es3.0"]),
         ]
 
@@ -94,44 +81,14 @@ class GlazeCppConan(ConanFile):
         cmake_layout(self)
 
     def generate(self):
-        deps = CMakeDeps(self)
-        deps.generate()
         tc = CMakeToolchain(self)
-        tc.variables["GLAZE_CPP_WITH_TESTS"] = bool(self.options.with_tests)
         tc.generate()
 
     # ------------------------------------------------------------------ build
 
-    def _find_glaze_binary(self):
-        """Locate the glaze binary produced by Phase A. Handles both
-        single-config generators (flat `bin/` layout) and multi-config
-        generators (per-config subdirectory). Raises if not found."""
-        suffixes = [".exe", ""] if self.settings.os == "Windows" else [""]
-        patterns = []
-        for suffix in suffixes:
-            patterns.append(os.path.join(self.build_folder, "bin", f"glaze{suffix}"))
-            patterns.append(os.path.join(self.build_folder, "bin", "*", f"glaze{suffix}"))
-            patterns.append(os.path.join(self.build_folder, "**", f"glaze{suffix}"))
-        for pattern in patterns:
-            matches = glob.glob(pattern, recursive=True)
-            matches = [m for m in matches if os.path.isfile(m) and "CMakeFiles" not in m]
-            if matches:
-                return matches[0]
-        raise RuntimeError("glaze binary not found under " + self.build_folder)
-
     def build(self):
-        # -------------------- Phase A: build the C++ generator --------------------
-        cmake = CMake(self)
-        cmake.configure()
-        cmake.build()
-        if self.options.with_tests:
-            cmake.test()
-
-        glaze_binary = self._find_glaze_binary()
-        self.output.info(f"Using generator at {glaze_binary}")
-
-        # -------------------- Phase B: run the generator --------------------------
-        api_list = [api.strip() for api in str(self.options.apis).split(",") if api.strip()]
+        # -------------------- Phase B: run the glaze generator --------------------
+        api_list = [a.strip() for a in str(self.options.apis).split(",") if a.strip()]
 
         langs_args = []
         if self.options.language in ("c", "cpp", "both"):
@@ -149,15 +106,18 @@ class GlazeCppConan(ConanFile):
 
         ext_vendor_args = []
         if str(self.options.extension_vendors).strip():
-            ext_vendor_args = ["--extension-vendors", str(self.options.extension_vendors)]
+            ext_vendor_args = ["--extension-vendors",
+                               str(self.options.extension_vendors)]
         ext_name_args = []
         if str(self.options.extensions).strip():
             ext_name_args = ["--extensions", str(self.options.extensions)]
 
-        registry_path = os.path.join(self.source_folder, "OpenGL-Registry", "xml", "gl.xml")
+        registry_path = os.path.join(
+            self.source_folder, "OpenGL-Registry", "xml", "gl.xml")
 
+        # The glaze binary is on PATH thanks to glazer's buildenv_info.
         cmd = [
-            glaze_binary,
+            "glaze",
             "generate",
             "--registry", registry_path,
             "--output-dir", out_dir,
@@ -171,17 +131,13 @@ class GlazeCppConan(ConanFile):
 
         # Vendor khrplatform.h alongside the generated headers so the C
         # loader compiles without any external KHR include path.
-        khr_src = os.path.join(self.source_folder, "EGL-Registry", "api", "KHR", "khrplatform.h")
+        khr_src = os.path.join(
+            self.source_folder, "EGL-Registry", "api", "KHR", "khrplatform.h")
         khr_dst_dir = os.path.join(out_dir, "include", "KHR")
         os.makedirs(khr_dst_dir, exist_ok=True)
         shutil.copy2(khr_src, khr_dst_dir)
 
-        # -------------------- Phase C: build the generated C loader --------------
-        # A second Conan CMake() invocation over the generated sources would
-        # collide with Phase A's cache in self.build_folder, so we shell out
-        # to plain cmake with a dedicated source + build tree. The Conan
-        # toolchain file is reused so the generated loader picks up the same
-        # compiler + settings as the generator did.
+        # -------------------- Phase C: build the generated C loader ---------------
         if self.options.language in ("c", "cpp", "both"):
             templates_dir = os.path.join(self.source_folder, "templates")
             env = jinja2.Environment(
@@ -191,7 +147,7 @@ class GlazeCppConan(ConanFile):
                 keep_trailing_newline=True,
             )
             template = env.get_template("cmake/CMakeLists.txt.j2")
-            api_names = [api_item.split(":")[0] for api_item in api_list]
+            api_names = [a.split(":")[0] for a in api_list]
             cmake_content = template.render(
                 apis=api_names,
                 lib_type="SHARED" if self.options.shared else "STATIC",
@@ -231,7 +187,6 @@ class GlazeCppConan(ConanFile):
         copy(self, "*.h",
              src=os.path.join(out_dir, "include"),
              dst=os.path.join(self.package_folder, "include"))
-        # raii.hpp is written into out_dir/include/glaze/ by CppGenerator.
         copy(self, "*.hpp",
              src=os.path.join(out_dir, "include"),
              dst=os.path.join(self.package_folder, "include"))
@@ -259,13 +214,13 @@ class GlazeCppConan(ConanFile):
                  keep_path=False)
 
     def package_info(self):
+        # Preserve cmake_file_name so downstream find_package(glaze) keeps working.
         self.cpp_info.set_property("cmake_file_name", "glaze")
         self.cpp_info.set_property("cmake_target_name", "glaze::glaze")
-        api_list = [api.strip() for api in str(self.options.apis).split(",") if api.strip()]
 
+        api_list = [a.strip() for a in str(self.options.apis).split(",") if a.strip()]
         debug_build = self.settings.build_type == "Debug"
 
-        # Top-level header-only component: API-agnostic glaze::Unique / Shared / Weak.
         if self.options.language in ("cpp", "both"):
             raii = self.cpp_info.components["raii"]
             raii.set_property("cmake_target_name", "glaze::raii")
@@ -294,7 +249,8 @@ class GlazeCppConan(ConanFile):
 
             if self.options.language in ("cpp", "both"):
                 hwrap = self.cpp_info.components[f"{api_name}_handle"]
-                hwrap.set_property("cmake_target_name", f"glaze::{api_name}_handle")
+                hwrap.set_property("cmake_target_name",
+                                   f"glaze::{api_name}_handle")
                 hwrap.includedirs = ["include"]
                 hwrap.bindirs = []
                 hwrap.libdirs = []
