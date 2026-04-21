@@ -1,8 +1,0 @@
-build/
-include/
-src/
-OpenGL-Registry/
-OpenGL-Refpages/
-EGL-Registry/
-*.egg-info/
-__pycache__/
