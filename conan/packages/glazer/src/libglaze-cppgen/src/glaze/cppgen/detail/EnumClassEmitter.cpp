@@ -17,10 +17,14 @@ nlohmann::json buildEnumClassContext(const std::string &groupName,
         if (!seenIdentifiers.insert(identifier).second) {
             continue;
         }
-        entries.push_back(nlohmann::json{
+        nlohmann::json entry{
             {"name", std::move(identifier)},
             {"value", e->name}, // emit the GL_* macro from the C header
-        });
+        };
+        if (e->comment) {
+            entry["comment"] = *e->comment;
+        }
+        entries.push_back(std::move(entry));
     }
 
     return nlohmann::json{

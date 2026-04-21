@@ -57,11 +57,20 @@ GLAZE_API void glazeSetPostCallback(GLAZE_CALLBACK callback);
 #define GL_VERSION_{{ feature.version_major }}_{{ feature.version_minor }} 1
 /* {{ feature.name }} definitions */
 {% for enum in feature.enums %}
+{% if existsIn(enum, "comment") %}
+#define {{ enum.name }} {{ enum.value }} /**< {{ enum.comment }} */
+{% else %}
 #define {{ enum.name }} {{ enum.value }}
+{% endif %}
 {% endfor %}
 {% for cmd in feature.commands %}
 {% if cmd.doc_brief %}
-/** @brief {{ cmd.doc_brief }} */
+/**
+ * @brief {{ cmd.doc_brief }}
+{% for p in cmd.doc_params %}
+ * @param {{ p.name }} {{ p.desc }}
+{% endfor %}
+ */
 {% endif %}
 {{ cmd.typedef }}
 {{ cmd.extern_raw }}
@@ -90,12 +99,21 @@ GLAZE_API int  glazeIsVersionSupported(int major, int minor);
 GLAZE_API extern int {{ ext.flag_var }};
 {% for enum in ext.enums %}
 #ifndef {{ enum.name }}
+{% if existsIn(enum, "comment") %}
+#define {{ enum.name }} {{ enum.value }} /**< {{ enum.comment }} */
+{% else %}
 #define {{ enum.name }} {{ enum.value }}
+{% endif %}
 #endif
 {% endfor %}
 {% for cmd in ext.commands %}
 {% if cmd.doc_brief %}
-/** @brief {{ cmd.doc_brief }} */
+/**
+ * @brief {{ cmd.doc_brief }}
+{% for p in cmd.doc_params %}
+ * @param {{ p.name }} {{ p.desc }}
+{% endfor %}
+ */
 {% endif %}
 {{ cmd.typedef }}
 {{ cmd.extern_raw }}

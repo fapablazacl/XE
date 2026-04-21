@@ -23,7 +23,12 @@ public:
 {% for m in hc.methods %}
 #if GLAZE_GL_VERSION >= {{ m.version_int }}
 {% if m.has_doc_brief %}
-    /** @brief {{ m.doc_brief }} */
+    /**
+     * @brief {{ m.doc_brief }}
+{% for p in m.doc_params %}
+     * @param {{ p.name }} {{ p.desc }}
+{% endfor %}
+     */
 {% endif %}
     inline {{ m.return_type }} {{ m.name }}({{ m.params_str }}) const {
 {{ m.body }}

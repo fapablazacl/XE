@@ -118,8 +118,12 @@ nlohmann::json buildDsaClasses(const model::Registry &registry,
             }
 
             std::string docBrief;
+            nlohmann::json docParams = nlohmann::json::array();
             if (const auto it = ctx.docs.find(command.name); it != ctx.docs.end()) {
                 docBrief = it->second.brief;
+                for (const auto &[paramName, desc] : it->second.params) {
+                    docParams.push_back(nlohmann::json{{"name", paramName}, {"desc", desc}});
+                }
             }
 
             methods.push_back(nlohmann::json{
@@ -133,6 +137,7 @@ nlohmann::json buildDsaClasses(const model::Registry &registry,
                 {"is_void_return", returnType == "void"},
                 {"has_doc_brief", !docBrief.empty()},
                 {"doc_brief", docBrief},
+                {"doc_params", std::move(docParams)},
             });
         }
 

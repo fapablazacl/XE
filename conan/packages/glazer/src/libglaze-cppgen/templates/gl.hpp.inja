@@ -70,7 +70,7 @@ private:
 {% for ec in enum_classes %}
 enum class {{ ec.group_name }} : {{ ec.base_type }} {
 {% for entry in ec.entries %}
-    {{ entry.name }} = {{ entry.value }}{% if not loop.is_last %},{% endif %}
+    {{ entry.name }} = {{ entry.value }}{% if not loop.is_last %},{% endif %}{% if existsIn(entry, "comment") %} /**< {{ entry.comment }} */{% endif %}
 
 {% endfor %}
 };
@@ -103,7 +103,12 @@ inline bool {{ ext.short_name }}() { return ::{{ ext.flag_var }} != 0; }
 {% endif %}
 #if GLAZE_GL_VERSION >= {{ fn.version_int }}
 {% if fn.has_doc_brief %}
-/** @brief {{ fn.doc_brief }} */
+/**
+ * @brief {{ fn.doc_brief }}
+{% for p in fn.doc_params %}
+ * @param {{ p.name }} {{ p.desc }}
+{% endfor %}
+ */
 {% endif %}
 struct {{ fn.struct_name }} {
 {% for ov in fn.overloads %}
@@ -135,7 +140,12 @@ public:
 {% for m in dc.methods %}
 #if GLAZE_GL_VERSION >= {{ m.version_int }}
 {% if m.has_doc_brief %}
-    /** @brief {{ m.doc_brief }} */
+    /**
+     * @brief {{ m.doc_brief }}
+{% for p in m.doc_params %}
+     * @param {{ p.name }} {{ p.desc }}
+{% endfor %}
+     */
 {% endif %}
     inline {{ m.return_type }} {{ m.name }}({{ m.params_str }}) const {
 {% if m.is_void_return %}

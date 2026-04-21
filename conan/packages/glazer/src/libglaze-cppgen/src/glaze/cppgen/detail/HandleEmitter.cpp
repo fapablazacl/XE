@@ -139,7 +139,8 @@ nlohmann::json makeMethod(const std::string &name,
                           const std::string &returnType,
                           const std::string &paramsStr,
                           const std::string &body, int versionInt,
-                          const std::string &docBrief = "") {
+                          const std::string &docBrief = "",
+                          nlohmann::json docParams = nlohmann::json::array()) {
     return nlohmann::json{
         {"name", name},
         {"return_type", returnType},
@@ -148,6 +149,7 @@ nlohmann::json makeMethod(const std::string &name,
         {"version_int", versionInt},
         {"has_doc_brief", !docBrief.empty()},
         {"doc_brief", docBrief},
+        {"doc_params", std::move(docParams)},
     };
 }
 
@@ -173,8 +175,12 @@ void appendMethods(nlohmann::json &methods, const model::Command &command,
     const auto versionInt = commandVersion(command, ctx);
 
     std::string docBrief;
+    nlohmann::json docParams = nlohmann::json::array();
     if (const auto it = ctx.docs.find(command.name); it != ctx.docs.end()) {
         docBrief = it->second.brief;
+        for (const auto &[paramName, desc] : it->second.params) {
+            docParams.push_back(nlohmann::json{{"name", paramName}, {"desc", desc}});
+        }
     }
 
     // 1. Canonical method — every param after the handle.
@@ -185,7 +191,7 @@ void appendMethods(nlohmann::json &methods, const model::Command &command,
         methods.push_back(makeMethod(
             name, rt, joinDecls(decls),
             buildDelegationBody(api, functorName, argsStr, rt == "void"),
-            versionInt, docBrief));
+            versionInt, docBrief, docParams));
     }
 
     // 2. Scalar query overload (drops the trailing scalar out-pointer).
@@ -198,7 +204,7 @@ void appendMethods(nlohmann::json &methods, const model::Command &command,
                 name, *base, joinDecls(decls),
                 buildDelegationBody(api, functorName, argsStr,
                                     /*isVoid=*/false),
-                versionInt, docBrief));
+                versionInt, docBrief, docParams));
         }
     }
 
@@ -213,7 +219,7 @@ void appendMethods(nlohmann::json &methods, const model::Command &command,
         methods.push_back(makeMethod(
             name, "std::string", joinDecls(decls),
             buildDelegationBody(api, functorName, argsStr, /*isVoid=*/false),
-            versionInt, docBrief));
+            versionInt, docBrief, docParams));
     }
 
     // 4. InfoLog self-query overload (zero extra args, returns std::string).
@@ -222,7 +228,7 @@ void appendMethods(nlohmann::json &methods, const model::Command &command,
         methods.push_back(makeMethod(
             name, "std::string", /*paramsStr=*/"",
             buildDelegationBody(api, functorName, "m_id", /*isVoid=*/false),
-            versionInt, docBrief));
+            versionInt, docBrief, docParams));
     }
 }
 

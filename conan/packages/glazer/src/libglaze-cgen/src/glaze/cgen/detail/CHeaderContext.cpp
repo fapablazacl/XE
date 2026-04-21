@@ -32,6 +32,15 @@ nlohmann::json buildCommandEntry(const model::Command &command,
         brief = it->second.brief;
     }
     entry["doc_brief"] = std::move(brief);
+
+    nlohmann::json docParams = nlohmann::json::array();
+    if (const auto it = docs.find(command.name); it != docs.end()) {
+        for (const auto &[paramName, desc] : it->second.params) {
+            docParams.push_back(nlohmann::json{{"name", paramName}, {"desc", desc}});
+        }
+    }
+    entry["doc_params"] = std::move(docParams);
+
     return entry;
 }
 
@@ -102,8 +111,11 @@ nlohmann::json buildHeaderContext(
         for (const auto &require : feature.requireList) {
             for (const auto &enumRef : require.enums) {
                 if (const auto *e = registry.findEnum(enumRef.name); e != nullptr) {
-                    enumsArr.push_back(
-                        nlohmann::json{{"name", e->name}, {"value", e->value}});
+                    nlohmann::json enumEntry{{"name", e->name}, {"value", e->value}};
+                    if (e->comment) {
+                        enumEntry["comment"] = *e->comment;
+                    }
+                    enumsArr.push_back(std::move(enumEntry));
                 }
             }
             for (const auto &cmdRef : require.commands) {
@@ -131,7 +143,11 @@ nlohmann::json buildHeaderContext(
     for (const auto &emission : extensionEmissions) {
         nlohmann::json enumsArr = nlohmann::json::array();
         for (const auto *e : emission.enums) {
-            enumsArr.push_back(nlohmann::json{{"name", e->name}, {"value", e->value}});
+            nlohmann::json enumEntry{{"name", e->name}, {"value", e->value}};
+            if (e->comment) {
+                enumEntry["comment"] = *e->comment;
+            }
+            enumsArr.push_back(std::move(enumEntry));
         }
         nlohmann::json commandsArr = nlohmann::json::array();
         for (const auto *cmd : emission.commands) {
