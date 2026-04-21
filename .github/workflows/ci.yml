@@ -1,0 +1,117 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+env:
+  CONAN_HOME: ${{ github.workspace }}/.conan2
+  PROFILE: conan/profiles/x64-linux-gcc
+  BUILD_TYPE: Release
+
+jobs:
+
+  conan-deps:
+    name: Conan dependencies (x64-linux-gcc)
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install system packages for GLFW / OpenGL / X11
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential ninja-build pkg-config \
+            libgl1-mesa-dev libx11-dev libxrandr-dev libxinerama-dev \
+            libxcursor-dev libxi-dev libxext-dev libxkbcommon-dev \
+            libwayland-dev wayland-protocols
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Conan 2 (+ jinja2 for in-tree recipes)
+        run: pip install "conan>=2.0,<3.0" jinja2
+
+      - name: Cache Conan package store
+        id: conan-cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.CONAN_HOME }}
+          key: conan-${{ runner.os }}-${{ hashFiles('conanfile.py', 'conan/profiles/x64-linux-gcc', 'conan/packages/**') }}
+          restore-keys: |
+            conan-${{ runner.os }}-
+
+      - name: Detect default profile
+        run: conan profile detect --force
+
+      - name: Export in-tree Conan recipes
+        run: |
+          for recipe in conan/packages/*/conanfile.py; do
+            echo "::group::conan export ${recipe}"
+            conan export "$(dirname "${recipe}")"
+            echo "::endgroup::"
+          done
+
+      - name: Install dependencies
+        run: |
+          conan install . \
+            --build=missing \
+            --profile=${{ env.PROFILE }} \
+            --settings=build_type=${{ env.BUILD_TYPE }}
+
+  build:
+    name: Build and test (x64-linux-gcc, Release)
+    needs: conan-deps
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install system packages
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential ninja-build pkg-config \
+            libgl1-mesa-dev libx11-dev libxrandr-dev libxinerama-dev \
+            libxcursor-dev libxi-dev libxext-dev libxkbcommon-dev \
+            libwayland-dev wayland-protocols
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Conan 2 (+ jinja2 for in-tree recipes)
+        run: pip install "conan>=2.0,<3.0" jinja2
+
+      - name: Restore Conan package store
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.CONAN_HOME }}
+          key: conan-${{ runner.os }}-${{ hashFiles('conanfile.py', 'conan/profiles/x64-linux-gcc', 'conan/packages/**') }}
+          restore-keys: |
+            conan-${{ runner.os }}-
+
+      - name: Re-export in-tree Conan recipes
+        run: |
+          conan profile detect --force
+          for recipe in conan/packages/*/conanfile.py; do
+            conan export "$(dirname "${recipe}")"
+          done
+
+      - name: Regenerate CMake presets from cached Conan store
+        run: |
+          conan install . \
+            --build=missing \
+            --profile=${{ env.PROFILE }} \
+            --settings=build_type=${{ env.BUILD_TYPE }}
+
+      - name: Configure
+        run: cmake --preset conan-release
+
+      - name: Build
+        run: cmake --build --preset conan-release --parallel
+
+      - name: Test
+        run: ctest --preset conan-release --output-on-failure
