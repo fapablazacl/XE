@@ -30,10 +30,13 @@ namespace xe {
          * a soft tl::expected error (BackendErrorCode::HandlePoolExhausted). Scan cost is O(n) only on
          * the overflow path, which is unreachable under normal usage.
          *
-         * @tparam T underlying GL resource type
+         * Slot-shape agnostic: works for any slot type exposing an `obj` field contextually convertible
+         * to bool (Slot<T> via glaze::Unique, OptSlot<T> via std::optional).
+         *
+         * @tparam SlotT the concrete slot struct (Slot<T> or OptSlot<T>)
          * @param pool the pool to inspect; not mutated
          */
-        template <class T> bool poolHasCapacity(const std::vector<Slot<T>> &pool) {
+        template <class SlotT> bool poolHasCapacity(const std::vector<SlotT> &pool) {
             if (pool.size() < kHandleIndexLimit)
                 return true;
             for (auto const &s : pool) {
@@ -46,29 +49,34 @@ namespace xe {
         /**
          * @brief Reuse an empty slot (or append a new one) and return (index, gen).
          *
-         * Linear-scans pool looking for a slot whose RAII holder is empty - those are free slots
-         * awaiting reuse. On hit, moves obj into that slot and bumps its gen counter. On miss,
-         * appends a new slot. Scan cost is O(n); resource creation is not on the frame hot path
-         * so this is intentional.
+         * Linear-scans pool looking for a slot whose holder is empty - those are free slots awaiting
+         * reuse. On hit, moves obj into that slot and bumps its gen counter. On miss, appends a new
+         * slot. Scan cost is O(n); resource creation is not on the frame hot path so this is
+         * intentional.
          *
          * Callers must ensure poolHasCapacity(pool) is true before calling; the tail assert is a
          * defensive invariant, not a user-facing failure path.
          *
-         * @tparam T underlying GL resource type
+         * Slot-shape agnostic: accepts any slot type whose `obj` field is assignable from ObjT and
+         * contextually convertible to bool (Slot<T> holding glaze::Unique<T>, or OptSlot<T> holding
+         * std::optional<T>).
+         *
+         * @tparam SlotT the concrete slot struct (Slot<T> or OptSlot<T>)
+         * @tparam ObjT type of the resource holder being installed (deduced)
          * @param pool the pool vector to acquire a slot in; grows if no free slot is available
-         * @param obj RAII holder for the GL object to install at the acquired slot
+         * @param obj resource holder to install at the acquired slot
          * @return {index, gen} pair ready to be passed to HandleT::make
          */
-        template <class T> std::pair<uint32_t, uint8_t> acquireSlot(std::vector<Slot<T>> &pool, glaze::Unique<T> &&obj) {
+        template <class SlotT, class ObjT> std::pair<uint32_t, uint8_t> acquireSlot(std::vector<SlotT> &pool, ObjT &&obj) {
             for (uint32_t i = 0; i < pool.size(); ++i) {
                 if (!pool[i].obj) {
-                    pool[i].obj = std::move(obj);
+                    pool[i].obj = std::forward<ObjT>(obj);
                     pool[i].gen = static_cast<uint8_t>((pool[i].gen + 1) & kHandleGenMask);
                     return {i, pool[i].gen};
                 }
             }
             assert(pool.size() < kHandleIndexLimit && "acquireSlot: pool exhausted - caller skipped poolHasCapacity");
-            pool.push_back({std::move(obj), 0});
+            pool.push_back({std::forward<ObjT>(obj), 0});
             return {static_cast<uint32_t>(pool.size() - 1), 0};
         }
     } // namespace
@@ -255,6 +263,18 @@ namespace xe {
         }
         assert(false && "toPixelTypeGL: Invalid DataType");
         return gl::PixelType::eUnsignedByte;
+    }
+
+    gl::DrawElementsType toDrawElementsTypeGL(const GeometryIndexType indexType) {
+        switch (indexType) {
+        case GeometryIndexType::uint16:
+            return gl::DrawElementsType::eUnsignedShort;
+        case GeometryIndexType::uint32:
+            return gl::DrawElementsType::eUnsignedInt;
+        }
+
+        assert(false && "toDrawElementsTypeGL: Invalid GeometryIndexType");
+        return gl::DrawElementsType::eUnsignedShort;
     }
 
     gl::AttributeType toAttributeTypeGL(const VertexAttribFormat attributeType) {
@@ -520,12 +540,16 @@ namespace xe {
     }
 
     tl::expected<VertexLayoutHandle, BackendError>
-    createVertexLayoutGL(
-        RenderDeviceBackendContext *ctx,
-        const VertexLayoutDescriptor &desc) {
+    createVertexLayoutGL(RenderDeviceBackendContext *ctx, const VertexLayoutDescriptor &desc) {
+        auto &layouts = glctx(ctx)->layouts;
+
+        if (!poolHasCapacity(layouts)) {
+            return makeBackendError(BackendErrorCode::HandlePoolExhausted, "vertex layout pool exhausted (16-bit index field)");
+        }
 
         VertexLayoutGL layout;
         layout.attributes.reserve(desc.attribs.size());
+        layout.indexDataType = toDrawElementsTypeGL(desc.indexType);
 
         for (const VertexAttrib &attr : desc.attribs) {
             layout.attributes.emplace_back(
@@ -535,15 +559,18 @@ namespace xe {
             );
         }
 
-        auto &layouts = glctx(ctx)->layouts;
-        layouts.push_back(layout);
-        uint32_t index = layouts.size();
-
-        return VertexLayoutHandle::make(0, index);
+        auto const [index, gen] = acquireSlot(layouts, std::move(layout));
+        return VertexLayoutHandle::make(gen, index);
     }
 
-    void destroyVertexLayoutGL (RenderDeviceBackendContext * ctx, VertexLayoutHandle handle) {
-
+    void destroyVertexLayoutGL(RenderDeviceBackendContext *ctx, VertexLayoutHandle handle) {
+        auto &layouts = glctx(ctx)->layouts;
+        uint32_t const index = handle.index();
+        assert(index < layouts.size() && "destroyVertexLayoutGL: handle index out of range");
+        auto &slot = layouts[index];
+        assert(slot.obj && "destroyVertexLayoutGL: slot already free (double destroy)");
+        assert(slot.gen == handle.gen() && "destroyVertexLayoutGL: stale handle (generation mismatch)");
+        slot.obj.reset();
     }
 
     void initializeBackendTableGL(RenderDeviceBackendVTable *vtable) {

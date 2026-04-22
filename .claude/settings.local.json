@@ -113,7 +113,8 @@
       "Bash(objdump -h /home/user/.conan2/p/b/glaze47074aa819d8d/p/lib/libglaze_gl.a)",
       "Bash(nm /home/user/.conan2/p/b/glaze47074aa819d8d/p/lib/libglaze_gl.a)",
       "Bash(nm /home/user/.conan2/p/b/glaze47074aa819d8d/b/build/Debug/c-loader-build/libglaze_gl.a)",
-      "Bash(xe-\")"
+      "Bash(xe-\")",
+      "Bash(ctest --test-dir build/Debug --output-on-failure)"
     ]
   }
 }

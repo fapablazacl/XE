@@ -2,6 +2,7 @@
 #pragma once
 
 #include <cstdint>
+#include <optional>
 #include <vector>
 
 #include <glaze/gl.hpp>
@@ -57,6 +58,23 @@ namespace xe {
     };
 
     /**
+     * @brief A pool slot for non-GL resources (e.g. VertexLayoutGL) that live as plain C++ values.
+     *
+     * Shares the contract used by Slot<T>: the `obj` field evaluates to false iff the slot is free,
+     * and the 8-bit generation counter is bumped on reuse so stale handles fail the gen check. Uses
+     * std::optional as the liveness wrapper because glaze::Unique is specific to GL handle types.
+     *
+     * @tparam T the plain (non-GL) resource type held by the pool
+     */
+    template <class T> struct OptSlot {
+        //! Engaged when the slot is live; empty after destroy, awaiting reuse.
+        std::optional<T> obj;
+
+        //! Authoritative generation counter. Bumped by acquireSlot when this slot is reused.
+        uint8_t gen = 0;
+    };
+
+    /**
      * @brief GL-backed implementation of RenderDeviceBackendContext.
      * Holds per-resource pools addressed by Handle::index(). Each pool element is a Slot
      * pairing the RAII-managed GL object with its generation counter; a slot is free when
@@ -73,8 +91,8 @@ namespace xe {
         //! Pool of texture objects. A slot's obj is empty after destroyTextureGL.
         std::vector<Slot<gl::Texture>> textures;
 
-        //! Pool of texture software layout descriptors
-        std::vector<VertexLayoutGL> layouts;
+        //! Pool of vertex layout descriptors. A slot's obj is empty after destroyVertexLayoutGL, awaiting reuse.
+        std::vector<OptSlot<VertexLayoutGL>> layouts;
     };
 
     tl::expected<RenderDeviceBackendContext *, BackendError> createContextGL();
