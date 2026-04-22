@@ -1,138 +1,47 @@
 
-#ifndef __XE_GRAPHICS_PLANEGENERATOR_HPP__
-#define __XE_GRAPHICS_PLANEGENERATOR_HPP__
+#ifndef __XE_GEOMETRY_PLANEGENERATOR_H__
+#define __XE_GEOMETRY_PLANEGENERATOR_H__
 
-#include <vector>
-#include <xe/math.h>
-
-#include "ShapeGenerator.h"
+#include <xe/geometry/MeshBuffers.h>
+#include <xe/math/Math.h>
 
 namespace xe {
-    template <typename FloatT> inline FloatT ratio(const int a, const int b) {
-        return static_cast<FloatT>(a) / static_cast<FloatT>(b);
-    }
+    /**
+     * @brief LOD + sizing options for a procedural plane mesh.
+     *
+     * The plane lies on XY (normal = -Z), centered on the origin, covering
+     * [-size/2, +size/2] in X and Y. Division components control slices × stacks
+     * and must each be >= 1 (debug asserts).
+     */
+    struct PlaneOptions {
+        //! Grid resolution (slices × stacks). Each component must be >= 1.
+        Vector2i division = {1, 1};
+
+        //! Full extent of the plane along X and Y.
+        Vector2 size = {1.0f, 1.0f};
+    };
 
     /**
-     * @brief Generate a geometry mesh over the plane XZ
+     * @brief Pre-compute storage sizing for a given PlaneOptions.
+     * @param opts plane parameters; division components must be >= 1
+     * @return vertex / index counts and the chosen IndexType
      */
+    MeshCounts computePlaneCounts(const PlaneOptions &opts);
 
-    // TODO: Add the following generation parameters: Reference Plane, Rotation
-    // TODO: Add a method to return required rendering parameters via the SubsetEnvelope class
-    // TODO: Add control parameter for the Face Vertex Ordering
-    template <typename T> class PlaneGenerator {
-    public:
-        PlaneGenerator(const Vector2i &division, const TVector<T, 2> &size, const TPlane<T> &plane) {
-            assert(division.X > 0);
-            assert(division.Y > 0);
-            assert(size.X > 0.0f);
-            assert(size.Y > 0.0f);
+    /**
+     * @brief Fill caller-owned storage with plane vertex and index data.
+     *
+     * Writes positions, normals (all {0, 0, -1}), texCoords, and indices into the
+     * pointers held by `out`. Null attribute pointers are skipped silently.
+     *
+     * @tparam T floating-point element type (float or double). Only these are instantiated.
+     * @param opts plane parameters; must match those passed to computePlaneCounts
+     * @param out pointer bundle into caller-owned storage
+     */
+    template <typename T> void generatePlane(const PlaneOptions &opts, const MeshStorage<T> &out);
 
-            this->division = division;
-            this->size = size;
-            this->plane = plane;
-
-            this->vertexCount = this->computeVertexCount();
-            this->indexCount = this->computeIndexCount();
-        }
-
-    public:
-        void generate(TVector<T, 3> *coordinates, TVector<T, 3> *normals, TVector<T, 2> *textureCoordinates) const {
-            const int slices = division.X;
-            const int stacks = division.Y;
-
-            int vertexIndex = 0;
-
-            for (int i = 0; i < slices + 1; i++) {
-                const auto ti = ratio<T>(i, slices);
-
-                for (int j = 0; j < stacks + 1; j++) {
-                    const auto tj = ratio<T>(j, stacks);
-
-                    if (coordinates) {
-                        coordinates[vertexIndex] = this->computeCoordinate(ti, tj);
-                    }
-
-                    if (normals) {
-                        normals[vertexIndex] = this->computeNormal(ti, tj);
-                    }
-
-                    if (textureCoordinates) {
-                        textureCoordinates[vertexIndex] = this->computeTextureCoordinate(ti, tj);
-                    }
-
-                    ++vertexIndex;
-                }
-            }
-        }
-
-        template <typename I> void generateIndices(I *indices) const {
-            const int slices = division.X;
-            const int stacks = division.Y;
-            const int slices_plus_1 = slices + 1;
-
-            int index = 0;
-
-            for (int i = 0; i < slices; i++) {
-                for (int j = 0; j < stacks; j++) {
-                    const int p0 = (i + 0) + (j + 0) * (slices_plus_1);
-                    const int p1 = (i + 1) + (j + 0) * (slices_plus_1);
-                    const int p2 = (i + 0) + (j + 1) * (slices_plus_1);
-                    const int p3 = (i + 1) + (j + 1) * (slices_plus_1);
-
-                    indices[index++] = p0;
-                    indices[index++] = p1;
-                    indices[index++] = p2;
-
-                    indices[index++] = p1;
-                    indices[index++] = p3;
-                    indices[index++] = p2;
-                }
-            }
-        }
-
-        int getVertexCount() const {
-            return vertexCount;
-        }
-
-        int getIndexCount() const {
-            return indexCount;
-        }
-
-    private:
-        TVector<T, 3> computeCoordinate(const T ti, const T tj) const {
-            return {lerp(T(-0.5), T(0.5), tj), lerp(T(0.5), T(-0.5), ti), T(0.0)};
-        }
-
-        TVector<T, 3> computeNormal(const T ti, const T tj) const {
-            return {T(0), T(0), T(-1)};
-        }
-
-        TVector<T, 2> computeTextureCoordinate(const T ti, const T tj) const {
-            return {lerp(T(0), T(1), tj), lerp(T(1), T(0), ti)};
-        }
-
-        int computeVertexCount() const {
-            const int slices = division.X;
-            const int stacks = division.Y;
-
-            return (slices + 1) * (stacks + 1);
-        }
-
-        int computeIndexCount() const {
-            const int slices = division.X;
-            const int stacks = division.Y;
-
-            return 6 * (slices) * (stacks);
-        }
-
-    private:
-        Vector2i division;
-        TVector<T, 2> size;
-        TPlane<T> plane;
-
-        int vertexCount;
-        int indexCount;
-    };
+    extern template void generatePlane<float>(const PlaneOptions &, const MeshStorage<float> &);
+    extern template void generatePlane<double>(const PlaneOptions &, const MeshStorage<double> &);
 } // namespace xe
 
 #endif

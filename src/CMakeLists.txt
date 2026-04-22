@@ -10,6 +10,9 @@ endif()
 
 add_subdirectory ("libxe-scene")
 add_subdirectory ("libxe-geometry")
+if (XE_DEV_UNIT_TEST)
+    add_subdirectory ("libxe-geometry-test")
+endif()
 # add_subdirectory ("libxe-app")
 
 # DevIL doesn't build in MSVC
@@ -27,6 +30,7 @@ if (XE_PLUGIN_PNG)
 endif ()
 
 add_subdirectory ("libxe-graphics")
+add_subdirectory ("libxe-mesh")
 
 if (XE_PLUGIN_GL_GLFW)
     # add_subdirectory("libxe-core-platform-glfw")
