@@ -166,6 +166,7 @@ namespace xe {
         auto buffer = glaze::makeUnique<gl::BufferId>();
         gl::bindBuffer(target, buffer);
         gl::bufferData(target, desc.size, desc.data, usage);
+        gl::bindBuffer(target, {});
 
         auto const [index, gen] = acquireSlot(buffers, std::move(buffer));
         return BufferHandle::make(gen, index, desc.type);
@@ -197,6 +198,7 @@ namespace xe {
 
         gl::bindBuffer(target, slot.obj);
         gl::getBufferSubData(target, static_cast<GLintptr>(desc.offset), static_cast<GLsizeiptr>(desc.size), desc.data);
+        gl::bindBuffer(target, {});
     }
 
     gl::TextureTarget toTextureTargetGL(const TextureType type) {
@@ -409,9 +411,17 @@ namespace xe {
         GLint const param = hasMips ? GL_LINEAR_MIPMAP_LINEAR : GL_LINEAR;
         gl::texParameteri(target, gl::TextureParameterName::eTextureMinFilter, param);
         gl::texParameteri(target, gl::TextureParameterName::eTextureMagFilter, GL_LINEAR);
-        gl::texParameteri(target, gl::TextureParameterName::eTextureWrapS, GL_REPEAT);
-        gl::texParameteri(target, gl::TextureParameterName::eTextureWrapT, GL_REPEAT);
-        gl::texParameteri(target, gl::TextureParameterName::eTextureWrapR, GL_REPEAT);
+        gl::texParameteri(target, gl::TextureParameterName::eTextureWrapS, GL_CLAMP_TO_EDGE);
+
+        if (h > 0) {
+            gl::texParameteri(target, gl::TextureParameterName::eTextureWrapT, GL_CLAMP_TO_EDGE);
+        }
+
+        if (d > 0) {
+            gl::texParameteri(target, gl::TextureParameterName::eTextureWrapR, GL_CLAMP_TO_EDGE);
+        }
+
+        gl::bindTexture(target, {});
 
         auto const [index, gen] = acquireSlot(textures, std::move(texture));
         return TextureHandle::make(gen, index, desc.type);
@@ -472,9 +482,11 @@ namespace xe {
         default:
             assert(false && "TextureType is unknown");
         }
+
+        gl::bindTexture(target, {});
     }
 
-    void  readTextureGL(RenderDeviceBackendContext *ctx, TextureHandle handle, const TextureReadDescriptor &desc) {
+    void readTextureGL(RenderDeviceBackendContext *ctx, TextureHandle handle, const TextureReadDescriptor &desc) {
         assert(desc.data != nullptr && "TextureReadDescriptor: data must not be null");
         assert(desc.offset.x == 0 && desc.offset.y == 0 && desc.offset.z == 0 && "TextureReadDescriptor: GL 3.3 backend requires offset == {0,0,0}");
 
@@ -616,7 +628,6 @@ namespace xe {
         slot.obj.reset();
     }
 
-
     tl::expected<GeometryHandle, BackendError> createGeometryGL(RenderDeviceBackendContext *ctx, const GeometryDescriptor &desc) {
         auto &geometries = glctx(ctx)->geometries;
         auto &buffers = glctx(ctx)->buffers;
@@ -631,6 +642,7 @@ namespace xe {
             return makeBackendError(BackendErrorCode::InvalidDescriptor, "createGeometryGL: layoutHandle is invalid or references a freed layout");
         }
 
+        // check buffer attribs
         for (const GeometryBufferAttrib &bufferAttrib : desc.bufferAttribs) {
             if (bufferAttrib.attribIndex >= layout->attributes.size()) {
                 return makeBackendError(BackendErrorCode::InvalidDescriptor, "createGeometryGL: bufferAttrib.attribIndex out of range for the supplied layout");
@@ -643,6 +655,8 @@ namespace xe {
         }
 
         uint32_t const indexBufIdx = desc.indexBufferHandle.index();
+
+        // check index buffer
         if (indexBufIdx >= buffers.size() || !buffers[indexBufIdx].obj || buffers[indexBufIdx].gen != desc.indexBufferHandle.gen()) {
             return makeBackendError(BackendErrorCode::InvalidDescriptor, "createGeometryGL: indexBufferHandle is invalid or references a freed buffer");
         }
