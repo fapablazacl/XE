@@ -1,4 +1,6 @@
 
+// TODO: Refactor the handle assert validation into generic functions that works across different Handle types
+
 #include <glaze/gl.hpp>
 #include <glaze/raii.hpp>
 #include <xe/math/Vector.h>

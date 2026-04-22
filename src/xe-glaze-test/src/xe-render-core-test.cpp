@@ -136,7 +136,6 @@ int main() {
         return 1;
     }
     xe::RenderDeviceBackendContext *ctx = *ctxResult;
-    auto glctxgl = static_cast<xe::RenderDeviceBackendContextGL *>(ctx);
 
     // shader initialization
     xe::ShaderProgramDescriptor shaderDesc;
@@ -173,7 +172,7 @@ void main() {
         return 1;
     }
     xe::ShaderHandle shaderHandle = *shaderResult;
-    gl::Program programId = glctxgl->shaderPrograms[shaderHandle.index()].obj.get();
+
 
     // texture generation
     auto textureResult = createCheckerBoardTexture(vtable, ctx, {512, 512});
@@ -182,7 +181,6 @@ void main() {
         return 1;
     }
     xe::TextureHandle textureHandle = *textureResult;
-    gl::Texture textureId = glctxgl->textures[textureHandle.index()].obj.get();
 
     // vertex buffer initialization
     xe::vec3 const verts[] = {{-0.5f, 0.5f, 0.0f}, {0.5f, 0.5f, 0.0f}, {-0.5f, -0.5, 0.0f}, {0.5, -0.5, 0.0}};
@@ -209,22 +207,42 @@ void main() {
     }
     xe::BufferHandle texCoordBuffer = *texCoordBufferResult;
 
-    // get native GL buffer id to manually create a VAO for rendering testing purposes
-    const gl::BufferId vertexBufferId = glctxgl->buffers[vertexBuffer.index()].obj.get();
-    const gl::BufferId texCoordBufferId = glctxgl->buffers[texCoordBuffer.index()].obj.get();
+    // Vertex Layout initialization
+    xe::VertexLayoutDescriptor layoutDesc;
+    layoutDesc.resolveMode = xe::VertexLayoutResolveMode::Explicit;
+    layoutDesc.attribs = {
+        {xe::VertexAttribSemantic::DontUse, 0, xe::VertexAttribFormat::float3, false },
+        {xe::VertexAttribSemantic::DontUse, 1, xe::VertexAttribFormat::float2, false }
+    };
 
-    gl::VertexArray vao = gl::createVertexArrays();
+    auto layoutResult = vtable.createVertexLayout(ctx, layoutDesc);
+    if (!layoutResult) {
+        std::cerr << "createGeometry failed: " << layoutResult.error().message << std::endl;
+        return 1;
+    }
 
-    gl::bindVertexArray(vao);
-    // vertex buffer
-    gl::bindBuffer(gl::BufferTarget::eArrayBuffer, vertexBufferId);
-    gl::enableVertexArrayAttrib(vao, 0);
-    gl::vertexAttribPointer(gl::AttribLocation{0}, 3, gl::VertexAttribPointerType::eFloat, GL_FALSE, 0, nullptr);
+    xe::VertexLayoutHandle layout = *layoutResult;
 
-    // texcoord buffer
-    gl::bindBuffer(gl::BufferTarget::eArrayBuffer, texCoordBufferId);
-    gl::enableVertexArrayAttrib(vao, 1);
-    gl::vertexAttribPointer(gl::AttribLocation{1}, 2, gl::VertexAttribPointerType::eFloat, GL_FALSE, 0, nullptr);
+    // Geometry (enriched VAO wrapper)
+    xe::GeometryDescriptor geometryDesc;
+    geometryDesc.layoutHandle = layout;
+    geometryDesc.bufferAttribs = {
+        xe::GeometryBufferAttrib{vertexBuffer, 0},
+        xe::GeometryBufferAttrib{texCoordBuffer, 1},
+    };
+
+    auto geometryResult = vtable.createGeometry(ctx, geometryDesc);
+    if (!geometryResult) {
+        std::cerr << "createGeometry failed: " << geometryResult.error().message << std::endl;
+        return 1;
+    }
+
+    xe::GeometryHandle geometryHandle = *geometryResult;
+
+    auto glctxgl = static_cast<xe::RenderDeviceBackendContextGL *>(ctx);
+    gl::Program const programId = glctxgl->shaderPrograms[shaderHandle.index()].obj.get();
+    gl::VertexArray const vao = glctxgl->geometries[geometryHandle.index()].obj->vao.get();
+    gl::Texture const textureId = glctxgl->textures[textureHandle.index()].obj.get();
 
     while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();
@@ -246,6 +264,7 @@ void main() {
 
         gl::bindVertexArray(vao);
         gl::drawArrays(gl::PrimitiveType::eTriangleStrip, 0, 4);
+
         gl::flush();
 
         glfwSwapBuffers(window);
