@@ -11,6 +11,32 @@
 #include <xe/render/RenderBackend.h>
 
 namespace xe {
+    struct VertexAttribGL {
+        gl::AttribLocation loc;
+        GLboolean normalized = GL_FALSE;
+        gl::AttributeType dataType;
+
+        VertexAttribGL(gl::AttribLocation loc, gl::AttributeType dataType, GLboolean normalized = GL_FALSE) {
+            this->loc = loc;
+            this->dataType = dataType;
+            this->normalized = normalized;
+        }
+    };
+
+    struct VertexLayoutGL {
+        std::vector<VertexAttribGL> attributes;
+        gl::DrawElementsType indexDataType = gl::DrawElementsType::eUnsignedByte;
+    };
+
+    struct PipelineGL {
+        vec4 clearColor = {0.0f, 0.0f, 0.0f, 1.0f};
+
+        gl::Flags<gl::ClearBufferMask> clearMask = gl::ClearBufferMask::eColorBufferBit;
+
+        //! @note: Consider a Weak ptr
+        gl::Program shaderProgram;
+    };
+
     /**
      * @brief A single entry in a backend resource pool.
      *
@@ -47,7 +73,8 @@ namespace xe {
         //! Pool of texture objects. A slot's obj is empty after destroyTextureGL.
         std::vector<Slot<gl::Texture>> textures;
 
-
+        //! Pool of texture software layout descriptors
+        std::vector<VertexLayoutGL> layouts;
     };
 
     tl::expected<RenderDeviceBackendContext *, BackendError> createContextGL();

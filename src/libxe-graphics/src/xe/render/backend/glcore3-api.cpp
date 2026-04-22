@@ -13,14 +13,6 @@
 
 namespace xe {
     namespace {
-        struct PipelineGL {
-            xe::vec4 clearColor = {0.0f, 0.0f, 0.0f, 1.0f};
-            gl::Flags<gl::ClearBufferMask> clearMask = gl::ClearBufferMask::eColorBufferBit;
-
-            //! @note: Consider a Weak ptr
-            gl::Program shaderProgram;
-        };
-
         inline RenderDeviceBackendContextGL *glctx(RenderDeviceBackendContext *ctx) {
             assert(ctx);
             return static_cast<RenderDeviceBackendContextGL *>(ctx);
@@ -260,11 +252,25 @@ namespace xe {
             return gl::PixelType::eFloat;
         case DataType::Float16:
             return gl::PixelType::eHalfFloat;
-        default:
-            break;
         }
         assert(false && "toPixelTypeGL: Invalid DataType");
         return gl::PixelType::eUnsignedByte;
+    }
+
+    gl::AttributeType toAttributeTypeGL(const VertexAttribFormat attributeType) {
+        switch (attributeType) {
+        case VertexAttribFormat::float1: return gl::AttributeType::eFloat;
+        case VertexAttribFormat::float2: return gl::AttributeType::eFloatVec2;
+        case VertexAttribFormat::float3: return gl::AttributeType::eFloatVec3;
+        case VertexAttribFormat::float4: return gl::AttributeType::eFloatVec4;
+        case VertexAttribFormat::int1: return gl::AttributeType::eInt;
+        case VertexAttribFormat::int2: return gl::AttributeType::eIntVec2;
+        case VertexAttribFormat::int3: return gl::AttributeType::eIntVec3;
+        case VertexAttribFormat::int4: return gl::AttributeType::eIntVec4;
+        }
+
+        assert(false && "toPixelTypeGL: Invalid DataType");
+        return gl::AttributeType::eFloat;
     }
 
     tl::expected<TextureHandle, BackendError> createTextureGL(RenderDeviceBackendContext *ctx, const TextureDescriptor &desc) {
@@ -421,7 +427,6 @@ namespace xe {
         gl::TextureTarget const bindTarget = toTextureTargetGL(type);
         gl::PixelFormat const pixelFormat = toPixelFormatGL(desc.destFormat);
         gl::PixelType const pixelType = toPixelTypeGL(desc.destDataType);
-
         gl::TextureTarget const readTarget = (type == TextureType::TexCubeMap) ? cubeMapSides[desc.faceIndex] : bindTarget;
 
         if (type == TextureType::TexCubeMap) {
@@ -514,17 +519,6 @@ namespace xe {
         slot.obj.reset({});
     }
 
-    struct VertexAttribGL {
-        gl::AttribLocation loc;
-        GLboolean normalized = GL_FALSE;
-        gl::AttributeType dataType;
-    };
-
-    struct VertexLayoutGL {
-        std::vector<VertexAttribGL> attributes;
-        gl::DrawElementsType indexDataType = gl::DrawElementsType::eUnsignedByte;
-    };
-
     tl::expected<VertexLayoutHandle, BackendError>
     createVertexLayoutGL(
         RenderDeviceBackendContext *ctx,
@@ -534,17 +528,18 @@ namespace xe {
         layout.attributes.reserve(desc.attribs.size());
 
         for (const VertexAttrib &attr : desc.attribs) {
-            layout.attributes.push_back({
+            layout.attributes.emplace_back(
                 gl::AttribLocation{attr.location},
-                attr.normalized ? GL_TRUE : GL_FALSE,
-                toAttributeTypeGL(attr.format)
-            });
+                toAttributeTypeGL(attr.format),
+                attr.normalized ? GL_TRUE : GL_FALSE
+            );
         }
 
+        auto &layouts = glctx(ctx)->layouts;
+        layouts.push_back(layout);
+        uint32_t index = layouts.size();
 
-        glctx(ctx)->buffers;
-
-
+        return VertexLayoutHandle::make(0, index);
     }
 
     void destroyVertexLayoutGL (RenderDeviceBackendContext * ctx, VertexLayoutHandle handle) {

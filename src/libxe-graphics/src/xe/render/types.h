@@ -276,7 +276,7 @@ namespace xe {
     };
 
     //! semantic vertex attribute
-    enum class VertexAttribSemantic : int { Position, Normal, TexCoord0 };
+    enum class VertexAttribSemantic : int { DontUse, Position, Normal, TexCoord0 };
 
     enum class VertexAttribFormat { int1, int2, int3, int4, float1, float2, float3, float4 };
 
