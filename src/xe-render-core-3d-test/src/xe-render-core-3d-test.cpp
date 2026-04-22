@@ -217,7 +217,12 @@ int main() {
     }
     xe::RenderDeviceBackendContext *ctx = *ctxResult;
 
-    // shader initialization — Lambert + ambient on a single hardcoded directional light.
+    // Shader initialization. The camera matrices travel as raw uniforms (uModel / uView /
+    // uProjection / uTexTile), while the directional-light parameters are shared via a
+    // std140 uniform block bound at binding point kLightBlockBinding. This mirrors the two
+    // uniform paths the render-backend abstraction exposes.
+    constexpr uint32_t kLightBlockBinding = 0u;
+
     xe::ShaderProgramDescriptor shaderDesc;
     shaderDesc.glslVertexShader = R"(
 #version 330 core
@@ -244,6 +249,11 @@ void main() {
     shaderDesc.glslFragmentShader = R"(
 #version 330 core
 
+layout(std140) uniform LightBlock {
+    vec4 uLightDirection;   // xyz = world-space direction; w unused
+    vec4 uLightAmbient;     // rgb = ambient color; a unused
+};
+
 in vec3 vNormal;
 in vec2 vTexCoord;
 
@@ -252,10 +262,10 @@ uniform sampler2D uTexture;
 out vec4 fragColor;
 
 void main() {
-    vec3 L = normalize(vec3(-0.4, 1.0, -0.3));
+    vec3 L = normalize(uLightDirection.xyz);
     float ndotl = max(dot(normalize(vNormal), L), 0.0);
     vec3 base = texture(uTexture, vTexCoord).rgb;
-    vec3 lit = (0.2 + 0.8 * ndotl) * base;
+    vec3 lit = (uLightAmbient.rgb + 0.8 * ndotl) * base;
     fragColor = vec4(lit, 1.0);
 }
 )";
@@ -370,18 +380,62 @@ void main() {
     }
     xe::GeometryHandle geometryHandle = *geometryResult;
 
+    // Static directional-light data, laid out to match std140 (two vec4s).
+    struct LightBlockData {
+        xe::vec4 direction;
+        xe::vec4 ambient;
+    };
+    LightBlockData const lightBlock{
+        xe::normalize(xe::vec4{-0.4f, 1.0f, -0.3f, 0.0f}),
+        xe::vec4{0.2f, 0.2f, 0.2f, 1.0f},
+    };
+
+    xe::BufferDescriptor lightUboDesc{};
+    lightUboDesc.type = xe::BufferType::Uniform;
+    lightUboDesc.usage = xe::BufferUsage::StaticDraw;
+    lightUboDesc.data = &lightBlock;
+    lightUboDesc.size = sizeof(lightBlock);
+    auto lightUboResult = vtable.createBuffer(ctx, lightUboDesc);
+    if (!lightUboResult) {
+        std::cerr << "createBuffer (lightUbo) failed: " << lightUboResult.error().message << std::endl;
+        return 1;
+    }
+    xe::BufferHandle lightUbo = *lightUboResult;
+
+    // Pipeline bakes the LightBlock → kLightBlockBinding mapping once via glUniformBlockBinding.
+    xe::PipelineDescriptor pipelineDesc;
+    pipelineDesc.layoutHandle = layout;
+    pipelineDesc.shaderProgramHandle = shaderHandle;
+    pipelineDesc.uniformBlocks.push_back({"LightBlock", kLightBlockBinding});
+    auto pipelineResult = vtable.createPipeline(ctx, pipelineDesc);
+    if (!pipelineResult) {
+        std::cerr << "createPipeline failed: " << pipelineResult.error().message << std::endl;
+        return 1;
+    }
+    xe::PipelineHandle const pipelineHandle = *pipelineResult;
+
+    // Resolve every raw uniform location up front. Each returned UniformLocation is keyed to
+    // shaderHandle; applyUniforms asserts in debug that the location is used against the
+    // matching program, catching accidental program mixups.
+    auto resolve = [&](const char *name) {
+        auto r = vtable.resolveUniformLocation(ctx, shaderHandle, name);
+        if (!r) {
+            std::cerr << "resolveUniformLocation(" << name << ") failed: " << r.error().message << std::endl;
+            std::exit(1);
+        }
+        return *r;
+    };
+    xe::UniformLocation const uModelLoc = resolve("uModel");
+    xe::UniformLocation const uViewLoc = resolve("uView");
+    xe::UniformLocation const uProjectionLoc = resolve("uProjection");
+    xe::UniformLocation const uTextureLoc = resolve("uTexture");
+    xe::UniformLocation const uTexTileLoc = resolve("uTexTile");
+
     auto glctxgl = static_cast<xe::RenderDeviceBackendContextGL *>(ctx);
-    gl::Program const programId = glctxgl->shaderPrograms[shaderHandle.index()].obj.get();
     gl::VertexArray const vao = glctxgl->geometries[geometryHandle.index()].obj->vao.get();
     gl::Texture const textureId = glctxgl->textures[textureHandle.index()].obj.get();
     gl::DrawElementsType const indexDataType = glctxgl->geometries[geometryHandle.index()].obj->indexDataType;
     GLsizei const indexCount = static_cast<GLsizei>(counts.indexCount);
-
-    gl::UniformLocation const uModelLoc = gl::getUniformLocation(programId, "uModel");
-    gl::UniformLocation const uViewLoc = gl::getUniformLocation(programId, "uView");
-    gl::UniformLocation const uProjectionLoc = gl::getUniformLocation(programId, "uProjection");
-    gl::UniformLocation const uTextureLoc = gl::getUniformLocation(programId, "uTexture");
-    gl::UniformLocation const uTexTileLoc = gl::getUniformLocation(programId, "uTexTile");
 
     gl::enable(gl::EnableCap::eDepthTest);
     gl::depthFunc(gl::DepthFunction::eLess);
@@ -421,16 +475,31 @@ void main() {
         gl::clearColor(0.08f, 0.10f, 0.14f, 1.0f);
         gl::clear(gl::ClearBufferMask::eColorBufferBit | gl::ClearBufferMask::eDepthBufferBit);
 
-        gl::useProgram(programId);
-
         gl::activeTexture(gl::TextureUnit::eTexture0);
         gl::bindTexture(gl::TextureTarget::eTexture2d, textureId);
-        gl::uniform1i(uTextureLoc, 0);
-        gl::uniform1f(uTexTileLoc, 8.0f);
 
-        gl::uniformMatrix4fv(uModelLoc, 1, GL_FALSE, model.data());
-        gl::uniformMatrix4fv(uViewLoc, 1, GL_FALSE, view.data());
-        gl::uniformMatrix4fv(uProjectionLoc, 1, GL_FALSE, projection.data());
+        // Attach the static light UBO to its pipeline-declared binding point. Done per-frame
+        // to exercise the abstraction; with a single pipeline the binding also stays live
+        // across frames, so in real code this could hoist to initialization.
+        vtable.bindUniformBuffer(ctx, kLightBlockBinding, lightUbo, 0u, 0u);
+
+        constexpr GLint kTextureUnit = 0;
+        constexpr float kTexTile = 8.0f;
+
+        xe::UniformValueSubmission const valueUniforms[] = {
+            {uTextureLoc, xe::UniformElementType::Int,   xe::UniformDimension::D1, 1u, &kTextureUnit},
+            {uTexTileLoc, xe::UniformElementType::Float, xe::UniformDimension::D1, 1u, &kTexTile},
+        };
+
+        xe::UniformMatrixSubmission const matrixUniforms[] = {
+            {uModelLoc,      xe::UniformMatrixShape::R4C4, 1u, false, model.data()},
+            {uViewLoc,       xe::UniformMatrixShape::R4C4, 1u, false, view.data()},
+            {uProjectionLoc, xe::UniformMatrixShape::R4C4, 1u, false, projection.data()},
+        };
+
+        vtable.applyUniforms(ctx, shaderHandle,
+                             valueUniforms, sizeof(valueUniforms) / sizeof(valueUniforms[0]),
+                             matrixUniforms, sizeof(matrixUniforms) / sizeof(matrixUniforms[0]));
 
         gl::bindVertexArray(vao);
         gl::drawElements(gl::PrimitiveType::eTriangles, indexCount, indexDataType, nullptr);
@@ -440,6 +509,7 @@ void main() {
         glfwSwapBuffers(window);
     }
 
+    vtable.destroyPipeline(ctx, pipelineHandle);
     vtable.destroyContext(ctx);
 
     glfwDestroyWindow(window);
