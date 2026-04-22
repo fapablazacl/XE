@@ -321,9 +321,14 @@ namespace xe {
     static_assert(std::is_trivially_copyable_v<BufferHandle>);
     static_assert(std::is_trivially_copyable_v<TextureHandle>);
 
+    struct GeometryBufferAttrib {
+        BufferHandle bufferHandle;
+        uint32_t attribIndex = 0;
+    };
+
     struct GeometryDescriptor {
         VertexLayoutHandle layoutHandle;
-        std::vector<BufferHandle> buffers;
+        std::vector<GeometryBufferAttrib> bufferAttribs;
         BufferHandle indexBufferHandle;
     };
 

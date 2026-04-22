@@ -15,10 +15,12 @@ namespace xe {
     struct VertexAttribGL {
         gl::AttribLocation loc;
         GLboolean normalized = GL_FALSE;
-        gl::AttributeType dataType;
+        gl::VertexAttribPointerType dataType;
+        int dim = 3;
 
-        VertexAttribGL(gl::AttribLocation loc, gl::AttributeType dataType, GLboolean normalized = GL_FALSE) {
+        VertexAttribGL(gl::AttribLocation loc, int dim, gl::VertexAttribPointerType dataType, GLboolean normalized = GL_FALSE) {
             this->loc = loc;
+            this->dim = dim;
             this->dataType = dataType;
             this->normalized = normalized;
         }
@@ -94,6 +96,17 @@ namespace xe {
         //! Pool of vertex layout descriptors. A slot's obj is empty after destroyVertexLayoutGL, awaiting reuse.
         std::vector<OptSlot<VertexLayoutGL>> layouts;
     };
+
+    template<typename ObjectT, typename HandleT>
+    std::optional<ObjectT> tryObjectExtract(const std::vector<OptSlot<ObjectT>> &objectsSlot, const HandleT &handle) {
+        Slot<ObjectT> const &optSlot = objectsSlot[handle.index()];
+
+        if (optSlot.gen != handle.gen()) {
+            return std::nullopt;
+        }
+
+        return optSlot.obj;
+    }
 
     tl::expected<RenderDeviceBackendContext *, BackendError> createContextGL();
     void destroyContextGL(RenderDeviceBackendContext *ctx);

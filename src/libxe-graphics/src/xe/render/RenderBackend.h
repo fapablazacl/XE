@@ -35,11 +35,11 @@ namespace xe {
         tl::expected<VertexLayoutHandle, BackendError> (*createVertexLayout)(RenderDeviceBackendContext *, const VertexLayoutDescriptor &) = nullptr;
         void (*destroyVertexLayout)(RenderDeviceBackendContext *, VertexLayoutHandle) = nullptr;
 
-        tl::expected<PipelineHandle, BackendError> (*createPipeline)(RenderDeviceBackendContext *, const PipelineDescriptor &) = nullptr;
-        void (*destroyPipeline)(RenderDeviceBackendContext *, PipelineHandle) = nullptr;
-
         tl::expected<GeometryHandle, BackendError> (*createGeometry)(RenderDeviceBackendContext *, const GeometryDescriptor &) = nullptr;
         void (*destroyGeometry)(RenderDeviceBackendContext *, GeometryHandle) = nullptr;
+
+        tl::expected<PipelineHandle, BackendError> (*createPipeline)(RenderDeviceBackendContext *, const PipelineDescriptor &) = nullptr;
+        void (*destroyPipeline)(RenderDeviceBackendContext *, PipelineHandle) = nullptr;
 
         void (*beginFrame)(RenderDeviceBackendContext *) = nullptr;
         void (*endFrame)(RenderDeviceBackendContext *) = nullptr;

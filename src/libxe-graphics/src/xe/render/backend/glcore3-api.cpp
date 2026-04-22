@@ -293,6 +293,48 @@ namespace xe {
         return gl::AttributeType::eFloat;
     }
 
+    gl::VertexAttribPointerType toVertexAttribPointerTypeGL(const VertexAttribFormat attributeType) {
+        switch (attributeType) {
+        case VertexAttribFormat::float1:
+        case VertexAttribFormat::float2:
+        case VertexAttribFormat::float3:
+        case VertexAttribFormat::float4:
+            return gl::VertexAttribPointerType::eFloat;
+
+        case VertexAttribFormat::int1:
+        case VertexAttribFormat::int2:
+        case VertexAttribFormat::int3:
+        case VertexAttribFormat::int4:
+            return gl::VertexAttribPointerType::eInt;
+        }
+
+        assert(false && "toPixelTypeGL: Invalid DataType");
+        return gl::VertexAttribPointerType::eInt;
+    }
+
+    int getVertexAttribDim(const VertexAttribFormat attributeType) {
+        switch (attributeType) {
+        case VertexAttribFormat::float1:
+        case VertexAttribFormat::int1:
+            return 1;
+
+        case VertexAttribFormat::float2:
+        case VertexAttribFormat::int2:
+            return 2;
+
+        case VertexAttribFormat::float3:
+        case VertexAttribFormat::int3:
+            return 3;
+
+        case VertexAttribFormat::float4:
+        case VertexAttribFormat::int4:
+            return 4;
+        }
+
+        assert(false && "toPixelTypeGL: Unhandled or Invalid DataType");
+        return 1;
+    }
+
     tl::expected<TextureHandle, BackendError> createTextureGL(RenderDeviceBackendContext *ctx, const TextureDescriptor &desc) {
         auto &textures = glctx(ctx)->textures;
         if (!poolHasCapacity(textures)) {
@@ -554,7 +596,8 @@ namespace xe {
         for (const VertexAttrib &attr : desc.attribs) {
             layout.attributes.emplace_back(
                 gl::AttribLocation{attr.location},
-                toAttributeTypeGL(attr.format),
+                getVertexAttribDim(attr.format),
+                toVertexAttribPointerTypeGL(attr.format),
                 attr.normalized ? GL_TRUE : GL_FALSE
             );
         }
@@ -571,6 +614,43 @@ namespace xe {
         assert(slot.obj && "destroyVertexLayoutGL: slot already free (double destroy)");
         assert(slot.gen == handle.gen() && "destroyVertexLayoutGL: stale handle (generation mismatch)");
         slot.obj.reset();
+    }
+
+
+    tl::expected<GeometryHandle, BackendError> createGeometryGL(RenderDeviceBackendContext *ctx, const GeometryDescriptor &desc) {
+        uint32_t const layoutIndex = desc.layoutHandle.index();
+
+        // TODO: Refactor this into a search utility function. tryObjectExtract currently is failing
+        // auto layoutOpt = tryObjectExtract<VertexLayoutGL, VertexLayoutHandle>(glctx(ctx)->layouts, desc.layoutHandle);
+        auto& buffers = glctx(ctx)->buffers;
+        std::optional<VertexLayoutGL> layoutOpt = glctx(ctx)->layouts[layoutIndex].obj;
+
+        // TODO: Add error checking
+        if (!layoutOpt) {
+
+        }
+
+        const VertexLayoutGL &layout = layoutOpt.value();
+
+        auto vao = glaze::makeUnique<gl::VertexArray>();
+
+        gl::bindVertexArray(vao);
+        for (const GeometryBufferAttrib &bufferAttrib : desc.bufferAttribs) {
+            const uint32_t attribIndex = bufferAttrib.attribIndex;
+            VertexAttribGL const &attrib = layoutOpt->attributes[attribIndex];
+
+            BufferHandle bufferHandle = bufferAttrib.bufferHandle;
+            gl::BufferId const bufferId = buffers[bufferHandle.index()].obj.get();
+
+            gl::bindBuffer(gl::BufferTarget::eArrayBuffer, bufferId);
+            gl::enableVertexArrayAttrib(vao, attrib.loc.loc);
+            gl::vertexAttribPointer(attrib.loc, attrib.dim, attrib.dataType, attrib.normalized, 0, nullptr);
+        }
+        gl::bindVertexArray({});
+    }
+
+    void destroyGeometryGL(RenderDeviceBackendContext *ctx, GeometryHandle handle) {
+
     }
 
     void initializeBackendTableGL(RenderDeviceBackendVTable *vtable) {
