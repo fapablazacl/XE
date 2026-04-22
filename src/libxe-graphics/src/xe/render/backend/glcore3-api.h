@@ -28,7 +28,19 @@ namespace xe {
 
     struct VertexLayoutGL {
         std::vector<VertexAttribGL> attributes;
-        gl::DrawElementsType indexDataType = gl::DrawElementsType::eUnsignedByte;
+        gl::DrawElementsType indexDataType = gl::DrawElementsType::eUnsignedShort;
+    };
+
+    /**
+     * @brief A single geometry: the VAO wiring together buffer bindings, plus the draw-time index
+     * data type captured at creation so glDrawElements calls don't need to re-query the layout.
+     */
+    struct GeometryGL {
+        //! RAII-owned VAO that encodes the attribute bindings and the element array buffer binding.
+        glaze::Unique<gl::VertexArray> vao;
+
+        //! Index component type (uint16 or uint32), propagated from the source VertexLayoutGL.
+        gl::DrawElementsType indexDataType = gl::DrawElementsType::eUnsignedShort;
     };
 
     struct PipelineGL {
@@ -95,17 +107,41 @@ namespace xe {
 
         //! Pool of vertex layout descriptors. A slot's obj is empty after destroyVertexLayoutGL, awaiting reuse.
         std::vector<OptSlot<VertexLayoutGL>> layouts;
+
+        //! Pool of geometries (VAO + index metadata). A slot's obj is empty after destroyGeometryGL, awaiting reuse.
+        std::vector<OptSlot<GeometryGL>> geometries;
     };
 
+    /**
+     * @brief Validate a handle against an OptSlot pool and return a pointer to the held object, or nullptr.
+     *
+     * Performs the full three-step handle check (index in range, slot live, generation matches). Returns
+     * a borrowed pointer into the pool so callers avoid copying the underlying resource (e.g. a
+     * VertexLayoutGL's attribute vector). The pointer is valid until the pool is mutated by the next
+     * acquireSlot / destroy call on this pool.
+     *
+     * @tparam ObjectT the plain resource type held by the pool
+     * @tparam HandleT the typed handle kind (must expose index() and gen())
+     * @param pool the OptSlot-backed pool to look up in
+     * @param handle the handle to validate
+     * @return const pointer to the held object on success; nullptr if any check fails
+     */
     template<typename ObjectT, typename HandleT>
-    std::optional<ObjectT> tryObjectExtract(const std::vector<OptSlot<ObjectT>> &objectsSlot, const HandleT &handle) {
-        Slot<ObjectT> const &optSlot = objectsSlot[handle.index()];
-
-        if (optSlot.gen != handle.gen()) {
-            return std::nullopt;
+    const ObjectT *tryObjectExtract(const std::vector<OptSlot<ObjectT>> &pool, const HandleT &handle) {
+        uint32_t const index = handle.index();
+        if (index >= pool.size()) {
+            return nullptr;
         }
 
-        return optSlot.obj;
+        OptSlot<ObjectT> const &slot = pool[index];
+        if (!slot.obj) {
+            return nullptr;
+        }
+        if (slot.gen != handle.gen()) {
+            return nullptr;
+        }
+
+        return &*slot.obj;
     }
 
     tl::expected<RenderDeviceBackendContext *, BackendError> createContextGL();
