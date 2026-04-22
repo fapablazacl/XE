@@ -1,10 +1,10 @@
 
-#include <gtest/gtest.h>
+#include <catch2/catch_test_macros.hpp>
 #include <xe/scene/Trackball.h>
 
-TEST(TrackballTest, ConstructorFillsStartCurrentAndEndPoints) {
-    EXPECT_EQ(XE::Trackball(XE::Vector2i(640, 480)).getVirtualSphere(), XE::VirtualSphere(XE::Vector2i(640, 480)));
-    EXPECT_EQ(XE::Trackball(XE::Vector2i(800, 600)).getVirtualSphere(), XE::VirtualSphere(XE::Vector2i(800, 600)));
+TEST_CASE("TrackballTest.ConstructorFillsStartCurrentAndEndPoints", "[scene][trackball]") {
+    REQUIRE(XE::Trackball(XE::Vector2i(640, 480)).getVirtualSphere() == XE::VirtualSphere(XE::Vector2i(640, 480)));
+    REQUIRE(XE::Trackball(XE::Vector2i(800, 600)).getVirtualSphere() == XE::VirtualSphere(XE::Vector2i(800, 600)));
 
     auto trackball = XE::Trackball{{800, 600}};
 
@@ -12,12 +12,12 @@ TEST(TrackballTest, ConstructorFillsStartCurrentAndEndPoints) {
     trackball.drag({50, 50});
     trackball.endDrag({100, 100});
 
-    EXPECT_EQ(trackball.getDragBegin(), XE::Vector2i(0, 0));
-    EXPECT_EQ(trackball.getDragCurrent(), XE::Vector2i(50, 50));
-    EXPECT_EQ(trackball.getDragEnd(), XE::Vector2i(100, 100));
+    REQUIRE(trackball.getDragBegin() == XE::Vector2i(0, 0));
+    REQUIRE(trackball.getDragCurrent() == XE::Vector2i(50, 50));
+    REQUIRE(trackball.getDragEnd() == XE::Vector2i(100, 100));
 }
 
-TEST(TrackballTest, ComputeRotationGeneratesAnEmptyRotationWhenStartAndEndPointsAreTheSame) {
+TEST_CASE("TrackballTest.ComputeRotationGeneratesAnEmptyRotationWhenStartAndEndPointsAreTheSame", "[scene][trackball]") {
     XE::Trackball trackball = {{640, 480}};
 
     trackball.beginDrag({100, 100});
@@ -25,11 +25,11 @@ TEST(TrackballTest, ComputeRotationGeneratesAnEmptyRotationWhenStartAndEndPoints
 
     XE::Rotation rotation = trackball.computeRotation();
 
-    EXPECT_EQ(rotation.angle, 0.0);
+    REQUIRE(rotation.angle == 0.0);
 }
 
 // TODO: These tests should be implemented after the quaternion class is fully unit-tested.
-// TEST(TrackballTest, "should generate a rotation around the Y axis with a horizontal mouse movement, inside the virtual unit trackball") {
+// TEST_CASE("TrackballTest.should generate a rotation around the Y axis with a horizontal mouse movement, inside the virtual unit trackball", "[scene][trackball]") {
 //    auto trackball = xe::Trackball{{100, 100}};
 
 //    trackball.beginDrag({50, 50});
@@ -38,11 +38,11 @@ TEST(TrackballTest, ComputeRotationGeneratesAnEmptyRotationWhenStartAndEndPoints
 
 //    auto rotation = trackball.computeRotation();
 
-//    EXPECT_EQ(rotation.axis, xe::Vector3{0.0f, 1.0f, 0.0f});
-//    EXPECT_EQ(rotation.angle > 0.0f);
+//    REQUIRE(rotation.axis == xe::Vector3{0.0f, 1.0f, 0.0f});
+//    REQUIRE(rotation.angle > 0.0f);
 //}
 
-// TEST(TrackballTest, "should generate a rotation around the X axis with a horizontal mouse movement, inside the virtual unit trackball") {
+// TEST_CASE("TrackballTest.should generate a rotation around the X axis with a horizontal mouse movement, inside the virtual unit trackball", "[scene][trackball]") {
 //     auto trackball = xe::Trackball{{100, 100}};
 
 //    trackball.beginDrag({50, 50});
@@ -51,6 +51,6 @@ TEST(TrackballTest, ComputeRotationGeneratesAnEmptyRotationWhenStartAndEndPoints
 
 //    auto rotation = trackball.computeRotation();
 
-//    EXPECT_EQ(rotation.axis, xe::Vector3{1.0f, 0.0f, 0.0f});
-//    EXPECT_EQ(rotation.angle > 0.0f);
+//    REQUIRE(rotation.axis == xe::Vector3{1.0f, 0.0f, 0.0f});
+//    REQUIRE(rotation.angle > 0.0f);
 //}

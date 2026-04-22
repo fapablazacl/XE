@@ -273,6 +273,6 @@ namespace xe {
 
     // Legacy PascalCase aliases. See Legacy.h.
     template <typename T> using TPlane = tplane<T>; ///< @deprecated Use @ref tplane.
-    using Plane = plane;   ///< @deprecated Use @ref plane.
-    using Planed = dplane; ///< @deprecated Use @ref dplane.
+    using Plane = plane;                            ///< @deprecated Use @ref plane.
+    using Planed = dplane;                          ///< @deprecated Use @ref dplane.
 } // namespace xe

@@ -27,9 +27,9 @@ namespace xe {
 
     // Legacy PascalCase aliases. See Legacy.h.
     template <typename T> using TBox = tbox<T>; ///< @deprecated Use @ref tbox.
-    using Box = box;   ///< @deprecated Use @ref box.
-    using Boxd = dbox; ///< @deprecated Use @ref dbox.
-    using Boxi = ibox; ///< @deprecated Use @ref ibox.
+    using Box = box;                            ///< @deprecated Use @ref box.
+    using Boxd = dbox;                          ///< @deprecated Use @ref dbox.
+    using Boxi = ibox;                          ///< @deprecated Use @ref ibox.
 
     /**
      * @brief Stream insertion for @ref tbox — debug print of min/max corners.

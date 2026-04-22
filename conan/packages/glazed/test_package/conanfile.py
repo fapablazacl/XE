@@ -1,11 +1,11 @@
 import os
 
 from conan import ConanFile
+from conan.tools.cmake import CMake, CMakeToolchain, cmake_layout
 from conan.tools.build import can_run
-from conan.tools.cmake import CMake, cmake_layout
 
 
-class GlazedTestConan(ConanFile):
+class GlazeCppTestConan(ConanFile):
     settings = "os", "compiler", "build_type", "arch"
     generators = "CMakeDeps", "CMakeToolchain"
 
@@ -22,7 +22,5 @@ class GlazedTestConan(ConanFile):
 
     def test(self):
         if can_run(self):
-            for name in ("test_glazed_gl",):
-                cmd = os.path.join(self.cpp.build.bindir, name)
-                if os.path.isfile(cmd) or os.path.isfile(cmd + ".exe"):
-                    self.run(cmd, env="conanrun")
+            cmd = os.path.join(self.cpp.build.bindir, "example")
+            self.run(cmd, env="conanrun")

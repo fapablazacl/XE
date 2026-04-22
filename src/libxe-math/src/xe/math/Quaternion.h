@@ -456,8 +456,8 @@ namespace xe {
 
     // Legacy PascalCase aliases. See Legacy.h.
     template <typename T> using TQuaternion = tquat<T>; ///< @deprecated Use @ref tquat.
-    using Quat = quat;   ///< @deprecated Use @ref quat.
-    using Quatd = dquat; ///< @deprecated Use @ref dquat.
+    using Quat = quat;                                  ///< @deprecated Use @ref quat.
+    using Quatd = dquat;                                ///< @deprecated Use @ref dquat.
 } // namespace xe
 
 #if defined(_MSC_VER)

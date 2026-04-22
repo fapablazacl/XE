@@ -42,17 +42,11 @@ add_definitions(-DGLM_ENABLE_EXPERIMENTAL)
 if (XE_DEV_UNIT_TEST)
     include(CTest)
     enable_testing()
-    find_package(GTest CONFIG REQUIRED)
     find_package(Catch2 3 CONFIG REQUIRED)
 endif()
 
 if (CMAKE_BUILD_TYPE MATCHES "Debug")
     add_definitions (-D_DEBUG)
-
-    # FIXME:
-    # Usage of this macro should be removed, because should be detected
-    # by GLAZE automatically.
-    add_definitions (-DGLAZE_DEBUG)
 endif ()
 
 add_definitions (-DXE_VERSION_MAJOR=${XE_VERSION_MAJOR})

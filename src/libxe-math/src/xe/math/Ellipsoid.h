@@ -19,8 +19,8 @@ namespace xe {
      * where a sphere is too coarse.
      */
     template <typename T> struct tellipsoid {
-        tvec<T, 3> center{T(0), T(0), T(0)};   ///< Centre of the ellipsoid in world space.
-        tvec<T, 3> size{T(1), T(1), T(1)};     ///< Per-axis radii (not diameters).
+        tvec<T, 3> center{T(0), T(0), T(0)}; ///< Centre of the ellipsoid in world space.
+        tvec<T, 3> size{T(1), T(1), T(1)};   ///< Per-axis radii (not diameters).
 
         /**
          * @brief Default-construct to a unit sphere centred at the origin.
@@ -59,6 +59,6 @@ namespace xe {
 
     // Legacy PascalCase aliases. See Legacy.h.
     template <typename T> using TEllipsoid = tellipsoid<T>; ///< @deprecated Use @ref tellipsoid.
-    using Ellipsoid = ellipsoid;   ///< @deprecated Use @ref ellipsoid.
-    using Ellipsoidd = dellipsoid; ///< @deprecated Use @ref dellipsoid.
+    using Ellipsoid = ellipsoid;                            ///< @deprecated Use @ref ellipsoid.
+    using Ellipsoidd = dellipsoid;                          ///< @deprecated Use @ref dellipsoid.
 } // namespace xe

@@ -62,6 +62,6 @@ namespace xe {
 
     // Legacy PascalCase aliases. See Legacy.h.
     template <typename T> using TTriangle = ttriangle<T>; ///< @deprecated Use @ref ttriangle.
-    using Triangle = triangle;   ///< @deprecated Use @ref triangle.
-    using Triangled = dtriangle; ///< @deprecated Use @ref dtriangle.
+    using Triangle = triangle;                            ///< @deprecated Use @ref triangle.
+    using Triangled = dtriangle;                          ///< @deprecated Use @ref dtriangle.
 } // namespace xe
