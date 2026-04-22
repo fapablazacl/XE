@@ -7,12 +7,14 @@
 #include <string>
 #include <type_traits>
 #include <utility>
+#include <vector>
 
 #include <tl/expected.hpp>
 
 #include <xe/DataType.h>
 #include <xe/graphics/GraphicsDevice.h>
 #include <xe/graphics/BufferDescriptor.h>
+#include <xe/graphics/Uniform.h>
 
 namespace xe {
     /**
@@ -337,10 +339,105 @@ namespace xe {
         std::string glslFragmentShader;
     };
 
+    /**
+     * @brief Scalar / vector uniform element type.
+     *
+     * Orthogonal to UniformDimension: the backend dispatches on (elementType, dimension) to
+     * pick the correct glUniform* entrypoint. Matrix uniforms use UniformMatrixShape instead.
+     */
+    enum class UniformElementType { Float, Int, UInt };
+
+    /**
+     * @brief Opaque resolved uniform location handed back by RenderDeviceBackendVTable::resolveUniformLocation.
+     *
+     * Populated by the backend after a successful glGetUniformLocation (or equivalent) lookup.
+     * A location is tied to the shader program it was resolved against: programKey holds the
+     * raw bits of that ShaderHandle, so applyUniforms can assert (in debug builds) that a
+     * location is not accidentally reused against a different program.
+     */
+    struct UniformLocation {
+        //! Backend-specific location identifier. -1 is the canonical invalid sentinel.
+        int32_t raw = -1;
+
+        //! Raw bits of the owning ShaderHandle, captured at resolve time.
+        uint32_t programKey = 0;
+
+        //! True iff this location refers to a real uniform in a live program.
+        constexpr bool isValid() const {
+            return raw >= 0;
+        }
+    };
+
+    /**
+     * @brief One scalar/vector uniform upload in an applyUniforms batch.
+     *
+     * All fields must be populated. data points at count * elementcount(dimension) elements of
+     * the C type matching elementType (GLfloat for Float, GLint for Int, GLuint for UInt) and
+     * must outlive the applyUniforms call.
+     */
+    struct UniformValueSubmission {
+        //! Resolved target location. Must refer to the same program passed to applyUniforms.
+        UniformLocation location;
+
+        //! Scalar element type (float/int/uint).
+        UniformElementType elementType = UniformElementType::Float;
+
+        //! Vector width (1..4).
+        UniformDimension dimension = UniformDimension::D1;
+
+        //! Number of array elements; 1 for a scalar/vector uniform, N for a uniform array.
+        uint32_t count = 1;
+
+        //! Borrowed pointer to the upload payload; must outlive applyUniforms.
+        const void *data = nullptr;
+    };
+
+    /**
+     * @brief One matrix uniform upload in an applyUniforms batch.
+     *
+     * data points at count * countElements(shape) GLfloat elements. Double-precision matrices
+     * are not supported by this API; clients that need them should use dedicated backend paths.
+     */
+    struct UniformMatrixSubmission {
+        //! Resolved target location. Must refer to the same program passed to applyUniforms.
+        UniformLocation location;
+
+        //! Matrix shape (rows x columns).
+        UniformMatrixShape shape = UniformMatrixShape::R4C4;
+
+        //! Number of matrices; 1 for a single uniform, N for an array of matrices.
+        uint32_t count = 1;
+
+        //! When true, the backend transposes each matrix on upload (glUniformMatrix*fv transpose flag).
+        bool transpose = false;
+
+        //! Borrowed pointer to the upload payload; must outlive applyUniforms.
+        const void *data = nullptr;
+    };
+
+    /**
+     * @brief Pipeline-level declaration that a named uniform block maps to a specific binding point.
+     *
+     * Consumed by createPipeline at pipeline creation time: the backend calls whatever API it needs
+     * (e.g. glUniformBlockBinding on GL 3.3) to bake the block-name-to-binding-point assignment into
+     * the pipeline's shader program. At draw time, clients call bindUniformBuffer with the matching
+     * bindingPoint to attach actual buffer storage; no block-name lookup is repeated per draw.
+     */
+    struct PipelineUniformBlock {
+        //! Uniform block name as it appears in the GLSL source (e.g. "CameraBlock").
+        std::string blockName;
+
+        //! Binding point to assign this block to. Must be < GL_MAX_UNIFORM_BUFFER_BINDINGS on GL backends.
+        uint32_t bindingPoint = 0;
+    };
+
     struct PipelineDescriptor {
         VertexLayoutHandle layoutHandle;
         ShaderHandle shaderProgramHandle;
         ClearFlags clearFlags = ClearFlags::Color;
         vec4 clearColor = {0.0f, 0.0f, 0.0f, 1.0f};
+
+        //! Uniform block bindings baked into this pipeline at creation time.
+        std::vector<PipelineUniformBlock> uniformBlocks;
     };
 } // namespace xe

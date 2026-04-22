@@ -8,7 +8,7 @@
 namespace xe {
     enum class BufferUsage { StreamDraw, StreamRead, StreamCopy, StaticDraw, StaticRead, StaticCopy, DynamicDraw, DynamicRead, DynamicCopy };
 
-    enum class BufferType { Vertex, Index };
+    enum class BufferType { Vertex, Index, Uniform };
 
     struct BufferDescriptor {
         BufferType type;

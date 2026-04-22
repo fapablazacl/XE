@@ -7,6 +7,7 @@
 #include <xe/render/RenderBackend.h>
 #include <cassert>
 #include <new>
+#include <string>
 #include <utility>
 #include <vector>
 #include <array>
@@ -122,6 +123,9 @@ namespace xe {
 
         case BufferType::Index:
             return gl::BufferTarget::eElementArrayBuffer;
+
+        case BufferType::Uniform:
+            return gl::BufferTarget::eUniformBuffer;
 
         default:
             assert(false && "toTextureTargetGL: Invalid BufferType");
@@ -697,6 +701,206 @@ namespace xe {
         slot.obj.reset();
     }
 
+    /**
+     * @brief Resolve a live gl::Program from a shader pool slot, or nullptr on validation failure.
+     *
+     * Performs the full index-range + slot-alive + generation-match check. Returns a borrowed
+     * pointer into the pool; the pointer is valid until the next mutation of the shader-program pool.
+     */
+    static const glaze::Unique<gl::Program> *tryProgramExtract(const std::vector<Slot<gl::Program>> &pool, ShaderHandle handle) {
+        uint32_t const index = handle.index();
+        if (index >= pool.size()) {
+            return nullptr;
+        }
+        Slot<gl::Program> const &slot = pool[index];
+        if (!slot.obj) {
+            return nullptr;
+        }
+        if (slot.gen != handle.gen()) {
+            return nullptr;
+        }
+        return &slot.obj;
+    }
+
+    tl::expected<PipelineHandle, BackendError> createPipelineGL(RenderDeviceBackendContext *ctx, const PipelineDescriptor &desc) {
+        auto &pipelines = glctx(ctx)->pipelines;
+        auto &shaderPrograms = glctx(ctx)->shaderPrograms;
+
+        if (!poolHasCapacity(pipelines)) {
+            return makeBackendError(BackendErrorCode::HandlePoolExhausted, "pipeline pool exhausted (16-bit index field)");
+        }
+
+        const glaze::Unique<gl::Program> *programPtr = tryProgramExtract(shaderPrograms, desc.shaderProgramHandle);
+        if (programPtr == nullptr) {
+            return makeBackendError(BackendErrorCode::InvalidDescriptor, "createPipelineGL: shaderProgramHandle is invalid or references a freed shader program");
+        }
+
+        PipelineGL pipeline;
+        pipeline.clearColor = desc.clearColor;
+        pipeline.shaderProgram = programPtr->get();
+        pipeline.shaderHandle = desc.shaderProgramHandle;
+        pipeline.uniformBlockBindings.reserve(desc.uniformBlocks.size());
+
+        for (const PipelineUniformBlock &block : desc.uniformBlocks) {
+            GLuint const blockIndex = gl::getUniformBlockIndex(pipeline.shaderProgram, block.blockName.c_str());
+            if (blockIndex == GL_INVALID_INDEX) {
+                return makeBackendError(BackendErrorCode::InvalidDescriptor,
+                                        std::string{"createPipelineGL: uniform block '"} + block.blockName + "' is not active in the shader program");
+            }
+
+            gl::uniformBlockBinding(pipeline.shaderProgram, blockIndex, block.bindingPoint);
+            pipeline.uniformBlockBindings.push_back({block.blockName, block.bindingPoint, blockIndex});
+        }
+
+        auto const [index, gen] = acquireSlot(pipelines, std::move(pipeline));
+        return PipelineHandle::make(gen, index);
+    }
+
+    void destroyPipelineGL(RenderDeviceBackendContext *ctx, PipelineHandle handle) {
+        auto &pipelines = glctx(ctx)->pipelines;
+        uint32_t const index = handle.index();
+        assert(index < pipelines.size() && "destroyPipelineGL: handle index out of range");
+        auto &slot = pipelines[index];
+        assert(slot.obj && "destroyPipelineGL: slot already free (double destroy)");
+        assert(slot.gen == handle.gen() && "destroyPipelineGL: stale handle (generation mismatch)");
+        slot.obj.reset();
+    }
+
+    tl::expected<UniformLocation, BackendError> resolveUniformLocationGL(RenderDeviceBackendContext *ctx, ShaderHandle handle, const char *name) {
+        assert(name != nullptr && "resolveUniformLocationGL: name must not be null");
+
+        auto &shaderPrograms = glctx(ctx)->shaderPrograms;
+        const glaze::Unique<gl::Program> *programPtr = tryProgramExtract(shaderPrograms, handle);
+        if (programPtr == nullptr) {
+            return makeBackendError(BackendErrorCode::InvalidDescriptor, "resolveUniformLocationGL: shader handle is invalid or references a freed program");
+        }
+
+        gl::UniformLocation const loc = gl::getUniformLocation(programPtr->get(), name);
+        if (!loc.valid()) {
+            return makeBackendError(BackendErrorCode::InvalidDescriptor, std::string{"resolveUniformLocationGL: uniform '"} + name + "' is not active in the shader program");
+        }
+
+        UniformLocation out;
+        out.raw = loc.loc;
+        out.programKey = handle.raw;
+        return out;
+    }
+
+    /**
+     * @brief Dispatch a scalar/vector uniform upload to the correct glUniform{1,2,3,4}{f,i,ui}v call.
+     *
+     * The backend assumes the payload in `sub.data` is already in the memory layout the matching
+     * glUniform*v entrypoint expects: count * elementcount(dimension) tightly-packed elements of
+     * the C type implied by elementType (GLfloat / GLint / GLuint).
+     */
+    static void applyUniformValueGL(const UniformValueSubmission &sub) {
+        gl::UniformLocation const loc{sub.location.raw};
+        GLsizei const count = static_cast<GLsizei>(sub.count);
+
+        switch (sub.elementType) {
+        case UniformElementType::Float: {
+            auto const *data = static_cast<const GLfloat *>(sub.data);
+            switch (sub.dimension) {
+            case UniformDimension::D1: gl::uniform1fv(loc, count, data); return;
+            case UniformDimension::D2: gl::uniform2fv(loc, count, data); return;
+            case UniformDimension::D3: gl::uniform3fv(loc, count, data); return;
+            case UniformDimension::D4: gl::uniform4fv(loc, count, data); return;
+            }
+            break;
+        }
+        case UniformElementType::Int: {
+            auto const *data = static_cast<const GLint *>(sub.data);
+            switch (sub.dimension) {
+            case UniformDimension::D1: gl::uniform1iv(loc, count, data); return;
+            case UniformDimension::D2: gl::uniform2iv(loc, count, data); return;
+            case UniformDimension::D3: gl::uniform3iv(loc, count, data); return;
+            case UniformDimension::D4: gl::uniform4iv(loc, count, data); return;
+            }
+            break;
+        }
+        case UniformElementType::UInt: {
+            auto const *data = static_cast<const GLuint *>(sub.data);
+            switch (sub.dimension) {
+            case UniformDimension::D1: gl::uniform1uiv(loc, count, data); return;
+            case UniformDimension::D2: gl::uniform2uiv(loc, count, data); return;
+            case UniformDimension::D3: gl::uniform3uiv(loc, count, data); return;
+            case UniformDimension::D4: gl::uniform4uiv(loc, count, data); return;
+            }
+            break;
+        }
+        }
+
+        assert(false && "applyUniformValueGL: unhandled (elementType, dimension) pair");
+    }
+
+    /**
+     * @brief Dispatch a matrix uniform upload to the correct glUniformMatrix*fv call.
+     *
+     * Data is always GLfloat; double-precision matrix uniforms are not part of this API surface.
+     */
+    static void applyUniformMatrixGL(const UniformMatrixSubmission &sub) {
+        gl::UniformLocation const loc{sub.location.raw};
+        GLsizei const count = static_cast<GLsizei>(sub.count);
+        GLboolean const transpose = sub.transpose ? GL_TRUE : GL_FALSE;
+        auto const *data = static_cast<const GLfloat *>(sub.data);
+
+        switch (sub.shape) {
+        case UniformMatrixShape::R2C2: gl::uniformMatrix2fv  (loc, count, transpose, data); return;
+        case UniformMatrixShape::R2C3: gl::uniformMatrix2x3fv(loc, count, transpose, data); return;
+        case UniformMatrixShape::R2C4: gl::uniformMatrix2x4fv(loc, count, transpose, data); return;
+        case UniformMatrixShape::R3C2: gl::uniformMatrix3x2fv(loc, count, transpose, data); return;
+        case UniformMatrixShape::R3C3: gl::uniformMatrix3fv  (loc, count, transpose, data); return;
+        case UniformMatrixShape::R3C4: gl::uniformMatrix3x4fv(loc, count, transpose, data); return;
+        case UniformMatrixShape::R4C2: gl::uniformMatrix4x2fv(loc, count, transpose, data); return;
+        case UniformMatrixShape::R4C3: gl::uniformMatrix4x3fv(loc, count, transpose, data); return;
+        case UniformMatrixShape::R4C4: gl::uniformMatrix4fv  (loc, count, transpose, data); return;
+        }
+
+        assert(false && "applyUniformMatrixGL: unhandled UniformMatrixShape");
+    }
+
+    void applyUniformsGL(RenderDeviceBackendContext *ctx,
+                         ShaderHandle handle,
+                         const UniformValueSubmission *values, size_t valueCount,
+                         const UniformMatrixSubmission *matrices, size_t matrixCount) {
+        auto &shaderPrograms = glctx(ctx)->shaderPrograms;
+        const glaze::Unique<gl::Program> *programPtr = tryProgramExtract(shaderPrograms, handle);
+        assert(programPtr != nullptr && "applyUniformsGL: shader handle is invalid or references a freed program");
+
+        gl::useProgram(programPtr->get());
+
+        for (size_t i = 0; i < valueCount; ++i) {
+            assert(values[i].location.isValid() && "applyUniformsGL: UniformValueSubmission carries an invalid location");
+            assert(values[i].location.programKey == handle.raw && "applyUniformsGL: UniformValueSubmission location was resolved against a different program");
+            assert(values[i].data != nullptr && "applyUniformsGL: UniformValueSubmission::data must not be null");
+            applyUniformValueGL(values[i]);
+        }
+
+        for (size_t i = 0; i < matrixCount; ++i) {
+            assert(matrices[i].location.isValid() && "applyUniformsGL: UniformMatrixSubmission carries an invalid location");
+            assert(matrices[i].location.programKey == handle.raw && "applyUniformsGL: UniformMatrixSubmission location was resolved against a different program");
+            assert(matrices[i].data != nullptr && "applyUniformsGL: UniformMatrixSubmission::data must not be null");
+            applyUniformMatrixGL(matrices[i]);
+        }
+    }
+
+    void bindUniformBufferGL(RenderDeviceBackendContext *ctx, uint32_t bindingPoint, BufferHandle handle, size_t offset, size_t size) {
+        assert(handle.subType() == BufferType::Uniform && "bindUniformBufferGL: handle must reference a BufferType::Uniform buffer");
+
+        auto &buffers = glctx(ctx)->buffers;
+        uint32_t const index = handle.index();
+        assert(index < buffers.size() && "bindUniformBufferGL: handle index out of range");
+        auto &slot = buffers[index];
+        assert(slot.obj && "bindUniformBufferGL: use of freed handle");
+        assert(slot.gen == handle.gen() && "bindUniformBufferGL: stale handle (generation mismatch)");
+
+        if (size == 0) {
+            gl::bindBufferBase(gl::BufferTarget::eUniformBuffer, bindingPoint, slot.obj);
+        } else {
+            gl::bindBufferRange(gl::BufferTarget::eUniformBuffer, bindingPoint, slot.obj, static_cast<GLintptr>(offset), static_cast<GLsizeiptr>(size));
+        }
+    }
+
     void initializeBackendTableGL(RenderDeviceBackendVTable *vtable) {
         vtable->createContext = &createContextGL;
         vtable->destroyContext = &destroyContextGL;
@@ -713,5 +917,10 @@ namespace xe {
         vtable->destroyVertexLayout = &destroyVertexLayoutGL;
         vtable->createGeometry = &createGeometryGL;
         vtable->destroyGeometry = &destroyGeometryGL;
+        vtable->createPipeline = &createPipelineGL;
+        vtable->destroyPipeline = &destroyPipelineGL;
+        vtable->resolveUniformLocation = &resolveUniformLocationGL;
+        vtable->applyUniforms = &applyUniformsGL;
+        vtable->bindUniformBuffer = &bindUniformBufferGL;
     }
 } // namespace xe
