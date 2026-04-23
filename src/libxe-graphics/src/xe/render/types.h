@@ -445,14 +445,18 @@ namespace xe {
     // It encapsulates inmediate-mode commands
 
     // Identify which command
-    enum class CommandOpcode {
-
+    enum class CommandOp {
+        Clear,
+        Draw,
+        SetUniform,
+        BindTexture,
+        BindPipeline
     };
 
     struct CommandClear {
         ClearFlags flags = ClearFlags::Color;
-        vec4 clearColor = {0.0f, 0.0f, 0.0f, 1.0f};
-        float depthColor = 1.0f;
+        vec4 color = {0.0f, 0.0f, 0.0f, 1.0f};
+        float depth = 1.0f;
         int stencil = 0;
     };
 
@@ -463,7 +467,7 @@ namespace xe {
         GeometryHandle geometry;
     };
 
-    struct CommandUniform {
+    struct CommandSetUniform {
         UniformLocation location;
         UniformElementType elementType = UniformElementType::Float;
         UniformDimension dimension = UniformDimension::D1;
@@ -471,11 +475,77 @@ namespace xe {
         const void *data = nullptr;
     };
 
-    struct CommandTexture {
+    struct CommandBindTexture {
+        uint32_t bindingPoint = 0;
         TextureHandle textureHandle;
     };
 
-    struct CommandBuffer {
-        CommandOpcode op;
+    struct CommandBindPipeline {
+        PipelineHandle pipelineHandle;
     };
+
+    /**
+     * @brief Records a series of render commands for subsequent execution
+     *
+     * Intended to be instanciated directly by the app
+     */
+    class CommandBuffer {
+    public:
+        void clear();
+
+        void record(const CommandClear &command);
+        void record(const CommandDraw &command);
+        void record(const CommandSetUniform &command);
+        void record(const CommandBindTexture &command);
+        void record(const CommandBindPipeline &command);
+
+    private:
+        //! use a Union instead to make porting to old standard easier
+        union CommandUnion {
+            CommandClear clear;
+            CommandBindTexture bindTexture;
+            CommandBindPipeline bindPipeline;
+            CommandSetUniform setUniform;
+            CommandDraw draw;
+
+            CommandUnion(const CommandClear &clear) { this->clear = clear; }
+            CommandUnion(const CommandBindTexture &bindTexture) { this->bindTexture = bindTexture; }
+            CommandUnion(const CommandBindPipeline &bindPipeline) { this->bindPipeline = bindPipeline; }
+            CommandUnion(const CommandSetUniform &uniform) { this->setUniform = uniform; }
+            CommandUnion(const CommandDraw &draw) { this->draw = draw; }
+        };
+
+        struct Command {
+            CommandOp opcode;
+            CommandUnion cmd;
+
+            Command(const CommandClear &clear) : opcode(CommandOp::Clear), cmd(clear) {}
+            Command(const CommandBindTexture &bindTexture) : opcode(CommandOp::BindTexture), cmd(bindTexture) {}
+            Command(const CommandBindPipeline &bindPipeline) : opcode(CommandOp::BindPipeline), cmd(bindPipeline) {}
+            Command(const CommandSetUniform &uniform) : opcode(CommandOp::SetUniform), cmd(uniform) {}
+            Command(const CommandDraw &draw) : opcode(CommandOp::Clear), cmd(draw) {}
+        };
+
+        std::vector<Command> commands;
+    };
+
+    inline void CommandBuffer::clear() {
+        commands.clear();
+    }
+
+    inline void CommandBuffer::record(const CommandDraw &command) {
+        commands.push_back(command);
+    }
+
+    inline void CommandBuffer::record(const CommandSetUniform &command) {
+        commands.push_back(command);
+    }
+
+    inline void CommandBuffer::record(const CommandBindTexture &command) {
+        commands.push_back(command);
+    }
+
+    inline void CommandBuffer::record(const CommandBindPipeline &command) {
+        commands.push_back(command);
+    }
 } // namespace xe
