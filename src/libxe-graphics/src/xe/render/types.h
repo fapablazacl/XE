@@ -484,6 +484,44 @@ namespace xe {
         PipelineHandle pipelineHandle;
     };
 
+    // ------------------------------------------------------------------------
+    // CommandBuffer — cleanup notes (WIP, not yet applied)
+    // ------------------------------------------------------------------------
+    //
+    // Bugs to fix first:
+    //   * Command(const CommandDraw &) sets opcode to CommandOp::Clear instead
+    //     of CommandOp::Draw — every draw will misdispatch at submit time.
+    //   * record(const CommandClear &) is declared but has no inline definition
+    //     below; first caller to record a clear produces a linker error.
+    //   * CommandBuffer exposes no accessor for the recorded stream, so the
+    //     backend's submit() has no way to read it. Add:
+    //         const Command *data() const;
+    //         std::size_t    size() const;
+    //
+    // Simplifications (keep pre-C++17 compatibility):
+    //   * Replace the five record(...) overloads with a single templated
+    //         template <class T> void record(const T &cmd);
+    //     gated by a CommandTraits<T>::op specialization that maps payload
+    //     type -> CommandOp. Makes the opcode impossible to get wrong by
+    //     construction, and new command types need one traits line + one
+    //     union member + one Payload ctor.
+    //   * Use member-init lists in the union constructors
+    //         Payload(const CommandClear &c) : clear(c) {}
+    //     instead of the "assign-to-inactive-member" body form. Current form
+    //     works only because every payload is trivially copyable.
+    //   * Lock the trivially-destructible invariant with static_asserts on
+    //     each payload type; the union leaks silently the moment someone adds
+    //     a std::string / std::vector field otherwise.
+    //
+    // Standard-library note:
+    //   std::variant is C++17 (not C++20), so on a C++17 target the whole
+    //   CommandOp + Payload union + Command wrapper collapses to
+    //       using Command = std::variant<CommandClear, CommandDraw, ...>;
+    //   and dispatch is std::visit. Blocker: GCC 5.1 (x64/x86-win-gcc
+    //   profiles) ships libstdc++ < 7 and has no <variant> header. Revisit
+    //   if/when those profiles are dropped or bumped.
+    // ------------------------------------------------------------------------
+
     /**
      * @brief Records a series of render commands for subsequent execution
      *
