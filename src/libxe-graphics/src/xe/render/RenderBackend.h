@@ -41,6 +41,8 @@ namespace xe {
         tl::expected<PipelineHandle, BackendError> (*createPipeline)(RenderDeviceBackendContext *, const PipelineDescriptor &) = nullptr;
         void (*destroyPipeline)(RenderDeviceBackendContext *, PipelineHandle) = nullptr;
 
+        void (*submitCommand)(RenderDeviceBackendContext *ctx, const CommandBuffer::Command *command, size_t count) = nullptr;
+
         // TODO: These should be part of the command buffer. Left here for testing purposes
         tl::expected<UniformLocation, BackendError> (*resolveUniformLocation)(RenderDeviceBackendContext *, ShaderHandle, const char *name) = nullptr;
         void (*applyUniforms)(RenderDeviceBackendContext *,

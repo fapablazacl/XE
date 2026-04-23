@@ -793,7 +793,7 @@ namespace xe {
      * glUniform*v entrypoint expects: count * elementcount(dimension) tightly-packed elements of
      * the C type implied by elementType (GLfloat / GLint / GLuint).
      */
-    static void applyUniformValueGL(const UniformValueSubmission &sub) {
+    static void applyUniformGL(const UniformValueSubmission &sub) {
         gl::UniformLocation const loc{sub.location.raw};
         GLsizei const count = static_cast<GLsizei>(sub.count);
 
@@ -873,7 +873,7 @@ namespace xe {
             assert(values[i].location.isValid() && "applyUniformsGL: UniformValueSubmission carries an invalid location");
             assert(values[i].location.programKey == handle.raw && "applyUniformsGL: UniformValueSubmission location was resolved against a different program");
             assert(values[i].data != nullptr && "applyUniformsGL: UniformValueSubmission::data must not be null");
-            applyUniformValueGL(values[i]);
+            applyUniformGL(values[i]);
         }
 
         for (size_t i = 0; i < matrixCount; ++i) {
@@ -901,13 +901,12 @@ namespace xe {
         }
     }
 
-    void submit(RenderDeviceBackendContextGL *glctx, const CommandClear &cmd) {
-        gl::clearColor(cmd.color.x, cmd.color.y, cmd.color.z, cmd.color.w);
-        gl::clearDepth(cmd.depth);
-        gl::clearStencil(cmd.stencil);
+    void clear(vec4 color, float depth, uint8_t stencil, gl::Flags<gl::ClearBufferMask> flags) {
+        gl::clearColor(color.x, color.y, color.z, color.w);
+        gl::clearDepth(depth);
+        gl::clearStencil(stencil);
 
-        // TODO: Add clear flag mapping
-        gl::clear(gl::ClearBufferMask::eColorBufferBit);
+        gl::clear(flags);
     }
 
     void bindPipeline(RenderDeviceBackendContextGL *glctx, const PipelineGL &pipeline) {
@@ -923,6 +922,60 @@ namespace xe {
     void bindTexture(RenderDeviceBackendContextGL *glctx, const uint32_t unit, gl::TextureTarget target, const gl::Texture &texture) {
         gl::activeTexture(getTextureUnit(unit));
         gl::bindTexture(target, texture);
+    }
+
+    void setUniform(const UniformValueSubmission *uniform, size_t count) {
+        for (size_t i = 0; i < count; ++i) {
+            applyUniformGL(uniform[i]);
+        }
+    }
+
+    void setUniformMatrix(const UniformMatrixSubmission *uniformMatrix, size_t count) {
+        for (size_t i = 0; i < count; ++i) {
+            applyUniformMatrixGL(uniformMatrix[i]);
+        }
+    }
+
+    void dispatch(RenderDeviceBackendContextGL *glctx, const CommandClear &c) {
+        // TODO: Add flags mapping to GL
+        // clear(c.color, c.depth, c.depth, c.flags);
+    }
+
+    void dispatch(RenderDeviceBackendContextGL *glctx, const CommandBindPipeline &c) {
+
+    }
+
+
+    void dispatch(RenderDeviceBackendContextGL *glctx, const CommandBindTexture &c) {
+
+    }
+
+
+    void dispatch(RenderDeviceBackendContextGL *glctx, const CommandSetUniform &c) {
+
+    }
+
+
+    void dispatch(RenderDeviceBackendContextGL *glctx, const CommandSetUniformMatrix &c) {
+
+    }
+
+
+    void dispatch(RenderDeviceBackendContextGL *glctx, const CommandDraw &c) {
+
+    }
+
+    void submitCommandGL(RenderDeviceBackendContext *ctx, const CommandBuffer::Command *command, size_t count) {
+        for (size_t i = 0; i < count; ++i) {
+            switch (command[i].opcode) {
+            case CommandOp::Clear: dispatch(glctx(ctx), command[i].cmd.clear); break;
+            case CommandOp::BindPipeline: dispatch(glctx(ctx), command[i].cmd.bindPipeline); break;
+            case CommandOp::BindTexture: dispatch(glctx(ctx), command[i].cmd.bindTexture); break;
+            case CommandOp::SetUniform: dispatch(glctx(ctx), command[i].cmd.setUniform); break;
+            case CommandOp::SetUniformMatrix: dispatch(glctx(ctx), command[i].cmd.setUniformMatrix); break;
+            case CommandOp::Draw: dispatch(glctx(ctx), command[i].cmd.draw); break;
+            }
+        }
     }
 
     void initializeBackendTableGL(RenderDeviceBackendVTable *vtable) {
@@ -946,5 +999,7 @@ namespace xe {
         vtable->resolveUniformLocation = &resolveUniformLocationGL;
         vtable->applyUniforms = &applyUniformsGL;
         vtable->bindUniformBuffer = &bindUniformBufferGL;
+        vtable->submitCommand = &submitCommandGL;
+
     }
 } // namespace xe

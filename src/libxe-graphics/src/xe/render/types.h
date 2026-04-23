@@ -450,6 +450,7 @@ namespace xe {
         Clear,
         Draw,
         SetUniform,
+        SetUniformMatrix,
         BindTexture,
         BindPipeline
     };
@@ -484,17 +485,23 @@ namespace xe {
     };
 
     struct CommandSetUniform {
-        UniformLocation location;
-        UniformElementType elementType = UniformElementType::Float;
-        UniformDimension dimension = UniformDimension::D1;
-        uint32_t count = 1;
-        const void *data = nullptr;
+        UniformValueSubmission *uniforms = nullptr;
+        size_t count = 0;
     };
-
 
     template<>
     struct CommandTraits<CommandSetUniform> {
         CommandOp op = CommandOp::SetUniform;
+    };
+
+    struct CommandSetUniformMatrix {
+        UniformMatrixSubmission *uniforms = nullptr;
+        size_t count = 0;
+    };
+
+    template<>
+    struct CommandTraits<CommandSetUniformMatrix> {
+        CommandOp op = CommandOp::SetUniformMatrix;
     };
 
     struct CommandBindTexture {
@@ -557,7 +564,6 @@ namespace xe {
     //   if/when those profiles are dropped or bumped.
     // ------------------------------------------------------------------------
 
-
     /**
      * @brief Records a series of render commands for subsequent execution
      *
@@ -565,26 +571,20 @@ namespace xe {
      */
     class CommandBuffer {
     public:
-        void clear();
-
-        template<typename CommandT>
-        void record(const CommandT &cmd) {
-            commands.push_back({CommandTraits<CommandT>::op, cmd});
-        }
-
-    private:
         //! use a Union instead to make porting to old standard easier
         union CommandUnion {
             CommandClear clear;
             CommandBindTexture bindTexture;
             CommandBindPipeline bindPipeline;
             CommandSetUniform setUniform;
+            CommandSetUniformMatrix setUniformMatrix;
             CommandDraw draw;
 
             CommandUnion(const CommandClear &clear) { this->clear = clear; }
             CommandUnion(const CommandBindTexture &bindTexture) { this->bindTexture = bindTexture; }
             CommandUnion(const CommandBindPipeline &bindPipeline) { this->bindPipeline = bindPipeline; }
             CommandUnion(const CommandSetUniform &uniform) { this->setUniform = uniform; }
+            CommandUnion(const CommandSetUniformMatrix &uniform) { this->setUniformMatrix = uniform; }
             CommandUnion(const CommandDraw &draw) { this->draw = draw; }
         };
 
@@ -593,6 +593,18 @@ namespace xe {
             CommandUnion cmd;
         };
 
+        void clear();
+
+        template<typename CommandT>
+        void record(const CommandT &cmd) {
+            commands.push_back({CommandTraits<CommandT>::op, cmd});
+        }
+
+        const Command* getCommandPtr() const { return commands.data(); }
+
+        size_t getCommandCount() const { return commands.size(); }
+
+    private:
         std::vector<Command> commands;
     };
 } // namespace xe
