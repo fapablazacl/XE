@@ -18,17 +18,9 @@ namespace xe {
 
 namespace xe {
     /**
-     * @brief Geometric Primitive Shape basis for rendering
-     */
-    enum class PrimitiveType { PointList, LineList, LineStrip, TriangleStrip, TriangleList, TriangleFan };
-
-    /**
      * @brief Interpretation information for a given subset. Used in rendering operations.
      */
     struct SubsetEnvelope {
-        //! Geometric Primitive Shape basis for rendering
-        PrimitiveType primitive = PrimitiveType::PointList;
-
         //! From wich vertex we will render
         int vertexStart = 0;
 

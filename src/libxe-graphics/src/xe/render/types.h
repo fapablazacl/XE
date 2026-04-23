@@ -446,11 +446,17 @@ namespace xe {
 
     // Identify which command
     enum class CommandOp {
+        Noop,
         Clear,
         Draw,
         SetUniform,
         BindTexture,
         BindPipeline
+    };
+
+    template<typename>
+    struct CommandTraits {
+        static const CommandOp op = CommandOp::Noop;
     };
 
     struct CommandClear {
@@ -460,11 +466,21 @@ namespace xe {
         int stencil = 0;
     };
 
+    template<>
+    struct CommandTraits<CommandClear> {
+        CommandOp op = CommandOp::Clear;
+    };
+
     enum class PrimitiveType { Points, Lines, LineStrip, LineLoop, Triangles, TriangleStrip, TriangleFan };
 
     struct CommandDraw {
         PrimitiveType primitiveType = PrimitiveType::TriangleStrip;
         GeometryHandle geometry;
+    };
+
+    template<>
+    struct CommandTraits<CommandDraw> {
+        CommandOp op = CommandOp::Draw;
     };
 
     struct CommandSetUniform {
@@ -475,13 +491,32 @@ namespace xe {
         const void *data = nullptr;
     };
 
+
+    template<>
+    struct CommandTraits<CommandSetUniform> {
+        CommandOp op = CommandOp::SetUniform;
+    };
+
     struct CommandBindTexture {
+        //! The uniform to use
         uint32_t bindingPoint = 0;
+
+        //! A valid texture handle
         TextureHandle textureHandle;
+    };
+
+    template<>
+    struct CommandTraits<CommandBindTexture> {
+        CommandOp op = CommandOp::BindTexture;
     };
 
     struct CommandBindPipeline {
         PipelineHandle pipelineHandle;
+    };
+
+    template<>
+    struct CommandTraits<CommandBindPipeline> {
+        CommandOp op = CommandOp::BindPipeline;
     };
 
     // ------------------------------------------------------------------------
@@ -522,6 +557,7 @@ namespace xe {
     //   if/when those profiles are dropped or bumped.
     // ------------------------------------------------------------------------
 
+
     /**
      * @brief Records a series of render commands for subsequent execution
      *
@@ -531,11 +567,10 @@ namespace xe {
     public:
         void clear();
 
-        void record(const CommandClear &command);
-        void record(const CommandDraw &command);
-        void record(const CommandSetUniform &command);
-        void record(const CommandBindTexture &command);
-        void record(const CommandBindPipeline &command);
+        template<typename CommandT>
+        void record(const CommandT &cmd) {
+            commands.push_back({CommandTraits<CommandT>::op, cmd});
+        }
 
     private:
         //! use a Union instead to make porting to old standard easier
@@ -556,34 +591,8 @@ namespace xe {
         struct Command {
             CommandOp opcode;
             CommandUnion cmd;
-
-            Command(const CommandClear &clear) : opcode(CommandOp::Clear), cmd(clear) {}
-            Command(const CommandBindTexture &bindTexture) : opcode(CommandOp::BindTexture), cmd(bindTexture) {}
-            Command(const CommandBindPipeline &bindPipeline) : opcode(CommandOp::BindPipeline), cmd(bindPipeline) {}
-            Command(const CommandSetUniform &uniform) : opcode(CommandOp::SetUniform), cmd(uniform) {}
-            Command(const CommandDraw &draw) : opcode(CommandOp::Clear), cmd(draw) {}
         };
 
         std::vector<Command> commands;
     };
-
-    inline void CommandBuffer::clear() {
-        commands.clear();
-    }
-
-    inline void CommandBuffer::record(const CommandDraw &command) {
-        commands.push_back(command);
-    }
-
-    inline void CommandBuffer::record(const CommandSetUniform &command) {
-        commands.push_back(command);
-    }
-
-    inline void CommandBuffer::record(const CommandBindTexture &command) {
-        commands.push_back(command);
-    }
-
-    inline void CommandBuffer::record(const CommandBindPipeline &command) {
-        commands.push_back(command);
-    }
 } // namespace xe

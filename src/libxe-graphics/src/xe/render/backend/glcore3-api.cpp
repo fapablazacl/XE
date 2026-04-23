@@ -901,6 +901,30 @@ namespace xe {
         }
     }
 
+    void submit(RenderDeviceBackendContextGL *glctx, const CommandClear &cmd) {
+        gl::clearColor(cmd.color.x, cmd.color.y, cmd.color.z, cmd.color.w);
+        gl::clearDepth(cmd.depth);
+        gl::clearStencil(cmd.stencil);
+
+        // TODO: Add clear flag mapping
+        gl::clear(gl::ClearBufferMask::eColorBufferBit);
+    }
+
+    void bindPipeline(RenderDeviceBackendContextGL *glctx, const PipelineGL &pipeline) {
+        // TODO: Apply list of enable / render state, cull mode, etc
+        gl::useProgram(pipeline.shaderProgram);
+    }
+
+    gl::TextureUnit getTextureUnit(const uint32_t unit) {
+        assert(unit < 32);
+        return static_cast<gl::TextureUnit>(static_cast<int>(gl::TextureUnit::eTexture0) + unit);
+    }
+
+    void bindTexture(RenderDeviceBackendContextGL *glctx, const uint32_t unit, gl::TextureTarget target, const gl::Texture &texture) {
+        gl::activeTexture(getTextureUnit(unit));
+        gl::bindTexture(target, texture);
+    }
+
     void initializeBackendTableGL(RenderDeviceBackendVTable *vtable) {
         vtable->createContext = &createContextGL;
         vtable->destroyContext = &destroyContextGL;
