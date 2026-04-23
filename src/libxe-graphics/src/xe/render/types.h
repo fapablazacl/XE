@@ -440,4 +440,42 @@ namespace xe {
         //! Uniform block bindings baked into this pipeline at creation time.
         std::vector<PipelineUniformBlock> uniformBlocks;
     };
+
+    // Command Buffer API
+    // It encapsulates inmediate-mode commands
+
+    // Identify which command
+    enum class CommandOpcode {
+
+    };
+
+    struct CommandClear {
+        ClearFlags flags = ClearFlags::Color;
+        vec4 clearColor = {0.0f, 0.0f, 0.0f, 1.0f};
+        float depthColor = 1.0f;
+        int stencil = 0;
+    };
+
+    enum class PrimitiveType { Points, Lines, LineStrip, LineLoop, Triangles, TriangleStrip, TriangleFan };
+
+    struct CommandDraw {
+        PrimitiveType primitiveType = PrimitiveType::TriangleStrip;
+        GeometryHandle geometry;
+    };
+
+    struct CommandUniform {
+        UniformLocation location;
+        UniformElementType elementType = UniformElementType::Float;
+        UniformDimension dimension = UniformDimension::D1;
+        uint32_t count = 1;
+        const void *data = nullptr;
+    };
+
+    struct CommandTexture {
+        TextureHandle textureHandle;
+    };
+
+    struct CommandBuffer {
+        CommandOpcode op;
+    };
 } // namespace xe
