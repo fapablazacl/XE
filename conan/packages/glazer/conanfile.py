@@ -56,12 +56,14 @@ class GlazerConan(ConanFile):
             cmake.test()
 
     def package(self):
-        # Package only the glaze CLI binary.
-        copy(self, "glaze",
+        # Package only the glaze CLI binary. Patterns are wildcarded so they
+        # match through the per-config subdir (Debug/Release) that MSVC's
+        # multi-config generator inserts between bin/ and the executable.
+        copy(self, "*glaze",
              src=os.path.join(self.build_folder, "bin"),
              dst=os.path.join(self.package_folder, "bin"),
              keep_path=False)
-        copy(self, "glaze.exe",
+        copy(self, "*glaze.exe",
              src=os.path.join(self.build_folder, "bin"),
              dst=os.path.join(self.package_folder, "bin"),
              keep_path=False)
