@@ -12,10 +12,10 @@ namespace xe {
      * @brief Element byte size field for a TypeEncoding value.
      */
     enum class TypeSize : uint8_t {
-        Byte1,
-        Byte2,
-        Byte4,
-        Byte8,
+        Byte1,  //!< 1 byte per element
+        Byte2,  //!< 2 bytes per element
+        Byte4,  //!< 4 bytes per element
+        Byte8,  //!< 8 bytes per element
     };
 
     /**
@@ -39,11 +39,11 @@ namespace xe {
         Matrix,
     };
 
-    //! Bit layout: bytes[1:0] | kind[3:2] | cols[6:4] | rows[9:7]
-    constexpr uint16_t bytesShift = 0u;
-    constexpr uint16_t bytesMask  = 0x3u;
-    constexpr uint16_t typeShift  = 2u;
-    constexpr uint16_t typeMask   = 0x3u;
+    //! Bit layout: size[1:0] | kind[3:2] | cols[6:4] | rows[9:7]
+    constexpr uint16_t sizeShift = 0u;
+    constexpr uint16_t sizeMask  = 0x3u;
+    constexpr uint16_t kindShift  = 2u;
+    constexpr uint16_t kindMask   = 0x3u;
     constexpr uint16_t colsShift  = 4u;
     constexpr uint16_t colsMask   = 0x7u;
     constexpr uint16_t rowsShift  = 7u;
@@ -51,24 +51,24 @@ namespace xe {
 
     constexpr TypeEncoding makeScalarType(TypeSize bytes, TypeKind type) {
         return static_cast<TypeEncoding>(
-            (static_cast<uint16_t>(bytes) & bytesMask) |
-            ((static_cast<uint16_t>(type) & typeMask) << typeShift) |
+            (static_cast<uint16_t>(bytes) & sizeMask) |
+            ((static_cast<uint16_t>(type) & kindMask) << kindShift) |
             (1u << colsShift)
         );
     }
 
     constexpr TypeEncoding makeVectorType(TypeSize bytes, TypeKind type, uint8_t dim) {
         return static_cast<TypeEncoding>(
-            (static_cast<uint16_t>(bytes) & bytesMask) |
-            ((static_cast<uint16_t>(type) & typeMask) << typeShift) |
+            (static_cast<uint16_t>(bytes) & sizeMask) |
+            ((static_cast<uint16_t>(type) & kindMask) << kindShift) |
             ((static_cast<uint16_t>(dim) & colsMask) << colsShift)
         );
     }
 
     constexpr TypeEncoding makeMatrixType(TypeSize bytes, TypeKind type, uint8_t cols, uint8_t rows) {
         return static_cast<TypeEncoding>(
-            (static_cast<uint16_t>(bytes) & bytesMask) |
-            ((static_cast<uint16_t>(type) & typeMask) << typeShift) |
+            (static_cast<uint16_t>(bytes) & sizeMask) |
+            ((static_cast<uint16_t>(type) & kindMask) << kindShift) |
             ((static_cast<uint16_t>(cols) & colsMask) << colsShift) |
             ((static_cast<uint16_t>(rows) & rowsMask) << rowsShift)
         );
@@ -78,14 +78,14 @@ namespace xe {
      * @brief Returns the size in bytes of a single element for the given encoded type.
      */
     constexpr uint8_t getTypeSizeInBytes(TypeEncoding dt) {
-        return static_cast<uint8_t>(1u << (dt & bytesMask));
+        return static_cast<uint8_t>(1u << (dt & sizeMask));
     }
 
     /**
      * @brief Returns the numeric kind (UInt, Int, or Float) encoded in dt.
      */
     constexpr TypeKind getTypeKind(TypeEncoding dt) {
-        return static_cast<TypeKind>((dt >> typeShift) & typeMask);
+        return static_cast<TypeKind>((dt >> kindShift) & kindMask);
     }
 
     /**
