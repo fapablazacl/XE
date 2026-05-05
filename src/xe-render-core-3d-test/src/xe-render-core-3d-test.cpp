@@ -433,7 +433,7 @@ void main() {
 
     auto glctxgl = static_cast<xe::RenderDeviceBackendContextGL *>(ctx);
     gl::VertexArray const vao = glctxgl->geometries[geometryHandle.index()].obj->vao.get();
-    gl::Texture const textureId = glctxgl->textures[textureHandle.index()].obj.get();
+    gl::Texture const textureId = glctxgl->textures[textureHandle.index()].obj->texture.get();
     gl::DrawElementsType const indexDataType = glctxgl->geometries[geometryHandle.index()].obj->indexDataType;
     GLsizei const indexCount = static_cast<GLsizei>(counts.indexCount);
 

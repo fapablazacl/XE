@@ -174,7 +174,7 @@ namespace xe {
         gl::bufferData(target, desc.size, desc.data, usage);
         gl::bindBuffer(target, {});
 
-        auto const [index, gen] = acquireSlot(buffers, std::move(buffer));
+        auto const [index, gen] = acquireSlot(buffers, BufferGL{std::move(buffer)});
         return BufferHandle::make(gen, index, desc.type);
     }
 
@@ -186,7 +186,7 @@ namespace xe {
         assert(slot.obj && "destroyBufferGL: slot already free (double destroy)");
         assert(slot.gen == handle.gen() && "destroyBufferGL: stale handle (generation mismatch)");
 
-        slot.obj.reset({});
+        slot.obj.reset();
     }
 
     void readBufferGL(RenderDeviceBackendContext *ctx, BufferHandle handle, const BufferReadDescriptor &desc) {
@@ -202,7 +202,7 @@ namespace xe {
 
         gl::BufferTarget const target = toBufferTargetGL(handle.subType());
 
-        gl::bindBuffer(target, slot.obj);
+        gl::bindBuffer(target, slot.obj->buffer);
         gl::getBufferSubData(target, static_cast<GLintptr>(desc.offset), static_cast<GLsizeiptr>(desc.size), desc.data);
         gl::bindBuffer(target, {});
     }
@@ -429,7 +429,7 @@ namespace xe {
 
         gl::bindTexture(target, {});
 
-        auto const [index, gen] = acquireSlot(textures, std::move(texture));
+        auto const [index, gen] = acquireSlot(textures, TextureGL{std::move(texture)});
         return TextureHandle::make(gen, index, desc.type);
     }
 
@@ -440,7 +440,7 @@ namespace xe {
         auto &slot = textures[index];
         assert(slot.obj && "destroyTextureGL: slot already free (double destroy)");
         assert(slot.gen == handle.gen() && "destroyTextureGL: stale handle (generation mismatch)");
-        slot.obj.reset({});
+        slot.obj.reset();
     }
 
     void updateTextureGL(RenderDeviceBackendContext *ctx, TextureHandle handle, const TextureUpdateDescriptor &desc) {
@@ -464,7 +464,7 @@ namespace xe {
         GLsizei const h = desc.size.y;
         GLsizei const d = desc.size.z;
 
-        gl::bindTexture(target, slot.obj);
+        gl::bindTexture(target, slot.obj->texture);
 
         switch (type) {
         case TextureType::Tex1D:
@@ -513,7 +513,7 @@ namespace xe {
             assert(desc.faceIndex >= 0 && desc.faceIndex < 6 && "TextureReadDescriptor: faceIndex out of range");
         }
 
-        gl::bindTexture(bindTarget, slot.obj);
+        gl::bindTexture(bindTarget, slot.obj->texture);
 
 #ifndef NDEBUG
         GLint actualWidth = 0;
@@ -585,7 +585,7 @@ namespace xe {
             return makeBackendError(BackendErrorCode::HandlePoolExhausted, "shader program pool exhausted (16-bit index field)");
         }
 
-        auto const [index, gen] = acquireSlot(shaderPrograms, std::move(program));
+        auto const [index, gen] = acquireSlot(shaderPrograms, ProgramGL{std::move(program)});
         return ShaderHandle::make(gen, index);
     }
 
@@ -596,7 +596,7 @@ namespace xe {
         auto &slot = shaderPrograms[index];
         assert(slot.obj && "destroyShaderProgramGL: slot already free (double destroy)");
         assert(slot.gen == handle.gen() && "destroyShaderProgramGL: stale handle (generation mismatch)");
-        slot.obj.reset({});
+        slot.obj.reset();
     }
 
     tl::expected<VertexLayoutHandle, BackendError>
@@ -675,7 +675,7 @@ namespace xe {
 
         for (const GeometryBufferAttrib &bufferAttrib : desc.bufferAttribs) {
             VertexAttribGL const &attrib = layout->attributes[bufferAttrib.attribIndex];
-            gl::BufferId const bufferId = buffers[bufferAttrib.bufferHandle.index()].obj.get();
+            gl::BufferId const bufferId = buffers[bufferAttrib.bufferHandle.index()].obj->buffer.get();
 
             gl::bindBuffer(gl::BufferTarget::eArrayBuffer, bufferId);
             gl::enableVertexAttribArray(attrib.loc);
@@ -683,7 +683,7 @@ namespace xe {
         }
 
         // The element array buffer binding is part of VAO state, so this sticks to the geometry.
-        gl::bindBuffer(gl::BufferTarget::eElementArrayBuffer, buffers[indexBufIdx].obj.get());
+        gl::bindBuffer(gl::BufferTarget::eElementArrayBuffer, buffers[indexBufIdx].obj->buffer.get());
 
         gl::bindVertexArray({});
 
@@ -707,19 +707,19 @@ namespace xe {
      * Performs the full index-range + slot-alive + generation-match check. Returns a borrowed
      * pointer into the pool; the pointer is valid until the next mutation of the shader-program pool.
      */
-    static const glaze::Unique<gl::Program> *tryProgramExtract(const std::vector<Slot<gl::Program>> &pool, ShaderHandle handle) {
+    static const ProgramGL *tryProgramExtract(const std::vector<OptSlot<ProgramGL>> &pool, ShaderHandle handle) {
         uint32_t const index = handle.index();
         if (index >= pool.size()) {
             return nullptr;
         }
-        Slot<gl::Program> const &slot = pool[index];
+        OptSlot<ProgramGL> const &slot = pool[index];
         if (!slot.obj) {
             return nullptr;
         }
         if (slot.gen != handle.gen()) {
             return nullptr;
         }
-        return &slot.obj;
+        return &*slot.obj;
     }
 
     tl::expected<PipelineHandle, BackendError> createPipelineGL(RenderDeviceBackendContext *ctx, const PipelineDescriptor &desc) {
@@ -730,14 +730,14 @@ namespace xe {
             return makeBackendError(BackendErrorCode::HandlePoolExhausted, "pipeline pool exhausted (16-bit index field)");
         }
 
-        const glaze::Unique<gl::Program> *programPtr = tryProgramExtract(shaderPrograms, desc.shaderProgramHandle);
+        const ProgramGL *programPtr = tryProgramExtract(shaderPrograms, desc.shaderProgramHandle);
         if (programPtr == nullptr) {
             return makeBackendError(BackendErrorCode::InvalidDescriptor, "createPipelineGL: shaderProgramHandle is invalid or references a freed shader program");
         }
 
         PipelineGL pipeline;
         pipeline.clearColor = desc.clearColor;
-        pipeline.shaderProgram = programPtr->get();
+        pipeline.shaderProgram = programPtr->program.get();
         pipeline.shaderHandle = desc.shaderProgramHandle;
         pipeline.uniformBlockBindings.reserve(desc.uniformBlocks.size());
 
@@ -770,12 +770,12 @@ namespace xe {
         assert(name != nullptr && "resolveUniformLocationGL: name must not be null");
 
         auto &shaderPrograms = glctx(ctx)->shaderPrograms;
-        const glaze::Unique<gl::Program> *programPtr = tryProgramExtract(shaderPrograms, handle);
+        const ProgramGL *programPtr = tryProgramExtract(shaderPrograms, handle);
         if (programPtr == nullptr) {
             return makeBackendError(BackendErrorCode::InvalidDescriptor, "resolveUniformLocationGL: shader handle is invalid or references a freed program");
         }
 
-        gl::UniformLocation const loc = gl::getUniformLocation(programPtr->get(), name);
+        gl::UniformLocation const loc = gl::getUniformLocation(programPtr->program.get(), name);
         if (!loc.valid()) {
             return makeBackendError(BackendErrorCode::InvalidDescriptor, std::string{"resolveUniformLocationGL: uniform '"} + name + "' is not active in the shader program");
         }
@@ -864,10 +864,10 @@ namespace xe {
                          const UniformValueSubmission *values, size_t valueCount,
                          const UniformMatrixSubmission *matrices, size_t matrixCount) {
         auto &shaderPrograms = glctx(ctx)->shaderPrograms;
-        const glaze::Unique<gl::Program> *programPtr = tryProgramExtract(shaderPrograms, handle);
+        const ProgramGL *programPtr = tryProgramExtract(shaderPrograms, handle);
         assert(programPtr != nullptr && "applyUniformsGL: shader handle is invalid or references a freed program");
 
-        gl::useProgram(programPtr->get());
+        gl::useProgram(programPtr->program.get());
 
         for (size_t i = 0; i < valueCount; ++i) {
             assert(values[i].location.isValid() && "applyUniformsGL: UniformValueSubmission carries an invalid location");
@@ -895,9 +895,9 @@ namespace xe {
         assert(slot.gen == handle.gen() && "bindUniformBufferGL: stale handle (generation mismatch)");
 
         if (size == 0) {
-            gl::bindBufferBase(gl::BufferTarget::eUniformBuffer, bindingPoint, slot.obj);
+            gl::bindBufferBase(gl::BufferTarget::eUniformBuffer, bindingPoint, slot.obj->buffer);
         } else {
-            gl::bindBufferRange(gl::BufferTarget::eUniformBuffer, bindingPoint, slot.obj, static_cast<GLintptr>(offset), static_cast<GLsizeiptr>(size));
+            gl::bindBufferRange(gl::BufferTarget::eUniformBuffer, bindingPoint, slot.obj->buffer, static_cast<GLintptr>(offset), static_cast<GLsizeiptr>(size));
         }
     }
 

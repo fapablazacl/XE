@@ -31,6 +31,18 @@ namespace xe {
         gl::DrawElementsType indexDataType = gl::DrawElementsType::eUnsignedShort;
     };
 
+    struct ProgramGL {
+        glaze::Unique<gl::Program> program;
+    };
+
+	struct BufferGL {
+        glaze::Unique<gl::BufferId> buffer;
+	};
+
+	struct TextureGL {
+        glaze::Unique<gl::Texture> texture;
+	};
+
     /**
      * @brief A single geometry: the VAO wiring together buffer bindings, plus the draw-time index
      * data type captured at creation so glDrawElements calls don't need to re-query the layout.
@@ -134,13 +146,13 @@ namespace xe {
      */
     struct RenderDeviceBackendContextGL : RenderDeviceBackendContext {
         //! Pool of buffer objects. A slot's obj is empty after destroyBufferGL, awaiting reuse.
-        std::vector<Slot<gl::BufferId>> buffers;
+        std::vector<OptSlot<BufferGL>> buffers;
 
         //! Pool of linked shader programs. A slot's obj is empty after destroyShaderProgramGL.
-        std::vector<Slot<gl::Program>> shaderPrograms;
+        std::vector<OptSlot<ProgramGL>> shaderPrograms;
 
         //! Pool of texture objects. A slot's obj is empty after destroyTextureGL.
-        std::vector<Slot<gl::Texture>> textures;
+        std::vector<OptSlot<TextureGL>> textures;
 
         //! Pool of vertex layout descriptors. A slot's obj is empty after destroyVertexLayoutGL, awaiting reuse.
         std::vector<OptSlot<VertexLayoutGL>> layouts;

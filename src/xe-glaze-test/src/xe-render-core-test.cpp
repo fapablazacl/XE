@@ -240,9 +240,9 @@ void main() {
     xe::GeometryHandle geometryHandle = *geometryResult;
 
     auto glctxgl = static_cast<xe::RenderDeviceBackendContextGL *>(ctx);
-    gl::Program const programId = glctxgl->shaderPrograms[shaderHandle.index()].obj.get();
+    gl::Program const programId = glctxgl->shaderPrograms[shaderHandle.index()].obj->program.get();
     gl::VertexArray const vao = glctxgl->geometries[geometryHandle.index()].obj->vao.get();
-    gl::Texture const textureId = glctxgl->textures[textureHandle.index()].obj.get();
+    gl::Texture const textureId = glctxgl->textures[textureHandle.index()].obj->texture.get();
 
     while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();
