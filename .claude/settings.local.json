@@ -117,7 +117,8 @@
       "Bash(ctest --test-dir build/Debug --output-on-failure)",
       "Bash(conan cache *)",
       "Bash(where conan *)",
-      "Bash(pip show *)"
+      "Bash(pip show *)",
+      "Bash(gh api *)"
     ]
   }
 }
