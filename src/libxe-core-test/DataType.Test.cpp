@@ -2,7 +2,7 @@
 
 #include <xe/DataType.h>
 
-using namespace xe::internal;
+using namespace xe;
 
 TEST_CASE("bytesize returns 1 for 1-byte scalar types", "[datatype][bytesize]") {
     REQUIRE(bytesize(Scalar_UInt8) == 1);
@@ -38,33 +38,33 @@ TEST_CASE("bytesize is consistent across scalars vectors and matrices of same ba
     REQUIRE(bytesize(Mat4_Float64) == bytesize(Scalar_Float64));
 }
 
-TEST_CASE("baseType returns UINT for unsigned integer types", "[datatype][basetype]") {
-    REQUIRE(baseType(Scalar_UInt8)  == DataKind::UInt);
-    REQUIRE(baseType(Scalar_UInt16) == DataKind::UInt);
-    REQUIRE(baseType(Scalar_UInt32) == DataKind::UInt);
-    REQUIRE(baseType(Scalar_UInt64) == DataKind::UInt);
+TEST_CASE("kind returns UInt for unsigned integer types", "[datatype][kind]") {
+    REQUIRE(kind(Scalar_UInt8)  == TypeKind::UInt);
+    REQUIRE(kind(Scalar_UInt16) == TypeKind::UInt);
+    REQUIRE(kind(Scalar_UInt32) == TypeKind::UInt);
+    REQUIRE(kind(Scalar_UInt64) == TypeKind::UInt);
 }
 
-TEST_CASE("baseType returns INT for signed integer types", "[datatype][basetype]") {
-    REQUIRE(baseType(Scalar_Int8)  == DataKind::Int);
-    REQUIRE(baseType(Scalar_Int16) == DataKind::Int);
-    REQUIRE(baseType(Scalar_Int32) == DataKind::Int);
-    REQUIRE(baseType(Scalar_Int64) == DataKind::Int);
+TEST_CASE("kind returns Int for signed integer types", "[datatype][kind]") {
+    REQUIRE(kind(Scalar_Int8)  == TypeKind::Int);
+    REQUIRE(kind(Scalar_Int16) == TypeKind::Int);
+    REQUIRE(kind(Scalar_Int32) == TypeKind::Int);
+    REQUIRE(kind(Scalar_Int64) == TypeKind::Int);
 }
 
-TEST_CASE("baseType returns FLOAT for floating-point types", "[datatype][basetype]") {
-    REQUIRE(baseType(Scalar_Float16) == DataKind::Float);
-    REQUIRE(baseType(Scalar_Float32) == DataKind::Float);
-    REQUIRE(baseType(Scalar_Float64) == DataKind::Float);
+TEST_CASE("kind returns Float for floating-point types", "[datatype][kind]") {
+    REQUIRE(kind(Scalar_Float16) == TypeKind::Float);
+    REQUIRE(kind(Scalar_Float32) == TypeKind::Float);
+    REQUIRE(kind(Scalar_Float64) == TypeKind::Float);
 }
 
-TEST_CASE("baseType is preserved in vector and matrix variants", "[datatype][basetype]") {
-    REQUIRE(baseType(Vec4_Float32)    == DataKind::Float);
-    REQUIRE(baseType(Vec4_Int32)      == DataKind::Int);
-    REQUIRE(baseType(Vec4_UInt8)      == DataKind::UInt);
-    REQUIRE(baseType(Mat4_Float32)    == DataKind::Float);
-    REQUIRE(baseType(Mat4_Float64)    == DataKind::Float);
-    REQUIRE(baseType(Mat3x4_Float32)  == DataKind::Float);
+TEST_CASE("kind is preserved in vector and matrix variants", "[datatype][kind]") {
+    REQUIRE(kind(Vec4_Float32)   == TypeKind::Float);
+    REQUIRE(kind(Vec4_Int32)     == TypeKind::Int);
+    REQUIRE(kind(Vec4_UInt8)     == TypeKind::UInt);
+    REQUIRE(kind(Mat4_Float32)   == TypeKind::Float);
+    REQUIRE(kind(Mat4_Float64)   == TypeKind::Float);
+    REQUIRE(kind(Mat3x4_Float32) == TypeKind::Float);
 }
 
 TEST_CASE("cols returns 1 for all scalar types", "[datatype][cols]") {
@@ -84,13 +84,13 @@ TEST_CASE("cols returns correct dimension for vector types", "[datatype][cols]")
 }
 
 TEST_CASE("cols returns correct column count for matrix types", "[datatype][cols]") {
-    REQUIRE(cols(Mat2_Float32)    == 2);
-    REQUIRE(cols(Mat3_Float32)    == 3);
-    REQUIRE(cols(Mat4_Float32)    == 4);
-    REQUIRE(cols(Mat2_Float64)    == 2);
-    REQUIRE(cols(Mat4_Float64)    == 4);
-    REQUIRE(cols(Mat3x4_Float32)  == 3);
-    REQUIRE(cols(Mat4x3_Float32)  == 4);
+    REQUIRE(cols(Mat2_Float32)   == 2);
+    REQUIRE(cols(Mat3_Float32)   == 3);
+    REQUIRE(cols(Mat4_Float32)   == 4);
+    REQUIRE(cols(Mat2_Float64)   == 2);
+    REQUIRE(cols(Mat4_Float64)   == 4);
+    REQUIRE(cols(Mat3x4_Float32) == 3);
+    REQUIRE(cols(Mat4x3_Float32) == 4);
 }
 
 TEST_CASE("rows returns 0 for all scalar types", "[datatype][rows]") {
@@ -110,64 +110,64 @@ TEST_CASE("rows returns 0 for all vector types", "[datatype][rows]") {
 }
 
 TEST_CASE("rows returns correct row count for matrix types", "[datatype][rows]") {
-    REQUIRE(rows(Mat2_Float32)    == 2);
-    REQUIRE(rows(Mat3_Float32)    == 3);
-    REQUIRE(rows(Mat4_Float32)    == 4);
-    REQUIRE(rows(Mat2_Float64)    == 2);
-    REQUIRE(rows(Mat4_Float64)    == 4);
-    REQUIRE(rows(Mat3x4_Float32)  == 4);
-    REQUIRE(rows(Mat4x3_Float32)  == 3);
+    REQUIRE(rows(Mat2_Float32)   == 2);
+    REQUIRE(rows(Mat3_Float32)   == 3);
+    REQUIRE(rows(Mat4_Float32)   == 4);
+    REQUIRE(rows(Mat2_Float64)   == 2);
+    REQUIRE(rows(Mat4_Float64)   == 4);
+    REQUIRE(rows(Mat3x4_Float32) == 4);
+    REQUIRE(rows(Mat4x3_Float32) == 3);
 }
 
-TEST_CASE("all internal DataType functions are usable in constexpr context", "[datatype][constexpr]") {
-    static_assert(bytesize(Scalar_Float32)  == 4);
-    static_assert(bytesize(Scalar_UInt8)    == 1);
-    static_assert(bytesize(Vec4_Float32)    == 4);
-    static_assert(bytesize(Mat4_Float64)    == 8);
+TEST_CASE("all TypeEncoding functions are usable in constexpr context", "[datatype][constexpr]") {
+    static_assert(bytesize(Scalar_Float32) == 4);
+    static_assert(bytesize(Scalar_UInt8)   == 1);
+    static_assert(bytesize(Vec4_Float32)   == 4);
+    static_assert(bytesize(Mat4_Float64)   == 8);
 
-    static_assert(baseType(Scalar_Float32)  == DataKind::Float);
-    static_assert(baseType(Scalar_Int32)    == DataKind::Int);
-    static_assert(baseType(Scalar_UInt8)    == DataKind::UInt);
+    static_assert(kind(Scalar_Float32) == TypeKind::Float);
+    static_assert(kind(Scalar_Int32)   == TypeKind::Int);
+    static_assert(kind(Scalar_UInt8)   == TypeKind::UInt);
 
-    static_assert(cols(Scalar_Float32)      == 1);
-    static_assert(cols(Vec4_Float32)        == 4);
-    static_assert(cols(Mat4_Float32)        == 4);
-    static_assert(cols(Mat3x4_Float32)      == 3);
+    static_assert(cols(Scalar_Float32)  == 1);
+    static_assert(cols(Vec4_Float32)    == 4);
+    static_assert(cols(Mat4_Float32)    == 4);
+    static_assert(cols(Mat3x4_Float32)  == 3);
 
-    static_assert(rows(Scalar_Float32)      == 0);
-    static_assert(rows(Vec4_Float32)        == 0);
-    static_assert(rows(Mat4_Float32)        == 4);
-    static_assert(rows(Mat3x4_Float32)      == 4);
-    static_assert(rows(Mat4x3_Float32)      == 3);
+    static_assert(rows(Scalar_Float32)  == 0);
+    static_assert(rows(Vec4_Float32)    == 0);
+    static_assert(rows(Mat4_Float32)    == 4);
+    static_assert(rows(Mat3x4_Float32)  == 4);
+    static_assert(rows(Mat4x3_Float32)  == 3);
 
-    static_assert(shape(Scalar_Float32)     == xe::DataTypeShape::Scalar);
-    static_assert(shape(Vec4_Float32)       == xe::DataTypeShape::Vector);
-    static_assert(shape(Mat4_Float32)       == xe::DataTypeShape::Matrix);
+    static_assert(shape(Scalar_Float32) == TypeShape::Scalar);
+    static_assert(shape(Vec4_Float32)   == TypeShape::Vector);
+    static_assert(shape(Mat4_Float32)   == TypeShape::Matrix);
 
     REQUIRE(true); // suppress empty-test-case warning
 }
 
 TEST_CASE("shape returns Scalar for all scalar types", "[datatype][shape]") {
-    REQUIRE(shape(Scalar_UInt8)   == xe::DataTypeShape::Scalar);
-    REQUIRE(shape(Scalar_Int32)   == xe::DataTypeShape::Scalar);
-    REQUIRE(shape(Scalar_Float32) == xe::DataTypeShape::Scalar);
-    REQUIRE(shape(Scalar_Float64) == xe::DataTypeShape::Scalar);
+    REQUIRE(shape(Scalar_UInt8)   == TypeShape::Scalar);
+    REQUIRE(shape(Scalar_Int32)   == TypeShape::Scalar);
+    REQUIRE(shape(Scalar_Float32) == TypeShape::Scalar);
+    REQUIRE(shape(Scalar_Float64) == TypeShape::Scalar);
 }
 
 TEST_CASE("shape returns Vector for all vector types", "[datatype][shape]") {
-    REQUIRE(shape(Vec2_Float32) == xe::DataTypeShape::Vector);
-    REQUIRE(shape(Vec3_Float32) == xe::DataTypeShape::Vector);
-    REQUIRE(shape(Vec4_Float32) == xe::DataTypeShape::Vector);
-    REQUIRE(shape(Vec4_UInt8)   == xe::DataTypeShape::Vector);
-    REQUIRE(shape(Vec4_Int32)   == xe::DataTypeShape::Vector);
-    REQUIRE(shape(Vec2_Float64) == xe::DataTypeShape::Vector);
+    REQUIRE(shape(Vec2_Float32) == TypeShape::Vector);
+    REQUIRE(shape(Vec3_Float32) == TypeShape::Vector);
+    REQUIRE(shape(Vec4_Float32) == TypeShape::Vector);
+    REQUIRE(shape(Vec4_UInt8)   == TypeShape::Vector);
+    REQUIRE(shape(Vec4_Int32)   == TypeShape::Vector);
+    REQUIRE(shape(Vec2_Float64) == TypeShape::Vector);
 }
 
 TEST_CASE("shape returns Matrix for all matrix types", "[datatype][shape]") {
-    REQUIRE(shape(Mat2_Float32)   == xe::DataTypeShape::Matrix);
-    REQUIRE(shape(Mat3_Float32)   == xe::DataTypeShape::Matrix);
-    REQUIRE(shape(Mat4_Float32)   == xe::DataTypeShape::Matrix);
-    REQUIRE(shape(Mat4_Float64)   == xe::DataTypeShape::Matrix);
-    REQUIRE(shape(Mat3x4_Float32) == xe::DataTypeShape::Matrix);
-    REQUIRE(shape(Mat4x3_Float32) == xe::DataTypeShape::Matrix);
+    REQUIRE(shape(Mat2_Float32)   == TypeShape::Matrix);
+    REQUIRE(shape(Mat3_Float32)   == TypeShape::Matrix);
+    REQUIRE(shape(Mat4_Float32)   == TypeShape::Matrix);
+    REQUIRE(shape(Mat4_Float64)   == TypeShape::Matrix);
+    REQUIRE(shape(Mat3x4_Float32) == TypeShape::Matrix);
+    REQUIRE(shape(Mat4x3_Float32) == TypeShape::Matrix);
 }
