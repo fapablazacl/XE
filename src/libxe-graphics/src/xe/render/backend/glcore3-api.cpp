@@ -250,97 +250,43 @@ namespace xe {
         return gl::PixelFormat::eRgba;
     }
 
-    gl::PixelType toPixelTypeGL(const DataType dataType) {
-        switch (dataType) {
-        case DataType::Int8:
-            return gl::PixelType::eByte;
-        case DataType::UInt8:
-            return gl::PixelType::eUnsignedByte;
-        case DataType::Int16:
-            return gl::PixelType::eShort;
-        case DataType::UInt16:
-            return gl::PixelType::eUnsignedShort;
-        case DataType::Int32:
-            return gl::PixelType::eInt;
-        case DataType::UInt32:
-            return gl::PixelType::eUnsignedInt;
-        case DataType::Float32:
-            return gl::PixelType::eFloat;
-        case DataType::Float16:
-            return gl::PixelType::eHalfFloat;
+    gl::PixelType toPixelTypeGL(const PixelDataType dataType) {
+        const TypeEncoding te = static_cast<TypeEncoding>(dataType);
+        const TypeKind kind = getTypeKind(te);
+        const TypeSize size = getElementSize(te);
+        if (kind == TypeKind::Float) {
+            return size == TypeSize::Byte2 ? gl::PixelType::eHalfFloat : gl::PixelType::eFloat;
         }
-        assert(false && "toPixelTypeGL: Invalid DataType");
-        return gl::PixelType::eUnsignedByte;
+        if (kind == TypeKind::UInt) {
+            if (size == TypeSize::Byte1) return gl::PixelType::eUnsignedByte;
+            if (size == TypeSize::Byte2) return gl::PixelType::eUnsignedShort;
+            return gl::PixelType::eUnsignedInt;
+        }
+        // Int
+        if (size == TypeSize::Byte1) return gl::PixelType::eByte;
+        if (size == TypeSize::Byte2) return gl::PixelType::eShort;
+        return gl::PixelType::eInt;
     }
 
     gl::DrawElementsType toDrawElementsTypeGL(const GeometryIndexType indexType) {
-        switch (indexType) {
-        case GeometryIndexType::uint16:
-            return gl::DrawElementsType::eUnsignedShort;
-        case GeometryIndexType::uint32:
-            return gl::DrawElementsType::eUnsignedInt;
-        }
-
-        assert(false && "toDrawElementsTypeGL: Invalid GeometryIndexType");
-        return gl::DrawElementsType::eUnsignedShort;
+        const TypeSize size = getElementSize(static_cast<TypeEncoding>(indexType));
+        return size == TypeSize::Byte2 ? gl::DrawElementsType::eUnsignedShort : gl::DrawElementsType::eUnsignedInt;
     }
 
-   gl::AttributeType toAttributeTypeGL(const VertexAttribFormat attributeType) {
-        switch (attributeType) {
-            case VertexAttribFormat::float1: return gl::AttributeType::eFloat;
-            case VertexAttribFormat::float2: return gl::AttributeType::eFloatVec2;
-            case VertexAttribFormat::float3: return gl::AttributeType::eFloatVec3;
-            case VertexAttribFormat::float4: return gl::AttributeType::eFloatVec4;
-            case VertexAttribFormat::int1: return gl::AttributeType::eInt;
-            case VertexAttribFormat::int2: return gl::AttributeType::eIntVec2;
-            case VertexAttribFormat::int3: return gl::AttributeType::eIntVec3;
-            case VertexAttribFormat::int4: return gl::AttributeType::eIntVec4;
+    gl::AttributeType toAttributeTypeGL(const VertexAttribFormat attributeType) {
+        const TypeEncoding te = static_cast<TypeEncoding>(attributeType);
+        const uint8_t cols = getTypeCols(te);
+        if (getTypeKind(te) == TypeKind::Float) {
+            constexpr gl::AttributeType floatTypes[] = {gl::AttributeType::eFloat, gl::AttributeType::eFloatVec2, gl::AttributeType::eFloatVec3, gl::AttributeType::eFloatVec4};
+            return floatTypes[cols - 1];
         }
-
-        assert(false && "toPixelTypeGL: Invalid DataType");
-        return gl::AttributeType::eFloat;
+        constexpr gl::AttributeType intTypes[] = {gl::AttributeType::eInt, gl::AttributeType::eIntVec2, gl::AttributeType::eIntVec3, gl::AttributeType::eIntVec4};
+        return intTypes[cols - 1];
     }
 
     gl::VertexAttribPointerType toVertexAttribPointerTypeGL(const VertexAttribFormat attributeType) {
-        switch (attributeType) {
-        case VertexAttribFormat::float1:
-        case VertexAttribFormat::float2:
-        case VertexAttribFormat::float3:
-        case VertexAttribFormat::float4:
-            return gl::VertexAttribPointerType::eFloat;
-
-        case VertexAttribFormat::int1:
-        case VertexAttribFormat::int2:
-        case VertexAttribFormat::int3:
-        case VertexAttribFormat::int4:
-            return gl::VertexAttribPointerType::eInt;
-        }
-
-        assert(false && "toVertexAttribPointerTypeGL: Invalid VertexAttribFormat");
-        return gl::VertexAttribPointerType::eInt;
-    }
-
-    int getVertexAttribDim(const VertexAttribFormat attributeType) {
-        switch (attributeType) {
-        case VertexAttribFormat::float1:
-        case VertexAttribFormat::int1:
-            return 1;
-
-        case VertexAttribFormat::float2:
-        case VertexAttribFormat::int2:
-            return 2;
-
-        case VertexAttribFormat::float3:
-        case VertexAttribFormat::int3:
-            return 3;
-
-        case VertexAttribFormat::float4:
-        case VertexAttribFormat::int4:
-            return 4;
-        }
-
-        assert(false && "getVertexAttribDim: Invalid VertexAttribFormat");
-        return 1;
+        const TypeKind kind = getTypeKind(static_cast<TypeEncoding>(attributeType));
+        return kind == TypeKind::Float ? gl::VertexAttribPointerType::eFloat : gl::VertexAttribPointerType::eInt;
     }
 
     tl::expected<TextureHandle, BackendError> createTextureGL(RenderDeviceBackendContext *ctx, const TextureDescriptor &desc) {
@@ -614,7 +560,7 @@ namespace xe {
         for (const VertexAttrib &attr : desc.attribs) {
             layout.attributes.emplace_back(
                 gl::AttribLocation{attr.location},
-                getVertexAttribDim(attr.format),
+                static_cast<int>(getTypeCols(static_cast<TypeEncoding>(attr.format))),
                 toVertexAttribPointerTypeGL(attr.format),
                 attr.normalized ? GL_TRUE : GL_FALSE
             );
@@ -790,47 +736,43 @@ namespace xe {
      * @brief Dispatch a scalar/vector uniform upload to the correct glUniform{1,2,3,4}{f,i,ui}v call.
      *
      * The backend assumes the payload in `sub.data` is already in the memory layout the matching
-     * glUniform*v entrypoint expects: count * elementcount(dimension) tightly-packed elements of
-     * the C type implied by elementType (GLfloat / GLint / GLuint).
+     * glUniform*v entrypoint expects: count * getTypeCols(te) tightly-packed elements of
+     * the C type implied by getTypeKind(te) (GLfloat / GLint / GLuint).
      */
     static void applyUniformGL(const UniformValueSubmission &sub) {
         gl::UniformLocation const loc{sub.location.raw};
         GLsizei const count = static_cast<GLsizei>(sub.count);
+        const TypeEncoding te = static_cast<TypeEncoding>(sub.type);
+        const uint8_t cols = getTypeCols(te);
 
-        switch (sub.elementType) {
-        case UniformElementType::Float: {
+        switch (getTypeKind(te)) {
+        case TypeKind::Float: {
             auto const *data = static_cast<const GLfloat *>(sub.data);
-            switch (sub.dimension) {
-            case UniformDimension::D1: gl::uniform1fv(loc, count, data); return;
-            case UniformDimension::D2: gl::uniform2fv(loc, count, data); return;
-            case UniformDimension::D3: gl::uniform3fv(loc, count, data); return;
-            case UniformDimension::D4: gl::uniform4fv(loc, count, data); return;
-            }
+            if (cols == 1) { gl::uniform1fv(loc, count, data); return; }
+            if (cols == 2) { gl::uniform2fv(loc, count, data); return; }
+            if (cols == 3) { gl::uniform3fv(loc, count, data); return; }
+            if (cols == 4) { gl::uniform4fv(loc, count, data); return; }
             break;
         }
-        case UniformElementType::Int: {
+        case TypeKind::Int: {
             auto const *data = static_cast<const GLint *>(sub.data);
-            switch (sub.dimension) {
-            case UniformDimension::D1: gl::uniform1iv(loc, count, data); return;
-            case UniformDimension::D2: gl::uniform2iv(loc, count, data); return;
-            case UniformDimension::D3: gl::uniform3iv(loc, count, data); return;
-            case UniformDimension::D4: gl::uniform4iv(loc, count, data); return;
-            }
+            if (cols == 1) { gl::uniform1iv(loc, count, data); return; }
+            if (cols == 2) { gl::uniform2iv(loc, count, data); return; }
+            if (cols == 3) { gl::uniform3iv(loc, count, data); return; }
+            if (cols == 4) { gl::uniform4iv(loc, count, data); return; }
             break;
         }
-        case UniformElementType::UInt: {
+        case TypeKind::UInt: {
             auto const *data = static_cast<const GLuint *>(sub.data);
-            switch (sub.dimension) {
-            case UniformDimension::D1: gl::uniform1uiv(loc, count, data); return;
-            case UniformDimension::D2: gl::uniform2uiv(loc, count, data); return;
-            case UniformDimension::D3: gl::uniform3uiv(loc, count, data); return;
-            case UniformDimension::D4: gl::uniform4uiv(loc, count, data); return;
-            }
+            if (cols == 1) { gl::uniform1uiv(loc, count, data); return; }
+            if (cols == 2) { gl::uniform2uiv(loc, count, data); return; }
+            if (cols == 3) { gl::uniform3uiv(loc, count, data); return; }
+            if (cols == 4) { gl::uniform4uiv(loc, count, data); return; }
             break;
         }
         }
 
-        assert(false && "applyUniformValueGL: unhandled (elementType, dimension) pair");
+        assert(false && "applyUniformValueGL: unhandled (kind, cols) pair");
     }
 
     /**
@@ -843,20 +785,27 @@ namespace xe {
         GLsizei const count = static_cast<GLsizei>(sub.count);
         GLboolean const transpose = sub.transpose ? GL_TRUE : GL_FALSE;
         auto const *data = static_cast<const GLfloat *>(sub.data);
+        const TypeEncoding te = static_cast<TypeEncoding>(sub.shape);
+        const uint8_t cols = getTypeCols(te);
+        const uint8_t rows = getTypeRows(te);
 
-        switch (sub.shape) {
-        case UniformMatrixShape::R2C2: gl::uniformMatrix2fv  (loc, count, transpose, data); return;
-        case UniformMatrixShape::R2C3: gl::uniformMatrix2x3fv(loc, count, transpose, data); return;
-        case UniformMatrixShape::R2C4: gl::uniformMatrix2x4fv(loc, count, transpose, data); return;
-        case UniformMatrixShape::R3C2: gl::uniformMatrix3x2fv(loc, count, transpose, data); return;
-        case UniformMatrixShape::R3C3: gl::uniformMatrix3fv  (loc, count, transpose, data); return;
-        case UniformMatrixShape::R3C4: gl::uniformMatrix3x4fv(loc, count, transpose, data); return;
-        case UniformMatrixShape::R4C2: gl::uniformMatrix4x2fv(loc, count, transpose, data); return;
-        case UniformMatrixShape::R4C3: gl::uniformMatrix4x3fv(loc, count, transpose, data); return;
-        case UniformMatrixShape::R4C4: gl::uniformMatrix4fv  (loc, count, transpose, data); return;
+        if (cols == 2) {
+            if (rows == 2) { gl::uniformMatrix2fv  (loc, count, transpose, data); return; }
+            if (rows == 3) { gl::uniformMatrix2x3fv(loc, count, transpose, data); return; }
+            if (rows == 4) { gl::uniformMatrix2x4fv(loc, count, transpose, data); return; }
+        }
+        if (cols == 3) {
+            if (rows == 2) { gl::uniformMatrix3x2fv(loc, count, transpose, data); return; }
+            if (rows == 3) { gl::uniformMatrix3fv  (loc, count, transpose, data); return; }
+            if (rows == 4) { gl::uniformMatrix3x4fv(loc, count, transpose, data); return; }
+        }
+        if (cols == 4) {
+            if (rows == 2) { gl::uniformMatrix4x2fv(loc, count, transpose, data); return; }
+            if (rows == 3) { gl::uniformMatrix4x3fv(loc, count, transpose, data); return; }
+            if (rows == 4) { gl::uniformMatrix4fv  (loc, count, transpose, data); return; }
         }
 
-        assert(false && "applyUniformMatrixGL: unhandled UniformMatrixShape");
+        assert(false && "applyUniformMatrixGL: unhandled (cols, rows) combination");
     }
 
     void applyUniformsGL(RenderDeviceBackendContext *ctx,

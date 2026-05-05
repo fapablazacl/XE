@@ -30,42 +30,28 @@ namespace {
         }
     }
 
-    size_t byteSizeOf(xe::DataType type) {
-        switch (type) {
-        case xe::DataType::Int8:
-        case xe::DataType::UInt8:
-            return 1;
-        case xe::DataType::Int16:
-        case xe::DataType::UInt16:
-        case xe::DataType::Float16:
-            return 2;
-        case xe::DataType::Int32:
-        case xe::DataType::UInt32:
-        case xe::DataType::Float32:
-            return 4;
-        default:
-            return 0;
-        }
+    size_t byteSizeOf(xe::PixelDataType type) {
+        return xe::toBytes(xe::getElementSize(static_cast<xe::TypeEncoding>(type)));
     }
 
-    void writeNormalizedChannel(void *base, size_t pixelOffset, int channel, float value, xe::DataType type) {
+    void writeNormalizedChannel(void *base, size_t pixelOffset, int channel, float value, xe::PixelDataType type) {
         auto *byteBase = static_cast<uint8_t *>(base) + pixelOffset;
         switch (type) {
-        case xe::DataType::UInt8:
+        case xe::PixelDataType::UInt8:
             byteBase[channel] = static_cast<uint8_t>(value * 255.0f);
             break;
-        case xe::DataType::UInt16:
+        case xe::PixelDataType::UInt16:
             reinterpret_cast<uint16_t *>(byteBase)[channel] = static_cast<uint16_t>(value * 65535.0f);
             break;
-        case xe::DataType::Float32:
+        case xe::PixelDataType::Float32:
             reinterpret_cast<float *>(byteBase)[channel] = value;
             break;
         default:
-            assert(false && "writeNormalizedChannel: unsupported DataType");
+            assert(false && "writeNormalizedChannel: unsupported PixelDataType");
         }
     }
 
-    void fillCheckerboardImage(void *data, size_t byteSize, int width, int height, xe::PixelFormat format, xe::DataType dataType, int tileSize) {
+    void fillCheckerboardImage(void *data, size_t byteSize, int width, int height, xe::PixelFormat format, xe::PixelDataType dataType, int tileSize) {
         int const channels = channelCountOf(format);
         size_t const channelBytes = byteSizeOf(dataType);
         size_t const pixelStride = static_cast<size_t>(channels) * channelBytes;
@@ -90,7 +76,7 @@ namespace {
     tl::expected<xe::TextureHandle, xe::BackendError> createCheckerBoardTexture(const xe::RenderDeviceBackendVTable &vtable, xe::RenderDeviceBackendContext *ctx, xe::ivec2 size) {
         constexpr int tileSize = 64;
         constexpr xe::PixelFormat format = xe::PixelFormat::R8G8B8A8;
-        constexpr xe::DataType dataType = xe::DataType::UInt8;
+        constexpr xe::PixelDataType dataType = xe::PixelDataType::UInt8;
 
         size_t const byteSize = static_cast<size_t>(size.x) * static_cast<size_t>(size.y) * 4u;
         std::vector<uint8_t> pixels(byteSize);
@@ -487,8 +473,8 @@ void main() {
         constexpr float kTexTile = 8.0f;
 
         xe::UniformValueSubmission const valueUniforms[] = {
-            {uTextureLoc, xe::UniformElementType::Int,   xe::UniformDimension::D1, 1u, &kTextureUnit},
-            {uTexTileLoc, xe::UniformElementType::Float, xe::UniformDimension::D1, 1u, &kTexTile},
+            {uTextureLoc, xe::UniformVectorType::Int1,   1u, &kTextureUnit},
+            {uTexTileLoc, xe::UniformVectorType::Float1, 1u, &kTexTile},
         };
 
         xe::UniformMatrixSubmission const matrixUniforms[] = {

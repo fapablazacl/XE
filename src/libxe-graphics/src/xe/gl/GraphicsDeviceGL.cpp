@@ -274,86 +274,30 @@ namespace xe {
         for (size_t i = 0; i < count; i++) {
             const UniformMatrix *current = &uniformMatrix[i];
             const GLint location = 0;
-
             assert(location >= 0);
 
-            switch (current->type) {
-            case DataType::Float32: {
-                const auto values = (const GLfloat *)&ptr[offset];
+            const TypeEncoding te = static_cast<TypeEncoding>(current->type);
+            const auto values = reinterpret_cast<const GLfloat *>(&ptr[offset]);
+            const uint8_t cols = getTypeCols(te);
+            const uint8_t rows = getTypeRows(te);
 
-                switch (current->shape) {
-                case UniformMatrixShape::R2C2:
-                    glUniformMatrix2fv(location, current->count, GL_TRUE, values);
-                    break;
-                case UniformMatrixShape::R2C3:
-                    glUniformMatrix2x3fv(location, current->count, GL_TRUE, values);
-                    break;
-                case UniformMatrixShape::R2C4:
-                    glUniformMatrix2x4fv(location, current->count, GL_TRUE, values);
-                    break;
-                case UniformMatrixShape::R3C2:
-                    glUniformMatrix3x2fv(location, current->count, GL_TRUE, values);
-                    break;
-                case UniformMatrixShape::R3C3:
-                    glUniformMatrix3fv(location, current->count, GL_TRUE, values);
-                    break;
-                case UniformMatrixShape::R3C4:
-                    glUniformMatrix3x4fv(location, current->count, GL_TRUE, values);
-                    break;
-                case UniformMatrixShape::R4C2:
-                    glUniformMatrix4x2fv(location, current->count, GL_TRUE, values);
-                    break;
-                case UniformMatrixShape::R4C3:
-                    glUniformMatrix4x3fv(location, current->count, GL_TRUE, values);
-                    break;
-                case UniformMatrixShape::R4C4:
-                    glUniformMatrix4fv(location, current->count, GL_TRUE, values);
-                    break;
-                }
-                break;
+            if (cols == 2) {
+                if (rows == 2) { glUniformMatrix2fv  (location, current->count, GL_TRUE, values); }
+                else if (rows == 3) { glUniformMatrix2x3fv(location, current->count, GL_TRUE, values); }
+                else if (rows == 4) { glUniformMatrix2x4fv(location, current->count, GL_TRUE, values); }
+            } else if (cols == 3) {
+                if (rows == 2) { glUniformMatrix3x2fv(location, current->count, GL_TRUE, values); }
+                else if (rows == 3) { glUniformMatrix3fv  (location, current->count, GL_TRUE, values); }
+                else if (rows == 4) { glUniformMatrix3x4fv(location, current->count, GL_TRUE, values); }
+            } else if (cols == 4) {
+                if (rows == 2) { glUniformMatrix4x2fv(location, current->count, GL_TRUE, values); }
+                else if (rows == 3) { glUniformMatrix4x3fv(location, current->count, GL_TRUE, values); }
+                else if (rows == 4) { glUniformMatrix4fv  (location, current->count, GL_TRUE, values); }
+            } else {
+                assert(false && "Supplied UniformMatrixShape isn't supported");
             }
 
-            case DataType::Float64: {
-                const auto values = (const GLdouble *)&ptr[offset];
-
-                switch (current->shape) {
-                case UniformMatrixShape::R2C2:
-                    glUniformMatrix2dv(location, current->count, GL_TRUE, values);
-                    break;
-                case UniformMatrixShape::R2C3:
-                    glUniformMatrix2x3dv(location, current->count, GL_TRUE, values);
-                    break;
-                case UniformMatrixShape::R2C4:
-                    glUniformMatrix2x4dv(location, current->count, GL_TRUE, values);
-                    break;
-                case UniformMatrixShape::R3C2:
-                    glUniformMatrix3x2dv(location, current->count, GL_TRUE, values);
-                    break;
-                case UniformMatrixShape::R3C3:
-                    glUniformMatrix3dv(location, current->count, GL_TRUE, values);
-                    break;
-                case UniformMatrixShape::R3C4:
-                    glUniformMatrix3x4dv(location, current->count, GL_TRUE, values);
-                    break;
-                case UniformMatrixShape::R4C2:
-                    glUniformMatrix4x2dv(location, current->count, GL_TRUE, values);
-                    break;
-                case UniformMatrixShape::R4C3:
-                    glUniformMatrix4x3dv(location, current->count, GL_TRUE, values);
-                    break;
-                case UniformMatrixShape::R4C4:
-                    glUniformMatrix4dv(location, current->count, GL_TRUE, values);
-                    break;
-                }
-                break;
-            }
-
-            default: {
-                assert(false && "Supplied DataType isn't supported");
-            }
-            }
-
-            offset += bytesize(current->type) * countElements(current->shape) * current->count;
+            offset += static_cast<int>(getTotalSizeInBytes(te)) * current->count;
         }
     }
 
@@ -369,72 +313,41 @@ namespace xe {
         for (size_t i = 0; i < count; i++) {
             const Uniform *current = &uniform[i];
             const GLint location = 0;
-
             assert(location >= 0);
 
-            switch (current->type) {
-            case DataType::Int32:
-                switch (current->dimension) {
-                case UniformDimension::D1:
-                    glUniform1iv(location, current->count, (const GLint *)&ptr[offset]);
-                    break;
-                case UniformDimension::D2:
-                    glUniform2iv(location, current->count, (const GLint *)&ptr[offset]);
-                    break;
-                case UniformDimension::D3:
-                    glUniform3iv(location, current->count, (const GLint *)&ptr[offset]);
-                    break;
-                case UniformDimension::D4:
-                    glUniform4iv(location, current->count, (const GLint *)&ptr[offset]);
-                    break;
-                default:
-                    assert(false);
-                }
+            const TypeEncoding te = static_cast<TypeEncoding>(current->type);
+            const uint8_t cols = getTypeCols(te);
+
+            switch (getTypeKind(te)) {
+            case TypeKind::Int:
+                if (cols == 1) { glUniform1iv(location, current->count, reinterpret_cast<const GLint *>(&ptr[offset])); break; }
+                if (cols == 2) { glUniform2iv(location, current->count, reinterpret_cast<const GLint *>(&ptr[offset])); break; }
+                if (cols == 3) { glUniform3iv(location, current->count, reinterpret_cast<const GLint *>(&ptr[offset])); break; }
+                if (cols == 4) { glUniform4iv(location, current->count, reinterpret_cast<const GLint *>(&ptr[offset])); break; }
+                assert(false);
                 break;
 
-            case DataType::Float32:
-                switch (current->dimension) {
-                case UniformDimension::D1:
-                    glUniform1fv(location, current->count, (const GLfloat *)&ptr[offset]);
-                    break;
-                case UniformDimension::D2:
-                    glUniform2fv(location, current->count, (const GLfloat *)&ptr[offset]);
-                    break;
-                case UniformDimension::D3:
-                    glUniform3fv(location, current->count, (const GLfloat *)&ptr[offset]);
-                    break;
-                case UniformDimension::D4:
-                    glUniform4fv(location, current->count, (const GLfloat *)&ptr[offset]);
-                    break;
-                default:
-                    assert(false);
-                }
+            case TypeKind::Float:
+                if (cols == 1) { glUniform1fv(location, current->count, reinterpret_cast<const GLfloat *>(&ptr[offset])); break; }
+                if (cols == 2) { glUniform2fv(location, current->count, reinterpret_cast<const GLfloat *>(&ptr[offset])); break; }
+                if (cols == 3) { glUniform3fv(location, current->count, reinterpret_cast<const GLfloat *>(&ptr[offset])); break; }
+                if (cols == 4) { glUniform4fv(location, current->count, reinterpret_cast<const GLfloat *>(&ptr[offset])); break; }
+                assert(false);
                 break;
 
-            case DataType::UInt32:
-                switch (current->dimension) {
-                case UniformDimension::D1:
-                    glUniform1uiv(location, current->count, (const GLuint *)&ptr[offset]);
-                    break;
-                case UniformDimension::D2:
-                    glUniform2uiv(location, current->count, (const GLuint *)&ptr[offset]);
-                    break;
-                case UniformDimension::D3:
-                    glUniform3uiv(location, current->count, (const GLuint *)&ptr[offset]);
-                    break;
-                case UniformDimension::D4:
-                    glUniform4uiv(location, current->count, (const GLuint *)&ptr[offset]);
-                    break;
-                default:
-                    assert(false);
-                }
+            case TypeKind::UInt:
+                if (cols == 1) { glUniform1uiv(location, current->count, reinterpret_cast<const GLuint *>(&ptr[offset])); break; }
+                if (cols == 2) { glUniform2uiv(location, current->count, reinterpret_cast<const GLuint *>(&ptr[offset])); break; }
+                if (cols == 3) { glUniform3uiv(location, current->count, reinterpret_cast<const GLuint *>(&ptr[offset])); break; }
+                if (cols == 4) { glUniform4uiv(location, current->count, reinterpret_cast<const GLuint *>(&ptr[offset])); break; }
+                assert(false);
                 break;
 
             default:
-                assert(false && "Supplied DataType isn't supported");
+                assert(false && "Supplied UniformVectorType isn't supported");
             }
 
-            offset += bytesize(current->type) * elementcount(current->dimension) * current->count;
+            offset += static_cast<int>(getTotalSizeInBytes(te)) * current->count;
         }
     }
 

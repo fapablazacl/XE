@@ -41,8 +41,9 @@ TEST_CASE("UniformValueSubmission defaults to a safe, empty shape") {
     xe::UniformValueSubmission sub;
 
     REQUIRE_FALSE(sub.location.isValid());
-    REQUIRE(sub.elementType == xe::UniformElementType::Float);
-    REQUIRE(sub.dimension == xe::UniformDimension::D1);
+    REQUIRE(sub.type == xe::UniformVectorType::Float1);
+    REQUIRE(xe::getTypeKind(static_cast<xe::TypeEncoding>(sub.type)) == xe::TypeKind::Float);
+    REQUIRE(xe::getTypeCols(static_cast<xe::TypeEncoding>(sub.type)) == 1u);
     REQUIRE(sub.count == 1u);
     REQUIRE(sub.data == nullptr);
 }
@@ -52,6 +53,8 @@ TEST_CASE("UniformMatrixSubmission defaults to a 4x4 float matrix with transpose
 
     REQUIRE_FALSE(sub.location.isValid());
     REQUIRE(sub.shape == xe::UniformMatrixShape::R4C4);
+    REQUIRE(xe::getTypeCols(static_cast<xe::TypeEncoding>(sub.shape)) == 4u);
+    REQUIRE(xe::getTypeRows(static_cast<xe::TypeEncoding>(sub.shape)) == 4u);
     REQUIRE(sub.count == 1u);
     REQUIRE_FALSE(sub.transpose);
     REQUIRE(sub.data == nullptr);

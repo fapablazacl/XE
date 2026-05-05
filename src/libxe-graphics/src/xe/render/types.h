@@ -183,12 +183,25 @@ namespace xe {
      * mipLevels == nullptr / mipLevelCount == 0 implies a single implicit
      * level 0 with null data (storage-only allocation).
      */
+    /**
+     * @brief Scalar pixel element types accepted by texture creation/update entry points.
+     *
+     * Backed by TypeEncoding: each member's value is a valid Scalar_* constant, so
+     * getTypeKind / getElementSize work directly via static_cast<TypeEncoding>(v).
+     */
+    enum class PixelDataType : TypeEncoding {
+        UInt8   = Scalar_UInt8,  Int8    = Scalar_Int8,
+        UInt16  = Scalar_UInt16, Int16   = Scalar_Int16,
+        UInt32  = Scalar_UInt32, Int32   = Scalar_Int32,
+        Float16 = Scalar_Float16, Float32 = Scalar_Float32,
+    };
+
     struct TextureDescriptor {
         TextureType type = TextureType::Tex2D;
         PixelFormat format = PixelFormat::R8G8B8;
         ivec3 size;
         PixelFormat sourceFormat;
-        DataType sourceDataType;
+        PixelDataType sourceDataType = PixelDataType::UInt8;
 
         //! Borrowed pointer to an array of MipLevel entries. Must outlive createTexture().
         const MipLevel *mipLevels = nullptr;
@@ -244,7 +257,7 @@ namespace xe {
         PixelFormat destFormat = PixelFormat::Unknown;
 
         //! Desired component data type of the destination buffer.
-        DataType destDataType = DataType::Unknown;
+        PixelDataType destDataType = PixelDataType::UInt8;
 
         //! Destination, caller-allocated, sized for the described region.
         void *data = nullptr;
@@ -271,7 +284,7 @@ namespace xe {
         PixelFormat sourceFormat = PixelFormat::Unknown;
 
         //! Component data type of sourceData.
-        DataType sourceDataType = DataType::Unknown;
+        PixelDataType sourceDataType = PixelDataType::UInt8;
 
         //! Source pixel data. Must cover the region described by size.
         const void *sourceData = nullptr;
@@ -280,7 +293,17 @@ namespace xe {
     //! semantic vertex attribute
     enum class VertexAttribSemantic : int { DontUse, Position, Normal, TexCoord0 };
 
-    enum class VertexAttribFormat { int1, int2, int3, int4, float1, float2, float3, float4 };
+    /**
+     * @brief Vertex attribute element formats, backed by TypeEncoding.
+     *
+     * Each member is a valid Vec*_Int32 or Vec*_Float32 TypeEncoding constant.
+     * Dispatch code can use getTypeKind / getTypeCols via static_cast<TypeEncoding>(fmt)
+     * instead of switching over all 8 values.
+     */
+    enum class VertexAttribFormat : TypeEncoding {
+        int1   = Scalar_Int32,   int2   = Vec2_Int32,   int3   = Vec3_Int32,   int4   = Vec4_Int32,
+        float1 = Scalar_Float32, float2 = Vec2_Float32, float3 = Vec3_Float32, float4 = Vec4_Float32,
+    };
 
     /**
      * @brief Describes a Vertex Attribute for use in the vertex shader
@@ -293,7 +316,15 @@ namespace xe {
         bool normalized = false;
     };
 
-    enum class GeometryIndexType { uint16, uint32 };
+    /**
+     * @brief Index buffer element type, backed by TypeEncoding.
+     *
+     * Values are Scalar_UInt16 and Scalar_UInt32; getElementSize gives byte width directly.
+     */
+    enum class GeometryIndexType : TypeEncoding {
+        uint16 = Scalar_UInt16,
+        uint32 = Scalar_UInt32,
+    };
 
     enum class VertexLayoutResolveMode { Semantic, Explicit };
 
@@ -339,13 +370,6 @@ namespace xe {
         std::string glslFragmentShader;
     };
 
-    /**
-     * @brief Scalar / vector uniform element type.
-     *
-     * Orthogonal to UniformDimension: the backend dispatches on (elementType, dimension) to
-     * pick the correct glUniform* entrypoint. Matrix uniforms use UniformMatrixShape instead.
-     */
-    enum class UniformElementType { Float, Int, UInt };
 
     /**
      * @brief Opaque resolved uniform location handed back by RenderDeviceBackendVTable::resolveUniformLocation.
@@ -371,19 +395,16 @@ namespace xe {
     /**
      * @brief One scalar/vector uniform upload in an applyUniforms batch.
      *
-     * All fields must be populated. data points at count * elementcount(dimension) elements of
-     * the C type matching elementType (GLfloat for Float, GLint for Int, GLuint for UInt) and
-     * must outlive the applyUniforms call.
+     * All fields must be populated. data points at count * getTypeCols(static_cast<TypeEncoding>(type))
+     * elements of the C type matching the kind encoded in type (float for Float*, int for Int*, unsigned
+     * int for UInt*), and must outlive the applyUniforms call.
      */
     struct UniformValueSubmission {
         //! Resolved target location. Must refer to the same program passed to applyUniforms.
         UniformLocation location;
 
-        //! Scalar element type (float/int/uint).
-        UniformElementType elementType = UniformElementType::Float;
-
-        //! Vector width (1..4).
-        UniformDimension dimension = UniformDimension::D1;
+        //! Encodes element kind (Float/Int/UInt) and vector width (1..4).
+        UniformVectorType type = UniformVectorType::Float1;
 
         //! Number of array elements; 1 for a scalar/vector uniform, N for a uniform array.
         uint32_t count = 1;
@@ -395,8 +416,8 @@ namespace xe {
     /**
      * @brief One matrix uniform upload in an applyUniforms batch.
      *
-     * data points at count * countElements(shape) GLfloat elements. Double-precision matrices
-     * are not supported by this API; clients that need them should use dedicated backend paths.
+     * data points at count * getTypeCols(te) * getTypeRows(te) GLfloat elements, where
+     * te = static_cast<TypeEncoding>(shape). Only Float32 precision is supported.
      */
     struct UniformMatrixSubmission {
         //! Resolved target location. Must refer to the same program passed to applyUniforms.

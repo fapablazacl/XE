@@ -3,6 +3,7 @@
 
 #include <cassert>
 #include <xe/DataType.h>
+#include <xe/render/types.h>
 #include <xe/graphics/BufferDescriptor.h>
 #include <xe/graphics/Material.h>
 #include <xe/graphics/PixelFormat.h>
@@ -119,6 +120,23 @@ namespace xe {
 
     GLenum convertToGL(const TextureWrap wrap) {
         return textureWraps[static_cast<size_t>(wrap)];
+    }
+
+    GLenum convertToGL(const PixelDataType type) {
+        const TypeEncoding te = static_cast<TypeEncoding>(type);
+        const TypeKind kind = getTypeKind(te);
+        const TypeSize size = getElementSize(te);
+        if (kind == TypeKind::Float) {
+            return size == TypeSize::Byte2 ? GL_HALF_FLOAT : GL_FLOAT;
+        }
+        if (kind == TypeKind::UInt) {
+            if (size == TypeSize::Byte1) return GL_UNSIGNED_BYTE;
+            if (size == TypeSize::Byte2) return GL_UNSIGNED_SHORT;
+            return GL_UNSIGNED_INT;
+        }
+        if (size == TypeSize::Byte1) return GL_BYTE;
+        if (size == TypeSize::Byte2) return GL_SHORT;
+        return GL_INT;
     }
 
     GLboolean convertToGL(const bool value) {

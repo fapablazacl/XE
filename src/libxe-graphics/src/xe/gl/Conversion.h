@@ -7,6 +7,7 @@
 
 namespace xe {
     enum class DataType : std::int16_t;
+    enum class PixelDataType : uint16_t;
 }
 
 namespace xe {
@@ -26,6 +27,7 @@ namespace xe {
 
 namespace xe {
     extern GLenum convertToGL(const DataType type);
+    extern GLenum convertToGL(const PixelDataType type);
     extern GLenum convertToGL(const PixelFormat format);
     extern GLenum convertToGL(const BufferType type);
     extern GLenum convertToGL(const BufferUsage usage, const BufferAccess access);
