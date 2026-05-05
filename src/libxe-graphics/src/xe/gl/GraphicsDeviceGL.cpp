@@ -110,9 +110,7 @@ namespace xe {
         if (!indexBuffer) {
             for (size_t i = 0; i < envelopeCount; i++) {
                 const SubsetEnvelope &env = envelopes[i];
-                const GLenum primitiveGL = convertToGL(env.primitive);
-
-                glDrawArrays(primitiveGL, env.vertexStart, env.vertexCount);
+                // glDrawArrays(primitiveGL, env.vertexStart, env.vertexCount);
             }
         } else {
             // TODO: Obtain dynamically the index data-type
@@ -120,13 +118,14 @@ namespace xe {
 
             for (size_t i = 0; i < envelopeCount; i++) {
                 const SubsetEnvelope &env = envelopes[i];
-                const GLenum primitiveGL = convertToGL(env.primitive);
+                /*const GLenum primitiveGL = convertToGL(env.primitive);
 
                 if (env.vertexStart == 0) {
                     glDrawElements(primitiveGL, env.vertexCount, indexTypeGL, nullptr);
                 } else {
                     glDrawElementsBaseVertex(primitiveGL, env.vertexCount, indexTypeGL, nullptr, env.vertexStart);
                 }
+                */
             }
         }
 

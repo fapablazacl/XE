@@ -440,4 +440,171 @@ namespace xe {
         //! Uniform block bindings baked into this pipeline at creation time.
         std::vector<PipelineUniformBlock> uniformBlocks;
     };
+
+    // Command Buffer API
+    // It encapsulates inmediate-mode commands
+
+    // Identify which command
+    enum class CommandOp {
+        Noop,
+        Clear,
+        Draw,
+        SetUniform,
+        SetUniformMatrix,
+        BindTexture,
+        BindPipeline
+    };
+
+    template<typename>
+    struct CommandTraits {
+        static const CommandOp op = CommandOp::Noop;
+    };
+
+    struct CommandClear {
+        ClearFlags flags = ClearFlags::Color;
+        vec4 color = {0.0f, 0.0f, 0.0f, 1.0f};
+        float depth = 1.0f;
+        int stencil = 0;
+    };
+
+    template<>
+    struct CommandTraits<CommandClear> {
+        CommandOp op = CommandOp::Clear;
+    };
+
+    enum class PrimitiveType { Points, Lines, LineStrip, LineLoop, Triangles, TriangleStrip, TriangleFan };
+
+    struct CommandDraw {
+        PrimitiveType primitiveType = PrimitiveType::TriangleStrip;
+        GeometryHandle geometry;
+    };
+
+    template<>
+    struct CommandTraits<CommandDraw> {
+        CommandOp op = CommandOp::Draw;
+    };
+
+    struct CommandSetUniform {
+        UniformValueSubmission *uniforms = nullptr;
+        size_t count = 0;
+    };
+
+    template<>
+    struct CommandTraits<CommandSetUniform> {
+        CommandOp op = CommandOp::SetUniform;
+    };
+
+    struct CommandSetUniformMatrix {
+        UniformMatrixSubmission *uniforms = nullptr;
+        size_t count = 0;
+    };
+
+    template<>
+    struct CommandTraits<CommandSetUniformMatrix> {
+        CommandOp op = CommandOp::SetUniformMatrix;
+    };
+
+    struct CommandBindTexture {
+        //! The uniform to use
+        uint32_t bindingPoint = 0;
+
+        //! A valid texture handle
+        TextureHandle textureHandle;
+    };
+
+    template<>
+    struct CommandTraits<CommandBindTexture> {
+        CommandOp op = CommandOp::BindTexture;
+    };
+
+    struct CommandBindPipeline {
+        PipelineHandle pipelineHandle;
+    };
+
+    template<>
+    struct CommandTraits<CommandBindPipeline> {
+        CommandOp op = CommandOp::BindPipeline;
+    };
+
+    // ------------------------------------------------------------------------
+    // CommandBuffer — cleanup notes (WIP, not yet applied)
+    // ------------------------------------------------------------------------
+    //
+    // Bugs to fix first:
+    //   * Command(const CommandDraw &) sets opcode to CommandOp::Clear instead
+    //     of CommandOp::Draw — every draw will misdispatch at submit time.
+    //   * record(const CommandClear &) is declared but has no inline definition
+    //     below; first caller to record a clear produces a linker error.
+    //   * CommandBuffer exposes no accessor for the recorded stream, so the
+    //     backend's submit() has no way to read it. Add:
+    //         const Command *data() const;
+    //         std::size_t    size() const;
+    //
+    // Simplifications (keep pre-C++17 compatibility):
+    //   * Replace the five record(...) overloads with a single templated
+    //         template <class T> void record(const T &cmd);
+    //     gated by a CommandTraits<T>::op specialization that maps payload
+    //     type -> CommandOp. Makes the opcode impossible to get wrong by
+    //     construction, and new command types need one traits line + one
+    //     union member + one Payload ctor.
+    //   * Use member-init lists in the union constructors
+    //         Payload(const CommandClear &c) : clear(c) {}
+    //     instead of the "assign-to-inactive-member" body form. Current form
+    //     works only because every payload is trivially copyable.
+    //   * Lock the trivially-destructible invariant with static_asserts on
+    //     each payload type; the union leaks silently the moment someone adds
+    //     a std::string / std::vector field otherwise.
+    //
+    // Standard-library note:
+    //   std::variant is C++17 (not C++20), so on a C++17 target the whole
+    //   CommandOp + Payload union + Command wrapper collapses to
+    //       using Command = std::variant<CommandClear, CommandDraw, ...>;
+    //   and dispatch is std::visit. Blocker: GCC 5.1 (x64/x86-win-gcc
+    //   profiles) ships libstdc++ < 7 and has no <variant> header. Revisit
+    //   if/when those profiles are dropped or bumped.
+    // ------------------------------------------------------------------------
+
+    /**
+     * @brief Records a series of render commands for subsequent execution
+     *
+     * Intended to be instanciated directly by the app
+     */
+    class CommandBuffer {
+    public:
+        //! use a Union instead to make porting to old standard easier
+        union CommandUnion {
+            CommandClear clear;
+            CommandBindTexture bindTexture;
+            CommandBindPipeline bindPipeline;
+            CommandSetUniform setUniform;
+            CommandSetUniformMatrix setUniformMatrix;
+            CommandDraw draw;
+
+            CommandUnion(const CommandClear &clear) { this->clear = clear; }
+            CommandUnion(const CommandBindTexture &bindTexture) { this->bindTexture = bindTexture; }
+            CommandUnion(const CommandBindPipeline &bindPipeline) { this->bindPipeline = bindPipeline; }
+            CommandUnion(const CommandSetUniform &uniform) { this->setUniform = uniform; }
+            CommandUnion(const CommandSetUniformMatrix &uniform) { this->setUniformMatrix = uniform; }
+            CommandUnion(const CommandDraw &draw) { this->draw = draw; }
+        };
+
+        struct Command {
+            CommandOp opcode;
+            CommandUnion cmd;
+        };
+
+        void clear();
+
+        template<typename CommandT>
+        void record(const CommandT &cmd) {
+            commands.push_back({CommandTraits<CommandT>::op, cmd});
+        }
+
+        const Command* getCommandPtr() const { return commands.data(); }
+
+        size_t getCommandCount() const { return commands.size(); }
+
+    private:
+        std::vector<Command> commands;
+    };
 } // namespace xe

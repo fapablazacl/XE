@@ -87,6 +87,8 @@ namespace xe {
         std::vector<UniformBlockBindingGL> uniformBlockBindings;
     };
 
+    
+
     /**
      * @brief A single entry in a backend resource pool.
      *
