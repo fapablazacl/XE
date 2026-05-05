@@ -75,17 +75,17 @@ namespace xe {
     }
 
     /**
-     * @brief Returns the size in bytes of a single element for the given encoded type.
+     * @brief Returns the element size field encoded in dt as a TypeSize value.
      */
-    constexpr uint8_t getTypeSizeInBytes(TypeEncoding dt) {
-        return static_cast<uint8_t>(1u << (dt & sizeMask));
+    constexpr TypeSize getElementSize(TypeEncoding dt) {
+        return static_cast<TypeSize>(dt & sizeMask);
     }
 
     /**
-     * @brief Returns the numeric kind (UInt, Int, or Float) encoded in dt.
+     * @brief Converts a TypeSize enumerator to its byte count (1, 2, 4, or 8).
      */
-    constexpr TypeKind getTypeKind(TypeEncoding dt) {
-        return static_cast<TypeKind>((dt >> kindShift) & kindMask);
+    constexpr uint8_t toBytes(TypeSize size) {
+        return static_cast<uint8_t>(1u << static_cast<uint8_t>(size));
     }
 
     /**
@@ -100,6 +100,22 @@ namespace xe {
      */
     constexpr uint8_t getTypeRows(TypeEncoding dt) {
         return static_cast<uint8_t>((dt >> rowsShift) & rowsMask);
+    }
+
+    /**
+     * @brief Returns the total byte size of the encoded type across all its elements.
+     */
+    constexpr uint16_t getTotalSizeInBytes(TypeEncoding dt) {
+        const uint8_t r = getTypeRows(dt);
+        const uint8_t c = getTypeCols(dt);
+        return static_cast<uint16_t>(toBytes(getElementSize(dt)) * c * (r != 0u ? r : 1u));
+    }
+
+    /**
+     * @brief Returns the numeric kind (UInt, Int, or Float) encoded in dt.
+     */
+    constexpr TypeKind getTypeKind(TypeEncoding dt) {
+        return static_cast<TypeKind>((dt >> kindShift) & kindMask);
     }
 
     /**
