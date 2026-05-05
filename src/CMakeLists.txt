@@ -2,6 +2,9 @@
 # add_subdirectory("d3d11-app-poc")
 
 add_subdirectory ("libxe-core")
+if (XE_DEV_UNIT_TEST)
+    add_subdirectory ("libxe-core-test")
+endif()
 
 add_subdirectory ("libxe-math")
 if (XE_DEV_UNIT_TEST)
