@@ -732,6 +732,39 @@ namespace xe {
         return out;
     }
 
+    // -- Fallback stubs --
+    static void uniformFvFallback(GLint, GLsizei, const GLfloat *) {
+        // TODO: replace assert with a proper logging call once the logging subsystem is in place.
+        assert(false && "uniformFvFallback: glUniform*fv function pointer not loaded");
+    }
+    static void uniformIvFallback(GLint, GLsizei, const GLint *) {
+        // TODO: replace assert with a proper logging call once the logging subsystem is in place.
+        assert(false && "uniformIvFallback: glUniform*iv function pointer not loaded");
+    }
+    static void uniformUivFallback(GLint, GLsizei, const GLuint *) {
+        // TODO: replace assert with a proper logging call once the logging subsystem is in place.
+        assert(false && "uniformUivFallback: glUniform*uiv function pointer not loaded");
+    }
+    static void uniformMatFvFallback(GLint, GLsizei, GLboolean, const GLfloat *) {
+        // TODO: replace assert with a proper logging call once the logging subsystem is in place.
+        assert(false && "uniformMatFvFallback: glUniformMatrix*fv function pointer not loaded");
+    }
+
+    using UniformFvFn    = void (*)(GLint, GLsizei, const GLfloat *);
+    using UniformIvFn    = void (*)(GLint, GLsizei, const GLint *);
+    using UniformUivFn   = void (*)(GLint, GLsizei, const GLuint *);
+    using UniformMatFvFn = void (*)(GLint, GLsizei, GLboolean, const GLfloat *);
+
+    static UniformFvFn  s_uniformFv[4]  = { uniformFvFallback,  uniformFvFallback,  uniformFvFallback,  uniformFvFallback  };
+    static UniformIvFn  s_uniformIv[4]  = { uniformIvFallback,  uniformIvFallback,  uniformIvFallback,  uniformIvFallback  };
+    static UniformUivFn s_uniformUiv[4] = { uniformUivFallback, uniformUivFallback, uniformUivFallback, uniformUivFallback };
+
+    static UniformMatFvFn s_uniformMatFv[3][3] = {
+        { uniformMatFvFallback, uniformMatFvFallback, uniformMatFvFallback },
+        { uniformMatFvFallback, uniformMatFvFallback, uniformMatFvFallback },
+        { uniformMatFvFallback, uniformMatFvFallback, uniformMatFvFallback },
+    };
+
     /**
      * @brief Dispatch a scalar/vector uniform upload to the correct glUniform{1,2,3,4}{f,i,ui}v call.
      *
@@ -740,39 +773,18 @@ namespace xe {
      * the C type implied by getTypeKind(te) (GLfloat / GLint / GLuint).
      */
     static void applyUniformGL(const UniformValueSubmission &sub) {
-        gl::UniformLocation const loc{sub.location.raw};
+        GLint const loc = sub.location.raw;
         GLsizei const count = static_cast<GLsizei>(sub.count);
         const TypeEncoding te = static_cast<TypeEncoding>(sub.type);
         const uint8_t cols = getTypeCols(te);
+        assert(cols >= 1 && cols <= 4 && "applyUniformGL: unsupported vector width");
 
         switch (getTypeKind(te)) {
-        case TypeKind::Float: {
-            auto const *data = static_cast<const GLfloat *>(sub.data);
-            if (cols == 1) { gl::uniform1fv(loc, count, data); return; }
-            if (cols == 2) { gl::uniform2fv(loc, count, data); return; }
-            if (cols == 3) { gl::uniform3fv(loc, count, data); return; }
-            if (cols == 4) { gl::uniform4fv(loc, count, data); return; }
-            break;
+        case TypeKind::Float: s_uniformFv[cols - 1](loc, count, static_cast<const GLfloat *>(sub.data));  return;
+        case TypeKind::Int:   s_uniformIv[cols - 1](loc, count, static_cast<const GLint *>(sub.data));    return;
+        case TypeKind::UInt:  s_uniformUiv[cols - 1](loc, count, static_cast<const GLuint *>(sub.data));  return;
         }
-        case TypeKind::Int: {
-            auto const *data = static_cast<const GLint *>(sub.data);
-            if (cols == 1) { gl::uniform1iv(loc, count, data); return; }
-            if (cols == 2) { gl::uniform2iv(loc, count, data); return; }
-            if (cols == 3) { gl::uniform3iv(loc, count, data); return; }
-            if (cols == 4) { gl::uniform4iv(loc, count, data); return; }
-            break;
-        }
-        case TypeKind::UInt: {
-            auto const *data = static_cast<const GLuint *>(sub.data);
-            if (cols == 1) { gl::uniform1uiv(loc, count, data); return; }
-            if (cols == 2) { gl::uniform2uiv(loc, count, data); return; }
-            if (cols == 3) { gl::uniform3uiv(loc, count, data); return; }
-            if (cols == 4) { gl::uniform4uiv(loc, count, data); return; }
-            break;
-        }
-        }
-
-        assert(false && "applyUniformValueGL: unhandled (kind, cols) pair");
+        assert(false && "applyUniformGL: unhandled TypeKind");
     }
 
     /**
@@ -781,31 +793,15 @@ namespace xe {
      * Data is always GLfloat; double-precision matrix uniforms are not part of this API surface.
      */
     static void applyUniformMatrixGL(const UniformMatrixSubmission &sub) {
-        gl::UniformLocation const loc{sub.location.raw};
+        GLint const loc = sub.location.raw;
         GLsizei const count = static_cast<GLsizei>(sub.count);
         GLboolean const transpose = sub.transpose ? GL_TRUE : GL_FALSE;
         auto const *data = static_cast<const GLfloat *>(sub.data);
         const TypeEncoding te = static_cast<TypeEncoding>(sub.shape);
         const uint8_t cols = getTypeCols(te);
         const uint8_t rows = getTypeRows(te);
-
-        if (cols == 2) {
-            if (rows == 2) { gl::uniformMatrix2fv  (loc, count, transpose, data); return; }
-            if (rows == 3) { gl::uniformMatrix2x3fv(loc, count, transpose, data); return; }
-            if (rows == 4) { gl::uniformMatrix2x4fv(loc, count, transpose, data); return; }
-        }
-        if (cols == 3) {
-            if (rows == 2) { gl::uniformMatrix3x2fv(loc, count, transpose, data); return; }
-            if (rows == 3) { gl::uniformMatrix3fv  (loc, count, transpose, data); return; }
-            if (rows == 4) { gl::uniformMatrix3x4fv(loc, count, transpose, data); return; }
-        }
-        if (cols == 4) {
-            if (rows == 2) { gl::uniformMatrix4x2fv(loc, count, transpose, data); return; }
-            if (rows == 3) { gl::uniformMatrix4x3fv(loc, count, transpose, data); return; }
-            if (rows == 4) { gl::uniformMatrix4fv  (loc, count, transpose, data); return; }
-        }
-
-        assert(false && "applyUniformMatrixGL: unhandled (cols, rows) combination");
+        assert(cols >= 2 && cols <= 4 && rows >= 2 && rows <= 4 && "applyUniformMatrixGL: unsupported matrix shape");
+        s_uniformMatFv[cols - 2][rows - 2](loc, count, transpose, data);
     }
 
     void applyUniformsGL(RenderDeviceBackendContext *ctx,
@@ -950,5 +946,23 @@ namespace xe {
         vtable->bindUniformBuffer = &bindUniformBufferGL;
         vtable->submitCommand = &submitCommandGL;
 
+        s_uniformFv[0]  = glUniform1fv;   s_uniformFv[1]  = glUniform2fv;
+        s_uniformFv[2]  = glUniform3fv;   s_uniformFv[3]  = glUniform4fv;
+
+        s_uniformIv[0]  = glUniform1iv;   s_uniformIv[1]  = glUniform2iv;
+        s_uniformIv[2]  = glUniform3iv;   s_uniformIv[3]  = glUniform4iv;
+
+        s_uniformUiv[0] = glUniform1uiv;  s_uniformUiv[1] = glUniform2uiv;
+        s_uniformUiv[2] = glUniform3uiv;  s_uniformUiv[3] = glUniform4uiv;
+
+        s_uniformMatFv[0][0] = glUniformMatrix2fv;    // 2c 2r
+        s_uniformMatFv[0][1] = glUniformMatrix2x3fv;  // 2c 3r
+        s_uniformMatFv[0][2] = glUniformMatrix2x4fv;  // 2c 4r
+        s_uniformMatFv[1][0] = glUniformMatrix3x2fv;  // 3c 2r
+        s_uniformMatFv[1][1] = glUniformMatrix3fv;    // 3c 3r
+        s_uniformMatFv[1][2] = glUniformMatrix3x4fv;  // 3c 4r
+        s_uniformMatFv[2][0] = glUniformMatrix4x2fv;  // 4c 2r
+        s_uniformMatFv[2][1] = glUniformMatrix4x3fv;  // 4c 3r
+        s_uniformMatFv[2][2] = glUniformMatrix4fv;    // 4c 4r
     }
 } // namespace xe
