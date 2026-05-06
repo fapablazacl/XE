@@ -48,9 +48,7 @@ namespace {
         const float angle = angleDist(rng);
 
         const xe::mat4 xm = xe::translate(t) * xe::rotate(angle, axis) * xe::scale(s);
-        const glm::mat4 gm = glm::translate(glm::mat4(1.0f), toGlm(t))
-                             * glm::rotate(glm::mat4(1.0f), angle, toGlm(axis))
-                             * glm::scale(glm::mat4(1.0f), toGlm(s));
+        const glm::mat4 gm = glm::translate(glm::mat4(1.0f), toGlm(t)) * glm::rotate(glm::mat4(1.0f), angle, toGlm(axis)) * glm::scale(glm::mat4(1.0f), toGlm(s));
         return {xm, gm};
     }
 } // namespace
@@ -150,8 +148,7 @@ TEST_CASE("xe::lookAtRH matches glm on random inputs", "[matrix][xcheck][lookAt]
         const xe::vec3 eye{posDist(rng), posDist(rng), posDist(rng) + 100.0f};
         const xe::vec3 center{posDist(rng), posDist(rng), posDist(rng)};
         const xe::vec3 up = randomUnitVec3(rng);
-        requireMatNear(xe::lookAtRH(eye, center, up),
-                       glm::lookAtRH(toGlm(eye), toGlm(center), toGlm(up)));
+        requireMatNear(xe::lookAtRH(eye, center, up), glm::lookAtRH(toGlm(eye), toGlm(center), toGlm(up)));
     }
 }
 
@@ -166,8 +163,7 @@ TEST_CASE("xe::perspectiveRH matches glm::perspectiveRH_NO on random inputs", "[
         const float aspect = aspectDist(rng);
         const float znear = nearDist(rng);
         const float zfar = znear + 10.0f + nearDist(rng) * 100.0f;
-        requireMatNear(xe::perspectiveRH(fovy, aspect, znear, zfar),
-                       glm::perspectiveRH_NO(fovy, aspect, znear, zfar));
+        requireMatNear(xe::perspectiveRH(fovy, aspect, znear, zfar), glm::perspectiveRH_NO(fovy, aspect, znear, zfar));
     }
 }
 
@@ -181,7 +177,6 @@ TEST_CASE("xe::orthoRH matches glm::orthoRH_NO on random inputs", "[matrix][xche
         const float h = dimDist(rng);
         const float znear = nearDist(rng);
         const float zfar = znear + 10.0f + dimDist(rng);
-        requireMatNear(xe::orthoRH(-w, w, -h, h, znear, zfar),
-                       glm::orthoRH_NO(-w, w, -h, h, znear, zfar));
+        requireMatNear(xe::orthoRH(-w, w, -h, h, znear, zfar), glm::orthoRH_NO(-w, w, -h, h, znear, zfar));
     }
 }

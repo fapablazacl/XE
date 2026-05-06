@@ -45,10 +45,9 @@ namespace xe {
 
         // TODO: These should be part of the command buffer. Left here for testing purposes
         tl::expected<UniformLocation, BackendError> (*resolveUniformLocation)(RenderDeviceBackendContext *, ShaderHandle, const char *name) = nullptr;
-        void (*applyUniforms)(RenderDeviceBackendContext *,
-                              ShaderHandle,
-                              const UniformValueSubmission *values, size_t valueCount,
-                              const UniformMatrixSubmission *matrices, size_t matrixCount) = nullptr;
+        void (*applyUniforms)(
+            RenderDeviceBackendContext *, ShaderHandle, const UniformValueSubmission *values, size_t valueCount, const UniformMatrixSubmission *matrices, size_t matrixCount
+        ) = nullptr;
         void (*bindUniformBuffer)(RenderDeviceBackendContext *, uint32_t bindingPoint, BufferHandle, size_t offset, size_t size) = nullptr;
 
         // TODO: Review if these are necessary or not

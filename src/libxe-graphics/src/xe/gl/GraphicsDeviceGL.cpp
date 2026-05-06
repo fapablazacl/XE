@@ -282,17 +282,29 @@ namespace xe {
             const uint8_t rows = getTypeRows(te);
 
             if (cols == 2) {
-                if (rows == 2) { glUniformMatrix2fv  (location, current->count, GL_TRUE, values); }
-                else if (rows == 3) { glUniformMatrix2x3fv(location, current->count, GL_TRUE, values); }
-                else if (rows == 4) { glUniformMatrix2x4fv(location, current->count, GL_TRUE, values); }
+                if (rows == 2) {
+                    glUniformMatrix2fv(location, current->count, GL_TRUE, values);
+                } else if (rows == 3) {
+                    glUniformMatrix2x3fv(location, current->count, GL_TRUE, values);
+                } else if (rows == 4) {
+                    glUniformMatrix2x4fv(location, current->count, GL_TRUE, values);
+                }
             } else if (cols == 3) {
-                if (rows == 2) { glUniformMatrix3x2fv(location, current->count, GL_TRUE, values); }
-                else if (rows == 3) { glUniformMatrix3fv  (location, current->count, GL_TRUE, values); }
-                else if (rows == 4) { glUniformMatrix3x4fv(location, current->count, GL_TRUE, values); }
+                if (rows == 2) {
+                    glUniformMatrix3x2fv(location, current->count, GL_TRUE, values);
+                } else if (rows == 3) {
+                    glUniformMatrix3fv(location, current->count, GL_TRUE, values);
+                } else if (rows == 4) {
+                    glUniformMatrix3x4fv(location, current->count, GL_TRUE, values);
+                }
             } else if (cols == 4) {
-                if (rows == 2) { glUniformMatrix4x2fv(location, current->count, GL_TRUE, values); }
-                else if (rows == 3) { glUniformMatrix4x3fv(location, current->count, GL_TRUE, values); }
-                else if (rows == 4) { glUniformMatrix4fv  (location, current->count, GL_TRUE, values); }
+                if (rows == 2) {
+                    glUniformMatrix4x2fv(location, current->count, GL_TRUE, values);
+                } else if (rows == 3) {
+                    glUniformMatrix4x3fv(location, current->count, GL_TRUE, values);
+                } else if (rows == 4) {
+                    glUniformMatrix4fv(location, current->count, GL_TRUE, values);
+                }
             } else {
                 assert(false && "Supplied UniformMatrixShape isn't supported");
             }
@@ -320,26 +332,62 @@ namespace xe {
 
             switch (getTypeKind(te)) {
             case TypeKind::Int:
-                if (cols == 1) { glUniform1iv(location, current->count, reinterpret_cast<const GLint *>(&ptr[offset])); break; }
-                if (cols == 2) { glUniform2iv(location, current->count, reinterpret_cast<const GLint *>(&ptr[offset])); break; }
-                if (cols == 3) { glUniform3iv(location, current->count, reinterpret_cast<const GLint *>(&ptr[offset])); break; }
-                if (cols == 4) { glUniform4iv(location, current->count, reinterpret_cast<const GLint *>(&ptr[offset])); break; }
+                if (cols == 1) {
+                    glUniform1iv(location, current->count, reinterpret_cast<const GLint *>(&ptr[offset]));
+                    break;
+                }
+                if (cols == 2) {
+                    glUniform2iv(location, current->count, reinterpret_cast<const GLint *>(&ptr[offset]));
+                    break;
+                }
+                if (cols == 3) {
+                    glUniform3iv(location, current->count, reinterpret_cast<const GLint *>(&ptr[offset]));
+                    break;
+                }
+                if (cols == 4) {
+                    glUniform4iv(location, current->count, reinterpret_cast<const GLint *>(&ptr[offset]));
+                    break;
+                }
                 assert(false);
                 break;
 
             case TypeKind::Float:
-                if (cols == 1) { glUniform1fv(location, current->count, reinterpret_cast<const GLfloat *>(&ptr[offset])); break; }
-                if (cols == 2) { glUniform2fv(location, current->count, reinterpret_cast<const GLfloat *>(&ptr[offset])); break; }
-                if (cols == 3) { glUniform3fv(location, current->count, reinterpret_cast<const GLfloat *>(&ptr[offset])); break; }
-                if (cols == 4) { glUniform4fv(location, current->count, reinterpret_cast<const GLfloat *>(&ptr[offset])); break; }
+                if (cols == 1) {
+                    glUniform1fv(location, current->count, reinterpret_cast<const GLfloat *>(&ptr[offset]));
+                    break;
+                }
+                if (cols == 2) {
+                    glUniform2fv(location, current->count, reinterpret_cast<const GLfloat *>(&ptr[offset]));
+                    break;
+                }
+                if (cols == 3) {
+                    glUniform3fv(location, current->count, reinterpret_cast<const GLfloat *>(&ptr[offset]));
+                    break;
+                }
+                if (cols == 4) {
+                    glUniform4fv(location, current->count, reinterpret_cast<const GLfloat *>(&ptr[offset]));
+                    break;
+                }
                 assert(false);
                 break;
 
             case TypeKind::UInt:
-                if (cols == 1) { glUniform1uiv(location, current->count, reinterpret_cast<const GLuint *>(&ptr[offset])); break; }
-                if (cols == 2) { glUniform2uiv(location, current->count, reinterpret_cast<const GLuint *>(&ptr[offset])); break; }
-                if (cols == 3) { glUniform3uiv(location, current->count, reinterpret_cast<const GLuint *>(&ptr[offset])); break; }
-                if (cols == 4) { glUniform4uiv(location, current->count, reinterpret_cast<const GLuint *>(&ptr[offset])); break; }
+                if (cols == 1) {
+                    glUniform1uiv(location, current->count, reinterpret_cast<const GLuint *>(&ptr[offset]));
+                    break;
+                }
+                if (cols == 2) {
+                    glUniform2uiv(location, current->count, reinterpret_cast<const GLuint *>(&ptr[offset]));
+                    break;
+                }
+                if (cols == 3) {
+                    glUniform3uiv(location, current->count, reinterpret_cast<const GLuint *>(&ptr[offset]));
+                    break;
+                }
+                if (cols == 4) {
+                    glUniform4uiv(location, current->count, reinterpret_cast<const GLuint *>(&ptr[offset]));
+                    break;
+                }
                 assert(false);
                 break;
 

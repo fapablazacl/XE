@@ -148,17 +148,23 @@ namespace {
         cam.pitch -= dy * cam.lookSensitivity;
 
         float const pitchLimit = 1.55334f; // ~89°
-        if (cam.pitch > pitchLimit) cam.pitch = pitchLimit;
-        if (cam.pitch < -pitchLimit) cam.pitch = -pitchLimit;
+        if (cam.pitch > pitchLimit)
+            cam.pitch = pitchLimit;
+        if (cam.pitch < -pitchLimit)
+            cam.pitch = -pitchLimit;
 
         xe::vec3 const forwardXZ = xe::normalize(xe::vec3{std::sin(cam.yaw), 0.0f, -std::cos(cam.yaw)});
         xe::vec3 const rightXZ = xe::vec3{std::cos(cam.yaw), 0.0f, std::sin(cam.yaw)};
 
         xe::vec3 move{0.0f, 0.0f, 0.0f};
-        if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) move = move + forwardXZ;
-        if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) move = move - forwardXZ;
-        if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) move = move + rightXZ;
-        if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) move = move - rightXZ;
+        if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+            move = move + forwardXZ;
+        if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+            move = move - forwardXZ;
+        if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+            move = move + rightXZ;
+        if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+            move = move - rightXZ;
 
         float const len2 = xe::length2(move);
         if (len2 > 0.0f) {
@@ -473,19 +479,18 @@ void main() {
         constexpr float kTexTile = 8.0f;
 
         xe::UniformValueSubmission const valueUniforms[] = {
-            {uTextureLoc, xe::UniformVectorType::Int1,   1u, &kTextureUnit},
+            {uTextureLoc, xe::UniformVectorType::Int1, 1u, &kTextureUnit},
             {uTexTileLoc, xe::UniformVectorType::Float1, 1u, &kTexTile},
         };
 
         xe::UniformMatrixSubmission const matrixUniforms[] = {
-            {uModelLoc,      xe::UniformMatrixShape::R4C4, 1u, false, model.data()},
-            {uViewLoc,       xe::UniformMatrixShape::R4C4, 1u, false, view.data()},
+            {uModelLoc, xe::UniformMatrixShape::R4C4, 1u, false, model.data()},
+            {uViewLoc, xe::UniformMatrixShape::R4C4, 1u, false, view.data()},
             {uProjectionLoc, xe::UniformMatrixShape::R4C4, 1u, false, projection.data()},
         };
 
-        vtable.applyUniforms(ctx, shaderHandle,
-                             valueUniforms, sizeof(valueUniforms) / sizeof(valueUniforms[0]),
-                             matrixUniforms, sizeof(matrixUniforms) / sizeof(matrixUniforms[0]));
+        vtable
+            .applyUniforms(ctx, shaderHandle, valueUniforms, sizeof(valueUniforms) / sizeof(valueUniforms[0]), matrixUniforms, sizeof(matrixUniforms) / sizeof(matrixUniforms[0]));
 
         gl::bindVertexArray(vao);
         gl::drawElements(gl::PrimitiveType::eTriangles, indexCount, indexDataType, nullptr);

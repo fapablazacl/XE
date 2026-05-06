@@ -49,8 +49,9 @@ namespace xe {
         }
     } // namespace
 
-    tl::expected<MeshGeometry, BackendError> uploadMesh(const RenderDeviceBackendVTable &vtable, RenderDeviceBackendContext *ctx, const MeshCounts &counts, const MeshStorage<float> &storage,
-                                                       const MeshUploadOptions &opts) {
+    tl::expected<MeshGeometry, BackendError> uploadMesh(
+        const RenderDeviceBackendVTable &vtable, RenderDeviceBackendContext *ctx, const MeshCounts &counts, const MeshStorage<float> &storage, const MeshUploadOptions &opts
+    ) {
         MeshGeometry mesh{};
 
         VertexLayoutDescriptor layoutDesc;

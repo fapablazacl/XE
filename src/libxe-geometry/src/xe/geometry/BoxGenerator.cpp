@@ -20,11 +20,11 @@ namespace xe {
 
         //! Six rotations that carry the base face (z = -0.5, normal = -Z) to each face of the cube.
         constexpr std::array<FaceRotation, kFaceCount> kFaceRotations = {{
-            {0.0f, {0.0f, 1.0f, 0.0f}},                // -Z (front)
-            {xe::pi<float> * 0.5f, {0.0f, 1.0f, 0.0f}}, // +X (right)
-            {xe::pi<float>, {0.0f, 1.0f, 0.0f}},        // +Z (back)
-            {xe::pi<float> * 1.5f, {0.0f, 1.0f, 0.0f}}, // -X (left)
-            {xe::pi<float> * 0.5f, {1.0f, 0.0f, 0.0f}}, // -Y (bottom)
+            {0.0f, {0.0f, 1.0f, 0.0f}},                  // -Z (front)
+            {xe::pi<float> * 0.5f, {0.0f, 1.0f, 0.0f}},  // +X (right)
+            {xe::pi<float>, {0.0f, 1.0f, 0.0f}},         // +Z (back)
+            {xe::pi<float> * 1.5f, {0.0f, 1.0f, 0.0f}},  // -X (left)
+            {xe::pi<float> * 0.5f, {1.0f, 0.0f, 0.0f}},  // -Y (bottom)
             {-xe::pi<float> * 0.5f, {1.0f, 0.0f, 0.0f}}, // +Y (top)
         }};
 

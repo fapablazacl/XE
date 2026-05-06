@@ -159,7 +159,6 @@ void main() {
     }
     xe::ShaderHandle shaderHandle = *shaderResult;
 
-
     // texture generation
     auto textureResult = createCheckerBoardTexture(vtable, ctx, {512, 512});
     if (!textureResult) {
@@ -197,8 +196,8 @@ void main() {
     xe::VertexLayoutDescriptor layoutDesc;
     layoutDesc.resolveMode = xe::VertexLayoutResolveMode::Explicit;
     layoutDesc.attribs = {
-        {xe::VertexAttribSemantic::DontUse, 0, xe::VertexAttribFormat::float3, false },
-        {xe::VertexAttribSemantic::DontUse, 1, xe::VertexAttribFormat::float2, false }
+        {xe::VertexAttribSemantic::DontUse, 0, xe::VertexAttribFormat::float3, false},
+        {xe::VertexAttribSemantic::DontUse, 1, xe::VertexAttribFormat::float2, false}
     };
 
     auto layoutResult = vtable.createVertexLayout(ctx, layoutDesc);

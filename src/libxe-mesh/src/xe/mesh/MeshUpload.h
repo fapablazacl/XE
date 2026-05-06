@@ -81,11 +81,8 @@ namespace xe {
      * @return populated MeshGeometry on success; a BackendError on the first failure (resources rolled back)
      */
     tl::expected<MeshGeometry, BackendError> uploadMesh(
-        const RenderDeviceBackendVTable &vtable,
-        RenderDeviceBackendContext *ctx,
-        const MeshCounts &counts,
-        const MeshStorage<float> &storage,
-        const MeshUploadOptions &opts = {});
+        const RenderDeviceBackendVTable &vtable, RenderDeviceBackendContext *ctx, const MeshCounts &counts, const MeshStorage<float> &storage, const MeshUploadOptions &opts = {}
+    );
 
     /**
      * @brief Destroy every handle owned by a MeshGeometry and zero it out.

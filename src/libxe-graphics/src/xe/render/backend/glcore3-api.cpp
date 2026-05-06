@@ -258,13 +258,17 @@ namespace xe {
             return size == TypeSize::Byte2 ? gl::PixelType::eHalfFloat : gl::PixelType::eFloat;
         }
         if (kind == TypeKind::UInt) {
-            if (size == TypeSize::Byte1) return gl::PixelType::eUnsignedByte;
-            if (size == TypeSize::Byte2) return gl::PixelType::eUnsignedShort;
+            if (size == TypeSize::Byte1)
+                return gl::PixelType::eUnsignedByte;
+            if (size == TypeSize::Byte2)
+                return gl::PixelType::eUnsignedShort;
             return gl::PixelType::eUnsignedInt;
         }
         // Int
-        if (size == TypeSize::Byte1) return gl::PixelType::eByte;
-        if (size == TypeSize::Byte2) return gl::PixelType::eShort;
+        if (size == TypeSize::Byte1)
+            return gl::PixelType::eByte;
+        if (size == TypeSize::Byte2)
+            return gl::PixelType::eShort;
         return gl::PixelType::eInt;
     }
 
@@ -545,8 +549,7 @@ namespace xe {
         slot.obj.reset();
     }
 
-    tl::expected<VertexLayoutHandle, BackendError>
-    createVertexLayoutGL(RenderDeviceBackendContext *ctx, const VertexLayoutDescriptor &desc) {
+    tl::expected<VertexLayoutHandle, BackendError> createVertexLayoutGL(RenderDeviceBackendContext *ctx, const VertexLayoutDescriptor &desc) {
         auto &layouts = glctx(ctx)->layouts;
 
         if (!poolHasCapacity(layouts)) {
@@ -690,8 +693,10 @@ namespace xe {
         for (const PipelineUniformBlock &block : desc.uniformBlocks) {
             GLuint const blockIndex = gl::getUniformBlockIndex(pipeline.shaderProgram, block.blockName.c_str());
             if (blockIndex == GL_INVALID_INDEX) {
-                return makeBackendError(BackendErrorCode::InvalidDescriptor,
-                                        std::string{"createPipelineGL: uniform block '"} + block.blockName + "' is not active in the shader program");
+                return makeBackendError(
+                    BackendErrorCode::InvalidDescriptor,
+                    std::string{"createPipelineGL: uniform block '"} + block.blockName + "' is not active in the shader program"
+                );
             }
 
             gl::uniformBlockBinding(pipeline.shaderProgram, blockIndex, block.bindingPoint);
@@ -750,19 +755,19 @@ namespace xe {
         assert(false && "uniformMatFvFallback: glUniformMatrix*fv function pointer not loaded");
     }
 
-    using UniformFvFn    = void (*)(GLint, GLsizei, const GLfloat *);
-    using UniformIvFn    = void (*)(GLint, GLsizei, const GLint *);
-    using UniformUivFn   = void (*)(GLint, GLsizei, const GLuint *);
+    using UniformFvFn = void (*)(GLint, GLsizei, const GLfloat *);
+    using UniformIvFn = void (*)(GLint, GLsizei, const GLint *);
+    using UniformUivFn = void (*)(GLint, GLsizei, const GLuint *);
     using UniformMatFvFn = void (*)(GLint, GLsizei, GLboolean, const GLfloat *);
 
-    static UniformFvFn  s_uniformFv[4]  = { uniformFvFallback,  uniformFvFallback,  uniformFvFallback,  uniformFvFallback  };
-    static UniformIvFn  s_uniformIv[4]  = { uniformIvFallback,  uniformIvFallback,  uniformIvFallback,  uniformIvFallback  };
-    static UniformUivFn s_uniformUiv[4] = { uniformUivFallback, uniformUivFallback, uniformUivFallback, uniformUivFallback };
+    static UniformFvFn s_uniformFv[4] = {uniformFvFallback, uniformFvFallback, uniformFvFallback, uniformFvFallback};
+    static UniformIvFn s_uniformIv[4] = {uniformIvFallback, uniformIvFallback, uniformIvFallback, uniformIvFallback};
+    static UniformUivFn s_uniformUiv[4] = {uniformUivFallback, uniformUivFallback, uniformUivFallback, uniformUivFallback};
 
     static UniformMatFvFn s_uniformMatFv[3][3] = {
-        { uniformMatFvFallback, uniformMatFvFallback, uniformMatFvFallback },
-        { uniformMatFvFallback, uniformMatFvFallback, uniformMatFvFallback },
-        { uniformMatFvFallback, uniformMatFvFallback, uniformMatFvFallback },
+        {uniformMatFvFallback, uniformMatFvFallback, uniformMatFvFallback},
+        {uniformMatFvFallback, uniformMatFvFallback, uniformMatFvFallback},
+        {uniformMatFvFallback, uniformMatFvFallback, uniformMatFvFallback},
     };
 
     /**
@@ -780,9 +785,15 @@ namespace xe {
         assert(cols >= 1 && cols <= 4 && "applyUniformGL: unsupported vector width");
 
         switch (getTypeKind(te)) {
-        case TypeKind::Float: s_uniformFv[cols - 1](loc, count, static_cast<const GLfloat *>(sub.data));  return;
-        case TypeKind::Int:   s_uniformIv[cols - 1](loc, count, static_cast<const GLint *>(sub.data));    return;
-        case TypeKind::UInt:  s_uniformUiv[cols - 1](loc, count, static_cast<const GLuint *>(sub.data));  return;
+        case TypeKind::Float:
+            s_uniformFv[cols - 1](loc, count, static_cast<const GLfloat *>(sub.data));
+            return;
+        case TypeKind::Int:
+            s_uniformIv[cols - 1](loc, count, static_cast<const GLint *>(sub.data));
+            return;
+        case TypeKind::UInt:
+            s_uniformUiv[cols - 1](loc, count, static_cast<const GLuint *>(sub.data));
+            return;
         }
         assert(false && "applyUniformGL: unhandled TypeKind");
     }
@@ -804,10 +815,9 @@ namespace xe {
         s_uniformMatFv[cols - 2][rows - 2](loc, count, transpose, data);
     }
 
-    void applyUniformsGL(RenderDeviceBackendContext *ctx,
-                         ShaderHandle handle,
-                         const UniformValueSubmission *values, size_t valueCount,
-                         const UniformMatrixSubmission *matrices, size_t matrixCount) {
+    void applyUniformsGL(
+        RenderDeviceBackendContext *ctx, ShaderHandle handle, const UniformValueSubmission *values, size_t valueCount, const UniformMatrixSubmission *matrices, size_t matrixCount
+    ) {
         auto &shaderPrograms = glctx(ctx)->shaderPrograms;
         const ProgramGL *programPtr = tryProgramExtract(shaderPrograms, handle);
         assert(programPtr != nullptr && "applyUniformsGL: shader handle is invalid or references a freed program");
@@ -887,38 +897,41 @@ namespace xe {
     }
 
     void dispatch(RenderDeviceBackendContextGL *glctx, const CommandBindPipeline &c) {
-
     }
-
 
     void dispatch(RenderDeviceBackendContextGL *glctx, const CommandBindTexture &c) {
-
     }
-
 
     void dispatch(RenderDeviceBackendContextGL *glctx, const CommandSetUniform &c) {
-
     }
-
 
     void dispatch(RenderDeviceBackendContextGL *glctx, const CommandSetUniformMatrix &c) {
-
     }
 
-
     void dispatch(RenderDeviceBackendContextGL *glctx, const CommandDraw &c) {
-
     }
 
     void submitCommandGL(RenderDeviceBackendContext *ctx, const CommandBuffer::Command *command, size_t count) {
         for (size_t i = 0; i < count; ++i) {
             switch (command[i].opcode) {
-            case CommandOp::Clear: dispatch(glctx(ctx), command[i].cmd.clear); break;
-            case CommandOp::BindPipeline: dispatch(glctx(ctx), command[i].cmd.bindPipeline); break;
-            case CommandOp::BindTexture: dispatch(glctx(ctx), command[i].cmd.bindTexture); break;
-            case CommandOp::SetUniform: dispatch(glctx(ctx), command[i].cmd.setUniform); break;
-            case CommandOp::SetUniformMatrix: dispatch(glctx(ctx), command[i].cmd.setUniformMatrix); break;
-            case CommandOp::Draw: dispatch(glctx(ctx), command[i].cmd.draw); break;
+            case CommandOp::Clear:
+                dispatch(glctx(ctx), command[i].cmd.clear);
+                break;
+            case CommandOp::BindPipeline:
+                dispatch(glctx(ctx), command[i].cmd.bindPipeline);
+                break;
+            case CommandOp::BindTexture:
+                dispatch(glctx(ctx), command[i].cmd.bindTexture);
+                break;
+            case CommandOp::SetUniform:
+                dispatch(glctx(ctx), command[i].cmd.setUniform);
+                break;
+            case CommandOp::SetUniformMatrix:
+                dispatch(glctx(ctx), command[i].cmd.setUniformMatrix);
+                break;
+            case CommandOp::Draw:
+                dispatch(glctx(ctx), command[i].cmd.draw);
+                break;
             }
         }
     }
@@ -946,23 +959,29 @@ namespace xe {
         vtable->bindUniformBuffer = &bindUniformBufferGL;
         vtable->submitCommand = &submitCommandGL;
 
-        s_uniformFv[0]  = glUniform1fv;   s_uniformFv[1]  = glUniform2fv;
-        s_uniformFv[2]  = glUniform3fv;   s_uniformFv[3]  = glUniform4fv;
+        s_uniformFv[0] = glUniform1fv;
+        s_uniformFv[1] = glUniform2fv;
+        s_uniformFv[2] = glUniform3fv;
+        s_uniformFv[3] = glUniform4fv;
 
-        s_uniformIv[0]  = glUniform1iv;   s_uniformIv[1]  = glUniform2iv;
-        s_uniformIv[2]  = glUniform3iv;   s_uniformIv[3]  = glUniform4iv;
+        s_uniformIv[0] = glUniform1iv;
+        s_uniformIv[1] = glUniform2iv;
+        s_uniformIv[2] = glUniform3iv;
+        s_uniformIv[3] = glUniform4iv;
 
-        s_uniformUiv[0] = glUniform1uiv;  s_uniformUiv[1] = glUniform2uiv;
-        s_uniformUiv[2] = glUniform3uiv;  s_uniformUiv[3] = glUniform4uiv;
+        s_uniformUiv[0] = glUniform1uiv;
+        s_uniformUiv[1] = glUniform2uiv;
+        s_uniformUiv[2] = glUniform3uiv;
+        s_uniformUiv[3] = glUniform4uiv;
 
-        s_uniformMatFv[0][0] = glUniformMatrix2fv;    // 2c 2r
-        s_uniformMatFv[0][1] = glUniformMatrix2x3fv;  // 2c 3r
-        s_uniformMatFv[0][2] = glUniformMatrix2x4fv;  // 2c 4r
-        s_uniformMatFv[1][0] = glUniformMatrix3x2fv;  // 3c 2r
-        s_uniformMatFv[1][1] = glUniformMatrix3fv;    // 3c 3r
-        s_uniformMatFv[1][2] = glUniformMatrix3x4fv;  // 3c 4r
-        s_uniformMatFv[2][0] = glUniformMatrix4x2fv;  // 4c 2r
-        s_uniformMatFv[2][1] = glUniformMatrix4x3fv;  // 4c 3r
-        s_uniformMatFv[2][2] = glUniformMatrix4fv;    // 4c 4r
+        s_uniformMatFv[0][0] = glUniformMatrix2fv;   // 2c 2r
+        s_uniformMatFv[0][1] = glUniformMatrix2x3fv; // 2c 3r
+        s_uniformMatFv[0][2] = glUniformMatrix2x4fv; // 2c 4r
+        s_uniformMatFv[1][0] = glUniformMatrix3x2fv; // 3c 2r
+        s_uniformMatFv[1][1] = glUniformMatrix3fv;   // 3c 3r
+        s_uniformMatFv[1][2] = glUniformMatrix3x4fv; // 3c 4r
+        s_uniformMatFv[2][0] = glUniformMatrix4x2fv; // 4c 2r
+        s_uniformMatFv[2][1] = glUniformMatrix4x3fv; // 4c 3r
+        s_uniformMatFv[2][2] = glUniformMatrix4fv;   // 4c 4r
     }
 } // namespace xe

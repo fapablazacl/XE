@@ -15,9 +15,18 @@ namespace xe {
      * static_cast<TypeEncoding>(v) without a conversion switch.
      */
     enum class UniformVectorType : TypeEncoding {
-        Float1 = Scalar_Float32, Float2 = Vec2_Float32, Float3 = Vec3_Float32, Float4 = Vec4_Float32,
-        Int1   = Scalar_Int32,   Int2   = Vec2_Int32,   Int3   = Vec3_Int32,   Int4   = Vec4_Int32,
-        UInt1  = Scalar_UInt32,  UInt2  = Vec2_UInt32,  UInt3  = Vec3_UInt32,  UInt4  = Vec4_UInt32,
+        Float1 = Scalar_Float32,
+        Float2 = Vec2_Float32,
+        Float3 = Vec3_Float32,
+        Float4 = Vec4_Float32,
+        Int1 = Scalar_Int32,
+        Int2 = Vec2_Int32,
+        Int3 = Vec3_Int32,
+        Int4 = Vec4_Int32,
+        UInt1 = Scalar_UInt32,
+        UInt2 = Vec2_UInt32,
+        UInt3 = Vec3_UInt32,
+        UInt4 = Vec4_UInt32,
     };
 
     /**

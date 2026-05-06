@@ -190,10 +190,14 @@ namespace xe {
      * getTypeKind / getElementSize work directly via static_cast<TypeEncoding>(v).
      */
     enum class PixelDataType : TypeEncoding {
-        UInt8   = Scalar_UInt8,  Int8    = Scalar_Int8,
-        UInt16  = Scalar_UInt16, Int16   = Scalar_Int16,
-        UInt32  = Scalar_UInt32, Int32   = Scalar_Int32,
-        Float16 = Scalar_Float16, Float32 = Scalar_Float32,
+        UInt8 = Scalar_UInt8,
+        Int8 = Scalar_Int8,
+        UInt16 = Scalar_UInt16,
+        Int16 = Scalar_Int16,
+        UInt32 = Scalar_UInt32,
+        Int32 = Scalar_Int32,
+        Float16 = Scalar_Float16,
+        Float32 = Scalar_Float32,
     };
 
     struct TextureDescriptor {
@@ -301,8 +305,14 @@ namespace xe {
      * instead of switching over all 8 values.
      */
     enum class VertexAttribFormat : TypeEncoding {
-        int1   = Scalar_Int32,   int2   = Vec2_Int32,   int3   = Vec3_Int32,   int4   = Vec4_Int32,
-        float1 = Scalar_Float32, float2 = Vec2_Float32, float3 = Vec3_Float32, float4 = Vec4_Float32,
+        int1 = Scalar_Int32,
+        int2 = Vec2_Int32,
+        int3 = Vec3_Int32,
+        int4 = Vec4_Int32,
+        float1 = Scalar_Float32,
+        float2 = Vec2_Float32,
+        float3 = Vec3_Float32,
+        float4 = Vec4_Float32,
     };
 
     /**
@@ -369,7 +379,6 @@ namespace xe {
         std::string glslVertexShader;
         std::string glslFragmentShader;
     };
-
 
     /**
      * @brief Opaque resolved uniform location handed back by RenderDeviceBackendVTable::resolveUniformLocation.
@@ -466,18 +475,9 @@ namespace xe {
     // It encapsulates inmediate-mode commands
 
     // Identify which command
-    enum class CommandOp {
-        Noop,
-        Clear,
-        Draw,
-        SetUniform,
-        SetUniformMatrix,
-        BindTexture,
-        BindPipeline
-    };
+    enum class CommandOp { Noop, Clear, Draw, SetUniform, SetUniformMatrix, BindTexture, BindPipeline };
 
-    template<typename>
-    struct CommandTraits {
+    template <typename> struct CommandTraits {
         static const CommandOp op = CommandOp::Noop;
     };
 
@@ -488,8 +488,7 @@ namespace xe {
         int stencil = 0;
     };
 
-    template<>
-    struct CommandTraits<CommandClear> {
+    template <> struct CommandTraits<CommandClear> {
         CommandOp op = CommandOp::Clear;
     };
 
@@ -500,8 +499,7 @@ namespace xe {
         GeometryHandle geometry;
     };
 
-    template<>
-    struct CommandTraits<CommandDraw> {
+    template <> struct CommandTraits<CommandDraw> {
         CommandOp op = CommandOp::Draw;
     };
 
@@ -510,8 +508,7 @@ namespace xe {
         size_t count = 0;
     };
 
-    template<>
-    struct CommandTraits<CommandSetUniform> {
+    template <> struct CommandTraits<CommandSetUniform> {
         CommandOp op = CommandOp::SetUniform;
     };
 
@@ -520,8 +517,7 @@ namespace xe {
         size_t count = 0;
     };
 
-    template<>
-    struct CommandTraits<CommandSetUniformMatrix> {
+    template <> struct CommandTraits<CommandSetUniformMatrix> {
         CommandOp op = CommandOp::SetUniformMatrix;
     };
 
@@ -533,8 +529,7 @@ namespace xe {
         TextureHandle textureHandle;
     };
 
-    template<>
-    struct CommandTraits<CommandBindTexture> {
+    template <> struct CommandTraits<CommandBindTexture> {
         CommandOp op = CommandOp::BindTexture;
     };
 
@@ -542,8 +537,7 @@ namespace xe {
         PipelineHandle pipelineHandle;
     };
 
-    template<>
-    struct CommandTraits<CommandBindPipeline> {
+    template <> struct CommandTraits<CommandBindPipeline> {
         CommandOp op = CommandOp::BindPipeline;
     };
 
@@ -601,12 +595,24 @@ namespace xe {
             CommandSetUniformMatrix setUniformMatrix;
             CommandDraw draw;
 
-            CommandUnion(const CommandClear &clear) { this->clear = clear; }
-            CommandUnion(const CommandBindTexture &bindTexture) { this->bindTexture = bindTexture; }
-            CommandUnion(const CommandBindPipeline &bindPipeline) { this->bindPipeline = bindPipeline; }
-            CommandUnion(const CommandSetUniform &uniform) { this->setUniform = uniform; }
-            CommandUnion(const CommandSetUniformMatrix &uniform) { this->setUniformMatrix = uniform; }
-            CommandUnion(const CommandDraw &draw) { this->draw = draw; }
+            CommandUnion(const CommandClear &clear) {
+                this->clear = clear;
+            }
+            CommandUnion(const CommandBindTexture &bindTexture) {
+                this->bindTexture = bindTexture;
+            }
+            CommandUnion(const CommandBindPipeline &bindPipeline) {
+                this->bindPipeline = bindPipeline;
+            }
+            CommandUnion(const CommandSetUniform &uniform) {
+                this->setUniform = uniform;
+            }
+            CommandUnion(const CommandSetUniformMatrix &uniform) {
+                this->setUniformMatrix = uniform;
+            }
+            CommandUnion(const CommandDraw &draw) {
+                this->draw = draw;
+            }
         };
 
         struct Command {
@@ -616,14 +622,17 @@ namespace xe {
 
         void clear();
 
-        template<typename CommandT>
-        void record(const CommandT &cmd) {
+        template <typename CommandT> void record(const CommandT &cmd) {
             commands.push_back({CommandTraits<CommandT>::op, cmd});
         }
 
-        const Command* getCommandPtr() const { return commands.data(); }
+        const Command *getCommandPtr() const {
+            return commands.data();
+        }
 
-        size_t getCommandCount() const { return commands.size(); }
+        size_t getCommandCount() const {
+            return commands.size();
+        }
 
     private:
         std::vector<Command> commands;

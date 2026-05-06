@@ -8,7 +8,7 @@
 namespace xe {
     enum class DataType : std::int16_t;
     enum class PixelDataType : uint16_t;
-}
+} // namespace xe
 
 namespace xe {
     enum class PixelFormat;

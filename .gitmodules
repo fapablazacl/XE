@@ -4,3 +4,6 @@
 [submodule "tools/OpenGL-Hpp/glad"]
 	path = tools/OpenGL-Hpp/glad
 	url = https://github.com/Dav1dde/glad.git
+[submodule "conan/config"]
+	path = conan/config
+	url = git@github.com:XenoideSoftware/conan-common.git

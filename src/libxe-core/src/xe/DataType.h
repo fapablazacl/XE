@@ -12,10 +12,10 @@ namespace xe {
      * @brief Element byte size field for a TypeEncoding value.
      */
     enum class TypeSize : uint8_t {
-        Byte1,  //!< 1 byte per element
-        Byte2,  //!< 2 bytes per element
-        Byte4,  //!< 4 bytes per element
-        Byte8,  //!< 8 bytes per element
+        Byte1, //!< 1 byte per element
+        Byte2, //!< 2 bytes per element
+        Byte4, //!< 4 bytes per element
+        Byte8, //!< 8 bytes per element
     };
 
     /**
@@ -41,35 +41,27 @@ namespace xe {
 
     //! Bit layout: size[1:0] | kind[3:2] | cols[6:4] | rows[9:7]
     constexpr uint16_t sizeShift = 0u;
-    constexpr uint16_t sizeMask  = 0x3u;
-    constexpr uint16_t kindShift  = 2u;
-    constexpr uint16_t kindMask   = 0x3u;
-    constexpr uint16_t colsShift  = 4u;
-    constexpr uint16_t colsMask   = 0x7u;
-    constexpr uint16_t rowsShift  = 7u;
-    constexpr uint16_t rowsMask   = 0x7u;
+    constexpr uint16_t sizeMask = 0x3u;
+    constexpr uint16_t kindShift = 2u;
+    constexpr uint16_t kindMask = 0x3u;
+    constexpr uint16_t colsShift = 4u;
+    constexpr uint16_t colsMask = 0x7u;
+    constexpr uint16_t rowsShift = 7u;
+    constexpr uint16_t rowsMask = 0x7u;
 
     constexpr TypeEncoding makeScalarType(TypeSize bytes, TypeKind type) {
-        return static_cast<TypeEncoding>(
-            (static_cast<uint16_t>(bytes) & sizeMask) |
-            ((static_cast<uint16_t>(type) & kindMask) << kindShift) |
-            (1u << colsShift)
-        );
+        return static_cast<TypeEncoding>((static_cast<uint16_t>(bytes) & sizeMask) | ((static_cast<uint16_t>(type) & kindMask) << kindShift) | (1u << colsShift));
     }
 
     constexpr TypeEncoding makeVectorType(TypeSize bytes, TypeKind type, uint8_t dim) {
         return static_cast<TypeEncoding>(
-            (static_cast<uint16_t>(bytes) & sizeMask) |
-            ((static_cast<uint16_t>(type) & kindMask) << kindShift) |
-            ((static_cast<uint16_t>(dim) & colsMask) << colsShift)
+            (static_cast<uint16_t>(bytes) & sizeMask) | ((static_cast<uint16_t>(type) & kindMask) << kindShift) | ((static_cast<uint16_t>(dim) & colsMask) << colsShift)
         );
     }
 
     constexpr TypeEncoding makeMatrixType(TypeSize bytes, TypeKind type, uint8_t cols, uint8_t rows) {
         return static_cast<TypeEncoding>(
-            (static_cast<uint16_t>(bytes) & sizeMask) |
-            ((static_cast<uint16_t>(type) & kindMask) << kindShift) |
-            ((static_cast<uint16_t>(cols) & colsMask) << colsShift) |
+            (static_cast<uint16_t>(bytes) & sizeMask) | ((static_cast<uint16_t>(type) & kindMask) << kindShift) | ((static_cast<uint16_t>(cols) & colsMask) << colsShift) |
             ((static_cast<uint16_t>(rows) & rowsMask) << rowsShift)
         );
     }
@@ -122,43 +114,45 @@ namespace xe {
      * @brief Returns the shape (Scalar, Vector, or Matrix) of the encoded type.
      */
     constexpr TypeShape getTypeShape(TypeEncoding dt) {
-        if (getTypeRows(dt) != 0u) return TypeShape::Matrix;
-        if (getTypeCols(dt) > 1u)  return TypeShape::Vector;
+        if (getTypeRows(dt) != 0u)
+            return TypeShape::Matrix;
+        if (getTypeCols(dt) > 1u)
+            return TypeShape::Vector;
         return TypeShape::Scalar;
     }
 
     // scalars
-    constexpr TypeEncoding Scalar_UInt8   = makeScalarType(TypeSize::Byte1, TypeKind::UInt);
-    constexpr TypeEncoding Scalar_UInt16  = makeScalarType(TypeSize::Byte2, TypeKind::UInt);
-    constexpr TypeEncoding Scalar_UInt32  = makeScalarType(TypeSize::Byte4, TypeKind::UInt);
-    constexpr TypeEncoding Scalar_UInt64  = makeScalarType(TypeSize::Byte8, TypeKind::UInt);
-    constexpr TypeEncoding Scalar_Int8    = makeScalarType(TypeSize::Byte1, TypeKind::Int);
-    constexpr TypeEncoding Scalar_Int16   = makeScalarType(TypeSize::Byte2, TypeKind::Int);
-    constexpr TypeEncoding Scalar_Int32   = makeScalarType(TypeSize::Byte4, TypeKind::Int);
-    constexpr TypeEncoding Scalar_Int64   = makeScalarType(TypeSize::Byte8, TypeKind::Int);
+    constexpr TypeEncoding Scalar_UInt8 = makeScalarType(TypeSize::Byte1, TypeKind::UInt);
+    constexpr TypeEncoding Scalar_UInt16 = makeScalarType(TypeSize::Byte2, TypeKind::UInt);
+    constexpr TypeEncoding Scalar_UInt32 = makeScalarType(TypeSize::Byte4, TypeKind::UInt);
+    constexpr TypeEncoding Scalar_UInt64 = makeScalarType(TypeSize::Byte8, TypeKind::UInt);
+    constexpr TypeEncoding Scalar_Int8 = makeScalarType(TypeSize::Byte1, TypeKind::Int);
+    constexpr TypeEncoding Scalar_Int16 = makeScalarType(TypeSize::Byte2, TypeKind::Int);
+    constexpr TypeEncoding Scalar_Int32 = makeScalarType(TypeSize::Byte4, TypeKind::Int);
+    constexpr TypeEncoding Scalar_Int64 = makeScalarType(TypeSize::Byte8, TypeKind::Int);
     constexpr TypeEncoding Scalar_Float16 = makeScalarType(TypeSize::Byte2, TypeKind::Float);
     constexpr TypeEncoding Scalar_Float32 = makeScalarType(TypeSize::Byte4, TypeKind::Float);
     constexpr TypeEncoding Scalar_Float64 = makeScalarType(TypeSize::Byte8, TypeKind::Float);
 
     // vectors
-    constexpr TypeEncoding Vec2_UInt8   = makeVectorType(TypeSize::Byte1, TypeKind::UInt,  2);
-    constexpr TypeEncoding Vec3_UInt8   = makeVectorType(TypeSize::Byte1, TypeKind::UInt,  3);
-    constexpr TypeEncoding Vec4_UInt8   = makeVectorType(TypeSize::Byte1, TypeKind::UInt,  4);
-    constexpr TypeEncoding Vec2_UInt16  = makeVectorType(TypeSize::Byte2, TypeKind::UInt,  2);
-    constexpr TypeEncoding Vec3_UInt16  = makeVectorType(TypeSize::Byte2, TypeKind::UInt,  3);
-    constexpr TypeEncoding Vec4_UInt16  = makeVectorType(TypeSize::Byte2, TypeKind::UInt,  4);
-    constexpr TypeEncoding Vec2_UInt32  = makeVectorType(TypeSize::Byte4, TypeKind::UInt,  2);
-    constexpr TypeEncoding Vec3_UInt32  = makeVectorType(TypeSize::Byte4, TypeKind::UInt,  3);
-    constexpr TypeEncoding Vec4_UInt32  = makeVectorType(TypeSize::Byte4, TypeKind::UInt,  4);
-    constexpr TypeEncoding Vec2_Int8    = makeVectorType(TypeSize::Byte1, TypeKind::Int,   2);
-    constexpr TypeEncoding Vec3_Int8    = makeVectorType(TypeSize::Byte1, TypeKind::Int,   3);
-    constexpr TypeEncoding Vec4_Int8    = makeVectorType(TypeSize::Byte1, TypeKind::Int,   4);
-    constexpr TypeEncoding Vec2_Int16   = makeVectorType(TypeSize::Byte2, TypeKind::Int,   2);
-    constexpr TypeEncoding Vec3_Int16   = makeVectorType(TypeSize::Byte2, TypeKind::Int,   3);
-    constexpr TypeEncoding Vec4_Int16   = makeVectorType(TypeSize::Byte2, TypeKind::Int,   4);
-    constexpr TypeEncoding Vec2_Int32   = makeVectorType(TypeSize::Byte4, TypeKind::Int,   2);
-    constexpr TypeEncoding Vec3_Int32   = makeVectorType(TypeSize::Byte4, TypeKind::Int,   3);
-    constexpr TypeEncoding Vec4_Int32   = makeVectorType(TypeSize::Byte4, TypeKind::Int,   4);
+    constexpr TypeEncoding Vec2_UInt8 = makeVectorType(TypeSize::Byte1, TypeKind::UInt, 2);
+    constexpr TypeEncoding Vec3_UInt8 = makeVectorType(TypeSize::Byte1, TypeKind::UInt, 3);
+    constexpr TypeEncoding Vec4_UInt8 = makeVectorType(TypeSize::Byte1, TypeKind::UInt, 4);
+    constexpr TypeEncoding Vec2_UInt16 = makeVectorType(TypeSize::Byte2, TypeKind::UInt, 2);
+    constexpr TypeEncoding Vec3_UInt16 = makeVectorType(TypeSize::Byte2, TypeKind::UInt, 3);
+    constexpr TypeEncoding Vec4_UInt16 = makeVectorType(TypeSize::Byte2, TypeKind::UInt, 4);
+    constexpr TypeEncoding Vec2_UInt32 = makeVectorType(TypeSize::Byte4, TypeKind::UInt, 2);
+    constexpr TypeEncoding Vec3_UInt32 = makeVectorType(TypeSize::Byte4, TypeKind::UInt, 3);
+    constexpr TypeEncoding Vec4_UInt32 = makeVectorType(TypeSize::Byte4, TypeKind::UInt, 4);
+    constexpr TypeEncoding Vec2_Int8 = makeVectorType(TypeSize::Byte1, TypeKind::Int, 2);
+    constexpr TypeEncoding Vec3_Int8 = makeVectorType(TypeSize::Byte1, TypeKind::Int, 3);
+    constexpr TypeEncoding Vec4_Int8 = makeVectorType(TypeSize::Byte1, TypeKind::Int, 4);
+    constexpr TypeEncoding Vec2_Int16 = makeVectorType(TypeSize::Byte2, TypeKind::Int, 2);
+    constexpr TypeEncoding Vec3_Int16 = makeVectorType(TypeSize::Byte2, TypeKind::Int, 3);
+    constexpr TypeEncoding Vec4_Int16 = makeVectorType(TypeSize::Byte2, TypeKind::Int, 4);
+    constexpr TypeEncoding Vec2_Int32 = makeVectorType(TypeSize::Byte4, TypeKind::Int, 2);
+    constexpr TypeEncoding Vec3_Int32 = makeVectorType(TypeSize::Byte4, TypeKind::Int, 3);
+    constexpr TypeEncoding Vec4_Int32 = makeVectorType(TypeSize::Byte4, TypeKind::Int, 4);
     constexpr TypeEncoding Vec2_Float16 = makeVectorType(TypeSize::Byte2, TypeKind::Float, 2);
     constexpr TypeEncoding Vec3_Float16 = makeVectorType(TypeSize::Byte2, TypeKind::Float, 3);
     constexpr TypeEncoding Vec4_Float16 = makeVectorType(TypeSize::Byte2, TypeKind::Float, 4);
@@ -181,8 +175,7 @@ namespace xe {
     constexpr TypeEncoding Mat3x4_Float32 = makeMatrixType(TypeSize::Byte4, TypeKind::Float, 3, 4);
     constexpr TypeEncoding Mat4x3_Float32 = makeMatrixType(TypeSize::Byte4, TypeKind::Float, 4, 3);
 
-    enum class
-    DataType : std::int16_t { MetaFirst, Unknown = MetaFirst, UInt8, UInt16, UInt32, UInt64, Int8, Int16, Int32, Int64, Float16, Float32, Float64, MetaCount };
+    enum class DataType : std::int16_t { MetaFirst, Unknown = MetaFirst, UInt8, UInt16, UInt32, UInt64, Int8, Int16, Int32, Int64, Float16, Float32, Float64, MetaCount };
 
     [[deprecated]]
     extern int bytesize(const DataType dataType);

@@ -35,13 +35,13 @@ namespace xe {
         glaze::Unique<gl::Program> program;
     };
 
-	struct BufferGL {
+    struct BufferGL {
         glaze::Unique<gl::BufferId> buffer;
-	};
+    };
 
-	struct TextureGL {
+    struct TextureGL {
         glaze::Unique<gl::Texture> texture;
-	};
+    };
 
     /**
      * @brief A single geometry: the VAO wiring together buffer bindings, plus the draw-time index
@@ -98,8 +98,6 @@ namespace xe {
         //! Uniform block bindings baked into the program by createPipelineGL.
         std::vector<UniformBlockBindingGL> uniformBlockBindings;
     };
-
-    
 
     /**
      * @brief A single entry in a backend resource pool.
@@ -178,8 +176,7 @@ namespace xe {
      * @param handle the handle to validate
      * @return const pointer to the held object on success; nullptr if any check fails
      */
-    template<typename ObjectT, typename HandleT>
-    const ObjectT *tryObjectExtract(const std::vector<OptSlot<ObjectT>> &pool, const HandleT &handle) {
+    template <typename ObjectT, typename HandleT> const ObjectT *tryObjectExtract(const std::vector<OptSlot<ObjectT>> &pool, const HandleT &handle) {
         uint32_t const index = handle.index();
         if (index >= pool.size()) {
             return nullptr;
@@ -215,10 +212,9 @@ namespace xe {
     void destroyPipelineGL(RenderDeviceBackendContext *ctx, PipelineHandle handle);
 
     tl::expected<UniformLocation, BackendError> resolveUniformLocationGL(RenderDeviceBackendContext *ctx, ShaderHandle handle, const char *name);
-    void applyUniformsGL(RenderDeviceBackendContext *ctx,
-                         ShaderHandle handle,
-                         const UniformValueSubmission *values, size_t valueCount,
-                         const UniformMatrixSubmission *matrices, size_t matrixCount);
+    void applyUniformsGL(
+        RenderDeviceBackendContext *ctx, ShaderHandle handle, const UniformValueSubmission *values, size_t valueCount, const UniformMatrixSubmission *matrices, size_t matrixCount
+    );
     void bindUniformBufferGL(RenderDeviceBackendContext *ctx, uint32_t bindingPoint, BufferHandle handle, size_t offset, size_t size);
 
     void initializeBackendTableGL(RenderDeviceBackendVTable *vtable);

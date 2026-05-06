@@ -130,12 +130,16 @@ namespace xe {
             return size == TypeSize::Byte2 ? GL_HALF_FLOAT : GL_FLOAT;
         }
         if (kind == TypeKind::UInt) {
-            if (size == TypeSize::Byte1) return GL_UNSIGNED_BYTE;
-            if (size == TypeSize::Byte2) return GL_UNSIGNED_SHORT;
+            if (size == TypeSize::Byte1)
+                return GL_UNSIGNED_BYTE;
+            if (size == TypeSize::Byte2)
+                return GL_UNSIGNED_SHORT;
             return GL_UNSIGNED_INT;
         }
-        if (size == TypeSize::Byte1) return GL_BYTE;
-        if (size == TypeSize::Byte2) return GL_SHORT;
+        if (size == TypeSize::Byte1)
+            return GL_BYTE;
+        if (size == TypeSize::Byte2)
+            return GL_SHORT;
         return GL_INT;
     }
 
