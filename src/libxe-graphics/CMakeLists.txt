@@ -50,6 +50,7 @@ set (headers
 	"src/xe/render/RenderBackend.h"
 	"src/xe/render/types.h"
 	"src/xe/render/backend/glcore3-api.h"
+	"src/xe/render/backend/glcore3-types.h"
 )
 
 set (sources
@@ -83,6 +84,13 @@ set (sources
 	# xe/render/ implementations
 	"src/xe/render/RenderBackend.cpp"
 	"src/xe/render/backend/glcore3-api.cpp"
+	"src/xe/render/backend/glcore3-buffer.cpp"
+	"src/xe/render/backend/glcore3-texture.cpp"
+	"src/xe/render/backend/glcore3-shader.cpp"
+	"src/xe/render/backend/glcore3-vertex.cpp"
+	"src/xe/render/backend/glcore3-pipeline.cpp"
+	"src/xe/render/backend/glcore3-uniform.cpp"
+	"src/xe/render/backend/glcore3-commands.cpp"
 )
 
 add_library (${target} ${sources})
