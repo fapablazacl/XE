@@ -75,6 +75,10 @@ namespace xe {
         uint32_t blockIndex = 0;
     };
 
+    struct SamplerGL {
+        gl::Sampler sampler;
+    };
+
     /**
      * @brief GL-side representation of a PipelineDescriptor.
      *

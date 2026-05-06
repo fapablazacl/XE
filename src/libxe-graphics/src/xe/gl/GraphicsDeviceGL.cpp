@@ -160,6 +160,7 @@ namespace xe {
     }
 
     void GraphicsDeviceGL::preRenderMaterial(const Material *material) {
+        /*
         const auto &rs = material->renderState;
 
         if (rs.depthTest) {
@@ -207,10 +208,11 @@ namespace xe {
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, convertToGL(layer.wrapS));
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, convertToGL(layer.wrapT));
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, convertToGL(layer.wrapR));
-        }
+        }*/
     }
 
     void GraphicsDeviceGL::postRenderMaterial(const Material *material) {
+        /*
         const auto &rs = material->renderState;
 
         if (rs.depthTest) {
@@ -238,6 +240,7 @@ namespace xe {
         }
 
         glActiveTexture(GL_TEXTURE0);
+        */
     }
 
     void GraphicsDeviceGL::setMaterial(const Material *material) {
@@ -318,85 +321,6 @@ namespace xe {
         assert(uniform);
         assert(count > 0);
         assert(data);
-
-        int offset = 0;
-        const auto ptr = reinterpret_cast<const std::byte *>(data);
-
-        for (size_t i = 0; i < count; i++) {
-            const Uniform *current = &uniform[i];
-            const GLint location = 0;
-            assert(location >= 0);
-
-            const TypeEncoding te = static_cast<TypeEncoding>(current->type);
-            const uint8_t cols = getTypeCols(te);
-
-            switch (getTypeKind(te)) {
-            case TypeKind::Int:
-                if (cols == 1) {
-                    glUniform1iv(location, current->count, reinterpret_cast<const GLint *>(&ptr[offset]));
-                    break;
-                }
-                if (cols == 2) {
-                    glUniform2iv(location, current->count, reinterpret_cast<const GLint *>(&ptr[offset]));
-                    break;
-                }
-                if (cols == 3) {
-                    glUniform3iv(location, current->count, reinterpret_cast<const GLint *>(&ptr[offset]));
-                    break;
-                }
-                if (cols == 4) {
-                    glUniform4iv(location, current->count, reinterpret_cast<const GLint *>(&ptr[offset]));
-                    break;
-                }
-                assert(false);
-                break;
-
-            case TypeKind::Float:
-                if (cols == 1) {
-                    glUniform1fv(location, current->count, reinterpret_cast<const GLfloat *>(&ptr[offset]));
-                    break;
-                }
-                if (cols == 2) {
-                    glUniform2fv(location, current->count, reinterpret_cast<const GLfloat *>(&ptr[offset]));
-                    break;
-                }
-                if (cols == 3) {
-                    glUniform3fv(location, current->count, reinterpret_cast<const GLfloat *>(&ptr[offset]));
-                    break;
-                }
-                if (cols == 4) {
-                    glUniform4fv(location, current->count, reinterpret_cast<const GLfloat *>(&ptr[offset]));
-                    break;
-                }
-                assert(false);
-                break;
-
-            case TypeKind::UInt:
-                if (cols == 1) {
-                    glUniform1uiv(location, current->count, reinterpret_cast<const GLuint *>(&ptr[offset]));
-                    break;
-                }
-                if (cols == 2) {
-                    glUniform2uiv(location, current->count, reinterpret_cast<const GLuint *>(&ptr[offset]));
-                    break;
-                }
-                if (cols == 3) {
-                    glUniform3uiv(location, current->count, reinterpret_cast<const GLuint *>(&ptr[offset]));
-                    break;
-                }
-                if (cols == 4) {
-                    glUniform4uiv(location, current->count, reinterpret_cast<const GLuint *>(&ptr[offset]));
-                    break;
-                }
-                assert(false);
-                break;
-
-            default:
-                assert(false && "Supplied UniformVectorType isn't supported");
-            }
-
-            offset += static_cast<int>(getTotalSizeInBytes(te)) * current->count;
-        }
     }
 
     void GraphicsDeviceGL::setViewport(const Viewport &viewport) {

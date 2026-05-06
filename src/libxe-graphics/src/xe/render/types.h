@@ -461,14 +461,63 @@ namespace xe {
         uint32_t bindingPoint = 0;
     };
 
+    enum class PolygonMode { Point, Line, Fill };
+
+    enum class DepthFunc { Never, Less, Equal, LesserEqual, Greater, NotEqual, GreaterEqual, Always };
+
+    enum class FrontFaceOrder { Clockwise, CounterClockwise };
+
+    enum class BlendParam {
+        Zero,
+        One,
+        SourceColor,
+        OneMinusSourceColor,
+        DestinationColor,
+        OneMinusDestinationColor,
+        SourceAlpha,
+        OneMinusSourceAlpha,
+        DestinationAlpha,
+        OneMinusDestinationAlpha,
+        ConstantColor,
+        OneMinusConstantColor,
+        ConstantAlpha,
+        OneMinusConstantAlpha
+    };
+
     struct PipelineDescriptor {
         VertexLayoutHandle layoutHandle;
         ShaderHandle shaderProgramHandle;
         ClearFlags clearFlags = ClearFlags::Color;
         vec4 clearColor = {0.0f, 0.0f, 0.0f, 1.0f};
 
+        bool depthTest = true;
+        bool stencilTest = false;
+        bool cullBackFace = false;
+        bool blendEnable = false;
+
+        BlendParam blendSource = BlendParam::One;
+        BlendParam blendDestination = BlendParam::One;
+
+        float lineWidth = 1.0f;
+        DepthFunc depthFunc = DepthFunc::LesserEqual;
+        FrontFaceOrder frontFace = FrontFaceOrder::Clockwise;
+
+        int clipDistanceCount = 0;
+
         //! Uniform block bindings baked into this pipeline at creation time.
         std::vector<PipelineUniformBlock> uniformBlocks;
+    };
+
+    enum class TextureFilter { Nearest, Linear };
+
+    enum class TextureWrap { Repeat, Clamp };
+
+    struct SamplerDescriptor {
+        TextureFilter minFilter = TextureFilter::Nearest;
+        TextureFilter magFilter = TextureFilter::Nearest;
+        TextureWrap wrapS = TextureWrap::Repeat;
+        TextureWrap wrapT = TextureWrap::Repeat;
+        TextureWrap wrapR = TextureWrap::Repeat;
     };
 
     // Command Buffer API
