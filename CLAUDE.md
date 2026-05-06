@@ -9,8 +9,8 @@ XE is a barebones multiplatform C++17 game engine with OpenGL rendering, GLTF mo
 ## Code Conventions
 - instance types (AKA polymorphic type) should be classes with PascalCase naming.
 - value types must be represented as structs, and global functions and methods must be camelCase.
-- each new test should have their own unit test suite.
-- public classes and methods must have extended Doxygen documentation
+- each new feature should have their own unit test suite.
+- public classes and methods must have Doxygen format documentation. If a method is several lines long, the documentation should be extended.
 - member variables must have a single line Doxygen comment above them.
 - Some examples of these conventions:
 ```C++
@@ -76,16 +76,20 @@ make configure
 # Or manually (ensure you use the proper profile from conan/profiles/):
 conan install . --build=missing --profile=conan/profiles/<your-profile> --settings=build_type=Release
 conan install . --build=missing --profile=conan/profiles/<your-profile> --settings=build_type=Debug
+
+# Configure (gcc)
 cmake --preset conan-release
 cmake --preset conan-debug
+
+# Configure (msvc)
+cmake --preset conan-default
 
 # Build
 cmake --build --preset conan-release
 cmake --build --preset conan-debug
 
-# Build (Visual C++)
-cmake --build --preset conan-release
-cmake --build --preset conan-debug
+# Build (msvc)
+cmake --build --preset conan-default
 ```
 
 Conan generates CMake presets in `build/generators/CMakePresets.json`. Always run `conan install` before `cmake --preset`.
@@ -181,6 +185,6 @@ lipo -create -output libxe.dylib arm64/libxe.dylib x64/libxe.dylib
 Adjust `compiler.version` in the macOS profiles to match the installed Xcode version.
 
 ## Notes
-- imgui backends (glfw, opengl3, sdl2, sdl3) are auto-copied from the Conan package into `src/xe-gltf-view/src/bindings/` during `conan install`.
-- VulkanSDK must be downloaded manually; the Conan package provides only the loader.
+- `imgui` backends (glfw, opengl3, sdl2, sdl3) are auto-copied from the Conan package into `src/xe-gltf-view/src/bindings/` during `conan install`.
+- `VulkanSDK` must be installed manually; the Conan package provides only the loader.
 - `compile_commands.json` is generated at `build/Debug/compile_commands.json` and copied to the root for IDE/tooling use.

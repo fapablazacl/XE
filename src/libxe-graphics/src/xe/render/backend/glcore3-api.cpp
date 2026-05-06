@@ -648,7 +648,7 @@ namespace xe {
     }
 
     /**
-     * @brief Resolve a live gl::Program from a shader pool slot, or nullptr on validation failure.
+     * @brief Resolve a ProgramGL from a shader pool slot, or nullptr on validation failure.
      *
      * Performs the full index-range + slot-alive + generation-match check. Returns a borrowed
      * pointer into the pool; the pointer is valid until the next mutation of the shader-program pool.
