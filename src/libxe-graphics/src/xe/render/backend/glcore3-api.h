@@ -14,24 +14,6 @@
 #include "glcore3-common.h"
 
 namespace xe {
-    struct VertexAttribGL {
-        gl::AttribLocation loc;
-        GLboolean normalized = GL_FALSE;
-        gl::VertexAttribPointerType dataType;
-        int dim = 3;
-
-        VertexAttribGL(gl::AttribLocation loc, int dim, gl::VertexAttribPointerType dataType, GLboolean normalized = GL_FALSE) {
-            this->loc = loc;
-            this->dim = dim;
-            this->dataType = dataType;
-            this->normalized = normalized;
-        }
-    };
-
-    struct VertexLayoutGL {
-        std::vector<VertexAttribGL> attributes;
-        gl::DrawElementsType indexDataType = gl::DrawElementsType::eUnsignedShort;
-    };
 
     struct ProgramGL {
         glaze::Unique<gl::Program> program;
