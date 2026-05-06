@@ -53,4 +53,4 @@ namespace xe {
 
     tl::expected<RenderDeviceBackendContext *, BackendError> createContextGL();
     void destroyContextGL(RenderDeviceBackendContext *ctx);
-}
+} // namespace xe

@@ -17,4 +17,4 @@ namespace xe {
     tl::expected<BufferHandle, BackendError> createBufferGL(RenderDeviceBackendContext *ctx, const BufferDescriptor &desc);
     void destroyBufferGL(RenderDeviceBackendContext *ctx, BufferHandle handle);
     void readBufferGL(RenderDeviceBackendContext *ctx, BufferHandle handle, const BufferReadDescriptor &desc);
-}
+} // namespace xe

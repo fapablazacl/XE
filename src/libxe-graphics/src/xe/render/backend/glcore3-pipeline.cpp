@@ -48,4 +48,4 @@ namespace xe {
         assert(slot.gen == handle.gen() && "destroyPipelineGL: stale handle (generation mismatch)");
         slot.obj.reset();
     }
-}
+} // namespace xe

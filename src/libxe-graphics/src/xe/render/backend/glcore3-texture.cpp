@@ -272,4 +272,4 @@ namespace xe {
         gl::getTexImage(readTarget, desc.mipLevel, pixelFormat, pixelType, desc.data);
     }
 
-}
+} // namespace xe

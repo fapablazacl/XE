@@ -23,4 +23,4 @@ namespace xe {
         return &*slot.obj;
     }
 
-}
+} // namespace xe

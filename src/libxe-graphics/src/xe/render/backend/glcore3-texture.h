@@ -17,4 +17,4 @@ namespace xe {
     void destroyTextureGL(RenderDeviceBackendContext *ctx, TextureHandle handle);
     void updateTextureGL(RenderDeviceBackendContext *ctx, TextureHandle handle, const TextureUpdateDescriptor &desc);
     void readTextureGL(RenderDeviceBackendContext *ctx, TextureHandle handle, const TextureReadDescriptor &desc);
-}
+} // namespace xe

@@ -20,9 +20,7 @@ namespace xe {
     /**
      * @brief Graphics Device current render states
      */
-    struct MaterialRenderState {
-
-    };
+    struct MaterialRenderState {};
 
     /**
      * @brief Describes the generic visual appearance of all the objects. For other properties, use uniforms.

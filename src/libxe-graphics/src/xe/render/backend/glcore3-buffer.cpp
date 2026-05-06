@@ -94,4 +94,4 @@ namespace xe {
         gl::bindBuffer(target, {});
     }
 
-}
+} // namespace xe

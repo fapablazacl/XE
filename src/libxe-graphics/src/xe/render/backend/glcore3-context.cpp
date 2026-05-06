@@ -13,4 +13,4 @@ namespace xe {
     void destroyContextGL(RenderDeviceBackendContext *ctx) {
         delete glctx(ctx);
     }
-}
+} // namespace xe

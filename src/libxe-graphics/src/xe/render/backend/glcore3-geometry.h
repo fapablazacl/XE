@@ -24,4 +24,4 @@ namespace xe {
     tl::expected<GeometryHandle, BackendError> createGeometryGL(RenderDeviceBackendContext *ctx, const GeometryDescriptor &desc);
 
     void destroyGeometryGL(RenderDeviceBackendContext *ctx, GeometryHandle handle);
-}
+} // namespace xe

@@ -12,4 +12,4 @@ namespace xe {
     struct SamplerGL {
         gl::Sampler sampler;
     };
-}
+} // namespace xe

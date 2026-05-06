@@ -16,4 +16,4 @@ namespace xe {
     tl::expected<ShaderHandle, BackendError> createShaderProgramGL(RenderDeviceBackendContext *ctx, const ShaderProgramDescriptor &desc);
     void destroyShaderProgramGL(RenderDeviceBackendContext *ctx, ShaderHandle handle);
 
-}
+} // namespace xe

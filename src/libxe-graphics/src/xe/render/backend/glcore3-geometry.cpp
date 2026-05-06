@@ -69,4 +69,4 @@ namespace xe {
         slot.obj.reset();
     }
 
-}
+} // namespace xe

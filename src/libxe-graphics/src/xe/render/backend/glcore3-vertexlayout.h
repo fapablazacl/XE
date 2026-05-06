@@ -25,7 +25,6 @@ namespace xe {
         gl::DrawElementsType indexDataType = gl::DrawElementsType::eUnsignedShort;
     };
 
-
     tl::expected<VertexLayoutHandle, BackendError> createVertexLayoutGL(RenderDeviceBackendContext *ctx, const VertexLayoutDescriptor &desc);
     void destroyVertexLayoutGL(RenderDeviceBackendContext *ctx, VertexLayoutHandle handle);
-}
+} // namespace xe

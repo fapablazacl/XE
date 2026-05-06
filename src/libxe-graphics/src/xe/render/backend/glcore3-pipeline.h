@@ -55,4 +55,4 @@ namespace xe {
 
     tl::expected<PipelineHandle, BackendError> createPipelineGL(RenderDeviceBackendContext *ctx, const PipelineDescriptor &desc);
     void destroyPipelineGL(RenderDeviceBackendContext *ctx, PipelineHandle handle);
-}
+} // namespace xe
