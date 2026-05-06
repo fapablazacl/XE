@@ -10,7 +10,7 @@ find_package(tl-expected CONFIG REQUIRED)
 set (target "libxe-graphics")
 
 set (headers
-	# xe/graphics/ — abstraction layer (originally libxe-core/src/xe/graphics/)
+	# xe/graphics/
 	"src/xe/graphics/Graphics.h"
 	"src/xe/graphics/GraphicsAPI.h"
 	"src/xe/graphics/GraphicsContext.h"
@@ -34,7 +34,7 @@ set (headers
 	"src/xe/graphics/Material.h"
 	"src/xe/graphics/Viewport.h"
 
-	# xe/gl/ — OpenGL 3 Core Profile reference implementation (originally libxe-gl/)
+	# xe/gl/
 	"src/xe/GL.h"
 	"src/xe/gl/gl.h"
 	"src/xe/gl/GraphicsDeviceGL.h"
@@ -46,10 +46,18 @@ set (headers
 	"src/xe/gl/RendererGL.h"
 	"src/xe/gl/Types.h"
 
-	# xe/render/ — new vtable+handle backend prototype (originally xe-glaze-test/src/xe/render/)
+	# xe/render/
 	"src/xe/render/RenderBackend.h"
 	"src/xe/render/types.h"
 	"src/xe/render/backend/glcore3-api.h"
+	"src/xe/render/backend/glcore3-geometry.h"
+	"src/xe/render/backend/glcore3-pipeline.h"
+	"src/xe/render/backend/glcore3-program.h"
+	"src/xe/render/backend/glcore3-sampler.h"
+	"src/xe/render/backend/glcore3-texture.h"
+	"src/xe/render/backend/glcore3-vertexlayout.h"
+	"src/xe/render/backend/glcore3-buffer.h"
+	"src/xe/render/backend/glcore3-common.h"
 )
 
 set (sources
@@ -83,6 +91,14 @@ set (sources
 	# xe/render/ implementations
 	"src/xe/render/RenderBackend.cpp"
 	"src/xe/render/backend/glcore3-api.cpp"
+	"src/xe/render/backend/glcore3-geometry.cpp"
+	"src/xe/render/backend/glcore3-pipeline.cpp"
+	"src/xe/render/backend/glcore3-program.cpp"
+	"src/xe/render/backend/glcore3-sampler.cpp"
+	"src/xe/render/backend/glcore3-texture.cpp"
+	"src/xe/render/backend/glcore3-vertexlayout.cpp"
+	"src/xe/render/backend/glcore3-buffer.cpp"
+	"src/xe/render/backend/glcore3-common.cpp"
 )
 
 add_library (${target} ${sources})
