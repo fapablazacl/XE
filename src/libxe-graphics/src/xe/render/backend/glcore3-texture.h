@@ -4,6 +4,17 @@
 #include <glaze/gl.hpp>
 #include <glaze/raii.hpp>
 
-namespace xe {
+#include <xe/render/types.h>
+#include <xe/render/RenderBackend.h>
+#include "glcore3-common.h"
 
+namespace xe {
+    struct TextureGL {
+        glaze::Unique<gl::Texture> texture;
+    };
+
+    tl::expected<TextureHandle, BackendError> createTextureGL(RenderDeviceBackendContext *ctx, const TextureDescriptor &desc);
+    void destroyTextureGL(RenderDeviceBackendContext *ctx, TextureHandle handle);
+    void updateTextureGL(RenderDeviceBackendContext *ctx, TextureHandle handle, const TextureUpdateDescriptor &desc);
+    void readTextureGL(RenderDeviceBackendContext *ctx, TextureHandle handle, const TextureReadDescriptor &desc);
 }

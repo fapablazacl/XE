@@ -58,6 +58,7 @@ set (headers
 	"src/xe/render/backend/glcore3-vertexlayout.h"
 	"src/xe/render/backend/glcore3-buffer.h"
 	"src/xe/render/backend/glcore3-common.h"
+		"src/xe/render/backend/glcore3-context.h"
 )
 
 set (sources
@@ -99,6 +100,7 @@ set (sources
 	"src/xe/render/backend/glcore3-vertexlayout.cpp"
 	"src/xe/render/backend/glcore3-buffer.cpp"
 	"src/xe/render/backend/glcore3-common.cpp"
+		"src/xe/render/backend/glcore3-context.cpp"
 )
 
 add_library (${target} ${sources})
