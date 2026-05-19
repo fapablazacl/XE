@@ -12,7 +12,7 @@ namespace xe {
             int pointerOffset; // offset into MeshStorage<float> field triplet: 0 pos, 1 normal, 2 texcoord
         };
 
-        constexpr std::array<AttribSpec, 3> kAttribSpecs = {{
+        constexpr std::array<AttribSpec, 3> attribSpecs = {{
             {MeshAttribPosition, sizeof(xe::vec3), VertexAttribFormat::float3, 0},
             {MeshAttribNormal, sizeof(xe::vec3), VertexAttribFormat::float3, 1},
             {MeshAttribTexCoord0, sizeof(xe::vec2), VertexAttribFormat::float2, 2},
@@ -31,19 +31,6 @@ namespace xe {
             }
         }
 
-        VertexAttribSemantic semanticFor(int which) {
-            switch (which) {
-            case 0:
-                return VertexAttribSemantic::Position;
-            case 1:
-                return VertexAttribSemantic::Normal;
-            case 2:
-                return VertexAttribSemantic::TexCoord0;
-            default:
-                return VertexAttribSemantic::DontUse;
-            }
-        }
-
         GeometryIndexType toGeometryIndexType(IndexType type) {
             return type == IndexType::UInt16 ? GeometryIndexType::uint16 : GeometryIndexType::uint32;
         }
@@ -59,10 +46,10 @@ namespace xe {
         layoutDesc.indexType = toGeometryIndexType(counts.indexType);
 
         std::vector<GeometryBufferAttrib> bufferAttribs;
-        bufferAttribs.reserve(kAttribSpecs.size());
+        bufferAttribs.reserve(attribSpecs.size());
 
-        for (std::size_t k = 0; k < kAttribSpecs.size(); ++k) {
-            const AttribSpec &spec = kAttribSpecs[k];
+        for (std::size_t k = 0; k < attribSpecs.size(); ++k) {
+            const AttribSpec &spec = attribSpecs[k];
             if ((opts.attribMask & spec.flag) == 0u) {
                 continue;
             }
@@ -73,13 +60,13 @@ namespace xe {
                 return makeBackendError(BackendErrorCode::InvalidDescriptor, "uploadMesh: attribute bit set in attribMask but matching MeshStorage pointer is null");
             }
 
-            BufferDescriptor bufDesc{};
-            bufDesc.type = BufferType::Vertex;
-            bufDesc.usage = opts.usage;
-            bufDesc.size = counts.vertexCount * spec.elementByteSize;
-            bufDesc.data = data;
+            BufferDescriptor bufferDesc{};
+            bufferDesc.type = BufferType::Vertex;
+            bufferDesc.usage = opts.usage;
+            bufferDesc.size = counts.vertexCount * spec.elementByteSize;
+            bufferDesc.data = data;
 
-            auto bufResult = vtable.createBuffer(ctx, bufDesc);
+            auto bufResult = vtable.createBuffer(ctx, bufferDesc);
             if (!bufResult) {
                 destroyMeshGeometry(vtable, ctx, mesh);
                 return tl::unexpected<BackendError>{bufResult.error()};
@@ -87,16 +74,15 @@ namespace xe {
             mesh.attributeBuffers.push_back(*bufResult);
 
             VertexAttrib attrib{};
-            attrib.semantic = semanticFor(spec.pointerOffset);
             attrib.location = opts.locations[k];
             attrib.format = spec.format;
             attrib.normalized = false;
             layoutDesc.attribs.push_back(attrib);
 
-            GeometryBufferAttrib ba{};
-            ba.bufferHandle = *bufResult;
-            ba.attribIndex = static_cast<uint32_t>(layoutDesc.attribs.size() - 1);
-            bufferAttribs.push_back(ba);
+            GeometryBufferAttrib bufferAttrib{};
+            bufferAttrib.bufferHandle = *bufResult;
+            bufferAttrib.attribIndex = static_cast<uint32_t>(layoutDesc.attribs.size() - 1);
+            bufferAttribs.push_back(bufferAttrib);
         }
 
         if (counts.indexCount > 0) {
@@ -105,18 +91,18 @@ namespace xe {
                 return makeBackendError(BackendErrorCode::InvalidDescriptor, "uploadMesh: counts.indexCount > 0 but storage.indices is null");
             }
 
-            BufferDescriptor idxDesc{};
-            idxDesc.type = BufferType::Index;
-            idxDesc.usage = opts.usage;
-            idxDesc.size = counts.indexCount * indexByteSize(counts.indexType);
-            idxDesc.data = storage.indices;
+            BufferDescriptor indexBufferDesc{};
+            indexBufferDesc.type = BufferType::Index;
+            indexBufferDesc.usage = opts.usage;
+            indexBufferDesc.size = counts.indexCount * indexByteSize(counts.indexType);
+            indexBufferDesc.data = storage.indices;
 
-            auto idxResult = vtable.createBuffer(ctx, idxDesc);
-            if (!idxResult) {
+            auto indexBufferResult = vtable.createBuffer(ctx, indexBufferDesc);
+            if (!indexBufferResult) {
                 destroyMeshGeometry(vtable, ctx, mesh);
-                return tl::unexpected<BackendError>{idxResult.error()};
+                return tl::unexpected<BackendError>{indexBufferResult.error()};
             }
-            mesh.indexBuffer = *idxResult;
+            mesh.indexBuffer = *indexBufferResult;
         }
 
         auto layoutResult = vtable.createVertexLayout(ctx, layoutDesc);

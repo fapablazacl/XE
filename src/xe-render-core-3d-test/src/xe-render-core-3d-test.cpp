@@ -344,9 +344,9 @@ void main() {
     layoutDesc.resolveMode = xe::VertexLayoutResolveMode::Explicit;
     layoutDesc.indexType = (counts.indexType == xe::IndexType::UInt16) ? xe::GeometryIndexType::uint16 : xe::GeometryIndexType::uint32;
     layoutDesc.attribs = {
-        {xe::VertexAttribSemantic::DontUse, 0, xe::VertexAttribFormat::float3, false},
-        {xe::VertexAttribSemantic::DontUse, 1, xe::VertexAttribFormat::float3, false},
-        {xe::VertexAttribSemantic::DontUse, 2, xe::VertexAttribFormat::float2, false},
+        { 0, xe::VertexAttribFormat::float3, false},
+        { 1, xe::VertexAttribFormat::float3, false},
+        { 2, xe::VertexAttribFormat::float2, false},
     };
 
     auto layoutResult = vtable.createVertexLayout(ctx, layoutDesc);

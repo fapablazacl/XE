@@ -294,9 +294,6 @@ namespace xe {
         const void *sourceData = nullptr;
     };
 
-    //! semantic vertex attribute
-    enum class VertexAttribSemantic : int { DontUse, Position, Normal, TexCoord0 };
-
     /**
      * @brief Vertex attribute element formats, backed by TypeEncoding.
      *
@@ -319,7 +316,6 @@ namespace xe {
      * @brief Describes a Vertex Attribute for use in the vertex shader
      */
     struct VertexAttrib {
-        VertexAttribSemantic semantic;
         int location = 0;
 
         VertexAttribFormat format;
@@ -364,6 +360,9 @@ namespace xe {
     static_assert(std::is_trivially_copyable_v<BufferHandle>);
     static_assert(std::is_trivially_copyable_v<TextureHandle>);
 
+    /**
+     * @brief Relates a Buffer with an Attribute index
+     */
     struct GeometryBufferAttrib {
         BufferHandle bufferHandle;
         uint32_t attribIndex = 0;
