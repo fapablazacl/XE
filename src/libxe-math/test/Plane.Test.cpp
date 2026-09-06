@@ -1,6 +1,6 @@
 
 #include "xe/math/Plane.h"
-#include <catch2/catch_test_macros.hpp>
+#include <catch2/catch_all.hpp>
 
 TEST_CASE("PlaneTest, DefaultConstructorMakesXZPlanePointingPlusYAxis") {
     xe::Plane subject;
@@ -101,12 +101,12 @@ TEST_CASE("PlaneTest, VectorialFactoryMethodGeneratesAPlaneFromASpecificPointAnd
     };
 
     const VectorialTestCase testCases[] = {
-        {VectorialInput{xe::Vector3{1.0f, 0.0f, 0.0f} == xe::Vector3{0.0f, 0.0f, 0.0f}} == xe::Plane{1.0f, 0.0f, 0.0f, 0.0f}},
-        {VectorialInput{xe::Vector3{0.0f, 1.0f, 0.0f} == xe::Vector3{0.0f, 0.0f, 0.0f}} == xe::Plane{0.0f, 1.0f, 0.0f, 0.0f}},
-        {VectorialInput{xe::Vector3{0.0f, 0.0f, 1.0f} == xe::Vector3{0.0f, 0.0f, 0.0f}} == xe::Plane{0.0f, 0.0f, 1.0f, 0.0f}},
-        {VectorialInput{xe::Vector3{1.0f, 0.0f, 0.0f} == xe::Vector3{1.0f, 1.0f, 1.0f}} == xe::Plane{1.0f, 0.0f, 0.0f, 1.0f}},
-        {VectorialInput{xe::Vector3{0.0f, 1.0f, 0.0f} == xe::Vector3{1.0f, 1.0f, 1.0f}} == xe::Plane{0.0f, 1.0f, 0.0f, 1.0f}},
-        {VectorialInput{xe::Vector3{0.0f, 0.0f, 1.0f} == xe::Vector3{1.0f, 1.0f, 1.0f}} == xe::Plane{0.0f, 0.0f, 1.0f, 1.0f}},
+        {VectorialInput{xe::Vector3{1.0f, 0.0f, 0.0f}, xe::Vector3{0.0f, 0.0f, 0.0f}}, xe::Plane{1.0f, 0.0f, 0.0f, 0.0f}},
+        {VectorialInput{xe::Vector3{0.0f, 1.0f, 0.0f}, xe::Vector3{0.0f, 0.0f, 0.0f}}, xe::Plane{0.0f, 1.0f, 0.0f, 0.0f}},
+        {VectorialInput{xe::Vector3{0.0f, 0.0f, 1.0f}, xe::Vector3{0.0f, 0.0f, 0.0f}}, xe::Plane{0.0f, 0.0f, 1.0f, 0.0f}},
+        {VectorialInput{xe::Vector3{1.0f, 0.0f, 0.0f}, xe::Vector3{1.0f, 1.0f, 1.0f}}, xe::Plane{1.0f, 0.0f, 0.0f, 1.0f}},
+        {VectorialInput{xe::Vector3{0.0f, 1.0f, 0.0f}, xe::Vector3{1.0f, 1.0f, 1.0f}}, xe::Plane{0.0f, 1.0f, 0.0f, 1.0f}},
+        {VectorialInput{xe::Vector3{0.0f, 0.0f, 1.0f}, xe::Vector3{1.0f, 1.0f, 1.0f}}, xe::Plane{0.0f, 0.0f, 1.0f, 1.0f}},
     };
 
     for (const auto &testCase : testCases") {

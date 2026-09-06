@@ -1,6 +1,6 @@
 
 #include "xe/math/Triangle.h"
-#include <catch2/catch_test_macros.hpp>
+#include <catch2/catch_all.hpp>
 
 TEST_CASE("TriangleTest, EqualsShouldComparePointsInAElementWiseFasion") {
     xe::TTriangle<float> tri1;

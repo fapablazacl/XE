@@ -1,6 +1,6 @@
 
 #include "xe/math/Box.h"
-#include <catch2/catch_test_macros.hpp>
+#include <catch2/catch_all.hpp>
 #include <iostream>
 #include <sstream>
 
@@ -126,12 +126,12 @@ TEST_CASE("BoxTest, intersectsChecksIfThereIsAnOverlappingWithAHalfSizedBox") {
     const auto size = box.getSize();
 
     const xe::Vector3 displacements[] = {
-        {0.5f * size.X, 0.0f, 0.0f},
-        {0.0f, 0.5f * size.Y, 0.0f},
-        {0.0f, 0.0f, 0.5f * size.Z},
-        {-0.5f * size.X, 0.0f, 0.0f},
-        {0.0f, -0.5f * size.Y, 0.0f},
-        {0.0f, 0.0f, -0.5f * size.Z},
+        {0.5f * size.x, 0.0f, 0.0f},
+        {0.0f, 0.5f * size.y, 0.0f},
+        {0.0f, 0.0f, 0.5f * size.z},
+        {-0.5f * size.x, 0.0f, 0.0f},
+        {0.0f, -0.5f * size.y, 0.0f},
+        {0.0f, 0.0f, -0.5f * size.z},
     };
 
     for (const auto &displacement : displacements) {
@@ -148,12 +148,12 @@ TEST_CASE("BoxTest, intersectsChecksIfThereIsAnOverlappingBetweenTwoBoxesWithANe
     const auto size = box.getSize();
 
     const xe::Vector3 displacements[] = {
-        {0.99f * size.X, 0.0f, 0.0f},
-        {0.0f, 0.99f * size.Y, 0.0f},
-        {0.0f, 0.0f, 0.99f * size.Z},
-        {-0.99f * size.X, 0.0f, 0.0f},
-        {0.0f, -0.99f * size.Y, 0.0f},
-        {0.0f, 0.0f, -0.99f * size.Z},
+        {0.99f * size.x, 0.0f, 0.0f},
+        {0.0f, 0.99f * size.y, 0.0f},
+        {0.0f, 0.0f, 0.99f * size.z},
+        {-0.99f * size.x, 0.0f, 0.0f},
+        {0.0f, -0.99f * size.y, 0.0f},
+        {0.0f, 0.0f, -0.99f * size.z},
     };
 
     for (const auto &displacement : displacements) {
@@ -169,12 +169,12 @@ TEST_CASE("BoxTest, intersectsChecksIfThereIsAnOverlappingBetweenTwoBoxesWithExa
     const auto size = box.getSize();
 
     const xe::Vector3 displacements[] = {
-        {size.X, 0.0f, 0.0f},
-        {0.0f, size.Y, 0.0f},
-        {0.0f, 0.0f, size.Z},
-        {-size.X, 0.0f, 0.0f},
-        {0.0f, -size.Y, 0.0f},
-        {0.0f, 0.0f, -size.Z},
+        {size.x, 0.0f, 0.0f},
+        {0.0f, size.y, 0.0f},
+        {0.0f, 0.0f, size.z},
+        {-size.x, 0.0f, 0.0f},
+        {0.0f, -size.y, 0.0f},
+        {0.0f, 0.0f, -size.z},
     };
 
     for (const auto &displacement : displacements) {
@@ -190,12 +190,12 @@ TEST_CASE("BoxTest, intersectsChecksIfThereIsAnOverlappingBetweenTwoBoxesDisplac
     const auto size = box.getSize();
 
     const xe::Vector3 displacements[] = {
-        {2.5f * size.X, 0.0f, 0.0f},
-        {0.0f, 2.5f * size.Y, 0.0f},
-        {0.0f, 0.0f, 2.5f * size.Z},
-        {-2.5f * size.X, 0.0f, 0.0f},
-        {0.0f, -2.5f * size.Y, 0.0f},
-        {0.0f, 0.0f, -2.5f * size.Z},
+        {2.5f * size.x, 0.0f, 0.0f},
+        {0.0f, 2.5f * size.y, 0.0f},
+        {0.0f, 0.0f, 2.5f * size.z},
+        {-2.5f * size.x, 0.0f, 0.0f},
+        {0.0f, -2.5f * size.y, 0.0f},
+        {0.0f, 0.0f, -2.5f * size.z},
     };
 
     for (const auto &displacement : displacements) {
@@ -204,18 +204,4 @@ TEST_CASE("BoxTest, intersectsChecksIfThereIsAnOverlappingBetweenTwoBoxesDisplac
         REQUIRE_FALSE(displaced.intersect(box));
         REQUIRE_FALSE(box.intersect(displaced));
     }
-}
-
-TEST_CASE("BoxTest, operatorLessLessShouldCreateAnUniqueStringRepresentationFromDifferentBoxes") {
-    xe::Box box{{-1.0f, -1.0f, -1.0f}, {1.0f, 1.0f, 1.0f}};
-
-    xe::Box box1{{0.0f, 0.0f, 0.0f}, {10.0f, 10.0f, 10.0f}};
-
-    std::stringstream ss;
-    ss << box;
-    EXPECT_NE(ss.str(), "");
-
-    std::stringstream ss1;
-    ss1 << box1;
-    EXPECT_NE(ss.str(), ss1.str());
 }

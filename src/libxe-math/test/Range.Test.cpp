@@ -1,6 +1,6 @@
 
 #include "xe/math/Range.h"
-#include <catch2/catch_test_macros.hpp>
+#include <catch2/catch_all.hpp>
 #include <iostream>
 
 TEST_CASE("RangeTest, DefaultConstructorShouldLetTheRangeWithValues0And1") {

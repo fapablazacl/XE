@@ -1,6 +1,6 @@
 
 #include "xe/math/Common.h"
-#include <catch2/catch_test_macros.hpp>
+#include <catch2/catch_all.hpp>
 
 TEST_CASE("EqualsTest, WithNoEpsilonComparesExactly") {
     REQUIRE(xe::equals(1.0f, 1.0f, 0.0f), true);

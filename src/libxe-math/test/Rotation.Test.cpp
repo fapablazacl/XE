@@ -1,6 +1,6 @@
 
 #include "xe/math/Rotation.h"
-#include <catch2/catch_test_macros.hpp>
+#include <catch2/catch_all.hpp>
 
 TEST_CASE("RotationTest, EqualsShouldComparePointsInAElementWiseFasion") {
     xe::Rotation<float> tri1;

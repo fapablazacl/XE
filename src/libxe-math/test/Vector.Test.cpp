@@ -1,5 +1,5 @@
 
-#include <catch2/catch_test_macros.hpp>
+#include <catch2/catch_all.hpp>
 
 #include "xe/math/Vector.h"
 #include <sstream>
@@ -7,17 +7,17 @@
 TEST_CASE("VectorTest, DefaultConstructorShouldInitializeToZeroes") {
     const xe::Vector3 v;
 
-    REQUIRE(v.X, 0.0f);
-    REQUIRE(v.Y, 0.0f);
-    REQUIRE(v.Z, 0.0f);
+    REQUIRE(v.x, 0.0f);
+    REQUIRE(v.y, 0.0f);
+    REQUIRE(v.z, 0.0f);
 }
 
 TEST_CASE("VectorTest, ConstructorShouldSetupTheVectorComponentsCorrectly") {
     const xe::Vector3 v = {1.0f, 2.0f, 3.0f};
 
-    REQUIRE(v.X, 1.0f);
-    REQUIRE(v.Y, 2.0f);
-    REQUIRE(v.Z, 3.0f);
+    REQUIRE(v.x, 1.0f);
+    REQUIRE(v.y, 2.0f);
+    REQUIRE(v.z, 3.0f);
 
     REQUIRE(v.values[0], 1.0f);
     REQUIRE(v.values[1], 2.0f);
@@ -32,9 +32,9 @@ TEST_CASE("VectorTest, ConstructorFromPointerShouldSetupTheVectorComponentsCorre
     const float data[] = {1.0f, 2.0f, 3.0};
     const xe::Vector3 v{data};
 
-    REQUIRE(v.X, 1.0f);
-    REQUIRE(v.Y, 2.0f);
-    REQUIRE(v.Z, 3.0f);
+    REQUIRE(v.x, 1.0f);
+    REQUIRE(v.y, 2.0f);
+    REQUIRE(v.z, 3.0f);
 }
 
 TEST_CASE("VectorTest, DataMethodShouldReturnAnAddressToTheFirstComponent") {
@@ -53,9 +53,9 @@ TEST_CASE("VectorTest, CastMethodShouldConvertUnderlyingType") {
     const xe::Vector3 vf{1.0f, 2.0f, 3.0f};
     const auto vd = vf.cast<double>();
 
-    REQUIRE(vd.X, 1.0);
-    REQUIRE(vd.Y, 2.0);
-    REQUIRE(vd.Z, 3.0);
+    REQUIRE(vd.x, 1.0);
+    REQUIRE(vd.y, 2.0);
+    REQUIRE(vd.z, 3.0);
 }
 
 TEST_CASE("VectorTest, ComparisonOperatorsShouldCheckVectorComponentsForEqualityAndInequality") {
@@ -131,9 +131,9 @@ TEST_CASE("VectorTest, OperatorMulAndAssignByScalarShouldMultiplyComponentWise")
 
     v1 *= -1.0f;
 
-    REQUIRE(v1.X, -1.0f);
-    REQUIRE(v1.Y, 2.0f);
-    REQUIRE(v1.Z, -3.0f);
+    REQUIRE(v1.x, -1.0f);
+    REQUIRE(v1.y, 2.0f);
+    REQUIRE(v1.z, -3.0f);
 }
 
 TEST_CASE("VectorTest, OperatorDivAndAssignByScalarShouldMultiplyComponentWise") {
@@ -141,9 +141,9 @@ TEST_CASE("VectorTest, OperatorDivAndAssignByScalarShouldMultiplyComponentWise")
 
     v1 /= 2.0f;
 
-    REQUIRE(v1.X, 1.0f);
-    REQUIRE(v1.Y, -1.0f);
-    REQUIRE(v1.Z, 2.0f);
+    REQUIRE(v1.x, 1.0f);
+    REQUIRE(v1.y, -1.0f);
+    REQUIRE(v1.z, 2.0f);
 }
 
 TEST_CASE("VectorTest, OperatorDivShouldDivideComponentWise") {
