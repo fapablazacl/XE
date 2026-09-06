@@ -7,7 +7,7 @@
 #include "xe/math/Matrix.h"
 #include "xe/math/Vector.h"
 
-TEST_CASE("MatrixTest, DefaultConstructorShouldInitializeToZeroes") {
+TEST_CASE("Matrix default constructor should initialize to zeroes", "[math][matrix]") {
     xe::Matrix4 mat;
 
     for (int i = 0; i < 16; i++) {
@@ -15,7 +15,7 @@ TEST_CASE("MatrixTest, DefaultConstructorShouldInitializeToZeroes") {
     }
 }
 
-TEST_CASE("MatrixTest, PointerConstructorShouldInterpretMatrixAsRowMajor") {
+TEST_CASE("Matrix pointer constructor should interpret matrix as row-major", "[math][matrix]") {
     float values[] = {1.0f, 2.0f, 3.0f, 4.0, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f, 10.0f, 11.0f, 12.0f, 13.0f, 14.0f, 15.0f, 16.0f};
 
     xe::Matrix4 mat{values};
@@ -38,7 +38,7 @@ TEST_CASE("MatrixTest, PointerConstructorShouldInterpretMatrixAsRowMajor") {
     REQUIRE(mat.data()[15] == 16.0f);
 }
 
-TEST_CASE("MatrixTest, AccessOperatorReturnsRowsAsVectorsReferences") {
+TEST_CASE("Matrix operator[] returns rows as vector references", "[math][matrix]") {
     float values[] = {1.0f, 2.0f, 3.0f, 4.0, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f, 10.0f, 11.0f, 12.0f, 13.0f, 14.0f, 15.0f, 16.0f};
 
     xe::Matrix4 mat{values};
@@ -49,7 +49,7 @@ TEST_CASE("MatrixTest, AccessOperatorReturnsRowsAsVectorsReferences") {
     REQUIRE(mat[3] == xe::Vector4(13.0f, 14.0f, 15.0f, 16.0));
 }
 
-TEST_CASE("MatrixTest, InitializerListConstructorInterpretsThemAsMatrixRows") {
+TEST_CASE("Matrix initializer list constructor interprets items as matrix rows", "[math][matrix]") {
     xe::Matrix3 mat{1.0f, 2.0f, 3.0f, 4.0, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f};
 
     REQUIRE(mat[0][0] == 1.0f);
@@ -63,7 +63,7 @@ TEST_CASE("MatrixTest, InitializerListConstructorInterpretsThemAsMatrixRows") {
     REQUIRE(mat[2][2] == 9.0f);
 }
 
-TEST_CASE("MatrixTest, VectorConstructorOrderElementsInRowMajorOrder") {
+TEST_CASE("Matrix vector constructor orders elements in row-major order", "[math][matrix]") {
     xe::Matrix4 mat{xe::TVector<float, 16>{1.0f, 2.0f, 3.0f, 4.0, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f, 10.0f, 11.0f, 12.0f, 13.0f, 14.0f, 15.0f, 16.0f}};
 
     REQUIRE(mat[0] == xe::Vector4(1.0f, 2.0f, 3.0f, 4.0));
@@ -72,12 +72,12 @@ TEST_CASE("MatrixTest, VectorConstructorOrderElementsInRowMajorOrder") {
     REQUIRE(mat[3] == xe::Vector4(13.0f, 14.0f, 15.0f, 16.0));
 }
 
-TEST_CASE("MatrixTest, ShouldHaveRowMajorOrder") {
+TEST_CASE("Matrix elements should have row-major order", "[math][matrix]") {
     const xe::Matrix4 mat{};
     REQUIRE(mat.order() == xe::MatrixOrder::RowMajor);
 }
 
-TEST_CASE("MatrixTest, ConstructorShouldSetupTheMatrixComponentsCorrectlyForTwoDimensions") {
+TEST_CASE("Matrix constructor should setup components correctly for two dimensions", "[math][matrix]") {
     const auto m = xe::Matrix2::rows({xe::Vector2{1.0f, 2.0f}, xe::Vector2{3.0f, 4.0f}});
 
     REQUIRE(m(0, 0) == 1.0f);
@@ -86,7 +86,7 @@ TEST_CASE("MatrixTest, ConstructorShouldSetupTheMatrixComponentsCorrectlyForTwoD
     REQUIRE(m(1, 1) == 4.0f);
 }
 
-TEST_CASE("MatrixTest, ConstructorShouldSetupTheMatrixComponentsCorrectlyForThreeDimensions") {
+TEST_CASE("Matrix constructor should setup components correctly for three dimensions", "[math][matrix]") {
     const xe::Matrix3 m = xe::Matrix3::rows({xe::Vector3{1.0f, 2.0f, 3.0f}, xe::Vector3{4.0f, 5.0f, 6.0f}, xe::Vector3{7.0f, 8.0f, 9.0f}});
 
     REQUIRE(m(0, 0) == 1.0f);
@@ -100,7 +100,7 @@ TEST_CASE("MatrixTest, ConstructorShouldSetupTheMatrixComponentsCorrectlyForThre
     REQUIRE(m(2, 2) == 9.0f);
 }
 
-TEST_CASE("MatrixTest, ConstructorShouldSetupTheMatrixComponentsCorrectlyForFourDimensions") {
+TEST_CASE("Matrix constructor should setup components correctly for four dimensions", "[math][matrix]") {
     const auto m = xe::Matrix4::rows(
         {xe::Vector4{1.0f, 2.0f, 3.0f, 4.0f}, xe::Vector4{5.0f, 6.0f, 7.0f, 8.0f}, xe::Vector4{9.0f, 10.0f, 11.0f, 12.0f}, xe::Vector4{13.0f, 14.0f, 15.0f, 16.0f}}
     );
@@ -123,7 +123,7 @@ TEST_CASE("MatrixTest, ConstructorShouldSetupTheMatrixComponentsCorrectlyForFour
     REQUIRE(m(3, 3) == 16.0f);
 }
 
-TEST_CASE("MatrixTest, ConstructorShouldSetupTheMatrixComponentsCorrectlyForFourDimensionsRowVector") {
+TEST_CASE("Matrix constructor should setup components correctly for four dimensions row vector", "[math][matrix]") {
     const auto m = xe::Matrix4::rows(
         {xe::Vector4{1.0f, 2.0f, 3.0f, 4.0f}, xe::Vector4{5.0f, 6.0f, 7.0f, 8.0f}, xe::Vector4{9.0f, 10.0f, 11.0f, 12.0f}, xe::Vector4{13.0f, 14.0f, 15.0f, 16.0f}}
     );
@@ -146,7 +146,7 @@ TEST_CASE("MatrixTest, ConstructorShouldSetupTheMatrixComponentsCorrectlyForFour
     REQUIRE(m(3, 3) == 16.0f);
 }
 
-TEST_CASE("MatrixTest, DeterminantShouldComputeTheMatrixDeterminantCorrectly") {
+TEST_CASE("Matrix determinant should compute matrix determinant correctly", "[math][matrix]") {
     const auto matA = xe::Matrix4::rows(
         {xe::Vector4{1.0f, 2.0f, 1.0f, 0.0f}, xe::Vector4{2.0f, 1.0f, -3.0f, -1.0f}, xe::Vector4{-3.0f, 2.0f, 1.0f, 0.0f}, xe::Vector4{2.0f, -1.0f, 0.0f, -1.0f}}
     );
@@ -157,7 +157,7 @@ TEST_CASE("MatrixTest, DeterminantShouldComputeTheMatrixDeterminantCorrectly") {
     REQUIRE(xe::determinant(matA) == Catch::Approx(-32.0f));
 }
 
-TEST_CASE("MatrixTest, ComparisonOperatorsShouldCheckMatrixComponents") {
+TEST_CASE("Matrix comparison operators should check matrix components", "[math][matrix]") {
     const xe::Matrix4 m1 = xe::Matrix4::rows(
         {xe::Vector4{1.0f, 2.0f, 3.0f, 4.0f}, xe::Vector4{5.0f, 6.0f, 7.0f, 8.0f}, xe::Vector4{9.0f, 10.0f, 11.0f, 12.0f}, xe::Vector4{13.0f, 14.0f, 15.0f, 16.0f}}
     );
@@ -172,7 +172,7 @@ TEST_CASE("MatrixTest, ComparisonOperatorsShouldCheckMatrixComponents") {
     REQUIRE(m2 != m1);
 }
 
-TEST_CASE("MatrixTest, AdditionAddsEveryFieldOneToOne") {
+TEST_CASE("Matrix operator+ adds every field one to one", "[math][matrix]") {
     const auto matA = xe::Matrix4::rows(
         {xe::Vector4{1.0f, 2.0f, 1.0f, 0.0f}, xe::Vector4{2.0f, 1.0f, -3.0f, -1.0f}, xe::Vector4{-3.0f, 2.0f, 1.0f, 0.0f}, xe::Vector4{2.0f, -1.0f, 0.0f, -1.0f}}
     );
@@ -199,7 +199,7 @@ TEST_CASE("MatrixTest, AdditionAddsEveryFieldOneToOne") {
     REQUIRE(matAddResult == ((+matB) += matA));
 }
 
-TEST_CASE("MatrixTest, SubtractionSubtractsEveryFieldOneToOne") {
+TEST_CASE("Matrix operator- subtracts every field one to one", "[math][matrix]") {
     const auto matA = xe::Matrix4::rows(
         {xe::Vector4{1.0f, 2.0f, 1.0f, 0.0f}, xe::Vector4{2.0f, 1.0f, -3.0f, -1.0f}, xe::Vector4{-3.0f, 2.0f, 1.0f, 0.0f}, xe::Vector4{2.0f, -1.0f, 0.0f, -1.0f}}
     );
@@ -231,7 +231,7 @@ TEST_CASE("MatrixTest, SubtractionSubtractsEveryFieldOneToOne") {
     REQUIRE(-matSubResult == ((+matB) -= matA));
 }
 
-TEST_CASE("MatrixTest, ScalarMultiplicationMultipliesEveryFieldWithAnScalar") {
+TEST_CASE("Matrix scalar multiplication multiplies every field with a scalar", "[math][matrix]") {
     const auto matA = xe::Matrix4::rows(
         {xe::Vector4{1.0f, 2.0f, 1.0f, 0.0f}, xe::Vector4{2.0f, 1.0f, -3.0f, -1.0f}, xe::Vector4{-3.0f, 2.0f, 1.0f, 0.0f}, xe::Vector4{2.0f, -1.0f, 0.0f, -1.0f}}
     );
@@ -243,7 +243,7 @@ TEST_CASE("MatrixTest, ScalarMultiplicationMultipliesEveryFieldWithAnScalar") {
     REQUIRE(matA * 1.0f == 1.0f * matA);
 }
 
-TEST_CASE("MatrixTest, MatrixMultiplicationPerformsADotProductBetweenRowAndColumnsForEachResultField") {
+TEST_CASE("Matrix multiplication performs a dot product between row and columns for each result field", "[math][matrix]") {
     const auto matA = xe::Matrix4::rows(
         {xe::Vector4{1.0f, 2.0f, 1.0f, 0.0f}, xe::Vector4{2.0f, 1.0f, -3.0f, -1.0f}, xe::Vector4{-3.0f, 2.0f, 1.0f, 0.0f}, xe::Vector4{2.0f, -1.0f, 0.0f, -1.0f}}
     );
@@ -268,7 +268,7 @@ TEST_CASE("MatrixTest, MatrixMultiplicationPerformsADotProductBetweenRowAndColum
     REQUIRE(matMulResult == ((+matA) *= matB));
 }
 
-TEST_CASE("MatrixTest, TransposeShouldSwapRowsAndColumns") {
+TEST_CASE("Matrix transpose should swap rows and columns", "[math][matrix]") {
     const auto mi = xe::mat4Identity();
     const auto m0 = xe::Matrix4::zero();
 
@@ -284,7 +284,7 @@ TEST_CASE("MatrixTest, TransposeShouldSwapRowsAndColumns") {
         ));
 }
 
-TEST_CASE("MatrixTest, InverseShouldComputeTheMatrixInverseMultiplicative") {
+TEST_CASE("Matrix inverse should compute the multiplicative matrix inverse", "[math][matrix]") {
     const auto invMatA = xe::Matrix4::rows(
         {xe::Vector4{0.25000f, 0.000f, -0.25000f, 0.000},
          xe::Vector4{0.28125f, 0.125f, 0.09375f, -0.125},
@@ -304,7 +304,7 @@ TEST_CASE("MatrixTest, InverseShouldComputeTheMatrixInverseMultiplicative") {
     REQUIRE(invMatA == inverse(matA));
 }
 
-TEST_CASE("MatrixTest, GetColumnShouldExtractACertainColumnFromTheMatrixAsVector") {
+TEST_CASE("Matrix getColumn should extract a certain column from the matrix as vector", "[math][matrix]") {
     const xe::Matrix4 m = xe::Matrix4::rows(
         {xe::Vector4{1.0f, 2.0f, 3.0f, 4.0f}, xe::Vector4{5.0f, 6.0f, 7.0f, 8.0f}, xe::Vector4{9.0f, 10.0f, 11.0f, 12.0f}, xe::Vector4{13.0f, 14.0f, 15.0f, 16.0f}}
     );
@@ -315,7 +315,7 @@ TEST_CASE("MatrixTest, GetColumnShouldExtractACertainColumnFromTheMatrixAsVector
     REQUIRE(m.getColumn(3) == xe::Vector4(4.0f, 8.0f, 12.0f, 16.0f));
 }
 
-TEST_CASE("MatrixTest, SetColumnShouldChangeCorrectlyACertainColumnInTheMatrix") {
+TEST_CASE("Matrix setColumn should change correctly a certain column in the matrix", "[math][matrix]") {
     const auto m = xe::Matrix4::rows(
         {xe::Vector4{1.0f, 2.0f, 3.0f, 4.0f}, xe::Vector4{5.0f, 6.0f, 7.0f, 8.0f}, xe::Vector4{9.0f, 10.0f, 11.0f, 12.0f}, xe::Vector4{13.0f, 14.0f, 15.0f, 16.0f}}
     );
@@ -328,7 +328,7 @@ TEST_CASE("MatrixTest, SetColumnShouldChangeCorrectlyACertainColumnInTheMatrix")
     REQUIRE(m1 == m1_result);
 }
 
-TEST_CASE("MatrixTest, GetRowShouldExtractACertainRowFromTheMatrixAsAVector") {
+TEST_CASE("Matrix getRow should extract a certain row from the matrix as a vector", "[math][matrix]") {
     const xe::Matrix4 m = xe::Matrix4::rows(
         {xe::Vector4{1.0f, 2.0f, 3.0f, 4.0f}, xe::Vector4{5.0f, 6.0f, 7.0f, 8.0f}, xe::Vector4{9.0f, 10.0f, 11.0f, 12.0f}, xe::Vector4{13.0f, 14.0f, 15.0f, 16.0f}}
     );
@@ -339,7 +339,7 @@ TEST_CASE("MatrixTest, GetRowShouldExtractACertainRowFromTheMatrixAsAVector") {
     REQUIRE(m.getRow(3) == xe::Vector4(13.0f, 14.0f, 15.0f, 16.0f));
 }
 
-TEST_CASE("MatrixTest, GetSubMatrixShouldExtractASmallerMatrixFromAnother") {
+TEST_CASE("Matrix getSubMatrix should extract a smaller matrix from another", "[math][matrix]") {
     const xe::Matrix4 m = xe::Matrix4::rows(
         {xe::Vector4{1.0f, 2.0f, 3.0f, 4.0f}, xe::Vector4{5.0f, 6.0f, 7.0f, 8.0f}, xe::Vector4{9.0f, 10.0f, 11.0f, 12.0f}, xe::Vector4{13.0f, 14.0f, 15.0f, 16.0f}}
     );
@@ -359,7 +359,7 @@ TEST_CASE("MatrixTest, GetSubMatrixShouldExtractASmallerMatrixFromAnother") {
         }));
 }
 
-TEST_CASE("MatrixTest, MatrixVectorMultiplyOperationShouldTransformTheVectorByTheRight") {
+TEST_CASE("Matrix vector multiply operation should transform the vector by the right", "[math][matrix]") {
     const xe::Matrix3 m = xe::Matrix3::rows({xe::Vector3{1.0f, -1.0f, 1.0f}, xe::Vector3{-1.0f, 1.0f, -1.0f}, xe::Vector3{1.0f, 0.0f, 1.0f}});
 
     REQUIRE(m * xe::Vector3(0.0f, 0.0f, 0.0f) == xe::Vector3(0.0f, 0.0f, 0.0f));
@@ -367,7 +367,7 @@ TEST_CASE("MatrixTest, MatrixVectorMultiplyOperationShouldTransformTheVectorByTh
     REQUIRE(m * xe::Vector3(-1.0f, -1.0f, -1.0f) == xe::Vector3(-1.0f, 1.0f, -2.0f));
 }
 
-TEST_CASE("MatrixTest, ZeroStaticFunctionShouldCreateAValidZeroMatrix") {
+TEST_CASE("Matrix zero static function should create a valid zero matrix", "[math][matrix]") {
     REQUIRE(xe::Matrix4::zero() == xe::Matrix4::rows({xe::Vector4(0.0f, 0.0f, 0.0f, 0.0f), xe::Vector4(0.0f, 0.0f, 0.0f, 0.0f), xe::Vector4(0.0f, 0.0f, 0.0f, 0.0f), xe::Vector4(0.0f, 0.0f, 0.0f, 0.0f)}));
 
     REQUIRE(xe::Matrix3::zero() == xe::Matrix3::rows({xe::Vector3(0.0f, 0.0f, 0.0f), xe::Vector3(0.0f, 0.0f, 0.0f), xe::Vector3(0.0f, 0.0f, 0.0f)}));
@@ -382,7 +382,7 @@ TEST_CASE("MatrixTest, ZeroStaticFunctionShouldCreateAValidZeroMatrix") {
     REQUIRE(mzero * xe::Vector4(0.0f, 0.0f, 1.0f, 0.0f) == xe::Vector4(0.0f, 0.0f, 0.0f, 0.0f));
 }
 
-TEST_CASE("MatrixTest, IdentityStaticFunctionShouldCreateAValidIdentityMatrix") {
+TEST_CASE("Matrix identity static function should create a valid identity matrix", "[math][matrix]") {
     REQUIRE(xe::mat4Identity() == xe::Matrix4::rows({xe::Vector4(1.0f, 0.0f, 0.0f, 0.0f), xe::Vector4(0.0f, 1.0f, 0.0f, 0.0f), xe::Vector4(0.0f, 0.0f, 1.0f, 0.0f), xe::Vector4(0.0f, 0.0f, 0.0f, 1.0f)}));
 
     REQUIRE(xe::mat3Identity() == xe::Matrix3::rows({xe::Vector3(1.0f, 0.0f, 0.0f), xe::Vector3(0.0f, 1.0f, 0.0f), xe::Vector3(0.0f, 0.0f, 1.0f)}));
@@ -397,7 +397,7 @@ TEST_CASE("MatrixTest, IdentityStaticFunctionShouldCreateAValidIdentityMatrix") 
     REQUIRE(mid * xe::Vector4(1.0f, 2.0f, -3.0f, 4.0f) == xe::Vector4(1.0f, 2.0f, -3.0f, 4.0f));
 }
 
-TEST_CASE("MatrixTest, ScaleStaticFunctionShouldCreateAValidScalingMatrix") {
+TEST_CASE("Matrix scale static function should create a valid scaling matrix", "[math][matrix]") {
     REQUIRE(xe::mat4Scaling({1.0f, 2.0f, 3.0f, 4.0f}) == xe::Matrix4::rows({xe::Vector4(1.0f, 0.0f, 0.0f, 0.0f), xe::Vector4(0.0f, 2.0f, 0.0f, 0.0f), xe::Vector4(0.0f, 0.0f, 3.0f, 0.0f), xe::Vector4(0.0f, 0.0f, 0.0f, 4.0f)}));
 
     REQUIRE(xe::mat3Scaling({1.0f, 2.0f, 3.0f}) == xe::Matrix3::rows({xe::Vector3(1.0f, 0.0f, 0.0f), xe::Vector3(0.0f, 2.0f, 0.0f), xe::Vector3(0.0f, 0.0f, 3.0f)}));
@@ -412,7 +412,7 @@ TEST_CASE("MatrixTest, ScaleStaticFunctionShouldCreateAValidScalingMatrix") {
     REQUIRE(m_s1 * xe::Vector4(1.0f, 2.0f, -3.0f, 4.0f) == xe::Vector4(1.0f, 4.0f, -9.0f, 4.0f));
 }
 
-TEST_CASE("MatrixTest, CreateTranslationStaticFunctionShouldCreateAValidTranslateMatrix") {
+TEST_CASE("Matrix createTranslation static function should create a valid translate matrix", "[math][matrix]") {
     const auto m1 = xe::mat4Translation({2.0f, 3.0f, 4.0f});
 
     REQUIRE(m1.getRow(0) == xe::Vector4(1.0f, 0.0f, 0.0f, 2.0f));
@@ -421,7 +421,7 @@ TEST_CASE("MatrixTest, CreateTranslationStaticFunctionShouldCreateAValidTranslat
     REQUIRE(m1.getRow(3) == xe::Vector4(0.0f, 0.0f, 0.0f, 1.0f));
 }
 
-TEST_CASE("MatrixTest, RotateXStaticFunctionShouldCreateAXAxisRotationMatrix") {
+TEST_CASE("Matrix rotateX static function should create an X-axis rotation matrix", "[math][matrix]") {
     xe::Matrix4 m;
     float sin = NAN, cos = NAN;
 
@@ -448,7 +448,7 @@ TEST_CASE("MatrixTest, RotateXStaticFunctionShouldCreateAXAxisRotationMatrix") {
     REQUIRE(m.getRow(3) == xe::Vector4(0.0f, 0.0f, 0.0f, 1.0f));
 }
 
-TEST_CASE("MatrixTest, RotateYStaticFunctionShouldCreateAWellConstructedRotationMatrix") {
+TEST_CASE("Matrix rotateY static function should create a well constructed rotation matrix", "[math][matrix]") {
     xe::Matrix4 m;
     float sin = NAN, cos = NAN;
 
@@ -475,7 +475,7 @@ TEST_CASE("MatrixTest, RotateYStaticFunctionShouldCreateAWellConstructedRotation
     REQUIRE(m.getRow(3) == xe::Vector4(0.0f, 0.0f, 0.0f, 1.0f));
 }
 
-TEST_CASE("MatrixTest, RotateZStaticFunctionShouldCreateAWellConstructedRotationMatrix") {
+TEST_CASE("Matrix rotateZ static function should create a well constructed rotation matrix", "[math][matrix]") {
     xe::Matrix4 m;
     float sin = NAN, cos = NAN;
 
@@ -502,7 +502,7 @@ TEST_CASE("MatrixTest, RotateZStaticFunctionShouldCreateAWellConstructedRotation
     REQUIRE(m.getRow(3) == xe::Vector4(0.0f, 0.0f, 0.0f, 1.0f));
 }
 
-TEST_CASE("MatrixTest, RotateWithFixedAxisShouldMatchTheCorrespondingRotateXYZStaticMethods") {
+TEST_CASE("Matrix rotate with fixed axis should match corresponding rotate XYZ static methods", "[math][matrix]") {
     REQUIRE(xe::mat4Rotation(0.0f, xe::Vector3(0.0f, 1.0f, 0.0f)) == xe::mat4Identity());
     REQUIRE(xe::mat4Rotation(0.0f, xe::Vector3(0.0f, 0.0f, 1.0f)) == xe::mat4Identity());
     REQUIRE(xe::mat4Rotation(0.0f, xe::Vector3(-1.0f, 0.0f, 0.0f)) == xe::mat4Identity());
@@ -528,18 +528,18 @@ TEST_CASE("MatrixTest, RotateWithFixedAxisShouldMatchTheCorrespondingRotateXYZSt
     REQUIRE(xe::mat4Rotation(2.0f * xe::pi<float>, xe::Vector3(0.0f, 0.0f, 1.0f)) == xe::mat4RotationZ(2.0f * xe::pi<float>));
 }
 
-TEST_CASE("MatrixTest, LookAtRHShouldCreateATransformThatSimulatesAStandardLookAtCamera_WithCenterAtThOriginLookingAtTheZAxisAndYOrientation_ShouldGenerateAnIdentityMatrix") {
+TEST_CASE("Matrix lookAtRH simulating standard camera with center at origin looking at Z axis and Y orientation should generate identity matrix", "[math][matrix]") {
     const auto lookAt = xe::mat4LookAtRH({0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, -1.0f}, {0.0f, 1.0f, 0.0f});
     REQUIRE(lookAt == xe::mat4Identity());
 }
 
-TEST_CASE("MatrixTest, LookAtRHShouldCreateATransformThatSimulatesAStandardLookAtCamera_WithCenterAtTheOrigin_LookingAtTheZAxisAndYOrientation_ShouldGenerateAnPseudoIdentityMatrixWithSomeNegativeUnitAxis") {
+TEST_CASE("Matrix lookAtRH simulating standard camera with center at origin looking at Z axis and Y orientation should generate pseudo-identity matrix with negative unit axis", "[math][matrix]") {
     const auto lookAt = xe::mat4LookAtRH({0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f, 0.0f});
 
     REQUIRE(lookAt == xe::Matrix4::rows({xe::Vector4(-1.0f, 0.0f, 0.0f, 0.0f), xe::Vector4(0.0f, 1.0f, 0.0f, 0.0f), xe::Vector4(0.0f, 0.0f, -1.0f, 0.0f), xe::Vector4(0.0f, 0.0f, 0.0f, 1.0f)}));
 }
 
-TEST_CASE("MatrixTest, LookAtRHShouldCreateATransformThatSimulatesAStandardLookAtCamera_WithCenterAtTheMinus10ZLookingAtTheZAxisAndYOrientationShouldGenerateATranslationMatrix") {
+TEST_CASE("Matrix lookAtRH simulating standard camera with center at -10 Z looking at Z axis and Y orientation should generate translation matrix", "[math][matrix]") {
     const auto lookAt1 = xe::mat4LookAtRH({0.0f, 0.0f, 10.0f}, {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f, 0.0f});
     REQUIRE(lookAt1 == xe::mat4Translation(xe::Vector3(0.0f, 0.0f, -10.0f)));
 
@@ -547,7 +547,7 @@ TEST_CASE("MatrixTest, LookAtRHShouldCreateATransformThatSimulatesAStandardLookA
     REQUIRE(lookAt2 == xe::mat4Translation(xe::Vector3(0.0f, 0.0f, -10.0f)));
 }
 
-TEST_CASE("MatrixTest, createPerspectiveShouldCreateAPerspectiveTransformationMatrix") {
+TEST_CASE("Matrix createPerspective should create a perspective transformation matrix", "[math][matrix]") {
     const auto m1 = xe::mat4Perspective(xe::radians(60.0f), (320.0f / 240.0f), 0.1f, 100.0f);
     REQUIRE(m1 == xe::Matrix4::rows(
             {xe::Vector4(1.299038170f, 0.000000000f, 0.000000000f, 0.000000000f),
@@ -565,7 +565,7 @@ TEST_CASE("MatrixTest, createPerspectiveShouldCreateAPerspectiveTransformationMa
         ));
 }
 
-TEST_CASE("MatrixTest, CreateOrthographicShouldCreateAOrthographicTransformationMatrix") {
+TEST_CASE("Matrix createOrthographic should create an orthographic transformation matrix", "[math][matrix]") {
     const auto m1 = xe::mat4Ortho({-1.0f, -1.0f, -1.0f}, {1.0f, 1.0f, 1.0f});
     REQUIRE(m1 == xe::Matrix4::rows({
             xe::Vector4(1.0f, 0.0f, 0.0f, 0.0f),

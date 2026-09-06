@@ -3,14 +3,14 @@
 #include <catch2/catch_all.hpp>
 #include <iostream>
 
-TEST_CASE("RangeTest, DefaultConstructorShouldLetTheRangeWithValues0And1") {
+TEST_CASE("Range default constructor should initialize range with values 0 and 1", "[math][range]") {
     xe::TRange<float> subject;
     REQUIRE(subject.max >= subject.min);
     REQUIRE(subject.min == 0.0f);
     REQUIRE(subject.max == 1.0f);
 }
 
-TEST_CASE("RangeTest, TwoParamConstructorShouldLetTheRangeWithThoseValuesCorrectlySetted") {
+TEST_CASE("Range two parameter constructor should initialize range with values correctly set", "[math][range]") {
     xe::TRange<float> subject = xe::TRange<float>{1.0f, -1.0f};
 
     REQUIRE(subject.max >= subject.min);
@@ -18,7 +18,7 @@ TEST_CASE("RangeTest, TwoParamConstructorShouldLetTheRangeWithThoseValuesCorrect
     REQUIRE(subject.max == 1.0f);
 }
 
-TEST_CASE("RangeTest, ExpandShouldNotMutateTheRangeIfTheSuppliedValueIsInsideTheRange") {
+TEST_CASE("Range expand should not mutate the range if supplied value is inside range", "[math][range]") {
     xe::TRange<float> subject;
 
     const float values[] = {0.0f, 0.25f, 0.5f, 0.75f, 1.0f};
@@ -31,7 +31,7 @@ TEST_CASE("RangeTest, ExpandShouldNotMutateTheRangeIfTheSuppliedValueIsInsideThe
     }
 }
 
-TEST_CASE("RangeTest, ExpandShouldMutateTheRangeIfTheSuppliedValueIsOutsideTheRange") {
+TEST_CASE("Range expand should mutate the range if supplied value is outside range", "[math][range]") {
     xe::TRange<float> subject;
 
     subject.expand(-1.0f);
@@ -50,7 +50,7 @@ TEST_CASE("RangeTest, ExpandShouldMutateTheRangeIfTheSuppliedValueIsOutsideTheRa
     REQUIRE(subject.max == 2.0f);
 }
 
-TEST_CASE("RangeTest, PartialOverlapShouldReturnTrueWhenOverlapsWithTheSuppliedRange") {
+TEST_CASE("Range partialOverlap should return true when overlapping with supplied range", "[math][range]") {
     xe::TRange<float> subject;
 
     const xe::TRange<float> ranges[] = {
@@ -67,7 +67,7 @@ TEST_CASE("RangeTest, PartialOverlapShouldReturnTrueWhenOverlapsWithTheSuppliedR
     }
 }
 
-TEST_CASE("RangeTest, OverlapShouldReturnTrueWhenTheCurrentRangeOverlapsWithTheSuppliedRange") {
+TEST_CASE("Range overlap should return true when current range overlaps with supplied range", "[math][range]") {
     xe::TRange<float> subject;
 
     const xe::TRange<float> ranges[] = {
@@ -87,7 +87,7 @@ TEST_CASE("RangeTest, OverlapShouldReturnTrueWhenTheCurrentRangeOverlapsWithTheS
     }
 }
 
-TEST_CASE("RangeTest, OverlapShouldReturnFalseWhenUsingTightlyPositionedRanges") {
+TEST_CASE("Range overlap should return false when using tightly positioned ranges", "[math][range]") {
     for (int i = -10; i < 10; i++) {
         for (float offset = 0.0f; offset < 1.0f; offset += 0.125f) {
             const float width = 1.0f;

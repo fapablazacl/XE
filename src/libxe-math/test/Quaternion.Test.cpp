@@ -3,7 +3,7 @@
 #include "xe/math/Quaternion.h"
 #include "xe/math/Common.h"
 
-TEST_CASE("QuaternionTest, VectorScalarConstructorInitializesTheVectorAndScalarPart") {
+TEST_CASE("Quaternion vector scalar constructor initializes vector and scalar part", "[math][quaternion]") {
     const auto q2 = xe::Quat{{0.0f, 1.0f, 0.0f}, 1.0f};
 
     REQUIRE(q2.V.x == Catch::Approx(0.0f));
@@ -12,7 +12,7 @@ TEST_CASE("QuaternionTest, VectorScalarConstructorInitializesTheVectorAndScalarP
     REQUIRE(q2.W == Catch::Approx(1.0f));
 }
 
-TEST_CASE("QuaternionTest, FourScalarConstructorInitializesTheVectorAndScalarPart") {
+TEST_CASE("Quaternion four scalar constructor initializes vector and scalar part", "[math][quaternion]") {
     const auto q = xe::Quat{0.0f, 1.0f, 0.0f, 1.0f};
 
     REQUIRE(q.V.x == Catch::Approx(0.0f));
@@ -21,7 +21,7 @@ TEST_CASE("QuaternionTest, FourScalarConstructorInitializesTheVectorAndScalarPar
     REQUIRE(q.W == Catch::Approx(1.0f));
 }
 
-TEST_CASE("QuaternionTest, OneScalarConstructorInitializesTheScalarPart") {
+TEST_CASE("Quaternion one scalar constructor initializes scalar part", "[math][quaternion]") {
     const auto q2 = xe::Quat{1.0f};
 
     REQUIRE(q2.V.x == Catch::Approx(0.0f));
@@ -30,7 +30,7 @@ TEST_CASE("QuaternionTest, OneScalarConstructorInitializesTheScalarPart") {
     REQUIRE(q2.W == Catch::Approx(1.0f));
 }
 
-TEST_CASE("QuaternionTest, Vector3ConstructorConstructorInitializesTheVectorPart") {
+TEST_CASE("Quaternion vector3 constructor initializes vector part", "[math][quaternion]") {
     const auto q = xe::Quat{{0.0f, 1.0f, 0.0f}};
 
     REQUIRE(q.V.x == Catch::Approx(0.0f));
@@ -39,7 +39,7 @@ TEST_CASE("QuaternionTest, Vector3ConstructorConstructorInitializesTheVectorPart
     REQUIRE(q.W == Catch::Approx(0.0f));
 }
 
-TEST_CASE("QuaternionTest, Vector4ConstructorConstructorInitializesTheVectorPart") {
+TEST_CASE("Quaternion vector4 constructor initializes vector part", "[math][quaternion]") {
     const auto v = xe::Vector4{0.0f, 1.0f, 0.0f, 10.0f};
     const auto q = xe::Quat{v};
 
@@ -49,7 +49,7 @@ TEST_CASE("QuaternionTest, Vector4ConstructorConstructorInitializesTheVectorPart
     REQUIRE(q.W == Catch::Approx(10.0f));
 }
 
-TEST_CASE("QuaternionTest, ThreeScalarConstructorInitializesTheVectorPart") {
+TEST_CASE("Quaternion three scalar constructor initializes vector part", "[math][quaternion]") {
     const auto q = xe::Quat{0.0f, 1.0f, 0.0f};
 
     REQUIRE(q.V.x == Catch::Approx(0.0f));
@@ -58,7 +58,7 @@ TEST_CASE("QuaternionTest, ThreeScalarConstructorInitializesTheVectorPart") {
     REQUIRE(q.W == Catch::Approx(0.0f));
 }
 
-TEST_CASE("QuaternionTest, PointerConstructorInitializesTheVectorAndScalarPart") {
+TEST_CASE("Quaternion pointer constructor initializes vector and scalar part", "[math][quaternion]") {
     const float values[] = {4.0f, 2.0f, 3.0f, 1.0f};
 
     const auto q = xe::Quat{values};
@@ -69,7 +69,7 @@ TEST_CASE("QuaternionTest, PointerConstructorInitializesTheVectorAndScalarPart")
     REQUIRE(q.W == Catch::Approx(1.0f));
 }
 
-TEST_CASE("QuaternionTest, CopyConstructorInitializesTheVectorAndScalarPart") {
+TEST_CASE("Quaternion copy constructor initializes vector and scalar part", "[math][quaternion]") {
     const auto q = xe::Quat{xe::Quat{1.0f, 2.0f, 3.0f, 1.0f}};
 
     REQUIRE(q.V.x == Catch::Approx(1.0f));
@@ -78,7 +78,7 @@ TEST_CASE("QuaternionTest, CopyConstructorInitializesTheVectorAndScalarPart") {
     REQUIRE(q.W == Catch::Approx(1.0f));
 }
 
-TEST_CASE("QuaternionTest, DataShouldReturnAPointerToTheFirstElement") {
+TEST_CASE("Quaternion data should return a pointer to the first element", "[math][quaternion]") {
     const auto quat = xe::Quat{0.0f, 1.0f, 2.0f, 3.0f};
     const float *data = quat.data();
 
@@ -88,12 +88,12 @@ TEST_CASE("QuaternionTest, DataShouldReturnAPointerToTheFirstElement") {
     REQUIRE(data[3] == 3.0f);
 }
 
-TEST_CASE("QuaternionTest, SizeAlwaysReturnsFour") {
+TEST_CASE("Quaternion size always returns four", "[math][quaternion]") {
     const auto quat = xe::Quat{0.0f, 1.0f, 2.0f, 3.0f};
     REQUIRE(quat.size() == 4);
 }
 
-TEST_CASE("QuaternionTest, OperatorBracketsShouldEnableAccessToEachElement") {
+TEST_CASE("Quaternion operator[] should enable access to each element", "[math][quaternion]") {
     auto quat = xe::Quat{0.0f, 1.0f, 2.0f, 3.0f};
     REQUIRE(quat[0] == 0.0f);
     REQUIRE(quat[1] == 1.0f);
@@ -110,7 +110,7 @@ TEST_CASE("QuaternionTest, OperatorBracketsShouldEnableAccessToEachElement") {
     REQUIRE(quat2[3] == -3.0f);
 }
 
-TEST_CASE("QuaternionTest, EqualityOperatorDoesElementWiseComparisonViaFPTolerance") {
+TEST_CASE("Quaternion operator== does element-wise comparison via FP tolerance", "[math][quaternion]") {
     const auto qa_1 = xe::Quat{{1.0f, 2.0f, 3.0f}, 1.0f};
     const auto qa_2 = xe::Quat{1.0f, 2.0f, 3.0f, 1.0f};
     const auto qb_1 = xe::Quat{{1.0f, 2.0f, 3.0f}};
@@ -122,7 +122,7 @@ TEST_CASE("QuaternionTest, EqualityOperatorDoesElementWiseComparisonViaFPToleran
     REQUIRE(qb_2 == qb_1);
 }
 
-TEST_CASE("QuaternionTest, InequalityOperatorDoesElementWiseComparisonViaFPTolerance") {
+TEST_CASE("Quaternion operator!= does element-wise comparison via FP tolerance", "[math][quaternion]") {
     const auto qa_1 = xe::Quat{{1.0f, 2.0f, 3.0f}, 1.0f};
     const auto qa_2 = xe::Quat{1.0f, 2.0f, 3.0f, 1.0f};
     const auto qb_1 = xe::Quat{{1.0f, 2.0f, 3.0f}};
@@ -135,7 +135,7 @@ TEST_CASE("QuaternionTest, InequalityOperatorDoesElementWiseComparisonViaFPToler
     REQUIRE(qb_2 != qa_1);
 }
 
-TEST_CASE("QuaternionTest, ZeroQuaternionFactoryMethodInitializesScalarAndVectorPartToZeroes") {
+TEST_CASE("Quaternion zero factory method initializes scalar and vector part to zeroes", "[math][quaternion]") {
     const auto q = xe::quatZero<float>();
 
     REQUIRE(q.V.x == Catch::Approx(0.0f));
@@ -144,7 +144,7 @@ TEST_CASE("QuaternionTest, ZeroQuaternionFactoryMethodInitializesScalarAndVector
     REQUIRE(q.W == Catch::Approx(0.0f));
 }
 
-TEST_CASE("QuaternionTest, IdentityQuaternionFactoryMethodInitializesScalarPartToOne") {
+TEST_CASE("Quaternion identity factory method initializes scalar part to one", "[math][quaternion]") {
     const auto q = xe::quatId<float>();
 
     REQUIRE(q.V.x == Catch::Approx(0.0f));
@@ -153,7 +153,7 @@ TEST_CASE("QuaternionTest, IdentityQuaternionFactoryMethodInitializesScalarPartT
     REQUIRE(q.W == Catch::Approx(1.0f));
 }
 
-TEST_CASE("QuaternionTest, RotationRHQuaternionFactoryMethodInitializesNormalizedQuaternionWithHalfAngleCosine") {
+TEST_CASE("Quaternion rotationRH factory method initializes normalized quaternion with half-angle cosine", "[math][quaternion]") {
     const float radians = xe::pi<float>;
     const xe::Vector3 axis{0.0f, 1.0f, 0.0f};
 
@@ -167,7 +167,7 @@ TEST_CASE("QuaternionTest, RotationRHQuaternionFactoryMethodInitializesNormalize
     REQUIRE(subject.W == Catch::Approx(correct.W));
 }
 
-TEST_CASE("QuaternionTest, RotationLHQuaternionFactoryMethodInitializesNormalizedQuaternionWithHalfAngleCosine") {
+TEST_CASE("Quaternion rotationLH factory method initializes normalized quaternion with half-angle cosine", "[math][quaternion]") {
     const float radians = xe::pi<float>;
     const xe::Vector3 axis{0.0f, 1.0f, 0.0f};
 
@@ -180,17 +180,17 @@ TEST_CASE("QuaternionTest, RotationLHQuaternionFactoryMethodInitializesNormalize
     REQUIRE(subject.W == Catch::Approx(correct.W));
 }
 
-TEST_CASE("QuaternionTest, Norm2ShouldComputeTheSquaredMagnitude") {
+TEST_CASE("Quaternion norm2 should compute the squared magnitude", "[math][quaternion]") {
     const auto q = xe::Quat{2.0f, 3.0f, 4.0f, 5.0f};
     REQUIRE(norm2(q) == 54.0f);
 }
 
-TEST_CASE("QuaternionTest, NormShouldComputeTheMagnitude") {
+TEST_CASE("Quaternion norm should compute the magnitude", "[math][quaternion]") {
     const auto q = xe::Quat{0.0f, 3.0f, 0.0f, 4.0f};
     REQUIRE(norm(q) == 5.0f);
 }
 
-TEST_CASE("QuaternionTest, ConjugateShouldNegateTheVectorPart") {
+TEST_CASE("Quaternion conjugate should negate the vector part", "[math][quaternion]") {
     const auto q4 = xe::conjugate(xe::Quat{{-1.0f, 1.0f, -1.0f}, 1.0f});
 
     REQUIRE(q4.V.x == 1.0f);
@@ -199,7 +199,7 @@ TEST_CASE("QuaternionTest, ConjugateShouldNegateTheVectorPart") {
     REQUIRE(q4.W == 1.0f);
 }
 
-TEST_CASE("QuaternionTest, NormalizeShouldScaleAQuaternionToTheUnitLength") {
+TEST_CASE("Quaternion normalize should scale a quaternion to unit length", "[math][quaternion]") {
     const auto q1 = xe::normalize(xe::Quat{{1.0f, 1.0f, 1.0f}, 1.0f});
     REQUIRE(q1.V.x == 0.5f);
     REQUIRE(q1.V.y == 0.5f);
@@ -219,7 +219,7 @@ TEST_CASE("QuaternionTest, NormalizeShouldScaleAQuaternionToTheUnitLength") {
     REQUIRE(q3.W == 0.0f);
 }
 
-TEST_CASE("QuaternionTest, AdditionOperatorShouldAddTheirEachComponentsTogether") {
+TEST_CASE("Quaternion operator+ should add each component together", "[math][quaternion]") {
     const auto q1 = xe::Quat(1.0f, 0.0f, 1.0f, 1.0f);
     const auto q2 = xe::Quat(0.0f, 1.0f, 0.0f, 1.0f);
 
@@ -227,7 +227,7 @@ TEST_CASE("QuaternionTest, AdditionOperatorShouldAddTheirEachComponentsTogether"
     REQUIRE(q1 + q2 == xe::Quat(1.0f, 1.0f, 1.0f, 2.0f));
 }
 
-TEST_CASE("QuaternionTest, SubtractionOperatorShouldSubtractEachComponentTogether") {
+TEST_CASE("Quaternion operator- should subtract each component together", "[math][quaternion]") {
     const auto q1 = xe::Quat(1.0f, 0.0f, 1.0f, 1.0f);
     const auto q2 = xe::Quat(0.0f, 1.0f, 0.0f, 1.0f);
 
@@ -235,7 +235,7 @@ TEST_CASE("QuaternionTest, SubtractionOperatorShouldSubtractEachComponentTogethe
     REQUIRE(q1 - q2 == xe::Quat(1.0f, -1.0f, 1.0f, 0.0f));
 }
 
-TEST_CASE("QuaternionTest, NegationOperatorShouldInvertEachComponent") {
+TEST_CASE("Quaternion unary operator- should invert each component", "[math][quaternion]") {
     const auto q1 = xe::Quat(1.0f, 0.0f, 1.0f, 1.0f);
     const auto q2 = xe::Quat(0.0f, 1.0f, 0.0f, 1.0f);
 
@@ -243,7 +243,7 @@ TEST_CASE("QuaternionTest, NegationOperatorShouldInvertEachComponent") {
     REQUIRE(-q2 == xe::Quat(0.0f, -1.0f, 0.0f, -1.0f));
 }
 
-TEST_CASE("QuaternionTest, PlusOperatorShouldModifyNoComponents") {
+TEST_CASE("Quaternion unary operator+ should modify no components", "[math][quaternion]") {
     const auto q1 = xe::Quat(1.0f, 0.0f, 1.0f, 1.0f);
     const auto q2 = xe::Quat(0.0f, 1.0f, 0.0f, 1.0f);
 
@@ -251,7 +251,7 @@ TEST_CASE("QuaternionTest, PlusOperatorShouldModifyNoComponents") {
     REQUIRE(+q2 == xe::Quat(0.0f, 1.0f, 0.0f, 1.0f));
 }
 
-TEST_CASE("QuaternionTest, MultiplyByScalarOperatorMultiplyEachComponent") {
+TEST_CASE("Quaternion operator* by scalar should multiply each component", "[math][quaternion]") {
     const auto q1 = xe::Quat(1.0f, 0.0f, 1.0f, 1.0f);
     const auto q2 = xe::Quat(0.0f, 1.0f, 0.0f, 1.0f);
 
@@ -259,7 +259,7 @@ TEST_CASE("QuaternionTest, MultiplyByScalarOperatorMultiplyEachComponent") {
     REQUIRE(q2 * 0.0f == xe::Quat(0.0f, 0.0f, 0.0f, 0.0f));
 }
 
-TEST_CASE("QuaternionTest, ScalarByQuaternionOperatorMultiplyEachComponent") {
+TEST_CASE("Quaternion scalar operator* by quaternion should multiply each component", "[math][quaternion]") {
     const auto q1 = xe::Quat(1.0f, 0.0f, 1.0f, 1.0f);
     const auto q2 = xe::Quat(0.0f, 1.0f, 0.0f, 1.0f);
 
@@ -267,7 +267,7 @@ TEST_CASE("QuaternionTest, ScalarByQuaternionOperatorMultiplyEachComponent") {
     REQUIRE(0.0f * q2 == xe::Quat(0.0f, 0.0f, 0.0f, 0.0f));
 }
 
-TEST_CASE("QuaternionTest, DivideByScalarOperatorMultiplyEachComponent") {
+TEST_CASE("Quaternion operator/ by scalar should divide each component", "[math][quaternion]") {
     const auto q1 = xe::Quat(1.0f, 0.0f, 1.0f, 1.0f);
     const auto q2 = xe::Quat(0.0f, 1.0f, 0.0f, 1.0f);
 
@@ -275,7 +275,7 @@ TEST_CASE("QuaternionTest, DivideByScalarOperatorMultiplyEachComponent") {
     REQUIRE(q2 / 0.5f == xe::Quat(0.0f, 2.0f, 0.0f, 2.0f));
 }
 
-TEST_CASE("QuaternionTest, MultiplyShouldCombineTwoQuaternions") {
+TEST_CASE("Quaternion operator* should combine two quaternions", "[math][quaternion]") {
     const auto q1 = xe::Quat(1.0f, 0.0f, 0.0f, 1.0f);
     const auto q2 = xe::Quat(0.0f, 1.0f, 0.0f, 1.0f);
 
@@ -292,7 +292,7 @@ TEST_CASE("QuaternionTest, MultiplyShouldCombineTwoQuaternions") {
     REQUIRE(r2.W == Catch::Approx(1.0f));
 }
 
-TEST_CASE("QuaternionTest, MultiplyByIdentityQShouldNotHaveAnyAffect") {
+TEST_CASE("Quaternion multiplication by identity quaternion should not have any effect", "[math][quaternion]") {
     const auto q1 = xe::Quat(1.0f, 0.0f, 1.0f, 1.0f);
     const auto q2 = xe::Quat(0.0f, 1.0f, 0.0f, 1.0f);
     const auto qi = xe::quatId<float>();
@@ -301,7 +301,7 @@ TEST_CASE("QuaternionTest, MultiplyByIdentityQShouldNotHaveAnyAffect") {
     REQUIRE(q2 * qi == q2);
 }
 
-TEST_CASE("QuaternionTest, MultiplyByZeroQShouldCollapseAnyQuaternionToZero") {
+TEST_CASE("Quaternion multiplication by zero quaternion should collapse any quaternion to zero", "[math][quaternion]") {
     const auto q1 = xe::Quat(1.0f, 0.0f, 1.0f, 1.0f);
     const auto q2 = xe::Quat(0.0f, 1.0f, 0.0f, 1.0f);
     const auto qz = xe::quatZero<float>();
@@ -310,7 +310,7 @@ TEST_CASE("QuaternionTest, MultiplyByZeroQShouldCollapseAnyQuaternionToZero") {
     REQUIRE(q2 * qz == qz);
 }
 
-TEST_CASE("QuaternionTest, DivideByIdentityShouldNotAffectAnyQuaternion") {
+TEST_CASE("Quaternion division by identity quaternion should not affect any quaternion", "[math][quaternion]") {
     const auto q1 = xe::Quat(1.0f, 0.0f, 1.0f, 1.0f);
     const auto q2 = xe::Quat(0.0f, 1.0f, 0.0f, 1.0f);
     const auto qi = xe::quatId<float>();
@@ -319,7 +319,7 @@ TEST_CASE("QuaternionTest, DivideByIdentityShouldNotAffectAnyQuaternion") {
     REQUIRE(q2 / qi == q2);
 }
 
-TEST_CASE("QuaternionTest, DivideByZeroShouldCollapseAnyQuaternionToNaNValues") {
+TEST_CASE("Quaternion division by zero should collapse any quaternion to NaN values", "[math][quaternion]") {
     const auto q1 = xe::Quat(1.0f, 0.0f, 1.0f, 1.0f);
     const auto q2 = xe::Quat(0.0f, 1.0f, 0.0f, 1.0f);
     const auto qz = xe::quatZero<float>();
@@ -338,7 +338,7 @@ TEST_CASE("QuaternionTest, DivideByZeroShouldCollapseAnyQuaternionToNaNValues") 
     REQUIRE(std::isnan(r2.W));
 }
 
-TEST_CASE("QuaternionTest, AddAndAssignOperatorShouldAddTheirEachComponentsTogether") {
+TEST_CASE("Quaternion operator+= should add each component together", "[math][quaternion]") {
     xe::Quat q1{{1.0f, 0.0f, 1.0f}, 1.0f};
     q1 += q1;
 
@@ -348,7 +348,7 @@ TEST_CASE("QuaternionTest, AddAndAssignOperatorShouldAddTheirEachComponentsToget
     REQUIRE(q1.W == Catch::Approx(2.0f));
 }
 
-TEST_CASE("QuaternionTest, SubtractractAndAssignOperatorShouldSubtractEachComponentTogether") {
+TEST_CASE("Quaternion operator-= should subtract each component together", "[math][quaternion]") {
     xe::Quat q1{{1.0f, 0.0f, 1.0f}, 1.0f};
     q1 -= xe::Quat(0.0f, 1.0f, 0.0f, 1.0f);
 
@@ -358,7 +358,7 @@ TEST_CASE("QuaternionTest, SubtractractAndAssignOperatorShouldSubtractEachCompon
     REQUIRE(q1.W == Catch::Approx(0.0f));
 }
 
-TEST_CASE("QuaternionTest, MultiplyAndAssignByScalarOperatorMultiplyEachComponent") {
+TEST_CASE("Quaternion operator*= by scalar should multiply each component", "[math][quaternion]") {
     xe::Quat q1{{1.0f, 0.0f, 1.0f}, 1.0f};
 
     q1 *= 3.0f;
@@ -369,7 +369,7 @@ TEST_CASE("QuaternionTest, MultiplyAndAssignByScalarOperatorMultiplyEachComponen
     REQUIRE(q1.W == Catch::Approx(3.0f));
 }
 
-TEST_CASE("QuaternionTest, DivideAndAssignByScalarOperatorMultiplyEachComponent") {
+TEST_CASE("Quaternion operator/= by scalar should divide each component", "[math][quaternion]") {
     xe::Quat q1{{1.0f, 0.0f, 1.0f}, 1.0f};
 
     q1 /= 1.0f;
@@ -380,19 +380,19 @@ TEST_CASE("QuaternionTest, DivideAndAssignByScalarOperatorMultiplyEachComponent"
     REQUIRE(q1.W == Catch::Approx(1.0f));
 }
 
-TEST_CASE("QuaternionTest, Norm2ShouldComputeSquaredMagnitude") {
+TEST_CASE("Quaternion norm2 static function should compute squared magnitude", "[math][quaternion]") {
     const auto q = xe::Quat{3.0f, 4.0f, 5.0f, 0.0f};
 
     REQUIRE(xe::norm2(q) == Catch::Approx(50.0f));
 }
 
-TEST_CASE("QuaternionTest, NormShouldComputeMagnitude") {
+TEST_CASE("Quaternion norm static function should compute magnitude", "[math][quaternion]") {
     const auto q = xe::Quat{3.0f, 4.0f, 5.0f, 0.0f};
 
     REQUIRE(xe::norm(q) == Catch::Approx(7.071067812f));
 }
 
-TEST_CASE("QuaternionTest, ConjugateShouldReturnNegatedVectorPart") {
+TEST_CASE("Quaternion conjugate static function should return negated vector part", "[math][quaternion]") {
     const auto q = xe::Quat{3.0f, 4.0f, 5.0f, 1.0f};
     const auto conjugate = xe::conjugate(q);
 
@@ -402,14 +402,14 @@ TEST_CASE("QuaternionTest, ConjugateShouldReturnNegatedVectorPart") {
     REQUIRE(conjugate.W == Catch::Approx(1.0f));
 }
 
-TEST_CASE("QuaternionTest, NormalizeShouldReturnUnitLengthQuaternion") {
+TEST_CASE("Quaternion normalize static function should return unit length quaternion", "[math][quaternion]") {
     const auto q = xe::Quat{3.0f, 4.0f, 5.0f, 0.0f};
     const auto normalized = xe::normalize(q);
 
     REQUIRE(xe::norm(normalized) == Catch::Approx(1.0f));
 }
 
-TEST_CASE("QuaternionTest, InverseShouldComputeAnNormalizedCongujatedQuaternion") {
+TEST_CASE("Quaternion inverse static function should compute a normalized conjugated quaternion", "[math][quaternion]") {
     const auto q1 = xe::Quat{{3.0f, 4.0f, 5.0f}, 0.0f};
     const auto inverse = xe::inverse(q1);
 
@@ -419,7 +419,7 @@ TEST_CASE("QuaternionTest, InverseShouldComputeAnNormalizedCongujatedQuaternion"
     REQUIRE(inverse.W == Catch::Approx(0.0f));
 }
 
-TEST_CASE("QuaternionTest, TransformShouldRotatePointVector") {
+TEST_CASE("Quaternion transform should rotate point vector", "[math][quaternion]") {
     const auto rotation = xe::quatRotationRH({0.0f, 1.0f, 0.0f}, xe::pi<float> * 0.5f);
     const auto point = xe::Vector3{1.0f, 0.0f, 0.0f};
     const auto result = xe::transform(rotation, point);

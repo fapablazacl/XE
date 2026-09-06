@@ -2,7 +2,7 @@
 #include "xe/math/Plane.h"
 #include <catch2/catch_all.hpp>
 
-TEST_CASE("PlaneTest, DefaultConstructorMakesXZPlanePointingPlusYAxis") {
+TEST_CASE("Plane default constructor makes XZ plane pointing plus Y axis", "[math][plane]") {
     xe::Plane subject;
 
     REQUIRE(subject.a == 0.0f);
@@ -11,7 +11,7 @@ TEST_CASE("PlaneTest, DefaultConstructorMakesXZPlanePointingPlusYAxis") {
     REQUIRE(subject.d == 0.0f);
 }
 
-TEST_CASE("PlaneTest, FourParamConstructorMakesAPlaneWithSpecificEquationTerms") {
+TEST_CASE("Plane four parameter constructor makes a plane with specific equation terms", "[math][plane]") {
     xe::Plane subject{1.0f, 2.0f, 3.0f, 4.0f};
 
     REQUIRE(subject.a == 1.0f);
@@ -20,7 +20,7 @@ TEST_CASE("PlaneTest, FourParamConstructorMakesAPlaneWithSpecificEquationTerms")
     REQUIRE(subject.d == 4.0f);
 }
 
-TEST_CASE("PlaneTest, ConstDataRetunsAPointerToInternalArray") {
+TEST_CASE("Plane const data returns a pointer to internal array", "[math][plane]") {
     const xe::Plane subject{1.0f, 2.0f, 3.0f, 4.0f};
 
     const float *values = subject.data();
@@ -36,7 +36,7 @@ TEST_CASE("PlaneTest, ConstDataRetunsAPointerToInternalArray") {
     REQUIRE(values[3] == 4.0f);
 }
 
-TEST_CASE("PlaneTest, DataRetunsAPointerToInternalArray") {
+TEST_CASE("Plane data returns a pointer to internal array", "[math][plane]") {
     xe::Plane subject{1.0f, 2.0f, 3.0f, 4.0f};
 
     const float *values = subject.data();
@@ -57,7 +57,7 @@ struct TestCase {
     bool output{false};
 };
 
-TEST_CASE("PlaneTest, EqualityOperatorChecksForEqualityForEachTerm") {
+TEST_CASE("Plane operator== checks for equality for each term", "[math][plane]") {
     xe::Plane subject{1.0f, 2.0f, 3.0f, 4.0f};
 
     const TestCase testCases[] = {
@@ -73,7 +73,7 @@ TEST_CASE("PlaneTest, EqualityOperatorChecksForEqualityForEachTerm") {
     }
 }
 
-TEST_CASE("PlaneTest, InequalityOperatorChecksForEqualityForEachTerm") {
+TEST_CASE("Plane operator!= checks for inequality for each term", "[math][plane]") {
     xe::Plane subject{1.0f, 2.0f, 3.0f, 4.0f};
 
     const TestCase testCases[] = {
@@ -89,7 +89,7 @@ TEST_CASE("PlaneTest, InequalityOperatorChecksForEqualityForEachTerm") {
     }
 }
 
-TEST_CASE("PlaneTest, VectorialFactoryMethodGeneratesAPlaneFromASpecificPointAndANormalVector") {
+TEST_CASE("Plane vectorial factory method generates a plane from a specific point and normal vector", "[math][plane]") {
     struct VectorialInput {
         xe::Vector3 normal;
         xe::Vector3 position;
@@ -118,7 +118,7 @@ TEST_CASE("PlaneTest, VectorialFactoryMethodGeneratesAPlaneFromASpecificPointAnd
     }
 }
 
-TEST_CASE("PlaneTest, EvaluateReturnsTheResultScalarOfEvaluatingPointAgainstThePlaneEquation") {
+TEST_CASE("Plane evaluate returns result scalar of evaluating point against plane equation", "[math][plane]") {
     using xe::Plane;
 
     Plane plane{-1.0f, 2.0f, -3.0f, 1.0f};
@@ -129,7 +129,7 @@ TEST_CASE("PlaneTest, EvaluateReturnsTheResultScalarOfEvaluatingPointAgainstTheP
     REQUIRE(plane.evaluate({-1.0f, 1.0f, 0.0f}) == 2.0f);
 }
 
-TEST_CASE("PlaneTest, IntersectChecksIfTwoPlanesIntersect") {
+TEST_CASE("Plane intersect checks if two planes intersect", "[math][plane]") {
     using xe::Plane;
 
     Plane plane1{1.0f, 0.0f, 0.0f, 1.0f};
@@ -141,7 +141,7 @@ TEST_CASE("PlaneTest, IntersectChecksIfTwoPlanesIntersect") {
     REQUIRE(plane3.intersect(plane1));
 }
 
-TEST_CASE("PlaneTest, TestChecksHowAPointRelatesToAPlane") {
+TEST_CASE("Plane test checks how a point relates to a plane", "[math][plane]") {
     using xe::Plane;
     using xe::PlaneSide;
 
@@ -152,7 +152,7 @@ TEST_CASE("PlaneTest, TestChecksHowAPointRelatesToAPlane") {
     REQUIRE(plane.test({0.0f, 1.0f, 0.0f}) == PlaneSide::Inside);
 }
 
-TEST_CASE("PlaneTest, SerializationGeneratesANonEmptyString") {
+TEST_CASE("Plane serialization generates a non-empty string", "[math][plane]") {
     xe::Plane subject;
 
     std::stringstream ss;
@@ -161,7 +161,7 @@ TEST_CASE("PlaneTest, SerializationGeneratesANonEmptyString") {
     REQUIRE(ss.str() != "");
 }
 
-TEST_CASE("PlaneTest, SerializationGeneratesDiffrentStringsForDifferentPlanes") {
+TEST_CASE("Plane serialization generates different strings for different planes", "[math][plane]") {
     std::stringstream ss1;
     ss1 << xe::planeXY();
 

@@ -4,7 +4,7 @@
 #include <iostream>
 #include <sstream>
 
-TEST_CASE("BoxTest, DefaultConstructorZeroesEdges") {
+TEST_CASE("Box default constructor zeroes edges", "[math][box]") {
     xe::Box box;
 
     REQUIRE(box.getMinEdge() == xe::Vector3(0.0f, 0.0f, 0.0f));
@@ -12,7 +12,7 @@ TEST_CASE("BoxTest, DefaultConstructorZeroesEdges") {
     REQUIRE(box.isValid());
 }
 
-TEST_CASE("BoxTest, ConstructorFromOneVectorInitializeEdges") {
+TEST_CASE("Box constructor from one vector initializes edges", "[math][box]") {
     xe::Box box{{1.0f, 2.0f, 3.0f}};
 
     REQUIRE(box.getMinEdge() == xe::Vector3(1.0f, 2.0f, 3.0f));
@@ -20,7 +20,7 @@ TEST_CASE("BoxTest, ConstructorFromOneVectorInitializeEdges") {
     REQUIRE(box.isValid());
 }
 
-TEST_CASE("BoxTest, ConstructorFromTwoVectorsInitalizeEdges") {
+TEST_CASE("Box constructor from two vectors initializes edges", "[math][box]") {
     xe::Box box{{1.0f, 2.0f, -3.0f}, {-1.0f, 8.0f, 3.0f}};
 
     REQUIRE(box.getMinEdge() == xe::Vector3(-1.0f, 2.0f, -3.0f));
@@ -28,7 +28,7 @@ TEST_CASE("BoxTest, ConstructorFromTwoVectorsInitalizeEdges") {
     REQUIRE(box.isValid());
 }
 
-TEST_CASE("BoxTest, getEdgeShouldGetASpecificPointFromTheBox") {
+TEST_CASE("Box getEdge should get a specific point from the box", "[math][box]") {
     xe::Box box{{1.0f, 2.0f, -3.0f}, {-1.0f, 8.0f, 3.0f}};
 
     box = {{-1.0f, -1.0f, -1.0f}, {1.0f, 1.0f, 1.0f}};
@@ -46,17 +46,17 @@ TEST_CASE("BoxTest, getEdgeShouldGetASpecificPointFromTheBox") {
     REQUIRE(box.getEdge(7) == xe::Vector3(1.0f, 1.0f, 1.0f));
 }
 
-TEST_CASE("BoxTest, getSizeReturnsAVectorWithTheComputedSize") {
+TEST_CASE("Box getSize returns a vector with the computed size", "[math][box]") {
     xe::Box box{{1.0f, 2.0f, -3.0f}, {-1.0f, 8.0f, 3.0f}};
     REQUIRE(box.getSize() == xe::Vector3(2.0f, 6.0f, 6.0f));
 }
 
-TEST_CASE("BoxTest, getCenterReturnsAVectorWithTheAverageBetweenMinAndMaxEdges") {
+TEST_CASE("Box getCenter returns a vector with average between min and max edges", "[math][box]") {
     xe::Box box{{1.0f, 2.0f, -3.0f}, {-1.0f, 8.0f, 3.0f}};
     REQUIRE(box.getCenter() == xe::Vector3(0.0f, 5.0f, 0.0f));
 }
 
-TEST_CASE("BoxTest, expandDoesNotChangesTheBoxWhenUsingAPointInsideOfIt") {
+TEST_CASE("Box expand does not change the box when using a point inside of it", "[math][box]") {
     xe::Box box{{1.0f, 2.0f, -3.0f}, {-1.0f, 8.0f, 3.0f}};
 
     box.expand(box.getCenter());
@@ -65,7 +65,7 @@ TEST_CASE("BoxTest, expandDoesNotChangesTheBoxWhenUsingAPointInsideOfIt") {
     REQUIRE(box.getCenter() == xe::Vector3(0.0f, 5.0f, 0.0f));
 }
 
-TEST_CASE("BoxTest, expandDoesNotChangesTheBoxWhenUsingAPointLikeBoxInsideOfIt") {
+TEST_CASE("Box expand does not change the box when using a point-like box inside of it", "[math][box]") {
     xe::Box box{{1.0f, 2.0f, -3.0f}, {-1.0f, 8.0f, 3.0f}};
 
     box.expand(xe::Box{box.getCenter()});
@@ -74,7 +74,7 @@ TEST_CASE("BoxTest, expandDoesNotChangesTheBoxWhenUsingAPointLikeBoxInsideOfIt")
     REQUIRE(box.getCenter() == xe::Vector3(0.0f, 5.0f, 0.0f));
 }
 
-TEST_CASE("BoxTest, expandIncreasesTheBoxWhenUsingAPointInsideOf") {
+TEST_CASE("Box expand increases the box when using a point outside of it", "[math][box]") {
     xe::Box box{{1.0f, 2.0f, -3.0f}, {-1.0f, 8.0f, 3.0f}};
 
     const auto prevCenter = box.getCenter();
@@ -87,7 +87,7 @@ TEST_CASE("BoxTest, expandIncreasesTheBoxWhenUsingAPointInsideOf") {
     REQUIRE(box.getSize() != prevSize);
 }
 
-TEST_CASE("BoxTest, isInsideChecksIfAPointBetweenTheMinAndMaxEdges") {
+TEST_CASE("Box isInside checks if a point is between the min and max edges", "[math][box]") {
     xe::Box box{{-1.0f, -1.0f, -1.0f}, {1.0f, 1.0f, 1.0f}};
 
     REQUIRE(box.isInside({0.0f, 0.0f, 0.0f}));
@@ -107,7 +107,7 @@ TEST_CASE("BoxTest, isInsideChecksIfAPointBetweenTheMinAndMaxEdges") {
     }
 }
 
-TEST_CASE("BoxTest, intersectsChecksIfThereIsAnOverlappingBetweenTwoBoxes") {
+TEST_CASE("Box intersect checks if there is overlapping between two boxes", "[math][box]") {
     xe::Box box{{-1.0f, -1.0f, -1.0f}, {1.0f, 1.0f, 1.0f}};
     xe::Box box2 = xe::Box{{-1.0f, -1.0f, -1.0f}, {1.0f, 1.0f, 1.0f}};
 
@@ -120,7 +120,7 @@ TEST_CASE("BoxTest, intersectsChecksIfThereIsAnOverlappingBetweenTwoBoxes") {
     REQUIRE(within.intersect(box));
 }
 
-TEST_CASE("BoxTest, intersectsChecksIfThereIsAnOverlappingWithAHalfSizedBox") {
+TEST_CASE("Box intersect checks if there is overlapping with a half-sized box", "[math][box]") {
     xe::Box box{{-1.0f, -1.0f, -1.0f}, {1.0f, 1.0f, 1.0f}};
 
     const auto size = box.getSize();
@@ -142,7 +142,7 @@ TEST_CASE("BoxTest, intersectsChecksIfThereIsAnOverlappingWithAHalfSizedBox") {
     }
 }
 
-TEST_CASE("BoxTest, intersectsChecksIfThereIsAnOverlappingBetweenTwoBoxesWithANearlyPosition") {
+TEST_CASE("Box intersect checks if there is overlapping between two boxes with a nearby position", "[math][box]") {
     xe::Box box{{-1.0f, -1.0f, -1.0f}, {1.0f, 1.0f, 1.0f}};
 
     const auto size = box.getSize();
@@ -164,7 +164,7 @@ TEST_CASE("BoxTest, intersectsChecksIfThereIsAnOverlappingBetweenTwoBoxesWithANe
     }
 }
 
-TEST_CASE("BoxTest, intersectsChecksIfThereIsAnOverlappingBetweenTwoBoxesWithExactSizeApart") {
+TEST_CASE("Box intersect checks if there is overlapping between two boxes with exact size apart", "[math][box]") {
     xe::Box box{{-1.0f, -1.0f, -1.0f}, {1.0f, 1.0f, 1.0f}};
     const auto size = box.getSize();
 
@@ -185,7 +185,7 @@ TEST_CASE("BoxTest, intersectsChecksIfThereIsAnOverlappingBetweenTwoBoxesWithExa
     }
 }
 
-TEST_CASE("BoxTest, intersectsChecksIfThereIsAnOverlappingBetweenTwoBoxesDisplacesTwoAndAHalfOfTheFirstBoxsize") {
+TEST_CASE("Box intersect checks if there is overlapping between two boxes displaced two and a half of the first box size", "[math][box]") {
     xe::Box box{{-1.0f, -1.0f, -1.0f}, {1.0f, 1.0f, 1.0f}};
     const auto size = box.getSize();
 
@@ -206,7 +206,7 @@ TEST_CASE("BoxTest, intersectsChecksIfThereIsAnOverlappingBetweenTwoBoxesDisplac
     }
 }
 
-TEST_CASE("BoxTest, operatorLessLessShouldCreateAnUniqueStringRepresentationFromDifferentBoxes") {
+TEST_CASE("Box operator<< should create a unique string representation from different boxes", "[math][box]") {
     xe::Box box{{-1.0f, -1.0f, -1.0f}, {1.0f, 1.0f, 1.0f}};
     xe::Box box1{{0.0f, 0.0f, 0.0f}, {10.0f, 10.0f, 10.0f}};
 
