@@ -1,8 +1,8 @@
 
 #include "xe/math/Triangle.h"
-#include "GoogleTestCommon.h"
+#include <catch2/catch_test_macros.hpp>
 
-TEST(TriangleTest, EqualsShouldComparePointsInAElementWiseFasion) {
-    XE::TTriangle<float> tri1;
-    EXPECT_EQ(true, true);
+TEST_CASE("TriangleTest, EqualsShouldComparePointsInAElementWiseFasion") {
+    xe::TTriangle<float> tri1;
+    REQUIRE(true, true);
 }

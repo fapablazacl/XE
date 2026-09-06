@@ -1,8 +1,8 @@
 
 #include "xe/math/Rect.h"
-#include "GoogleTestCommon.h"
+#include <catch2/catch_test_macros.hpp>
 
-TEST(RectTest, EqualsShouldComparePointsInAElementWiseFasion) {
-    XE::Rectf tri1;
-    EXPECT_EQ(true, true);
+TEST_CASE("RectTest, EqualsShouldComparePointsInAElementWiseFasion") {
+    xe::Rectf tri1;
+    REQUIRE(true, true);
 }

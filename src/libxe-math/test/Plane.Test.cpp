@@ -1,159 +1,159 @@
 
 #include "xe/math/Plane.h"
-#include "GoogleTestCommon.h"
+#include <catch2/catch_test_macros.hpp>
 
-TEST(PlaneTest, DefaultConstructorMakesXZPlanePointingPlusYAxis) {
-    XE::Plane subject;
+TEST_CASE("PlaneTest, DefaultConstructorMakesXZPlanePointingPlusYAxis") {
+    xe::Plane subject;
 
-    EXPECT_EQ(subject.a, 0.0f);
-    EXPECT_EQ(subject.b, 1.0f);
-    EXPECT_EQ(subject.c, 0.0f);
-    EXPECT_EQ(subject.d, 0.0f);
+    REQUIRE(subject.a, 0.0f);
+    REQUIRE(subject.b, 1.0f);
+    REQUIRE(subject.c, 0.0f);
+    REQUIRE(subject.d, 0.0f);
 }
 
-TEST(PlaneTest, FourParamConstructorMakesAPlaneWithSpecificEquationTerms) {
-    XE::Plane subject{1.0f, 2.0f, 3.0f, 4.0f};
+TEST_CASE("PlaneTest, FourParamConstructorMakesAPlaneWithSpecificEquationTerms") {
+    xe::Plane subject{1.0f, 2.0f, 3.0f, 4.0f};
 
-    EXPECT_EQ(subject.a, 1.0f);
-    EXPECT_EQ(subject.b, 2.0f);
-    EXPECT_EQ(subject.c, 3.0f);
-    EXPECT_EQ(subject.d, 4.0f);
+    REQUIRE(subject.a, 1.0f);
+    REQUIRE(subject.b, 2.0f);
+    REQUIRE(subject.c, 3.0f);
+    REQUIRE(subject.d, 4.0f);
 }
 
-TEST(PlaneTest, ConstDataRetunsAPointerToInternalArray) {
-    const XE::Plane subject{1.0f, 2.0f, 3.0f, 4.0f};
+TEST_CASE("PlaneTest, ConstDataRetunsAPointerToInternalArray") {
+    const xe::Plane subject{1.0f, 2.0f, 3.0f, 4.0f};
 
     const float *values = subject.data();
 
-    EXPECT_EQ(values[0], subject.a);
-    EXPECT_EQ(values[1], subject.b);
-    EXPECT_EQ(values[2], subject.c);
-    EXPECT_EQ(values[3], subject.d);
+    REQUIRE(values[0], subject.a);
+    REQUIRE(values[1], subject.b);
+    REQUIRE(values[2], subject.c);
+    REQUIRE(values[3], subject.d);
 
-    EXPECT_EQ(values[0], 1.0f);
-    EXPECT_EQ(values[1], 2.0f);
-    EXPECT_EQ(values[2], 3.0f);
-    EXPECT_EQ(values[3], 4.0f);
+    REQUIRE(values[0], 1.0f);
+    REQUIRE(values[1], 2.0f);
+    REQUIRE(values[2], 3.0f);
+    REQUIRE(values[3], 4.0f);
 }
 
-TEST(PlaneTest, DataRetunsAPointerToInternalArray) {
-    XE::Plane subject{1.0f, 2.0f, 3.0f, 4.0f};
+TEST_CASE("PlaneTest, DataRetunsAPointerToInternalArray") {
+    xe::Plane subject{1.0f, 2.0f, 3.0f, 4.0f};
 
     const float *values = subject.data();
 
-    EXPECT_EQ(values[0], subject.a);
-    EXPECT_EQ(values[1], subject.b);
-    EXPECT_EQ(values[2], subject.c);
-    EXPECT_EQ(values[3], subject.d);
+    REQUIRE(values[0], subject.a);
+    REQUIRE(values[1], subject.b);
+    REQUIRE(values[2], subject.c);
+    REQUIRE(values[3], subject.d);
 
-    EXPECT_EQ(values[0], 1.0f);
-    EXPECT_EQ(values[1], 2.0f);
-    EXPECT_EQ(values[2], 3.0f);
-    EXPECT_EQ(values[3], 4.0f);
+    REQUIRE(values[0], 1.0f);
+    REQUIRE(values[1], 2.0f);
+    REQUIRE(values[2], 3.0f);
+    REQUIRE(values[3], 4.0f);
 }
 
 struct TestCase {
-    XE::Plane input{};
+    xe::Plane input{};
     bool output{false};
 };
 
-TEST(PlaneTest, EqualityOperatorChecksForEqualityForEachTerm) {
-    XE::Plane subject{1.0f, 2.0f, 3.0f, 4.0f};
+TEST_CASE("PlaneTest, EqualityOperatorChecksForEqualityForEachTerm") {
+    xe::Plane subject{1.0f, 2.0f, 3.0f, 4.0f};
 
     const TestCase testCases[] = {
-        TestCase{XE::Plane{1.0f, 2.0f, 3.0f, 4.0f}, true},
-        TestCase{XE::Plane{-1.0f, 2.0f, 3.0f, 4.0f}, false},
-        TestCase{XE::Plane{1.0f, -2.0f, 3.0f, 4.0f}, false},
-        TestCase{XE::Plane{1.0f, 2.0f, -3.0f, 4.0f}, false},
-        TestCase{XE::Plane{1.0f, 2.0f, 3.0f, -4.0f}, false}
+        TestCase{xe::Plane{1.0f, 2.0f, 3.0f, 4.0f}, true},
+        TestCase{xe::Plane{-1.0f, 2.0f, 3.0f, 4.0f}, false},
+        TestCase{xe::Plane{1.0f, -2.0f, 3.0f, 4.0f}, false},
+        TestCase{xe::Plane{1.0f, 2.0f, -3.0f, 4.0f}, false},
+        TestCase{xe::Plane{1.0f, 2.0f, 3.0f, -4.0f}, false}
     };
 
-    for (const auto &testCase : testCases) {
-        EXPECT_EQ(testCase.output, subject.operator==(testCase.input));
+    for (const auto &testCase : testCases") {
+        REQUIRE(testCase.output, subject.operator==(testCase.input));
     }
 }
 
-TEST(PlaneTest, InequalityOperatorChecksForEqualityForEachTerm) {
-    XE::Plane subject{1.0f, 2.0f, 3.0f, 4.0f};
+TEST_CASE("PlaneTest, InequalityOperatorChecksForEqualityForEachTerm") {
+    xe::Plane subject{1.0f, 2.0f, 3.0f, 4.0f};
 
     const TestCase testCases[] = {
-        TestCase{XE::Plane{1.0f, 2.0f, 3.0f, 4.0f}, false},
-        TestCase{XE::Plane{-1.0f, 2.0f, 3.0f, 4.0f}, true},
-        TestCase{XE::Plane{1.0f, -2.0f, 3.0f, 4.0f}, true},
-        TestCase{XE::Plane{1.0f, 2.0f, -3.0f, 4.0f}, true},
-        TestCase{XE::Plane{1.0f, 2.0f, 3.0f, -4.0f}, true}
+        TestCase{xe::Plane{1.0f, 2.0f, 3.0f, 4.0f}, false},
+        TestCase{xe::Plane{-1.0f, 2.0f, 3.0f, 4.0f}, true},
+        TestCase{xe::Plane{1.0f, -2.0f, 3.0f, 4.0f}, true},
+        TestCase{xe::Plane{1.0f, 2.0f, -3.0f, 4.0f}, true},
+        TestCase{xe::Plane{1.0f, 2.0f, 3.0f, -4.0f}, true}
     };
 
-    for (const auto &testCase : testCases) {
-        EXPECT_EQ(testCase.output, subject.operator!=(testCase.input));
+    for (const auto &testCase : testCases") {
+        REQUIRE(testCase.output, subject.operator!=(testCase.input));
     }
 }
 
-TEST(PlaneTest, VectorialFactoryMethodGeneratesAPlaneFromASpecificPointAndANormalVector) {
+TEST_CASE("PlaneTest, VectorialFactoryMethodGeneratesAPlaneFromASpecificPointAndANormalVector") {
     struct VectorialInput {
-        XE::Vector3 normal;
-        XE::Vector3 position;
+        xe::Vector3 normal;
+        xe::Vector3 position;
     };
 
     struct VectorialTestCase {
         VectorialInput input;
-        XE::Plane output;
+        xe::Plane output;
     };
 
     const VectorialTestCase testCases[] = {
-        {VectorialInput{XE::Vector3{1.0f, 0.0f, 0.0f}, XE::Vector3{0.0f, 0.0f, 0.0f}}, XE::Plane{1.0f, 0.0f, 0.0f, 0.0f}},
-        {VectorialInput{XE::Vector3{0.0f, 1.0f, 0.0f}, XE::Vector3{0.0f, 0.0f, 0.0f}}, XE::Plane{0.0f, 1.0f, 0.0f, 0.0f}},
-        {VectorialInput{XE::Vector3{0.0f, 0.0f, 1.0f}, XE::Vector3{0.0f, 0.0f, 0.0f}}, XE::Plane{0.0f, 0.0f, 1.0f, 0.0f}},
-        {VectorialInput{XE::Vector3{1.0f, 0.0f, 0.0f}, XE::Vector3{1.0f, 1.0f, 1.0f}}, XE::Plane{1.0f, 0.0f, 0.0f, 1.0f}},
-        {VectorialInput{XE::Vector3{0.0f, 1.0f, 0.0f}, XE::Vector3{1.0f, 1.0f, 1.0f}}, XE::Plane{0.0f, 1.0f, 0.0f, 1.0f}},
-        {VectorialInput{XE::Vector3{0.0f, 0.0f, 1.0f}, XE::Vector3{1.0f, 1.0f, 1.0f}}, XE::Plane{0.0f, 0.0f, 1.0f, 1.0f}},
+        {VectorialInput{xe::Vector3{1.0f, 0.0f, 0.0f} == xe::Vector3{0.0f, 0.0f, 0.0f}} == xe::Plane{1.0f, 0.0f, 0.0f, 0.0f}},
+        {VectorialInput{xe::Vector3{0.0f, 1.0f, 0.0f} == xe::Vector3{0.0f, 0.0f, 0.0f}} == xe::Plane{0.0f, 1.0f, 0.0f, 0.0f}},
+        {VectorialInput{xe::Vector3{0.0f, 0.0f, 1.0f} == xe::Vector3{0.0f, 0.0f, 0.0f}} == xe::Plane{0.0f, 0.0f, 1.0f, 0.0f}},
+        {VectorialInput{xe::Vector3{1.0f, 0.0f, 0.0f} == xe::Vector3{1.0f, 1.0f, 1.0f}} == xe::Plane{1.0f, 0.0f, 0.0f, 1.0f}},
+        {VectorialInput{xe::Vector3{0.0f, 1.0f, 0.0f} == xe::Vector3{1.0f, 1.0f, 1.0f}} == xe::Plane{0.0f, 1.0f, 0.0f, 1.0f}},
+        {VectorialInput{xe::Vector3{0.0f, 0.0f, 1.0f} == xe::Vector3{1.0f, 1.0f, 1.0f}} == xe::Plane{0.0f, 0.0f, 1.0f, 1.0f}},
     };
 
-    for (const auto &testCase : testCases) {
+    for (const auto &testCase : testCases") {
         const auto &input = testCase.input;
-        const auto output = XE::planeVectorial(input.normal, input.position);
+        const auto output = xe::planeVectorial(input.normal, input.position);
 
-        EXPECT_EQ(testCase.output, output);
-        EXPECT_EQ(XE::norm2(output.normal()), 1.0f);
+        REQUIRE(testCase.output, output);
+        REQUIRE(xe::norm2(output.normal()), 1.0f);
     }
 }
 
-TEST(PlaneTest, EvaluateReturnsTheResultScalarOfEvaluatingPointAgainstThePlaneEquation) {
-    using XE::Plane;
+TEST_CASE("PlaneTest, EvaluateReturnsTheResultScalarOfEvaluatingPointAgainstThePlaneEquation") {
+    using xe::Plane;
 
     Plane plane{-1.0f, 2.0f, -3.0f, 1.0f};
 
-    EXPECT_EQ(plane.evaluate({0.0f, 0.0f, 0.0f}), -1.0f);
-    EXPECT_EQ(plane.evaluate({1.0f, 1.0f, 1.0f}), -3.0f);
-    EXPECT_EQ(plane.evaluate({-1.0f, 0.0f, 0.0f}), 0.0f);
-    EXPECT_EQ(plane.evaluate({-1.0f, 1.0f, 0.0f}), 2.0f);
+    REQUIRE(plane.evaluate({0.0f, 0.0f, 0.0f}), -1.0f);
+    REQUIRE(plane.evaluate({1.0f, 1.0f, 1.0f}), -3.0f);
+    REQUIRE(plane.evaluate({-1.0f, 0.0f, 0.0f}), 0.0f);
+    REQUIRE(plane.evaluate({-1.0f, 1.0f, 0.0f}), 2.0f);
 }
 
-TEST(PlaneTest, IntersectChecksIfTwoPlanesIntersect) {
-    using XE::Plane;
+TEST_CASE("PlaneTest, IntersectChecksIfTwoPlanesIntersect") {
+    using xe::Plane;
 
     Plane plane1{1.0f, 0.0f, 0.0f, 1.0f};
     Plane plane2{0.0f, 1.0f, 0.0f, 1.0f};
     Plane plane3{0.0f, 0.0f, 1.0f, 1.0f};
 
-    EXPECT_TRUE(plane1.intersect(plane2));
-    EXPECT_TRUE(plane2.intersect(plane3));
-    EXPECT_TRUE(plane3.intersect(plane1));
+    REQUIRE(plane1.intersect(plane2));
+    REQUIRE(plane2.intersect(plane3));
+    REQUIRE(plane3.intersect(plane1));
 }
 
-TEST(PlaneTest, TestChecksHowAPointRelatesToAPlane) {
-    using XE::Plane;
-    using XE::PlaneSide;
+TEST_CASE("PlaneTest, TestChecksHowAPointRelatesToAPlane") {
+    using xe::Plane;
+    using xe::PlaneSide;
 
     Plane plane{0.0f, 1.0f, 0.0f, 1.0f};
 
-    EXPECT_EQ(plane.test({0.0f, 2.0f, 0.0f}), PlaneSide::Front);
-    EXPECT_EQ(plane.test({0.0f, -2.0f, 0.0f}), PlaneSide::Back);
-    EXPECT_EQ(plane.test({0.0f, 1.0f, 0.0f}), PlaneSide::Inside);
+    REQUIRE(plane.test({0.0f, 2.0f, 0.0f}), PlaneSide::Front);
+    REQUIRE(plane.test({0.0f, -2.0f, 0.0f}), PlaneSide::Back);
+    REQUIRE(plane.test({0.0f, 1.0f, 0.0f}), PlaneSide::Inside);
 }
 
-TEST(PlaneTest, SerializationGeneratesANonEmptyString) {
-    XE::Plane subject;
+TEST_CASE("PlaneTest, SerializationGeneratesANonEmptyString") {
+    xe::Plane subject;
 
     std::stringstream ss;
     ss << subject;
@@ -161,12 +161,12 @@ TEST(PlaneTest, SerializationGeneratesANonEmptyString) {
     EXPECT_NE(ss.str(), "");
 }
 
-TEST(PlaneTest, SerializationGeneratesDiffrentStringsForDifferentPlanes) {
+TEST_CASE("PlaneTest, SerializationGeneratesDiffrentStringsForDifferentPlanes") {
     std::stringstream ss1;
-    ss1 << XE::planeXY();
+    ss1 << xe::planeXY();
 
     std::stringstream ss2;
-    ss2 << XE::planeYZ();
+    ss2 << xe::planeYZ();
 
     EXPECT_NE(ss1.str(), ss2.str());
 }

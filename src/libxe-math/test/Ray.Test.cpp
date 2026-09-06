@@ -1,8 +1,8 @@
 
 #include "xe/math/Ray.h"
-#include "GoogleTestCommon.h"
+#include <catch2/catch_test_macros.hpp>
 
-TEST(RayTest, EqualsShouldComparePointsInAElementWiseFasion) {
-    XE::TRay<float> ray1;
-    EXPECT_EQ(true, true);
+TEST_CASE("RayTest, EqualsShouldComparePointsInAElementWiseFasion") {
+    xe::TRay<float> ray1;
+    REQUIRE(true, true);
 }

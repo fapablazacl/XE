@@ -1,8 +1,8 @@
 
 #include "xe/math/Sphere.h"
-#include "GoogleTestCommon.h"
+#include <catch2/catch_test_macros.hpp>
 
-TEST(SphereTest, EqualsShouldComparePointsInAElementWiseFasion) {
-    XE::TSphere<float> tri1;
-    EXPECT_EQ(true, true);
+TEST_CASE("SphereTest, EqualsShouldComparePointsInAElementWiseFasion") {
+    xe::TSphere<float> tri1;
+    REQUIRE(true, true);
 }
