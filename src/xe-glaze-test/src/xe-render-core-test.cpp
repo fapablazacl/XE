@@ -83,7 +83,7 @@ tl::expected<xe::TextureHandle, xe::BackendError> createCheckerBoardTexture(cons
     xe::TextureDescriptor desc{};
     desc.type = xe::TextureType::Tex2D;
     desc.format = format;
-    desc.size = xe::ivec3(size, 1);
+    desc.size = xe::ivec3(size.x, size.y, 1);
     desc.sourceFormat = format;
     desc.sourceDataType = dataType;
     desc.mipLevels = &mip;

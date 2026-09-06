@@ -435,9 +435,9 @@ namespace xe {
 
             TVector<T, 3> V = normalize(axis);
 
-            const auto c1 = TVector<T, 3>{static_cast<T>(0), -V.Z, V.Y};
-            const auto c2 = TVector<T, 3>{V.Z, static_cast<T>(0), -V.X};
-            const auto c3 = TVector<T, 3>{-V.Y, V.X, static_cast<T>(0)};
+            const auto c1 = TVector<T, 3>{static_cast<T>(0), -V.z, V.y};
+            const auto c2 = TVector<T, 3>{V.z, static_cast<T>(0), -V.x};
+            const auto c3 = TVector<T, 3>{-V.y, V.x, static_cast<T>(0)};
 
             const auto matS = TMatrix<T, 3, 3>::columns({c1, c2, c3});
 
@@ -470,9 +470,9 @@ namespace xe {
         const auto yaxis = cross(xaxis, zaxis);
 
         auto result = TMatrix<T, 4, 4>{};
-        result[0] = {xaxis.X, xaxis.Y, xaxis.Z, -dot(xaxis, eye)};
-        result[1] = {yaxis.X, yaxis.Y, yaxis.Z, -dot(yaxis, eye)};
-        result[2] = {-zaxis.X, -zaxis.Y, -zaxis.Z, dot(zaxis, eye)};
+        result[0] = {xaxis.x, xaxis.y, xaxis.z, -dot(xaxis, eye)};
+        result[1] = {yaxis.x, yaxis.y, yaxis.z, -dot(yaxis, eye)};
+        result[2] = {-zaxis.x, -zaxis.y, -zaxis.z, dot(zaxis, eye)};
         result[3] = {T(0), T(0), T(0), T(1)};
 
         return result;
@@ -505,14 +505,14 @@ namespace xe {
 
         auto result = matIdentity<T, 4>();
 
-        result(0, 0) = two / diff.X;
-        result(1, 1) = two / diff.Y;
-        result(2, 2) = -two / diff.Z;
+        result(0, 0) = two / diff.x;
+        result(1, 1) = two / diff.y;
+        result(2, 2) = -two / diff.z;
         result(3, 3) = one;
 
-        result(0, 3) = -(pmax.X + pmin.X) / diff.X;
-        result(1, 3) = -(pmax.Y + pmin.Y) / diff.Y;
-        result(2, 3) = -(pmax.Z + pmin.Z) / diff.Z;
+        result(0, 3) = -(pmax.x + pmin.x) / diff.x;
+        result(1, 3) = -(pmax.y + pmin.y) / diff.y;
+        result(2, 3) = -(pmax.z + pmin.z) / diff.z;
 
         return result;
     }
@@ -774,6 +774,12 @@ namespace xe {
 
         return os;
     }
+
+    using mat4 = Matrix4;
+
+    template<typename T, int R, int C>
+    using tmat = TMatrix<T, R, C>;
+
 } // namespace xe
 
 #endif

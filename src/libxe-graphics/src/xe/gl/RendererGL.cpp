@@ -427,7 +427,7 @@ namespace xe::gl {
         glGenTextures(1, &textureId);
         glBindTexture(target, textureId);
 
-        glTexImage2D(target, 0, internalFormat, image.size.X, image.size.Y, 0, image.format, image.type, image.pixels);
+        glTexImage2D(target, 0, internalFormat, image.size.x, image.size.y, 0, image.format, image.type, image.pixels);
 
         if (options.flags & GenerateMipMaps) {
             glGenerateMipmap(target);
@@ -448,7 +448,7 @@ namespace xe::gl {
         glGenTextures(1, &textureId);
         glBindTexture(target, textureId);
 
-        glTexImage3D(target, 0, internalFormat, image.size.X, image.size.Y, image.size.Z, 0, image.format, image.type, image.pixels);
+        glTexImage3D(target, 0, internalFormat, image.size.x, image.size.y, image.size.z, 0, image.format, image.type, image.pixels);
 
         if (options.flags & GenerateMipMaps) {
             glGenerateMipmap(target);
@@ -493,7 +493,7 @@ namespace xe::gl {
 
     void RendererGL::clear(const GLenum flags, std::optional<xe::Vector4> color, std::optional<float> depth, std::optional<int> stencil) const {
         if (color.has_value()) {
-            glClearColor(color->X, color->Y, color->Z, color->W);
+            glClearColor(color->x, color->y, color->z, color->w);
         }
 
         if (depth.has_value()) {
@@ -518,7 +518,7 @@ namespace xe::gl {
     void RendererGL::viewport(const xe::Vector2i &pos, const xe::Vector2i &size) const {
         XE_GL_SCOPED_ERROR_CHECK();
 
-        glViewport(pos.X, pos.Y, size.X, size.Y);
+        glViewport(pos.x, pos.y, size.x, size.y);
     }
 
     void RendererGL::useProgram(const Program &program) const {

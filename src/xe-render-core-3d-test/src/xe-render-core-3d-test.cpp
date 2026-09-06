@@ -237,7 +237,7 @@ namespace {
         xe::TextureDescriptor desc{};
         desc.type = xe::TextureType::Tex2D;
         desc.format = format;
-        desc.size = xe::ivec3(size, 1);
+        desc.size = xe::ivec3(size.x, size.y, 1);
         desc.sourceFormat = format;
         desc.sourceDataType = dataType;
         desc.mipLevels = &mip;
@@ -277,7 +277,7 @@ namespace {
     xe::mat4 viewMatrixOf(const FpsCamera &cam) {
         xe::vec3 const f = forwardOf(cam);
         xe::vec3 const target = cam.position + f;
-        return xe::lookAt<float>(cam.position, target, xe::vec3{0.0f, 1.0f, 0.0f});
+        return xe::mat4LookAtRH<float>(cam.position, target, xe::vec3{0.0f, 1.0f, 0.0f});
     }
 
     void updateFpsCamera(FpsCamera &cam, GLFWwindow *window, float dt, double &prevMouseX, double &prevMouseY, bool &mouseInitialized) {
@@ -316,7 +316,7 @@ namespace {
         if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
             move = move - rightXZ;
 
-        float const len2 = xe::length2(move);
+        float const len2 = xe::dot(move, move);
         if (len2 > 0.0f) {
             cam.position = cam.position + xe::normalize(move) * (cam.moveSpeed * dt);
         }
@@ -585,7 +585,7 @@ void main() {
     // Floor's natural orientation is the XY plane with normal -Z; rotate so it sits on the XZ
     // plane with normal +Y. The rotation is orthonormal, so it doubles as its own normal matrix
     // in the vertex shader (mat3(uModel)).
-    xe::mat4 const model = xe::rotateX<float>(xe::radians(90.0f));
+    xe::mat4 const model = xe::mat4RotationX<float>(xe::radians(90.0f));
 
     FpsCamera camera;
     double prevMouseX = 0.0;
@@ -610,7 +610,7 @@ void main() {
         }
 
         float const aspect = static_cast<float>(w) / static_cast<float>(h);
-        xe::mat4 const projection = xe::perspective<float>(xe::radians(60.0f), aspect, 0.1f, 200.0f);
+        xe::mat4 const projection = xe::mat4Perspective<float>(xe::radians(60.0f), aspect, 0.1f, 200.0f);
         xe::mat4 const view = viewMatrixOf(camera);
 
         gl::viewport(0, 0, w, h);

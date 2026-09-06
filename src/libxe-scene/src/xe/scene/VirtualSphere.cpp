@@ -23,10 +23,10 @@ namespace xe {
         const auto sp_length_squared = norm2(sp);
 
         if (sp_length_squared > 1.0f) {
-            return normalize(Vector3{sp, 0.0f});
+            return normalize(Vector3{sp.x, sp.y, 0.0f});
         }
 
-        return {sp, std::sqrt(1.0f - sp_length_squared)};
+        return {sp.x, sp.y, std::sqrt(1.0f - sp_length_squared)};
     }
 
     bool VirtualSphere::operator==(const VirtualSphere &rhs) const {

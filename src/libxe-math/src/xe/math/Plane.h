@@ -27,7 +27,7 @@ namespace xe {
         explicit TPlane(const T a, const T b, const T c, const T d) : a(a), b(b), c(c), d(d) {
         }
 
-        explicit TPlane(const TVector3<T> &n, const T d) : a(n.X), b(n.Y), c(n.Z), d(d) {
+        explicit TPlane(const TVector3<T> &n, const T d) : a(n.x), b(n.y), c(n.z), d(d) {
         }
 
         /**
@@ -179,7 +179,7 @@ namespace xe {
      * @return Plane<T>
      */
     template <typename T = float> TPlane<T> planeYZ(const TVector3<T> &position) {
-        return TPlane<T>{T(1), T(0), T(0), position.X};
+        return TPlane<T>{T(1), T(0), T(0), position.x};
     }
 
     /**
@@ -189,7 +189,7 @@ namespace xe {
      * @return Plane<T>
      */
     template <typename T = float> TPlane<T> planeXZ(const TVector3<T> &position) {
-        return TPlane<T>{T(0), T(1), T(0), position.Y};
+        return TPlane<T>{T(0), T(1), T(0), position.y};
     }
 
     /**
@@ -199,7 +199,7 @@ namespace xe {
      * @return Plane<T>
      */
     template <typename T = float> TPlane<T> planeXY(const TVector3<T> &position) {
-        return TPlane<T>{T(0), T(0), T(1), position.Z};
+        return TPlane<T>{T(0), T(0), T(1), position.z};
     }
 
     /**

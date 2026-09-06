@@ -29,11 +29,11 @@ namespace xe {
         };
 
         TQuaternion() {
-            V.X = V.Y = V.Z = W = T(0);
+            V.x = V.y = V.z = W = T(0);
         }
 
         explicit TQuaternion(const T w) {
-            V.X = V.Y = V.Z = T(0);
+            V.x = V.y = V.z = T(0);
             W = w;
         }
 
@@ -46,9 +46,9 @@ namespace xe {
         }
 
         TQuaternion(const T x, const T y, const T z, const T w) {
-            V.X = x;
-            V.Y = y;
-            V.Z = z;
+            V.x = x;
+            V.y = y;
+            V.z = z;
             W = w;
         }
 
@@ -58,9 +58,9 @@ namespace xe {
         }
 
         explicit TQuaternion(const T x, const T y, const T z) {
-            V.X = x;
-            V.Y = y;
-            V.Z = z;
+            V.x = x;
+            V.y = y;
+            V.z = z;
             W = T(0);
         }
 
@@ -70,10 +70,10 @@ namespace xe {
         }
 
         explicit TQuaternion(const TVector<T, 4> &v) {
-            V.X = v.X;
-            V.Y = v.Y;
-            V.Z = v.Z;
-            W = v.W;
+            V.x = v.x;
+            V.y = v.y;
+            V.z = v.z;
+            W = v.w;
         }
 
         TQuaternion(const TQuaternion<T> &other) {
@@ -123,7 +123,7 @@ namespace xe {
         }
 
         explicit operator TVector<T, 4>() const {
-            return {V.X, V.Y, V.Z, W};
+            return {V.x, V.y, V.z, W};
         }
 
         TQuaternion<T> operator+(const TQuaternion<T> &rhs) const {
@@ -161,14 +161,14 @@ namespace xe {
         }
 
         TQuaternion<T> operator*(const TQuaternion<T> &rhs) const {
-            const auto v1 = cross(V, rhs.V);
-            const auto v2 = rhs.V * W;
-            const auto v3 = V * rhs.W;
-            const auto v = v1 + v2 + v3;
+            const TVector<T, 3> v1 = cross(V, rhs.V);
+            const TVector<T, 3>  v2 = rhs.V * W;
+            const TVector<T, 3>  v3 = V * rhs.W;
+            const TVector<T, 3>  v = v1 + v2 + v3;
 
-            const auto w = W * rhs.W - dot(V, rhs.V);
+            const T w = W * rhs.W - dot(V, rhs.V);
 
-            return {v, w};
+            return {v.x, v.y, v.z, w};
         }
 
         TQuaternion<T> operator/(const TQuaternion<T> &rhs) const {

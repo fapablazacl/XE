@@ -27,10 +27,10 @@ namespace xe {
     template <typename T, int N> struct VectorBase {
         T values[N] = {};
 
-        VectorBase() {
+        constexpr VectorBase() {
         }
 
-        VectorBase(std::initializer_list<T> il) {
+        constexpr VectorBase(std::initializer_list<T> il) {
             assert(il.size() == N);
 
             int i = 0;
@@ -44,104 +44,45 @@ namespace xe {
         union {
             T values[2];
             struct {
-                T X, Y;
+                T x, y;
             };
         };
 
-        VectorBase() {
-            X = Y = static_cast<T>(0);
+        constexpr VectorBase() {
+            x = y = static_cast<T>(0);
         }
 
-        VectorBase(T x, T y) {
-            X = x;
-            Y = y;
-        }
+        constexpr VectorBase(T const x, T const y) : x(x), y(y) {}
     };
 
     template <typename T> struct VectorBase<T, 3> {
         union {
             T values[3];
             struct {
-                T X, Y, Z;
+                T x, y, z;
             };
         };
 
-        VectorBase() {
-            X = Y = Z = static_cast<T>(0);
+        constexpr VectorBase() {
+            x = y = z = static_cast<T>(0);
         }
 
-        VectorBase(T x, T y, T z) {
-            X = x;
-            Y = y;
-            Z = z;
-        }
-
-        VectorBase(const VectorBase<T, 2> &v, T z) {
-            X = v.X;
-            Y = v.Y;
-            Z = z;
-        }
-
-        VectorBase(T x, const VectorBase<T, 2> &v) {
-            X = x;
-            Y = v.X;
-            Z = v.Y;
-        }
+        constexpr VectorBase(T const x, T const y, T const z) : x(x), y(y), z(z) {}
     };
 
     template <typename T> struct VectorBase<T, 4> {
         union {
             T values[4];
             struct {
-                T X, Y, Z, W;
+                T x, y, z, w;
             };
         };
 
-        VectorBase() {
-            X = Y = Z = W = static_cast<T>(0);
+        constexpr VectorBase() {
+            x = y = z = w = static_cast<T>(0);
         }
 
-        VectorBase(T x, T y, T z, T w) {
-            X = x;
-            Y = y;
-            Z = z;
-            W = w;
-        }
-
-        VectorBase(const VectorBase<T, 3> &v, T w) {
-            X = v.X;
-            Y = v.Y;
-            Z = v.Z;
-            W = w;
-        }
-
-        VectorBase(T x, const VectorBase<T, 3> &v) {
-            X = x;
-            Y = v.X;
-            Z = v.T;
-            W = v.W;
-        }
-
-        VectorBase(const VectorBase<T, 2> &v, T z, T w) {
-            X = v.X;
-            Y = v.Y;
-            Z = z;
-            W = w;
-        }
-
-        VectorBase(T x, const VectorBase<T, 2> &v, T w) {
-            X = x;
-            Y = v.X;
-            Z = v.Y;
-            W = w;
-        }
-
-        VectorBase(T x, T y, const VectorBase<T, 2> &v) {
-            X = x;
-            Y = y;
-            Z = v.X;
-            W = v.Y;
-        }
+        constexpr VectorBase(T const x, T const y, T const z, T const w) : x(x), y(y), z(z), w(w) {}
     };
 
     /**
@@ -150,7 +91,7 @@ namespace xe {
     template <typename T, int N> struct TVector : public VectorBase<T, N> {
         using VectorBase<T, N>::VectorBase;
 
-        explicit TVector();
+        TVector();
 
         explicit TVector(T value);
 
@@ -240,11 +181,11 @@ namespace xe {
     }
 
     template <typename T> TVector<T, 3> cross(const TVector<T, 3> &v1, const TVector<T, 3> &v2) {
-        return {v1.Y * v2.Z - v1.Z * v2.Y, v1.Z * v2.X - v1.X * v2.Z, v1.X * v2.Y - v1.Y * v2.X};
+        return {v1.y * v2.z - v1.z * v2.y, v1.z * v2.x - v1.x * v2.z, v1.x * v2.y - v1.y * v2.x};
     }
 
     template <typename T> T cross(const TVector<T, 2> &v1, const TVector<T, 2> &v2) {
-        return v1.X * v2.Y - v1.Y * v2.X;
+        return v1.x * v2.y - v1.y * v2.x;
     }
 
     template <typename T> TVector<T, 3> cross(const TVector<T, 3> &v1, const TVector<T, 3> &v2, const TVector<T, 3> &v3) {

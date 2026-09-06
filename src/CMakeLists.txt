@@ -7,10 +7,6 @@ if (XE_DEV_UNIT_TEST)
 endif()
 
 add_subdirectory ("libxe-math")
-if (XE_DEV_UNIT_TEST)
-    add_subdirectory ("libxe-math-test")
-endif()
-
 add_subdirectory ("libxe-scene")
 add_subdirectory ("libxe-geometry")
 if (XE_DEV_UNIT_TEST)

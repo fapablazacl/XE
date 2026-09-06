@@ -137,7 +137,7 @@ namespace xe {
 
         if (flags & ClearFlags::Color) {
             clearFlagsGL |= GL_COLOR_BUFFER_BIT;
-            glClearColor(color.X, color.Y, color.Z, color.W);
+            glClearColor(color.x, color.y, color.z, color.w);
         }
 
         if (flags & ClearFlags::Depth) {
@@ -324,11 +324,11 @@ namespace xe {
     }
 
     void GraphicsDeviceGL::setViewport(const Viewport &viewport) {
-        GLint x = static_cast<GLint>(viewport.position.X);
-        GLint y = static_cast<GLint>(viewport.position.Y);
+        GLint x = static_cast<GLint>(viewport.position.x);
+        GLint y = static_cast<GLint>(viewport.position.y);
 
-        GLint w = static_cast<GLint>(viewport.size.X);
-        GLint h = static_cast<GLint>(viewport.size.Y);
+        GLint w = static_cast<GLint>(viewport.size.x);
+        GLint h = static_cast<GLint>(viewport.size.y);
 
         glViewport(x, y, w, h);
 

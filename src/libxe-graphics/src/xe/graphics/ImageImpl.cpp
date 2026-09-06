@@ -30,7 +30,7 @@ namespace xe {
         size = newSize;
 
         const int pixelByteSize = ComputeStorage(format);
-        const int byteSize = size.X * size.Y * pixelByteSize;
+        const int byteSize = size.x * size.y * pixelByteSize;
 
         assert(byteSize);
 
