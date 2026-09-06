@@ -51,6 +51,156 @@ namespace {
         }
     }
 
+    template<typename T>
+    class Span {
+    public:
+        struct Iterator {
+            using iterator_category = std::forward_iterator_tag;
+            using value_type = T;
+            using difference_type = std::ptrdiff_t;
+            using pointer = T*;
+            using reference = T&;
+
+            explicit Iterator(pointer ptr) : _ptr(ptr) {}
+
+            reference operator*() const {
+                return *_ptr;
+            }
+
+            pointer operator->() {
+                return _ptr;
+            }
+
+            Iterator& operator++() {
+                _ptr++;
+
+                return *this;
+            }
+
+            Iterator& operator++(int) {
+                Iterator it = *this;
+
+                _ptr++;
+
+                return it;
+            }
+
+            friend bool operator==(const Iterator &lhs, const Iterator &rhs) {
+                return _ptr == rhs._ptr;
+            }
+
+            friend bool operator==(const Iterator &lhs, const Iterator &rhs) {
+                return _ptr != rhs._ptr;
+            }
+
+        private:
+            pointer _ptr;
+        };
+
+        explicit Span() {}
+
+        explicit Span(T* data, size_t size) : _data(data), _size(size) {
+            // prevents issues where data and size have inconsistencies
+            assert(data == nullptr && size == 0 || data != nullptr && size > 0);
+        }
+
+        T* data() {
+            return _data;
+        }
+
+        size_t size() const {
+            return _size;
+        }
+
+        explicit operator bool() const {
+            return _data != nullptr;
+        }
+
+        Iterator begin() {
+            return Iterator(_data);
+        }
+
+        Iterator end() {
+            return Iterator(_data + _size);
+        }
+
+        T& operator[](const size_t i) {
+            assert(i < size);
+
+            return _data[i];
+        }
+
+        T operator[](const size_t i) const {
+            assert(i < size);
+
+            return _data[i];
+        }
+
+    private:
+        T* _data = nullptr;
+        size_t _size = 0;
+    };
+
+
+    template<typename T>
+    Span<T> makeSpan(const std::vector<T> &values) {
+        return Span<T>(values.data(), values.size());
+    }
+
+    template<typename T, size_t N>
+    Span<T> makeSpan(const std::array<T, N> &values) {
+        return Span<T>(values.data(), values.size());
+    }
+
+    //! computes Y coord elevation from a single horizontal point
+    float surface(float x, float z) {
+        return std::cos(x) * std::sin(z);
+    }
+
+    void computeSurfaceTriangles(Span<xe::vec3> &vertices, const float width, const float depth, int slices, int stacks) {
+        const size_t size = (slices + 1) * (stacks + 1);
+        assert(vertices.size() == size);
+
+        xe::vec2 const d = xe::vec2{width, depth} / xe::vec2{(float)slices, (float)depth};
+        xe::vec2 const init = -d * 0.5f;
+
+        size_t index = 0;
+
+        for (int i = 0; i < slices + 1; i++) {
+            for (int j = 0; j < stacks + 1; j++) {
+                xe::vec2 const point = init + xe::vec2{(float)i, (float)j} * d;
+                float const y = surface(point.x, point.y);
+
+                vertices[index++] = xe::vec3{point.x, y, point.y};
+            }
+        }
+    }
+
+    void computeSurfaceIndicesTriangles(Span<std::uint32_t> &indices, int slices, int stacks) {
+        int const stride = slices + 1;
+        std::size_t const count = 6 * stride * stacks;
+
+        assert(indices.size() == count);
+
+        std::size_t index = 0;
+        for (int i = 0; i < slices; ++i) {
+            for (int j = 0; j < stacks; ++j) {
+                const std::uint32_t p0 = (i + 0) + (j + 0) * stride;
+                const std::uint32_t p1 = (i + 1) + (j + 0) * stride;
+                const std::uint32_t p2 = (i + 0) + (j + 1) * stride;
+                const std::uint32_t p3 = (i + 1) + (j + 1) * stride;
+
+                indices[index++] = p0;
+                indices[index++] = p1;
+                indices[index++] = p2;
+
+                indices[index++] = p1;
+                indices[index++] = p3;
+                indices[index++] = p2;
+            }
+        }
+    }
+
     void fillCheckerboardImage(void *data, size_t byteSize, int width, int height, xe::PixelFormat format, xe::PixelDataType dataType, int tileSize) {
         int const channels = channelCountOf(format);
         size_t const channelBytes = byteSizeOf(dataType);
