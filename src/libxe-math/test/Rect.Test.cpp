@@ -4,5 +4,5 @@
 
 TEST_CASE("RectTest, EqualsShouldComparePointsInAElementWiseFasion") {
     xe::Rectf tri1;
-    REQUIRE(true, true);
+    REQUIRE(true);
 }

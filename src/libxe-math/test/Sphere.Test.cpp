@@ -4,5 +4,5 @@
 
 TEST_CASE("SphereTest, EqualsShouldComparePointsInAElementWiseFasion") {
     xe::TSphere<float> tri1;
-    REQUIRE(true, true);
+    REQUIRE(true);
 }

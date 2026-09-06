@@ -4,7 +4,6 @@ set (test_sources
     "Box.Test.cpp"
     "Common.Test.cpp"
     "Ellipsoid.Test.cpp"
-    "Main.cpp"
     "Matrix.Test.cpp"
     "Plane.Test.cpp"
     "Quaternion.Test.cpp"
@@ -18,7 +17,7 @@ set (test_sources
 )
 
 add_executable(${test_target} ${test_sources})
-target_link_libraries(${test_target} xe::core xe::interface Catch2::Catch2WithMain)
+target_link_libraries(${test_target} PRIVATE xe::math xe::core xe::interface Catch2::Catch2WithMain)
 
 # NOTE: The test name must have the same name as the command name
 add_test(NAME ${test_target} COMMAND ${test_target})

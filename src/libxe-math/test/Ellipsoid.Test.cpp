@@ -21,5 +21,5 @@ TEST_CASE("EllipsoidTest, CanBeSerializedToANonEmptyString") {
     std::stringstream ss;
     ss << ellipsoid;
 
-    EXPECT_NE(ss.str(), "");
+    REQUIRE(ss.str() != "");
 }

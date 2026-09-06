@@ -4,5 +4,5 @@
 
 TEST_CASE("RotationTest, EqualsShouldComparePointsInAElementWiseFasion") {
     xe::Rotation<float> tri1;
-    REQUIRE(true, true);
+    REQUIRE(true);
 }

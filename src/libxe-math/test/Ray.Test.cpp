@@ -4,5 +4,5 @@
 
 TEST_CASE("RayTest, EqualsShouldComparePointsInAElementWiseFasion") {
     xe::TRay<float> ray1;
-    REQUIRE(true, true);
+    REQUIRE(true);
 }

@@ -83,8 +83,8 @@ TEST_CASE("BoxTest, expandIncreasesTheBoxWhenUsingAPointInsideOf") {
     box.expand(xe::Vector3(-10.0f, -10.0f, -10.0f));
 
     REQUIRE(box.getMinEdge() == xe::Vector3(-10.0f, -10.0f, -10.0f));
-    EXPECT_NE(box.getCenter(), prevCenter);
-    EXPECT_NE(box.getSize(), prevSize);
+    REQUIRE(box.getCenter() != prevCenter);
+    REQUIRE(box.getSize() != prevSize);
 }
 
 TEST_CASE("BoxTest, isInsideChecksIfAPointBetweenTheMinAndMaxEdges") {
@@ -204,4 +204,17 @@ TEST_CASE("BoxTest, intersectsChecksIfThereIsAnOverlappingBetweenTwoBoxesDisplac
         REQUIRE_FALSE(displaced.intersect(box));
         REQUIRE_FALSE(box.intersect(displaced));
     }
+}
+
+TEST_CASE("BoxTest, operatorLessLessShouldCreateAnUniqueStringRepresentationFromDifferentBoxes") {
+    xe::Box box{{-1.0f, -1.0f, -1.0f}, {1.0f, 1.0f, 1.0f}};
+    xe::Box box1{{0.0f, 0.0f, 0.0f}, {10.0f, 10.0f, 10.0f}};
+
+    std::stringstream ss;
+    ss << box;
+    REQUIRE(ss.str() != "");
+
+    std::stringstream ss1;
+    ss1 << box1;
+    REQUIRE(ss.str() != ss1.str());
 }

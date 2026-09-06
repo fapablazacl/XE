@@ -5,19 +5,19 @@
 TEST_CASE("PlaneTest, DefaultConstructorMakesXZPlanePointingPlusYAxis") {
     xe::Plane subject;
 
-    REQUIRE(subject.a, 0.0f);
-    REQUIRE(subject.b, 1.0f);
-    REQUIRE(subject.c, 0.0f);
-    REQUIRE(subject.d, 0.0f);
+    REQUIRE(subject.a == 0.0f);
+    REQUIRE(subject.b == 1.0f);
+    REQUIRE(subject.c == 0.0f);
+    REQUIRE(subject.d == 0.0f);
 }
 
 TEST_CASE("PlaneTest, FourParamConstructorMakesAPlaneWithSpecificEquationTerms") {
     xe::Plane subject{1.0f, 2.0f, 3.0f, 4.0f};
 
-    REQUIRE(subject.a, 1.0f);
-    REQUIRE(subject.b, 2.0f);
-    REQUIRE(subject.c, 3.0f);
-    REQUIRE(subject.d, 4.0f);
+    REQUIRE(subject.a == 1.0f);
+    REQUIRE(subject.b == 2.0f);
+    REQUIRE(subject.c == 3.0f);
+    REQUIRE(subject.d == 4.0f);
 }
 
 TEST_CASE("PlaneTest, ConstDataRetunsAPointerToInternalArray") {
@@ -25,15 +25,15 @@ TEST_CASE("PlaneTest, ConstDataRetunsAPointerToInternalArray") {
 
     const float *values = subject.data();
 
-    REQUIRE(values[0], subject.a);
-    REQUIRE(values[1], subject.b);
-    REQUIRE(values[2], subject.c);
-    REQUIRE(values[3], subject.d);
+    REQUIRE(values[0] == subject.a);
+    REQUIRE(values[1] == subject.b);
+    REQUIRE(values[2] == subject.c);
+    REQUIRE(values[3] == subject.d);
 
-    REQUIRE(values[0], 1.0f);
-    REQUIRE(values[1], 2.0f);
-    REQUIRE(values[2], 3.0f);
-    REQUIRE(values[3], 4.0f);
+    REQUIRE(values[0] == 1.0f);
+    REQUIRE(values[1] == 2.0f);
+    REQUIRE(values[2] == 3.0f);
+    REQUIRE(values[3] == 4.0f);
 }
 
 TEST_CASE("PlaneTest, DataRetunsAPointerToInternalArray") {
@@ -41,15 +41,15 @@ TEST_CASE("PlaneTest, DataRetunsAPointerToInternalArray") {
 
     const float *values = subject.data();
 
-    REQUIRE(values[0], subject.a);
-    REQUIRE(values[1], subject.b);
-    REQUIRE(values[2], subject.c);
-    REQUIRE(values[3], subject.d);
+    REQUIRE(values[0] == subject.a);
+    REQUIRE(values[1] == subject.b);
+    REQUIRE(values[2] == subject.c);
+    REQUIRE(values[3] == subject.d);
 
-    REQUIRE(values[0], 1.0f);
-    REQUIRE(values[1], 2.0f);
-    REQUIRE(values[2], 3.0f);
-    REQUIRE(values[3], 4.0f);
+    REQUIRE(values[0] == 1.0f);
+    REQUIRE(values[1] == 2.0f);
+    REQUIRE(values[2] == 3.0f);
+    REQUIRE(values[3] == 4.0f);
 }
 
 struct TestCase {
@@ -68,8 +68,8 @@ TEST_CASE("PlaneTest, EqualityOperatorChecksForEqualityForEachTerm") {
         TestCase{xe::Plane{1.0f, 2.0f, 3.0f, -4.0f}, false}
     };
 
-    for (const auto &testCase : testCases") {
-        REQUIRE(testCase.output, subject.operator==(testCase.input));
+    for (const auto &testCase : testCases) {
+        REQUIRE(testCase.output == (subject == testCase.input));
     }
 }
 
@@ -84,8 +84,8 @@ TEST_CASE("PlaneTest, InequalityOperatorChecksForEqualityForEachTerm") {
         TestCase{xe::Plane{1.0f, 2.0f, 3.0f, -4.0f}, true}
     };
 
-    for (const auto &testCase : testCases") {
-        REQUIRE(testCase.output, subject.operator!=(testCase.input));
+    for (const auto &testCase : testCases) {
+        REQUIRE(testCase.output == (subject != testCase.input));
     }
 }
 
@@ -109,12 +109,12 @@ TEST_CASE("PlaneTest, VectorialFactoryMethodGeneratesAPlaneFromASpecificPointAnd
         {VectorialInput{xe::Vector3{0.0f, 0.0f, 1.0f}, xe::Vector3{1.0f, 1.0f, 1.0f}}, xe::Plane{0.0f, 0.0f, 1.0f, 1.0f}},
     };
 
-    for (const auto &testCase : testCases") {
+    for (const auto &testCase : testCases) {
         const auto &input = testCase.input;
         const auto output = xe::planeVectorial(input.normal, input.position);
 
-        REQUIRE(testCase.output, output);
-        REQUIRE(xe::norm2(output.normal()), 1.0f);
+        REQUIRE(testCase.output == output);
+        REQUIRE(xe::norm2(output.normal()) == Catch::Approx(1.0f));
     }
 }
 
@@ -123,10 +123,10 @@ TEST_CASE("PlaneTest, EvaluateReturnsTheResultScalarOfEvaluatingPointAgainstTheP
 
     Plane plane{-1.0f, 2.0f, -3.0f, 1.0f};
 
-    REQUIRE(plane.evaluate({0.0f, 0.0f, 0.0f}), -1.0f);
-    REQUIRE(plane.evaluate({1.0f, 1.0f, 1.0f}), -3.0f);
-    REQUIRE(plane.evaluate({-1.0f, 0.0f, 0.0f}), 0.0f);
-    REQUIRE(plane.evaluate({-1.0f, 1.0f, 0.0f}), 2.0f);
+    REQUIRE(plane.evaluate({0.0f, 0.0f, 0.0f}) == -1.0f);
+    REQUIRE(plane.evaluate({1.0f, 1.0f, 1.0f}) == -3.0f);
+    REQUIRE(plane.evaluate({-1.0f, 0.0f, 0.0f}) == 0.0f);
+    REQUIRE(plane.evaluate({-1.0f, 1.0f, 0.0f}) == 2.0f);
 }
 
 TEST_CASE("PlaneTest, IntersectChecksIfTwoPlanesIntersect") {
@@ -147,9 +147,9 @@ TEST_CASE("PlaneTest, TestChecksHowAPointRelatesToAPlane") {
 
     Plane plane{0.0f, 1.0f, 0.0f, 1.0f};
 
-    REQUIRE(plane.test({0.0f, 2.0f, 0.0f}), PlaneSide::Front);
-    REQUIRE(plane.test({0.0f, -2.0f, 0.0f}), PlaneSide::Back);
-    REQUIRE(plane.test({0.0f, 1.0f, 0.0f}), PlaneSide::Inside);
+    REQUIRE(plane.test({0.0f, 2.0f, 0.0f}) == PlaneSide::Front);
+    REQUIRE(plane.test({0.0f, -2.0f, 0.0f}) == PlaneSide::Back);
+    REQUIRE(plane.test({0.0f, 1.0f, 0.0f}) == PlaneSide::Inside);
 }
 
 TEST_CASE("PlaneTest, SerializationGeneratesANonEmptyString") {
@@ -158,7 +158,7 @@ TEST_CASE("PlaneTest, SerializationGeneratesANonEmptyString") {
     std::stringstream ss;
     ss << subject;
 
-    EXPECT_NE(ss.str(), "");
+    REQUIRE(ss.str() != "");
 }
 
 TEST_CASE("PlaneTest, SerializationGeneratesDiffrentStringsForDifferentPlanes") {
@@ -168,5 +168,6 @@ TEST_CASE("PlaneTest, SerializationGeneratesDiffrentStringsForDifferentPlanes") 
     std::stringstream ss2;
     ss2 << xe::planeYZ();
 
-    EXPECT_NE(ss1.str(), ss2.str());
+    REQUIRE(ss1.str() != ss2.str());
 }
+
