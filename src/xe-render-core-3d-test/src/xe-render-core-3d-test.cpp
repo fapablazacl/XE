@@ -277,22 +277,30 @@ namespace {
     xe::mat4 viewMatrixOf(const FpsCamera &cam) {
         xe::Vector3 const f = forwardOf(cam);
         xe::Vector3 const target = cam.position + f;
-        return xe::mat4LookAtRH<float>(cam.position, target, xe::Vector3{0.0f, 1.0f, 0.0f});
+        return xe::mat4LookAtRH<float>(cam.position, target, xe::vec(0.0f, 1.0f, 0.0f));
     }
 
     void updateFpsCamera(FpsCamera &cam, GLFWwindow *window, float dt, double &prevMouseX, double &prevMouseY, bool &mouseInitialized) {
-        double mx = 0.0;
-        double my = 0.0;
-        glfwGetCursorPos(window, &mx, &my);
+        auto m = xe::vec(0.0, 0.0);
+        
+        glfwGetCursorPos(window, &m.x, &m.y);
         if (!mouseInitialized) {
-            prevMouseX = mx;
-            prevMouseY = my;
+            prevMouseX = m.x;
+            prevMouseY = m.y;
             mouseInitialized = true;
         }
-        float const dx = static_cast<float>(mx - prevMouseX);
-        float const dy = static_cast<float>(my - prevMouseY);
-        prevMouseX = mx;
-        prevMouseY = my;
+
+        auto d = (m - xe::vec(prevMouseX, prevMouseY)).cast<float>();
+
+        auto [dx, dy] = d;
+
+        /*
+        float const dx = static_cast<float>(m.x - prevMouseX);
+        float const dy = static_cast<float>(m.y - prevMouseY);
+        */
+
+        prevMouseX = m.x;
+        prevMouseY = m.y;
 
         cam.yaw += dx * cam.lookSensitivity;
         cam.pitch -= dy * cam.lookSensitivity;

@@ -420,7 +420,94 @@ namespace xe {
     extern template struct TVector<double, 2>;
     extern template struct TVector<double, 3>;
     extern template struct TVector<double, 4>;
+
+    template<typename T>
+    TVector<T, 2> vec(const T x, const T y) {
+        return TVector<T, 2>(x, y);
+    }
+
+    template<typename T>
+    TVector<T, 3> vec(const T x, const T y, const T z) {
+        return TVector<T, 3>(x, y, z);
+    }
+
+    template<typename T>
+    TVector<T, 3> vec(const TVector2<T> v, const T z) {
+        return TVector<T, 3>(v[0], v[1], z);
+    }
+
+    template<typename T>
+    TVector<T, 3> vec(const T x, const TVector2<T> v) {
+        return TVector<T, 3>(x, v[0], v[1]);
+    }
+
+    template<typename T>
+    TVector<T, 4> vec(const T x, const T y, const T z, const T w) {
+        return TVector<T, 4>(x, y, z, w);
+    }
+
+    template<typename T>
+    TVector<T, 4> vec(const TVector2<T> v, const T z, const T w) {
+        return TVector<T, 4>(v[0], v[1], z, w);
+    }
+
+    template<typename T>
+    TVector<T, 4> vec(const T x, const TVector2<T> v, const T w) {
+        return TVector<T, 4>(x, v[0], v[1], w);
+    }
+
+    template<typename T>
+    TVector<T, 4> vec(const T x, const T y, const TVector2<T> v) {
+        return TVector<T, 4>(x, y, v[0], v[1]);
+    }
+
+    template<typename T>
+    TVector<T, 4> vec(const TVector3<T> v, const T w) {
+        return TVector<T, 4>(v[0], v[1], v[2], w);
+    }
+
+    template<typename T>
+    TVector<T, 4> vec(const T x, const TVector3<T> v) {
+        return TVector<T, 4>(x, v[0], v[1], v[2]);
+    }
+
+    // for tuple destructuring
+    template<std::size_t I, typename T, int N> 
+    constexpr T& get(xe::TVector<T, N> &v) {
+        static_assert(I < N, "xe::TVector<T, N> index out of range");
+        return v[I];
+    }
+
+    template<std::size_t I, typename T, int N> 
+    constexpr const T& get(const xe::TVector<T, N> &v) {
+        static_assert(I < N, "xe::TVector<T, N> index out of range");
+        return v[I];
+    }
+
+    template<std::size_t I, typename T, int N> 
+    constexpr T&& get(xe::TVector<T, N> &&v) {
+        static_assert(I < N, "xe::TVector<T, N> index out of range");
+        return std::move(v[I]);
+    }
+
+    template<std::size_t I, typename T, int N> 
+    constexpr const T&& get(const xe::TVector<T, N> &&v) {
+        static_assert(I < N, "xe::TVector<T, N> index out of range");
+        return std::move(v[I]);
+    }
 } // namespace xe
+
+// tuple protocol
+namespace std {
+    template<typename T, int N>
+    struct tuple_size<xe::TVector<T, N>> : std::integral_constant<std::size_t, N> {};
+
+    template<std::size_t I, typename T, int N>
+    struct tuple_element<I, xe::TVector<T, N>> {
+        static_assert(I < N, "xe::TVector<T, N> index out of range");
+        using type = T;
+    };
+}
 
 #if defined(_MSC_VER)
 #pragma warning(pop)
