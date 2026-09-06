@@ -1,47 +1,66 @@
 /**
  * @file VectorExpr.h
- * @brief Experimental expression-template vector arithmetic.
- *
- * @warning This header is kept for reference only. It is not wired into
- * xe::vec or any consumer code, and its interface is unstable. The live
- * vector type is @ref xe::tvec in Vector.h.
+ * @brief A xe::Vector implementation using expression templates for high-performance
  */
 
-#pragma once
+#ifndef _XE_MATH_VECTOREXPR_HPP__
+#define _XE_MATH_VECTOREXPR_HPP__
+
+#if defined(_MSC_VER)
+#pragma message("This is an experimental header file. Although it contains usable code, it is incomplete, unstable, and has not been tested yet. Use at your own risk")
+#else
+#pragma message "This is an experimental header file. Although it contains usable code, it is incomplete, unstable, and has not been tested yet. Use at your own risk"
+#endif
 
 #include <cmath>
 #include <functional>
 
 namespace xe {
-    //! Sum of all components of a vector expression.
-    template <typename VectorExpr> auto expr_sum(VectorExpr expression) {
+    /**
+     * @brief Computes the sum of all
+     */
+    template <typename VectorExpr> auto sum(VectorExpr expression) {
         auto result = expression[0];
-        for (int i = 1; i < VectorExpr::vector_type::size; ++i) {
+
+        for (int i = 1; i < VectorExpr::vector_type::size; i++) {
             result += expression[i];
         }
+
         return result;
     }
 
-    template <typename VectorExprLeft, typename VectorExprRight> auto expr_dot(VectorExprLeft v1, VectorExprRight v2) {
-        return expr_sum(v1 * v2);
+    template <typename VectorExprLeft, typename VectorExprRight> auto dot(VectorExprLeft v1, VectorExprRight v2) {
+        return sum(v1 * v2);
     }
 
-    template <typename VectorExpr> auto expr_length2(VectorExpr v) {
-        return expr_sum(v * v);
+    /*
+    template<typename VectorExprLeft, typename VectorExprRight>
+    auto cross(VectorExprLeft v1, VectorExprRight v2) {
+        constexpr int size = VectorExprLeft::vector_type::size;
+
+        if constexpr (size == 3) {
+            return
+        }
+    }
+    */
+
+    template <typename VectorExpr> auto norm2(VectorExpr v) {
+        return sum(v * v);
     }
 
-    template <typename VectorExpr> auto expr_length(VectorExpr v) {
-        return std::sqrt(expr_length2(v));
+    template <typename VectorExpr> auto norm(VectorExpr v) {
+        return std::sqrt(norm2(v));
     }
 
     template <typename VectorExprLeft, typename VectorExprRight, typename BinaryOperator> class VectorBinaryExpr {
     public:
-        using vector_type = typename VectorExprLeft::vector_type;
+        typedef typename VectorExprLeft::vector_type vector_type;
 
+    public:
         VectorBinaryExpr(VectorExprLeft left, VectorExprRight right) : m_left(left), m_right(right) {
         }
 
-        auto operator[](int i) const {
+        auto operator[](const int i) const {
             return m_operator(m_left[i], m_right[i]);
         }
 
@@ -53,12 +72,13 @@ namespace xe {
 
     template <typename VectorExpr, typename UnaryOperator> class VectorUnaryExpr {
     public:
-        using vector_type = typename VectorExpr::vector_type;
+        typedef typename VectorExpr::vector_type vector_type;
 
-        explicit VectorUnaryExpr(VectorExpr v) : m_vector(v) {
+    public:
+        VectorUnaryExpr(VectorExpr vector) : m_vector(vector) {
         }
 
-        auto operator[](int i) const {
+        auto operator[](const int i) const {
             return m_operator(m_vector[i]);
         }
 
@@ -67,15 +87,41 @@ namespace xe {
         UnaryOperator m_operator = UnaryOperator();
     };
 
-    template <typename T> struct expr_identity {
-        T operator()(T value) const {
+    template <typename T> struct identity {
+        T operator()(const T value) const {
             return value;
         }
     };
 
-    template <typename T> struct expr_negate {
-        T operator()(T value) const {
+    template <typename VectorExpr> auto operator+(VectorExpr expression) {
+        return VectorUnaryExpr<VectorExpr, identity<typename VectorExpr::vector_type::type>>(expression);
+    }
+
+    template <typename T> struct negate {
+        T operator()(const T value) const {
             return -value;
         }
     };
+
+    template <typename VectorExpr> auto operator-(VectorExpr expression) {
+        return VectorUnaryExpr<VectorExpr, negate<typename VectorExpr::vector_type::type>>(expression);
+    }
+
+    template <typename VectorExprLeft, typename VectorExprRight> auto operator+(VectorExprLeft left, VectorExprRight right) {
+        return VectorBinaryExpr<VectorExprLeft, VectorExprRight, std::plus<typename VectorExprLeft::vector_type::type>>(left, right);
+    }
+
+    template <typename VectorExprLeft, typename VectorExprRight> auto operator-(VectorExprLeft left, VectorExprRight right) {
+        return VectorBinaryExpr<VectorExprLeft, VectorExprRight, std::minus<typename VectorExprLeft::vector_type::type>>(left, right);
+    }
+
+    template <typename VectorExprLeft, typename VectorExprRight> auto operator*(VectorExprLeft left, VectorExprRight right) {
+        return VectorBinaryExpr<VectorExprLeft, VectorExprRight, std::multiplies<typename VectorExprLeft::vector_type::type>>(left, right);
+    }
+
+    template <typename VectorExprLeft, typename VectorExprRight> auto operator/(VectorExprLeft left, VectorExprRight right) {
+        return VectorBinaryExpr<VectorExprLeft, VectorExprRight, std::divides<typename VectorExprLeft::vector_type::type>>(left, right);
+    }
 } // namespace xe
+
+#endif
