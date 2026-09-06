@@ -13,9 +13,9 @@ namespace xe {
         };
 
         constexpr std::array<AttribSpec, 3> attribSpecs = {{
-            {MeshAttribPosition, sizeof(xe::vec3), VertexAttribFormat::float3, 0},
-            {MeshAttribNormal, sizeof(xe::vec3), VertexAttribFormat::float3, 1},
-            {MeshAttribTexCoord0, sizeof(xe::vec2), VertexAttribFormat::float2, 2},
+            {MeshAttribPosition, sizeof(xe::Vector3), VertexAttribFormat::float3, 0},
+            {MeshAttribNormal, sizeof(xe::Vector3), VertexAttribFormat::float3, 1},
+            {MeshAttribTexCoord0, sizeof(xe::Vector2), VertexAttribFormat::float2, 2},
         }};
 
         const void *attributePointer(const MeshStorage<float> &storage, int which) {

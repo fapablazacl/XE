@@ -38,7 +38,7 @@ namespace xe {
      */
     struct PipelineGL {
         //! RGBA clear color applied at beginFrame (once beginFrame is wired up on this backend).
-        vec4 clearColor = {0.0f, 0.0f, 0.0f, 1.0f};
+        xe::Vector4 clearColor = {0.0f, 0.0f, 0.0f, 1.0f};
 
         //! Mask selecting which buffers glClear will clear.
         gl::Flags<gl::ClearBufferMask> clearMask = gl::ClearBufferMask::eColorBufferBit;

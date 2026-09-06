@@ -39,14 +39,14 @@ namespace xe {
      * @tparam T floating-point component type for positions/normals/texcoords (float or double).
      */
     template <typename T> struct MeshStorage {
-        //! At least MeshCounts::vertexCount tvec<T,3> slots, or nullptr to skip.
-        tvec<T, 3> *positions = nullptr;
+        //! At least MeshCounts::vertexCount xe::TVector<T,3> slots, or nullptr to skip.
+        xe::TVector<T, 3> *positions = nullptr;
 
-        //! At least MeshCounts::vertexCount tvec<T,3> slots, or nullptr to skip.
-        tvec<T, 3> *normals = nullptr;
+        //! At least MeshCounts::vertexCount xe::TVector<T,3> slots, or nullptr to skip.
+        xe::TVector<T, 3> *normals = nullptr;
 
-        //! At least MeshCounts::vertexCount tvec<T,2> slots, or nullptr to skip.
-        tvec<T, 2> *texCoords = nullptr;
+        //! At least MeshCounts::vertexCount xe::TVector<T,2> slots, or nullptr to skip.
+        xe::TVector<T, 2> *texCoords = nullptr;
 
         //! Reinterpreted as uint16_t* or uint32_t* per MeshCounts::indexType. Required when indexCount > 0.
         void *indices = nullptr;

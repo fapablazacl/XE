@@ -203,7 +203,7 @@ namespace xe {
     struct TextureDescriptor {
         TextureType type = TextureType::Tex2D;
         PixelFormat format = PixelFormat::R8G8B8;
-        ivec3 size;
+        Vector3i size;
         PixelFormat sourceFormat;
         PixelDataType sourceDataType = PixelDataType::UInt8;
 
@@ -246,10 +246,10 @@ namespace xe {
      */
     struct TextureReadDescriptor {
         //! Region origin inside the target mip level, in texels. Must be {0,0,0} on the GL 3.3 backend.
-        ivec3 offset = {0, 0, 0};
+        Vector3i offset = {0, 0, 0};
 
         //! Region extent in texels. Must equal the mip level's full extent on the GL 3.3 backend.
-        ivec3 size;
+        Vector3i size;
 
         //! Target mip level index.
         int mipLevel = 0;
@@ -273,10 +273,10 @@ namespace xe {
      */
     struct TextureUpdateDescriptor {
         //! Region origin inside the target mip level, in texels.
-        ivec3 offset = {0, 0, 0};
+        Vector3i offset = {0, 0, 0};
 
         //! Region extent in texels. Unused axes should be 1.
-        ivec3 size;
+        Vector3i size;
 
         //! Target mip level index.
         int mipLevel = 0;
@@ -487,7 +487,7 @@ namespace xe {
         VertexLayoutHandle layoutHandle;
         ShaderHandle shaderProgramHandle;
         ClearFlags clearFlags = ClearFlags::Color;
-        vec4 clearColor = {0.0f, 0.0f, 0.0f, 1.0f};
+        xe::Vector4 clearColor = {0.0f, 0.0f, 0.0f, 1.0f};
 
         bool depthTest = true;
         bool stencilTest = false;
@@ -531,7 +531,7 @@ namespace xe {
 
     struct CommandClear {
         ClearFlags flags = ClearFlags::Color;
-        vec4 color = {0.0f, 0.0f, 0.0f, 1.0f};
+        xe::Vector4 color = {0.0f, 0.0f, 0.0f, 1.0f};
         float depth = 1.0f;
         int stencil = 0;
     };

@@ -420,18 +420,6 @@ namespace xe {
     extern template struct TVector<double, 2>;
     extern template struct TVector<double, 3>;
     extern template struct TVector<double, 4>;
-    
-    template<typename T, int N>
-    using tvec = TVector<T, N>;
-
-    using vec2 = Vector2;
-    using vec3 = Vector3;
-    using vec4 = Vector4;
-
-    using ivec2 = Vector2i;
-    using ivec3 = Vector3i;
-    using ivec4 = Vector4i;
-
 } // namespace xe
 
 #if defined(_MSC_VER)

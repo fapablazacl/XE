@@ -53,8 +53,8 @@ namespace xe {
 
         const int slices = opts.slices;
         const int stacks = opts.stacks;
-        const tvec<T, 3> radii{static_cast<T>(opts.radii.x), static_cast<T>(opts.radii.y), static_cast<T>(opts.radii.z)};
-        const tvec<T, 3> invSquaredRadii{T(1) / (radii.x * radii.x), T(1) / (radii.y * radii.y), T(1) / (radii.z * radii.z)};
+        const xe::TVector<T, 3> radii{static_cast<T>(opts.radii.x), static_cast<T>(opts.radii.y), static_cast<T>(opts.radii.z)};
+        const xe::TVector<T, 3> invSquaredRadii{T(1) / (radii.x * radii.x), T(1) / (radii.y * radii.y), T(1) / (radii.z * radii.z)};
 
         const MeshCounts counts = computeEllipsoidCounts(opts);
 
@@ -74,19 +74,19 @@ namespace xe {
 
                 const std::size_t vertIndex = static_cast<std::size_t>(i) * static_cast<std::size_t>(slices + 1) + static_cast<std::size_t>(j);
 
-                const tvec<T, 3> position{radii.x * sinPhi * cosTheta, radii.y * cosPhi, radii.z * sinPhi * sinTheta};
+                const xe::TVector<T, 3> position{radii.x * sinPhi * cosTheta, radii.y * cosPhi, radii.z * sinPhi * sinTheta};
 
                 if (out.positions != nullptr) {
                     out.positions[vertIndex] = position;
                 }
 
                 if (out.normals != nullptr) {
-                    const tvec<T, 3> n{position.x * invSquaredRadii.x, position.y * invSquaredRadii.y, position.z * invSquaredRadii.z};
+                    const xe::TVector<T, 3> n{position.x * invSquaredRadii.x, position.y * invSquaredRadii.y, position.z * invSquaredRadii.z};
                     out.normals[vertIndex] = normalize(n);
                 }
 
                 if (out.texCoords != nullptr) {
-                    out.texCoords[vertIndex] = tvec<T, 2>{tu, T(1) - tv};
+                    out.texCoords[vertIndex] = xe::TVector<T, 2>{tu, T(1) - tv};
                 }
             }
         }

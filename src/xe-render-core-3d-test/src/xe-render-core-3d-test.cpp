@@ -157,21 +157,21 @@ namespace {
         return std::cos(x) * std::sin(z);
     }
 
-    void computeSurfaceTriangles(Span<xe::vec3> &vertices, const float width, const float depth, int slices, int stacks) {
+    void computeSurfaceTriangles(Span<xe::Vector3> &vertices, const float width, const float depth, int slices, int stacks) {
         const size_t size = (slices + 1) * (stacks + 1);
         assert(vertices.size() == size);
 
-        xe::vec2 const d = xe::vec2{width, depth} / xe::vec2{(float)slices, (float)depth};
-        xe::vec2 const init = -d * 0.5f;
+        xe::Vector2 const d = xe::Vector2{width, depth} / xe::Vector2{(float)slices, (float)depth};
+        xe::Vector2 const init = -d * 0.5f;
 
         size_t index = 0;
 
         for (int i = 0; i < slices + 1; i++) {
             for (int j = 0; j < stacks + 1; j++) {
-                xe::vec2 const point = init + xe::vec2{(float)i, (float)j} * d;
+                xe::Vector2 const point = init + xe::Vector2{(float)i, (float)j} * d;
                 float const y = surface(point.x, point.y);
 
-                vertices[index++] = xe::vec3{point.x, y, point.y};
+                vertices[index++] = xe::Vector3{point.x, y, point.y};
             }
         }
     }
@@ -223,7 +223,7 @@ namespace {
         }
     }
 
-    tl::expected<xe::TextureHandle, xe::BackendError> createCheckerBoardTexture(const xe::RenderDeviceBackendVTable &vtable, xe::RenderDeviceBackendContext *ctx, xe::ivec2 size) {
+    tl::expected<xe::TextureHandle, xe::BackendError> createCheckerBoardTexture(const xe::RenderDeviceBackendVTable &vtable, xe::RenderDeviceBackendContext *ctx, xe::Vector2i size) {
         constexpr int tileSize = 64;
         constexpr xe::PixelFormat format = xe::PixelFormat::R8G8B8A8;
         constexpr xe::PixelDataType dataType = xe::PixelDataType::UInt8;
@@ -237,7 +237,7 @@ namespace {
         xe::TextureDescriptor desc{};
         desc.type = xe::TextureType::Tex2D;
         desc.format = format;
-        desc.size = xe::ivec3(size.x, size.y, 1);
+        desc.size = xe::Vector3i(size.x, size.y, 1);
         desc.sourceFormat = format;
         desc.sourceDataType = dataType;
         desc.mipLevels = &mip;
@@ -254,7 +254,7 @@ namespace {
      */
     struct FpsCamera {
         //! World-space eye position.
-        xe::vec3 position = {0.0f, 1.7f, 6.0f};
+        xe::Vector3 position = {0.0f, 1.7f, 6.0f};
 
         //! Yaw in radians; 0 looks toward -Z.
         float yaw = 0.0f;
@@ -269,15 +269,15 @@ namespace {
         float lookSensitivity = 0.0025f;
     };
 
-    xe::vec3 forwardOf(const FpsCamera &cam) {
+    xe::Vector3 forwardOf(const FpsCamera &cam) {
         float const cp = std::cos(cam.pitch);
         return {std::sin(cam.yaw) * cp, std::sin(cam.pitch), -std::cos(cam.yaw) * cp};
     }
 
     xe::mat4 viewMatrixOf(const FpsCamera &cam) {
-        xe::vec3 const f = forwardOf(cam);
-        xe::vec3 const target = cam.position + f;
-        return xe::mat4LookAtRH<float>(cam.position, target, xe::vec3{0.0f, 1.0f, 0.0f});
+        xe::Vector3 const f = forwardOf(cam);
+        xe::Vector3 const target = cam.position + f;
+        return xe::mat4LookAtRH<float>(cam.position, target, xe::Vector3{0.0f, 1.0f, 0.0f});
     }
 
     void updateFpsCamera(FpsCamera &cam, GLFWwindow *window, float dt, double &prevMouseX, double &prevMouseY, bool &mouseInitialized) {
@@ -303,10 +303,10 @@ namespace {
         if (cam.pitch < -pitchLimit)
             cam.pitch = -pitchLimit;
 
-        xe::vec3 const forwardXZ = xe::normalize(xe::vec3{std::sin(cam.yaw), 0.0f, -std::cos(cam.yaw)});
-        xe::vec3 const rightXZ = xe::vec3{std::cos(cam.yaw), 0.0f, std::sin(cam.yaw)};
+        xe::Vector3 const forwardXZ = xe::normalize(xe::Vector3{std::sin(cam.yaw), 0.0f, -std::cos(cam.yaw)});
+        xe::Vector3 const rightXZ = xe::Vector3{std::cos(cam.yaw), 0.0f, std::sin(cam.yaw)};
 
-        xe::vec3 move{0.0f, 0.0f, 0.0f};
+        xe::Vector3 move{0.0f, 0.0f, 0.0f};
         if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
             move = move + forwardXZ;
         if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
@@ -433,9 +433,9 @@ void main() {
     planeOpts.size = {40.0f, 40.0f};
     xe::MeshCounts const counts = xe::computePlaneCounts(planeOpts);
 
-    std::vector<xe::vec3> positions(counts.vertexCount);
-    std::vector<xe::vec3> normals(counts.vertexCount);
-    std::vector<xe::vec2> texCoords(counts.vertexCount);
+    std::vector<xe::Vector3> positions(counts.vertexCount);
+    std::vector<xe::Vector3> normals(counts.vertexCount);
+    std::vector<xe::Vector2> texCoords(counts.vertexCount);
     std::vector<std::uint8_t> indexBytes(counts.indexCount * xe::indexByteSize(counts.indexType));
 
     xe::MeshStorage<float> storage;
@@ -451,7 +451,7 @@ void main() {
     bufferDesc.usage = xe::BufferUsage::StaticDraw;
 
     bufferDesc.data = positions.data();
-    bufferDesc.size = positions.size() * sizeof(xe::vec3);
+    bufferDesc.size = positions.size() * sizeof(xe::Vector3);
     auto positionBufferResult = vtable.createBuffer(ctx, bufferDesc);
     if (!positionBufferResult) {
         std::cerr << "createBuffer (positions) failed: " << positionBufferResult.error().message << std::endl;
@@ -460,7 +460,7 @@ void main() {
     xe::BufferHandle positionBuffer = *positionBufferResult;
 
     bufferDesc.data = normals.data();
-    bufferDesc.size = normals.size() * sizeof(xe::vec3);
+    bufferDesc.size = normals.size() * sizeof(xe::Vector3);
     auto normalBufferResult = vtable.createBuffer(ctx, bufferDesc);
     if (!normalBufferResult) {
         std::cerr << "createBuffer (normals) failed: " << normalBufferResult.error().message << std::endl;
@@ -469,7 +469,7 @@ void main() {
     xe::BufferHandle normalBuffer = *normalBufferResult;
 
     bufferDesc.data = texCoords.data();
-    bufferDesc.size = texCoords.size() * sizeof(xe::vec2);
+    bufferDesc.size = texCoords.size() * sizeof(xe::Vector2);
     auto texCoordBufferResult = vtable.createBuffer(ctx, bufferDesc);
     if (!texCoordBufferResult) {
         std::cerr << "createBuffer (texCoords) failed: " << texCoordBufferResult.error().message << std::endl;
@@ -524,12 +524,12 @@ void main() {
 
     // Static directional-light data, laid out to match std140 (two vec4s).
     struct LightBlockData {
-        xe::vec4 direction;
-        xe::vec4 ambient;
+        xe::Vector4 direction;
+        xe::Vector4 ambient;
     };
     LightBlockData const lightBlock{
-        xe::normalize(xe::vec4{-0.4f, 1.0f, -0.3f, 0.0f}),
-        xe::vec4{0.2f, 0.2f, 0.2f, 1.0f},
+        xe::normalize(xe::Vector4{-0.4f, 1.0f, -0.3f, 0.0f}),
+        xe::Vector4{0.2f, 0.2f, 0.2f, 1.0f},
     };
 
     xe::BufferDescriptor lightUboDesc{};

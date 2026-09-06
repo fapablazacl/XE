@@ -15,12 +15,12 @@ namespace xe {
             //! Rotation angle in radians.
             float radians;
             //! Rotation axis (unit vector, right-handed).
-            xe::vec3 axis;
+            xe::Vector3 axis;
         };
 
         //! Six rotations that carry the base face (z = -0.5, normal = -Z) to each face of the cube.
         constexpr std::array<FaceRotation, kFaceCount> kFaceRotations = {{
-            {0.0f, xe::vec3{0.0f, 1.0f, 0.0f}},                  // -Z (front)
+            {0.0f, xe::Vector3{0.0f, 1.0f, 0.0f}},                  // -Z (front)
             {xe::pi<float> * 0.5f, {0.0f, 1.0f, 0.0f}},  // +X (right)
             {xe::pi<float>, {0.0f, 1.0f, 0.0f}},         // +Z (back)
             {xe::pi<float> * 1.5f, {0.0f, 1.0f, 0.0f}},  // -X (left)
@@ -76,13 +76,13 @@ namespace xe {
         const std::size_t vertsPerFace = static_cast<std::size_t>(slices + 1) * static_cast<std::size_t>(stacks + 1);
         const std::size_t indicesPerFace = 6u * static_cast<std::size_t>(slices) * static_cast<std::size_t>(stacks);
 
-        const tvec<T, 3> size{static_cast<T>(opts.size.x), static_cast<T>(opts.size.y), static_cast<T>(opts.size.z)};
+        const xe::TVector<T, 3> size{static_cast<T>(opts.size.x), static_cast<T>(opts.size.y), static_cast<T>(opts.size.z)};
 
         const MeshCounts counts = computeBoxCounts(opts);
 
         for (int face = 0; face < kFaceCount; ++face) {
             const FaceRotation &rot = kFaceRotations[face];
-            const tmat<T, 4, 4> rotation = xe::mat4Rotation(static_cast<T>(rot.radians), tvec<T, 3>{static_cast<T>(rot.axis.x), static_cast<T>(rot.axis.y), static_cast<T>(rot.axis.z)});
+            const tmat<T, 4, 4> rotation = xe::mat4Rotation(static_cast<T>(rot.radians), xe::TVector<T, 3>{static_cast<T>(rot.axis.x), static_cast<T>(rot.axis.y), static_cast<T>(rot.axis.z)});
 
             const std::size_t vertBase = static_cast<std::size_t>(face) * vertsPerFace;
 
@@ -94,19 +94,19 @@ namespace xe {
                     const std::size_t vertIndex = vertBase + static_cast<std::size_t>(i) + static_cast<std::size_t>(j) * static_cast<std::size_t>(slices + 1);
 
                     if (out.positions != nullptr) {
-                        const tvec<T, 4> basePos{lerp(T(-0.5), T(0.5), tj), lerp(T(0.5), T(-0.5), ti), T(-0.5), T(1)};
-                        const tvec<T, 4> rotated = rotation * basePos;
-                        out.positions[vertIndex] = tvec<T, 3>{rotated.x * size.x, rotated.y * size.y, rotated.z * size.z};
+                        const xe::TVector<T, 4> basePos{lerp(T(-0.5), T(0.5), tj), lerp(T(0.5), T(-0.5), ti), T(-0.5), T(1)};
+                        const xe::TVector<T, 4> rotated = rotation * basePos;
+                        out.positions[vertIndex] = xe::TVector<T, 3>{rotated.x * size.x, rotated.y * size.y, rotated.z * size.z};
                     }
 
                     if (out.normals != nullptr) {
-                        const tvec<T, 4> baseNormal{T(0), T(0), T(-1), T(0)};
-                        const tvec<T, 4> rotated = rotation * baseNormal;
-                        out.normals[vertIndex] = tvec<T, 3>{rotated.x, rotated.y, rotated.z};
+                        const xe::TVector<T, 4> baseNormal{T(0), T(0), T(-1), T(0)};
+                        const xe::TVector<T, 4> rotated = rotation * baseNormal;
+                        out.normals[vertIndex] = xe::TVector<T, 3>{rotated.x, rotated.y, rotated.z};
                     }
 
                     if (out.texCoords != nullptr) {
-                        out.texCoords[vertIndex] = tvec<T, 2>{lerp(T(0), T(1), tj), lerp(T(1), T(0), ti)};
+                        out.texCoords[vertIndex] = xe::TVector<T, 2>{lerp(T(0), T(1), tj), lerp(T(1), T(0), ti)};
                     }
                 }
             }

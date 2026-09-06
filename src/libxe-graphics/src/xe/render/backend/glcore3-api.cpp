@@ -155,7 +155,7 @@ namespace xe {
         }
     }
 
-    void clear(vec4 color, float depth, uint8_t stencil, gl::Flags<gl::ClearBufferMask> flags) {
+    void clear(xe::Vector4 color, float depth, uint8_t stencil, gl::Flags<gl::ClearBufferMask> flags) {
         gl::clearColor(color.x, color.y, color.z, color.w);
         gl::clearDepth(depth);
         gl::clearStencil(stencil);

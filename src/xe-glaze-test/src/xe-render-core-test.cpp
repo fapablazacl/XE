@@ -69,7 +69,7 @@ static void fillCheckerboardImage(void *data, size_t byteSize, int width, int he
     }
 }
 
-tl::expected<xe::TextureHandle, xe::BackendError> createCheckerBoardTexture(const xe::RenderDeviceBackendVTable &vtable, xe::RenderDeviceBackendContext *ctx, xe::ivec2 size) {
+tl::expected<xe::TextureHandle, xe::BackendError> createCheckerBoardTexture(const xe::RenderDeviceBackendVTable &vtable, xe::RenderDeviceBackendContext *ctx, xe::Vector2i size) {
     constexpr int tileSize = 64;
     constexpr xe::PixelFormat format = xe::PixelFormat::R8G8B8A8;
     constexpr xe::PixelDataType dataType = xe::PixelDataType::UInt8;
@@ -83,7 +83,7 @@ tl::expected<xe::TextureHandle, xe::BackendError> createCheckerBoardTexture(cons
     xe::TextureDescriptor desc{};
     desc.type = xe::TextureType::Tex2D;
     desc.format = format;
-    desc.size = xe::ivec3(size.x, size.y, 1);
+    desc.size = xe::Vector3i(size.x, size.y, 1);
     desc.sourceFormat = format;
     desc.sourceDataType = dataType;
     desc.mipLevels = &mip;
@@ -168,8 +168,8 @@ void main() {
     xe::TextureHandle textureHandle = *textureResult;
 
     // vertex buffer initialization
-    xe::vec3 const verts[] = {{-0.5f, 0.5f, 0.0f}, {0.5f, 0.5f, 0.0f}, {-0.5f, -0.5, 0.0f}, {0.5, -0.5, 0.0}};
-    xe::vec2 const texCoords[] = {{0.0f, 1.0f}, {0.0f, 0.0f}, {1.0f, 1.0f}, {1.0f, 0.0f}};
+    xe::Vector3 const verts[] = {{-0.5f, 0.5f, 0.0f}, {0.5f, 0.5f, 0.0f}, {-0.5f, -0.5, 0.0f}, {0.5, -0.5, 0.0}};
+    xe::Vector2 const texCoords[] = {{0.0f, 1.0f}, {0.0f, 0.0f}, {1.0f, 1.0f}, {1.0f, 0.0f}};
 
     xe::BufferDescriptor bufferDesc{};
     bufferDesc.type = xe::BufferType::Vertex;
