@@ -115,6 +115,7 @@ namespace {
         }
     }
 
+    /*
     gl::Texture createTexture(xe::Span<uint8_t> image, const xe::Vector2i &textureSize, gl::InternalFormat internal, gl::PixelFormat format) {
         // generate the checkerboard
         std::vector<std::uint8_t> pixels;
@@ -145,7 +146,7 @@ namespace {
 
         return texture;
     }
-
+    */
 
     /**
      * @brief Minimal free-look FPS camera state.
@@ -297,7 +298,7 @@ void main() {
     fragColor = vec4(lit, 1.0);
 }
 )";
-
+    /*
     auto shaderResult = vtable.createShaderProgram(ctx, shaderDesc);
     if (!shaderResult) {
         std::cerr << "createShaderProgram failed: " << shaderResult.error().message << std::endl;
@@ -542,5 +543,7 @@ void main() {
 
     glfwDestroyWindow(window);
     glfwTerminate();
+    */
+
     return 0;
 }
