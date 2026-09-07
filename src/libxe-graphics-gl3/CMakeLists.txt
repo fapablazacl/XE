@@ -1,4 +1,6 @@
 
+find_package(glaze CONFIG REQUIRED)
+
 set (target "libxe-graphics-gl3")
 
 set (sources 

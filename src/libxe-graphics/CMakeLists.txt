@@ -46,9 +46,9 @@ set (headers
 	"src/xe/gl/RendererGL.h"
 	"src/xe/gl/Types.h"
 
-	# xe/render/
-	"src/xe/render/RenderBackend.h"
-	"src/xe/render/types.h"
+	# xe/graphics/
+	"src/xe/graphics/RenderBackend.h"
+	"src/xe/graphics/types.h"
 
 )
 
@@ -80,8 +80,8 @@ set (sources
 	"src/xe/gl/TextureRepository.cpp"
 	"src/xe/gl/RendererGL.cpp"
 
-	# xe/render/ implementations
-	"src/xe/render/RenderBackend.cpp"
+	# xe/graphics/ implementations
+	"src/xe/graphics/RenderBackend.cpp"
 )
 
 add_library (${target} ${sources})
