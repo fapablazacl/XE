@@ -1,5 +1,6 @@
 
 #include <glaze/gl.hpp>
+#include <glaze/raii.hpp>
 #include <GLFW/glfw3.h>
 #include <iostream>
 #include <cstdlib>
@@ -8,11 +9,11 @@
 #include <cmath>
 #include <vector>
 
-#include "xe/render/RenderBackend.h"
-#include "xe/render/backend/glcore3-api.h"
-
+#include <xe/Span.h>
 #include <xe/geometry/PlaneGenerator.h>
 #include <xe/math/Math.h>
+#include <xe/graphics/PixelFormat.h>
+#include <xe/render/types.h>
 
 namespace {
     float checkerboardValue(int x, int y, int tileSize) {
@@ -34,130 +35,12 @@ namespace {
         return xe::toBytes(xe::getElementSize(static_cast<xe::TypeEncoding>(type)));
     }
 
-    void writeNormalizedChannel(void *base, size_t pixelOffset, int channel, float value, xe::PixelDataType type) {
-        auto *byteBase = static_cast<uint8_t *>(base) + pixelOffset;
-        switch (type) {
-        case xe::PixelDataType::UInt8:
-            byteBase[channel] = static_cast<uint8_t>(value * 255.0f);
-            break;
-        case xe::PixelDataType::UInt16:
-            reinterpret_cast<uint16_t *>(byteBase)[channel] = static_cast<uint16_t>(value * 65535.0f);
-            break;
-        case xe::PixelDataType::Float32:
-            reinterpret_cast<float *>(byteBase)[channel] = value;
-            break;
-        default:
-            assert(false && "writeNormalizedChannel: unsupported PixelDataType");
-        }
-    }
-
-    template<typename T>
-    class Span {
-    public:
-        struct Iterator {
-            using iterator_category = std::forward_iterator_tag;
-            using value_type = T;
-            using difference_type = std::ptrdiff_t;
-            using pointer = T*;
-            using reference = T&;
-
-            explicit Iterator(pointer ptr) : _ptr(ptr) {}
-
-            reference operator*() const {
-                return *_ptr;
-            }
-
-            pointer operator->() {
-                return _ptr;
-            }
-
-            Iterator& operator++() {
-                _ptr++;
-
-                return *this;
-            }
-
-            Iterator& operator++(int) {
-                Iterator it = *this;
-
-                _ptr++;
-
-                return it;
-            }
-
-            friend bool operator==(const Iterator &lhs, const Iterator &rhs) {
-                return _ptr == rhs._ptr;
-            }
-
-            friend bool operator==(const Iterator &lhs, const Iterator &rhs) {
-                return _ptr != rhs._ptr;
-            }
-
-        private:
-            pointer _ptr;
-        };
-
-        explicit Span() {}
-
-        explicit Span(T* data, size_t size) : _data(data), _size(size) {
-            // prevents issues where data and size have inconsistencies
-            assert(data == nullptr && size == 0 || data != nullptr && size > 0);
-        }
-
-        T* data() {
-            return _data;
-        }
-
-        size_t size() const {
-            return _size;
-        }
-
-        explicit operator bool() const {
-            return _data != nullptr;
-        }
-
-        Iterator begin() {
-            return Iterator(_data);
-        }
-
-        Iterator end() {
-            return Iterator(_data + _size);
-        }
-
-        T& operator[](const size_t i) {
-            assert(i < size);
-
-            return _data[i];
-        }
-
-        T operator[](const size_t i) const {
-            assert(i < size);
-
-            return _data[i];
-        }
-
-    private:
-        T* _data = nullptr;
-        size_t _size = 0;
-    };
-
-
-    template<typename T>
-    Span<T> makeSpan(const std::vector<T> &values) {
-        return Span<T>(values.data(), values.size());
-    }
-
-    template<typename T, size_t N>
-    Span<T> makeSpan(const std::array<T, N> &values) {
-        return Span<T>(values.data(), values.size());
-    }
-
     //! computes Y coord elevation from a single horizontal point
     float surface(float x, float z) {
         return std::cos(x) * std::sin(z);
     }
 
-    void computeSurfaceTriangles(Span<xe::Vector3> &vertices, const float width, const float depth, int slices, int stacks) {
+    void computeSurfaceTriangles(xe::Span<xe::Vector3> &vertices, const float width, const float depth, int slices, int stacks) {
         const size_t size = (slices + 1) * (stacks + 1);
         assert(vertices.size() == size);
 
@@ -176,7 +59,7 @@ namespace {
         }
     }
 
-    void computeSurfaceIndicesTriangles(Span<std::uint32_t> &indices, int slices, int stacks) {
+    void computeSurfaceIndicesTriangles(xe::Span<std::uint32_t> &indices, int slices, int stacks) {
         int const stride = slices + 1;
         std::size_t const count = 6 * stride * stacks;
 
@@ -201,51 +84,68 @@ namespace {
         }
     }
 
-    void fillCheckerboardImage(void *data, size_t byteSize, int width, int height, xe::PixelFormat format, xe::PixelDataType dataType, int tileSize) {
-        int const channels = channelCountOf(format);
-        size_t const channelBytes = byteSizeOf(dataType);
-        size_t const pixelStride = static_cast<size_t>(channels) * channelBytes;
+    std::size_t computeImageByteSize(const xe::Vector2i &textureSize, const size_t channelCount) {
+        return textureSize.x * textureSize.y * channelCount;
+    }
 
-        assert(data != nullptr);
-        assert(channels > 0 && channelBytes > 0);
-        assert(byteSize >= static_cast<size_t>(width) * height * pixelStride);
-        (void)byteSize;
+    void fillCheckerboardImage(xe::Span<uint8_t> image, const xe::Vector2i &textureSize, const size_t channelCount, int tileSize) {
+        const size_t pixelStride = channelCount;
+
+        assert(image);
+        assert(channelCount > 0);
+        assert(image.size() >= computeImageByteSize(textureSize, channelCount));
+
+        const int width = textureSize.x;
+        const int height = textureSize.y;
+        const int alphaChannel = 3;
 
         for (int y = 0; y < height; ++y) {
             for (int x = 0; x < width; ++x) {
                 float const v = checkerboardValue(x, y, tileSize);
+
                 size_t const pixelOffset = (static_cast<size_t>(y) * width + x) * pixelStride;
-                for (int c = 0; c < channels; ++c) {
-                    float const out = (c == 3) ? 1.0f : v;
-                    writeNormalizedChannel(data, pixelOffset, c, out, dataType);
+
+                for (int c = 0; c < channelCount; ++c) {
+                    float const out = (c == alphaChannel) ? 1.0f : v;
+
+                    auto buffer = image.data() + pixelOffset;
+                    buffer[c] = static_cast<uint8_t>(out * 255.0f);
                 }
             }
         }
     }
 
-    tl::expected<xe::TextureHandle, xe::BackendError> createCheckerBoardTexture(const xe::RenderDeviceBackendVTable &vtable, xe::RenderDeviceBackendContext *ctx, xe::Vector2i size) {
-        constexpr int tileSize = 64;
-        constexpr xe::PixelFormat format = xe::PixelFormat::R8G8B8A8;
-        constexpr xe::PixelDataType dataType = xe::PixelDataType::UInt8;
+    gl::Texture createTexture(xe::Span<uint8_t> image, const xe::Vector2i &textureSize, gl::InternalFormat internal, gl::PixelFormat format) {
+        // generate the checkerboard
+        std::vector<std::uint8_t> pixels;
 
+        constexpr int tileSize = 64;
         size_t const byteSize = static_cast<size_t>(size.x) * static_cast<size_t>(size.y) * 4u;
         std::vector<uint8_t> pixels(byteSize);
         fillCheckerboardImage(pixels.data(), byteSize, size.x, size.y, format, dataType, tileSize);
 
-        xe::MipLevel const mip{pixels.data()};
+        // create the texture
+        gl::Texture texture = gl::genTextures();
+        
+        const auto target = gl::TextureTarget::eTexture2d;
+        const int width = textureSize.x;
+        const int height = textureSize.y;
+        const auto type = gl::PixelType::eUnsignedByte;
 
-        xe::TextureDescriptor desc{};
-        desc.type = xe::TextureType::Tex2D;
-        desc.format = format;
-        desc.size = xe::Vector3i(size.x, size.y, 1);
-        desc.sourceFormat = format;
-        desc.sourceDataType = dataType;
-        desc.mipLevels = &mip;
-        desc.mipLevelCount = 1;
-        desc.generateMipmaps = true;
+        gl::bindTexture(target, texture);
+        gl::texImage2D(target, 0, internal, width, height, 0, format, type, pixels.data());
+        gl::generateMipmap(target);
 
-        return vtable.createTexture(ctx, desc);
+        gl::texParameteri(target, gl::TextureParameterName::eTextureMinFilter, GL_LINEAR);
+        gl::texParameteri(target, gl::TextureParameterName::eTextureMagFilter, GL_LINEAR);
+        gl::texParameteri(target, gl::TextureParameterName::eTextureWrapS, GL_CLAMP_TO_EDGE);
+        gl::texParameteri(target, gl::TextureParameterName::eTextureWrapT, GL_CLAMP_TO_EDGE);
+
+        gl::bindTexture(target, {});
+
+        return texture;
     }
+
 
     /**
      * @brief Minimal free-look FPS camera state.
@@ -290,14 +190,8 @@ namespace {
             mouseInitialized = true;
         }
 
-        auto d = (m - xe::vec(prevMouseX, prevMouseY)).cast<float>();
-
+        auto d = xe::cast<float>(m - xe::vec(prevMouseX, prevMouseY));
         auto [dx, dy] = d;
-
-        /*
-        float const dx = static_cast<float>(m.x - prevMouseX);
-        float const dy = static_cast<float>(m.y - prevMouseY);
-        */
 
         prevMouseX = m.x;
         prevMouseY = m.y;
@@ -357,22 +251,6 @@ int main() {
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     glazeLoadFunctions(glfwGetProcAddress);
 
-    xe::RenderDeviceBackendVTable vtable;
-    xe::initializeBackendTableGL(&vtable);
-
-    auto ctxResult = vtable.createContext();
-    if (!ctxResult) {
-        std::cerr << "createContext failed: " << ctxResult.error().message << std::endl;
-        return 1;
-    }
-    xe::RenderDeviceBackendContext *ctx = *ctxResult;
-
-    // Shader initialization. The camera matrices travel as raw uniforms (uModel / uView /
-    // uProjection / uTexTile), while the directional-light parameters are shared via a
-    // std140 uniform block bound at binding point kLightBlockBinding. This mirrors the two
-    // uniform paths the render-backend abstraction exposes.
-    constexpr uint32_t kLightBlockBinding = 0u;
-
     xe::ShaderProgramDescriptor shaderDesc;
     shaderDesc.glslVertexShader = R"(
 #version 330 core
@@ -428,6 +306,7 @@ void main() {
     xe::ShaderHandle shaderHandle = *shaderResult;
 
     // checkerboard texture
+
     auto textureResult = createCheckerBoardTexture(vtable, ctx, {512, 512});
     if (!textureResult) {
         std::cerr << "createCheckerBoardTexture failed: " << textureResult.error().message << std::endl;
