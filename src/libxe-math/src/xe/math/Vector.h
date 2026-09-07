@@ -38,6 +38,10 @@ namespace xe {
                 values[i++] = value;
             }
         }
+
+        constexpr size_t size() const {
+            return N;
+        }
     };
 
     template <typename T> struct VectorBase<T, 2> {
@@ -53,6 +57,10 @@ namespace xe {
         }
 
         constexpr VectorBase(T const x, T const y) : x(x), y(y) {}
+
+        constexpr size_t size() const {
+            return 2;
+        }
     };
 
     template <typename T> struct VectorBase<T, 3> {
@@ -68,6 +76,11 @@ namespace xe {
         }
 
         constexpr VectorBase(T const x, T const y, T const z) : x(x), y(y), z(z) {}
+
+
+        constexpr size_t size() const {
+            return 3;
+        }
     };
 
     template <typename T> struct VectorBase<T, 4> {
@@ -83,6 +96,10 @@ namespace xe {
         }
 
         constexpr VectorBase(T const x, T const y, T const z, T const w) : x(x), y(y), z(z), w(w) {}
+
+        constexpr size_t size() const {
+            return 4;
+        }
     };
 
     /**
@@ -462,6 +479,11 @@ namespace xe {
     }
 
     template<typename T>
+    TVector<T, 4> vec(const TVector2<T> v1, const TVector2<T> v2) {
+        return TVector<T, 4>(v1[0], v1[1], v2[0], v2[1]);
+    }
+
+    template<typename T>
     TVector<T, 4> vec(const TVector3<T> v, const T w) {
         return TVector<T, 4>(v[0], v[1], v[2], w);
     }
@@ -470,6 +492,7 @@ namespace xe {
     TVector<T, 4> vec(const T x, const TVector3<T> v) {
         return TVector<T, 4>(x, v[0], v[1], v[2]);
     }
+
 
     // for tuple destructuring
     template<std::size_t I, typename T, int N> 

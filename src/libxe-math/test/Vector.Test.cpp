@@ -327,3 +327,24 @@ TEST_CASE("Vector norm function should return the vector length", "[math][vector
     REQUIRE(norm(v2) == Catch::Approx(6.0f));
     REQUIRE(norm(v3) == Catch::Approx(std::sqrt(3.0f)));
 }
+
+TEST_CASE("Vector xe::vec factory functions should construct a Vector correctly", "[math][vector]") {
+    const float x = 1.0f;
+    const float y = 2.0f;
+    const float z = 3.0f;
+    const float w = 4.0f;
+
+    REQUIRE(xe::Vector2(x, y) == xe::vec(x, y));
+
+    REQUIRE(xe::Vector3(x, y, z) == xe::vec(x, y, z));
+    REQUIRE(xe::Vector3(x, y, z) == xe::vec(x, xe::vec(y, z)));
+    REQUIRE(xe::Vector3(x, y, z) == xe::vec(xe::vec(x, y), z));
+
+    REQUIRE(xe::Vector4(x, y, z, w) == xe::vec(x, y, z, w));
+    REQUIRE(xe::Vector4(x, y, z, w) == xe::vec(xe::vec(x, y), z, w));
+    REQUIRE(xe::Vector4(x, y, z, w) == xe::vec(x, xe::vec(y, z), w));
+    REQUIRE(xe::Vector4(x, y, z, w) == xe::vec(x, y, xe::vec(z, w)));
+    REQUIRE(xe::Vector4(x, y, z, w) == xe::vec(xe::vec(x, y), xe::vec(z, w)));
+    REQUIRE(xe::Vector4(x, y, z, w) == xe::vec(xe::vec(x, y, z), w));
+    REQUIRE(xe::Vector4(x, y, z, w) == xe::vec(x, xe::vec(y, z, w)));
+}
