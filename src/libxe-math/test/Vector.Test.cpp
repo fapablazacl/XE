@@ -49,9 +49,9 @@ TEST_CASE("Vector const data method should return an address to the first compon
     REQUIRE(constv.data() == &constv.values[0]);
 }
 
-TEST_CASE("Vector cast method should convert underlying type", "[math][vector]") {
+TEST_CASE("Vector cast should convert underlying type", "[math][vector]") {
     const xe::Vector3 vf{1.0f, 2.0f, 3.0f};
-    const auto vd = vf.cast<double>();
+    const auto vd = xe::cast<double>(vf);
 
     REQUIRE(vd.x == 1.0);
     REQUIRE(vd.y == 2.0);

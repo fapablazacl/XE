@@ -158,32 +158,12 @@ namespace xe {
             return this->values[index];
         }
 
-        const T operator[](const int index) const {
+        T operator[](const int index) const {
             return this->values[index];
         }
 
         inline friend TVector<T, N> operator*(const T s, const TVector<T, N> &v) {
             return v * s;
-        }
-
-        template <typename T2> operator TVector<T2, N>() const {
-            TVector<T2, N> result;
-
-            for (int i = 0; i < N; i++) {
-                result.values[i] = static_cast<T2>(this->values[i]);
-            }
-
-            return result;
-        }
-
-        template <typename T2> TVector<T2, N> cast() const {
-            TVector<T2, N> result;
-
-            for (int i = 0; i < N; i++) {
-                result.values[i] = static_cast<T2>(this->values[i]);
-            }
-
-            return result;
         }
     };
 
@@ -493,6 +473,17 @@ namespace xe {
         return TVector<T, 4>(x, v[0], v[1], v[2]);
     }
 
+    // vector casting utility
+    template<typename TargetT, typename T, int N>
+    TVector<TargetT, N> cast(const TVector<T, N> &v) {
+        TVector<TargetT, N> result;
+
+        for (int i = 0; i < N; i++) {
+            result[i] = static_cast<TargetT>(v[i]);
+        }
+
+        return result;
+    }
 
     // for tuple destructuring
     template<std::size_t I, typename T, int N> 

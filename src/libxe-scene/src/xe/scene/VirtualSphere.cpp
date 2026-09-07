@@ -15,8 +15,8 @@ namespace xe {
 
     Vector3 VirtualSphere::computePointAt(const Vector2i &screenPosition) const {
         // map position to the [-1, 1]^2 range domain
-        const auto position = Vector2{screenPosition};
-        const auto size = Vector2{screenSize};
+        const auto position = xe::cast<float>(screenPosition);
+        const auto size = xe::cast<float>(screenSize);
         const auto sp = (position / (0.5f * size)) - Vector2{1.0f};
 
         // compute the corresponding point in the surface of the sphere
