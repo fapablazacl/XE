@@ -1,5 +1,5 @@
 
-set (target xe::graphics-gl3)
+set (target "libxe-graphics-gl3")
 
 set (sources 
 	"src/xe/graphics/gl3/glcore3-api.h"
@@ -26,6 +26,7 @@ set (sources
 )
 
 add_library (${target} ${sources})
+add_library(xe::graphics-gl3 ALIAS ${target})
 
 target_link_libraries (${target} PRIVATE xe::interface)
 target_link_libraries (${target} PUBLIC xe::graphics)
