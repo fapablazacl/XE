@@ -7,8 +7,8 @@
 #include <cassert>
 #include <vector>
 
-#include "xe/render/RenderBackend.h"
-#include "xe/render/backend/glcore3-api.h"
+#include "xe/graphics/RenderBackend.h"
+#include "xe/graphics/gl3/glcore3-api.h"
 
 // TODO: The quick initial image generation infra needs to be refactored later
 static float checkerboardValue(int x, int y, int tileSize) {

@@ -30,6 +30,8 @@ set (sources
 add_library (${target} ${sources})
 add_library(xe::graphics-gl3 ALIAS ${target})
 
+target_include_directories(${target} PUBLIC "src")
+
 target_link_libraries (${target} PRIVATE xe::interface)
 target_link_libraries (${target} PUBLIC xe::graphics)
 target_link_libraries (${target} PUBLIC glaze::gl)

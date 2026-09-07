@@ -16,4 +16,4 @@ set (sources_renderer
 add_executable(${target_renderer} ${sources_renderer})
 target_include_directories(${target_renderer} PUBLIC src)
 target_link_libraries(${target_renderer} PRIVATE glfw)
-target_link_libraries(${target_renderer} PRIVATE glaze::raii glaze::gl xe::math xe::core xe::graphics)
+target_link_libraries(${target_renderer} PRIVATE glaze::raii glaze::gl xe::math xe::core xe::graphics xe::graphics-gl3)

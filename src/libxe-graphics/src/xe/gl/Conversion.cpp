@@ -3,7 +3,7 @@
 
 #include <cassert>
 #include <xe/DataType.h>
-#include <xe/render/types.h>
+#include <xe/graphics/types.h>
 #include <xe/graphics/BufferDescriptor.h>
 #include <xe/graphics/Material.h>
 #include <xe/graphics/PixelFormat.h>

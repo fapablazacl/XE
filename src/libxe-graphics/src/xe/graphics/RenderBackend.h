@@ -5,7 +5,7 @@
 
 #include <tl/expected.hpp>
 
-#include <xe/render/types.h>
+#include <xe/graphics/types.h>
 
 namespace xe {
     /**

@@ -8,8 +8,8 @@
 #include <glaze/gl.hpp>
 #include <glaze/raii.hpp>
 
-#include <xe/render/types.h>
-#include <xe/render/RenderBackend.h>
+#include <xe/graphics/types.h>
+#include <xe/graphics/RenderBackend.h>
 #include "glcore3-common.h"
 #include "glcore3-context.h"
 

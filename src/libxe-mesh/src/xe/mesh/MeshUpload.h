@@ -10,8 +10,8 @@
 
 #include <xe/geometry/MeshBuffers.h>
 #include <xe/graphics/BufferDescriptor.h>
-#include <xe/render/RenderBackend.h>
-#include <xe/render/types.h>
+#include <xe/graphics/RenderBackend.h>
+#include <xe/graphics/types.h>
 
 namespace xe {
     //! Bitmask identifying which attribute streams an uploadMesh caller wants on the GPU.

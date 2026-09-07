@@ -13,7 +13,7 @@
 #include <xe/geometry/PlaneGenerator.h>
 #include <xe/math/Math.h>
 #include <xe/graphics/PixelFormat.h>
-#include <xe/render/types.h>
+#include <xe/graphics/types.h>
 
 namespace {
     float checkerboardValue(int x, int y, int tileSize) {

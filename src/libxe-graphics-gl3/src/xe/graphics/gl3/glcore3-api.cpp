@@ -4,7 +4,7 @@
 #include <glaze/gl.hpp>
 #include <glaze/raii.hpp>
 #include <xe/math/Vector.h>
-#include <xe/render/RenderBackend.h>
+#include <xe/graphics/RenderBackend.h>
 #include <cassert>
 #include <new>
 #include <string>
