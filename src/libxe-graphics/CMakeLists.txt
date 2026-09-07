@@ -49,16 +49,7 @@ set (headers
 	# xe/render/
 	"src/xe/render/RenderBackend.h"
 	"src/xe/render/types.h"
-	"src/xe/render/backend/glcore3-api.h"
-	"src/xe/render/backend/glcore3-geometry.h"
-	"src/xe/render/backend/glcore3-pipeline.h"
-	"src/xe/render/backend/glcore3-program.h"
-	"src/xe/render/backend/glcore3-sampler.h"
-	"src/xe/render/backend/glcore3-texture.h"
-	"src/xe/render/backend/glcore3-vertexlayout.h"
-	"src/xe/render/backend/glcore3-buffer.h"
-	"src/xe/render/backend/glcore3-common.h"
-		"src/xe/render/backend/glcore3-context.h"
+
 )
 
 set (sources
@@ -91,16 +82,6 @@ set (sources
 
 	# xe/render/ implementations
 	"src/xe/render/RenderBackend.cpp"
-	"src/xe/render/backend/glcore3-api.cpp"
-	"src/xe/render/backend/glcore3-geometry.cpp"
-	"src/xe/render/backend/glcore3-pipeline.cpp"
-	"src/xe/render/backend/glcore3-program.cpp"
-	"src/xe/render/backend/glcore3-sampler.cpp"
-	"src/xe/render/backend/glcore3-texture.cpp"
-	"src/xe/render/backend/glcore3-vertexlayout.cpp"
-	"src/xe/render/backend/glcore3-buffer.cpp"
-	"src/xe/render/backend/glcore3-common.cpp"
-		"src/xe/render/backend/glcore3-context.cpp"
 )
 
 add_library (${target} ${sources})
