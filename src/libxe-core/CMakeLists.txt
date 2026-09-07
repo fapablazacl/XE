@@ -7,6 +7,7 @@ set (headers
 	"src/xe/XE.h"
 	"src/xe/Predef.h"
 	"src/xe/Buffer.h"
+	"src/xe/Span.h"
 	"src/xe/DataType.h"
 	"src/xe/Core.h"
 	"src/xe/Timer.h"
