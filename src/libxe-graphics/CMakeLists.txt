@@ -34,22 +34,9 @@ set (headers
 	"src/xe/graphics/Material.h"
 	"src/xe/graphics/Viewport.h"
 
-	# xe/gl/
-	"src/xe/GL.h"
-	"src/xe/gl/gl.h"
-	"src/xe/gl/GraphicsDeviceGL.h"
-	"src/xe/gl/SubsetGL.h"
-	"src/xe/gl/Conversion.h"
-	"src/xe/gl/UtilGL.h"
-	"src/xe/gl/TextureRepository.h"
-	"src/xe/gl/Renderer.h"
-	"src/xe/gl/RendererGL.h"
-	"src/xe/gl/Types.h"
-
 	# xe/graphics/
 	"src/xe/graphics/RenderBackend.h"
 	"src/xe/graphics/types.h"
-
 )
 
 set (sources
@@ -70,15 +57,6 @@ set (sources
 	"src/xe/graphics/Image.cpp"
 	"src/xe/graphics/ImageLoader.cpp"
 	"src/xe/graphics/Material.cpp"
-
-	# xe/gl/ implementations
-	"src/xe/gl/GraphicsDeviceGL.cpp"
-	"src/xe/gl/SubsetGL.cpp"
-	"src/xe/gl/Conversion.cpp"
-	"src/xe/gl/UtilGL.cpp"
-	"src/xe/gl/Renderer.cpp"
-	"src/xe/gl/TextureRepository.cpp"
-	"src/xe/gl/RendererGL.cpp"
 
 	# xe/graphics/ implementations
 	"src/xe/graphics/RenderBackend.cpp"
@@ -104,7 +82,3 @@ target_link_libraries (${target}
 	PUBLIC Microsoft.GSL::GSL
 	PUBLIC tl::expected
 )
-
-if (XE_DEV_UNIT_TEST)
-	add_subdirectory("unit-test")
-endif()
