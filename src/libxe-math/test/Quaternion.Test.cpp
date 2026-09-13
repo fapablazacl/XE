@@ -423,7 +423,7 @@ TEST_CASE("Quaternion transform should rotate point vector", "[math][quaternion]
     const auto rotation = xe::quatRotationRH({0.0f, 1.0f, 0.0f}, xe::pi<float> * 0.5f);
     const auto point = xe::Vector3{1.0f, 0.0f, 0.0f};
     const auto result = xe::transform(rotation, point);
-    const auto e = xe::DEFAULT_EPSILON<float>;
+    const auto e = xe::defaultEpsilon<float>;
 
     REQUIRE(result.x == Catch::Approx(0.0f).margin(e));
     REQUIRE(result.y == Catch::Approx(0.0f).margin(e));

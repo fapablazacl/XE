@@ -29,6 +29,7 @@ if (XE_PLUGIN_PNG)
 endif ()
 
 add_subdirectory ("libxe-graphics")
+add_subdirectory ("libxe-graphics-gl")
 add_subdirectory ("libxe-graphics-gl3")
 add_subdirectory ("libxe-mesh")
 
