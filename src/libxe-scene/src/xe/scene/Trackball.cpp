@@ -28,8 +28,8 @@ namespace xe {
 
     Vector2 Trackball::scalePosition(const Vector2i &position) const {
         // map position to the [-1, 1]^2 range domain
-        const Vector2 position_f = position;
-        const Vector2 size_f = vsphere.getScreenSize();
+        const Vector2 position_f = xe::cast<float>(position);
+        const Vector2 size_f = xe::cast<float>(vsphere.getScreenSize());
         const Vector2 mappedPosition = (position_f / (0.5f * size_f)) - Vector2{1.0f};
 
         return mappedPosition;
@@ -40,9 +40,9 @@ namespace xe {
         const auto sp_length_squared = norm2(sp);
 
         if (sp_length_squared > 1.0f) {
-            return normalize(Vector3{sp, 0.0f});
+            return normalize(Vector3{sp.x, sp.y, 0.0f});
         }
 
-        return {sp, std::sqrt(1.0f - sp_length_squared)};
+        return {sp.x, sp.y, std::sqrt(1.0f - sp_length_squared)};
     }
 } // namespace xe

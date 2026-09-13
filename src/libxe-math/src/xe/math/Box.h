@@ -1,49 +1,30 @@
-/**
- * @file Box.h
- * @brief 3D axis-aligned bounding box — specialisation of @ref tboundary.
- */
 
-#pragma once
-
-#include <ostream>
-#include <typeinfo>
+#ifndef __XE_MATH_BOX_HPP__
+#define __XE_MATH_BOX_HPP__
 
 #include "Boundary.h"
 
 namespace xe {
-    /**
-     * @brief 3D axis-aligned bounding box. xe-specific (not part of glm).
-     * Implemented as a type alias for @ref tboundary "tboundary<T,3>"; all
-     * box-shaped behaviour (expansion, containment, SAT intersection,
-     * corner enumeration) lives in the @ref tboundary template. The alias
-     * exists so application code can name the 3D case directly without
-     * spelling out the dimensionality.
-     */
-    template <typename T> using tbox = tboundary<T, 3>;
+    extern template class TBoundary<float, 3>;
+    extern template class TBoundary<double, 3>;
+    extern template class TBoundary<int, 3>;
 
-    using box = tbox<float>;   ///< Single-precision @ref tbox alias.
-    using dbox = tbox<double>; ///< Double-precision @ref tbox alias.
-    using ibox = tbox<int>;    ///< Integer-coordinate @ref tbox alias.
+    //! Bounding box in 3-space. It's a Boundary specialization
+    template <typename T> using TBox = TBoundary<T, 3>;
 
-    // Legacy PascalCase aliases. See Legacy.h.
-    template <typename T> using TBox = tbox<T>; ///< @deprecated Use @ref tbox.
-    using Box = box;                            ///< @deprecated Use @ref box.
-    using Boxd = dbox;                          ///< @deprecated Use @ref dbox.
-    using Boxi = ibox;                          ///< @deprecated Use @ref ibox.
+    using Box = TBox<float>;
+    using Boxd = TBox<double>;
+    using Boxi = TBox<int>;
 
-    /**
-     * @brief Stream insertion for @ref tbox — debug print of min/max corners.
-     * Not intended as a serialisation format; the output includes the
-     * scalar type's @c typeid name and the two corners on separate lines.
-     * @param os Output stream.
-     * @param b Box to print.
-     * @return The same stream, to allow chaining.
-     */
-    template <typename T> inline std::ostream &operator<<(std::ostream &os, const tbox<T> &b) {
-        os << "xe::box<" << typeid(T).name() << ">{\n";
-        os << "    " << b.getMinEdge() << ",\n";
-        os << "    " << b.getMaxEdge() << "\n";
-        os << "}";
+    //! Serializes the content of a Box object to an ostream.
+    template <typename T> inline std::ostream &operator<<(std::ostream &os, const TBox<T> &box) {
+        os << "xe::Box<" << typeid(T).name() << ">{ " << std::endl;
+        os << "    " << box.getMinEdge() << ", " << std::endl;
+        os << "    " << box.getMaxEdge() << std::endl;
+        os << "}" << std::endl;
+
         return os;
     }
 } // namespace xe
+
+#endif

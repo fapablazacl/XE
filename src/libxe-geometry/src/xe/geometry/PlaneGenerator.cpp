@@ -62,15 +62,15 @@ namespace xe {
                 const std::size_t vertIndex = static_cast<std::size_t>(i) + static_cast<std::size_t>(j) * static_cast<std::size_t>(slices + 1);
 
                 if (out.positions != nullptr) {
-                    out.positions[vertIndex] = tvec<T, 3>{lerp(-halfHeight, halfHeight, tj), lerp(halfWidth, -halfWidth, ti), T(0)};
+                    out.positions[vertIndex] = xe::TVector<T, 3>{lerp(-halfHeight, halfHeight, tj), lerp(halfWidth, -halfWidth, ti), T(0)};
                 }
 
                 if (out.normals != nullptr) {
-                    out.normals[vertIndex] = tvec<T, 3>{T(0), T(0), T(-1)};
+                    out.normals[vertIndex] = xe::TVector<T, 3>{T(0), T(0), T(-1)};
                 }
 
                 if (out.texCoords != nullptr) {
-                    out.texCoords[vertIndex] = tvec<T, 2>{lerp(T(0), T(1), tj), lerp(T(1), T(0), ti)};
+                    out.texCoords[vertIndex] = xe::TVector<T, 2>{lerp(T(0), T(1), tj), lerp(T(1), T(0), ti)};
                 }
             }
         }

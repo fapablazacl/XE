@@ -16,12 +16,12 @@ namespace xe {
         auto clip = window;
 
         // TODO: Add check with machine epsilon
-        if (clip.W > T(0.0)) {
-            clip /= window.W;
+        if (clip.w > T(0.0)) {
+            clip /= window.w;
         }
 
         const auto screen =
-            TVector<T, 4>{(clip.X + T(1.0)) * T(0.5) * viewport.size.X + viewport.position.X, (clip.Y + T(1.0)) * T(0.5) * viewport.size.Y + viewport.position.Y, clip.Z, clip.W};
+            TVector<T, 4>{(clip.x + T(1.0)) * T(0.5) * viewport.size.x + viewport.position.x, (clip.y + T(1.0)) * T(0.5) * viewport.size.y + viewport.position.y, clip.z, clip.w};
 
         return screen;
     }
@@ -31,17 +31,17 @@ namespace xe {
      */
     template <typename T> TVector<T, 4> unproject(const TVector<T, 4> &screen, const TMatrix<T, 4, 4> &invProjViewModel, const Viewport &viewport) {
         const auto clip = TVector<T, 4>{
-            (screen.X - viewport.position.X) / (T(0.5) * viewport.size.X) - T(1.0),
-            (screen.Y - viewport.position.Y) / (T(0.5) * viewport.size.Y) - T(1.0),
-            screen.Z,
-            screen.W
+            (screen.x - viewport.position.x) / (T(0.5) * viewport.size.x) - T(1.0),
+            (screen.y - viewport.position.y) / (T(0.5) * viewport.size.y) - T(1.0),
+            screen.z,
+            screen.w
         };
 
         auto world = invProjViewModel * clip;
 
         // TODO: Add check with machine epsilon
-        if (world.W > T(0.0)) {
-            world /= world.W;
+        if (world.w > T(0.0)) {
+            world /= world.w;
         }
 
         return world;

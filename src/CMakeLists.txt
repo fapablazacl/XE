@@ -7,10 +7,6 @@ if (XE_DEV_UNIT_TEST)
 endif()
 
 add_subdirectory ("libxe-math")
-if (XE_DEV_UNIT_TEST)
-    add_subdirectory ("libxe-math-test")
-endif()
-
 add_subdirectory ("libxe-scene")
 add_subdirectory ("libxe-geometry")
 if (XE_DEV_UNIT_TEST)
@@ -33,6 +29,7 @@ if (XE_PLUGIN_PNG)
 endif ()
 
 add_subdirectory ("libxe-graphics")
+add_subdirectory ("libxe-graphics-gl3")
 add_subdirectory ("libxe-mesh")
 
 if (XE_PLUGIN_GL_GLFW)

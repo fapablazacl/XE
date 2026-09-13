@@ -20,8 +20,8 @@ TEST_CASE("generateBox emits unit-length normals pointing outward on the unit cu
     const xe::BoxOptions opts{{1, 1}, {1.0f, 1.0f, 1.0f}};
     const xe::MeshCounts counts = xe::computeBoxCounts(opts);
 
-    std::vector<xe::vec3> positions(counts.vertexCount);
-    std::vector<xe::vec3> normals(counts.vertexCount);
+    std::vector<xe::Vector3> positions(counts.vertexCount);
+    std::vector<xe::Vector3> normals(counts.vertexCount);
     std::vector<std::uint16_t> indices(counts.indexCount);
 
     xe::MeshStorage<float> storage;
@@ -31,12 +31,12 @@ TEST_CASE("generateBox emits unit-length normals pointing outward on the unit cu
 
     xe::generateBox(opts, storage);
 
-    for (const xe::vec3 &n : normals) {
+    for (const xe::Vector3 &n : normals) {
         const float length = std::sqrt(n.x * n.x + n.y * n.y + n.z * n.z);
         REQUIRE(std::fabs(length - 1.0f) < 1e-4f);
     }
 
-    for (const xe::vec3 &p : positions) {
+    for (const xe::Vector3 &p : positions) {
         REQUIRE(std::fabs(p.x) <= 0.5f + 1e-4f);
         REQUIRE(std::fabs(p.y) <= 0.5f + 1e-4f);
         REQUIRE(std::fabs(p.z) <= 0.5f + 1e-4f);
@@ -47,7 +47,7 @@ TEST_CASE("generateBox indices all reference valid vertices", "[box][generate]")
     const xe::BoxOptions opts{{2, 3}, {1.0f, 1.0f, 1.0f}};
     const xe::MeshCounts counts = xe::computeBoxCounts(opts);
 
-    std::vector<xe::vec3> positions(counts.vertexCount);
+    std::vector<xe::Vector3> positions(counts.vertexCount);
     std::vector<std::uint16_t> indices(counts.indexCount);
 
     xe::MeshStorage<float> storage;
@@ -65,14 +65,14 @@ TEST_CASE("generateBox scales positions by BoxOptions::size", "[box][size]") {
     const xe::BoxOptions opts{{1, 1}, {4.0f, 2.0f, 6.0f}};
     const xe::MeshCounts counts = xe::computeBoxCounts(opts);
 
-    std::vector<xe::vec3> positions(counts.vertexCount);
+    std::vector<xe::Vector3> positions(counts.vertexCount);
 
     xe::MeshStorage<float> storage;
     storage.positions = positions.data();
 
     xe::generateBox(opts, storage);
 
-    for (const xe::vec3 &p : positions) {
+    for (const xe::Vector3 &p : positions) {
         REQUIRE(std::fabs(p.x) <= 2.0f + 1e-4f);
         REQUIRE(std::fabs(p.y) <= 1.0f + 1e-4f);
         REQUIRE(std::fabs(p.z) <= 3.0f + 1e-4f);

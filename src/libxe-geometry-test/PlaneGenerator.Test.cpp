@@ -28,12 +28,12 @@ TEST_CASE("generatePlane skips nullptr streams and leaves surrounding memory unt
     const xe::PlaneOptions opts{{2, 2}, {1.0f, 1.0f}};
     const xe::MeshCounts counts = xe::computePlaneCounts(opts);
 
-    std::vector<xe::vec3> positions(counts.vertexCount);
+    std::vector<xe::Vector3> positions(counts.vertexCount);
     std::vector<std::uint16_t> indices(counts.indexCount);
 
     // Sentinel buffer that the generator must not touch: positions-sized, but we pass nullptr for normals.
     constexpr float sentinel = 1234.5f;
-    std::vector<xe::vec3> normalsCanary(counts.vertexCount, xe::vec3{sentinel, sentinel, sentinel});
+    std::vector<xe::Vector3> normalsCanary(counts.vertexCount, xe::Vector3{sentinel, sentinel, sentinel});
 
     xe::MeshStorage<float> storage;
     storage.positions = positions.data();
@@ -43,7 +43,7 @@ TEST_CASE("generatePlane skips nullptr streams and leaves surrounding memory unt
 
     xe::generatePlane(opts, storage);
 
-    for (const xe::vec3 &n : normalsCanary) {
+    for (const xe::Vector3 &n : normalsCanary) {
         REQUIRE(n.x == sentinel);
         REQUIRE(n.y == sentinel);
         REQUIRE(n.z == sentinel);
@@ -58,9 +58,9 @@ TEST_CASE("generatePlane yields a single quad on the unit subdivision", "[plane]
     const xe::PlaneOptions opts{{1, 1}, {2.0f, 2.0f}};
     const xe::MeshCounts counts = xe::computePlaneCounts(opts);
 
-    std::vector<xe::vec3> positions(counts.vertexCount);
-    std::vector<xe::vec3> normals(counts.vertexCount);
-    std::vector<xe::vec2> texCoords(counts.vertexCount);
+    std::vector<xe::Vector3> positions(counts.vertexCount);
+    std::vector<xe::Vector3> normals(counts.vertexCount);
+    std::vector<xe::Vector2> texCoords(counts.vertexCount);
     std::vector<std::uint16_t> indices(counts.indexCount);
 
     xe::MeshStorage<float> storage;
@@ -71,13 +71,13 @@ TEST_CASE("generatePlane yields a single quad on the unit subdivision", "[plane]
 
     xe::generatePlane(opts, storage);
 
-    for (const xe::vec3 &n : normals) {
+    for (const xe::Vector3 &n : normals) {
         REQUIRE(n.x == 0.0f);
         REQUIRE(n.y == 0.0f);
         REQUIRE(n.z == -1.0f);
     }
 
-    for (const xe::vec3 &p : positions) {
+    for (const xe::Vector3 &p : positions) {
         REQUIRE(p.z == 0.0f);
         REQUIRE(p.x >= -1.0f);
         REQUIRE(p.x <= 1.0f);
@@ -94,7 +94,7 @@ TEST_CASE("generatePlane<double> compiles and produces double-precision output",
     const xe::PlaneOptions opts{{1, 1}, {1.0f, 1.0f}};
     const xe::MeshCounts counts = xe::computePlaneCounts(opts);
 
-    std::vector<xe::tvec<double, 3>> positions(counts.vertexCount);
+    std::vector<xe::TVector<double, 3>> positions(counts.vertexCount);
     std::vector<std::uint16_t> indices(counts.indexCount);
 
     xe::MeshStorage<double> storage;

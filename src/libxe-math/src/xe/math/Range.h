@@ -1,7 +1,3 @@
-/**
- * @file Range.h
- * @brief Half-open scalar range used by SAT projection.
- */
 
 #pragma once
 
@@ -11,108 +7,76 @@
 
 namespace xe {
     /**
-     * @brief Half-open numeric range @f$[\min, \max)@f$. Not part of glm.
-     * Used by @ref tboundary as the result of @ref tboundary::project for
-     * Separating-Axis-Theorem overlap testing. The interval is half-open:
-     * the lower bound is inclusive and the upper bound is exclusive,
-     * matching how scalar projection bounds compose under SAT.
+     * @brief Mathematical Range pair implementation.
+     *
+     * This struct represent Ranges of the form:
+     * [min, max)
+     *
+     * @tparam T
      */
-    template <typename T> struct trange {
-        T min = static_cast<T>(0); ///< Inclusive lower bound.
-        T max = static_cast<T>(1); ///< Exclusive upper bound.
+    template <typename T> struct TRange {
+        T min = static_cast<T>(0);
+        T max = static_cast<T>(1);
 
-        /**
-         * @brief Default-construct to the canonical @c [0, 1) range.
-         */
-        constexpr trange() noexcept = default;
-
-        /**
-         * @brief Construct a degenerate range that contains a single value.
-         * Useful as the seed for an incremental range-build via @ref expand.
-         * @param value Value used for both bounds.
-         */
-        constexpr explicit trange(T value) noexcept : min(value), max(value) {
+        TRange() {
         }
 
-        /**
-         * @brief Construct the smallest range that contains both @p a and @p b.
-         * The arguments may be supplied in any order; @ref expand handles
-         * the ordering.
-         * @param a First value.
-         * @param b Second value.
-         */
-        constexpr trange(T a, T b) noexcept : min(a), max(a) {
-            expand(b);
+        explicit TRange(const T value) : min(value), max(value) {
         }
 
-        /**
-         * @brief Grow the range to contain @p value.
-         * Updates @c min or @c max as needed; cheap and intended to be
-         * called in tight loops while accumulating a projection.
-         * @param value Value that must end up inside the range.
-         */
-        constexpr void expand(T value) noexcept {
-            if (value < min) {
-                min = value;
-            }
-            if (value > max) {
-                max = value;
-            }
+        explicit TRange(const T value1, const T value2) : TRange(value1) {
+            expand(value2);
         }
 
-        /**
-         * @brief Test whether two ranges overlap.
-         * Symmetrically combines @ref partialOverlap so the test works
-         * regardless of which range starts first.
-         * @param other The range to test against.
-         * @return @c true when the two ranges share at least one half-open subinterval.
-         */
-        [[nodiscard]] constexpr bool overlap(const trange<T> &other) const noexcept {
+        void expand(const T value) {
+            min = std::min(min, value);
+            max = std::max(max, value);
+        }
+
+        bool overlap(const TRange<T> &other) const {
             return partialOverlap(other) || other.partialOverlap(*this);
         }
 
         /**
-         * @brief One-sided overlap test used by @ref overlap.
-         * Returns @c true when either bound of @c *this lies inside the
-         * half-open interval @c [other.min, other.max). Asserts that both
-         * ranges are well-ordered.
-         * @param other The range to test against.
-         * @return @c true when @c *this has a bound inside @p other.
+         * @brief Checks if the current Projection overlaps with the supplied Projection.
+         *
+         * @param other
+         * @return true
+         * @return false
          */
-        [[nodiscard]] constexpr bool partialOverlap(const trange<T> &other) const noexcept {
+        bool partialOverlap(const TRange<T> &other) const {
             assert(max >= min);
             assert(other.max >= other.min);
 
             if (min >= other.min && min < other.max) {
                 return true;
             }
+
             if (max > other.min && max < other.max) {
                 return true;
             }
+
             return false;
         }
     };
 
     /**
-     * @brief Stream insertion for @ref trange — debug print.
-     * Writes the range in the form @c "xe::trange{ min, max }". Not
-     * intended as a serialisation format.
-     * @param os Output stream.
-     * @param r Range to print.
-     * @return The same stream, to allow chaining.
+     * @brief Serializes a Range<T> using the supplied ostream
      */
-    template <typename T> inline std::ostream &operator<<(std::ostream &os, const trange<T> &r) {
-        os << "xe::trange{ " << r.min << ", " << r.max << " }";
+    template <typename T> inline std::ostream &operator<<(std::ostream &os, const TRange<T> &range) {
+        os << "xe::Range<" << typeid(T).name() << ">{ ";
+
+        os << range.min << ", ";
+        os << range.max << " }";
+
         return os;
     }
 
-    using range = trange<float>;   ///< Single-precision range.
-    using drange = trange<double>; ///< Double-precision range.
-    using irange = trange<int>;    ///< Integer range.
+    using Range = TRange<float>;
+    using Ranged = TRange<double>;
+    using Rangei = TRange<int>;
 
-    // Legacy PascalCase aliases. See Legacy.h.
-    template <typename T> using TRange = trange<T>; ///< @deprecated Use @ref trange.
-    using Range = range;                            ///< @deprecated Use @ref range.
-    using Ranged = drange;                          ///< @deprecated Use @ref drange.
-    using Rangei = irange;                          ///< @deprecated Use @ref irange.
+    extern template struct TRange<float>;
+    extern template struct TRange<double>;
+    extern template struct TRange<int>;
 } // namespace xe
